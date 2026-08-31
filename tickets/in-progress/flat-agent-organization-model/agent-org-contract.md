@@ -4,9 +4,9 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-011`
-- Status: `Ready for Approval — approved RER-009 structure/persistence basis plus proposed handoff UI extension`
-- Approval reference: Structure/persistence behavior was approved on 2026-08-31 and recorded in `RER-009`. Handoff authoring/presentation cases `ORG-CASE-032`–`ORG-CASE-042` are proposed from user finding `RIF-AORG-001` and require explicit approval.
+- Requirements revision: `RER-012`
+- Status: `Approved`
+- Approval reference: Structure/persistence behavior was approved on 2026-08-31 and recorded in `RER-009`. On 2026-08-31 the user directed Requirements Engineering to send the `RER-011` handoff information to Product Prototyper and clarified that Product Prototyper owns creation of the UI; this approval is recorded in `RER-012`.
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Provide one normative configured-structure, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
@@ -96,7 +96,7 @@ AgentTeamDefinition
 | ORG-CASE-024 | Agent calls `get_handoff_rules` | Return ordered outgoing rules for exact mounted Agent | Framework does not evaluate rule prose. |
 | ORG-CASE-025 | Agent calls `send_message_to(recipient_address)` | Resolve only in active Org or standalone Team scope | No implicit cross-run routing. |
 
-### Handoff Authoring And Presentation — Proposed In RER-011
+### Handoff Information And Required Authoring Capabilities — Approved In RER-012
 
 One user-visible **Handoff** is one ordered directional endpoint pair with:
 
@@ -115,11 +115,11 @@ same endpoint pair belong in the same Handoff because duplicate effective
 
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
-| ORG-CASE-032 | Inspect a Handoff | Explicit labeled `From`, `To`, and every `When` condition are reviewable; exact canonical addresses remain visible secondary identity | Do not replace the fields with a nickname, generic arrow, tooltip-only address, or ambiguous rule count. |
+| ORG-CASE-032 | Inspect a Handoff | Explicit `From`, `To`, and every `When` condition are unambiguous; exact canonical endpoint identity is readily inspectable | Do not replace the information with a nickname, generic arrow, inaccessible address, or ambiguous rule count. Product Design owns the concrete presentation. |
 | ORG-CASE-033 | Author a `When` condition | Require one or more non-empty trimmed natural-language strings and preserve their order | No expression builder, automatic evaluation, scheduling, or authorization meaning. |
 | ORG-CASE-034 | Choose AgentOrg-owned `From` | Offer direct Org Agents and Agents mounted inside direct Teams | Team, Org, task execution, root, unrelated-run, and out-of-scope subjects are not sources. |
 | ORG-CASE-035 | Choose AgentOrg-owned `To` | Offer direct Org Agents, Agents mounted inside direct Teams, and direct Team placements | Org root, task execution, deeper, unrelated-run, and out-of-scope subjects are not destinations. |
-| ORG-CASE-036 | Select or inspect a Team destination | Show the Team name/address and state `Via coordinator <Agent>` with that coordinator's canonical Agent address near `To` | Do not imply Team broadcast, an Org coordinator, or hide effective ingress in a tooltip. |
+| ORG-CASE-036 | Select or inspect a Team destination | Communicate the Team name/address and `Via coordinator <Agent>` meaning, with that coordinator's canonical Agent address readily inspectable | Do not imply Team broadcast or an Org coordinator. Product Design owns the concrete presentation. |
 | ORG-CASE-037 | Author Team-local Handoff | `From` and `To` choices are direct Agent members of that Team; edit only from the Team surface | Team root `/`, Org peers, mounted-parent paths, and Team/Org subjects are not Team-local choices. |
 | ORG-CASE-038 | Add, edit, delete, or reorder | Provide functional `Add handoff`, Edit, Delete, and handoff-order controls; within one Handoff provide add/edit/delete/reorder for When conditions | Do not expose an inert `Add rule` action or conflate endpoint pairs with conditions. |
 | ORG-CASE-039 | Author self-resolving or duplicate effective endpoints | Block save and identify the affected Handoff; add another When condition to an existing pair instead of duplicating it | No duplicate pair, direct self-target, or Team target whose coordinator resolves to the source. |
@@ -419,7 +419,8 @@ The 2026-08-31 approval recorded in `RER-009` confirms:
 7. Task Teams remain under their exact runtime host and do not affect configured depth.
 8. A standalone-tested AgentTeam is directly reusable by reference inside AgentOrg; Org-scoped handoffs are sufficient to connect it without copying or changing the Team.
 
-The following `RER-011` extension is **not yet approved**: the explicit
-From/To/When presentation and complete owner-separated handoff authoring model
-defined by `ORG-CASE-032`–`ORG-CASE-042`. Approval of those cases is required
-before Product Design may treat them as normative and resume prototype work.
+The handoff semantic information and required authoring capabilities defined by
+`ORG-CASE-032`–`ORG-CASE-042` were approved in `RER-012`. They constrain what
+the experience must communicate and enable, not how Product Prototyper must
+compose the UI. Product Prototyper owns the concrete prototype and visual/
+interaction solution.
