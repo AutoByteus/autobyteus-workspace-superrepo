@@ -11,6 +11,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | RER-003 | User-confirmed migration assumption that no deeply nested configured data exists | Ready for Approval | Ready for Approval | BEH-007; REQ-012–REQ-013; AC-008; DEC-003; Existing Data Contract | Migration is reduced to two exhaustive zero/one-level cohorts; no deep legacy compatibility path is required. |
 | RER-004 | User direction to make fixed-depth data facts authoritative migration prerequisites | Ready for Approval | Ready for Approval | PRE-001–PRE-005; REQ-012–REQ-013; AC-008; Existing Data Contract | Downstream migration may rely on fixed-depth preknown conditions and must not design hypothetical recursive flattening. |
 | RER-005 | User direction for one contract containing configured structure and on-disk data structure | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 | The single normative contract now defines AgentOrg V1, flat-Team V3, task anchoring, strict invariants, and V2 migration mapping. |
+| RER-006 | User correction that `flat` is an AgentTeam invariant, not a type-name prefix | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 naming | Renamed the target Team record to `TeamRunExecutionTreeFileV3` and removed the redundant `FlatTeam` subtype terminology. |
 
 ## Revision Entries
 
@@ -94,3 +95,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Architecture Design is constrained by the logical durable structures while retaining ownership of physical file names, storage partitioning, target modules, and rollout mechanics.
 - Remaining gaps, assumptions, or blocked decisions: None at the product/contract level. Physical serialization placement and implementation mechanics remain downstream design decisions.
 - Next action or recipient: Present the unified `RER-005` contract for explicit approval, then complete the Architecture Design Routing Assessment.
+
+### RER-006 — AgentTeam Naming Simplification
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: The user questioned why the target uses `FlatTeamRunExecutionTreeFileV3` when the only supported AgentTeam model is already flat.
+- Prior authoritative status: `Ready for Approval` (`RER-005`).
+- Current authoritative status: `Ready for Approval` (`RER-006`).
+- IDs affected: `REQ-014`, `AC-009`, Downstream Architecture Input, configured-structure names, on-disk Team record name, migration mapping, and contract approval basis.
+- Why this revision was recorded: A `FlatTeam` name suggests a parallel non-flat Team type and weakens the simplification's ubiquitous language.
+- Canonical artifact sections changed: Durable execution requirement/acceptance criterion, downstream architecture input, investigation source log, and `AORG-CONTRACT-001` configured/on-disk names.
+- Supplemental artifacts added, changed, or removed: Updated the existing `agent-org-contract.md`; no new artifact.
+- Prototype evidence or product decisions incorporated: No prototype. Adopted the user decision that flatness is enforced through `AgentTeam` membership invariants rather than type/file prefixes.
+- User approval impact: Approval must reference `RER-006` and `AORG-CONTRACT-001`; all prior structure, persistence, task, and migration decisions remain unchanged.
+- Downstream architecture or direct-implementation route impact: Target domain/schema names must use ordinary AgentTeam/TeamRun terminology and must not introduce `FlatTeam` as a public or persisted subtype.
+- Remaining gaps, assumptions, or blocked decisions: None at the product/contract level.
+- Next action or recipient: Present `RER-006` and the corrected contract for explicit approval.

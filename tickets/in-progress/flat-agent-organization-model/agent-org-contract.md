@@ -4,7 +4,7 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-005`
+- Requirements revision: `RER-006`
 - Status: `Ready for Approval`
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Define supported composition, entry, addressing, handoff, lifecycle, task, and durable-state cases before Architecture Design.
@@ -40,20 +40,23 @@ AgentOrg                                  structural root; no coordinator
 ```text
 AgentOrgDefinition
   coordinator: absent
-  members: (AgentMemberRef | FlatTeamMemberRef)[]
+  members: (AgentMemberRef | AgentTeamMemberRef)[]
   handoffs: AgentSource -> AgentOrTeamDestination
 
-FlatAgentTeamDefinition
+AgentTeamDefinition
   coordinator: exact direct Agent member
   members: AgentMemberRef[]
   handoffs: direct AgentSource -> direct AgentOrTeamCoordinatorDestination
 ```
 
-An AgentOrg member reference and flat-Team Agent reference preserve the current
+An AgentOrg member reference and AgentTeam Agent reference preserve the current
 member identity fields (`memberName`, definition `ref`, and `refScope`) plus
 role/description metadata when supplied. The physical package-file naming and
 whether prose metadata remains in a companion Markdown file are Architecture
 Design decisions; the configured shape and invariants above are normative.
+
+`flat` is an invariant of `AgentTeam`, not a subtype or public type-name
+prefix. There is no parallel non-flat AgentTeam model in the target domain.
 
 ## Contract Cases
 
@@ -275,7 +278,7 @@ existing organization-like TeamRun is converted, its former root
 run preserves its prior entry behavior, while the referenced Agent remains an
 ordinary independent Org member.
 
-### `FlatTeamRunExecutionTreeFileV3`
+### `TeamRunExecutionTreeFileV3`
 
 ```json
 {
@@ -381,7 +384,7 @@ configured membership is fixed-depth:
 
 | Current TeamRun V2 Input | Flat Root Outcome | One-Level Organization-Like Outcome |
 | --- | --- | --- |
-| Top-level timestamps, application binding, handoffs | Preserve in FlatTeam V3 | Preserve in AgentOrg V1 |
+| Top-level timestamps, application binding, handoffs | Preserve in TeamRun V3 | Preserve in AgentOrg V1 |
 | `rootTeam.teamDefinitionId/name/teamRunId` | Preserve as Team identity | Preserve values as Org definition/name/run identity |
 | `rootTeam.coordinatorAddress` | Preserve as Team coordinator | Remove coordinator semantics; set initial `interactionTargetAddress` to the same Agent address for the converted run |
 | Direct root Agent member | Preserve as direct Team Agent | Preserve as independent Org Agent |
@@ -448,7 +451,7 @@ later, normal flat-model validation rejects it before mutation or activation.
 
 ## Approval Basis
 
-Approval of `RER-005` confirms this contract with the requirements document, specifically:
+Approval of `RER-006` confirms this contract with the requirements document, specifically:
 
 1. AgentOrg is the only persistent multi-Team composition root.
 2. AgentOrg has no coordinator; a caller selects an exact Agent or Team target.
@@ -457,4 +460,4 @@ Approval of `RER-005` confirms this contract with the requirements document, spe
 5. The current V2 Team execution JSON cannot be relabeled unchanged as AgentOrg; native Org persistence needs truthful Org-root semantics.
 6. The migration population has no deep configured topology: flat roots remain Teams and one-level organization-like roots convert to AgentOrg; no deep legacy compatibility path is required.
 7. Task-scoped Team execution remains distinct from configured nested membership.
-8. The logical on-disk AgentOrg V1 and flat-Team V3 structures, task anchoring, and V2 field mapping in this contract direct later Architecture Design.
+8. The logical on-disk AgentOrg V1 and TeamRun V3 structures, task anchoring, and V2 field mapping in this contract direct later Architecture Design; `flat` remains an invariant, not a type-name prefix.
