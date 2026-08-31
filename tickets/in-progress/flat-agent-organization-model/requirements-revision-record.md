@@ -10,6 +10,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | RER-002 | User clarification of task-Team ownership under AgentOrg | Ready for Approval | Ready for Approval | REQ-015; AC-010; DEC-005; ORG-CASE-028 | Org-originated task Teams are explicitly owned under the AgentOrg execution aggregate without becoming configured members. |
 | RER-003 | User-confirmed migration assumption that no deeply nested configured data exists | Ready for Approval | Ready for Approval | BEH-007; REQ-012–REQ-013; AC-008; DEC-003; Existing Data Contract | Migration is reduced to two exhaustive zero/one-level cohorts; no deep legacy compatibility path is required. |
 | RER-004 | User direction to make fixed-depth data facts authoritative migration prerequisites | Ready for Approval | Ready for Approval | PRE-001–PRE-005; REQ-012–REQ-013; AC-008; Existing Data Contract | Downstream migration may rely on fixed-depth preknown conditions and must not design hypothetical recursive flattening. |
+| RER-005 | User direction for one contract containing configured structure and on-disk data structure | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 | The single normative contract now defines AgentOrg V1, flat-Team V3, task anchoring, strict invariants, and V2 migration mapping. |
 
 ## Revision Entries
 
@@ -78,3 +79,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Migration design is explicitly fixed-depth. It must preserve task-scoped runtime lineage separately and must stop before writes on an unexpected precondition violation rather than implement recursive flattening.
 - Remaining gaps, assumptions, or blocked decisions: Exact migration mechanism remains Architecture Design-owned. No product decision remains open.
 - Next action or recipient: Present `RER-004` and `AORG-CONTRACT-001` to the user for explicit approval.
+
+### RER-005 — Unified Structure And On-Disk Contract
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: The user stated the requirements are clear, asked work to continue, and requested one contract file containing both the structure and on-disk data structure to direct later design.
+- Prior authoritative status: `Ready for Approval` (`RER-004`).
+- Current authoritative status: `Ready for Approval` (`RER-005`).
+- IDs affected: `REQ-014`, `AC-009`, the supplemental artifact description, Downstream Architecture Input, and `AORG-CONTRACT-001`.
+- Why this revision was recorded: The earlier contract defined durable semantics but deliberately left the target record shape abstract. The user's direction makes the logical versioned record structures part of the requirements contract.
+- Canonical artifact sections changed: Durable execution requirement/acceptance criterion, supplemental inventory, downstream architecture input, investigation source log, and the contract configured/on-disk/migration sections.
+- Supplemental artifacts added, changed, or removed: Expanded the existing single `agent-org-contract.md`; no competing contract file was created.
+- Prototype evidence or product decisions incorporated: No prototype. Added logical `AgentOrgRunExecutionTreeFileV1`, `FlatTeamRunExecutionTreeFileV3`, explicit member/task discriminators, task-host anchoring, strict invariants, and TeamRun V2 field mapping.
+- User approval impact: Approval must reference `RER-005` and `AORG-CONTRACT-001`; all earlier decisions and preconditions remain included.
+- Downstream architecture or direct-implementation route impact: Architecture Design is constrained by the logical durable structures while retaining ownership of physical file names, storage partitioning, target modules, and rollout mechanics.
+- Remaining gaps, assumptions, or blocked decisions: None at the product/contract level. Physical serialization placement and implementation mechanics remain downstream design decisions.
+- Next action or recipient: Present the unified `RER-005` contract for explicit approval, then complete the Architecture Design Routing Assessment.
