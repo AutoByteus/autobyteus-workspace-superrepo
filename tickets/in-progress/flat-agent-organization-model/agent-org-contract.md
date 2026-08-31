@@ -4,9 +4,9 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-013`
+- Requirements revision: `RER-014`
 - Status: `Approved`
-- Approval reference: Structure/persistence behavior was approved on 2026-08-31 in `RER-009`; handoff semantics/capabilities were approved in `RER-012`. During review of `RV-009`, the user explicitly rejected a separate pre-launch exact-entry selector and approved direct AgentOrg configuration, full-scope launch without an initial recipient, and post-launch workspace focus; `RER-013` records that reconciliation.
+- Approval reference: Structure/persistence behavior was approved on 2026-08-31 in `RER-009`; handoff semantics/capabilities were approved in `RER-012`; direct AgentOrg configuration, full-scope launch without an initial recipient, and post-launch workspace focus were approved in `RER-013`. `RER-014` links the user-approved Product UI package `RV-012` as the normative visual/interaction supplement without changing this contract's structure or persistence semantics.
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
@@ -460,3 +460,11 @@ only when a recipient-requiring interaction needs it. The configuration
 precedence adapts the current AgentTeam default/placement-override behavior to
 the approved fixed-depth Org model without prescribing Product Design's UI or
 Architecture Design's target implementation.
+
+The user-approved Product UI package `RV-012` is integrated in `RER-014`.
+`/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
+and `VIS-001`–`VIS-020` under that ticket's `visual-references/` directory are
+the normative product presentation of these cases. Product-declared fixture
+names/values remain illustrative, and the prototype's local mocked persistence,
+services, orchestration, streams, and writes do not define production
+architecture.
