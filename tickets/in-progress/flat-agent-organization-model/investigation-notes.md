@@ -9,8 +9,8 @@
 - Base or reference revision: `personal@80e2bd195c42ea3ced778dbc051d4d00edaef16f`
 - Bootstrap result: Dedicated clean requirements worktree created and verified.
 - Bootstrap blocker: `N/A`
-- Current requirements revision ID: `RER-009`
-- Investigation status: Complete for approved requirements and architecture routing; the cumulative package is `Approved Architecture-Ready`.
+- Current requirements revision ID: `RER-010`
+- Investigation status: Complete for the Product Design request handoff. The AgentOrg/AgentTeam behavior remains approved under `RER-009`; the current outcome is `Product Design Requested`, and independent architecture review is held pending approved prototype images.
 
 ## Initial Request And Clarifications
 
@@ -29,6 +29,7 @@
   - After requesting reinspection of the current execution tree, the user confirmed the intended persistence posture: reuse the deliberately generic current tree with minimal root naming/semantics changes; AgentOrg has no root coordinator, while every direct Team retains its own coordinator.
   - The user clarified the progressive composition journey: create and test an AgentTeam independently, then reference that same Team from AgentOrg and add Org-scoped handoffs without copying or redesigning the Team.
   - After the complete package was presented for approval, the user explicitly confirmed the governing requirements: AgentTeam is Agent-only with a coordinator, and AgentOrg contains multiple AgentTeams plus independent Agents. This approval is recorded in `RER-009`.
+  - During the user's review of committed architecture revision `AD-REV-001`, the user explicitly requested that Requirements Engineering coordinate a product UI prototype delivered as images before the architecture package proceeds to independent review. Architecture Designer returned this request as a requirements-owned Product Design coordination item.
 - User-supplied facts and constraints:
   - The supplied screenshot shows one Software Development Department run with one independent `requirements_engineer` placement and two mounted Teams: Product Design & Prototyping and Software Engineering.
   - The user experiences this as one organization rather than a Team recursively containing other Teams.
@@ -38,7 +39,7 @@
   - AgentOrg has no coordinator; a caller selects an exact Agent or Team target. Teams remain coordinator-led.
   - Flat-root data is preserved as Team and one-level organization-like data converts to AgentOrg. User confirmation establishes that these exhaust the migration population; no deep legacy path is needed.
   - Standalone flat Teams and task-scoped Team delegation remain supported.
-  - UI/API truthfulness is in scope, but no separate Product Design prototype was requested.
+  - UI/API truthfulness is in scope. The later user request now adds a Product Design-owned image prototype and explicit user-review gate before independent architecture review.
 
 ## Product And Domain Understanding
 
@@ -68,6 +69,7 @@
 | 2026-08-31 | User | Persistence correction: current execution tree was intentionally generic and should be minimally reused | Avoid inventing parallel Org/Team schemas and unnecessary migration | Root already owns Agent/Team members, handoffs, addresses, launch state, and host-anchored tasks. AgentOrg removes only root coordinator semantics; child Teams keep coordinators. | Replaced separate schema-family proposal with one minimal-delta generic V3 contract in `RER-007`. |
 | 2026-08-31 | User | Progressive Team-to-Org workflow clarification | Preserve the practical workflow of testing a Team before composing an Org | The same standalone AgentTeam definition must be directly reusable as an Org member; Org-scoped handoffs are the only additional workflow configuration required. | Added REQ-018, AC-013, SCN-006, and ORG-CASE-031 in `RER-008`. |
 | 2026-08-31 | User | Final requirements confirmation following explicit approval request | Close the requirements approval gate | The user confirmed AgentTeam is Agent-only and coordinator-led and AgentOrg contains multiple AgentTeams and independent Agents; prior reviewed persistence, task, handoff, reuse, and migration decisions remain part of the cumulative package. | Marked `RER-009` and `AORG-CONTRACT-001` Approved and completed architecture routing. |
+| 2026-08-31 | Architecture Designer transmitting explicit user request | Message from `architecture_designer_6b8b3019214246e086957b3f395901bb` after the user's review of `AD-REV-001`; architecture commit `36bc02deca363798b6eda878e5eb4850e624da6f` | Preserve and coordinate the newly requested product artifact without asking Architecture Design to invent it | The user wants a product UI prototype delivered as images before independent architecture review. Coverage should let the user review Agent-only Team authoring/coordinator selection, Org authoring with direct Agents and referenced Teams/no coordinator, exact Org entry selection, and truthful Org-versus-standalone-Team runtime/history. | Recorded `REQ-019`, `AC-014`, `SCN-007`, and `RER-010`; route the cumulative package to Product Prototyper, then obtain explicit user approval and return it to Architecture Designer for impact check. |
 | 2026-08-31 | Git branch | `origin/codex/flat-agent-team-domain-simplification@c3a318812`, cherry-picked as `ca6d24dfa` | Reuse the user-identified bootstrap work | The branch supports flat Agent-only Teams, a coordinator-free AgentOrg, exact caller-selected entry, preserved rooted addresses, and separation of configured nesting from task-scoped Team execution. | Integrated supported semantics into `RER-001`; removed the duplicate imported ticket files from the current tree so this package remains canonical while preserving their commit in history. |
 | 2026-08-31 | Git branch | `origin/codex/dynamic-agent-team-runtime@7d9b4ba69` | Check the concurrent-work warning in the imported branch | This draft proposes dynamic reconciliation of recursive configured Team topology and therefore conflicts with the flat target if implemented as written. It contains documentation only on the inspected commit. | Do not merge it into this requirements basis; prevent new recursive configured-Team dependencies. |
 | 2026-08-31 | Doc | `autobyteus-server-ts/docs/modules/agent_team_definition.md` | Verify definition and handoff contracts | Teams support `agent` and `agent_team` members, shared/team-local/application-owned scopes, recursive graph validation, and recursive handoff compilation. | Treat removal of recursive Team membership as a contract change. |
@@ -192,29 +194,33 @@
 
 ## Product Design Request Context
 
-- Product Design request in the current input: `Not stated`
-- User's requested outcome, in the user's own terms: Simplify the backend/team concept; no request for a prototype or visual design was made.
-- Requirement / behavior IDs involved: `BEH-001`–`BEH-007`
-- Product decision, uncertainty, or experience to understand or evolve: Backend/domain model and mental model; UI terminology may be affected later.
-- Critical journey and states: Definition authoring, launch, handoff, history/restore.
-- Known constraints and non-goals: Do not invent a prototype request.
-- Relevant existing-product or frontend context supplied or established: The supplied hierarchy screenshot and current recursive UI behavior.
-- Product Design request artifact / message reference: `N/A`
+- Product Design request in the current input: `Explicit user request returned through Architecture Designer after AD-REV-001 review`
+- User's requested outcome, in the user's own terms: Coordinate a product UI prototype delivered as images before the architecture package proceeds to independent review.
+- Requirement / behavior IDs involved: `BEH-001`, `BEH-004`, `BEH-006`; `REQ-001`–`REQ-004`, `REQ-011`, `REQ-016`, `REQ-018`, `REQ-019`; `AC-001`, `AC-002`, `AC-007`, `AC-011`, `AC-013`, `AC-014`; `SCN-001`, `SCN-002`, `SCN-006`, `SCN-007`.
+- Product decision, uncertainty, or experience to understand or evolve: Validate one coherent visual/interaction model that makes Team and Org authoring clearly different, makes exact Org entry selection understandable, preserves progressive Team reuse, and lets active/history views truthfully identify whether the root is an Org or standalone Team.
+- Critical journeys and states:
+  1. AgentTeam catalog, create/edit, and detail with Agent-only membership and exactly one direct Agent coordinator.
+  2. AgentOrg catalog, create/edit, and detail with direct independent Agents and references to reusable Teams, without an Org coordinator.
+  3. AgentOrg launch with an exact Agent-or-Team entry selector and no first-member/name/coordinator fallback.
+  4. Shared active runtime and history presentation that distinguishes AgentOrg from standalone AgentTeam and does not mistake task-scoped Team lineage for configured nesting.
+- Known constraints and non-goals: No Team-in-Team or Org-in-Org authoring; no Org coordinator; no implicit launch entry; no copied or Org-specific Team definition; the same Team remains independently launchable with stable identity/coordinator/local handoffs/history; no unrelated product redesign; no target backend architecture invention.
+- Relevant existing-product or frontend context supplied or established: The supplied current hierarchy screenshot; current recursive Agent Teams catalog/form/detail/launch/workspace/history behavior identified in `autobyteus-web`; approved `AORG-CONTRACT-001`; committed `AD-REV-001` as downstream context only.
+- Product Design request artifact / message reference: Message from `architecture_designer_6b8b3019214246e086957b3f395901bb`, transmitting the user's request during `AD-REV-001` review; architecture commit `36bc02deca363798b6eda878e5eb4850e624da6f`.
 - Established separate prototype repository/root and ticket reference, when applicable: `N/A`
 
 ## Product Design Findings
 
-- Product Design package path: `N/A — not requested`
+- Product Design package path: `Pending Product Prototyper return`
 - Visualizer or prototype source path: `N/A`
 - Approved UI/UX specification path: `N/A`
 - Review URL: `N/A`
 - Explicit user-confirmation reference: `N/A`
-- Journeys and scenarios validated: `N/A`
+- Journeys and scenarios validated: `Pending — four journeys listed in Product Design Request Context / SCN-007`
 - Final visual-reference paths: `N/A`
 - Product decisions supported by evidence: `N/A`
-- Alternatives rejected or still open: See `Assumptions And Resolved Decisions` in `requirements-doc.md`; target behavior and migration cohorts are resolved for approval.
-- Mocked boundaries and production gaps: `N/A`
-- Requirements sections affected: `N/A`
+- Alternatives rejected or still open: Recursive Team authoring, Org coordinator, implicit entry fallback, and copied Org-specific Team variants are rejected by the approved behavior. Exact future-state interaction/presentation choices remain open pending Product Design evidence and user review.
+- Mocked boundaries and production gaps: To be reported by Product Prototyper.
+- Requirements sections affected: `REQ-019`, `AC-014`, `SCN-007`, UI/Interaction/Experience, Readiness, and downstream architecture re-entry.
 
 ## Supplemental Artifact Inventory
 
@@ -223,6 +229,9 @@
 | `/home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/requirements_engineer_6568eac682114f2cb3ddb8f1d91d3c34/context_files/ctx_4cc02361f417__image.png` | User | Representative current hierarchy | Evidence only | Draft model | Supplied | No separate approval required |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Requirements Engineer | Single normative configured structure, progressive Team reuse, generic minimal-delta V3 tree, task anchoring, and V2 projection contract | AgentOrg/AgentTeam scope | REQ-001–REQ-018 / AC-001–AC-013 / PRE-001–PRE-005 | Approved | Included in `RER-009` approval basis |
 | `origin/codex/flat-agent-team-domain-simplification@c3a318812` (local cherry-pick `ca6d24dfa`) | Prior bootstrap author | Imported concept and investigation evidence | Flat Team/AgentOrg distinction and task/configured nesting boundary | BEH-001, BEH-004, BEH-009 | Integrated / superseded by canonical package | Evidence only; duplicate imported drafts are not authoritative |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` | Architecture Designer | Committed architecture context for the Product Design review and later impact check | `AD-REV-001` | REQ-001–REQ-018 / AC-001–AC-013 | Committed at `36bc02deca363798b6eda878e5eb4850e624da6f`; review held | External architecture-owned context; not revised by Requirements Engineer |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md` | Architecture Designer | Architecture revision identity and review state | `AD-REV-001` | Approved cumulative behavior | Current | External architecture-owned context; independent review held pending approved prototype evidence |
+| Product Design-owned specification, review record, prototype source/revision, and final image references | Product Prototyper | Future-state UI evidence for the four requested journeys | AgentTeam/AgentOrg authoring, Org launch entry, runtime/history | REQ-019 / AC-014 / SCN-007 | Pending | Requires explicit user approval before becoming normative and before architecture review resumes |
 
 ## Assumptions, Unknowns, And Risks
 
@@ -235,6 +244,7 @@
 | RISK-002 | Risk | Treating flat Teams as separate root runs would require new cross-run discovery/lifecycle/security behavior. | This misses the simplification objective. | One AgentOrg run/scope is part of the approval basis. | Controlled by requirements |
 | RISK-003 | Risk | Fixed depth still needs Team execution scope, exact addresses, lifecycle, handoffs, persistence, and UI hierarchy. | Simplification is not equivalent to deleting all hierarchy machinery. | Preserve observable semantics; Architecture Design owns structure. | Open downstream risk |
 | RISK-004 | Risk | The dynamic-AgentTeam draft could add new recursive configured-Team mutation before this simplification lands. | It would deepen the dependency being removed. | REQ-017 forbids that dependency; reconcile the branch before implementation. | Controlled by requirements |
+| RISK-005 | Risk | A UI prototype or subsequent UI/API cutover could visually reintroduce recursive Team authoring, imply an Org coordinator, or obscure root subject identity. | The product would regain the same conceptual ambiguity the simplification is meant to remove. | REQ-019/AC-014 require image-based review of all four journeys and explicit user approval; Architecture Designer performs an impact check before review. | Open pending Product Design |
 
 ## Requirement Implications
 
@@ -245,6 +255,7 @@
 5. The current V2 topology already is the target generic execution tree. Exact V2 root bytes need a minimal versioned projection because `rootTeam` requires a coordinator, but envelope/member/handoff/task records do not need redesign.
 6. The established migration input has no deeply nested configured topology, so Architecture Design does not need a deep legacy conversion or compatibility branch.
 7. Removing recursive nesting is a structural contract/persistence change, not a local cleanup. Architecture Design will be required after requirements approval.
+8. Because definition, launch, and history surfaces currently encode root-Team and recursive-Team assumptions, the requested prototype is a material coordination artifact for the UI/API cutover even though it does not change the already-approved domain contract by itself.
 
 ## Notes For Downstream Architecture Design Or Direct Implementation
 
@@ -252,3 +263,4 @@
 - Verify the complete definition/API/persistence/frontend transition surface for the two established migration cohorts and permanent rejection of deeper configured input.
 - Preserve current root-scoped logical addressing and coordinator targeting unless requirements explicitly change them.
 - Do not introduce cross-process or shared-member placement semantics under this simplification request without a separate approved requirement.
+- Keep `AD-REV-001` out of independent Architecture Review until the Product Design package is explicitly user-approved and integrated. Then perform an architecture impact check and record `AD-REV-002` if the approved visual behavior affects the design.
