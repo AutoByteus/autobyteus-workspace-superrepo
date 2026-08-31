@@ -4,11 +4,11 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-009`
-- Status: `Approved`
-- Approval reference: User confirmation on 2026-08-31 following review of `RER-008`; recorded in `RER-009`.
+- Requirements revision: `RER-011`
+- Status: `Ready for Approval — approved RER-009 structure/persistence basis plus proposed handoff UI extension`
+- Approval reference: Structure/persistence behavior was approved on 2026-08-31 and recorded in `RER-009`. Handoff authoring/presentation cases `ORG-CASE-032`–`ORG-CASE-042` are proposed from user finding `RIF-AORG-001` and require explicit approval.
 - Owner/date: Requirements Engineer / 2026-08-31
-- Purpose: Provide one normative configured-structure and on-disk execution-tree contract that later Architecture Design must preserve.
+- Purpose: Provide one normative configured-structure, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
 This contract intentionally reuses the generic current TeamRun V2 tree. The
 target is a semantic narrowing and minimal root generalization, not a new
@@ -36,7 +36,7 @@ AgentOrgDefinition
 AgentTeamDefinition
   coordinator: exact direct Agent member
   members: AgentMemberRef[]
-  handoffs: AgentSource -> AgentOrTeamDestination within Team scope
+  handoffs: AgentSource -> AgentDestination within Team scope
 ```
 
 1. `AgentOrg` is the only persistent multi-Team composition root.
@@ -95,6 +95,37 @@ AgentTeamDefinition
 | ORG-CASE-023 | Duplicate effective edge or self-resolving Team target | Reject deterministically | No duplicate/self delivery guidance. |
 | ORG-CASE-024 | Agent calls `get_handoff_rules` | Return ordered outgoing rules for exact mounted Agent | Framework does not evaluate rule prose. |
 | ORG-CASE-025 | Agent calls `send_message_to(recipient_address)` | Resolve only in active Org or standalone Team scope | No implicit cross-run routing. |
+
+### Handoff Authoring And Presentation — Proposed In RER-011
+
+One user-visible **Handoff** is one ordered directional endpoint pair with:
+
+```text
+From: exact Agent placement
+To: exact Agent placement or, for AgentOrg-owned handoffs, direct Team placement
+When: one or more ordered natural-language conditions
+```
+
+The current logical record remains `{ from, to, rules[] }`; `When` is the
+user-facing name for each `rules[]` string. The prose guides the source Agent
+when it reviews `get_handoff_rules`. It is not an executable expression, event
+subscription, scheduler, or authorization rule. Additional conditions for the
+same endpoint pair belong in the same Handoff because duplicate effective
+`(from,to)` pairs remain invalid.
+
+| Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
+| --- | --- | --- | --- |
+| ORG-CASE-032 | Inspect a Handoff | Explicit labeled `From`, `To`, and every `When` condition are reviewable; exact canonical addresses remain visible secondary identity | Do not replace the fields with a nickname, generic arrow, tooltip-only address, or ambiguous rule count. |
+| ORG-CASE-033 | Author a `When` condition | Require one or more non-empty trimmed natural-language strings and preserve their order | No expression builder, automatic evaluation, scheduling, or authorization meaning. |
+| ORG-CASE-034 | Choose AgentOrg-owned `From` | Offer direct Org Agents and Agents mounted inside direct Teams | Team, Org, task execution, root, unrelated-run, and out-of-scope subjects are not sources. |
+| ORG-CASE-035 | Choose AgentOrg-owned `To` | Offer direct Org Agents, Agents mounted inside direct Teams, and direct Team placements | Org root, task execution, deeper, unrelated-run, and out-of-scope subjects are not destinations. |
+| ORG-CASE-036 | Select or inspect a Team destination | Show the Team name/address and state `Via coordinator <Agent>` with that coordinator's canonical Agent address near `To` | Do not imply Team broadcast, an Org coordinator, or hide effective ingress in a tooltip. |
+| ORG-CASE-037 | Author Team-local Handoff | `From` and `To` choices are direct Agent members of that Team; edit only from the Team surface | Team root `/`, Org peers, mounted-parent paths, and Team/Org subjects are not Team-local choices. |
+| ORG-CASE-038 | Add, edit, delete, or reorder | Provide functional `Add handoff`, Edit, Delete, and handoff-order controls; within one Handoff provide add/edit/delete/reorder for When conditions | Do not expose an inert `Add rule` action or conflate endpoint pairs with conditions. |
+| ORG-CASE-039 | Author self-resolving or duplicate effective endpoints | Block save and identify the affected Handoff; add another When condition to an existing pair instead of duplicating it | No duplicate pair, direct self-target, or Team target whose coordinator resolves to the source. |
+| ORG-CASE-040 | Remove/rename a member used by a Handoff | Identify every affected Handoff and require explicit resolution before save | Do not silently delete, retarget, rebase, or persist a stale address. |
+| ORG-CASE-041 | Cancel or save Handoff edits | All edits remain in the definition draft; Cancel discards them; one complete validated definition save commits atomically and gives visible success/failure feedback while retaining a failed draft | No per-control partial persistence, loss of a failed draft, or mutation before complete validation. |
+| ORG-CASE-042 | View Org-owned versus Team-local Handoffs | Org surface edits Org-owned Handoffs only; Team surface edits Team-local Handoffs only; any compiled/effective combined view labels its owner and is read-only | Org editing never mutates the referenced Team or becomes a second Team-local editing authority. |
 
 ### Execution, Lifecycle, And Tasks
 
@@ -359,6 +390,7 @@ before rebuilding derived indexes or projections.
 | ORG-VERIFY-004 | ORG-CASE-026–030 | Org/Team lifecycle and host-anchored task execution. |
 | ORG-VERIFY-005 | V3 root variants and reused-node table | Strict schema, root conditional fields, depth constraints, restore. |
 | ORG-VERIFY-006 | Preconditions and V2 mapping | Exhaustive cohort classification, idempotent minimal migration, no topology rebuild. |
+| ORG-VERIFY-007 | ORG-CASE-032–042 | Explicit From/To/When detail and authoring; eligible endpoint projection; coordinator indication; address visibility; CRUD/order/validation/cancel/atomic save; Org-versus-Team ownership separation. |
 
 ## Contract Non-Goals
 
@@ -372,6 +404,7 @@ before rebuilding derived indexes or projections.
 - Live topology mutation/file watching.
 - Recursive legacy topology migration.
 - Removing supported task-scoped Team delegation.
+- Executable/scheduled handoff policy, a graphical workflow engine, or automatic evaluation of `When` prose.
 
 ## Approval Basis
 
@@ -385,3 +418,8 @@ The 2026-08-31 approval recorded in `RER-009` confirms:
 6. Migration is a fixed-depth subject/key/file-name projection, not tree reconstruction.
 7. Task Teams remain under their exact runtime host and do not affect configured depth.
 8. A standalone-tested AgentTeam is directly reusable by reference inside AgentOrg; Org-scoped handoffs are sufficient to connect it without copying or changing the Team.
+
+The following `RER-011` extension is **not yet approved**: the explicit
+From/To/When presentation and complete owner-separated handoff authoring model
+defined by `ORG-CASE-032`–`ORG-CASE-042`. Approval of those cases is required
+before Product Design may treat them as normative and resume prototype work.
