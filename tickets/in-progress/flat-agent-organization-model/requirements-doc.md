@@ -3,11 +3,11 @@
 ## Document Status
 
 - Status: `Ready for Approval`
-- Current requirements revision ID: `RER-007`
+- Current requirements revision ID: `RER-008`
 - Request / ticket: `AORG-FLAT-TEAM-001`
 - Requirements owner: Requirements Engineer
 - Date: 2026-08-31
-- Approval state and reference: Not yet approved; `RER-007` is presented for explicit user approval and includes the earlier baselines.
+- Approval state and reference: Not yet approved; `RER-008` is presented for explicit user approval and includes the earlier baselines.
 
 ## Problem And Desired Outcome
 
@@ -37,6 +37,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | Actor / Stakeholder | Required Outcome | Important Constraint |
 | --- | --- | --- |
 | Package author | Compose one Org from independent Agents and reusable flat Teams | Invalid deeper membership fails clearly and never silently flattens. |
+| Team developer | Build, launch, and test one AgentTeam independently before adopting it into an Org | Org adoption references the same Team definition rather than requiring a copied or Org-specific Team variant. |
 | End user / caller | Launch an Org, select an exact entry Agent or Team, and inspect/restore work | AgentOrg is not given a synthetic coordinator. |
 | Org-bound Agent | Use explicit handoffs to reach peers and Teams deterministically | Logical addresses never discover unrelated runs. |
 | Existing-data owner | Upgrade the known zero/one-level data without silent identity, content, memory, task, or history loss | Migration may assume there is no deeper configured topology in the relevant existing-data population. |
@@ -76,6 +77,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 
 - Preserve canonical rooted addresses, exact mounted placement identity, Team-to-coordinator ingress, Agent-only handoff sources, and same-scope resolution.
 - Preserve independently launchable flat Teams and supported Team lifecycle/task behavior.
+- Preserve progressive composition: a proven standalone AgentTeam can be referenced directly by an AgentOrg and connected through Org-scoped handoffs without changing its standalone definition or prior runs.
 - Preserve the effective workflows of inspected organization-like packages.
 - Preserve content, memory, tasks, and history while transitioning the established zero/one-level migration cohorts.
 
@@ -106,6 +108,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | REQ-015 | A task Team created by an AgentOrg member MUST be a fresh task-scoped Team execution owned within that AgentOrg run and anchored to the exact delegating host scope. It MUST NOT become a configured Org member or configured child Team. Task delegation from a standalone Team remains owned by that standalone Team run. | BEH-009 | High | Task runtime ownership belongs under the active root scope, while configured membership stays flat. |
 | REQ-016 | Affected GraphQL/transport, catalog/detail/launch/history, authoring, and workspace surfaces MUST distinguish AgentOrg from flat Team and MUST stop advertising or accepting configured Team members inside a Team. | BEH-006, BEH-008 | High | Product and external contracts must be truthful. |
 | REQ-017 | Concurrent work MUST NOT introduce new recursive configured-Team mutation dependencies. Any future dynamic membership capability requires a separate approved contract and may operate only within the approved Org-direct-member or Team-direct-Agent boundaries. | BEH-001 | High | Reconciles the conflicting draft dynamic-Team branch. |
+| REQ-018 | A user MUST be able to create, launch, configure, and test an AgentTeam independently, then add that same Team definition by reference as a direct AgentOrg member and add Org-scoped handoffs. Org adoption MUST NOT require copying the Team, changing its coordinator/internal handoffs, or invalidating its standalone launchability or prior run history. | BEH-001, BEH-006 | High | Enables incremental Team development and simple composition into an Org. |
 
 ## Acceptance Criteria
 
@@ -123,6 +126,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | AC-010 | REQ-015 | An Org member delegates a task to a flat Team | A fresh task TeamRun starts through that Team's coordinator, is recorded under the same AgentOrg execution aggregate at the delegating host scope, and settles/reports under supported task semantics | It is not added to the Org definition/member list and receives no new permanent Org member address. A task delegated from a standalone Team remains under that Team run. |
 | AC-011 | REQ-016 | Use affected API and web authoring/launch/history flows | Org and Team roles are distinguishable; Team authoring offers Agent members only; existing flat-Team flows remain usable | Nested-Team selectors/counts/warnings are absent from flat-Team authoring. |
 | AC-012 | REQ-017 | Reconcile the dynamic-AgentTeam draft work | No new production path can add/remove a configured Team beneath a Team | Reusable dynamic ideas, if any, require a separately approved fixed-depth contract. |
+| AC-013 | REQ-018 | A tested standalone AgentTeam is added by reference to an AgentOrg and Org-level handoffs are authored to/from it | The Org validates and launches using the same Team definition identity, coordinator, Agent membership, and Team-local handoffs; Org handoffs reach the Team/coordinator or its Agents; the Team remains independently launchable and its earlier runs remain intact | No copied Team definition, Org-specific Team subtype, or configured Team nesting is introduced. |
 
 ## Relevant Scenarios And Journeys
 
@@ -133,6 +137,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | SCN-003 | Contract | An applicable Agent handoff targets a peer Team | Destination resolves in the same Org and reaches Team coordinator | REQ-003, REQ-006, REQ-007; AC-003 |
 | SCN-004 | Operational | Upgrade/open the exhaustive flat-root and one-level-org cohorts | Preserve the former as Teams and convert the latter to AgentOrg | REQ-012, REQ-013; AC-008 |
 | SCN-005 | User | Launch a standalone Team and delegate work to a Team | Flat Team and task-scoped execution remain usable | REQ-011, REQ-015; AC-007, AC-010 |
+| SCN-006 | User | Create and repeatedly test a standalone AgentTeam, then reference it from an AgentOrg and add Org-scoped handoffs | The same Team becomes a direct Org member without losing standalone behavior or history | REQ-011, REQ-018; AC-007, AC-013 |
 
 ## UI, Interaction, And Experience Requirements
 
@@ -214,6 +219,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 | REQ-009–REQ-011 | BEH-006, BEH-007 | AC-004, AC-006, AC-007 | Real package configs and screenshot |
 | REQ-012–REQ-014 | BEH-005, BEH-007, BEH-008 | AC-008, AC-009 | SCN-002, SCN-004; stored-run and schema inventory |
 | REQ-015–REQ-017 | BEH-006, BEH-009 | AC-010–AC-012 | SCN-005; task models, UI, remote draft branch |
+| REQ-018 | BEH-001, BEH-006 | AC-013 | SCN-006; explicit user workflow clarification |
 
 ## Downstream Architecture Input
 
@@ -234,7 +240,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 - Behavior-defining supplement integrated: `Yes — agent-org-contract.md`
 - Data preservation and acceptable loss explicit: `Yes`
 - Target architecture avoided: `Yes`
-- User approval received: `No — requested for RER-007`
+- User approval received: `No — requested for RER-008`
 - Package ready for downstream route: `No — approval gate only`
 
 ## Architecture Design Routing Assessment

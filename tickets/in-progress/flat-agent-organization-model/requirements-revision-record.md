@@ -13,6 +13,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | RER-005 | User direction for one contract containing configured structure and on-disk data structure | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 | The single normative contract now defines AgentOrg V1, flat-Team V3, task anchoring, strict invariants, and V2 migration mapping. |
 | RER-006 | User correction that `flat` is an AgentTeam invariant, not a type-name prefix | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 naming | Renamed the target Team record to `TeamRunExecutionTreeFileV3` and removed the redundant `FlatTeam` subtype terminology. |
 | RER-007 | User correction to reuse the generic current execution tree with minimal root changes | Ready for Approval | Ready for Approval | BEH-008; REQ-014; AC-009; AORG-CONTRACT-001 | Replaced parallel AgentOrg/Team schema proposals with one generic V3 root union that reuses current V2 child/task records. |
+| RER-008 | User clarification of progressive standalone-Team-to-AgentOrg reuse | Ready for Approval | Ready for Approval | REQ-018; AC-013; SCN-006; ORG-CASE-031 | The same independently tested AgentTeam definition can be referenced directly by AgentOrg and connected with Org-scoped handoffs. |
 
 ## Revision Entries
 
@@ -126,3 +127,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Architecture must design one generic V3 execution tree with an AgentOrg-or-AgentTeam root variant and must avoid parallel topology families or record duplication.
 - Remaining gaps, assumptions, or blocked decisions: Physical generic filename/directory and exact target type/module names remain Architecture Design-owned; logical minimal-delta fields and invariants are fixed by the contract.
 - Next action or recipient: Present `RER-007` and the revised single contract for explicit approval.
+
+### RER-008 — Progressive AgentTeam Composition Workflow
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: The user explained that users need to build and test an AgentTeam independently, then include the completed Team in AgentOrg and connect it using handoff rules.
+- Prior authoritative status: `Ready for Approval` (`RER-007`).
+- Current authoritative status: `Ready for Approval` (`RER-008`).
+- IDs affected: Added `REQ-018`, `AC-013`, `SCN-006`, and `ORG-CASE-031`; updated stakeholders, preserved behavior, traceability, contract verification, and approval basis.
+- Why this revision was recorded: Direct Team launch and Org membership were already individually required, but identity-preserving progressive reuse without copying or Team modification was not explicit enough.
+- Canonical artifact sections changed: Stakeholders, preserved behavior, requirements, acceptance criteria, scenarios, traceability, investigation user evidence, and contract definition/reuse cases.
+- Supplemental artifacts added, changed, or removed: Updated the existing `agent-org-contract.md`; no new supplement.
+- Prototype evidence or product decisions incorporated: No prototype. Incorporated the explicit workflow that Org-scoped handoffs are sufficient additional configuration after a Team has been independently tested.
+- User approval impact: Approval must reference `RER-008` and `AORG-CONTRACT-001`; all prior domain, persistence, task, and migration decisions remain included.
+- Downstream architecture or direct-implementation route impact: Definition identity and standalone history must remain stable when a Team is referenced by Org; implementation must not create copied or Org-specific Team variants.
+- Remaining gaps, assumptions, or blocked decisions: None at the product/contract level.
+- Next action or recipient: Present `RER-008` and the updated contract for explicit approval.

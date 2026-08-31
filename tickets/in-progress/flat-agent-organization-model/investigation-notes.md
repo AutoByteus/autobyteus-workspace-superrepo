@@ -9,7 +9,7 @@
 - Base or reference revision: `personal@80e2bd195c42ea3ced778dbc051d4d00edaef16f`
 - Bootstrap result: Dedicated clean requirements worktree created and verified.
 - Bootstrap blocker: `N/A`
-- Current requirements revision ID: `RER-007`
+- Current requirements revision ID: `RER-008`
 - Investigation status: Current behavior, representative usage, durable JSON, and remote bootstrap branches investigated; a coherent package is ready for user approval.
 
 ## Initial Request And Clarifications
@@ -27,6 +27,7 @@
   - The user stated the requirements are clear, asked work to continue, and requested one contract file containing both the configured structure and on-disk data structure so it can direct later design.
   - The user rejected `FlatTeam` as a type/file prefix because all target AgentTeams are flat by invariant; naming a flat subtype would imply a nonexistent non-flat alternative.
   - After requesting reinspection of the current execution tree, the user confirmed the intended persistence posture: reuse the deliberately generic current tree with minimal root naming/semantics changes; AgentOrg has no root coordinator, while every direct Team retains its own coordinator.
+  - The user clarified the progressive composition journey: create and test an AgentTeam independently, then reference that same Team from AgentOrg and add Org-scoped handoffs without copying or redesigning the Team.
 - User-supplied facts and constraints:
   - The supplied screenshot shows one Software Development Department run with one independent `requirements_engineer` placement and two mounted Teams: Product Design & Prototyping and Software Engineering.
   - The user experiences this as one organization rather than a Team recursively containing other Teams.
@@ -64,6 +65,7 @@
 | 2026-08-31 | User | Direction to keep one contract file with structure and on-disk data shape | Make the approved domain boundary concrete enough to govern Architecture Design | The contract must include fixed configured composition, native AgentOrg/flat-Team durable structures, task anchoring, and V2 migration mapping. | Expanded `agent-org-contract.md` as the single normative supplement in `RER-005`. |
 | 2026-08-31 | User | Naming correction: remove `Flat` from Team execution/type prefixes | Ensure simplification is reflected in the ubiquitous domain language | There is one AgentTeam model and it is Agent-only by invariant; `FlatTeam` would incorrectly imply a second non-flat Team kind. | Renamed the logical record to `TeamRunExecutionTreeFileV3` and the definition to `AgentTeamDefinition` in `RER-006`. |
 | 2026-08-31 | User | Persistence correction: current execution tree was intentionally generic and should be minimally reused | Avoid inventing parallel Org/Team schemas and unnecessary migration | Root already owns Agent/Team members, handoffs, addresses, launch state, and host-anchored tasks. AgentOrg removes only root coordinator semantics; child Teams keep coordinators. | Replaced separate schema-family proposal with one minimal-delta generic V3 contract in `RER-007`. |
+| 2026-08-31 | User | Progressive Team-to-Org workflow clarification | Preserve the practical workflow of testing a Team before composing an Org | The same standalone AgentTeam definition must be directly reusable as an Org member; Org-scoped handoffs are the only additional workflow configuration required. | Added REQ-018, AC-013, SCN-006, and ORG-CASE-031 in `RER-008`. |
 | 2026-08-31 | Git branch | `origin/codex/flat-agent-team-domain-simplification@c3a318812`, cherry-picked as `ca6d24dfa` | Reuse the user-identified bootstrap work | The branch supports flat Agent-only Teams, a coordinator-free AgentOrg, exact caller-selected entry, preserved rooted addresses, and separation of configured nesting from task-scoped Team execution. | Integrated supported semantics into `RER-001`; removed the duplicate imported ticket files from the current tree so this package remains canonical while preserving their commit in history. |
 | 2026-08-31 | Git branch | `origin/codex/dynamic-agent-team-runtime@7d9b4ba69` | Check the concurrent-work warning in the imported branch | This draft proposes dynamic reconciliation of recursive configured Team topology and therefore conflicts with the flat target if implemented as written. It contains documentation only on the inspected commit. | Do not merge it into this requirements basis; prevent new recursive configured-Team dependencies. |
 | 2026-08-31 | Doc | `autobyteus-server-ts/docs/modules/agent_team_definition.md` | Verify definition and handoff contracts | Teams support `agent` and `agent_team` members, shared/team-local/application-owned scopes, recursive graph validation, and recursive handoff compilation. | Treat removal of recursive Team membership as a contract change. |
@@ -217,14 +219,14 @@
 | Artifact Path | Owner | Purpose | Scope | Related Requirement / AC IDs | Status | Approval Applicability / State |
 | --- | --- | --- | --- | --- | --- | --- |
 | `/home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/requirements_engineer_6568eac682114f2cb3ddb8f1d91d3c34/context_files/ctx_4cc02361f417__image.png` | User | Representative current hierarchy | Evidence only | Draft model | Supplied | No separate approval required |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Requirements Engineer | Single normative configured structure, generic minimal-delta V3 tree, task anchoring, and V2 projection contract | AgentOrg/AgentTeam scope | REQ-001–REQ-017 / AC-001–AC-012 / PRE-001–PRE-005 | Ready for Approval | Included in latest `RER-007` approval basis |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Requirements Engineer | Single normative configured structure, progressive Team reuse, generic minimal-delta V3 tree, task anchoring, and V2 projection contract | AgentOrg/AgentTeam scope | REQ-001–REQ-018 / AC-001–AC-013 / PRE-001–PRE-005 | Ready for Approval | Included in latest `RER-008` approval basis |
 | `origin/codex/flat-agent-team-domain-simplification@c3a318812` (local cherry-pick `ca6d24dfa`) | Prior bootstrap author | Imported concept and investigation evidence | Flat Team/AgentOrg distinction and task/configured nesting boundary | BEH-001, BEH-004, BEH-009 | Integrated / superseded by canonical package | Evidence only; duplicate imported drafts are not authoritative |
 
 ## Assumptions, Unknowns, And Risks
 
 | ID | Type | Description | Why It Matters | Resolution / Owner | Status |
 | --- | --- | --- | --- | --- | --- |
-| ASM-001 | Assumption | The user's main goal is a simpler, fixed-depth composition model rather than distributed orchestration across separately running Teams. | The latter is structurally more complex and contradicts the stated simplification goal. | Included in latest `RER-007` approval basis. | Proposed for approval |
+| ASM-001 | Assumption | The user's main goal is a simpler, fixed-depth composition model rather than distributed orchestration across separately running Teams. | The latter is structurally more complex and contradicts the stated simplification goal. | Included in latest `RER-008` approval basis. | Proposed for approval |
 | DEC-001 | Decision | AgentOrg has no coordinator; a caller selects an exact Agent or Team entry target. | Avoids synthetic root-Team semantics while preserving Team coordinators. | Imported branch concept plus user request to integrate it. | Proposed for approval |
 | DEC-002 | Decision | The relevant migration population contains only flat roots and one-level organization-like roots; no deep legacy compatibility path is required. | Keeps migration bounded while preserving all established data. | Data inventory plus explicit user confirmation. | Proposed for approval |
 | RISK-001 | Risk | Introducing AgentOrg without removing Team recursion could produce two overlapping hierarchy models. | Product complexity would increase instead of decrease. | REQ-001, REQ-002, and REQ-008 make the boundary exclusive. | Controlled by requirements |

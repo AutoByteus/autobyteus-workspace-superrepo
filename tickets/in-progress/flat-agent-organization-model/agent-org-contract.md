@@ -4,7 +4,7 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-007`
+- Requirements revision: `RER-008`
 - Status: `Ready for Approval`
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Provide one normative configured-structure and on-disk execution-tree contract that later Architecture Design must preserve.
@@ -46,6 +46,7 @@ AgentTeamDefinition
 6. One AgentOrg run owns one address, handoff, lifecycle, and persistence scope.
 7. Standalone AgentTeams remain directly launchable and reusable in an AgentOrg.
 8. Task Teams are runtime task executions beneath their exact host scope; they do not mutate configured membership.
+9. AgentTeam supports progressive composition: the same definition may be tested standalone and later referenced directly by AgentOrg without copying or specialization.
 
 ## Behavioral Contract Cases
 
@@ -103,6 +104,12 @@ AgentTeamDefinition
 | ORG-CASE-028 | Org member delegates task to Team | Fresh task TeamRun is stored beneath exact delegating host scope and starts through Team coordinator | It is not configured membership or a permanent address. |
 | ORG-CASE-029 | Stop/restore AgentOrg | Apply lifecycle to complete Org scope using stored identities/snapshot | Do not reinterpret from mutable definitions. |
 | ORG-CASE-030 | Launch/restore standalone Team | Preserve Team-owned lifecycle/tasks | No Org-only Team requirement. |
+
+### Standalone-To-Org Reuse
+
+| Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
+| --- | --- | --- | --- |
+| ORG-CASE-031 | User adds a previously tested standalone AgentTeam definition to AgentOrg and authors Org-scoped handoffs | Org references the same Team definition identity and preserves its coordinator, Agent members, Team-local handoffs, independent launchability, and prior run history | No copy, fork, Org-specific Team subtype, or Team-within-Team placement is required. |
 
 ## Current TeamRun V2 Assessment
 
@@ -345,7 +352,7 @@ before rebuilding derived indexes or projections.
 
 | Verification ID | Scope | Verification Intent |
 | --- | --- | --- |
-| ORG-VERIFY-001 | ORG-CASE-001–007 | Definition/import/update and standalone-Team validation. |
+| ORG-VERIFY-001 | ORG-CASE-001–007, ORG-CASE-031 | Definition/import/update, standalone-Team validation, and progressive Team-to-Org reuse. |
 | ORG-VERIFY-002 | ORG-CASE-008–018 | Coordinator-free Org targeting and strict addresses. |
 | ORG-VERIFY-003 | ORG-CASE-019–025 | Team-local and Org-wide handoffs using reused address records. |
 | ORG-VERIFY-004 | ORG-CASE-026–030 | Org/Team lifecycle and host-anchored task execution. |
@@ -367,7 +374,7 @@ before rebuilding derived indexes or projections.
 
 ## Approval Basis
 
-Approval of `RER-007` confirms:
+Approval of `RER-008` confirms:
 
 1. AgentOrg is the only persistent multi-Team composition root and has no coordinator.
 2. AgentTeam is Agent-only by invariant and retains its direct Agent coordinator.
@@ -376,3 +383,4 @@ Approval of `RER-007` confirms:
 5. AgentOrg root omits `coordinatorAddress`; direct Team nodes retain it.
 6. Migration is a fixed-depth subject/key/file-name projection, not tree reconstruction.
 7. Task Teams remain under their exact runtime host and do not affect configured depth.
+8. A standalone-tested AgentTeam is directly reusable by reference inside AgentOrg; Org-scoped handoffs are sufficient to connect it without copying or changing the Team.
