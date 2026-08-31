@@ -3,11 +3,11 @@
 ## Document Status
 
 - Status: `Ready for Approval`
-- Current requirements revision ID: `RER-002`
+- Current requirements revision ID: `RER-003`
 - Request / ticket: `AORG-FLAT-TEAM-001`
 - Requirements owner: Requirements Engineer
 - Date: 2026-08-31
-- Approval state and reference: Not yet approved; `RER-002` is presented for explicit user approval and includes the initial `RER-001` baseline.
+- Approval state and reference: Not yet approved; `RER-003` is presented for explicit user approval and includes the earlier baselines.
 
 ## Problem And Desired Outcome
 
@@ -39,7 +39,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | Package author | Compose one Org from independent Agents and reusable flat Teams | Invalid deeper membership fails clearly and never silently flattens. |
 | End user / caller | Launch an Org, select an exact entry Agent or Team, and inspect/restore work | AgentOrg is not given a synthetic coordinator. |
 | Org-bound Agent | Use explicit handoffs to reach peers and Teams deterministically | Logical addresses never discover unrelated runs. |
-| Existing-data owner | Upgrade without silent identity, content, memory, task, or history loss | Ambiguous/deeper topology remains retained and receives actionable recovery rather than reinterpretation. |
+| Existing-data owner | Upgrade the known zero/one-level data without silent identity, content, memory, task, or history loss | Migration may assume there is no deeper configured topology in the relevant existing-data population. |
 
 ## Scope Guardrail (Mandatory)
 
@@ -51,7 +51,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 - `UC-004`: Address `/agent`, `/team`, and `/team/agent` inside one Org scope and use explicit cross-Team handoffs.
 - `UC-005`: Reject Team-in-Team and Org-in-Org configured composition through every supported definition boundary.
 - `UC-006`: Convert observed Software Development Department and Northstar organization-like definitions/runs into the new model.
-- `UC-007`: Preserve or explicitly retain incompatible existing definitions and stored work without silent flattening or deletion.
+- `UC-007`: Transition the established migration population, which contains only flat roots or one level of flat child Teams.
 - `UC-008`: Update affected API, durable execution, history, and UI contracts so Org and Team semantics are truthful.
 - `UC-009`: Preserve supported task-scoped delegation to a flat Team as distinct from configured nesting.
 
@@ -77,7 +77,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 - Preserve canonical rooted addresses, exact mounted placement identity, Team-to-coordinator ingress, Agent-only handoff sources, and same-scope resolution.
 - Preserve independently launchable flat Teams and supported Team lifecycle/task behavior.
 - Preserve the effective workflows of inspected organization-like packages.
-- Preserve unambiguously convertible content, memory, tasks, and history; never silently truncate or rebase deeper identities.
+- Preserve content, memory, tasks, and history while transitioning the established zero/one-level migration cohorts.
 
 ### Review Authority
 
@@ -100,8 +100,8 @@ The governing principle is: **containment expresses stable membership; handoff r
 | REQ-009 | The Software Development Department MUST remain representable as one AgentOrg with direct `requirements_engineer`, `product_design_prototyping_team`, and `software_engineering_team` members and equivalent effective handoffs. | BEH-007 | Critical | User-supplied primary example. |
 | REQ-010 | Northstar Operating Company MUST remain representable as one AgentOrg with its independent executive Agents, six direct flat Teams, and equivalent effective handoffs. | BEH-007 | High | Largest inspected real organization example. |
 | REQ-011 | Standalone flat Teams MUST remain directly definable, reusable in an AgentOrg, and independently launchable. | BEH-006 | High | Preserves ordinary Team use cases. |
-| REQ-012 | Existing root Team definitions/runs with only direct Agents MUST remain standalone flat Teams. Existing roots with direct Agents and exactly one level of flat child Teams MUST convert to AgentOrg when identities, coordinators, addresses, and handoffs map unambiguously. | BEH-005, BEH-007 | Critical | Evidence-backed safe transition for observed data. |
-| REQ-013 | Deeper or ambiguous existing topology MUST NOT be automatically flattened, truncated, deleted, or activated under changed identity. The offending placement and recovery outcome MUST be explicit, while source data remains retained. | BEH-005, BEH-007 | Critical | Prevents semantic corruption and silent loss. |
+| REQ-012 | Migration MUST treat the relevant existing-data population as two exhaustive configured-topology cohorts: root Teams with direct Agents only remain standalone flat Teams; roots with direct Agents and exactly one level of flat child Teams convert to AgentOrg while preserving identities, coordinators, addresses, handoffs, content, tasks, memory, and history. | BEH-005, BEH-007 | Critical | Repository/data investigation plus explicit user confirmation establish that no deeper configured data exists. |
+| REQ-013 | Migration MUST NOT implement a legacy deeply nested conversion or compatibility path. After transition, any deeper configured topology newly presented through import/load/update MUST be rejected by the flat-model validation contract before mutation or activation. | BEH-001, BEH-007 | High | Keeps the migration and permanent product model simple under the approved data assumption. |
 | REQ-014 | Native AgentOrg durable execution state MUST use an Org-root semantic contract that distinguishes Org identity/run, direct independent Agents, direct flat Teams, selected interaction target where persisted, and Org-scoped handoffs. Unchanged TeamRun V2 MUST NOT be relabeled as AgentOrg. | BEH-008 | Critical | Current JSON requires `rootTeam`, root coordinator, and recursion. |
 | REQ-015 | A task Team created by an AgentOrg member MUST be a fresh task-scoped Team execution owned within that AgentOrg run and anchored to the exact delegating host scope. It MUST NOT become a configured Org member or configured child Team. Task delegation from a standalone Team remains owned by that standalone Team run. | BEH-009 | High | Task runtime ownership belongs under the active root scope, while configured membership stays flat. |
 | REQ-016 | Affected GraphQL/transport, catalog/detail/launch/history, authoring, and workspace surfaces MUST distinguish AgentOrg from flat Team and MUST stop advertising or accepting configured Team members inside a Team. | BEH-006, BEH-008 | High | Product and external contracts must be truthful. |
@@ -116,9 +116,9 @@ The governing principle is: **containment expresses stable membership; handoff r
 | AC-003 | REQ-005–REQ-007 | An Org-bound Agent uses collaboration tools | `/agent`, `/team`, and `/team/agent` resolve exactly in the active Org; `/team` targets its coordinator | `/`, malformed/deeper/unknown/out-of-scope destinations fail closed. |
 | AC-004 | REQ-006, REQ-009 | Convert and run Software Development Department | Existing Requirements ↔ Product Design/Engineering/Delivery workflow reaches the same effective recipients | No Team-inside-Team definition is required. |
 | AC-005 | REQ-002, REQ-008 | Import/edit a Team containing `refType=agent_team` or Org | The operation identifies the invalid member and performs no partial save/activation | It does not silently flatten or mount the member elsewhere. |
-| AC-006 | REQ-010 | Represent and run Northstar under the fixed-depth model | All direct executives, six Teams, and current cross-Team destinations fit addresses no deeper than `/team/agent` | Unsupported external deeper input follows AC-008. |
+| AC-006 | REQ-010 | Represent and run Northstar under the fixed-depth model | All direct executives, six Teams, and current cross-Team destinations fit addresses no deeper than `/team/agent` | Unsupported later deeper input follows AC-005 validation rather than migration compatibility. |
 | AC-007 | REQ-011 | Define and launch a flat Team without an Org, then reuse it in an Org | Standalone coordinator-led collaboration works; the same definition can be mounted as a direct Org Team | Org membership is not mandatory for ordinary Team work. |
-| AC-008 | REQ-012, REQ-013 | Transition each existing definition/run cohort | Flat roots remain Teams; unambiguous one-level org roots convert; deeper/ambiguous input is retained and blocked with exact recovery guidance | No identity/content/history is silently lost or reinterpreted. |
+| AC-008 | REQ-012, REQ-013 | Transition the complete relevant definition/run population | Every record classifies as either a flat standalone Team or a one-level organization-like root; the former remains a Team and the latter converts to AgentOrg with preserved supported state | The migration reports an invariant violation rather than guessing if deeper configured topology is unexpectedly encountered; no deeply nested legacy compatibility path is required. |
 | AC-009 | REQ-014 | Persist and restore a native AgentOrg run | Durable state identifies an Org root, no Org coordinator, direct member kinds, exact fixed-depth addresses, and the stored run snapshot | Strict validation rejects recursive configured Team nodes or a Team-root alias masquerading as Org. |
 | AC-010 | REQ-015 | An Org member delegates a task to a flat Team | A fresh task TeamRun starts through that Team's coordinator, is recorded under the same AgentOrg execution aggregate at the delegating host scope, and settles/reports under supported task semantics | It is not added to the Org definition/member list and receives no new permanent Org member address. A task delegated from a standalone Team remains under that Team run. |
 | AC-011 | REQ-016 | Use affected API and web authoring/launch/history flows | Org and Team roles are distinguishable; Team authoring offers Agent members only; existing flat-Team flows remain usable | Nested-Team selectors/counts/warnings are absent from flat-Team authoring. |
@@ -131,7 +131,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | SCN-001 | Contract | Define Org members and Org-scoped handoffs; validate | One fixed-depth Org definition is accepted | REQ-001–REQ-008; AC-001–AC-003 |
 | SCN-002 | System | Launch Org; caller selects Agent/Team; persist/restore | One Org-owned scope retains exact identities without an Org coordinator | REQ-004, REQ-005, REQ-014; AC-002, AC-009 |
 | SCN-003 | Contract | An applicable Agent handoff targets a peer Team | Destination resolves in the same Org and reaches Team coordinator | REQ-003, REQ-006, REQ-007; AC-003 |
-| SCN-004 | Operational | Upgrade/open each existing definition and run cohort | Apply safe conversion or retain-and-block behavior exactly | REQ-012, REQ-013; AC-008 |
+| SCN-004 | Operational | Upgrade/open the exhaustive flat-root and one-level-org cohorts | Preserve the former as Teams and convert the latter to AgentOrg | REQ-012, REQ-013; AC-008 |
 | SCN-005 | User | Launch a standalone Team and delegate work to a Team | Flat Team and task-scoped execution remain usable | REQ-011, REQ-015; AC-007, AC-010 |
 
 ## UI, Interaction, And Experience Requirements
@@ -147,8 +147,8 @@ The governing principle is: **containment expresses stable membership; handoff r
 | Quality ID | Area | Requirement | Verification Intent |
 | --- | --- | --- | --- |
 | QR-001 | Reliability | Invalid membership and addresses fail closed without name, coordinator, or flattening fallback. | Negative contract/runtime tests. |
-| QR-002 | Compatibility | Every identified data cohort has an explicit, repeatable, test-covered outcome. | Transition matrix and idempotency tests. |
-| QR-003 | Operability | A blocked conversion identifies the exact invalid placement and a recovery action while retaining source data. | Error and recovery tests. |
+| QR-002 | Compatibility | Both exhaustive existing-data cohorts have an explicit, repeatable, test-covered outcome. | Transition matrix and idempotency tests. |
+| QR-003 | Operability | An unexpected deeper input fails as an invariant/validation error before mutation rather than activating a legacy compatibility path. | Negative migration and validation tests. |
 | QR-004 | Integrity | Restore uses the durable run snapshot and preserves unambiguous placement, content, task, memory, and history identity. | Persistence/restore tests. |
 | QR-005 | Simplicity | Supported configured composition depth is exactly Org → Team → Agent, with independent Agents directly under Org. | Schema/topology invariant tests. |
 
@@ -157,9 +157,9 @@ The governing principle is: **containment expresses stable membership; handoff r
 - Persisted or external data affected: `Yes`.
 - Must preserve: unambiguously mapped definition identity, member placement, Team coordinator, handoff endpoint, Agent/Team run identity, communication/task content, memory reachability, and history.
 - Acceptable rebuild: derived catalogs, indexes, UI caches, and regenerated projections.
-- Not acceptable: silent deletion, automatic semantic flattening, endpoint truncation/rebasing, or activation of ambiguous data under changed identity.
+- Not acceptable: silent deletion, endpoint truncation/rebasing, or identity/content/history loss during either established cohort transition.
 - Observed volume: 23 local root packages and 41 readable stored TeamRun trees; all observed configured nesting is zero or one child-Team level.
-- External deeper topology remains possible; it follows retain-and-block recovery rather than guessed conversion.
+- Approved migration assumption: the relevant existing-data population contains no deeper configured topology. Deep input encountered later is unsupported input, not a migration cohort.
 
 ## External Contracts And Dependencies
 
@@ -168,7 +168,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | Package definition format | Distinguish Org direct members from Team Agent-only members and reject unsupported depth | Current `team-config.json` permits recursion. |
 | GraphQL/stream/web contracts | Expose truthful Org/Team identity and fixed-depth composition | Current types and UI recursively expose Teams. |
 | Collaboration tools | Preserve canonical same-scope addresses, ordered Agent handoffs, and Team coordinator targeting | Current logical routing does not join independent runs. |
-| Durable execution/history | Represent native Org root semantics; preserve/retain existing cohorts explicitly | Current strict V2 root is a recursive coordinator-led Team. |
+| Durable execution/history | Represent native Org root semantics and preserve both established migration cohorts explicitly | Current strict V2 root is a recursive coordinator-led Team. |
 | Remote flat-team bootstrap | Incorporated as evidence and concept input at commit `c3a318812` (cherry-picked as `ca6d24dfa`) | Its no-Org-coordinator and task-scope distinction are adopted; its duplicate draft is not canonical. |
 | Dynamic-AgentTeam draft branch | Must not add recursive configured-Team mutation | `origin/codex/dynamic-agent-team-runtime@7d9b4ba69` conflicts with the target if implemented as drafted. |
 
@@ -186,7 +186,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | --- | --- | --- |
 | DEC-001 | One AgentOrg launch owns one shared runtime/address/lifecycle scope. | Proposed for approval; simplest model consistent with current handoff behavior. |
 | DEC-002 | AgentOrg has no coordinator; caller selects an exact Agent or Team entry target. | Proposed for approval; integrated remote concept. |
-| DEC-003 | Safe zero/one-level local cohorts are preserved/converted; deeper or ambiguous data is retained and blocked, never silently flattened. | Proposed for approval; evidence-backed continuity rule. |
+| DEC-003 | The migration population contains no deeply nested configured data. Flat roots remain Teams; one-level organization-like roots convert to AgentOrg; no deep legacy migration/compatibility path is built. | User-confirmed assumption backed by the inventory of 23 root packages and 41 stored trees. |
 | DEC-004 | Standalone flat Teams remain reusable and independently launchable. | Proposed for approval; preserves existing Team value. |
 | DEC-005 | Configured nested Teams are removed. A task Team created inside an Org exists under that Org's execution aggregate at its delegating host scope, but not in configured membership; standalone-Team tasks remain under the standalone Team run. | Clarified by user before approval; preserves lifecycle ownership without restoring configured nesting. |
 | DEC-006 | No Product Design handoff is requested for this package. | Resolved from user request. |
@@ -219,7 +219,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 - Behavior-defining supplement integrated: `Yes — agent-org-contract.md`
 - Data preservation and acceptable loss explicit: `Yes`
 - Target architecture avoided: `Yes`
-- User approval received: `No — requested for RER-002`
+- User approval received: `No — requested for RER-003`
 - Package ready for downstream route: `No — approval gate only`
 
 ## Architecture Design Routing Assessment

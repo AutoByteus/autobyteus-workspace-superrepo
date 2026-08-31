@@ -8,6 +8,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | --- | --- | --- | --- | --- | --- |
 | RER-001 | Initial contract-first baseline plus integration of the user-identified remote bootstrap branch | N/A | Ready for Approval | BEH-001–BEH-009; REQ-001–REQ-017; AC-001–AC-012 | One coherent AgentOrg/flat-Team requirements and persistence contract is ready for explicit user approval. |
 | RER-002 | User clarification of task-Team ownership under AgentOrg | Ready for Approval | Ready for Approval | REQ-015; AC-010; DEC-005; ORG-CASE-028 | Org-originated task Teams are explicitly owned under the AgentOrg execution aggregate without becoming configured members. |
+| RER-003 | User-confirmed migration assumption that no deeply nested configured data exists | Ready for Approval | Ready for Approval | BEH-007; REQ-012–REQ-013; AC-008; DEC-003; Existing Data Contract | Migration is reduced to two exhaustive zero/one-level cohorts; no deep legacy compatibility path is required. |
 
 ## Revision Entries
 
@@ -46,3 +47,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Architecture must preserve Org-root ownership while anchoring the task execution to the exact delegating host scope; no configured member/address-tree mutation is authorized.
 - Remaining gaps, assumptions, or blocked decisions: Exact storage field/container and transient task addressing remain Architecture Design decisions.
 - Next action or recipient: Present the clarified `RER-002` package and `AORG-CONTRACT-001` to the user for explicit approval.
+
+### RER-003 — Zero/One-Level Migration Assumption
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: The user confirmed that migration may assume there is no deeply nested configured data and referenced the completed data investigation.
+- Prior authoritative status: `Ready for Approval` (`RER-002`).
+- Current authoritative status: `Ready for Approval` (`RER-003`).
+- IDs affected: `BEH-007`, `REQ-012`, `REQ-013`, `AC-008`, `DEC-003`, `SCN-004`, `QR-002`, `QR-003`, and the contract Existing Data Contract/approval basis.
+- Why this revision was recorded: The earlier conservative external/deeper-data recovery posture would add migration complexity despite evidence and user confirmation that the relevant data population has no deep configured topology.
+- Canonical artifact sections changed: Stakeholder outcomes, preserved behavior, requirements, acceptance criteria, operational scenario, quality constraints, data continuity, decisions, investigation data facts, and the contract migration matrix.
+- Supplemental artifacts added, changed, or removed: Updated `agent-org-contract.md`; no new supplement.
+- Prototype evidence or product decisions incorporated: No prototype. Promoted the inventory result—23 root packages and 41 readable stored trees, with maximum configured child-Team depth one—into a user-confirmed migration assumption.
+- User approval impact: Approval must reference `RER-003`; it includes `RER-001` and `RER-002` while replacing their conservative deep-legacy migration posture.
+- Downstream architecture or direct-implementation route impact: Architecture must handle only flat-root preservation and one-level organization-like conversion. It must not design a deep legacy migration/compatibility branch; permanent validators still reject unsupported deeper input.
+- Remaining gaps, assumptions, or blocked decisions: Exact transition mechanics remain Architecture Design-owned. No material product decision remains open.
+- Next action or recipient: Present `RER-003` and `AORG-CONTRACT-001` to the user for explicit approval.

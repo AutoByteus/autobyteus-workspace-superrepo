@@ -4,7 +4,7 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-002`
+- Requirements revision: `RER-003`
 - Status: `Ready for Approval`
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Define supported composition, entry, addressing, handoff, lifecycle, task, and durable-state cases before Architecture Design.
@@ -166,14 +166,18 @@ Required invariants:
 | --- | --- | --- |
 | Root Team with direct Agents only | Preserve as standalone flat Team | Already satisfies target Team invariant. |
 | Root Team with direct Agents and one level of child Teams whose members are Agents only | Convert to AgentOrg when coordinators, identities, addresses, and handoffs map unambiguously | Matches observed Software Development Department/Northstar shape. |
-| Definition/run with Team below Team below Team | Retain source data; do not auto-flatten; block conversion/activation with exact offending placement and recovery guidance | Flattening changes instruction, coordinator, ownership, lifecycle, workspace, and handoff meaning. |
 | One-level Org-like run with task-scoped Team history | Preserve task/result content when it maps to the same flat Team; fail closed on ambiguity | Task execution is distinct from configured nesting. |
 | Handoff snapshot fitting `/agent`, `/team`, or `/team/agent` | Preserve exact effective endpoints | Workflow remains valid. |
-| Handoff requiring deeper configured placement | Do not truncate/rebase; retain and block conversion | Endpoint identity would change. |
 | Derived catalogs/indexes/UI caches | Rebuild from converted durable authority when safe | Derived state is not canonical. |
 | Agent memory, context files, messages, tasks, and run/history identity | Preserve whenever conversion is unambiguous | Simplification does not authorize content loss. |
 
-Observed evidence: 23 local root package definitions and 41 readable stored TeamRun trees; all configured nesting is zero or one child-Team level, with no deeper local instance observed. This supports the safe local conversion cohort but is not proof about external packages.
+Approved migration assumption: the relevant existing-data population is fully
+covered by the first two rows. Investigation inspected 23 local root package
+definitions and 41 readable stored TeamRun trees; all configured nesting is
+zero or one child-Team level, and the user confirmed there is no deeply nested
+data to support. Migration therefore does not need a deep legacy conversion or
+compatibility branch. If deeper configured input is unexpectedly presented
+later, normal flat-model validation rejects it before mutation or activation.
 
 ## Contract Non-Goals
 
@@ -182,7 +186,7 @@ Observed evidence: 23 local root package definitions and 41 readable stored Team
 - Automatic cross-run/cross-process logical routing.
 - Live Org membership mutation or file watching.
 - Framework evaluation of natural-language handoff conditions.
-- Silent flattening or deletion of incompatible historical topology.
+- A migration or compatibility implementation for deeply nested legacy configured topology.
 - An AgentOrg label that preserves root-Team coordinator/recursion semantics.
 - Removal of supported task-scoped Team delegation as a side effect.
 
@@ -195,16 +199,16 @@ Observed evidence: 23 local root package definitions and 41 readable stored Team
 | ORG-VERIFY-003 | ORG-CASE-019–025 | Team-local and Org-cross-member handoff compilation/retrieval/delivery. |
 | ORG-VERIFY-004 | ORG-CASE-026–030 | Org/Team launch, task, stop, persistence, and restore. |
 | ORG-VERIFY-005 | JSON-DEC-001 invariants 1–9 | Durable schema and transport projection agreement. |
-| ORG-VERIFY-006 | Existing Data Contract cohorts | Conversion, retention/blocking, preservation, idempotency, and recovery evidence. |
+| ORG-VERIFY-006 | Existing Data Contract cohorts | Exhaustive cohort classification, conversion/preservation, idempotency, and unexpected-depth invariant evidence. |
 
 ## Approval Basis
 
-Approval of `RER-002` confirms this contract with the requirements document, specifically:
+Approval of `RER-003` confirms this contract with the requirements document, specifically:
 
 1. AgentOrg is the only persistent multi-Team composition root.
 2. AgentOrg has no coordinator; a caller selects an exact Agent or Team target.
 3. Teams are flat, Agent-only, coordinator-led, reusable, and independently launchable.
 4. One Org scope owns fixed-depth addresses and cross-Team handoffs.
 5. The current V2 Team execution JSON cannot be relabeled unchanged as AgentOrg; native Org persistence needs truthful Org-root semantics.
-6. Safe zero/one-level data is preserved/converted; incompatible deeper data is retained and not silently flattened.
+6. The migration population has no deep configured topology: flat roots remain Teams and one-level organization-like roots convert to AgentOrg; no deep legacy compatibility path is required.
 7. Task-scoped Team execution remains distinct from configured nested membership.
