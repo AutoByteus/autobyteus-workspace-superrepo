@@ -2,12 +2,12 @@
 
 ## Document Status
 
-- Status: `Ready for Approval`
-- Current requirements revision ID: `RER-008`
+- Status: `Approved`
+- Current requirements revision ID: `RER-009`
 - Request / ticket: `AORG-FLAT-TEAM-001`
 - Requirements owner: Requirements Engineer
 - Date: 2026-08-31
-- Approval state and reference: Not yet approved; `RER-008` is presented for explicit user approval and includes the earlier baselines.
+- Approval state and reference: Approved by the user on 2026-08-31 after review of `RER-008` and `AORG-CONTRACT-001`; the user explicitly confirmed the governing model that AgentTeam is Agent-only and coordinator-led while AgentOrg contains multiple AgentTeams and independent Agents. `RER-009` records the approval and routing assessment.
 
 ## Problem And Desired Outcome
 
@@ -195,7 +195,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 
 | Artifact | Purpose | Status / Approval Applicability |
 | --- | --- | --- |
-| `tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Single normative configured-structure, minimal-delta generic V3 execution tree, task anchoring, and V2 projection contract | `Ready for Approval`; included in this approval basis. |
+| `tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Single normative configured-structure, minimal-delta generic V3 execution tree, task anchoring, and V2 projection contract | `Approved`; included in the 2026-08-31 user approval basis. |
 | `tickets/in-progress/flat-agent-organization-model/investigation-notes.md` | Canonical evidence base | Current; supports but does not independently define behavior. |
 | User screenshot at the absolute path recorded in investigation notes | Current structure evidence | Evidence only. |
 
@@ -203,10 +203,10 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 
 | ID | Decision | Status / Basis |
 | --- | --- | --- |
-| DEC-001 | One AgentOrg launch owns one shared runtime/address/lifecycle scope. | Proposed for approval; simplest model consistent with current handoff behavior. |
-| DEC-002 | AgentOrg has no coordinator; caller selects an exact Agent or Team entry target. | Proposed for approval; integrated remote concept. |
+| DEC-001 | One AgentOrg launch owns one shared runtime/address/lifecycle scope. | Approved; simplest model consistent with current handoff behavior. |
+| DEC-002 | AgentOrg has no coordinator; caller selects an exact Agent or Team entry target. | Approved; integrated remote concept and user-confirmed governing model. |
 | DEC-003 | The migration population contains no deeply nested configured data. Flat roots remain Teams; one-level organization-like roots convert to AgentOrg; no deep legacy migration/compatibility path is built. | User-confirmed assumption backed by the inventory of 23 root packages and 41 stored trees. |
-| DEC-004 | Standalone flat Teams remain reusable and independently launchable. | Proposed for approval; preserves existing Team value. |
+| DEC-004 | Standalone flat Teams remain reusable and independently launchable. | Approved; preserves existing Team value and progressive composition workflow. |
 | DEC-005 | Configured nested Teams are removed. A task Team created inside an Org exists under that Org's execution aggregate at its delegating host scope, but not in configured membership; standalone-Team tasks remain under the standalone Team run. | Clarified by user before approval; preserves lifecycle ownership without restoring configured nesting. |
 | DEC-006 | No Product Design handoff is requested for this package. | Resolved from user request. |
 
@@ -240,13 +240,22 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 - Behavior-defining supplement integrated: `Yes — agent-org-contract.md`
 - Data preservation and acceptable loss explicit: `Yes`
 - Target architecture avoided: `Yes`
-- User approval received: `No — requested for RER-008`
-- Package ready for downstream route: `No — approval gate only`
+- User approval received: `Yes — explicit 2026-08-31 confirmation recorded in RER-009`
+- Package ready for downstream route: `Yes — Approved Architecture-Ready`
 
 ## Architecture Design Routing Assessment
 
-- Assessment status: `Not performed — requirements await explicit approval`.
-- Assessment owner/date: Requirements Engineer / pending approval.
-- Structural surfaces already identified: definition contracts, runtime ownership/lifecycle, canonical routing, persistence/migration, GraphQL/stream APIs, tasks, memory/history, and frontend.
-- Structural-impact triggers: confirmed present.
-- Expected route after approval: Architecture Designer; final preliminary size/risk and outcome classification will be recorded only after the approval/readiness gate.
+- Assessment status: `Complete`.
+- Assessment owner/date: Requirements Engineer / 2026-08-31.
+- Preliminary task size: `Large`.
+- Preliminary architectural risk: `High`.
+- Structural surfaces reviewed: AgentOrg/AgentTeam definition contracts, graph validation, launch planning, root lifecycle/ownership, canonical routing and handoff compilation, generic execution-tree persistence/restore, memory/history, task delegation, GraphQL/stream contracts, package discovery/import, and frontend authoring/launch/workspace/history.
+- Payload/content surfaces reviewed: 23 root package configurations, the Software Development Department and Northstar definitions, 41 stored TeamRun execution trees, handoff snapshots, task execution records, and the current strict V2 JSON contract.
+- Structural-impact triggers: `Present` — public/domain contract change, persisted root schema/invariant change, lifecycle/ownership distinction, deterministic data migration, API/transport change, and cross-subsystem structural refactoring.
+- Evidence paths: `investigation-notes.md`, `agent-org-contract.md`, current definition/execution source paths listed there, package fixtures, and stored-run inventory.
+- Decision rationale: Although the existing execution-tree topology is reusable with minimal persistence transformation, the overall product change introduces a distinct AgentOrg domain/root, removes recursive configured Team composition across definition/API/UI surfaces, changes root coordinator semantics, and requires coordinated migration and lifecycle updates. It is not safe for bounded direct implementation without architecture design.
+- Selected route: `Architecture Designer`.
+- Outcome classification: `Approved Architecture-Ready`.
+- Direct-route conditions all satisfied: `No` — task is Large/High and has confirmed contract, persistence, lifecycle, migration, ownership, and structural-refactoring impact.
+- Architecture design, review, and design-revision artifacts: `Pending downstream Architecture Designer`.
+- Downstream re-entry trigger: A material intended-behavior gap or conflict must return to Requirements Engineering; target modules, physical file/directory names, type names, and rollout mechanics remain Architecture Design-owned.

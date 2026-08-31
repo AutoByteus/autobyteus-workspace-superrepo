@@ -4,8 +4,9 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-008`
-- Status: `Ready for Approval`
+- Requirements revision: `RER-009`
+- Status: `Approved`
+- Approval reference: User confirmation on 2026-08-31 following review of `RER-008`; recorded in `RER-009`.
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Provide one normative configured-structure and on-disk execution-tree contract that later Architecture Design must preserve.
 
@@ -374,7 +375,7 @@ before rebuilding derived indexes or projections.
 
 ## Approval Basis
 
-Approval of `RER-008` confirms:
+The 2026-08-31 approval recorded in `RER-009` confirms:
 
 1. AgentOrg is the only persistent multi-Team composition root and has no coordinator.
 2. AgentTeam is Agent-only by invariant and retains its direct Agent coordinator.

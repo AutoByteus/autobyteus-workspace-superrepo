@@ -14,6 +14,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | RER-006 | User correction that `flat` is an AgentTeam invariant, not a type-name prefix | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 naming | Renamed the target Team record to `TeamRunExecutionTreeFileV3` and removed the redundant `FlatTeam` subtype terminology. |
 | RER-007 | User correction to reuse the generic current execution tree with minimal root changes | Ready for Approval | Ready for Approval | BEH-008; REQ-014; AC-009; AORG-CONTRACT-001 | Replaced parallel AgentOrg/Team schema proposals with one generic V3 root union that reuses current V2 child/task records. |
 | RER-008 | User clarification of progressive standalone-Team-to-AgentOrg reuse | Ready for Approval | Ready for Approval | REQ-018; AC-013; SCN-006; ORG-CASE-031 | The same independently tested AgentTeam definition can be referenced directly by AgentOrg and connected with Org-scoped handoffs. |
+| RER-009 | User approval and Architecture Design Routing Assessment | Ready for Approval | Approved Architecture-Ready | All approved IDs; routing assessment | User approved the cumulative AgentTeam/AgentOrg model and contract; Large/High structural impact routes to Architecture Designer. |
 
 ## Revision Entries
 
@@ -142,3 +143,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Definition identity and standalone history must remain stable when a Team is referenced by Org; implementation must not create copied or Org-specific Team variants.
 - Remaining gaps, assumptions, or blocked decisions: None at the product/contract level.
 - Next action or recipient: Present `RER-008` and the updated contract for explicit approval.
+
+### RER-009 — Approval And Architecture Routing
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: Following the explicit approval request and complete package review, the user confirmed the intended governing model: AgentTeam is Agent-only and coordinator-led; AgentOrg contains multiple AgentTeams and independent Agents.
+- Prior authoritative status: `Ready for Approval` (`RER-008`).
+- Current authoritative status: `Approved`; outcome `Approved Architecture-Ready`.
+- IDs affected: Approval applies cumulatively to `BEH-001`–`BEH-009`, `REQ-001`–`REQ-018`, `AC-001`–`AC-013`, `SCN-001`–`SCN-006`, `PRE-001`–`PRE-005`, `DEC-001`–`DEC-006`, and `ORG-CASE-001`–`ORG-CASE-031`.
+- Why this revision was recorded: It captures explicit user approval, closes the readiness gate, and records the required downstream routing decision.
+- Canonical artifact sections changed: Document status, approval references, supplement status, readiness check, Architecture Design Routing Assessment, investigation status/evidence, and contract status.
+- Supplemental artifacts added, changed, or removed: `agent-org-contract.md` marked Approved; no new supplement.
+- Prototype evidence or product decisions incorporated: No prototype. Approval includes the minimal-delta generic execution tree, fixed-depth migration preconditions, task-Team ownership, and progressive standalone-Team reuse.
+- User approval impact: Cumulative requirements and `AORG-CONTRACT-001` are approved as of 2026-08-31. Any material intended-behavior change requires a later revision and renewed approval.
+- Downstream architecture or direct-implementation route impact: Assessment is Complete with preliminary `task_size=Large` and `architectural_risk=High`; selected route is Architecture Designer because contract, persisted-root invariant, lifecycle, migration, API/UI, ownership, and structural-refactoring triggers are present.
+- Remaining gaps, assumptions, or blocked decisions: No product requirement gap. Architecture owns physical names/locations, target modules, rollout sequence, and final architecture risk/size classification.
+- Next action or recipient: Classify the package as `Approved Architecture-Ready`, call dynamic handoff rules, and send the cumulative package to every returned recipient.
