@@ -4,11 +4,11 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-012`
+- Requirements revision: `RER-013`
 - Status: `Approved`
-- Approval reference: Structure/persistence behavior was approved on 2026-08-31 and recorded in `RER-009`. On 2026-08-31 the user directed Requirements Engineering to send the `RER-011` handoff information to Product Prototyper and clarified that Product Prototyper owns creation of the UI; this approval is recorded in `RER-012`.
+- Approval reference: Structure/persistence behavior was approved on 2026-08-31 in `RER-009`; handoff semantics/capabilities were approved in `RER-012`. During review of `RV-009`, the user explicitly rejected a separate pre-launch exact-entry selector and approved direct AgentOrg configuration, full-scope launch without an initial recipient, and post-launch workspace focus; `RER-013` records that reconciliation.
 - Owner/date: Requirements Engineer / 2026-08-31
-- Purpose: Provide one normative configured-structure, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
+- Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
 This contract intentionally reuses the generic current TeamRun V2 tree. The
 target is a semantic narrowing and minimal root generalization, not a new
@@ -48,6 +48,8 @@ AgentTeamDefinition
 7. Standalone AgentTeams remain directly launchable and reusable in an AgentOrg.
 8. Task Teams are runtime task executions beneath their exact host scope; they do not mutate configured membership.
 9. AgentTeam supports progressive composition: the same definition may be tested standalone and later referenced directly by AgentOrg without copying or specialization.
+10. AgentOrg activation and recipient focus are separate: `Run` opens Org configuration, launch activates the full Org without focus, and a later exact Agent/Team focus is required only for a recipient-requiring interaction.
+11. AgentOrg configuration applies root choices across the scope, then direct Team placement and exact Agent placement overrides by increasing specificity; it does not mutate referenced definitions or alter Team coordinator ingress.
 
 ## Behavioral Contract Cases
 
@@ -67,10 +69,10 @@ AgentTeamDefinition
 
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
-| ORG-CASE-008 | Define or launch AgentOrg | No Org coordinator is required or persisted | Leadership role/title does not create runtime coordinator semantics. |
-| ORG-CASE-009 | Caller selects independent Agent | Target that exact Agent execution | No first-member or name fallback. |
-| ORG-CASE-010 | Caller selects AgentTeam | Route through that Team's direct coordinator | Org does not invent a second coordinator. |
-| ORG-CASE-011 | Recipient-requiring action has no valid selection | Reject and require an exact mounted target | Do not target `/` or guess. |
+| ORG-CASE-008 | Invoke `Run` for AgentOrg | Open one AgentOrg run-configuration journey; no Org coordinator or entry recipient is required | Do not open a separate pre-launch Agent/Team selector or infer leadership as runtime ingress. |
+| ORG-CASE-009 | After launch, user focuses an independent Agent or an Agent inside a Team | Focus that exact mounted Agent execution | No first-member, name, or address-prefix fallback. |
+| ORG-CASE-010 | After launch, user focuses an AgentTeam | Focus/deliver through that Team's exact direct coordinator | Org does not invent a second coordinator or broadcast to the Team. |
+| ORG-CASE-011 | Recipient-requiring action has no valid post-launch focus | Reject and require an exact mounted Agent or Team selection from the active workspace | Launch/configuration/inspection remain valid without focus; do not target `/` or guess. |
 
 ### Addressing
 
@@ -127,11 +129,35 @@ same endpoint pair belong in the same Handoff because duplicate effective
 | ORG-CASE-041 | Cancel or save Handoff edits | All edits remain in the definition draft; Cancel discards them; one complete validated definition save commits atomically and gives visible success/failure feedback while retaining a failed draft | No per-control partial persistence, loss of a failed draft, or mutation before complete validation. |
 | ORG-CASE-042 | View Org-owned versus Team-local Handoffs | Org surface edits Org-owned Handoffs only; Team surface edits Team-local Handoffs only; any compiled/effective combined view labels its owner and is read-only | Org editing never mutates the referenced Team or becomes a second Team-local editing authority. |
 
+### AgentOrg Configuration, Activation, And Focus — Approved In RER-013
+
+Configuration answers how every mounted execution will run; it does not answer
+who the user will communicate with. The supported effective-setting order is:
+
+```text
+direct Org Agent: Agent placement override -> Org root choices
+Team Agent:       Agent placement override -> Team placement override -> Org root choices
+```
+
+The AgentOrg definition's launch defaults seed the Org-root choices. A mounted
+Agent or Team definition's own default launch preferences do not independently
+replace the Org choices merely because that definition is referenced; those
+defaults still seed the definition's standalone launch journey.
+
+| Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
+| --- | --- | --- | --- |
+| ORG-CASE-043 | Invoke AgentOrg `Run` | Proceed directly to one AgentOrg configuration journey covering the complete mounted scope | No separate pre-configuration entry selector. Product Design owns the concrete interaction solution. |
+| ORG-CASE-044 | Set or change an Org-root launch choice | Apply it to every mounted execution that has no more-specific valid placement override | Do not require repeating the same choice per Team/Agent. |
+| ORG-CASE-045 | Override one direct Team placement | Apply the Team override to that Team and its Agents unless an exact Agent override exists | Do not mutate the referenced Team definition or affect peer/direct Org Agents. |
+| ORG-CASE-046 | Override an exact mounted Agent | Apply that override only to the exact Agent placement, with highest specificity | Do not change its containing Team, sibling Agents, or reusable Agent definition. |
+| ORG-CASE-047 | Reference a Team or Agent whose definition has standalone launch defaults | Preserve those definition defaults for standalone launch, but do not let them silently supersede the active Org-root/placement choices | Referencing a definition is not an implicit run override or definition mutation. |
+| ORG-CASE-048 | Launch a completely valid Org configuration | Activate one full Org execution scope with every mounted execution configured and no initially focused recipient | Do not launch a single chosen entry, auto-focus a member, or change Team coordinator ingress. |
+
 ### Execution, Lifecycle, And Tasks
 
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
-| ORG-CASE-026 | Launch AgentOrg | Create one Org-owned execution-tree root with direct Agent/Team members | Root has no coordinator. |
+| ORG-CASE-026 | Launch AgentOrg | Create and activate one Org-owned execution-tree root with all direct Agent/Team members and no initial focus | Root has no coordinator; activation does not require or infer a recipient. |
 | ORG-CASE-027 | Activate Team in Org | Preserve Team definition/run identity, coordinator, launch config, Agents, tasks, events, stop, and restore | No configured child Team below it. |
 | ORG-CASE-028 | Org member delegates task to Team | Fresh task TeamRun is stored beneath exact delegating host scope and starts through Team coordinator | It is not configured membership or a permanent address. |
 | ORG-CASE-029 | Stop/restore AgentOrg | Apply lifecycle to complete Org scope using stored identities/snapshot | Do not reinterpret from mutable definitions. |
@@ -385,12 +411,13 @@ before rebuilding derived indexes or projections.
 | Verification ID | Scope | Verification Intent |
 | --- | --- | --- |
 | ORG-VERIFY-001 | ORG-CASE-001–007, ORG-CASE-031 | Definition/import/update, standalone-Team validation, and progressive Team-to-Org reuse. |
-| ORG-VERIFY-002 | ORG-CASE-008–018 | Coordinator-free Org targeting and strict addresses. |
+| ORG-VERIFY-002 | ORG-CASE-008–018 | Coordinator-free Org activation/post-launch targeting and strict addresses. |
 | ORG-VERIFY-003 | ORG-CASE-019–025 | Team-local and Org-wide handoffs using reused address records. |
 | ORG-VERIFY-004 | ORG-CASE-026–030 | Org/Team lifecycle and host-anchored task execution. |
 | ORG-VERIFY-005 | V3 root variants and reused-node table | Strict schema, root conditional fields, depth constraints, restore. |
 | ORG-VERIFY-006 | Preconditions and V2 mapping | Exhaustive cohort classification, idempotent minimal migration, no topology rebuild. |
 | ORG-VERIFY-007 | ORG-CASE-032–042 | Explicit From/To/When detail and authoring; eligible endpoint projection; coordinator indication; address visibility; CRUD/order/validation/cancel/atomic save; Org-versus-Team ownership separation. |
+| ORG-VERIFY-008 | ORG-CASE-043–048 | Direct-to-Org configuration, Org → Team → Agent effective-setting precedence, referenced-definition immutability, complete launch validation, full-scope activation, and no initial focus. |
 
 ## Contract Non-Goals
 
@@ -398,7 +425,7 @@ before rebuilding derived indexes or projections.
 - Parallel AgentOrg V1 and AgentTeam V3 schema families.
 - `FlatTeam` domain/schema/file names.
 - Recursive configured AgentTeam or AgentOrg definitions.
-- A root AgentOrg coordinator or default coordinator fallback.
+- A root AgentOrg coordinator, pre-launch exact-entry selector, automatic initial focus, or default recipient fallback.
 - Shared Agent runtime instances across configured placements.
 - Automatic cross-run logical routing.
 - Live topology mutation/file watching.
@@ -424,3 +451,12 @@ The handoff semantic information and required authoring capabilities defined by
 the experience must communicate and enable, not how Product Prototyper must
 compose the UI. Product Prototyper owns the concrete prototype and visual/
 interaction solution.
+
+The launch/configuration/focus behavior defined by `ORG-CASE-008`–`ORG-CASE-011`
+and `ORG-CASE-043`–`ORG-CASE-048` was approved in `RER-013` from the user's
+explicit rejection of the `RV-009` selector. AgentOrg activation covers the
+complete configured scope without a recipient; exact focus is chosen afterward
+only when a recipient-requiring interaction needs it. The configuration
+precedence adapts the current AgentTeam default/placement-override behavior to
+the approved fixed-depth Org model without prescribing Product Design's UI or
+Architecture Design's target implementation.
