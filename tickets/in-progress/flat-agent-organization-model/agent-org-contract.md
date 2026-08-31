@@ -4,7 +4,7 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-001`
+- Requirements revision: `RER-002`
 - Status: `Ready for Approval`
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Define supported composition, entry, addressing, handoff, lifecycle, task, and durable-state cases before Architecture Design.
@@ -30,7 +30,7 @@ AgentOrg                                  structural root; no coordinator
 5. One AgentOrg run owns one collaboration/address/lifecycle scope.
 6. Containment expresses membership; explicit handoff rules express authorized workflow.
 7. Standalone flat Teams remain reusable and directly launchable.
-8. Configured membership is distinct from task-scoped delegation to a Team.
+8. A task Team spawned by an Org member exists under that AgentOrg's execution aggregate, anchored to the exact delegating host scope; it is not a configured Org/Team member. A standalone Team owns tasks delegated from its own run.
 
 ## Contract Cases
 
@@ -87,9 +87,15 @@ Task/run identifiers may add transient execution identity, but they do not creat
 | --- | --- | --- | --- |
 | ORG-CASE-026 | Launch AgentOrg | Create one Org-owned scope with direct independent Agent executions and direct flat-Team executions | Root is not persisted/restored as AgentTeam. |
 | ORG-CASE-027 | Activate Team in Org | Preserve Team instruction, coordinator, launch configuration, workspace, Agents, events, status, stop, and restore identity | No configured child Team lifecycle. |
-| ORG-CASE-028 | Delegate a task to flat Team | A fresh task-scoped execution of that Team may start through its coordinator and settle/report normally | This is not configured nested Team membership. |
+| ORG-CASE-028 | AgentOrg member delegates a task to flat Team | A fresh task-scoped TeamRun starts through that Team's coordinator and is recorded under the same AgentOrg execution aggregate at the exact delegating host scope | It is not added to configured Org membership, is not a configured child Team, and receives no new permanent Org member address. |
 | ORG-CASE-029 | Stop or restore AgentOrg | Apply lifecycle to the complete Org scope using stored exact identities and snapshot | Do not reinterpret via current mutable definitions. |
 | ORG-CASE-030 | Launch/restore standalone flat Team | Preserve Team-owned lifecycle and supported tasks | No Org-only requirement for Team execution. |
+
+For lifecycle and persistence, “under AgentOrg” means the AgentOrg run is the
+top-level durable owner. The task execution remains attached to the exact host
+scope that delegated it (the Org scope or a Team scope inside the Org), keeps a
+fresh task TeamRun identity, and is reached through task lifecycle identity.
+It does not alter the Org definition or the fixed configured address tree.
 
 ## Current `team_run_execution_tree.json` Assessment
 
@@ -132,7 +138,7 @@ Organization execution root
   direct flat Teams
   Organization-scoped effective handoffs
   selected interaction target, when the product persists focus/entry
-  Organization-owned task executions, when applicable
+  task executions created inside the Org, anchored to their delegating host scope
 
 Flat Team execution
   Team definition identity
@@ -193,7 +199,7 @@ Observed evidence: 23 local root package definitions and 41 readable stored Team
 
 ## Approval Basis
 
-Approval of `RER-001` confirms this contract with the requirements document, specifically:
+Approval of `RER-002` confirms this contract with the requirements document, specifically:
 
 1. AgentOrg is the only persistent multi-Team composition root.
 2. AgentOrg has no coordinator; a caller selects an exact Agent or Team target.

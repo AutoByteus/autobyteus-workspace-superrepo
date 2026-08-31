@@ -7,6 +7,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | Revision ID | Trigger / Round | Prior Status | Current Status | Affected Requirement / Behavior IDs | Result |
 | --- | --- | --- | --- | --- | --- |
 | RER-001 | Initial contract-first baseline plus integration of the user-identified remote bootstrap branch | N/A | Ready for Approval | BEH-001–BEH-009; REQ-001–REQ-017; AC-001–AC-012 | One coherent AgentOrg/flat-Team requirements and persistence contract is ready for explicit user approval. |
+| RER-002 | User clarification of task-Team ownership under AgentOrg | Ready for Approval | Ready for Approval | REQ-015; AC-010; DEC-005; ORG-CASE-028 | Org-originated task Teams are explicitly owned under the AgentOrg execution aggregate without becoming configured members. |
 
 ## Revision Entries
 
@@ -30,3 +31,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Structural contract, lifecycle, persistence, migration, API, and frontend triggers are present. Formal routing assessment remains gated on approval and is expected to select Architecture Designer.
 - Remaining gaps, assumptions, or blocked decisions: External deeper-topology volume is unknown but does not change the retain-and-block behavior. Exact target schema, transition mechanism, and rollout sequence belong to Architecture Design.
 - Next action or recipient: Present `RER-001` and `AORG-CONTRACT-001` to the user for explicit approval.
+
+### RER-002 — Task Team Runtime Ownership Clarification
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: The user asked whether a task Team, when created, will exist under the AgentOrg.
+- Prior authoritative status: `Ready for Approval` (`RER-001`).
+- Current authoritative status: `Ready for Approval` (`RER-002`).
+- IDs affected: `REQ-015`, `AC-010`, `DEC-005`, and `ORG-CASE-028`.
+- Why this revision was recorded: “Task-scoped” previously distinguished the execution from configured nesting but did not state its top-level durable owner precisely enough.
+- Canonical artifact sections changed: Requirements, Acceptance Criteria, Assumptions And Resolved Decisions, contract governing model, execution/lifecycle cases, and durable semantic shape.
+- Supplemental artifacts added, changed, or removed: Updated `agent-org-contract.md`; no new supplement.
+- Prototype evidence or product decisions incorporated: User clarification establishes that an Org-originated task Team belongs beneath the AgentOrg execution aggregate.
+- User approval impact: Approval must now reference `RER-002`; it includes and supersedes the review state of `RER-001` without changing its other decisions.
+- Downstream architecture or direct-implementation route impact: Architecture must preserve Org-root ownership while anchoring the task execution to the exact delegating host scope; no configured member/address-tree mutation is authorized.
+- Remaining gaps, assumptions, or blocked decisions: Exact storage field/container and transient task addressing remain Architecture Design decisions.
+- Next action or recipient: Present the clarified `RER-002` package and `AORG-CONTRACT-001` to the user for explicit approval.

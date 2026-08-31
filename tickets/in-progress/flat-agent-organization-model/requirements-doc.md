@@ -3,11 +3,11 @@
 ## Document Status
 
 - Status: `Ready for Approval`
-- Current requirements revision ID: `RER-001`
+- Current requirements revision ID: `RER-002`
 - Request / ticket: `AORG-FLAT-TEAM-001`
 - Requirements owner: Requirements Engineer
 - Date: 2026-08-31
-- Approval state and reference: Not yet approved; this is the first coherent package presented for explicit user approval.
+- Approval state and reference: Not yet approved; `RER-002` is presented for explicit user approval and includes the initial `RER-001` baseline.
 
 ## Problem And Desired Outcome
 
@@ -103,7 +103,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | REQ-012 | Existing root Team definitions/runs with only direct Agents MUST remain standalone flat Teams. Existing roots with direct Agents and exactly one level of flat child Teams MUST convert to AgentOrg when identities, coordinators, addresses, and handoffs map unambiguously. | BEH-005, BEH-007 | Critical | Evidence-backed safe transition for observed data. |
 | REQ-013 | Deeper or ambiguous existing topology MUST NOT be automatically flattened, truncated, deleted, or activated under changed identity. The offending placement and recovery outcome MUST be explicit, while source data remains retained. | BEH-005, BEH-007 | Critical | Prevents semantic corruption and silent loss. |
 | REQ-014 | Native AgentOrg durable execution state MUST use an Org-root semantic contract that distinguishes Org identity/run, direct independent Agents, direct flat Teams, selected interaction target where persisted, and Org-scoped handoffs. Unchanged TeamRun V2 MUST NOT be relabeled as AgentOrg. | BEH-008 | Critical | Current JSON requires `rootTeam`, root coordinator, and recursion. |
-| REQ-015 | Removing configured nested Teams MUST NOT remove supported task delegation to flat Teams or task-scoped Team execution solely due to structural nesting. | BEH-009 | High | Configured membership and delegated execution are different contracts. |
+| REQ-015 | A task Team created by an AgentOrg member MUST be a fresh task-scoped Team execution owned within that AgentOrg run and anchored to the exact delegating host scope. It MUST NOT become a configured Org member or configured child Team. Task delegation from a standalone Team remains owned by that standalone Team run. | BEH-009 | High | Task runtime ownership belongs under the active root scope, while configured membership stays flat. |
 | REQ-016 | Affected GraphQL/transport, catalog/detail/launch/history, authoring, and workspace surfaces MUST distinguish AgentOrg from flat Team and MUST stop advertising or accepting configured Team members inside a Team. | BEH-006, BEH-008 | High | Product and external contracts must be truthful. |
 | REQ-017 | Concurrent work MUST NOT introduce new recursive configured-Team mutation dependencies. Any future dynamic membership capability requires a separate approved contract and may operate only within the approved Org-direct-member or Team-direct-Agent boundaries. | BEH-001 | High | Reconciles the conflicting draft dynamic-Team branch. |
 
@@ -120,7 +120,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | AC-007 | REQ-011 | Define and launch a flat Team without an Org, then reuse it in an Org | Standalone coordinator-led collaboration works; the same definition can be mounted as a direct Org Team | Org membership is not mandatory for ordinary Team work. |
 | AC-008 | REQ-012, REQ-013 | Transition each existing definition/run cohort | Flat roots remain Teams; unambiguous one-level org roots convert; deeper/ambiguous input is retained and blocked with exact recovery guidance | No identity/content/history is silently lost or reinterpreted. |
 | AC-009 | REQ-014 | Persist and restore a native AgentOrg run | Durable state identifies an Org root, no Org coordinator, direct member kinds, exact fixed-depth addresses, and the stored run snapshot | Strict validation rejects recursive configured Team nodes or a Team-root alias masquerading as Org. |
-| AC-010 | REQ-015 | Delegate a task to a mounted or standalone flat Team | Fresh task execution starts through that Team's coordinator and settles/reports under existing supported task semantics | Configured nesting is not reintroduced into the Team definition. |
+| AC-010 | REQ-015 | An Org member delegates a task to a flat Team | A fresh task TeamRun starts through that Team's coordinator, is recorded under the same AgentOrg execution aggregate at the delegating host scope, and settles/reports under supported task semantics | It is not added to the Org definition/member list and receives no new permanent Org member address. A task delegated from a standalone Team remains under that Team run. |
 | AC-011 | REQ-016 | Use affected API and web authoring/launch/history flows | Org and Team roles are distinguishable; Team authoring offers Agent members only; existing flat-Team flows remain usable | Nested-Team selectors/counts/warnings are absent from flat-Team authoring. |
 | AC-012 | REQ-017 | Reconcile the dynamic-AgentTeam draft work | No new production path can add/remove a configured Team beneath a Team | Reusable dynamic ideas, if any, require a separately approved fixed-depth contract. |
 
@@ -188,7 +188,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | DEC-002 | AgentOrg has no coordinator; caller selects an exact Agent or Team entry target. | Proposed for approval; integrated remote concept. |
 | DEC-003 | Safe zero/one-level local cohorts are preserved/converted; deeper or ambiguous data is retained and blocked, never silently flattened. | Proposed for approval; evidence-backed continuity rule. |
 | DEC-004 | Standalone flat Teams remain reusable and independently launchable. | Proposed for approval; preserves existing Team value. |
-| DEC-005 | Configured nested Teams are removed; task-scoped Team delegation remains a separate supported contract. | Proposed for approval; avoids accidental scope loss. |
+| DEC-005 | Configured nested Teams are removed. A task Team created inside an Org exists under that Org's execution aggregate at its delegating host scope, but not in configured membership; standalone-Team tasks remain under the standalone Team run. | Clarified by user before approval; preserves lifecycle ownership without restoring configured nesting. |
 | DEC-006 | No Product Design handoff is requested for this package. | Resolved from user request. |
 
 ## Traceability
@@ -219,7 +219,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 - Behavior-defining supplement integrated: `Yes — agent-org-contract.md`
 - Data preservation and acceptable loss explicit: `Yes`
 - Target architecture avoided: `Yes`
-- User approval received: `No — requested for RER-001`
+- User approval received: `No — requested for RER-002`
 - Package ready for downstream route: `No — approval gate only`
 
 ## Architecture Design Routing Assessment
