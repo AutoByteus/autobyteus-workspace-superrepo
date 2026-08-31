@@ -9,6 +9,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | RER-001 | Initial contract-first baseline plus integration of the user-identified remote bootstrap branch | N/A | Ready for Approval | BEH-001–BEH-009; REQ-001–REQ-017; AC-001–AC-012 | One coherent AgentOrg/flat-Team requirements and persistence contract is ready for explicit user approval. |
 | RER-002 | User clarification of task-Team ownership under AgentOrg | Ready for Approval | Ready for Approval | REQ-015; AC-010; DEC-005; ORG-CASE-028 | Org-originated task Teams are explicitly owned under the AgentOrg execution aggregate without becoming configured members. |
 | RER-003 | User-confirmed migration assumption that no deeply nested configured data exists | Ready for Approval | Ready for Approval | BEH-007; REQ-012–REQ-013; AC-008; DEC-003; Existing Data Contract | Migration is reduced to two exhaustive zero/one-level cohorts; no deep legacy compatibility path is required. |
+| RER-004 | User direction to make fixed-depth data facts authoritative migration prerequisites | Ready for Approval | Ready for Approval | PRE-001–PRE-005; REQ-012–REQ-013; AC-008; Existing Data Contract | Downstream migration may rely on fixed-depth preknown conditions and must not design hypothetical recursive flattening. |
 
 ## Revision Entries
 
@@ -62,3 +63,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Architecture must handle only flat-root preservation and one-level organization-like conversion. It must not design a deep legacy migration/compatibility branch; permanent validators still reject unsupported deeper input.
 - Remaining gaps, assumptions, or blocked decisions: Exact transition mechanics remain Architecture Design-owned. No material product decision remains open.
 - Next action or recipient: Present `RER-003` and `AORG-CONTRACT-001` to the user for explicit approval.
+
+### RER-004 — Authoritative Fixed-Depth Migration Preconditions
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: The user directed that the known data shape be recorded explicitly as migration prerequisites so future work does not attempt to solve nonexistent three-level nesting.
+- Prior authoritative status: `Ready for Approval` (`RER-003`).
+- Current authoritative status: `Ready for Approval` (`RER-004`).
+- IDs affected: Added `PRE-001`–`PRE-005`; refined `REQ-012`, `REQ-013`, and `AC-008`; updated the contract Existing Data Contract and downstream architecture input.
+- Why this revision was recorded: A migration assumption stated only in prose could be reopened downstream. Stable precondition IDs make the fixed-depth input authoritative and testable.
+- Canonical artifact sections changed: Requirements, Acceptance Criteria, Data Continuity, new Migration Preconditions / Preknown Conditions, Downstream Architecture Input, investigation source/decision log, and contract migration preconditions.
+- Supplemental artifacts added, changed, or removed: Updated `agent-org-contract.md`; no new supplement.
+- Prototype evidence or product decisions incorporated: No prototype. Incorporated the user's operational fact that all relevant live/historical data derives from current zero/one-level configured Team definitions.
+- User approval impact: Approval must reference `RER-004`; it includes all earlier revisions and makes `PRE-001`–`PRE-005` authoritative.
+- Downstream architecture or direct-implementation route impact: Migration design is explicitly fixed-depth. It must preserve task-scoped runtime lineage separately and must stop before writes on an unexpected precondition violation rather than implement recursive flattening.
+- Remaining gaps, assumptions, or blocked decisions: Exact migration mechanism remains Architecture Design-owned. No product decision remains open.
+- Next action or recipient: Present `RER-004` and `AORG-CONTRACT-001` to the user for explicit approval.

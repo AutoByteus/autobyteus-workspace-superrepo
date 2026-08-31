@@ -4,7 +4,7 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-003`
+- Requirements revision: `RER-004`
 - Status: `Ready for Approval`
 - Owner/date: Requirements Engineer / 2026-08-31
 - Purpose: Define supported composition, entry, addressing, handoff, lifecycle, task, and durable-state cases before Architecture Design.
@@ -162,6 +162,16 @@ Required invariants:
 
 ## Existing Data Contract
 
+### Migration Preconditions / Preknown Conditions
+
+1. All relevant definitions and live/historical execution data derive from the currently managed AgentTeam definitions.
+2. Configured topology has at most one Team-membership edge: current root Team → optional direct child flat Team → Agents.
+3. No relevant root Team → child Team → grandchild Team definition or run data exists.
+4. The migration handles exactly two configured cohorts: Agent-only roots and one-level organization-like roots.
+5. Task-scoped Team execution lineage is not configured Team nesting and remains attached to its exact runtime host during conversion.
+6. Migration therefore uses fixed-depth mapping and does not implement recursive flattening or a deep legacy compatibility branch.
+7. If an actual record unexpectedly violates the configured-depth precondition, migration stops before writing and reports the invariant violation; it does not guess a conversion.
+
 | Existing Cohort | Required Outcome | Reason |
 | --- | --- | --- |
 | Root Team with direct Agents only | Preserve as standalone flat Team | Already satisfies target Team invariant. |
@@ -203,7 +213,7 @@ later, normal flat-model validation rejects it before mutation or activation.
 
 ## Approval Basis
 
-Approval of `RER-003` confirms this contract with the requirements document, specifically:
+Approval of `RER-004` confirms this contract with the requirements document, specifically:
 
 1. AgentOrg is the only persistent multi-Team composition root.
 2. AgentOrg has no coordinator; a caller selects an exact Agent or Team target.
