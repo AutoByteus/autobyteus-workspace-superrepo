@@ -12,6 +12,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | RER-004 | User direction to make fixed-depth data facts authoritative migration prerequisites | Ready for Approval | Ready for Approval | PRE-001–PRE-005; REQ-012–REQ-013; AC-008; Existing Data Contract | Downstream migration may rely on fixed-depth preknown conditions and must not design hypothetical recursive flattening. |
 | RER-005 | User direction for one contract containing configured structure and on-disk data structure | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 | The single normative contract now defines AgentOrg V1, flat-Team V3, task anchoring, strict invariants, and V2 migration mapping. |
 | RER-006 | User correction that `flat` is an AgentTeam invariant, not a type-name prefix | Ready for Approval | Ready for Approval | REQ-014; AC-009; AORG-CONTRACT-001 naming | Renamed the target Team record to `TeamRunExecutionTreeFileV3` and removed the redundant `FlatTeam` subtype terminology. |
+| RER-007 | User correction to reuse the generic current execution tree with minimal root changes | Ready for Approval | Ready for Approval | BEH-008; REQ-014; AC-009; AORG-CONTRACT-001 | Replaced parallel AgentOrg/Team schema proposals with one generic V3 root union that reuses current V2 child/task records. |
 
 ## Revision Entries
 
@@ -110,3 +111,18 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Downstream architecture or direct-implementation route impact: Target domain/schema names must use ordinary AgentTeam/TeamRun terminology and must not introduce `FlatTeam` as a public or persisted subtype.
 - Remaining gaps, assumptions, or blocked decisions: None at the product/contract level.
 - Next action or recipient: Present `RER-006` and the corrected contract for explicit approval.
+
+### RER-007 — Minimal-Delta Generic Execution Tree
+
+- Triggering user feedback, prototype package, downstream feedback, or investigation evidence: The user observed that the previously designed TeamRun execution tree was deliberately generic and should already represent AgentOrg with only minimal root/file naming changes; the user reaffirmed that AgentOrg has no coordinator while direct Teams retain theirs.
+- Prior authoritative status: `Ready for Approval` (`RER-006`).
+- Current authoritative status: `Ready for Approval` (`RER-007`).
+- IDs affected: `BEH-008`, `REQ-014`, `AC-009`, External Contracts, Downstream Architecture Input, investigation persistence findings, and all on-disk/migration sections of `AORG-CONTRACT-001`.
+- Why this revision was recorded: The prior two-schema proposal duplicated an already generic envelope/member/task topology and overstated the persistence change.
+- Canonical artifact sections changed: Current-versus-desired durable behavior, durable requirement/acceptance criterion, dependency/routing input, investigation source/code findings, and the complete contract on-disk structure/migration mapping.
+- Supplemental artifacts added, changed, or removed: Rewrote the existing single `agent-org-contract.md`; no new supplement.
+- Prototype evidence or product decisions incorporated: No prototype. Concrete V2 reinspection confirmed reuse of envelope, configured Agent/Team nodes, addresses, handoffs, launch state, and task lineage. Only root subject/naming/coordinator semantics and configured-depth validation change.
+- User approval impact: Approval must reference `RER-007` and `AORG-CONTRACT-001`; it supersedes the separate AgentOrg V1/TeamRun V3 schema proposal while preserving all domain, task, and migration preconditions.
+- Downstream architecture or direct-implementation route impact: Architecture must design one generic V3 execution tree with an AgentOrg-or-AgentTeam root variant and must avoid parallel topology families or record duplication.
+- Remaining gaps, assumptions, or blocked decisions: Physical generic filename/directory and exact target type/module names remain Architecture Design-owned; logical minimal-delta fields and invariants are fixed by the contract.
+- Next action or recipient: Present `RER-007` and the revised single contract for explicit approval.

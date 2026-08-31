@@ -1,41 +1,30 @@
-# AgentOrg Behavioral And Persistence Contract
+# AgentOrg And AgentTeam Structure / Persistence Contract
 
 ## Contract Status
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-006`
+- Requirements revision: `RER-007`
 - Status: `Ready for Approval`
 - Owner/date: Requirements Engineer / 2026-08-31
-- Purpose: Define supported composition, entry, addressing, handoff, lifecycle, task, and durable-state cases before Architecture Design.
+- Purpose: Provide one normative configured-structure and on-disk execution-tree contract that later Architecture Design must preserve.
 
-This is the single normative structure and persistence supplement. It defines
-the logical configured structure and the versioned on-disk execution records
-that later Architecture Design must realize. It does not assign target modules,
-classes, physical file names, storage partitioning, or rollout mechanics.
+This contract intentionally reuses the generic current TeamRun V2 tree. The
+target is a semantic narrowing and minimal root generalization, not a new
+execution topology. Target modules, physical storage directories, rollout
+mechanics, and implementation sequencing remain Architecture Design-owned.
 
-## Governing Model
+## Governing Configured Model
 
 ```text
-AgentOrg                                  structural root; no coordinator
+AgentOrg                                  no coordinator
 ├── independent Agent                    /agent
-├── flat Team                            /team  -> Team coordinator ingress
+├── AgentTeam                            /team  -> Team coordinator ingress
 │   ├── Agent                            /team/agent
 │   └── Agent                            /team/agent
-└── flat Team                            /team
+└── AgentTeam                            /team
     └── Agent                            /team/agent
 ```
-
-1. `AgentOrg` is the only persistent multi-Team composition root.
-2. AgentOrg may contain direct independent Agents and direct flat Teams; it cannot contain AgentOrg.
-3. A flat Team contains Agents only and has exactly one direct Agent coordinator.
-4. AgentOrg has no coordinator. A caller selects an exact mounted Agent or Team when beginning or focusing interaction.
-5. One AgentOrg run owns one collaboration/address/lifecycle scope.
-6. Containment expresses membership; explicit handoff rules express authorized workflow.
-7. Standalone flat Teams remain reusable and directly launchable.
-8. A task Team spawned by an Org member exists under that AgentOrg's execution aggregate, anchored to the exact delegating host scope; it is not a configured Org/Team member. A standalone Team owns tasks delegated from its own run.
-
-### Normative Configured Structure
 
 ```text
 AgentOrgDefinition
@@ -46,95 +35,88 @@ AgentOrgDefinition
 AgentTeamDefinition
   coordinator: exact direct Agent member
   members: AgentMemberRef[]
-  handoffs: direct AgentSource -> direct AgentOrTeamCoordinatorDestination
+  handoffs: AgentSource -> AgentOrTeamDestination within Team scope
 ```
 
-An AgentOrg member reference and AgentTeam Agent reference preserve the current
-member identity fields (`memberName`, definition `ref`, and `refScope`) plus
-role/description metadata when supplied. The physical package-file naming and
-whether prose metadata remains in a companion Markdown file are Architecture
-Design decisions; the configured shape and invariants above are normative.
+1. `AgentOrg` is the only persistent multi-Team composition root.
+2. AgentOrg may contain direct independent Agents and direct AgentTeams.
+3. AgentOrg cannot contain AgentOrg and has no coordinator.
+4. AgentTeam contains Agents only and has exactly one direct Agent coordinator.
+5. `flat` is an AgentTeam invariant, not a subtype or type/file-name prefix.
+6. One AgentOrg run owns one address, handoff, lifecycle, and persistence scope.
+7. Standalone AgentTeams remain directly launchable and reusable in an AgentOrg.
+8. Task Teams are runtime task executions beneath their exact host scope; they do not mutate configured membership.
 
-`flat` is an invariant of `AgentTeam`, not a subtype or public type-name
-prefix. There is no parallel non-flat AgentTeam model in the target domain.
-
-## Contract Cases
+## Behavioral Contract Cases
 
 ### Definition And Composition
 
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
-| ORG-CASE-001 | Define AgentOrg with independent Agents only | Valid when names and refs are unique and resolvable | Org is not represented as a recursive Team. |
-| ORG-CASE-002 | Define AgentOrg with flat Teams only | Valid; every Team independently satisfies its coordinator invariant | No Team needs a synthetic parent Team. |
-| ORG-CASE-003 | Define AgentOrg with both direct member kinds | Valid; all placements share one Org scope | Members are not unrelated roots joined implicitly. |
-| ORG-CASE-004 | Define a flat Team | Valid only with Agent members and exactly one direct Agent coordinator | Team/Org members are rejected. |
-| ORG-CASE-005 | Add AgentOrg below AgentOrg or Team | Reject before partial persistence/launch and identify the placement | No recursive Org composition. |
-| ORG-CASE-006 | Add Team below Team | Reject before partial persistence/launch and identify the placement | No silent flattening, remounting, or compatibility fallback. |
-| ORG-CASE-007 | Launch standalone flat Team | Preserve coordinator-led Team behavior and supported lifecycle/task behavior | Org membership is not mandatory. |
+| ORG-CASE-001 | Define AgentOrg with independent Agents only | Valid with unique, resolvable members | Org is not represented as AgentTeam. |
+| ORG-CASE-002 | Define AgentOrg with AgentTeams only | Valid; every Team independently satisfies its coordinator invariant | No synthetic parent Team. |
+| ORG-CASE-003 | Define AgentOrg with both direct member kinds | Valid; all placements share one Org scope | No implicit joining of unrelated root runs. |
+| ORG-CASE-004 | Define AgentTeam | Valid only with Agent members and exactly one direct Agent coordinator | Team/Org members are rejected. |
+| ORG-CASE-005 | Add AgentOrg below AgentOrg or Team | Reject before partial persistence/launch | No recursive Org composition. |
+| ORG-CASE-006 | Add AgentTeam below AgentTeam | Reject before partial persistence/launch | No silent flattening or compatibility fallback. |
+| ORG-CASE-007 | Launch standalone AgentTeam | Preserve coordinator-led Team lifecycle and task behavior | Org membership is not mandatory. |
 
 ### Entry And User Targeting
 
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
-| ORG-CASE-008 | Define or launch AgentOrg | No Org coordinator is required or accepted as Org semantics | A CEO/lead may be an independent Agent but is not a runtime coordinator by virtue of title. |
-| ORG-CASE-009 | Caller selects independent Agent | Initial/focused interaction targets that exact Agent execution | No first-member or name fallback. |
-| ORG-CASE-010 | Caller selects Team | Interaction targets the selected Team through its direct Agent coordinator | AgentOrg does not invent a second coordinator. |
-| ORG-CASE-011 | No valid selection is supplied for an action that requires a recipient | Reject the action and require an exact mounted target | Do not target the structural root or guess a default. |
+| ORG-CASE-008 | Define or launch AgentOrg | No Org coordinator is required or persisted | Leadership role/title does not create runtime coordinator semantics. |
+| ORG-CASE-009 | Caller selects independent Agent | Target that exact Agent execution | No first-member or name fallback. |
+| ORG-CASE-010 | Caller selects AgentTeam | Route through that Team's direct coordinator | Org does not invent a second coordinator. |
+| ORG-CASE-011 | Recipient-requiring action has no valid selection | Reject and require an exact mounted target | Do not target `/` or guess. |
 
 ### Addressing
 
 | Case ID | Address | Required Subject / Outcome |
 | --- | --- | --- |
 | ORG-CASE-012 | `/independent_agent` | Exact direct Org Agent placement. |
-| ORG-CASE-013 | `/team` | Exact direct flat-Team placement; ordinary delivery uses Team coordinator ingress. |
-| ORG-CASE-014 | `/team/agent` | Exact Agent placement inside the Team. |
-| ORG-CASE-015 | `/` | Structural Org root; not a collaboration recipient. |
-| ORG-CASE-016 | `/team/subteam` where the second segment denotes a Team | Reject unsupported configured composition. |
-| ORG-CASE-017 | `/team/agent/deeper` | Reject persistent placement deeper than two member segments. |
-| ORG-CASE-018 | Bare/relative/parent-traversal/backslash/unknown/case-colliding address | Fail closed without coordinator or name fallback. |
-
-Task/run identifiers may add transient execution identity, but they do not create a new persistent Team-within-Team placement.
+| ORG-CASE-013 | `/team` | Exact direct Team placement; delivery uses Team coordinator ingress. |
+| ORG-CASE-014 | `/team/agent` | Exact Agent placement inside Team. |
+| ORG-CASE-015 | `/` | Structural root; not a collaboration recipient. |
+| ORG-CASE-016 | `/team/subteam` where second segment is Team | Reject configured Team-in-Team composition. |
+| ORG-CASE-017 | `/team/agent/deeper` | Reject configured placement deeper than target model. |
+| ORG-CASE-018 | Bare/relative/parent-traversal/backslash/unknown/case-colliding address | Fail closed without fallback. |
 
 ### Handoffs
 
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
-| ORG-CASE-019 | Team author defines Agent-to-Agent handoff | Preserve as Team-local; mounting may rebase it once beneath `/team` | Team-local scope cannot address Org peers. |
-| ORG-CASE-020 | Org author defines independent Agent → Team handoff | Resolve in the Org and deliver through Team coordinator when applicable | Nesting is not needed to authorize the route. |
-| ORG-CASE-021 | Org author defines Team Agent → peer Agent/Team/Team Agent | Resolve both exact endpoints in the same Org | No global name or unrelated-run discovery. |
-| ORG-CASE-022 | Source is Team or Org | Reject; a handoff source is an Agent | No synthetic structural actor. |
-| ORG-CASE-023 | Duplicate effective edge or source resolves to the same Agent as a Team destination | Reject deterministically | No duplicate/self delivery guidance. |
-| ORG-CASE-024 | Agent calls `get_handoff_rules` | Return ordered outgoing rules for that exact mounted Agent | Framework does not evaluate natural-language conditions. |
-| ORG-CASE-025 | Agent calls `send_message_to(recipient_address)` | Resolve only in the active Org or standalone Team scope | No implicit cross-process/unrelated-run routing. |
+| ORG-CASE-019 | Team author defines Agent-to-Agent handoff | Preserve as Team-local and rebase once when mounted | Team-local scope cannot independently address Org peers. |
+| ORG-CASE-020 | Org author defines independent Agent → Team handoff | Resolve in Org and deliver through Team coordinator | Nesting is not needed to authorize route. |
+| ORG-CASE-021 | Org author defines Team Agent → peer Agent/Team/Team Agent | Resolve exact endpoints in same Org | No global/unrelated-run lookup. |
+| ORG-CASE-022 | Handoff source is Team or Org | Reject; source must be Agent | No synthetic structural actor. |
+| ORG-CASE-023 | Duplicate effective edge or self-resolving Team target | Reject deterministically | No duplicate/self delivery guidance. |
+| ORG-CASE-024 | Agent calls `get_handoff_rules` | Return ordered outgoing rules for exact mounted Agent | Framework does not evaluate rule prose. |
+| ORG-CASE-025 | Agent calls `send_message_to(recipient_address)` | Resolve only in active Org or standalone Team scope | No implicit cross-run routing. |
 
 ### Execution, Lifecycle, And Tasks
 
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
-| ORG-CASE-026 | Launch AgentOrg | Create one Org-owned scope with direct independent Agent executions and direct flat-Team executions | Root is not persisted/restored as AgentTeam. |
-| ORG-CASE-027 | Activate Team in Org | Preserve Team instruction, coordinator, launch configuration, workspace, Agents, events, status, stop, and restore identity | No configured child Team lifecycle. |
-| ORG-CASE-028 | AgentOrg member delegates a task to flat Team | A fresh task-scoped TeamRun starts through that Team's coordinator and is recorded under the same AgentOrg execution aggregate at the exact delegating host scope | It is not added to configured Org membership, is not a configured child Team, and receives no new permanent Org member address. |
-| ORG-CASE-029 | Stop or restore AgentOrg | Apply lifecycle to the complete Org scope using stored exact identities and snapshot | Do not reinterpret via current mutable definitions. |
-| ORG-CASE-030 | Launch/restore standalone flat Team | Preserve Team-owned lifecycle and supported tasks | No Org-only requirement for Team execution. |
+| ORG-CASE-026 | Launch AgentOrg | Create one Org-owned execution-tree root with direct Agent/Team members | Root has no coordinator. |
+| ORG-CASE-027 | Activate Team in Org | Preserve Team definition/run identity, coordinator, launch config, Agents, tasks, events, stop, and restore | No configured child Team below it. |
+| ORG-CASE-028 | Org member delegates task to Team | Fresh task TeamRun is stored beneath exact delegating host scope and starts through Team coordinator | It is not configured membership or a permanent address. |
+| ORG-CASE-029 | Stop/restore AgentOrg | Apply lifecycle to complete Org scope using stored identities/snapshot | Do not reinterpret from mutable definitions. |
+| ORG-CASE-030 | Launch/restore standalone Team | Preserve Team-owned lifecycle/tasks | No Org-only Team requirement. |
 
-For lifecycle and persistence, “under AgentOrg” means the AgentOrg run is the
-top-level durable owner. The task execution remains attached to the exact host
-scope that delegated it (the Org scope or a Team scope inside the Org), keeps a
-fresh task TeamRun identity, and is reached through task lifecycle identity.
-It does not alter the Org definition or the fixed configured address tree.
+## Current TeamRun V2 Assessment
 
-## Current `team_run_execution_tree.json` Assessment
-
-### Existing Strict V2 Semantics
+### Current On-Disk Shape
 
 ```text
-rootTeam
-  teamDefinitionId
-  teamDefinitionName
-  teamRunId
-  coordinatorAddress        // required direct root Agent
-  members[]                 // recursively Agent or configured Team
-  taskExecutions[]          // may include task Team executions
+TeamRunExecutionTreeFileV2
+  schemaVersion, timestamps, applicationBinding, handoffs
+  rootTeam
+    Team definition/name/run identity
+    coordinatorAddress
+    defaultLaunchConfiguration
+    members[]                 // Agent or Team, recursively
+    taskExecutions[]          // recursive task lineage
 ```
 
 Authority:
@@ -144,79 +126,78 @@ Authority:
 - `autobyteus-server-ts/src/agent-team-execution/services/team-run-execution-tree-builder.ts`
 - `autobyteus-team-stream-contracts/src/team-execution-view-dtos.ts`
 
-The validator uses exact keys, requires `rootTeam`, requires a direct root Agent coordinator, and recursively accepts configured Team members. It therefore cannot truthfully represent native AgentOrg semantics unchanged.
+### Reuse Finding
 
-### JSON Decision
+The V2 tree was designed generically and already contains the target topology:
 
-`JSON-DEC-001 — A native AgentOrg requires a new durable semantic contract.`
+- a root execution aggregate;
+- direct Agent or Team placements;
+- canonical addresses;
+- Team-local coordinators and launch defaults;
+- root-scoped handoffs;
+- task executions attached to their owning root/Team/task scope; and
+- recursive task lineage independent of configured topology depth.
 
-- The existing V2 file may remain valid for standalone flat-Team runs and/or legacy reading if Architecture Design chooses that transition.
-- A native AgentOrg run MUST NOT be written by merely renaming/aliasing V2 `rootTeam` while retaining its coordinator and recursion invariants.
-- Architecture Design may choose a new schema version of the existing artifact, a distinct Org execution artifact, or another durable aggregate. That file/mechanism choice is not a requirements decision.
+Therefore native AgentOrg does **not** require a second execution-tree topology,
+a parallel AgentOrg/Team schema family, explicit `flat` node types, or rebuilding
+member/task records. Only the root subject contract and configured-depth
+validation need to change.
 
-Required AgentOrg durable semantics, independent of exact names:
+## Normative Minimal-Delta On-Disk Contract
+
+### One Generic Record
+
+The target logical record is one versioned `RunExecutionTreeFileV3`. A generic
+physical file name such as `run_execution_tree.json` is appropriate because the
+root may be AgentOrg or AgentTeam; Architecture Design owns the final physical
+name and directory placement.
 
 ```text
-Organization execution root
-  Organization definition identity
-  Organization run identity
-  direct independent Agents
-  direct flat Teams
-  Organization-scoped effective handoffs
-  selected interaction target, when the product persists focus/entry
-  task executions created inside the Org, anchored to their delegating host scope
-
-Flat Team execution
-  Team definition identity
-  Team run identity
-  exact coordinator address
-  Agent configured members only
-  supported task-scoped executions
+RunExecutionTreeFileV3
+  schemaVersion: 3
+  createdAt
+  archivedAt
+  applicationBinding
+  handoffs
+  root: AgentOrgRootExecution | AgentTeamRootExecution
 ```
 
-Required invariants:
+The envelope, configured Agent record, configured child-Team record, launch
+configuration, handoff record, task Agent record, task Team record, timestamps,
+IDs, and addresses preserve the current V2 fields and meaning. No new `kind`
+discriminator is required on existing configured or task member nodes; the
+current AgentRun-ID-versus-TeamRun-ID union remains sufficient.
 
-1. The root subject is explicitly AgentOrg, not Team.
-2. No Org coordinator field or fallback is semantically required.
-3. Direct Org members discriminate independent Agent from flat Team.
-4. Configured Team members are Agents only; configured Team recursion is invalid.
-5. Effective handoff endpoints use fixed-depth canonical addresses.
-6. If interaction focus/entry is stored, it is an exact member address rather than an Org coordinator.
-7. Restore uses the immutable stored run snapshot, not current mutable definitions.
-8. Configured Team nodes and task-scoped Team executions remain distinguishable.
-9. Unsupported/ambiguous data fails before mutation or activation.
-
-## Normative On-Disk Execution Structures
-
-The following logical JSON records are the durable target contract. Physical
-file names may differ, but a persisted record and its reader projection MUST
-preserve these exact semantic fields and invariants. Current TeamRun V2 is
-migration input, not an AgentOrg output format.
-
-### `AgentOrgRunExecutionTreeFileV1`
+### AgentOrg Root Variant
 
 ```json
 {
-  "schemaVersion": 1,
-  "subjectKind": "agent_org",
+  "schemaVersion": 3,
   "createdAt": "2026-08-31T00:00:00.000Z",
   "archivedAt": null,
   "applicationBinding": null,
   "handoffs": [],
-  "rootOrg": {
+  "root": {
+    "subjectKind": "agent_org",
     "address": "/",
-    "orgDefinitionId": "org-definition-id",
-    "orgDefinitionName": "Software Development Department",
-    "orgRunId": "org-run-id",
-    "interactionTargetAddress": "/requirements_engineer",
+    "definitionId": "software-development-department",
+    "definitionName": "Software Development Department",
+    "runId": "software-development-department-run-id",
+    "defaultLaunchConfiguration": {
+      "runtimeKind": "autobyteus",
+      "llmModelIdentifier": "default",
+      "llmConfig": null,
+      "autoExecuteTools": true,
+      "skillAccessMode": "PRELOADED_ONLY",
+      "workspaceRootPath": null
+    },
     "members": [
       {
-        "kind": "agent",
         "address": "/requirements_engineer",
-        "agentDefinitionId": "agent-definition-id",
+        "agentDefinitionId": "requirements-engineer",
         "role": null,
         "description": null,
-        "agentRunId": "agent-run-id",
+        "agentRunId": "requirements-engineer-run-id",
         "platformAgentRunId": null,
         "launchConfiguration": {
           "runtimeKind": "autobyteus",
@@ -228,12 +209,11 @@ migration input, not an AgentOrg output format.
         }
       },
       {
-        "kind": "team",
         "address": "/software_engineering_team",
-        "teamDefinitionId": "team-definition-id",
+        "teamDefinitionId": "software-engineering-team",
         "role": null,
         "description": null,
-        "teamRunId": "team-run-id",
+        "teamRunId": "software-engineering-team-run-id",
         "coordinatorAddress": "/software_engineering_team/architecture_designer",
         "defaultLaunchConfiguration": {
           "runtimeKind": "autobyteus",
@@ -245,12 +225,11 @@ migration input, not an AgentOrg output format.
         },
         "members": [
           {
-            "kind": "agent",
             "address": "/software_engineering_team/architecture_designer",
-            "agentDefinitionId": "agent-definition-id",
+            "agentDefinitionId": "architecture-designer",
             "role": null,
             "description": null,
-            "agentRunId": "agent-run-id",
+            "agentRunId": "architecture-designer-run-id",
             "platformAgentRunId": null,
             "launchConfiguration": {
               "runtimeKind": "autobyteus",
@@ -270,194 +249,130 @@ migration input, not an AgentOrg output format.
 }
 ```
 
-`interactionTargetAddress` is nullable. It records current run interaction
-focus when that state is persisted; it is not an Org coordinator or definition
-default. A fresh Org may persist `null` until a caller selects a member. When an
-existing organization-like TeamRun is converted, its former root
-`coordinatorAddress` becomes the initial interaction target so reopening the
-run preserves its prior entry behavior, while the referenced Agent remains an
-ordinary independent Org member.
+AgentOrg root invariants:
 
-### `TeamRunExecutionTreeFileV3`
+- `subjectKind` is `agent_org`.
+- `root` has no `coordinatorAddress`.
+- Direct `members` may be current-format configured Agent or Team records.
+- Every direct Team retains its current `coordinatorAddress` and has configured Agent members only.
+- `defaultLaunchConfiguration` remains a common launch fallback; it is not coordinator semantics.
+
+### Standalone AgentTeam Root Variant
+
+The same envelope and member/task records are used. Only the root variant differs:
 
 ```json
 {
-  "schemaVersion": 3,
   "subjectKind": "agent_team",
-  "createdAt": "2026-08-31T00:00:00.000Z",
-  "archivedAt": null,
-  "applicationBinding": null,
-  "handoffs": [],
-  "rootTeam": {
-    "address": "/",
-    "teamDefinitionId": "team-definition-id",
-    "teamDefinitionName": "Software Engineering Team",
-    "teamRunId": "team-run-id",
-    "coordinatorAddress": "/architecture_designer",
-    "defaultLaunchConfiguration": {
-      "runtimeKind": "autobyteus",
-      "llmModelIdentifier": "default",
-      "llmConfig": null,
-      "autoExecuteTools": true,
-      "skillAccessMode": "PRELOADED_ONLY",
-      "workspaceRootPath": null
-    },
-    "members": [
-      {
-        "kind": "agent",
-        "address": "/architecture_designer",
-        "agentDefinitionId": "agent-definition-id",
-        "role": null,
-        "description": null,
-        "agentRunId": "agent-run-id",
-        "platformAgentRunId": null,
-        "launchConfiguration": {
-          "runtimeKind": "autobyteus",
-          "llmModelIdentifier": "default",
-          "llmConfig": null,
-          "autoExecuteTools": true,
-          "skillAccessMode": "PRELOADED_ONLY",
-          "workspaceRootPath": null
-        }
-      }
-    ],
-    "taskExecutions": []
-  }
+  "address": "/",
+  "definitionId": "software-engineering-team",
+  "definitionName": "Software Engineering Team",
+  "runId": "software-engineering-team-run-id",
+  "coordinatorAddress": "/architecture_designer",
+  "defaultLaunchConfiguration": {
+    "runtimeKind": "autobyteus",
+    "llmModelIdentifier": "default",
+    "llmConfig": null,
+    "autoExecuteTools": true,
+    "skillAccessMode": "PRELOADED_ONLY",
+    "workspaceRootPath": null
+  },
+  "members": [],
+  "taskExecutions": []
 }
 ```
 
-V3 is distinct from current V2 because V3 adds explicit subject/member kinds
-and makes Agent-only configured Team membership a strict invariant. A V3
-`rootTeam.members` array cannot contain a Team record.
+AgentTeam root invariants:
 
-### Node Contracts
+- `subjectKind` is `agent_team`.
+- `coordinatorAddress` is required and resolves to one direct configured Agent.
+- Configured `members` contains Agents only.
+- No `FlatTeam` type, field, discriminator, or file name exists.
 
-| Record | Required Fields | Structural Invariant |
-| --- | --- | --- |
-| Configured Agent | `kind="agent"`, `address`, definition/run IDs, nullable role/description/platform ID, complete launch configuration | Direct child of `rootOrg`, Org Team, or standalone `rootTeam`; address and run ID are unique. |
-| Configured Org Team | `kind="team"`, `address`, definition/run IDs, coordinator address, default launch configuration, Agent `members`, `taskExecutions` | Direct child of `rootOrg`; `members` contains configured Agents only; coordinator resolves to one direct Agent member. |
-| Org root | `/`, Org definition/run identity, nullable interaction target, direct `members`, root-owned `taskExecutions` | No coordinator; member address depth is one for direct Agents/Teams and two for Team Agents. |
-| Standalone Team root | `/`, Team definition/run identity, coordinator address, default launch configuration, Agent `members`, `taskExecutions` | Coordinator resolves to a direct Agent; configured members are Agents only. |
+### Reused Child And Task Records
 
-All persisted records use strict versioned validation, ISO-8601 UTC timestamps,
-canonical absolute addresses, exact record discriminators, unique AgentRun and
-TeamRun/OrgRun identities, normalized handoffs, and immutable configured
-placement identity during restore.
+| Current V2 Record | V3 Outcome |
+| --- | --- |
+| Configured Agent execution node | Reuse unchanged. |
+| Configured Team execution node | Reuse field shape; constrain configured `members` to Agents only. |
+| Task Agent execution | Reuse unchanged. |
+| Task Team execution and task-Team members | Reuse unchanged; its nested `taskExecutions` remain task lineage. |
+| Handoff snapshot | Reuse unchanged. |
+| Application binding, timestamps, launch configuration | Reuse unchanged. |
 
-### Task Execution Records
+A task execution remains stored in the `taskExecutions` array of its exact host:
+the AgentOrg root, an AgentTeam root/member, or another task Team. Its current
+`address` continues to identify the configured target placement; its fresh
+AgentRun/TeamRun ID identifies the concrete task execution. It does not add a
+configured member or permanent address.
 
-Task executions remain recursively nestable as task lineage even though
-configured membership is fixed-depth:
-
-```json
-{
-  "kind": "team",
-  "targetAddress": "/software_engineering_team",
-  "teamRunId": "fresh-task-team-run-id",
-  "members": [
-    {
-      "kind": "agent",
-      "address": "/software_engineering_team/architecture_designer",
-      "agentRunId": "fresh-task-agent-run-id",
-      "platformAgentRunId": null
-    }
-  ],
-  "taskExecutions": [],
-  "startedAt": "2026-08-31T00:00:00.000Z",
-  "settledAt": null
-}
-```
-
-- A task record is stored in the `taskExecutions` array of its exact host:
-  `rootOrg`, a configured Org Team, `rootTeam`, or another task Team.
-- `targetAddress` identifies the configured Agent/Team definition placement
-  that was delegated; it does not create a permanent address.
-- A task Team materializes Agents only because its source Team definition is
-  flat. Nested `taskExecutions` express further delegation, not configured Team
-  membership.
-- The durable task ledger continues to own `taskId`, delegator/reviewer,
-  description, status, updates, and the concrete AgentRun/TeamRun binding; the
-  execution tree records topology and lifecycle identity rather than duplicating
-  the whole ledger.
-
-### V2 Migration Field Mapping
-
-| Current TeamRun V2 Input | Flat Root Outcome | One-Level Organization-Like Outcome |
-| --- | --- | --- |
-| Top-level timestamps, application binding, handoffs | Preserve in TeamRun V3 | Preserve in AgentOrg V1 |
-| `rootTeam.teamDefinitionId/name/teamRunId` | Preserve as Team identity | Preserve values as Org definition/name/run identity |
-| `rootTeam.coordinatorAddress` | Preserve as Team coordinator | Remove coordinator semantics; set initial `interactionTargetAddress` to the same Agent address for the converted run |
-| Direct root Agent member | Preserve as direct Team Agent | Preserve as independent Org Agent |
-| Direct root Team member | Impossible under flat-root cohort | Convert to direct configured Org Team; its direct Agent members and Team coordinator are preserved |
-| Configured Team below a direct root Team | Excluded by `PRE-002` | Excluded by `PRE-002`; no recursive migration branch |
-| `rootTeam.taskExecutions` | Preserve under `rootTeam` | Preserve under `rootOrg` |
-| Child Team `taskExecutions` | N/A | Preserve under the corresponding direct Org Team |
-| Nested task lineage | Preserve recursively as task execution records | Preserve recursively under its exact converted host; never treat as configured nesting |
-
-Migration MUST validate `PRE-001`–`PRE-005` before committing writes and MUST
-be idempotent. It may rebuild derived indexes/projections after the canonical
-definition and execution records commit successfully.
-
-## Existing Data Contract
-
-### Migration Preconditions / Preknown Conditions
+## Migration Preconditions / Preknown Conditions
 
 1. All relevant definitions and live/historical execution data derive from the currently managed AgentTeam definitions.
-2. Configured topology has at most one Team-membership edge: current root Team → optional direct child flat Team → Agents.
-3. No relevant root Team → child Team → grandchild Team definition or run data exists.
-4. The migration handles exactly two configured cohorts: Agent-only roots and one-level organization-like roots.
-5. Task-scoped Team execution lineage is not configured Team nesting and remains attached to its exact runtime host during conversion.
-6. Migration therefore uses fixed-depth mapping and does not implement recursive flattening or a deep legacy compatibility branch.
-7. If an actual record unexpectedly violates the configured-depth precondition, migration stops before writing and reports the invariant violation; it does not guess a conversion.
+2. Configured topology has at most one Team-membership edge: current root Team → optional direct child Team → Agents.
+3. No relevant root Team → child Team → grandchild Team data exists.
+4. Existing data has exactly two configured cohorts: Agent-only roots and one-level organization-like roots.
+5. Task-scoped Team lineage is not configured Team nesting and remains anchored to its exact runtime host.
+6. Migration does not need recursive flattening or a deep legacy compatibility branch.
+7. An unexpected precondition violation stops before writes and reports the invariant; it does not guess a conversion.
 
-| Existing Cohort | Required Outcome | Reason |
+Observed evidence: 23 root package definitions and 41 readable stored TeamRun
+trees; 27 stored roots are Agent-only and 14 have exactly one direct Team level;
+none is deeper. The user confirmed this is the relevant migration population.
+
+## Minimal V2 → V3 Mapping
+
+| Current V2 Input | Agent-Only Root | One-Level Organization-Like Root |
 | --- | --- | --- |
-| Root Team with direct Agents only | Preserve as standalone flat Team | Already satisfies target Team invariant. |
-| Root Team with direct Agents and one level of child Teams whose members are Agents only | Convert to AgentOrg when coordinators, identities, addresses, and handoffs map unambiguously | Matches observed Software Development Department/Northstar shape. |
-| One-level Org-like run with task-scoped Team history | Preserve task/result content when it maps to the same flat Team; fail closed on ambiguity | Task execution is distinct from configured nesting. |
-| Handoff snapshot fitting `/agent`, `/team`, or `/team/agent` | Preserve exact effective endpoints | Workflow remains valid. |
-| Derived catalogs/indexes/UI caches | Rebuild from converted durable authority when safe | Derived state is not canonical. |
-| Agent memory, context files, messages, tasks, and run/history identity | Preserve whenever conversion is unambiguous | Simplification does not authorize content loss. |
+| Physical file name | Rename/move to generic selected V3 file name if required | Same |
+| `schemaVersion: 2` | Set to `3` | Set to `3` |
+| Envelope fields | Preserve unchanged | Preserve unchanged |
+| `rootTeam` | Rename/project to `root` | Rename/project to `root` |
+| Root `teamDefinitionId/name/teamRunId` | Rename/project to generic `definitionId/name/runId`; preserve values | Same |
+| Root kind | Set `subjectKind: agent_team` | Set `subjectKind: agent_org` |
+| Root `coordinatorAddress` | Preserve | Remove; AgentOrg has no coordinator. The referenced Agent member remains unchanged. |
+| Root default launch configuration | Preserve | Preserve as Org-wide launch fallback. |
+| Direct Agent records | Preserve byte-equivalent fields | Preserve byte-equivalent fields as independent Org Agents. |
+| Direct Team records | Not present | Preserve byte-equivalent fields as direct Org Teams; enforce Agent-only members. |
+| Handoffs | Preserve unchanged | Preserve unchanged. |
+| Root/Team/task-owned task executions | Preserve unchanged and at same host | Preserve unchanged and at same host. |
 
-Approved migration assumption: the relevant existing-data population is fully
-covered by the first two rows. Investigation inspected 23 local root package
-definitions and 41 readable stored TeamRun trees; all configured nesting is
-zero or one child-Team level, and the user confirmed there is no deeply nested
-data to support. Migration therefore does not need a deep legacy conversion or
-compatibility branch. If deeper configured input is unexpectedly presented
-later, normal flat-model validation rejects it before mutation or activation.
-
-## Contract Non-Goals
-
-- Recursive AgentOrg or configured AgentTeam definitions.
-- Shared Agent runtime instances across placements.
-- Automatic cross-run/cross-process logical routing.
-- Live Org membership mutation or file watching.
-- Framework evaluation of natural-language handoff conditions.
-- A migration or compatibility implementation for deeply nested legacy configured topology.
-- An AgentOrg label that preserves root-Team coordinator/recursion semantics.
-- Removal of supported task-scoped Team delegation as a side effect.
+This is a deterministic key/subject migration, not a topology transformation.
+It MUST be idempotent and MUST commit canonical definition/execution records
+before rebuilding derived indexes or projections.
 
 ## Contract Verification Matrix
 
-| Verification ID | Cases | Verification Intent |
+| Verification ID | Scope | Verification Intent |
 | --- | --- | --- |
 | ORG-VERIFY-001 | ORG-CASE-001–007 | Definition/import/update and standalone-Team validation. |
-| ORG-VERIFY-002 | ORG-CASE-008–018 | No-Org-coordinator entry selection and strict address resolution. |
-| ORG-VERIFY-003 | ORG-CASE-019–025 | Team-local and Org-cross-member handoff compilation/retrieval/delivery. |
-| ORG-VERIFY-004 | ORG-CASE-026–030 | Org/Team launch, task, stop, persistence, and restore. |
-| ORG-VERIFY-005 | JSON-DEC-001 invariants 1–9 | Durable schema and transport projection agreement. |
-| ORG-VERIFY-006 | Existing Data Contract cohorts | Exhaustive cohort classification, conversion/preservation, idempotency, and unexpected-depth invariant evidence. |
+| ORG-VERIFY-002 | ORG-CASE-008–018 | Coordinator-free Org targeting and strict addresses. |
+| ORG-VERIFY-003 | ORG-CASE-019–025 | Team-local and Org-wide handoffs using reused address records. |
+| ORG-VERIFY-004 | ORG-CASE-026–030 | Org/Team lifecycle and host-anchored task execution. |
+| ORG-VERIFY-005 | V3 root variants and reused-node table | Strict schema, root conditional fields, depth constraints, restore. |
+| ORG-VERIFY-006 | Preconditions and V2 mapping | Exhaustive cohort classification, idempotent minimal migration, no topology rebuild. |
+
+## Contract Non-Goals
+
+- A separate AgentOrg execution-tree topology.
+- Parallel AgentOrg V1 and AgentTeam V3 schema families.
+- `FlatTeam` domain/schema/file names.
+- Recursive configured AgentTeam or AgentOrg definitions.
+- A root AgentOrg coordinator or default coordinator fallback.
+- Shared Agent runtime instances across configured placements.
+- Automatic cross-run logical routing.
+- Live topology mutation/file watching.
+- Recursive legacy topology migration.
+- Removing supported task-scoped Team delegation.
 
 ## Approval Basis
 
-Approval of `RER-006` confirms this contract with the requirements document, specifically:
+Approval of `RER-007` confirms:
 
-1. AgentOrg is the only persistent multi-Team composition root.
-2. AgentOrg has no coordinator; a caller selects an exact Agent or Team target.
-3. Teams are flat, Agent-only, coordinator-led, reusable, and independently launchable.
-4. One Org scope owns fixed-depth addresses and cross-Team handoffs.
-5. The current V2 Team execution JSON cannot be relabeled unchanged as AgentOrg; native Org persistence needs truthful Org-root semantics.
-6. The migration population has no deep configured topology: flat roots remain Teams and one-level organization-like roots convert to AgentOrg; no deep legacy compatibility path is required.
-7. Task-scoped Team execution remains distinct from configured nested membership.
-8. The logical on-disk AgentOrg V1 and TeamRun V3 structures, task anchoring, and V2 field mapping in this contract direct later Architecture Design; `flat` remains an invariant, not a type-name prefix.
+1. AgentOrg is the only persistent multi-Team composition root and has no coordinator.
+2. AgentTeam is Agent-only by invariant and retains its direct Agent coordinator.
+3. The current generic V2 execution topology is reused rather than replaced.
+4. One generic V3 execution-tree record uses an AgentOrg-or-AgentTeam root variant and current child/task record shapes.
+5. AgentOrg root omits `coordinatorAddress`; direct Team nodes retain it.
+6. Migration is a fixed-depth subject/key/file-name projection, not tree reconstruction.
+7. Task Teams remain under their exact runtime host and do not affect configured depth.

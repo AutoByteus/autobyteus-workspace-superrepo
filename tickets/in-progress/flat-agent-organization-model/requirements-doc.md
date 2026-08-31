@@ -3,11 +3,11 @@
 ## Document Status
 
 - Status: `Ready for Approval`
-- Current requirements revision ID: `RER-006`
+- Current requirements revision ID: `RER-007`
 - Request / ticket: `AORG-FLAT-TEAM-001`
 - Requirements owner: Requirements Engineer
 - Date: 2026-08-31
-- Approval state and reference: Not yet approved; `RER-006` is presented for explicit user approval and includes the earlier baselines.
+- Approval state and reference: Not yet approved; `RER-007` is presented for explicit user approval and includes the earlier baselines.
 
 ## Problem And Desired Outcome
 
@@ -29,7 +29,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | BEH-005 | System | Definition, run, memory, event, history, and frontend contracts preserve recursive configured Team topology. | Persistent configured composition has fixed depth: Org → Team → Agent, with optional independent Agents directly under Org. | Supported content, task results, memory, run identity, and history are preserved when conversion is unambiguous. | Source inventory and 41 stored run trees. |
 | BEH-006 | User | Agent Teams UI authors and displays recursively nested Team membership. | Product/API surfaces distinguish AgentOrg from flat Team and prevent unsupported deeper composition. | Standalone flat Teams remain directly definable and launchable. | Web docs/components and existing packages. |
 | BEH-007 | Operational | Of 23 inspected root packages, three are organization-like; of 41 stored run trees, 14 have one configured child-Team level. None is deeper. | Safe observed organization-like definitions/runs can transition to AgentOrg without arbitrary flattening. | Existing Software Development Department, Northstar, and standalone Team workflows remain representable. | Local package and stored-data inventories. |
-| BEH-008 | Durable contract | `team_run_execution_tree.json` schema V2 requires `rootTeam`, a direct root coordinator, and recursive configured Team members. | Native AgentOrg execution is represented by an Org-root durable contract; unchanged V2 is not relabeled as AgentOrg. | V2 may remain a standalone flat-Team and/or legacy-read contract if architecture selects that transition. | Execution-tree domain, strict schema, builder, stream DTO. |
+| BEH-008 | Durable contract | `team_run_execution_tree.json` schema V2 already provides a generic root aggregate, direct Agent/Team records, Team coordinators, handoffs, host-owned tasks, and recursive task lineage, but names the root `rootTeam`, requires a root coordinator, and permits recursive configured Teams. | Reuse the V2 topology and child/task record shapes in one generic V3 execution tree; generalize the root to AgentOrg-or-AgentTeam and narrow configured-depth validation. | Envelope, member records, addresses, handoffs, launch state, run identities, and task records remain structurally unchanged. | Concrete Software Development Department V2 JSON, domain types, strict schema/validator, builder, stream DTO. |
 | BEH-009 | System | Task delegation may create task-scoped Team executions that are structurally nested under the delegating run. | Removing configured Team-within-Team membership does not by itself remove task-scoped delegation to a flat Team. | Supported task creation, settlement, review, and history behavior remain. | Task execution models and imported branch analysis. |
 
 ## Stakeholders, Actors, And Outcomes
@@ -102,7 +102,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | REQ-011 | Standalone flat Teams MUST remain directly definable, reusable in an AgentOrg, and independently launchable. | BEH-006 | High | Preserves ordinary Team use cases. |
 | REQ-012 | Under `PRE-001`–`PRE-005`, migration MUST treat the relevant existing-data population as two exhaustive configured-topology cohorts: root Teams with direct Agents only remain standalone flat Teams; roots with direct Agents and exactly one level of flat child Teams convert to AgentOrg while preserving identities, coordinators, addresses, handoffs, content, tasks, memory, and history. | BEH-005, BEH-007 | Critical | Repository/data investigation plus explicit user confirmation establish that no deeper configured data exists. |
 | REQ-013 | Migration MUST NOT implement a recursive flattening algorithm or legacy three-or-more-Team-level conversion/compatibility path. An unexpected violation of `PRE-002` MUST stop before mutation and be reported as a migration-invariant failure. After transition, deeper configured input through import/load/update MUST be rejected by ordinary flat-model validation. | BEH-001, BEH-007 | High | Keeps migration deterministic and avoids inventing ambiguous semantics for nonexistent data. |
-| REQ-014 | Native AgentOrg and AgentTeam durable execution state MUST conform to the logical on-disk contracts in `AORG-CONTRACT-001`: AgentOrg V1 uses an Org root with direct Agent/AgentTeam members and no coordinator; TeamRun V3 uses an Agent-only Team root; task executions anchor to their exact runtime host. Unchanged TeamRun V2 MUST NOT be relabeled as AgentOrg. `Flat` MUST remain an AgentTeam invariant, not a persisted type-name prefix or alternate subtype. | BEH-008 | Critical | Current JSON requires `rootTeam`, root coordinator, and recursion; the user requested one contract to direct later design and rejected redundant `FlatTeam` naming. |
+| REQ-014 | Native AgentOrg and AgentTeam durable state MUST use the single minimal-delta `RunExecutionTreeFileV3` logical contract in `AORG-CONTRACT-001`. It MUST reuse current V2 envelope/member/handoff/task records, use a conditional AgentOrg-or-AgentTeam root, omit root `coordinatorAddress` only for AgentOrg, retain coordinator addresses for every Team, and enforce fixed configured depth. It MUST NOT introduce separate Org/Team topology families, duplicate child/task records, or a `FlatTeam` subtype. | BEH-008 | Critical | Reinspection confirms current V2 was intentionally generic and already models the target tree; only root semantics/naming and validation differ. |
 | REQ-015 | A task Team created by an AgentOrg member MUST be a fresh task-scoped Team execution owned within that AgentOrg run and anchored to the exact delegating host scope. It MUST NOT become a configured Org member or configured child Team. Task delegation from a standalone Team remains owned by that standalone Team run. | BEH-009 | High | Task runtime ownership belongs under the active root scope, while configured membership stays flat. |
 | REQ-016 | Affected GraphQL/transport, catalog/detail/launch/history, authoring, and workspace surfaces MUST distinguish AgentOrg from flat Team and MUST stop advertising or accepting configured Team members inside a Team. | BEH-006, BEH-008 | High | Product and external contracts must be truthful. |
 | REQ-017 | Concurrent work MUST NOT introduce new recursive configured-Team mutation dependencies. Any future dynamic membership capability requires a separate approved contract and may operate only within the approved Org-direct-member or Team-direct-Agent boundaries. | BEH-001 | High | Reconciles the conflicting draft dynamic-Team branch. |
@@ -119,7 +119,7 @@ The governing principle is: **containment expresses stable membership; handoff r
 | AC-006 | REQ-010 | Represent and run Northstar under the fixed-depth model | All direct executives, six Teams, and current cross-Team destinations fit addresses no deeper than `/team/agent` | Unsupported later deeper input follows AC-005 validation rather than migration compatibility. |
 | AC-007 | REQ-011 | Define and launch a flat Team without an Org, then reuse it in an Org | Standalone coordinator-led collaboration works; the same definition can be mounted as a direct Org Team | Org membership is not mandatory for ordinary Team work. |
 | AC-008 | REQ-012, REQ-013 | Under `PRE-001`–`PRE-005`, transition the complete relevant definition/run population | Every configured root classifies as either a flat standalone Team or a one-level organization-like root; the former remains a Team and the latter converts to AgentOrg with preserved supported state, while task executions remain attached to their runtime host | The migration reports a precondition violation before writes rather than guessing if deeper configured topology is unexpectedly encountered; no deeply nested legacy compatibility path is required. |
-| AC-009 | REQ-014 | Persist/restore native AgentOrg V1 and TeamRun V3 logical records | AgentOrg state has `subjectKind=agent_org`, `rootOrg`, no coordinator, direct discriminated members, exact addresses, host-anchored tasks, and nullable interaction target; Team state has `subjectKind=agent_team`, `rootTeam`, direct Agent members, and a direct coordinator; no schema/type identifier uses `flat` | Strict validation rejects recursive configured Team nodes, wrong subject/version shapes, or a Team-root alias masquerading as Org. |
+| AC-009 | REQ-014 | Migrate, persist, and restore the single V3 execution-tree record | V2 envelope, configured Agent/Team nodes, handoffs, launch state, IDs, and host-anchored task records remain structurally equivalent; `root.subjectKind` selects AgentOrg (no root coordinator, Agent/Team members) or AgentTeam (required coordinator, Agent members only) | Strict validation rejects a coordinator on Org root, missing Team coordinator, configured Team below Team, wrong root variant, or precondition-violating depth. |
 | AC-010 | REQ-015 | An Org member delegates a task to a flat Team | A fresh task TeamRun starts through that Team's coordinator, is recorded under the same AgentOrg execution aggregate at the delegating host scope, and settles/reports under supported task semantics | It is not added to the Org definition/member list and receives no new permanent Org member address. A task delegated from a standalone Team remains under that Team run. |
 | AC-011 | REQ-016 | Use affected API and web authoring/launch/history flows | Org and Team roles are distinguishable; Team authoring offers Agent members only; existing flat-Team flows remain usable | Nested-Team selectors/counts/warnings are absent from flat-Team authoring. |
 | AC-012 | REQ-017 | Reconcile the dynamic-AgentTeam draft work | No new production path can add/remove a configured Team beneath a Team | Reusable dynamic ideas, if any, require a separately approved fixed-depth contract. |
@@ -182,7 +182,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 | Package definition format | Distinguish Org direct members from Team Agent-only members and reject unsupported depth | Current `team-config.json` permits recursion. |
 | GraphQL/stream/web contracts | Expose truthful Org/Team identity and fixed-depth composition | Current types and UI recursively expose Teams. |
 | Collaboration tools | Preserve canonical same-scope addresses, ordered Agent handoffs, and Team coordinator targeting | Current logical routing does not join independent runs. |
-| Durable execution/history | Represent native Org root semantics and preserve both established migration cohorts explicitly | Current strict V2 root is a recursive coordinator-led Team. |
+| Durable execution/history | Reuse the generic V2 topology in one minimal-delta V3 root union and preserve both established migration cohorts | Current strict V2 child/task records already fit; only root semantics/naming and configured-depth validation differ. |
 | Remote flat-team bootstrap | Incorporated as evidence and concept input at commit `c3a318812` (cherry-picked as `ca6d24dfa`) | Its no-Org-coordinator and task-scope distinction are adopted; its duplicate draft is not canonical. |
 | Dynamic-AgentTeam draft branch | Must not add recursive configured-Team mutation | `origin/codex/dynamic-agent-team-runtime@7d9b4ba69` conflicts with the target if implemented as drafted. |
 
@@ -190,7 +190,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 
 | Artifact | Purpose | Status / Approval Applicability |
 | --- | --- | --- |
-| `tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Single normative configured-structure, behavior, on-disk execution, task anchoring, and V2 migration-mapping contract | `Ready for Approval`; included in this approval basis. |
+| `tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Single normative configured-structure, minimal-delta generic V3 execution tree, task anchoring, and V2 projection contract | `Ready for Approval`; included in this approval basis. |
 | `tickets/in-progress/flat-agent-organization-model/investigation-notes.md` | Canonical evidence base | Current; supports but does not independently define behavior. |
 | User screenshot at the absolute path recorded in investigation notes | Current structure evidence | Evidence only. |
 
@@ -218,7 +218,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 ## Downstream Architecture Input
 
 - Preserve fixed semantics: distinct AgentOrg and flat Team, no Org coordinator, exact addresses, Team coordinator ingress, same-Org handoffs, standalone Teams, explicit data cohorts, and task/configured-nesting distinction.
-- Treat `PRE-001`–`PRE-005` and the logical AgentOrg V1 / TeamRun V3 on-disk structures in `AORG-CONTRACT-001` as authoritative design inputs: use fixed-depth mapping, preserve task lineage separately, do not design recursive legacy flattening, and do not create a redundant `FlatTeam` subtype/name.
+- Treat `PRE-001`–`PRE-005` and the single minimal-delta `RunExecutionTreeFileV3` contract as authoritative design inputs: reuse current V2 child/task records, change only generic root semantics/naming and configured-depth validation, preserve task lineage, and do not create parallel Org/Team schema families or a `FlatTeam` subtype.
 - Architecture Design owns target modules, schemas/file names, API shape, transition mechanics, lifecycle composition, and removal sequence.
 - Architecture must verify all definition, execution, persistence, history/memory, task, stream/GraphQL, package, and frontend readers/writers before removing recursive configured-Team paths.
 - Native AgentOrg replacement and recursive configured-Team retirement must be delivered in a capability-safe order; an intermediate product state must not strand organization-like configurations.
@@ -234,7 +234,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 - Behavior-defining supplement integrated: `Yes — agent-org-contract.md`
 - Data preservation and acceptable loss explicit: `Yes`
 - Target architecture avoided: `Yes`
-- User approval received: `No — requested for RER-006`
+- User approval received: `No — requested for RER-007`
 - Package ready for downstream route: `No — approval gate only`
 
 ## Architecture Design Routing Assessment
