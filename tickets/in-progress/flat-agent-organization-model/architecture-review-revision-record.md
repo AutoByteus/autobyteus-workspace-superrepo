@@ -9,6 +9,7 @@ concise chronological architecture-review history.
 | --- | --- | --- | --- | --- | --- |
 | ARCH-REV-001 | Round 1 / independent review requested after approved `RER-016`, Product `RV-012`, and completed `AD-REV-002` | `AD-REV-001`, `AD-REV-002` | N/A | Fail — Design Impact | `AR-FIND-001`, `AR-FIND-002` |
 | ARCH-REV-002 | Round 2 / cumulative re-review after approved `RER-018`, `AD-REV-003` finding recovery, and `AD-REV-004` migration-convention correction | `AD-REV-003`, `AD-REV-004` | Fail — Design Impact | Pass | `AR-FIND-001`, `AR-FIND-002`, `ADI-006` |
+| ARCH-REV-003 | Round 3 / re-review after implementation `IR-001` returned composition impact `IDI-001` and `AD-REV-005` defined the production runtime extraction | `AD-REV-005` | Pass | Pass | `IDI-001` |
 
 ## Revision Entries
 
@@ -53,3 +54,27 @@ None.
 - Material classification changes: The authoritative architecture-review result changes from `Fail / Design Impact` to `Pass`; task size remains `Large`, architectural risk remains `High`, and no Requirement Gap or Product UI gap exists.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must preserve strict source/family boundaries, flat-Team zero-write behavior, cleanup/readiness truth, handoff/task/config/focus ordering, tagged mixed projection, bounded runner evidence, and Product visual parity. These are controlled High implementation risks, not open architecture decisions.
+
+### ARCH-REV-003 — Root-neutral runtime composition recovery pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 3; implementation `IR-001` returned `IDI-001` after the prior pass because current Agent/Team execution, task tools, memory, sidecars, routing, and process lifecycle could not be composed under an AgentOrg without false Team-root ownership. `AD-REV-005` supplied the required explicit production composition and requested independent re-review.
+- Triggering role, report path, and finding IDs: Architecture Designer, based on Implementation Engineer evidence at `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`; `IDI-001`.
+- Relevant architecture design revision IDs: `AD-REV-005`
+- Prior authoritative decision: `Pass` (`ARCH-REV-002`)
+- Current authoritative decision: `Pass`
+- What changed in the review result or what baseline was established: Independently confirmed the implementation-reported Team-root coupling in committed current code, then revalidated the affected launch, Agent execution, tasks, messages, persistence, restore, routing, memory, application, and process-lifecycle spines. The revised design now provides mandatory tagged root/member/host/physical identities, sender-bound member/task capabilities, a root-neutral configured-Agent handle, rootless flat-Team local execution, private Team/Org task-message-event adapters, strict Org sidecars/state correlation, truthful Org task hosts/memory, compound active-root routing, complete-scope publication/registration, whole-Org fail-stop, and Org→Team→Agent teardown. Public/durable Team V2 and AgentOrg V1 ownership remain separate and exact.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001` | Resolved in `ARCH-REV-002` | Remains resolved | `RER-018`, `AD-REV-003`-`AD-REV-005` | Target-only Team V2/Org V1 admission, server-owned conversion, and external read-only ownership are unchanged by the runtime extraction. |
+| `AR-FIND-002` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-003`-`AD-REV-005` | Org/root-owned saved order still precedes stable Team-local lists; shared member contexts consume the compiled immutable order and do not regroup it. |
+| `ADI-006` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-004`, `AD-REV-005` | The canonical runner/atomic-write/direct-rename/relaunch convention and native flat-Team zero-write cohort are unchanged. |
+| `IDI-001` | Open architecture-owned composition impact from `IR-001` | Resolved at design boundary | `AD-REV-005`; `architecture-design-self-validation.md` | Current-code coupling is explicitly replaced by constructible, named capability/adaptor boundaries, exact files, dependency prohibitions, fresh/restore/fail-stop/termination sequences, and 17 supported use-case walkthroughs. No synthetic Team root, standalone mounted Team/Org Agent, public generic root, or Team sidecar reinterpretation is required. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: The authoritative result remains `Pass`; task size remains `Large`, architectural risk remains `High`, and no Requirement Gap or Product UI gap exists. The result validates architecture only and does not validate the partial implementation draft.
+- Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+- Remaining risks or uncertainty: Implementation must reconcile the partial draft with the AD-REV-005 boundary, prove import/registration/package negatives, retain Team V2 and migration guarantees, and validate full Org activation/task/message/binding/restore/fail-stop/memory/routing/shutdown plus Product parity. These are controlled High implementation risks, not open design decisions.
