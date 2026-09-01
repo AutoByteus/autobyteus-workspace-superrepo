@@ -15,6 +15,7 @@ does not revise intended behavior.
 | AD-REV-005 | Implementation Engineer `IR-001` / `IDI-001` after `ARCH-REV-002` Pass / implementation-impact recovery round | `IDI-001` | `Architecture Revision — Root-Neutral Configured Execution And AgentOrg Production Composition` | `Architecture Design Complete`; production extraction/composition boundary and self-validation added; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-006 | API/E2E Engineer real imported-package/browser validation after `IR-003` and `CRR-003` Pass / downstream design-impact recovery round | `ADI-007` | `Architecture Revision — Accepted Agent/Team Workspace Reuse And Strict AgentOrg Presentation` | `Architecture Design Complete`; raw Org runtime dashboard path removed by design; self-validation expanded to 22 cases; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-007 | API/E2E `API-FIND-007`, Code Review `CRR-009` / `CR-FIND-011`, and Requirements Engineer approved `RER-021` with focused Product `AORG-FLAT-TEAM-STATUS-001` / Product-baseline-impact recovery round | `API-FIND-007`, `CR-FIND-011` | `Architecture Revision — Mounted-Team Aggregate Status Projection` | `Architecture Design Complete`; focused Product gap mapped to an exact presentation-only Team-branch projection; self-validation expanded to 25 cases; focused delta `Medium/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-008 | Code Review `CRR-012/013` and API/E2E `API-FIND-008` exact correlated settlement probe / architecture-held Unclear recovery round | `API-FIND-008`, `CR-CAND-020` | `Architecture Revision — Non-Blocking Terminal Task Settlement And Interrupt-Before-Drain Shutdown` | `Architecture Design Complete`; exact liveness cycle classified and resolved at design boundary; self-validation expanded to 29 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -485,3 +486,92 @@ does not revise intended behavior.
   lifecycle/transport expansion. The design contains explicit ownership,
   dependency, test, and forbidden-shortcut controls for each; no implementation
   or browser-fix claim is made by this architecture-only revision.
+
+### AD-REV-008 — Non-Blocking Terminal Task Settlement And Interrupt-Before-Drain Shutdown
+
+- Triggering role, report path, and round: Code Reviewer `CRR-012` first
+  classified `API-FIND-008` as Unclear because the retained run showed a second
+  provider tool start and a top-level shutdown AggregateError but did not prove
+  MCP ingress, root-queue execution, persistence, or the close inner cause. Code
+  Review `CRR-013` then passed cumulative `IR-012@73a2c06eb14e3c5a7d91322aae7f42dbc4de0e0a`
+  while holding API/E2E for Architecture's disposition. API/E2E's first focused
+  clean control proved one same-task revision/resubmission and application-owned
+  SIGTERM can succeed. Its later exact two-task correlation at detached artifact
+  `895665929213ddf7c276c9a89af19b975935f128` reproduced the failure with full
+  boundary evidence in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008-settlement/settlement-correlation-observed-boundaries.md`.
+  This is the architecture-held Unclear investigation and Design Impact recovery
+  round.
+- Triggering finding IDs: `API-FIND-008` / `CR-CAND-020`. The later evidence
+  supersedes Architecture's interim clean-control `No Architecture Impact`
+  disposition: an accepted verifier's settlement became root FIFO head and
+  waited in `prepareTermination()` on its live `waitingOnApproval` provider
+  turn; an unrelated analyst revision submission reached MCP and the exact root
+  queue but never started; direct SIGTERM then waited in Team root shutdown
+  because interruption occurred only after that task drain.
+- Prior authoritative design result: `AD-REV-007`, Architecture Design Complete,
+  at commit `53acd4a359d59762c7d0ecb6020c0e14a75666b2`; independent Architecture
+  Review `ARCH-REV-005` passed it at `f366a3ce1`. The current source result is
+  `IR-012`; Code Review `CRR-013` is Pass — cumulative source but explicitly
+  holds validation on this architecture-owned disposition.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as `AD-REV-008` and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Why this revision is recorded: the shared root task FIFO currently owns both
+  the durable `settledAt` mutation and provider-dependent execution preparation/
+  teardown. The same Team/Org shutdown path drains task work before issuing the
+  provider interrupt that could release it, creating a real ownership/dependency
+  cycle and starving unrelated supported commands. AD-REV-008 splits one short
+  task mutation FIFO from a root-owned, task-keyed terminal settlement
+  coordinator; makes pre-durability settlement reservation passive; transfers
+  the durably fenced exact handle to an idempotent committed cleanup token before
+  releasing the FIFO; performs interrupt-first provider/backend/MCP/resource
+  teardown outside that FIFO; deduplicates jobs and waits for child cleanup
+  before parent cleanup; and makes both Team and Org close/freeze/interrupt their
+  complete scope before command or settlement drains. Existing task records,
+  statuses, `settledAt`, tools/results, notifications, Team V2/Org V1 schemas,
+  sidecars, APIs and Product behavior remain unchanged.
+- Approved behavior or requirement IDs affected: implementation/liveness path
+  for `BEH-009`, `REQ-015`, and `AC-010`, plus the already-established normal
+  Team/Org task lifecycle, fail-stop and graceful-shutdown contracts. No new
+  intended behavior, Product UI decision, migration behavior, task recovery
+  contract or support for self-review is introduced.
+- Design-spec sections updated: document chronology, evidence, classification
+  and AD-REV-008 impact decision; root-neutral task engine/settlement contract;
+  scenario and behavior maps; `DS-005`, `DS-015`, and new `DS-022`; main owners,
+  off-spine concerns, boundaries, dependencies, interfaces, file/folder mapping,
+  clean-cut removals, sequence, tradeoffs, risks, implementation guidance and
+  executable validation expectations.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` was updated from AD-REV-007 to
+  AD-REV-008. It retains the prior 25 supported cases and adds `VAL-026`-
+  `VAL-029` for concurrent terminal cleanup versus unrelated revision
+  resubmission, Team/Org interrupt-before-drain shutdown, pre-/post-durability
+  settlement failure boundaries, and recursive task-Team child/parent plus
+  independent-leaf cleanup. It explicitly uses both the clean control and exact
+  reproduced correlation; downstream source/API evidence remains read-only.
+- Downstream and architecture-review impact: the focused correction is
+  `Medium / High` because it is bounded to existing shared task/local-execution/
+  root lifecycle files but changes concurrency, fail-stop, admission fencing and
+  shutdown ordering. The cumulative ticket remains `Large / High`; independent
+  Architecture Review is mandatory before Implementation changes this path or
+  API/E2E resumes. Review must verify that no cleanup promise runs in the task
+  mutation FIFO; passive reservation performs no irreversible work; terminal
+  state/active-registry fencing precedes FIFO release; one task has at most one
+  cleanup job; parent waits for child cleanup completion while independent leaves
+  and commands progress; both roots interrupt before drains; and no timeout,
+  replay, force-kill, new task state/schema/API or self-review support is added.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of the
+  cumulative `RER-021` / Product authorities / `AD-REV-008` package. Code Review
+  source Pass does not bypass this new design-impact review, and API/E2E remains
+  held until review passes and Implementation reconciles the reviewed design.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, migration, schema
+  or public-contract gap remains. High residual risk is in exact atomic
+  tree/index/registry transfer, duplicate-job suppression, recursive child
+  cleanup dependency, idempotent root-wide interrupt versus cleanup-token
+  termination, pre-/post-durability failure handling, and shared Team/Org
+  shutdown sequencing. These are specified and self-validated but require
+  implementation, independent source review, and correlated executable
+  validation; this architecture revision makes no fix claim.

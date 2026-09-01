@@ -3,10 +3,10 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-007`
+- Architecture revision validated: `AD-REV-008`
 - Requirements authority: `RER-021` (approved BEH-011/REQ-028/AC-023/SCN-012 status supplement; prior runtime/durable behavior unchanged)
 - Product authority: `RV-012` / `VIS-001`-`VIS-020`; focused `AORG-FLAT-TEAM-STATUS-001` / `VIS-STATUS-001`-`VIS-STATUS-003`
-- Trigger: user-requested use-case/data-flow/ownership/boundary/dependency self-validation; resolved `IDI-001` and `ADI-007`; API-FIND-007 / CR-FIND-011 recovery under approved RER-021
+- Trigger: user-requested use-case/data-flow/ownership/boundary/dependency self-validation; resolved `IDI-001`, `ADI-007`, and API-FIND-007 / CR-FIND-011; API-FIND-008 / CR-CAND-020 exact two-task terminal-settlement liveness recovery
 - Date: 2026-09-01
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
@@ -38,6 +38,10 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008/correlated-rerun-observed-boundaries.md`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008-settlement/settlement-correlation-observed-boundaries.md`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008-settlement/boundary-evidence-assertions.log`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-001/screenshots/03-org-live-raw-events-defect.png`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/docs/design/production_data_migration_conventions.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
@@ -45,7 +49,7 @@ Inputs:
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/ui-ux-spec.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/user-decision-record.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/visual-references/visual-reference-manifest.json`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` (`CRR-009` / `CR-FIND-011`)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` (`CRR-013`; retained `CRR-009` / `CR-FIND-011` history and `CR-CAND-020` hold)
 - `origin/personal@773bce779` implementations of `workspaceHistoryNestedTeamStatus.ts`, `NestedTeamAggregateStatusDot.vue`, and `WorkspaceTeamExecutionTree.vue` (inspected with `git show`; continuity evidence only)
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md`
 
@@ -69,6 +73,8 @@ Inputs:
 | Browser Org state has one owner | One checkpointed AgentOrgExecutionContext owns view, AgentContexts, mounted-Team views, nullable focus and stream recovery | Pass |
 | Member presentation does not own root lifecycle | Org stop lives on active Org history root row; focused member and mounted Team have no root-stop action | Pass |
 | Mounted Team status is pure presentation | Exact configured/task descendant Agent statuses fold `running > initializing > error > idle > offline`; collapse does not alter input; historical live-only/missing values are offline; no status/lifecycle/API owner is added | Pass |
+| Task mutation and terminal cleanup have separate owners | Root FIFO persists/publishes short task mutations only; task-keyed settlement coordinator interrupts and tears down local execution outside that FIFO | Pass |
+| Root shutdown interrupts before task drains | Team and Org close/freeze their complete scope and interrupt active provider turns before waiting for task command or settlement drains | Pass |
 
 ## Identity And Physical-Scope Truth Table
 
@@ -101,12 +107,12 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-002 | SCN-002/009; REQ-004/024 | Fresh full-scope Org launch | DS-003, DS-012, DS-014 | Pass |
 | VAL-003 | REQ-003/006/007 | Org logical message/handoff to Agent or Team | DS-004, DS-009 | Pass |
 | VAL-004 | Existing exact-Agent messaging contract + BEH-003 | Same-root exact AgentRun routing in Org | DS-004, DS-008, DS-014 | Pass |
-| VAL-005 | AC-010; ORG-CASE-028 | Direct Org Agent delegates from Org-root host | DS-005, DS-006O, DS-014 | Pass |
-| VAL-006 | PRE-005; REQ-015 | Mounted/task Team delegation and recursive task lineage | DS-005, DS-006T/O | Pass |
+| VAL-005 | AC-010; ORG-CASE-028 | Direct Org Agent delegates from Org-root host | DS-005, DS-006O, DS-014, DS-022 | Pass |
+| VAL-006 | PRE-005; REQ-015 | Mounted/task Team delegation and recursive task lineage | DS-005, DS-006T/O, DS-022 | Pass |
 | VAL-007 | REQ-014 persisted binding | External provider binding during Org activation | DS-003, DS-006O, DS-014 | Pass |
 | VAL-008 | Existing fail-stop durability contract | Org message/task/tree persistence becomes indeterminate | DS-004-006O, DS-014 | Pass |
 | VAL-009 | SCN-002/004/010; AC-008/009/020 | Strict AgentOrg restore | DS-006O, DS-014, DS-015 | Pass |
-| VAL-010 | Existing server lifecycle contract | Process construction failure and normal shutdown | DS-015 | Pass |
+| VAL-010 | Existing server lifecycle contract | Process construction failure and normal shutdown | DS-015, DS-022 | Pass |
 | VAL-011 | REQ-016/025 | Mixed history/stream/workspace truth | DS-008 | Pass |
 | VAL-012 | SCN-004/010; REQ-012/013 | One-level Org-like Team package migration | DS-007, DS-010 | Pass |
 | VAL-013 | REQ-014; AC-020 | Native flat Team V2 no-op at cutover | DS-007, DS-010 | Pass |
@@ -122,6 +128,10 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-023 | SCN-012; REQ-028; AC-023; VIS-STATUS-001 | Active expanded mounted Team aggregates exact configured and task-scoped Agent statuses | DS-020, DS-021 | Pass |
 | VAL-024 | SCN-012; REQ-028; AC-023; VIS-STATUS-002 | Collapsed mounted Team retains reactive aggregate and exact branch isolation | DS-020, DS-021 | Pass |
 | VAL-025 | SCN-012; REQ-028; AC-023; VIS-STATUS-003 | Stopped/history Team aggregate loses live-only state and adds no lifecycle authority | DS-020 | Pass |
+| VAL-026 | REQ-015; AC-010; API-FIND-008 correlated two-task witness | One terminal task waits on provider approval while another supported revision/resubmission command executes | DS-005, DS-022 | Pass |
+| VAL-027 | Existing Team/Org graceful-shutdown contract; API-FIND-008 SIGTERM witness | Team and Org shutdown with live approval and queued task commands | DS-015, DS-022 | Pass |
+| VAL-028 | Existing task mutation durability/fail-stop contract | Settlement failure before durability versus cleanup failure after durability | DS-006T/O, DS-022 | Pass |
+| VAL-029 | PRE-005; REQ-015 | Recursive task-Team parent/child cleanup and independent terminal leaves | DS-005, DS-022 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -229,6 +239,9 @@ package-family rename. It does not infer logical topology from directory depth.
   host cannot persist or register a root.
 - **Dependency check:** engine is subject-neutral; Org adapter closes over Org
   state and passes only TaskExecutionHostCapability downward.
+- **Terminal path:** submit/review/interrupt mutates through the same short FIFO;
+  accepted/interrupted records schedule DS-022. The Org adapter commits
+  `settledAt` and returns an exact cleanup token before provider teardown begins.
 - **Rejected shortcut:** fabricate a root Team host or attach task Team to
   configured members.
 - **Result:** Pass.
@@ -247,6 +260,9 @@ package-family rename. It does not infer logical topology from directory depth.
   AgentOrg definition resolution.
 - **Dependency check:** recursive task Team uses FlatTeamExecutionFactory with
   appended physical ancestry; it creates no root package/manager entry.
+- **Terminal path:** a task-Team parent is eligible only after every owned child
+  cleanup job completes; independent terminal leaves may clean up concurrently
+  and never occupy the root mutation FIFO.
 - **Rejected shortcut:** delete task-Team recursion when configured Team recursion
   is removed.
 - **Result:** Pass.
@@ -309,9 +325,13 @@ package-family rename. It does not infer logical topology from directory depth.
   locations -> active-root directory -> configured-Agent + local-Team factories
   -> Team manager -> Org manager -> subject services/history/streams -> open
   admission`.
-- **Shutdown spine:** `close launch/stream admission -> stop all Org roots -> stop
-  standalone Team roots -> stop remaining AgentRuns -> release Org/Team/services/
-  directory -> close tool sessions/resources`.
+- **Shutdown spine:** process visits `Org roots -> standalone Team roots ->
+  residual AgentRuns`. Each root performs `close all external/materialization/
+  message admission -> freeze complete direct/mounted/task scope -> interrupt
+  every active provider turn -> drain short task mutations -> durably interrupt
+  open task records -> drain deepest-first settlement cleanup -> drain
+  persistence -> finish/unregister local execution`; then process releases
+  services/directory/tool resources in reverse.
 - **Owners:** GeneralProcessRunSupervisor owns ordering; subject managers own
   their roots; AgentRunManager owns residual AgentRuns.
 - **Boundary check:** supervisor calls managers, never individual local Teams or
@@ -319,8 +339,9 @@ package-family rename. It does not infer logical topology from directory depth.
   in reverse order.
 - **Application specialization:** application scope constructs no Org manager and
   retains Team -> Agent shutdown while using the extracted factories.
-- **Rejected shortcut:** Team manager registers embedded Org Teams or shutdown
-  stops AgentRuns before the roots that own them.
+- **Rejected shortcut:** Team manager registers embedded Org Teams, root shutdown
+  drains commands/settlements before interrupting its provider turns, or process
+  stops residual AgentRuns before the roots that own them.
 - **Result:** Pass.
 
 ### VAL-011 — Mixed History / Stream / Workspace
@@ -637,6 +658,114 @@ package-family rename. It does not infer logical topology from directory depth.
   lifecycle ownership.
 - **Result:** Pass.
 
+### VAL-026 — Terminal Provider Wait Cannot Starve Another Supported Task Command
+
+- **Trigger:** task V is durably accepted while its task Agent's provider turn is
+  waiting on an unsupported self-review approval; independently, task A has
+  received a valid revision request and its fresh task Agent calls
+  `submit_task_result` again.
+- **Primary spine V:** `accepted record -> RootTaskSettlementCoordinator job V ->
+  task mutation FIFO -> passive exact-handle reservation -> persist settledAt ->
+  replace tree/index/publish + transfer handle -> FIFO release -> interrupt V
+  provider turn -> prepare/quiesce -> backend/MCP/resource cleanup`.
+- **Concurrent spine A:** `provider tool call -> MCP ingress -> bound Team/Org
+  capability -> RootTaskLifecycleEngine -> mutation FIFO -> active-record
+  validation -> awaiting_review record/sidecar durability -> event/notification
+  -> tool success`. This proceeds after V's short durable fence even while V's
+  cleanup promise remains unresolved.
+- **Owners:** mutation FIFO owns ordering of durable task mutations only;
+  settlement coordinator owns V's cleanup job; AgentRun owns provider interrupt
+  and termination; subject adapter owns exact Team/Org durability and fail-stop.
+- **Boundary/dependency check:** the coordinator receives only the engine's short
+  terminal-commit port and a committed cleanup token. Neither it nor the engine
+  imports provider internals or subject stores. Task A never depends on V's
+  cleanup promise.
+- **Terminal fence check:** after V's tree/index/active-registry transfer, a late
+  V tool call receives existing not-live/not-active/unauthorized behavior. It
+  cannot review, delegate, resubmit or resurrect V.
+- **Rejected shortcut:** support self-review, add a provider timeout/replay,
+  process the queue concurrently without serialization, or persist a new
+  `settling` status.
+- **Outcome:** the exact API-FIND-008 starvation cycle is structurally absent
+  while both tasks retain their approved record and tool semantics.
+- **Result:** Pass.
+
+### VAL-027 — Team And Org Graceful Shutdown Interrupt Before Task Drain
+
+- **Trigger:** a standalone Team or AgentOrg receives application-owned SIGTERM
+  while a task Agent is waiting on provider approval and other task commands are
+  queued.
+- **Primary spine:** `process close -> subject manager/root -> close external,
+  task-materialization and message admission -> freeze full direct/mounted/task
+  scope -> interrupt every active provider turn -> drainCommands -> persist
+  active/awaiting_review interruptions -> schedule/drain terminal leaves and
+  parents -> persistence drain -> finish/unregister exact local handles -> root
+  manager unregister`; process continues Org -> Team -> residual Agent.
+- **Owners:** GeneralProcessRunSupervisor owns cross-root ordering; each subject
+  root owns its shutdown phases; settlement coordinator owns terminal cleanup;
+  AgentRun owns provider interruption/termination.
+- **Boundary check:** supervisor calls subject managers, not task engines or
+  local registries. Root interrupt traversal covers configured, mounted, task
+  Agent and task-Team descendants before any task drain waits.
+- **Idempotence check:** a later committed cleanup token may issue interrupt to
+  an already-interrupted Agent; `NO_ACTIVE_TURN` is success and per-handle
+  prepare/finish remains one-time.
+- **Rejected shortcut:** wait for settlement/queue drain before interrupt,
+  SIGKILL/process-group exit as graceful evidence, or add a root timeout that
+  abandons owned work.
+- **Outcome:** the root can release a provider approval wait before it drains the
+  commands that depend on that release, so normal shutdown terminates instead of
+  hanging in `agent_team_runs` or `agent_org_runs`.
+- **Result:** Pass.
+
+### VAL-028 — Settlement Failure Boundary Is Durable And Monotonic
+
+- **Trigger A:** subject `settledAt` write fails before atomic rename after the
+  exact execution was passively reserved.
+- **Spine A:** `terminal job -> FIFO revalidation -> passive reservation ->
+  subject persistence not_committed -> cancelBeforeDurability -> unchanged
+  records/tree/index/active registry -> FIFO release -> job remains retryable by
+  normal terminal resweep`.
+- **Trigger B:** `settledAt` is durable and state/registry transfer succeeds, but
+  interrupt/prepare/backend/MCP/resource cleanup rejects.
+- **Spine B:** `durable fence -> FIFO release -> committed cleanup token failure
+  -> subject adapter enters existing whole-root fail-stop -> root closes/
+  interrupts/tears down all owned work -> surfaced failure`.
+- **Owners:** subject persistence owns physical commit outcome; passive token
+  owns only reversible reservation; committed token owns exact local cleanup;
+  subject root owns fail-stop.
+- **Boundary check:** no provider action or active-registry removal occurs in A.
+  No rollback/reopen/replay occurs in B because accepted/interrupted plus
+  `settledAt` is already durable truth.
+- **Rejected shortcut:** silently swallow cleanup rejection, revert terminal
+  records, publish settlement before durability, or expose a partially active
+  mounted Team/task Agent after root fail-stop.
+- **Result:** Pass.
+
+### VAL-029 — Recursive Task-Team Settlement Is Deepest-First Without Global Starvation
+
+- **Trigger:** two terminal leaves exist in independent task branches while a
+  parent task Team also becomes terminal and one leaf's provider cleanup is
+  slower than the other.
+- **Primary spine:** coordinator builds dependencies from the existing exact
+  task ownership/index: each leaf receives at most one job and may complete its
+  short durable fence independently; local cleanup jobs may progress
+  independently; the parent is ineligible until every direct/indirect child
+  cleanup is complete; child completion triggers one parent resweep.
+- **Owners:** task records/tree retain host/parent truth; coordinator owns only
+  in-memory job/dedup/dependency state; task Team registry/cleanup token owns the
+  exact local subtree teardown.
+- **Boundary check:** the coordinator queries through root-neutral adapter/index
+  ports and never owns a generic Team/Org tree. Configured Teams are not part of
+  task recursion, and mounted Teams never become root settlement owners.
+- **Failure check:** one slow/failing leaf does not block an unrelated task
+  mutation or independent leaf durable fence. It does block only its dependent
+  parent cleanup; post-durable failure still fail-stops the whole owning root.
+- **Rejected shortcut:** enqueue repeated sweeps for one task, mark parent
+  cleanup complete when only child `settledAt` is durable, or flatten recursive
+  task Teams into configured Org membership.
+- **Result:** Pass.
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -650,7 +779,8 @@ package-family rename. It does not infer logical topology from directory depth.
 | RootTeamRun | private Team adapters + shared capabilities | Org root types/store | Pass |
 | Configured Agent handle | AgentRun/workspace/memory ports + root callbacks | Root aggregate/index/store/publisher | Pass |
 | Flat Team local factory | configured Agent factory + explicit root callbacks | root package/manager registration | Pass |
-| Task/message engine | one subject adapter port | subject tree/index/store/event imports | Pass |
+| RootTaskLifecycleEngine / mutation FIFO | one subject adapter short-mutation port | subject tree/index/store/event imports or provider/local teardown promise | Pass |
+| RootTaskSettlementCoordinator | engine terminal-commit port + committed cleanup token | subject tree/store/index/manager or provider implementation | Pass |
 | Global exact-Agent router | AgentRunManager + ActiveCollaborationRootDirectory | Team and Org managers together | Pass |
 | Mixed projection | explicit subject query boundaries | subject stores/files plus manager | Pass |
 | GeneralProcessRunSupervisor | subject managers/services | local Team/Agent handles | Pass |
@@ -675,7 +805,8 @@ Transport/UI
   -> subject managers
   -> RootTeamRun | AgentOrgRun
   -> private Team/Org adapters
-  -> root-neutral task/message/configured-Agent capabilities
+  -> root-neutral short task mutation engine + terminal settlement coordinator
+  -> root-neutral message/configured-Agent capabilities
   -> Team-local execution capability
   -> AgentRun/provider/workspace/memory infrastructure
 
@@ -691,6 +822,12 @@ Mounted Team view -X-> Team lifecycle, root store or Team registration
 AgentOrg Team branch adapter -> strict Org Team node + public AgentContext status selector -> pure Team status fold -> TeamAggregateStatusDot
 Team status fold/dot -X-> subject store, topology traversal, polling, transport, persistence or lifecycle
 Collapse/visible rows -X-> aggregate membership authority
+Task mutation FIFO -X-> AgentRun/provider/backend/MCP/local registry teardown
+Settlement coordinator -> short terminal commit port -> subject adapter
+Settlement coordinator -> committed cleanup token -> AgentRun/task-Team local lifecycle
+Settlement coordinator -X-> Team/Org tree/store/index/manager/provider implementation
+Root shutdown -> freeze/interrupt full scope -> task command drain -> settlement drain
+Task command/settlement drain -X-> pre-interrupt root shutdown position
 ```
 
 No upward bypass is needed in any validated use case. The active-root directory
@@ -717,6 +854,11 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Org root termination fails | Org lifecycle service + history row | clear pending into root-row error; focused surface remains non-authoritative | No mounted Team stopped independently | Pass |
 | Live Agent status is missing/unknown or context loses live authority | AgentOrg branch status source + shared fold | normalize to offline; historical running/initializing cannot pulse | No invented Team state or request | Pass |
 | Team branch traversal encounters empty/no Agent descendants | AgentOrg Team-branch projector | return offline through shared fold | No outside branch fallback | Pass |
+| Passive settlement write fails before durability | Subject task adapter + passive reservation | cancel reservation only; retain tree/index/active handle; release FIFO and allow ordinary resweep | No provider or registry side effect | Pass |
+| Terminal fence commits but local cleanup rejects | Committed cleanup token + subject root | release mutation FIFO, report failure and enter whole-root fail-stop; never reopen/replay task | No terminal-task resurrection | Pass |
+| Terminal cleanup remains pending while unrelated task command arrives | Settlement coordinator + mutation FIFO | cleanup stays outside FIFO; unrelated command reaches durability/result normally | No global task-lane starvation | Pass |
+| Root shutdown begins with provider approval wait | Subject root + AgentRun | close/freeze and interrupt full scope before any task drain; then drain commands/settlements and finish | No interrupt-after-wait cycle | Pass |
+| Repeated settlement sweep sees same terminal task | RootTaskSettlementCoordinator | reuse/ignore existing task-keyed scheduled/running job; at most one cleanup token | No duplicate teardown or FIFO entries | Pass |
 
 ## Removal And Forbidden-Shortcut Audit
 
@@ -744,13 +886,18 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Copied AgentOrg Team-status precedence or visible-row fold | Rejected | one shared pure fold plus exact Org branch adapter |
 | `NestedTeamAggregateStatusDot` / nesting-specific helper names retained through aliases | No; clean-cut rename | neutral TeamAggregateStatusDot and Team-history adapter, all imports/tests/locales updated |
 | Team aggregate persisted/polled/transported or mapped from TeamActivityDot | Rejected | pure projection over existing exact Agent status truth |
+| Provider/local teardown awaited by root task mutation FIFO | Yes | short terminal durable fence returns cleanup token to out-of-lane coordinator |
+| Drain-before-interrupt Team/Org root shutdown | Yes | close/freeze/interrupt complete scope precedes command and settlement drains |
+| Duplicate task settlement sweep entries | Yes | task-ID-keyed coordinator admits one scheduled/running job |
+| Team-domain shared settlement contract imported by Org | Yes | root-neutral passive/committed token contract under collaboration execution task |
+| Timeout/replay/new `settling` status/self-review support | Rejected | ownership/sequencing correction preserves existing task contract |
 
 ## Design-Principle Self-Check
 
 | Principle | Evidence In Revised Design | Result |
 | --- | --- | --- |
 | Approved behavior first | Every case cites REQ/AC/SCN/Product or established runtime contract; no new product behavior | Pass |
-| Supported-scenario gate | 25 concrete supported cases; active expanded/collapsed and stopped/history Team aggregates join the real browser prompt/focus/interaction/recovery/stop cases; contrived global lookup/tampering/deep conversion remain rejected | Pass |
+| Supported-scenario gate | 29 concrete supported cases; concurrent task settlement, interrupt-before-drain shutdown and failure/dependency boundaries join the prior launch/runtime/browser/status cases; contrived global lookup/tampering/deep conversion remain rejected | Pass |
 | Spine span sufficiency | Each primary case spans initiating caller through owner/durability/provider to result/event | Pass |
 | Multiple primary spines | Definition, Team launch, Org launch, message, task, persistence, migration, mixed read, focus, process lifecycle are distinct | Pass |
 | Ownership clarity | Root aggregates own lifecycle/state; lower capabilities own local mechanics; adapters own translation | Pass |
@@ -766,6 +913,9 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Lifecycle/action ownership | Org stop is a root history action; focused Agent and mounted Team surfaces expose no root lifecycle capability | Pass |
 | Projection proportionality | Existing Agent status/context/tree truth plus one pure fold/dot satisfies REQ-028; no backend, durable, polling or transport machinery is introduced | Pass |
 | Collapse-independent hierarchy truth | Full strict Team node is traversed before display filtering; hidden task Agents remain inputs and outside branches cannot leak | Pass |
+| Concurrency lane ownership | Short durable task mutations and provider-dependent cleanup have different owners/drains; no local teardown promise occupies the root FIFO | Pass |
+| Shutdown dependency order | Full owned scope is frozen/interrupted before command or settlement drain, breaking the evidenced wait cycle for both Team and Org | Pass |
+| Durable failure boundary | Passive pre-durability reservation is reversible; committed cleanup is monotonic and whole-root fail-stop on failure | Pass |
 
 ## Questions / Open Decisions
 
@@ -778,7 +928,9 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
   named in `design-spec.md`, especially Team-wire compatibility, strict Org
   presentation/command parsing, checkpointed member hydration, structural
   workspace reuse, pure Team fold/branch matrices, expanded/collapsed/stopped
-  AgentOrg status rendering and the real imported-package prompt/browser comparison. The
+  AgentOrg status rendering, the real imported-package prompt/browser comparison,
+  and AD-REV-008's deterministic concurrent-task, dedupe, recursive cleanup,
+  pre-/post-durable failure and interrupt-before-drain Team/Org shutdown checks. The
   downstream implementation/test changes and evidence are not validated or
   claimed by this artifact.
 
@@ -786,17 +938,23 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 
 `AD-REV-005` continues to resolve `IDI-001`; `AD-REV-006` resolves real-browser
 `ADI-007`; and AD-REV-007 resolves `API-FIND-007` / `CR-FIND-011` at the
-architecture boundary under approved RER-021. All 25 supported walkthroughs have
-a complete production spine, one authoritative owner, explicit status/lifecycle
-truth and a one-directional dependency path. No walkthrough requires a synthetic
-Team root, standalone mounted Team, standalone direct Org Agent, Team sidecar
-reinterpretation, public generic root, raw Org dashboard, opaque/JSON event
-fallback, component-owned Org socket, visible-row aggregate authority, status
-polling/persistence, or boundary bypass.
+architecture boundary under approved RER-021. AD-REV-008 resolves the reproduced
+API-FIND-008 / CR-CAND-020 liveness cycle at the architecture boundary by
+separating the short root task mutation lane from task-keyed provider/local
+cleanup and by interrupting owned turns before shutdown drains. All 29 supported
+walkthroughs have a complete production spine, one authoritative owner, explicit
+status/lifecycle/durability truth and a one-directional dependency path. No
+walkthrough requires a synthetic Team root, standalone mounted Team, standalone
+direct Org Agent, Team sidecar reinterpretation, public generic root, raw Org
+dashboard, opaque/JSON event fallback, component-owned Org socket, visible-row
+aggregate authority, status polling/persistence, provider teardown in the task
+FIFO, drain-before-interrupt shutdown, timeout/replay machinery, or boundary
+bypass.
 
-The self-validation therefore passes. The focused AD-REV-007 correction alone is
-a bounded `Medium / Low` frontend projection/refactor. The cumulative package
-still contains the previously reviewed structural runtime/persistence/contract
-work and remains classified `Large / High`; independent Architecture Review is
-mandatory before Implementation reconciles REQ-028 or API/E2E resumes that
-finding.
+The self-validation therefore passes. The focused AD-REV-008 correction is
+`Medium / High`: bounded to existing shared task/local-execution/root lifecycle
+owners, but material to concurrency, fail-stop and shutdown. The cumulative
+package remains `Large / High`; independent Architecture Review is mandatory
+before Implementation changes settlement/shutdown or API/E2E resumes cumulative
+validation. The earlier clean-control `No Architecture Impact` disposition is
+superseded by the later exact two-task correlated reproduction.
