@@ -3,142 +3,156 @@
 ## Review Round Meta
 
 - Review Entry Point: `Implementation Review`
-- Requirements Doc Reviewed As Context: `requirements-doc.md` (`RER-018` approved behavior authority; later record context preserved)
+- Requirements Doc Reviewed As Context: `requirements-doc.md` (`RER-019`; approved behavior remains cumulative `RER-018`)
 - Investigation Notes Reviewed As Context: `investigation-notes.md`
 - Requirements Revision Record Reviewed As Context: `requirements-revision-record.md`
-- Design Spec Reviewed As Context: `design-spec.md`
-- Supplemental Task Artifacts Reviewed As Context: `agent-org-contract.md`; approved `RV-012` / `VIS-001`–`VIS-020`; `production_data_migration_conventions.md`
+- Design Spec Reviewed As Context: `design-spec.md` (`AD-REV-006`)
+- Supplemental Task Artifacts Reviewed As Context: `agent-org-contract.md`; approved `RV-012` / `VIS-001`–`VIS-020`; `BASELINE-PROMOTION-001`; `production_data_migration_conventions.md`
 - Architecture Design Revision Record Reviewed As Context: `architecture-design-revision-record.md`
-- Relevant Architecture Design Revision IDs: `AD-REV-005`
+- Relevant Architecture Design Revision IDs: `AD-REV-006` (cumulative `AD-REV-001`–`AD-REV-005` retained)
 - Design Review Report Reviewed As Context: `design-review-report.md`
 - Architecture Review Revision Record Reviewed As Context: `architecture-review-revision-record.md`
-- Relevant Architecture Review Revision IDs: `ARCH-REV-003 / Pass`
+- Relevant Architecture Review Revision IDs: `ARCH-REV-004 / Pass`
 - Implementation Handoff Reviewed As Context: `implementation-handoff.md`
 - Implementation Revision Record Reviewed As Context: `implementation-revision-record.md`
-- Relevant Implementation Revision IDs: `IR-003` (with `IR-001`/`IR-002` history)
+- Relevant Implementation Revision IDs: `IR-004` (cumulative `IR-001`–`IR-003` retained)
 - Code Review Revision Record: `code-review-revision-record.md`
-- Current Code Review Revision ID: `CRR-003`
-- Current Review Round: `3`
-- Trigger: Implementation Engineer returned fix commit `8e680617cf3684de137ae318a7fa46133b695d4d` for `CR-FIND-001`–`CR-FIND-003`.
-- Prior Review Round Reviewed: `CRR-002 / round 2 / Fail — Local Fix`
-- Latest Authoritative Round: `3`
-- Coverage Investigation Reviewed (failure-origin entry point): `N/A`
-- Execution Coverage Report Reviewed (failure-origin entry point): `N/A`
-- API/E2E Revision Record Reviewed (failure-origin entry point): `N/A`
-- Relevant API/E2E Revision IDs: `N/A — pending`
-- Delivery Revision Record Reviewed (delivery re-entry only): `N/A`
+- Current Code Review Revision ID: `CRR-004`
+- Current Review Round: `4`
+- Trigger: IR-004 source commit `3d59992a4` and documentation commit `17c370e6e` returned after API/E2E `API-REV-001` exposed `ADI-007` and Architecture recovered it in `AD-REV-006` / `ARCH-REV-004`.
+- Prior Review Round Reviewed: `CRR-003 / Pass`
+- Latest Authoritative Round: `4`
+- Coverage Investigation Reviewed: `api-e2e-coverage-investigation.md` and `API-REV-001` evidence as triggering context; no API/E2E pass is claimed.
+- Execution Coverage Report Reviewed: `N/A — validation stopped at API-REV-001`
+- API/E2E Revision Record Reviewed: `N/A — no canonical revision record supplied`
+- Relevant API/E2E Revision IDs: `API-REV-001 / stopped for ADI-007`
+- Delivery Revision Record Reviewed: `N/A — pending`
 - Relevant Delivery Revision IDs: `N/A — pending`
-- Failing Scenario IDs: `N/A — prior scenarios revalidated successfully`
-- Exact Failing Commands / Execution Mode: `N/A`
-- Failure Evidence Paths: `N/A`
+- Triggering Scenario IDs: `API-E2E-005`; current reviewer scenarios `CR-SCN-004`–`CR-SCN-008`
+- Reviewer Evidence: `/tmp/aorg-crr004-correlation-probe.log`; focused contract/server/web commands recorded below.
 
 ## Routing Classification Review
 
-- Task size (`Small`/`Medium`/`Large`): `Large`
-- Architectural risk (`Low`/`High`): `High`
-- Selected route (`Implementation Review`/`API/E2E Failure-Origin Review`): `Implementation Review`
+- Task size: `Large`
+- Architectural risk: `High`
+- Selected route: `Implementation Review`
 - Independent source review required by the classification: `Yes`
-- Classification evidence or correction required: Confirmed. The cumulative package still crosses definitions, execution, persistence, migration, GraphQL/streaming, and web product surfaces; IR-003 is a bounded correction within existing owners.
+- Classification evidence or correction required: Confirmed. IR-004 changes shared Agent presentation contracts, Team serialization, Org projection/stream/context/recovery, commands, contextual queries, accepted workspace surfaces, history lifecycle placement, and process history ordering.
 
 ## Review Scope
 
-- Changed implementation and behavior reviewed: cumulative implementation at `8e680617c`, with round-3 focus on the `37d05c7..8e680617c` migration/UI/test correction and preservation of unaffected round-2 structural evidence.
-- Files / areas reviewed: both changed production files, both changed focused test files, IR-003 handoff/revision artifacts, all prior findings and scenarios, migration convention/design preflight/relaunch paths, UI partial-update path, cumulative 293-file production-source audit, and all 44 `>220` signals.
-- Explicit exclusions: external definition repositories remain read-only/out of ticket write scope; documented unrelated full-suite baselines were not re-attributed; API/E2E and delivery results remain pending.
+- Changed implementation and behavior reviewed: cumulative package at `17c370e6e`, with round-4 focus on `8e680617c..3d59992a4` and the `ADI-007` recovery.
+- Files / areas reviewed: shared presentation and collaboration-stream contracts; Team compatibility composition; server Agent presentation admission, Org aggregate/projector/stream/command/reference/history paths; web Org hydration/context/stream, active-target facade, shared Agent/Team surfaces, contextual tools, reference viewers, token/trace paths, history stop; IR-004 tests and rendered evidence; prior findings; cumulative size/legacy/cleanup state.
+- Explicit exclusions: external definition repositories remain read-only and outside ticket edits; untracked API/E2E artifacts remain owned by API/E2E; generated application SDK/Brief Studio `dist` directories are not attributed to IR-004; delivery remains pending.
+
+## Independent Validation Performed
+
+- Contract packages: Agent presentation `1/1`, collaboration stream `4/4`, Team stream `2/2` passed.
+- Focused server: Org stream handler, cold-start history ordering, and Org reference content `3 files / 9 tests` passed.
+- Focused web: Org stream state, Org workspace wrapper, active-context routing, and Org history stop `4 files / 12 tests` passed.
+- Reviewer correlation witness: `3/3` passed while intentionally asserting current defective behavior—an out-of-Team coordinator is admitted and targeted, a communication event with an unknown sender is appended while the context remains live, and a mismatched target/command-type ACK completes a pending command. This is reproduction evidence, not desired-behavior validation.
+- Static checks: `git diff --check` passed. The worktree returned to its incoming untracked-artifact state after the temporary reviewer test was removed.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
-- Approved requirements basis understood: Yes — `RER-018`, `REQ-001`–`REQ-027`, `AC-001`–`AC-022`, and approved product/migration supplements remain authoritative.
-- Design-spec behavior map verified against the implementation: Yes. IR-003 now satisfies the previously contradicted definition-migration and Org-edit lifecycle paths without changing the approved design.
-- Design review report and round confirmed: `ARCH-REV-003 / Pass` over `AD-REV-005`.
-- Behavior-basis status: `Confirmed`
-- Changed or newly discovered behavior, if any: None.
+- Approved requirements basis understood: Yes — `RER-019` / cumulative `RER-018`, `REQ-001`–`REQ-027`, `AC-001`–`AC-022`, and the approved Product/contract supplements remain authoritative.
+- Design-spec behavior map verified against the implementation: Partially. The accepted Agent/Team workspace and root-stop correction is implemented, but the strict identity/correlation portion of `DS-016`–`DS-018` is incomplete.
+- Design review report and round confirmed: `ARCH-REV-004 / Pass` over `AD-REV-006`.
+- Behavior-basis status: `Contradicted by implementation`
+- Changed or newly discovered behavior, if any: None. `CR-FIND-004` is a bounded implementation defect against already-approved strict stream/focus/command behavior.
 - Remaining material ambiguity, if any: None.
 
 | Behavior ID | Current Status | Current Implementation Path And Lifecycle Evidence | Contradicting Or Newly Discovered Supported Behavior Evidence |
 | --- | --- | --- | --- |
-| `BEH-001` | `Confirmed` | Strict Team V2/Org V1 services and atomic definition transactions remain; Org edit now sends only visible fields and preserves omitted durable state. | N/A |
-| `BEH-002` | `Confirmed` | Root-neutral execution/configuration remains; preserved definition launch defaults continue to seed Org configuration. | N/A |
-| `BEH-003` | `Confirmed` | Root-first/Team-member handoff order, endpoint ownership, ordered rules, and sender-bound routing remain intact. | N/A |
-| `BEH-004` | `Confirmed` | Org launch is unfocused; exact Agent and Team-coordinator focus paths remain distinct. | N/A |
-| `BEH-005` | `Confirmed` | Team V2 and Org V1 tree/task/message packages, state correlation, history, restore, fail-stop, and shutdown remain family-specific. | N/A |
-| `BEH-006` | `Confirmed` | Distinct Team/Org GraphQL and RV-012 surfaces remain; supported Org edit no longer clears hidden state. | N/A |
-| `BEH-007` | `Confirmed` | Required startup migration now preflights complete definition items, reports exact bounded failure reasons, recognizes prospective output, and completes ordinary relaunch. | N/A |
-| `BEH-008` | `Confirmed` | Native Team V2 remains separate from Org V1; tagged mixed projections reject family mismatch. | N/A |
-| `BEH-009` | `Confirmed` | Fresh task Agent/Team execution remains task-scoped under exact Team/Org host identities. | N/A |
-| `BEH-010` | `Confirmed` | Normal admission remains target-only; all retired decoding stays migration-private. | N/A |
+| `BEH-001` | `Confirmed` | Exact Team V2/Org V1 definition admission and atomic authoring remain intact. | N/A |
+| `BEH-002` | `Confirmed` | Root-neutral complete Org activation/configuration and no initial focus remain intact. | N/A |
+| `BEH-003` | `Confirmed` | Root-first stable handoff order and exact same-root routing remain intact. | N/A |
+| `BEH-004` | `Contradicted` | Valid snapshots select direct Agents and Team coordinators correctly, but a schema-valid snapshot whose Team coordinator points to another Org Agent is admitted; Team focus then targets that unrelated Agent. | `CR-FIND-004`; `CR-SCN-005` / `006`. |
+| `BEH-005` | `Contradicted` | Strict family persistence/history/restore remains, but miscorrelated task/communication events and ACK identities do not enter the required browser recovery path. | `CR-FIND-004`; `CR-SCN-006`. |
+| `BEH-006` | `Contradicted` | Raw JSON, duplicate Org header/composer, and member-header stop are removed, but the accepted workspace can still be fed a miscorrelated target/event instead of truthful recovery. | `CR-FIND-004`. |
+| `BEH-007` | `Confirmed` | Required startup migration mechanics and external read-only boundaries are unchanged from the verified IR-003 result. | N/A |
+| `BEH-008` | `Contradicted` | Team V2 remains separate and compatible; the Org V1 wire branch is shape-strict but not fully identity-correlated at the browser admission/reducer boundary. | `CR-FIND-004`; `REQ-025`, `DS-016`–`DS-018`. |
+| `BEH-009` | `Confirmed` | Task delegation remains root/host-scoped and recursively task-owned; no configured recursion was reintroduced. | N/A |
+| `BEH-010` | `Confirmed` | Normal definition admission remains target-only; migration-private legacy decoding is unchanged. | N/A |
 
 ## Supported Product Scenario And Reachability Gate (Mandatory)
 
 | Scenario ID | Related Behavior / Contract IDs | Kind | Actor / Initiator | Coherent Goal Or Governing Event | Supported Entry Surface / Event | Scenario Shape | Forward Production Path / Lifecycle | Expected Outcome / Consequence | Independent Evidence | Scenario Validity | Review Use |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-SCN-001` | `BEH-007`; `PRE-002`; `REQ-012`, `REQ-013`; `AC-008`; `QR-003` | `System` / `Contract` | Required startup migration | Convert only fixed-depth sources and reject an unexpected precondition violation without deep conversion. | Registered startup migration over writable server definitions. | `Explicit Edge` | startup -> runner -> complete definition plan/preflight -> write or failed disposition | Unexpected deeper input remains byte-faithful; exact child/member reason is reported. | Explicit requirements/design contract; reviewer probe and focused regression. | `Supported Explicit Edge Scenario` | `Use` |
-| `CR-SCN-002` | `BEH-007`; `AR-PREM-001`; migration convention | `Operational` | Process interruption and later ordinary startup | Resume the approved incomplete-attempt category through the existing runner. | Termination after an atomic prospective write, followed by ordinary startup. | `Explicit Edge` | first attempt commits exact prospective output -> termination -> retry recognizes output -> rename/reread/cleanup | Retry succeeds without journal, backup, or runtime fallback. | Migration convention/design; reviewer subprocess and two focused relaunch tests. | `Supported Explicit Edge Scenario` | `Use` |
-| `CR-SCN-003` | `BEH-001`, `BEH-002`, `BEH-006`; `REQ-012`, `REQ-023`, `REQ-024` | `User` | AgentOrg author | Save a visible Org edit without changing unexposed durable fields. | `/agent-orgs?view=org-edit&id=...`. | `Normal` | component -> partial store/GraphQL update -> service preserves omitted values -> atomic provider transaction | Instructions, metadata, avatar, and launch defaults remain unchanged. | Approved journeys; source trace and nonempty-field regression. | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-001` | `BEH-007`; `REQ-012`, `REQ-013`; migration convention | `System / Contract` | Required startup migration | Convert fixed-depth sources and reject an unexpected precondition violation before writes. | Registered startup migration. | `Explicit Edge` | runner -> complete preflight -> write or failed disposition | Unexpected deeper input is byte-faithful with an exact reason. | Approved migration contract; CRR-003 evidence. | `Supported Explicit Edge Scenario` | `Use` |
+| `CR-SCN-002` | `BEH-007`; `AR-PREM-001` | `Operational` | Process interruption and later startup | Resume the approved incomplete-attempt category. | Termination after prospective output, then ordinary startup. | `Explicit Edge` | prospective output -> termination -> retry recognition -> commit/cleanup | Retry succeeds without a journal/runtime fallback. | Migration convention; CRR-003 probes/tests. | `Supported Explicit Edge Scenario` | `Use` |
+| `CR-SCN-003` | `BEH-001`, `BEH-002`, `BEH-006` | `User` | AgentOrg author | Edit visible Org fields without clearing hidden durable state. | `/agent-orgs` edit journey. | `Normal` | component -> partial update -> atomic provider transaction | Omitted durable fields remain unchanged. | Approved Product journey; CRR-003 source/test evidence. | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-004` | `BEH-004`–`006`; `REQ-004`, `REQ-016`, `REQ-019`; `VIS-017` | `User` | User with a live AgentOrg | Focus a direct Agent, send a prompt, and read the answer in the accepted Agent workspace. | Active Org workspace and exact sidebar Agent selection. | `Normal` | Org route -> context -> active target -> shared Agent surface -> exact command -> typed event -> AgentContext | Normal conversation/composer, no raw protocol or duplicate Org surface. | Approved Product package; `API-E2E-005`; IR-004 real Codex render evidence. | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-005` | `BEH-004`, `BEH-006`; `REQ-004`; `VIS-018`; `DS-017` | `User` | User with a live AgentOrg | Focus a direct mounted Team or its Agent and interact through the accepted Team surface. | Active Org sidebar Team/Agent selection and accepted composer/tool actions. | `Normal` | exact selection -> Team coordinator/member -> `ActiveAgentWorkspaceTarget` -> Org interaction port -> exact Agent command/ACK | Team focus targets only its stored direct-Agent coordinator; command completion is correlated to the exact command type and Agent. | Approved Product/design; existing Team exact-target contract. | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-006` | `BEH-004`–`006`, `BEH-008`; `REQ-025`; `DS-016`–`DS-018` | `Contract` | Strict AgentOrg stream boundary | Reject an unknown, malformed, miscorrelated, or sequence-gapped Org message. | AgentOrg WebSocket server-message contract while an Org context is open. | `Explicit Edge` | server frame -> strict parser/correlation -> context reducer or rejection -> `reopen_required` -> checkpoint hydration | No wrong target/event/ACK is admitted; last committed context remains visible and recovery is required. | `design-spec.md` supported-scenario row at the strict presentation contract; `ARCH-REV-004`; Team recovery contract. | `Supported Explicit Edge Scenario` | `Use` |
+| `CR-SCN-007` | `BEH-005`, `BEH-006`; `REQ-016`; `DS-019` | `User` | Operator of an active Org | Stop the complete Org from the root history row. | AgentOrg history active root row. | `Normal Lifecycle` | history row -> Org store/service -> whole-root termination | Root pending/error parity; no focused-member or mounted-Team stop. | Approved design and Product boundary; IR-004 source/render/tests. | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-008` | `BEH-005`, `BEH-006`; history derivation contract | `System` | First Org launch in a cold data root | Initialize derived history before publishing a new current package. | `createAgentOrgRun`. | `Normal` | service -> history initialize -> manager create/package publish -> history record | First launch succeeds without rediscovering its package as a prior row. | Current history owner contract; focused regression. | `Supported Normal Scenario` | `Use` |
 
 ### Candidate Finding And Mechanism Gate
 
 | Candidate ID | Observation Or Mechanism | Scenario / Contract ID | Independent Trigger | Forward Path / Lifecycle / Consequence | Evidence | Disposition | Reason / Proportionate Response |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-CAND-001` | Prior child-by-child mutation before complete preflight. | `CR-SCN-001` | Valid earlier owned Team plus later deeper violation. | IR-003 `planOrgDefinition()` reads/transforms/target-validates every child, Org target, destination, and markdown before the write loop; failure leaves the item unchanged. | Migration lines 175–245; reviewer probe shows earlier child remains legacy; regression asserts all source bytes unchanged and exact reason. | `Promote` | Prior candidate remains valid and is verified resolved; no new machinery. |
-| `CR-CAND-002` | Prior inability to recognize an exact prospective definition source. | `CR-SCN-002` / `AR-PREM-001` | Interruption after committed child or Org config. | Planner accepts exact V2 children and matching Org config/markdown, then completes writes, rename, reread, and cleanup. | Migration lines 209–245; reviewer exit-77 probe retries `SUCCEEDED`; two relaunch tests pass. | `Promote` | Prior candidate remains valid and is verified resolved through the existing runner. |
-| `CR-CAND-003` | Prior edit payload explicitly cleared hidden durable fields. | `CR-SCN-003` | Author saves an existing nonempty Org. | Create sends intentional defaults; edit sends `visibleInput` only; store/service preserve omitted fields. | `AgentOrgExperience.vue:303-327`; store/service contract; nonempty-field component test. | `Promote` | Prior candidate remains valid and is verified resolved by a bounded UI correction. |
+| `CR-CAND-001` | Prior definition migration mutated an earlier child before complete preflight. | `CR-SCN-001` | Registered migration encounters an unexpected later child. | IR-003 still plans the complete item before the first write. | Source unchanged since CRR-003; prior probe/test evidence remains valid. | `Promote` | Verified resolved; no new machinery. |
+| `CR-CAND-002` | Prior migration could not resume exact prospective definition output. | `CR-SCN-002` | Approved interruption/relaunch category. | IR-003 prospective recognition and ordinary retry remain unchanged. | Source unchanged; prior subprocess/focused tests remain valid. | `Promote` | Verified resolved through the existing runner. |
+| `CR-CAND-003` | Prior Org edit cleared hidden durable fields. | `CR-SCN-003` | User saves an existing nonempty Org. | Edit still sends visible fields only; backend preserves omission. | Source unchanged; prior focused test remains. | `Promote` | Verified resolved. |
+| `CR-CAND-004` | API-REV-001 raw/opaque Org dashboard, bespoke composer/header, and member-header root stop. | `CR-SCN-004`, `CR-SCN-005`, `CR-SCN-007` | Real focused Org prompt and root lifecycle actions. | IR-004 now projects typed Agent messages into one Org context, reuses accepted surfaces, and places Stop Org only on the history root row. | Source trace; 70 implementation tests; reviewer 12 focused web tests; real Codex/render evidence. | `Promote` | `ADI-007` presentation/lifecycle symptom is verified resolved. |
+| `CR-CAND-005` | Org stream admission validates shapes but not every identity relationship: Team coordinator membership is unchecked; task/communication events mutate without current-context correlation; pending ACKs retain no expected target/type. | `CR-SCN-005`, `CR-SCN-006`; strict `DS-016`–`DS-018` contract | The established strict AgentOrg transport receives a schema-shaped but miscorrelated snapshot, event, or command ACK while the context is open. | Parser accepts -> Team focus can use a global unrelated Agent; task/message state can be appended from unknown identities; mismatched ACK can resolve a different pending command -> no `reopen_required`. | `root-execution-view-dtos.ts:35-119,121-137`; `agentOrgExecutionContext.ts:98-158,161-202`; `agentOrgStreamingService.ts:19-24,136-149,169-172,209-215`; `/tmp/aorg-crr004-correlation-probe.log` (`3/3` reproduction). | `Promote` | Established explicit failure contract and exact-target normal journey are contradicted. Bounded correlation checks and focused regressions are proportionate; no design revision or new recovery subsystem is needed. |
+| `CR-CAND-006` | First-launch history initialization occurred after package publication during IR-004 development. | `CR-SCN-008` | First supported Org launch in a cold data root. | Current service initializes derived history before manager publication. | `agent-org-run-service.ts`; reviewer focused server tests `9/9`, including history-order `1/1`. | `Promote` | Verified resolved in current source. |
 
 ## Structural / Design Checks
 
 | Check | Result | Evidence | Required Action |
 | --- | --- | --- | --- |
-| Task design health assessment is present, evidence-backed, and preserved by the implementation | `Pass` | IR-003 preserves Large/High, `Refactor Needed Now`, and AD-REV-005 boundaries. | None. |
-| Implementation matches approved behavior-defining supplemental artifacts | `Pass` | Migration preflight/relaunch and Org update now match approved contracts; unaffected RV-012 behavior remains preserved. | None. |
-| Data-flow spine inventory clarity and preservation under shared principles | `Pass` | Complete migration planning precedes mutation; prospective retry and partial update preserve lifecycle state. | None. |
-| Ownership boundary preservation and clarity | `Pass` | Team/Org definition, run, persistence, task/message/event, and provider owners remain separate. | None. |
-| Off-spine concern clarity | `Pass` | Admission diagnostics, readiness, history, and streaming remain outside root aggregates. | None. |
-| Existing capability/subsystem reuse check | `Pass` | Existing runner/atomic writer, definition transaction, execution, and history owners are reused. | None. |
-| Reusable owned structures check | `Pass` | Shared identity/task/tree records and flat-Team execution remain in their owned modules. | None. |
-| Shared-structure/data-model tightness check | `Pass` | Exact Team/Org roots stay separate; common records remain narrowly shared. | None. |
-| Repeated coordination ownership check | `Pass` | Task lifecycle, handoff compilation, configuration, readiness, and migration planning have clear owners. | None. |
-| Empty indirection check | `Pass` | Reviewed adapters/plans translate or stage real subject-specific responsibility. | None. |
-| Scope-appropriate separation of concerns and file responsibility clarity | `Pass` | IR-003 stays within the migration and Org-experience owners; migration remains cohesive and below the limit. | None. |
-| Ownership-driven dependency check | `Pass` | Subject owners depend inward on shared capabilities; no new shortcut/cycle was introduced. | None. |
-| Authoritative Boundary Rule check | `Pass` | No reviewed caller bypasses outer owners to depend on their internals in parallel. | None. |
-| File placement check | `Pass` | Corrected source/tests remain under their owning migration and product-surface packages. | None. |
-| Flat-vs-over-split layout judgment | `Pass` | Local plan types avoid both a second recovery subsystem and artificial fragmentation. | None. |
-| Interface/API/query/command/service-method boundary clarity | `Pass` | UI correctly uses partial update; migration plan has explicit write-required state. | None. |
-| Naming quality and naming-to-responsibility alignment check | `Pass` | `OrgDefinitionPlan`, `OwnedTeamDefinitionPlan`, and `visibleInput` match responsibility. | None. |
-| No unjustified duplication of code / repeated structures in changed scope | `Pass` | No duplicated recovery or update path was added. | None. |
-| Patch-on-patch complexity control | `Pass` | Fixes address ordering/contract use rather than adding compatibility branches. | None. |
-| Dead/obsolete code cleanup completeness in changed scope | `Pass` | Destructive payload and prior sequencing are replaced; no stale branch/helper remains. | None. |
-| Relevant test scenarios and assertions are clear and requirement-aligned | `Pass` | Zero-write, two prospective relaunch points, exact reason, and hidden-field omission are asserted. | None. |
-| Test fixtures/helpers are reasonably reusable and test structure remains coherent | `Pass` | Legacy definition/environment helpers serve focused migration cases; component fixture remains concise. | None. |
-| No stale, duplicated, or compatibility-only tests are retained in changed scope | `Pass` | Tests cover migration-private released/prospective states and current behavior, not runtime compatibility. | None. |
-| API/E2E readiness for the next workflow stage | `Pass` | All prior blockers are resolved; reviewer checks and implementation build evidence are clean. | Proceed to API/E2E. |
+| Task design health assessment is present, evidence-backed, and preserved by the implementation | `Pass` | Large/High and `Refactor Needed Now` remain explicit; IR-004 follows the selected structural recovery. | None. |
+| Implementation matches approved behavior-defining supplemental artifacts | `Fail` | Accepted surfaces/root-stop match; strict snapshot/event/ACK identity handling does not match AD-REV-006. | Resolve `CR-FIND-004`. |
+| Data-flow spine inventory clarity and preservation under shared principles | `Fail` | `DS-016`–`DS-018` are clear, but some miscorrelated frames bypass rejection/recovery. | Complete the existing correlation stage before mutation/ack completion. |
+| Ownership boundary preservation and clarity | `Pass` | Agent presentation, subject envelope, Org aggregate/context, active target, and shared surfaces have distinct owners. | None. |
+| Off-spine concern clarity | `Pass` | Projection, hydration, reference content, token/trace browse, and history stay attached to clear subject owners. | None. |
+| Existing capability/subsystem reuse check | `Pass` | Existing Agent projector, accepted Agent/Team surfaces, Team context port, history action, and root-neutral runtime are reused. | None. |
+| Reusable owned structures check | `Pass` | Root-neutral Agent message/token bodies are extracted below Team and Org envelopes. | None. |
+| Shared-structure/data-model tightness check | `Fail` | Shapes are closed and subject-specialized, but the Org snapshot model omits the Team coordinator-to-own-member invariant and event/ACK correlation state is incomplete. | Resolve `CR-FIND-004`; keep Team outer wire unchanged. |
+| Repeated coordination ownership check | `Pass` | One Org context/stream owns hydration, sequencing, focus, and recovery; components do not repeat protocol logic. | None. |
+| Empty indirection check | `Pass` | New adapters/surfaces translate or own real policy; no pass-through-only boundary was found. | None. |
+| Scope-appropriate separation of concerns and file responsibility clarity | `Pass` | Contract, adapter, projector, context, stream, surface, and history responsibilities are coherent. | None. |
+| Ownership-driven dependency check | `Pass` | Shared presentation is below subject contracts; mounted Teams do not import/register Team root authority. | None. |
+| Authoritative Boundary Rule check | `Pass` | Components use active-target/context ports; no reviewed caller combines an owning subject boundary with its private store/manager/socket. | None. |
+| File placement check | `Pass` | New files reside under their owning contract, server subject, web context, workspace surface, or history area. | None. |
+| Flat-vs-over-split layout judgment | `Pass` | The 69 IR-004 production files reflect real cross-subsystem owners without artificial micro-wrappers. | None. |
+| Interface/API/query/command/service-method boundary clarity | `Fail` | Compound Org browse/query identities are clear, but ACK completion and non-Agent event admission do not enforce their declared identity fields. | Resolve `CR-FIND-004`. |
+| Naming quality and naming-to-responsibility alignment check | `Pass` | Presentation, context, target, interaction, browse, and history names align with their responsibilities. | None. |
+| No unjustified duplication of code / repeated structures in changed scope | `Pass` | Raw Org dashboard and duplicate surface authority are removed; shared accepted surfaces replace duplicate markup. | None. |
+| Patch-on-patch complexity control | `Pass` | IR-004 replaces the parallel path rather than layering a fallback; recovery remains one checkpointed context. | None. |
+| Dead/obsolete code cleanup completeness in changed scope | `Pass` | Raw Org event rendering, bespoke composer/header, direct component send path, and member-header root stop are absent. | None. |
+| Relevant test scenarios and assertions are clear and requirement-aligned | `Fail` | Current tests cover malformed JSON/order/reopen atomics and valid UI states, but omit semantic snapshot/event/ACK correlation; the reviewer probe exposes all three gaps. | Add focused negative correlation tests with the fix. |
+| Test fixtures/helpers are reasonably reusable and test structure remains coherent | `Pass` | Contract fixtures and Team/workspace context builders are appropriately scoped. | None. |
+| No stale, duplicated, or compatibility-only tests are retained in changed scope | `Pass` | No obsolete raw-dashboard test remains; Team tests still exercise current behavior. | None. |
+| API/E2E readiness for the next workflow stage | `Fail` | ADI-007 rendering is corrected, but the strict Org stream contract can still silently mis-target or accept bad state. | Return to Implementation; do not resume API/E2E until re-review passes. |
 
 ## Source File Size And Structure Audit (If Applicable)
 
-Audit method: cumulative implementation changes from `f3035a2d5..8e680617c`; changed production `.ts/.tsx/.js/.mjs/.vue`, excluding tests/fixtures/`dist`. Result: `293` files, `44` signals over 220, `0` over 500. `git diff --check` passed.
+Audit method: cumulative production implementation changes from `f3035a2d5..HEAD`; `.ts/.tsx/.js/.mjs/.vue`, excluding tests, fixtures, `test-support`, and `dist`. Result: `344` files, `52` signals over 220 effective non-empty lines, `0` over 500. IR-004 alone: `69` production files, `10` signals over 220, `0` over 500.
 
 | Source File / Cohort | Effective Non-Empty Lines | `>500` Hard-Limit Check | `>220` Delta Check | SoC / Ownership Check | Placement Check | Preliminary Classification | Required Action |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `app-config.ts`; Agent backend factory/manager/Claude session | `500`, `498`, `498`, `492` | `Pass` | Signal | Existing owners with bounded deltas. | Pass | `Pass` | None. |
-| `root-team-run.ts`; Team form; application-bundle/agent-definition providers; Team manager | `478`, `455`, `453`, `443`, `424` | `Pass` | Signal | Existing cohesive owners; recursive responsibilities were removed/extracted. | Pass | `Pass` | None. |
-| `agent-org-flat-team-families-v1-app-data-migration.ts` | `445` | `Pass` | Signal | Cohesive migration-only inventory/plan/write/cleanup owner. | Pass | `Pass` | None. |
-| Flat-Team manager; standalone host; Codex bootstrapper; process supervisor; Team event adapter | `381`, `373`, `371`, `364`, `357` | `Pass` | Signal | Cohesive existing/extracted execution owners. | Pass | `Pass` | None. |
-| Team GraphQL; studio composition; scope builder; predecessor migration; root task engine; launch baseline | `349`, `338`, `325`, `318`, `318`, `313` | `Pass` | Signal | Existing API/composition/migration/policy owners. | Pass | `Pass` | None. |
-| `AgentOrgExperience.vue` | `318` | `Pass` | Signal | Cohesive Org surface; create/edit separation uses the existing store contract. | Pass | `Pass` | None. |
-| AgentOrg aggregate; configured Agent handle; Team store; server runtime; adaptive layout; Team service; Agent GraphQL | `300`–`277` | `Pass` | Signal | Responsibility-aligned existing/new owners. | Pass | `Pass` | None. |
-| Readiness index; Handoff manager; Team/Org task adapters | `270`, `263`, `252`, `251` | `Pass` | Signal | Cohesive readiness/authoring/subject-private adapters. | Pass | `Pass` | None. |
-| Remaining eleven signals: Team projector/index/service/memory; global router; shared schemas; location; persistence/registry/classifier/discovery | `243`–`222` | `Pass` | Signal | Existing or focused owners; no concern conflation found. | Pass | `Pass` | None. |
+| `app-config.ts`; Agent manager/autobyteus backend/Claude session | `500`, `498`, `498`, `492` | `Pass` | Signal | Existing cohesive owners with bounded ticket deltas. | Pass | `Pass` | None. |
+| Root Team; Team form; application provider; migration; Team manager; token store; Agent provider | `478`, `455`, `453`, `445`, `443`, `436`, `424` | `Pass` | Signal | Existing or focused owners; no newly conflated concern. | Pass | `Pass` | None. |
+| Flat-Team manager; standalone host; Codex bootstrapper; presentation adapter; process supervisor | `381`, `373`, `371`, `369`, `364` | `Pass` | Signal | Cohesive execution/admission/lifecycle owners. | Pass | `Pass` | None. |
+| Team GraphQL; Org aggregate; composition; history queries; scope builder; Org experience; predecessor migration; task engine; launch baseline | `349`–`313` | `Pass` | Signal | Broad but responsibility-aligned existing/new owners. | Pass | `Pass` | None. |
+| Configured Agent handle through handoff manager (nine files) | `292`–`263` | `Pass` | Signal | Cohesive runtime/store/API/UI owners. | Pass | `Pass` | None. |
+| `agentOrgStreamingService.ts`; active context; Team/Org task adapters; Team projector/panel; `agentOrgExecutionContext.ts` | `257`, `256`, `252`, `251`, `243`, `242`, `240` | `Pass` | Signal | File responsibilities are coherent; the two Org browser owners contain the correlation defect. | Pass | `Local Fix` for Org context/stream | Resolve `CR-FIND-004`; no size-driven split required. |
+| Remaining eleven signals: Team index/service/memory; Agent projector/router; shared schema/location/persistence/registry/classifier/discovery | `234`–`222` | `Pass` | Signal | Existing/focused owners; no actionable structural pressure. | Pass | `Pass` | None. |
+| `autobyteus-collaboration-stream-contracts/src/root-execution-view-dtos.ts` | `141` | `Pass` | Pass | Correct contract owner, but missing coordinator membership correlation. | Pass | `Local Fix` | Resolve `CR-FIND-004`; no split required. |
 
 ## Legacy / Backward-Compatibility Verdict
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| No backward-compatibility mechanisms in changed scope | `Pass` | Retired decoding/prospective classification remains inside the registered migration. |
-| No legacy old-behavior retention in changed scope | `Pass` | Normal providers/admission remain exact current-only. |
-| Dead/obsolete code cleanup completeness in changed scope | `Pass` | No actionable dormant compatibility owner or stale recursive test found. |
-| Approved persisted-data transition decision is followed without unnecessary migration work | `Pass` | Complete preflight and exact prospective retry implement only the approved fixed transition. |
-| No version-specific dual reads/writes or request-time old-shape fallback exists | `Pass` | No normal runtime fallback was added. |
-| Approved transition mechanics match the reviewed design, including migration safety only when required | `Pass` | Zero-write invariant and one ordinary relaunch category are verified. |
+| No backward-compatibility mechanisms in changed scope | `Pass` | Shared Agent bodies preserve Team semantics without a dual runtime parser. |
+| No legacy old-behavior retention in changed scope | `Pass` | Raw Org dashboard and send-only path are removed; migration-only legacy decoding remains isolated. |
+| Dead/obsolete code cleanup completeness in changed scope | `Pass` | No actionable retired Org component/store/socket path remains. |
+| Approved persisted-data transition decision is followed without unnecessary migration work | `Pass` | IR-004 changes no durable family or migration mechanics. |
+| No version-specific dual reads/writes or request-time old-shape fallback exists | `Pass` | Current Team/Org readers remain family-specific. |
+| Approved transition mechanics match the reviewed design, including migration safety only when required | `Pass` | IR-003 migration corrections remain unchanged and verified resolved. |
 
 ## Dead / Obsolete / Legacy Items Requiring Removal (Mandatory If Any Exist)
 
@@ -147,8 +161,8 @@ None.
 ## Docs-Impact Verdict
 
 - Docs impact: `Yes`
-- Why: The Large/High cutover changes Team/Org definitions, runtime, migration, API/streaming, and product workflows. IR-003 adds no new public behavior but final delivery documentation remains required.
-- Files or areas likely affected: server migration/architecture/README guidance, web Team/Org product docs, API/stream contracts, and final ticket artifacts. Delivery owns docs sync.
+- Why: The cumulative Large/High cutover changes public Team/Org definitions, runtime, stream/query contracts, product workflows, and migration behavior. IR-004 documentation already records the intended presentation recovery, but final delivery synchronization remains pending.
+- Files or areas likely affected: server/web AgentOrg and AgentTeam architecture/user docs, strict stream/command/query contracts, migration guidance, and final ticket artifacts.
 
 ## Additional Material Premise Validation (When Required)
 
@@ -156,57 +170,73 @@ None.
 
 | Premise ID | Current Status | Changed Evidence / Reason |
 | --- | --- | --- |
-| `AR-PREM-001` | `Confirmed` | Exact prospective definition output is now recognized and ordinary restart succeeds. |
-| `AR-PREM-002` | `Confirmed` | No extra recovery machinery was added. |
-| `AR-PREM-003` | `Confirmed` | External repositories remain read-only/out of ticket write scope. |
+| `AR-PREM-001` | `Confirmed` | Approved migration interruption/relaunch behavior remains unchanged and resolved. |
+| `AR-PREM-002` | `Confirmed` | Arbitrary corruption/tampering remains unsupported and drives no finding or machinery. `CR-FIND-004` does not rely on that premise; it relies on the separately approved strict stream failure contract. |
+| `AR-PREM-003` | `Confirmed` | Subject fail-stop for indeterminate durable finalization remains unchanged. |
 
-No new or reclassified premise is required.
+No new or reclassified premise is required. `CR-SCN-006` is already an explicit supported contract-failure scenario in `AD-REV-006`; the reviewer did not infer it from the probe.
 
 ## Review Scorecard (Mandatory)
 
-- Overall score (`/10`): `9.2/10`
-- Overall score (`/100`): `91.7/100`
-- Score calculation note: Simple average of the ten mandatory categories; every category meets the clean-pass threshold.
+- Overall score (`/10`): `8.9/10`
+- Overall score (`/100`): `88.4/100`
+- Score calculation note: Simple average of the ten mandatory categories. The decision is `Fail` because five categories remain below the `9.0` clean-pass threshold and `CR-FIND-004` is open.
 
 | Priority | Category | Score | Why This Score | What Is Weak / Holding It Down | What Should Improve |
 | --- | --- | --- | --- | --- | --- |
-| `1` | `Data-Flow Spine Inventory and Clarity` | `9.2` | Migration and UI update now preserve complete lifecycle state; broader spines remain explicit. | Migration has necessarily dense sequencing. | Keep plan-before-write and subject ownership. |
-| `2` | `Ownership Clarity and Boundary Encapsulation` | `9.3` | Team/Org owners and root-neutral capabilities remain separated. | Adapter count reflects broad scope. | Preserve current boundaries. |
-| `3` | `API / Interface / Query / Command Clarity` | `9.2` | Exact identities, GraphQL families, and partial update semantics are used correctly. | No material weakness. | Preserve omission-versus-null tests. |
-| `4` | `Separation of Concerns and File Placement` | `9.1` | IR-003 stays within existing owners; planner is migration-private. | Migration is 445 effective lines. | Extract only if a future independent concern emerges. |
-| `5` | `Shared-Structure / Data-Model Tightness and Reusable Owned Structures` | `9.2` | Strict families stay separate while actual common records/policies are shared. | No material weakness. | Maintain specialization. |
-| `6` | `Naming Quality and Local Readability` | `9.0` | Plan/write names make sequencing explicit. | Some cumulative code is dense. | Retain focused helpers and formatting. |
-| `7` | `API/E2E Readiness` | `9.1` | Prior blockers have durable tests, reviewer probes, typecheck/build evidence, and clean diff. | Independent API/E2E remains pending by ownership. | Execute downstream coverage. |
-| `8` | `Runtime Correctness And Behavioral Fidelity` | `9.2` | All promoted scenarios now produce approved outcomes. | Broader executable validation remains downstream. | Revalidate realistic journeys in API/E2E. |
-| `9` | `No Backward-Compatibility / No Legacy Retention` | `9.2` | Prospective handling is migration-only; runtime remains current-only. | Migration necessarily contains released-shape knowledge. | Keep it isolated. |
-| `10` | `Cleanup Completeness` | `9.2` | Retry cleans retired authorities; failed preflight leaves sources intact. | No material weakness. | Preserve cleanup assertions. |
+| `1` | `Data-Flow Spine Inventory and Clarity` | `8.8` | The intended presentation, interaction, hydration, and history spines are clear and mostly implemented. | Semantic identity failures can skip the rejection/recovery branch in `DS-016`–`DS-018`. | Correlate every snapshot/event/ACK relationship before mutation or completion. |
+| `2` | `Ownership Clarity and Boundary Encapsulation` | `9.2` | One Org aggregate/context and shared accepted surfaces replace the duplicate dashboard; mounted Teams remain rootless. | No material ownership weakness beyond the local validation omission. | Preserve current owners while fixing their invariants. |
+| `3` | `API / Interface / Query / Command Clarity` | `8.4` | Compound browse/query identities and closed message shapes are strong. | Declared coordinator, event, command-type, and target identities are not all enforced. | Make correlation executable at the owning contract/context/command boundary. |
+| `4` | `Separation of Concerns and File Placement` | `9.1` | Contracts, adapters, projectors, contexts, surfaces, and history remain responsibility-aligned. | Broad scope creates density but not an actionable split. | Keep fixes local; do not add another recovery owner. |
+| `5` | `Shared-Structure / Data-Model Tightness and Reusable Owned Structures` | `8.8` | Root-neutral Agent detail extraction is semantically tight and Team specialization remains separate. | Org snapshot/event/ACK semantics are shape-strict but incompletely correlated. | Add the missing semantic refinements/pending identity state. |
+| `6` | `Naming Quality and Local Readability` | `9.0` | Names consistently expose subject, presentation, target, browse, context, and lifecycle responsibilities. | Some dense one-line contract declarations slow review. | Preserve explicit names and format future refinements readably. |
+| `7` | `API/E2E Readiness` | `8.2` | Builds and broad focused tests/rendered journeys pass; prior raw UI is corrected. | Core negative identity cases are uncovered and currently fail the approved contract. | Fix and re-review before API/E2E resumes. |
+| `8` | `Runtime Correctness And Behavioral Fidelity` | `8.3` | Valid direct-Agent/Team/live-conversation/root-stop paths behave correctly. | Miscorrelated snapshot/event/ACK frames can silently target or mutate the wrong state instead of recovery. | Resolve `CR-FIND-004` with focused regressions. |
+| `9` | `No Backward-Compatibility / No Legacy Retention` | `9.3` | Team compatibility is achieved by shared current contracts, not legacy runtime branches; migration knowledge stays private. | Migration necessarily retains approved old-shape knowledge. | Keep that isolation. |
+| `10` | `Cleanup Completeness` | `9.3` | Raw/opaque Org rendering, duplicate header/composer, direct component socket path, and member-header stop are removed. | No material cleanup gap found. | Preserve absence through tests. |
 
 ## Findings
 
-No open findings. `CR-FIND-001`, `CR-FIND-002`, and `CR-FIND-003` are verified resolved in `CRR-003`.
+### `CR-FIND-004` — High — Strict AgentOrg stream identity correlation is incomplete
+
+- Candidate gate: `CR-CAND-005 / Promote`
+- Affected approved behavior: `BEH-004`, `BEH-005`, `BEH-006`, `BEH-008`; `REQ-004`, `REQ-016`, `REQ-025`; `DS-016`–`DS-018`; `CR-SCN-005`, `CR-SCN-006`.
+- Supported trigger and path: The approved strict AgentOrg transport contract explicitly treats an unknown, malformed, **miscorrelated**, or sequence-gapped message as a supported contract failure. The active Org WebSocket parses the frame, correlates it to the current context, and must either apply it to the exact target or enter `reopen_required` and checkpoint recovery.
+- Evidence:
+  1. `root-execution-view-dtos.ts:35-119` correlates root, duplicate identities, task/message sidecars, and statuses, but never requires a configured Team's `coordinatorAddress` to identify one of that Team's own direct Agent members.
+  2. `agentOrgExecutionContext.ts:109-153` accepts Team focus when the coordinator exists anywhere in the global Org address map; a miscorrelated Team coordinator can therefore target an unrelated direct Org Agent or another Team's Agent while presenting the selected Team.
+  3. `agentOrgExecutionContext.ts:181-202` appends task and communication events without checking their delegator/execution/sender/receiver identities against the current context, unlike the exact Agent-presentation branch.
+  4. `agentOrgStreamingService.ts:19-24,136-149,209-215` stores only callbacks/timeouts for a pending command and resolves by `command_id` alone, ignoring the ACK's declared `command_type` and `target_agent_run_id`.
+  5. `/tmp/aorg-crr004-correlation-probe.log` records a `3/3` reproduction of the current wrong behavior. The probe intentionally asserted observation: cross-Team coordinator targeting, unknown-sender message admission, and mismatched ACK completion.
+- Material consequence: Under the exact failure lifecycle the architecture specifically requires the browser to contain, Team focus can address the wrong Agent, task/message presentation can accept state from identities outside the current Org context, and a command promise can report success for a different target/type. None enters the visible recovery path, so the last known-good context is no longer the only committed authority.
+- Required action: Within the existing contract/context/stream owners, (a) validate every configured Team coordinator against that Team's direct Agent members before snapshot publication; (b) correlate task and communication event identities/execution address against the current context before mutation and route mismatch through the existing `reopen_required` path; (c) retain expected command type and target with pending commands and never complete a mismatch, using the reviewed failure behavior without adding a second recovery system; and (d) add focused negative tests for all three cases plus unchanged valid Team/Agent/command paths.
+- Classification: `Local Fix` — the reviewed design and requirements are complete; the defect is bounded to implementation-owned validation/reducer state and tests.
+
+`CR-FIND-001`, `CR-FIND-002`, and `CR-FIND-003` remain resolved; see `CRR-004` prior-finding resolution.
 
 ## Classification
 
-- `N/A — clean pass`
+- `Local Fix`
 
 ## Recommended Recipient
 
-- Primary: `api_e2e_engineer`
-- Informational after primary success: `implementation_engineer`
+- `implementation_engineer`
+- API/E2E must not resume until the correction returns through independent source review and passes.
 
 ## Residual Risks
 
-- Independent API/E2E validation remains required for this Large/High package.
-- Documented unrelated repository-wide baselines were not reclassified.
-- External definition publication remains separately owned; incompatible external definitions stay capability-scoped unavailable.
+- Independent API/E2E remains stopped at `API-REV-001`; after the local fix and source-review pass it must repeat real imported-package/Codex/browser, checkpoint recovery, contextual identity, lifecycle, Team compatibility, and migration/persistence evidence.
+- Team outer-wire preservation is strongly supported by source composition and current integration/package tests, but the architecture-requested broader golden coverage remains valuable downstream.
+- The repository-wide Nuxt typecheck remains broadly red. Its log also contains one diagnostic in the ticket-created `AgentOrgExperience.spec.ts`; it is not the basis of `CR-FIND-004`, and no full typecheck pass is claimed.
+- External definition publication remains separately owned; incompatible external definitions remain capability-scoped unavailable.
 
 ## Latest Authoritative Result
 
-- Review Decision: `Pass`
+- Review Decision: `Fail`
 - Review Entry Point: `Implementation Review`
-- Supported Product Scenario Gate (`Pass`/`Fail`/`Blocked`): `Pass`
-- Material-Premise Gate (`Pass`/`Fail`/`Blocked`): `Pass`
-- Score Summary: `9.2/10 (91.7/100)`; every category is at least `9.0`.
-- Failure Origin (when applicable): `N/A`
-- Recommended Recipient (when applicable): `api_e2e_engineer` primary; Implementation Engineer informational.
-- Notes: IR-003 resolves all prior findings without design change or compatibility machinery. The cumulative package is ready for independent API/E2E validation.
+- Supported Product Scenario Gate: `Pass`
+- Material-Premise Gate: `Pass`
+- Score Summary: `8.9/10 (88.4/100)`; `Data-Flow`, `API/Interface`, `Shared-Model`, `API/E2E Readiness`, and `Runtime Correctness` are below the clean-pass target.
+- Failure Origin: `Implementation defect against the approved strict AgentOrg stream/focus/command correlation contract.`
+- Recommended Recipient: `implementation_engineer`
+- Notes: IR-004 resolves the visible `ADI-007` raw-dashboard and lifecycle-placement problem, but source review cannot pass while schema-shaped miscorrelated frames silently target/mutate/complete instead of using the existing recovery path.

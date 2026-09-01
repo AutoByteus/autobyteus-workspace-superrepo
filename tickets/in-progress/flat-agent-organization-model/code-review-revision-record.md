@@ -7,6 +7,7 @@
 | `CRR-001` | `code-review-report.md` | Implementation Review / IR-002 independent source-review request | `N/A` | `Fail — Local Fix` | `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003` |
 | `CRR-002` | `code-review-report.md` | User reconsideration / fixed-depth inventory and migration-convention audit | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003` |
 | `CRR-003` | `code-review-report.md` | Implementation Review / IR-003 correction re-entry | `Fail — Local Fix` | `Pass` | `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003` |
+| `CRR-004` | `code-review-report.md` | Implementation Review / IR-004 after API-REV-001 ADI-007 architecture recovery | `Pass` | `Fail — Local Fix` | `CR-FIND-004` |
 
 ## Revision Entries
 
@@ -89,3 +90,31 @@ None.
 - Material score or classification changes: Score improves from `8.7/10 (86.6/100)` to `9.2/10 (91.7/100)`; `Local Fix` failure is replaced by clean `Pass`.
 - Recommended recipient: Primary `/software_engineering_team/api_e2e_engineer`; informational `/software_engineering_team/implementation_engineer` after primary handoff succeeds.
 - Remaining risks or uncertainty: Independent API/E2E and delivery remain pending; documented unrelated full-suite baselines and separate external definition publication remain outside this pass.
+
+### CRR-004 — IR-004 resolves the raw Org dashboard but leaves stream identity correlation incomplete
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review`, round `4`
+- Triggering role, report path, and finding or scenario IDs: Implementation Engineer / `implementation-handoff.md`; API/E2E `API-REV-001` / `ADI-007`; `CR-SCN-004`–`CR-SCN-008`; `CR-FIND-004`
+- Relevant architecture design revision IDs: `AD-REV-006`
+- Relevant architecture-review revision IDs: `ARCH-REV-004`
+- Relevant implementation revision IDs: `IR-004`
+- Relevant API/E2E revision IDs: `API-REV-001 / stopped; no pass`
+- Relevant delivery revision IDs: `N/A — pending`
+- Prior authoritative result: `CRR-003 / Pass`
+- Current authoritative result: `Fail — Local Fix; return to Implementation Engineer`
+- What changed in the review result and why: IR-004 correctly removed raw/opaque Org cards, the duplicate Org header/composer and member-header root stop, introduced root-neutral Agent presentation, one checkpointed Org context, exact active-target/query ports, accepted Agent/Team surfaces, and fixed cold-start history ordering. Independent source tracing and a focused reviewer witness then showed that the new browser boundary admits a Team coordinator outside its Team, mutates task/communication state without current-context identity correlation, and resolves a pending command from an ACK whose target/type do not match. Those paths contradict the already-approved strict miscorrelation/recovery contract and exact-target interaction path.
+- Supported product scenario / material-premise basis changes: No upstream behavior or premise changed. `CR-SCN-006` is the explicit `AD-REV-006` contract-failure scenario for unknown/malformed/miscorrelated/sequence-gapped messages, not a scenario inferred from the test. `AR-PREM-001`–`003` remain confirmed.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001` | `Resolved` | `Resolved` | `IR-003`; `AD-REV-005`; `CRR-003` | Migration source is unchanged since CRR-003; complete preflight remains before writes. |
+| `CR-FIND-002` | `Resolved` | `Resolved` | `IR-003`; `AR-PREM-001`; `CRR-003` | Migration source is unchanged; exact prospective output remains recognized by ordinary retry. |
+| `CR-FIND-003` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | `AgentOrgExperience.vue` is unchanged since CRR-003; edit still omits hidden durable fields. |
+
+- New or remaining finding IDs: `CR-FIND-004`
+- Material score or classification changes: Score changes from `9.2/10 (91.7/100)` to `8.9/10 (88.4/100)`; clean `Pass` is replaced by `Fail — Local Fix`.
+- Recommended recipient: `/software_engineering_team/implementation_engineer`
+- Remaining risks or uncertainty: API/E2E remains stopped and must resume only after the local correction passes source re-review. Broader Team-wire golden validation remains downstream-relevant; the broad Nuxt typecheck baseline remains red and contains one diagnostic in a ticket-created earlier test.

@@ -8,6 +8,7 @@
 | IR-002 | Architecture Reviewer / `ARCH-REV-003` Pass / design-impact recovery implementation | `IDI-001` (resolved) | `Local Fix` | `AD-REV-005`, `ARCH-REV-003`; Code/API/Delivery `N/A` | Implementation completed, implementation-scoped validation passed with documented unrelated baselines, and the package is ready for dynamic downstream handoff. |
 | IR-003 | Code Reviewer / `CRR-001`, `CRR-002` / source-review Local Fix | `CR-FIND-001`–`CR-FIND-003` | `Local Fix` | `AD-REV-005`, `ARCH-REV-003`, `CRR-001`, `CRR-002`; API/Delivery `N/A` | All three review findings corrected with focused regression/probe/build evidence; cumulative package ready to return to Code Review. |
 | IR-004 | API/E2E `API-REV-001` Design Impact -> Architecture `AD-REV-006` / `ARCH-REV-004` Pass | `ADI-007` | `Local Fix` | `AD-REV-006`, `ARCH-REV-004`, `CRR-003`, `API-REV-001`; Delivery `N/A` | Replaced the raw Org dashboard with strict root-neutral presentation, one checkpointed Org context and accepted Agent/Team surfaces; local validation complete and cumulative package ready for source review. |
+| IR-005 | Code Reviewer / `CRR-004` / source-review Local Fix | `CR-FIND-004` | `Local Fix` | `AD-REV-006`, `ARCH-REV-004`, `CRR-003`, `CRR-004`, `API-REV-001`; Delivery `N/A` | Completed strict snapshot, event and command-ACK identity correlation; negative and unchanged-valid-path regressions pass and the cumulative package is ready to return to Code Review. |
 
 ## Revision Entries
 
@@ -99,3 +100,26 @@
 - Source-size assessment: zero changed production source files exceed `500` effective non-empty lines. Every `>220` signal is a cohesive reviewed owner or clean-cut extraction/replacement; `git diff --check` passed.
 - Next recipient or routing: dynamic handoff rules after the documentation commit; Large/High remains eligible for independent source review.
 - Remaining limitations or risks: API/E2E must resume after source review and repeat real imported-package/Codex/browser, checkpoint recovery, contextual identity, lifecycle, standalone regression and migration/persistence evidence. The broad repository Nuxt typecheck baseline remains red and is not claimed fixed.
+
+
+### IR-005 — Strict AgentOrg stream identity correlation Local Fix
+
+- Triggering role, report path, and round: Code Reviewer `CRR-004 / Fail — Local Fix`; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`; second source-review correction round after the `IR-004` architecture-impact implementation.
+- Triggering finding IDs: `CR-FIND-004`.
+- Classification: `Local Fix`; task size remains `Large`, architectural risk remains `High`.
+- Prior authoritative result: `IR-004` resolved the visible `ADI-007` presentation/lifecycle defect, but source review found incomplete semantic identity correlation at the strict AgentOrg browser boundary.
+- Current authoritative result: snapshot admission now rejects a Team coordinator outside that Team, event reduction verifies task and communication identities before mutation, and command completion requires the exact pending command type and target AgentRun. Mismatches use the existing `reopen_required`/fail-closed recovery path; no second recovery authority or Team wire change was introduced.
+- Related architecture design revision IDs: `AD-REV-006` (cumulative `AD-REV-005`)
+- Related architecture-review revision IDs: `ARCH-REV-004`
+- Related code-review revision IDs: `CRR-003 / Pass`, `CRR-004 / Fail — Local Fix`
+- Related API/E2E revision IDs: `API-REV-001` triggering evidence only; completed API/E2E result/revision record `N/A`
+- Related delivery revision IDs: `N/A — pending`
+- Why this revision is recorded: the CRR-004 probe proved three schema-shaped miscorrelations could previously target an unrelated Agent, mutate committed Org state, or complete a different pending command without entering recovery. The correction executes the already-approved `DS-016`–`DS-018` contract inside its existing contract/context/stream owners.
+- Approved behavior or requirement IDs affected: `BEH-004`–`BEH-006`, `BEH-008`; `REQ-004`, `REQ-016`, `REQ-025`; `DS-016`–`DS-018`; review scenarios `CR-SCN-005`, `CR-SCN-006`.
+- Implementation delta: added the configured Team coordinator/direct-member refinement to the collaboration stream contract; removed global address-to-run focus lookup in favor of the selected Team's stored direct Agent; indexed exact AgentRun/TeamRun identities for task events; correlated task delegator/execution/recipient and communication sender/receiver before mutation; retained expected type/target on pending commands and rejected unknown or mismatched ACKs through fail-closed recovery. Also corrected the ticket-created Org experience test assertion that was the sole ticket-path diagnostic called out by CRR-004.
+- Changed files or areas: `autobyteus-collaboration-stream-contracts` source/generated contract/test; `agentOrgExecutionContext.ts`; `agentOrgStreamingService.ts`; focused context/stream/Org experience tests. Source commit: `dbc5f6f0a78517469b1ce758c781a50cd9a977ee`.
+- Local validation and result: contract packages `1/1`, `5/5`, `2/2`; focused server Org stream `6/6`; focused web `27/27`, including independent wrong coordinator, task delegator/execution, communication sender/receiver and ACK type/target negatives plus unchanged valid focus/event/command paths; server TypeScript/build and web production build passed. Full Nuxt typecheck remains repository-baseline red, but now emits zero diagnostics for every IR-005 changed path and the earlier `AgentOrgExperience.spec.ts` diagnostic is removed.
+- Source-size assessment: changed production owners are `142`, `330`, and `271` effective non-empty lines; none exceeds `500`, no changed production delta exceeds `220`, and `git diff --check` passed.
+- Frontend rendered-result assessment: `Not Applicable` for a new render round because IR-005 changes only strict pre-render stream admission/recovery and no Vue component, style, label or valid rendered state. The accepted direct-Agent/Team surfaces rendered in IR-004 remain unchanged and their valid focus/command paths were revalidated by focused tests and a production build.
+- Next recipient or routing: return to Code Reviewer through the dynamic handoff rules after the documentation commit.
+- Remaining limitations or risks: independent source review must verify `CR-FIND-004`; API/E2E remains stopped and must resume only after review passes. Broader checkpoint recovery, real imported-package/Codex/browser and cumulative migration/persistence validation remain API/E2E-owned. The broad unrelated Nuxt typecheck baseline remains red and is not claimed fixed.
