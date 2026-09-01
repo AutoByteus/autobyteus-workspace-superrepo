@@ -9,6 +9,7 @@
 | `CRR-003` | `code-review-report.md` | Implementation Review / IR-003 correction re-entry | `Fail — Local Fix` | `Pass` | `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003` |
 | `CRR-004` | `code-review-report.md` | Implementation Review / IR-004 after API-REV-001 ADI-007 architecture recovery | `Pass` | `Fail — Local Fix` | `CR-FIND-004` |
 | `CRR-005` | `code-review-report.md` | Implementation Review / IR-005 strict-correlation correction re-entry | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-004`, `CR-FIND-005` |
+| `CRR-006` | `code-review-report.md` | Implementation Review / IR-006 fresh-task correction re-entry and full cumulative review | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-004`, `CR-FIND-005`, `CR-FIND-006` |
 
 ## Revision Entries
 
@@ -155,3 +156,40 @@ New finding:
 - Review accountability: CRR-004's correlation requirement was valid, but its task prescription and synthetic witness conflated configured and task execution identities. This revision records and corrects that reviewer gap.
 - Recommended recipient: `/software_engineering_team/implementation_engineer`
 - Remaining risks or uncertainty: API/E2E remains stopped. After correction/source pass it must cover fresh Agent and Team task activation plus exact checkpoint/task-bearing restore, alongside the already-planned real browser and compatibility evidence. The two ticket-correlated Team test failures must return to the documented unrelated-only web baseline.
+
+### CRR-006 — IR-006 fixes fresh task identity and Team test readiness; cumulative review finds a stream-generation recovery gap
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review`, round `6`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md`; `CR-FIND-004`, `CR-FIND-005`; `CR-SCN-006`, `CR-SCN-009`–`CR-SCN-011`
+- Relevant architecture design revision IDs: `AD-REV-006` (cumulative `AD-REV-005`)
+- Relevant architecture-review revision IDs: `ARCH-REV-004 / Pass`
+- Relevant implementation revision IDs: `IR-006`
+- Relevant API/E2E revision IDs: `API-REV-001 / stopped; no pass`
+- Relevant delivery revision IDs: `N/A — pending`
+- Prior authoritative result: `CRR-005 / Fail — Local Fix`
+- Current authoritative result: `Fail — Local Fix; return to Implementation Engineer`
+- What changed in the review result and why: IR-006 correctly separates globally unique configured placements from fresh task run identity, admits exact task-bearing snapshots, checkpoint-hydrates valid fresh task activation, and repairs the store-neutral standalone Team workflow test. Because repeated Local Fixes had accumulated around the Org browser aggregate/recovery path, this round re-reviewed the full cumulative implementation and production spines rather than only the delta. That review found that `AgentOrgStreamingService` serializes raw messages without their source socket/session identity: a valid task presentation already queued from the old socket while activation awaits its checkpoint resumes after the replacement socket is installed and `failClosed()` closes the replacement before its snapshot can publish.
+- Supported product scenario / material-premise basis changes: Added `CR-SCN-011` as a refinement of the already-approved `AC-010` task lifecycle and `DS-018` recovery contract. It is one normal server-owned task sequence—activation, release, task presentation, checkpoint replacement—not two artificially concurrent user actions. No new Product behavior or recovery mechanism is invented.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Migration source remains unchanged; complete preflight remains before writes. |
+| `CR-FIND-002` | `Resolved` | `Resolved` | `IR-003`; `AR-PREM-001`; `CRR-003` | Exact prospective-state ordinary retry remains unchanged. |
+| `CR-FIND-003` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Org edit still sends only visible fields and preserves omitted durable state. |
+| `CR-FIND-004` | `Open — partially resolved` | `Resolved` | `IR-006`; `AD-REV-006`; `CRR-004/005` | Current contract/context/hydration distinguish configured-placement uniqueness from fresh task run identity; valid activation requests the existing checkpoint path; task-bearing Agent/Team snapshot and hydration tests pass. |
+| `CR-FIND-005` | `Open` | `Resolved` | `IR-006`; `CRR-005` | `TeamFocusSendWorkflow` now supplies `TeamWorkspaceContextView`, retains exact task-selection/send assertions, and passes `2/2`; the full reviewer run has no ticket-correlated Team failure. |
+
+New finding:
+
+| Finding ID | Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- |
+| `CR-FIND-006` | `Open` | `IR-006`; `AD-REV-006`; `DS-005`, `DS-018`; `CR-SCN-011` | `/tmp/aorg-crr006-stale-socket-focused.log` and `/tmp/aorg-crr006-stale-socket-probe.patch` reproduce the normal post-activation frame being evaluated under replacement phase and closing that replacement before hydration. |
+
+- New or remaining finding IDs: `CR-FIND-006`
+- Material score or classification changes: Score changes from `8.8/10 (87.5/100)` to `8.9/10 (88.6/100)` because the prior identity/model and Team test findings are resolved; classification remains `Local Fix` due to the bounded session-transition defect.
+- Review accountability: CRR-005 correctly repaired its earlier fresh-run-model gap but did not evaluate queued old-socket work across the newly added activation checkpoint transition. The requested full cumulative review exposed the gap; it is now explicit in the production spine, scorecard, and required regression.
+- Recommended recipient: `/software_engineering_team/implementation_engineer`
+- Remaining risks or uncertainty: API/E2E remains stopped. After correction/source pass it must exercise real fresh Agent/Team activation with ongoing presentation during checkpoint replacement, task-bearing restore, and the existing imported-package/Codex/browser scenarios. The sole broad web failure remains the established unrelated fixed-px audit.
