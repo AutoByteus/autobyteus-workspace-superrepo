@@ -2,12 +2,12 @@
 
 ## Document Status
 
-- Status: `Ready for Approval — Durable Contract Requirement Impact`
-- Current requirements revision ID: `RER-015`
+- Status: `Approved Architecture-Ready — Durable Contract Approved`
+- Current requirements revision ID: `RER-016`
 - Request / ticket: `AORG-FLAT-TEAM-001`
 - Requirements owner: Requirements Engineer
-- Date: 2026-08-31
-- Approval state and reference: The intended AgentOrg/AgentTeam, handoff, launch/focus, and Product UI behavior approved through `RER-014` remains authoritative. During the `RER-014` → `AD-REV-002` impact round, the user explicitly corrected the durable boundary: standalone AgentTeam runs keep the existing TeamRun V2 JSON/file family, while AgentOrg receives an additional AgentOrg-specific execution JSON with adjusted Org root attributes. `RER-015` records the exact proposed file/schema/API/migration contract below. This exact persistence revision requires explicit user approval before the package returns to Architecture Designer; the approved `RV-012` UI is otherwise unchanged.
+- Date: 2026-09-01
+- Approval state and reference: The intended AgentOrg/AgentTeam, handoff, launch/focus, and Product UI behavior approved through `RER-014` remains authoritative. During the `RER-014` → `AD-REV-002` impact round, the user explicitly corrected the durable boundary, then explicitly approved the exact `RER-015` contract on 2026-09-01. `RER-016` records final approval: standalone AgentTeam runs retain native Team V2 JSON/file/path with Agent-only validation; AgentOrg uses the separate exact V1 root/file family; mixed APIs discriminate root kind; only one-level organization-like roots migrate. The migration is a small fixed-depth record-family projection, while the overall Large/High architecture route remains unchanged.
 
 ## Problem And Desired Outcome
 
@@ -230,13 +230,13 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 
 | Artifact | Purpose | Status / Approval Applicability |
 | --- | --- | --- |
-| `tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Single configured-structure, launch/configuration/focus, handoff, two-family on-disk execution, task anchoring, generic projection, and migration contract | `Ready for Approval — persistence revision`; behavior/UI through `RER-014` remains approved, while `RER-015` replaces the generic V3 union with unchanged Team V2 plus new AgentOrg V1. |
+| `tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Single configured-structure, launch/configuration/focus, handoff, two-family on-disk execution, task anchoring, generic projection, and migration contract | `Approved`; exact Team V2 / AgentOrg V1 replacement approved in `RER-016`, with behavior/UI through `RER-014` preserved. |
 | `tickets/in-progress/flat-agent-organization-model/investigation-notes.md` | Canonical evidence base | Current; supports but does not independently define behavior. |
 | User screenshot at the absolute path recorded in investigation notes | Current structure evidence | Evidence only. |
 | `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md` | Approved normative UI/UX supplement for `REQ-019` / `AC-014` and the affected Team/Org, handoff, configuration, focus, runtime, history, responsive, and accessibility behavior | `Approved`; Product revision `RV-012`, runnable behavior commit `891b4e667d51fffb92ebd85dd2dc90a8e0afcf2e`, explicit user approval in `user-decision-record.md`. |
 | `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/visual-references` and `visual-reference-manifest.json` | Normative final image set, route/state/viewport inventory, hashes, and fixture boundaries | `Approved`; `VIS-001`–`VIS-020`, captured after approval at commit `3de2c08b6f3d8cfdb75714edaa88b00d04d67aaf`; manifest reports 59 checks, zero failures, and zero runtime errors. |
 | `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/user-decision-record.md`, `prototype-ticket.md`, and `validation/final-package` | Explicit user decision, terminal Product ticket identity, provenance, completed validation, and repository finalization evidence | `Completed`; Product package/integration revision `e53b8acbbc714a2571142a297fcba59f1b0818e5`, terminal closure `79093e9a781024844fe3d3678e93ab44386c1040`, final integrity 6/6 pass. |
-| `tickets/in-progress/flat-agent-organization-model/design-spec.md` and `architecture-design-revision-record.md` | Architecture context and requirement-gap return from the `AD-REV-002` impact round | `AD-REV-001` committed at `36bc02deca363798b6eda878e5eb4850e624da6f`; no partial `AD-REV-002`; Architecture Review held pending exact `RER-015` persistence approval. |
+| `tickets/in-progress/flat-agent-organization-model/design-spec.md` and `architecture-design-revision-record.md` | Architecture context and requirement-gap return from the `AD-REV-002` impact round | `AD-REV-001` committed at `36bc02deca363798b6eda878e5eb4850e624da6f`; no partial `AD-REV-002`; exact persistence contract approved in `RER-016` and ready for Architecture Designer re-entry. |
 | `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/requirement-impact-findings.md` | Historical Product Design findings `RIF-AORG-001` and `RIF-AORG-002` from user review of `RV-006`/`RV-009` | `Resolved`; authoritative triggers for `RER-011` and `RER-013`, not normative visual references. The rejected `RV-009` selector remains historical evidence only. |
 
 ## Assumptions And Resolved Decisions
@@ -255,7 +255,7 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 | DEC-010 | Handoff and condition changes are draft operations committed only by an atomic parent-definition save; member changes cannot silently retarget or remove handoffs. | Approved in `RER-012` from validate-before-write and identity-preservation requirements. |
 | DEC-011 | AgentOrg activation and communication targeting are separate states: a valid configuration can launch the full Org with no focus, and a user selects the exact communication target from the active workspace only when needed. | Approved in `RER-013` from explicit user rejection of `RV-009`'s separate pre-launch selector. |
 | DEC-012 | One Org configuration applies Org-root choices across the scope with Team-placement and Agent-placement overrides by increasing specificity; mounted definitions keep their standalone defaults and are not mutated. Configuration never selects a recipient or changes Team coordinator ingress. | Approved in `RER-013` as the current AgentTeam configuration-first behavior adapted to the approved fixed-depth Org model. |
-| DEC-013 | Standalone AgentTeam execution JSON remains native Team V2 at its existing file/path; AgentOrg uses an additional AgentOrg V1 file family with `rootOrg`; no Team V3 or generic root-union file is introduced. Mixed generic APIs use explicit root-kind discrimination while Team-only contracts may remain compatible. | Core direction explicitly corrected by the user during the `AD-REV-002` impact round; exact `RER-015` schema/path/projection/migration contract awaits approval. |
+| DEC-013 | Standalone AgentTeam execution JSON remains native Team V2 at its existing file/path; AgentOrg uses an additional AgentOrg V1 file family with `rootOrg`; no Team V3 or generic root-union file is introduced. Mixed generic APIs use explicit root-kind discrimination while Team-only contracts may remain compatible. | Explicitly approved by the user on 2026-09-01; exact contract recorded in `RER-015` and approval closure in `RER-016`. |
 
 ## Traceability
 
@@ -275,12 +275,12 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 ## Downstream Architecture Input
 
 - Preserve fixed semantics: distinct AgentOrg and flat Team, no Org coordinator, direct-to-Org configuration, full-scope launch without initial focus, exact post-launch recipient focus, no fallback, exact addresses, Team coordinator ingress, same-Org handoffs, standalone Teams, explicit data cohorts, and task/configured-nesting distinction.
-- Subject to explicit `RER-015` approval, treat `PRE-001`–`PRE-005` and the two-family durable contract as authoritative design inputs: retain native Team V2 schema/file/path unchanged for flat Team runs; add AgentOrg V1 at the exact Org file/path; reuse current V2 configured-member/handoff/launch/task shapes; preserve task lineage; and do not create Team V3, a generic root-union file, or a `FlatTeam` subtype.
+- Treat `PRE-001`–`PRE-005` and the approved two-family durable contract as authoritative design inputs: retain native Team V2 schema/file/path unchanged for flat Team runs; add AgentOrg V1 at the exact Org file/path; reuse current V2 configured-member/handoff/launch/task shapes; preserve task lineage; and do not create Team V3, a generic root-union file, or a `FlatTeam` subtype.
 - Architecture Design owns target modules/classes, internal abstractions, implementation sequencing, compatibility mechanics, lifecycle composition, and removal sequence. The logical JSON keys/versions, execution-tree file names/package roots, and generic root-kind discrimination in `AORG-CONTRACT-001` are product contract inputs rather than architecture placeholders.
 - Architecture must verify all definition, execution, persistence, history/memory, task, stream/GraphQL, package, and frontend readers/writers before removing recursive configured-Team paths.
 - Native AgentOrg replacement and recursive configured-Team retirement must be delivered in a capability-safe order; an intermediate product state must not strand organization-like configurations.
 - The Product Design gate is satisfied by user-approved `RV-012`; its `ui-ux-spec.md` and `VIS-001`–`VIS-020` are normative product references. Architecture Designer must translate the approved product behavior to production services and contracts rather than treating the prototype's deterministic local fixtures or mocked persistence/orchestration as architecture.
-- Architecture revision `AD-REV-001` is committed; its impact round returned this durable-contract requirement gap before any partial `AD-REV-002` commit. Architecture Review remains held until the exact `RER-015` persistence revision is approved and returned.
+- Architecture revision `AD-REV-001` is committed; its impact round returned this durable-contract requirement gap before any partial `AD-REV-002` commit. The exact contract is now approved in `RER-016` and returns for `AD-REV-002`; Architecture Review remains downstream of that architecture revision.
 - During the impact check, Architecture Designer must reconcile the approved direct-to-Org configuration/full-scope activation/post-launch focus contract, Org → Team → Agent configuration precedence, no-focus lifecycle, and handoff CRUD/reordering, natural-language condition ordering, owner-separated Org/Team definition APIs, endpoint-option projection, member-impact validation, atomic save/error contracts, responsive/accessibility expectations, and truthful runtime/history hierarchy. Requirements Engineering does not prescribe the target component/API design.
 
 ## Readiness Check
@@ -289,9 +289,9 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 - Current behavior evidence-backed: `Yes`
 - Desired/preserved behavior explicit: `Yes`
 - Scope/non-goals clear: `Yes`
-- Requirements and acceptance criteria stable, testable, and traceable: `Ready for approval — RER-015 defines exact Team V2 preservation, AgentOrg V1 addition, mixed projection, and fixed-depth transition; prior behavior/UI remains approved`
+- Requirements and acceptance criteria stable, testable, and traceable: `Yes — exact Team V2 preservation, AgentOrg V1 addition, mixed projection, and fixed-depth transition approved in RER-016; prior behavior/UI remains approved`
 - Relevant user/system/operational/contract scenarios covered: `Yes`
-- Behavior-defining supplements integrated: `Pending exact persistence approval — agent-org-contract.md contains the RER-015 replacement contract; Product-owned ui-ux-spec.md and VIS-001–VIS-020 remain approved and consistent`
+- Behavior-defining supplements integrated: `Yes — agent-org-contract.md exact two-family replacement approved in RER-016; Product-owned ui-ux-spec.md and VIS-001–VIS-020 remain approved and consistent`
 - Requested Product Design evidence integrated and approved: `Yes — RV-012 explicitly approved on 2026-08-31; ui-ux-spec.md, VIS-001–VIS-020, manifest, decision record, and validation paths agree on the completed package`
 - Data preservation and acceptable loss explicit: `Yes`
 - Target architecture avoided: `Yes`
@@ -299,13 +299,13 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 - RER-011 handoff-information clarification approval received: `Yes — recorded in RER-012`
 - RIF-AORG-002 launch/configuration/focus reconciliation approval received: `Yes — the user explicitly rejected the selector and stated the desired configuration-first, focus-after-launch model; recorded in RER-013`
 - Final Product UI approval received: `Yes — RV-012 approved; remaining Product UI decisions: none; Product package validation 59/59 browser checks and 6/6 final integrity checks`
-- RER-015 exact durable contract approval received: `No — the user's core two-family direction is explicit, but the proposed exact AgentOrg V1 keys/version/file/path, generic discriminator, and migration mapping require confirmation`
-- Package ready for current downstream route: `No — Ready for Approval — Durable Contract Requirement Impact`; Architecture Review and `AD-REV-002` remain held.
+- RER-015 exact durable contract approval received: `Yes — explicit user approval on 2026-09-01 after confirming that only configured one-level organization-like roots migrate and task-scoped Team lineage remains unchanged`
+- Package ready for current downstream route: `Yes — Approved Architecture-Ready`; return to Architecture Designer for `AD-REV-002` before independent Architecture Review.
 
 ## Architecture Design Routing Assessment
 
 - Assessment status: `Complete`.
-- Assessment owner/date: Requirements Engineer / 2026-08-31.
+- Assessment owner/date: Requirements Engineer / 2026-09-01.
 - Preliminary task size: `Large`.
 - Preliminary architectural risk: `High`.
 - Structural surfaces reviewed: AgentOrg/AgentTeam definition contracts, graph validation, launch planning, root lifecycle/ownership, canonical routing and handoff compilation, separate Team V2/AgentOrg V1 persistence/restore/package families, memory/history, task delegation, GraphQL/stream discrimination, package discovery/import, and frontend authoring/launch/workspace/history.
@@ -313,8 +313,8 @@ If a migration probe unexpectedly contradicts `PRE-002`, the migration fails bef
 - Structural-impact triggers: `Present` — public/domain contract change, persisted root schema/invariant change, lifecycle/ownership distinction, deterministic data migration, API/transport change, and cross-subsystem structural refactoring.
 - Evidence paths: `investigation-notes.md`, `agent-org-contract.md`, current definition/execution source paths listed there, package fixtures, and stored-run inventory.
 - Decision rationale: Although the existing Team V2 child/handoff/task topology is reusable and flat Team files now remain unchanged, the overall product change introduces a distinct AgentOrg domain/root and durable file family, removes recursive configured Team composition, requires mixed history/stream discrimination, and changes migration, lifecycle, API, and frontend contracts. It is not safe for bounded direct implementation without architecture design.
-- Selected ultimate engineering route: `Architecture Designer`; the route resumes after exact `RER-015` approval for the planned `AD-REV-002` impact work before independent Architecture Review.
-- Current requirements-stage classification: `Ready for Approval — Durable Contract Requirement Impact`.
+- Selected engineering route: `Architecture Designer`; exact durable approval now reopens the planned `AD-REV-002` impact work before independent Architecture Review.
+- Current requirements-stage classification: `Approved Architecture-Ready`.
 - Direct-route conditions all satisfied: `No` — task is Large/High and has confirmed contract, persistence, lifecycle, migration, ownership, and structural-refactoring impact.
-- Architecture design, review, and design-revision artifacts: `AD-REV-001` is committed at `36bc02deca363798b6eda878e5eb4850e624da6f`; no partial `AD-REV-002` was committed; Product UI remains approved; Architecture Review is held on the exact persistence contract.
-- Downstream re-entry trigger: After explicit user approval of the exact `RER-015` contract, Requirements Engineering records an approved revision, re-runs readiness without changing the Large/High route, and returns the cumulative package to Architecture Designer for `AD-REV-002`. Target modules/classes and rollout sequencing remain Architecture Design-owned; a change to the approved logical file/schema/API discriminator boundary returns as a Requirement Gap.
+- Architecture design, review, and design-revision artifacts: `AD-REV-001` is committed at `36bc02deca363798b6eda878e5eb4850e624da6f`; no partial `AD-REV-002` was committed; Product UI and the corrected durable contract are approved; Architecture Review follows the required `AD-REV-002` impact revision.
+- Downstream re-entry trigger: Requirements Engineering returns `RER-016`, the approved two-family contract, Product UI package, and cumulative context to Architecture Designer for `AD-REV-002`. Target modules/classes and rollout sequencing remain Architecture Design-owned; a change to the approved logical file/schema/API discriminator boundary returns as a Requirement Gap.

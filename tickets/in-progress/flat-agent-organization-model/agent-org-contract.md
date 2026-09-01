@@ -4,10 +4,10 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-015`
-- Status: `Ready for Approval — Durable Contract Requirement Impact`
-- Approval reference: Behavior through `RER-014` remains approved. During the `RER-014` → `AD-REV-002` impact round, the user explicitly corrected the persistence direction: do not replace the standalone AgentTeam run JSON; preserve native Team V2 and add a separate AgentOrg execution JSON with adjusted Org attributes. The exact Team V2 / AgentOrg V1 file, schema, generic projection, and migration boundary below requires explicit confirmation before it supersedes the previously approved generic V3 union.
-- Owner/date: Requirements Engineer / 2026-08-31
+- Requirements revision: `RER-016`
+- Status: `Approved`
+- Approval reference: Behavior through `RER-014` remains approved. During the `RER-014` → `AD-REV-002` impact round, the user explicitly corrected the persistence direction and, on 2026-09-01, explicitly approved the exact `RER-015` Team V2 / AgentOrg V1 file, schema, generic projection, and migration boundary. `RER-016` records that approval closure.
+- Owner/date: Requirements Engineer / 2026-09-01
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
 This contract reuses the current TeamRun V2 child, handoff, launch, and task
@@ -512,7 +512,7 @@ advertised as active canonical authority for the same root identity.
 - Removing supported task-scoped Team delegation.
 - Executable/scheduled handoff policy, a graphical workflow engine, or automatic evaluation of `When` prose.
 
-## Approval Basis And Pending Confirmation
+## Approval Basis
 
 The 2026-08-31 approval recorded in `RER-009` confirms the product/domain basis:
 
@@ -527,7 +527,8 @@ The 2026-08-31 approval recorded in `RER-009` confirms the product/domain basis:
 
 The previously approved generic persisted V3 root union is the specific point
 superseded by the user's later correction during the `RER-014` → `AD-REV-002`
-impact round. `RER-015` proposes the exact replacement boundary for approval:
+impact round. The user explicitly approved the exact `RER-015` replacement
+boundary on 2026-09-01; `RER-016` records the approval:
 
 1. native flat Team runs remain exact `TeamRunExecutionTreeFileV2` under `agent_teams/<rootTeamRunId>/team_run_execution_tree.json`;
 2. AgentOrg uses new `AgentOrgRunExecutionTreeFileV1` under `agent_orgs/<orgRunId>/agent_org_run_execution_tree.json`;
