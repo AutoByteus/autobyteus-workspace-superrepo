@@ -8,6 +8,7 @@
 | `CRR-002` | `code-review-report.md` | User reconsideration / fixed-depth inventory and migration-convention audit | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003` |
 | `CRR-003` | `code-review-report.md` | Implementation Review / IR-003 correction re-entry | `Fail — Local Fix` | `Pass` | `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003` |
 | `CRR-004` | `code-review-report.md` | Implementation Review / IR-004 after API-REV-001 ADI-007 architecture recovery | `Pass` | `Fail — Local Fix` | `CR-FIND-004` |
+| `CRR-005` | `code-review-report.md` | Implementation Review / IR-005 strict-correlation correction re-entry | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-004`, `CR-FIND-005` |
 
 ## Revision Entries
 
@@ -118,3 +119,39 @@ None.
 - Material score or classification changes: Score changes from `9.2/10 (91.7/100)` to `8.9/10 (88.4/100)`; clean `Pass` is replaced by `Fail — Local Fix`.
 - Recommended recipient: `/software_engineering_team/implementation_engineer`
 - Remaining risks or uncertainty: API/E2E remains stopped and must resume only after the local correction passes source re-review. Broader Team-wire golden validation remains downstream-relevant; the broad Nuxt typecheck baseline remains red and contains one diagnostic in a ticket-created earlier test.
+
+### CRR-005 — IR-005 fixes coordinator/message/ACK correlation but leaves task admission and Team test readiness open
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review`, round `5`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md`; `CR-FIND-004`, `CR-FIND-005`; `CR-SCN-005`, `CR-SCN-006`, `CR-SCN-009`, `CR-SCN-010`
+- Relevant architecture design revision IDs: `AD-REV-006` (cumulative `AD-REV-005`)
+- Relevant architecture-review revision IDs: `ARCH-REV-004 / Pass`
+- Relevant implementation revision IDs: `IR-005`
+- Relevant API/E2E revision IDs: `API-REV-001 / stopped; no pass`
+- Relevant delivery revision IDs: `N/A — pending`
+- Prior authoritative result: `CRR-004 / Fail — Local Fix`
+- Current authoritative result: `Fail — Local Fix; return to Implementation Engineer`
+- What changed in the review result and why: IR-005 correctly constrains a Team coordinator to that Team's direct Agent, resolves Team focus through the stored member, validates communication endpoints, and correlates ACK command type/target. Cumulative forward-path review then found that the task correction assumes the task execution already exists in the pre-activation snapshot, while snapshot/hydration assume task addresses are globally unique. The approved task engine instead allocates a fresh run at the configured recipient address. A reviewer probe reproduced rejection of both the valid live activation and exact post-activation snapshot. A full web run and isolated rerun also exposed two ticket-correlated stale `TeamFocusSendWorkflow` tests whose harness omits the store-neutral `team` prop.
+- Supported product scenario / material-premise basis changes: Added `CR-SCN-009`, not as new behavior but as the explicit normal `REQ-015` / `AC-010` task-delegation path that CRR-004 failed to trace deeply enough. No unsupported corruption or concurrency premise is used.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Migration source remains unchanged; complete preflight remains before writes. |
+| `CR-FIND-002` | `Resolved` | `Resolved` | `IR-003`; `AR-PREM-001`; `CRR-003` | Exact prospective-state retry remains unchanged. |
+| `CR-FIND-003` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Org edit still omits hidden durable fields. |
+| `CR-FIND-004` | `Open` | `Open — partially resolved` | `IR-005`; `AD-REV-006`; `CRR-004` | Coordinator, communication, and ACK branches are corrected. `/tmp/aorg-crr005-task-activation-probe.log` shows a fresh valid activation enters `reopen_required` and its exact task-bearing snapshot is rejected for address reuse. |
+
+New finding:
+
+| Finding ID | Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- |
+| `CR-FIND-005` | `Open` | `IR-004`, `IR-005`; `CRR-005` | `/tmp/aorg-crr005-web-focused.log` and `/tmp/aorg-crr005-team-focus-test.log` reproduce both Team task/focus workflow failures; the harness renders `TeamOverviewPanel` without its required `team` view. |
+
+- New or remaining finding IDs: `CR-FIND-004` (remaining task-lifecycle portion), `CR-FIND-005`
+- Material score or classification changes: Score changes from `8.9/10 (88.4/100)` to `8.8/10 (87.5/100)`; classification remains `Local Fix`.
+- Review accountability: CRR-004's correlation requirement was valid, but its task prescription and synthetic witness conflated configured and task execution identities. This revision records and corrects that reviewer gap.
+- Recommended recipient: `/software_engineering_team/implementation_engineer`
+- Remaining risks or uncertainty: API/E2E remains stopped. After correction/source pass it must cover fresh Agent and Team task activation plus exact checkpoint/task-bearing restore, alongside the already-planned real browser and compatibility evidence. The two ticket-correlated Team test failures must return to the documented unrelated-only web baseline.
