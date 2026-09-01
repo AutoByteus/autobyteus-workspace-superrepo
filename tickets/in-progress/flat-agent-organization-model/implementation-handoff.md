@@ -2,196 +2,216 @@
 
 ## Upstream Artifact Package
 
-- Upstream route: `Architecture Design -> Architecture Review -> Implementation`
-- Approved requirements: `RER-018` at `e1f26fbe128a33ef863a3735607b1b3857f161e6`
+- Upstream route: `Architecture Design -> Architecture Review -> Implementation rework`
+- Approved requirements: `RER-019` at `f3035a2d5ba90e64c51113fcd957524a3afd9cf9`; intended behavior remains cumulative `RER-018`.
 - Requirements doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`
 - Investigation notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - Requirements revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`
 - Requirements routing assessment: `Approved Architecture-Ready`
 - Requirements supplement: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
-- Approved architecture: `AD-REV-005` at `9718fb36b68e0ffee554b9eb443c9e0bb9735aa1`
+- Approved architecture: `AD-REV-006` at `0d71c76ca52c1dab907b81b41702fa4e88fb7538`
 - Design spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
 - Architecture design revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`
 - Architecture self-validation: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`
-- Architecture review: `ARCH-REV-003 / Pass` at `ae61ecd38`
+- Architecture review: `ARCH-REV-004 / Pass` at `2ae61a11f`
 - Design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
 - Architecture review revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
-- Code review trigger: `CRR-001` and reconsideration `CRR-002`, both `Fail — Local Fix`, with `CR-FIND-001`–`CR-FIND-003` assigned to Implementation.
+- Prior source review: `CRR-003 / Pass`, score `91.7/100`; `CR-FIND-001`–`CR-FIND-003` remain resolved.
 - Code review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
 - Code review revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-revision-record.md`
-- Product authority: approved `RV-012`; `ui-ux-spec.md` and `VIS-001`–`VIS-020` are normative.
-- Product artifacts:
+- Triggering API/E2E evidence: `API-REV-001` real imported-package/Codex/browser execution exposed architecture impact `ADI-007`; API/E2E did not complete and no validation pass is claimed.
+- API/E2E investigation: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+- Triggering screenshot: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-001/screenshots/03-org-live-raw-events-defect.png`
+- Product authority: approved `RV-012`; `ui-ux-spec.md` and `VIS-001`–`VIS-020` remain the primary normative visual set.
+- Primary product artifacts:
   - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/prototype-ticket.md`
   - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
   - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/user-decision-record.md`
   - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/visual-references/visual-reference-manifest.json`
+- Clean-route/default-baseline supplement only:
+  - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md`
+  - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/visual-references/README.md`
 - Migration convention: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/docs/design/production_data_migration_conventions.md`
-- Triggering implementation evidence: `IR-001 / IDI-001`, resolved at the design boundary by `AD-REV-005` and independently passed by `ARCH-REV-003`.
 
 ## Current Implementation Summary
 
-The implementation is complete for the approved production scope. It reconciles the partial `IR-001` draft with `AD-REV-005`, removes the recursive configured-Team/current-runtime model, adds the separate fixed-depth AgentOrg family, implements the root-neutral configured execution boundary, preserves exact standalone Team V2 persistence, adds exact Org V1 persistence, registers the required startup migration, exposes distinct Team/Org API and product surfaces, and implements the approved configuration-first/no-initial-focus AgentOrg journey.
+`IR-004` reconciles the stable `IR-003` implementation with cumulative `AD-REV-006`. AgentOrg now uses the accepted Agent and Team workspace presentation instead of its prior raw-event dashboard. One strict root-neutral Agent presentation contract sits below the compatible Team and strict Org envelopes; one checkpointed browser context owns Org hydration, stream recovery, focus and command routing; accepted Agent/Team surfaces consume explicit subject context; contextual trace/token/file/reference paths retain Org identity; and whole-Org stop is owned by the active Org history root row.
 
-- Implementation cycle: `Code Review Local Fix rework`
-- Current implementation revision ID: `IR-003`
-- Related architecture revisions: `AD-REV-005`, `ARCH-REV-003`
-- Related code-review revisions: `CRR-001`, `CRR-002`
-- Related API/E2E and delivery revisions: `N/A — pending downstream work`
-- Triggering findings: `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003 — corrected in IR-003`; `IDI-001 — previously resolved`
-- New Design Impact, Requirement Gap, Product UI gap, or implementation blocker: `None`
+The implementation preserves the exact Team V2/Org V1 definition, runtime, persistence, migration and external read-only boundaries already passed at `CRR-003`.
+
+- Implementation cycle: `Architecture-impact recovery rework`
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
+- Current implementation revision ID: `IR-004`
+- Implementation source commit: `3d59992a4` (`feat: restore agent org workspace presentation`)
+- Related architecture design revision IDs: `AD-REV-006` (cumulative `AD-REV-005`)
+- Related architecture-review revision IDs: `ARCH-REV-004 / Pass`
+- Related code-review revision IDs: `CRR-003 / Pass`
+- Related API/E2E revision IDs: `API-REV-001` triggering evidence only; completed result/revision record `N/A — validation stopped for Design Impact`
+- Related delivery revision IDs: `N/A — pending`
+- Triggering finding IDs: `ADI-007 — resolved in implementation`; prior `IDI-001`, `CR-FIND-001`–`CR-FIND-003` remain resolved.
+- New Design Impact, Requirement Gap, Product UI gap, or implementation blocker: `None`
 
-### Delivered production behavior
+### IR-004 delivered delta
 
-1. AgentTeam definitions are exact target Team Definition Config V2, Agent-only, coordinator-led, reusable standalone or as a direct AgentOrg member, and admitted without a legacy fallback.
-2. AgentOrg definitions are exact Org Definition Config V1, coordinator-free, fixed-depth, and contain direct Agents and direct flat Teams only.
-3. Handoffs preserve saved order exactly: Org/root-owned routes first, followed by each Team-local saved list in stable Org member order; every `rules[]` sequence remains stable through compilation, snapshots, API, UI, and runtime tools.
-4. Shared configured execution uses tagged root/member/host/physical identities, sender-bound `MemberExecutionContext` and task commands, a root-neutral configured-Agent handle, and a rootless flat-Team local factory/manager.
-5. Team and Org task/message/event/persistence owners remain private and family-specific. AgentOrg has exact task/message sidecars, strict package correlation, truthful task hosts/memory paths, compound active-root routing, complete-scope activation/restore, whole-Org fail-stop, and owned shutdown ordering.
-6. Standalone Team runs retain exact Team Run V2 file name, path, envelope, bytes for the native flat zero-write cohort, and coordinator semantics. AgentOrg runs use exact Org Run V1 in the Org package family. Mixed history/stream projections require `root_subject_kind` and fail closed on family mismatch.
-7. The registered `20260901_agent_org_flat_team_families_v1` migration is required on startup, `STARTUP_ONLY`, scheduled after `TEAM_RUN_EXECUTION_TREE_V2_MIGRATION_ID`, uses the existing app-data runner/status/log/`RESTART_TO_RETRY` behavior, keeps retired decoding inside the migration, and introduces no custom journal/backup/staging/restoration/manual retry path.
-8. Org promotion validates current targets in memory and through current codecs, atomically writes/rereads Org state in the source package, directly atomically renames the package family, rereads, and completes retired-file cleanup. Current-only readiness excludes only invalid/conflicting definitions or roots.
-9. GraphQL/catalog/detail/config/history/stream surfaces distinguish AgentOrg from AgentTeam and enforce atomic parent-definition saves with revision evidence.
-10. Production UI matches RV-012 desktop/narrow behavior: Team authoring offers Agents only; Org authoring offers direct Agents and reusable Teams; handoffs expose `From`, `To`, ordered `When`; Org `Run` opens configuration; launch has no entry selector or initial focus; exact Agent selection focuses that Agent and Team selection focuses its coordinator.
+1. Added `@autobyteus/agent-presentation-contracts`, a strict closed root-neutral Agent message/token presentation contract with no root-family or durable generic-root identity.
+2. Refactored Team event projection to compose that root-neutral body while retaining every existing Team-only outer message and standalone Team behavior.
+3. Added strict AgentOrg command/event envelopes, exact ACKs, checkpoint/topology/trace/token projections, closed event admission, and whole-Org fail-stop on rejected/invalid member presentation.
+4. Added one `AgentOrgExecutionContext` and hydration/stream owner with checkpoint recovery, atomic publication, complete member scope, nullable focus, and exact Agent or Team-coordinator target routing.
+5. Extracted store-neutral `AgentWorkspaceSurface` and `TeamWorkspaceSurface`; standalone Agent/Team and AgentOrg now structurally reuse the same accepted conversation, composer, tool, terminal, file, Messages and Tasks surfaces.
+6. Removed the bespoke AgentOrg header/composer/raw JSON renderer, duplicate component state, direct send-only component path, focused-member `Stop Org`, and any mounted-Team root registration/lifecycle control.
+7. Added Org-tagged member history/trace/token/file/reference projections. Message and task reference viewers now preserve exact Org sidecar ownership and content routes instead of hiding references or reinterpreting them as Team sidecars.
+8. Kept whole-Org termination on the active Org history root row; focused members and mounted Teams expose no root lifecycle action.
+9. During rendered validation, found and corrected a cold-start creation ordering defect: first Org package publication preceded lazy derived-history initialization, so discovery could falsely treat the just-created package as a duplicate. `AgentOrgRunService` now initializes derived history immediately before manager publication, and a focused ordering regression protects the boundary. This is a `Local Implementation Defect` within the existing run-service/history owners, not a new design impact.
 
-### CRR-002 Local Fix Resolution
-
-| Finding | Correction | Regression evidence | Status for re-review |
-| --- | --- | --- | --- |
-| `CR-FIND-001` | Org definition migration now preflights the legacy root, every direct owned Team, exact target Org config, destination, and markdown in memory before its first write. Unexpected deeper membership leaves every source file byte-faithful and the bounded disposition includes the exact child path and invariant reason. | Focused valid-earlier/invalid-later definition test; reviewer migration probe now reports the earlier child remains legacy (`schemaVersion: null`, `refType` retained). | Corrected |
-| `CR-FIND-002` | Migration-only planning recognizes exact current Team V2 children and matching prospective Org V1 config/markdown beside a legacy root, completes remaining writes, directly renames, rereads, and cleans retired authorities through ordinary rerun. No journal, backup, runtime fallback, or recovery subsystem was added. | Focused child-commit and Org-config-commit interruption/relaunch tests; reviewer subprocess exits `77`, then ordinary retry returns `SUCCEEDED`, removes source, and creates target. | Corrected |
-| `CR-FIND-003` | AgentOrg create still supplies explicit defaults, while edit sends only fields exposed by the edit form. Omitted instructions/category/avatar/default-launch fields therefore retain backend partial-update semantics instead of being cleared. | Component fixture now carries nonempty hidden fields and default launch config; a visible edit asserts the update payload omits all four fields and preserves ordered handoffs. | Corrected |
-
-Classification remains `Large` / `High`; these corrections stay within the approved migration and Org-experience owners and introduce no design change.
-
-## Routing Classification
+## Routing Classification (Mandatory)
 
 - Task size: `Large`
-- Architectural risk: `High`
-- Classification recheck: `Confirmed`
-- Evidence: the completed delta crosses definition admission, configured execution, task/message/event routing, persistence families, startup data migration, GraphQL, mixed history/stream contracts, and desktop/narrow UI.
-- Selected downstream route: `Independent source review`, subject to the dynamic handoff rules applied after the implementation result is committed.
-- Lightweight direct-route self-review: `N/A — Large/High reviewed route`
+- Architecture risk: `High`
+- Requirements routing assessment path: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`
+- Classification confirmed or changed: `Confirmed`
+- Evidence and rationale: the cumulative result still crosses strict shared contracts, root-neutral event admission, Team compatibility, Org streaming/recovery, member presentation state, root-tagged queries, lifecycle ownership, persistence/history, and desktop/narrow workspace rendering.
+- Selected route: `Code Review`, subject to the dynamic handoff rules applied to the completed result.
+- Lightweight implementation self-review for direct route: `Not Applicable — Large/High reviewed route`
+- New design impact or escalation trigger: `None`
 
 ## Reviewed Behavior Implementation Trace
 
-| Behavior ID | Implemented production path / outcome | Result |
-| --- | --- | --- |
-| `BEH-001` | Strict Team V2 Agent-only definitions; separate fixed-depth Org V1; target-only source admission and diagnostics | Complete |
-| `BEH-002` | Root-neutral configured Agent/flat-Team execution; one coordinator-free Org aggregate; complete-scope activation/restore/stop | Complete |
-| `BEH-003` | Canonical addresses and root-first stable handoff compilation; sender-bound routing; From/To/When authoring | Complete |
-| `BEH-004` | Team coordinator ingress; Org configuration-first launch; nullable focus; exact later Agent/Team coordinator focus | Complete |
-| `BEH-005` | Exact fixed-depth definition/run/memory/event/history ownership and strict two-family persistence | Complete |
-| `BEH-006` | Distinct Team/Org API and RV-012 catalog/detail/builder/config/workspace/history surfaces | Complete |
-| `BEH-007` | Server-owned conversion and runtime migration; external dependency repositories remain outside ticket writes/releases | Complete within approved ownership boundary |
-| `BEH-008` | Native Team V2 preserved; separate Org V1; tagged mixed projections and mismatch rejection | Complete |
-| `BEH-009` | Task Teams remain fresh task-scoped executions under exact Team/Org task hosts; no configured nesting | Complete |
-| `BEH-010` | Target-only admission, dependency diagnostics, current-only readiness, no normal legacy decoder | Complete |
+| Behavior ID | Approved change / preserved outcome | Implemented production path / key files | Result / notes |
+| --- | --- | --- | --- |
+| `BEH-001` | Exact target Team V2 and Org V1 definitions/admission | Existing definition/admission owners preserved; presentation delta does not change definitions | Complete; CRR-003 guarantees retained |
+| `BEH-002` | Root-neutral execution and complete Org scope | `agent-collaboration/execution/events/`; `AgentOrgRun`; Org stream/context owners | Complete |
+| `BEH-003` | Root-first ordered handoffs and sender-bound routing | Existing compilers/capabilities preserved; presentation snapshots retain source order | Complete |
+| `BEH-004` | No-focus Org launch and exact later focus | `agentOrgExecutionContext.ts`; `activeContextStore.ts`; `AgentOrgWorkspaceView.vue` | Complete |
+| `BEH-005` | Exact family-specific persistence/history/event ownership | Strict Org envelopes, checkpoint projection and Org reference routes; existing Team/Org run owners retained | Complete |
+| `BEH-006` | RV-012 distinct Team/Org authoring and accepted running workspace | Extracted Agent/Team surfaces, Org wrapper, history root stop | Complete |
+| `BEH-007` | Server-owned transition; external packages read-only | Existing reviewed migration/admission unchanged | Complete within approved boundary |
+| `BEH-008` | Team V2 compatibility and separate strict Org V1 projection | Team outer contract composes root-neutral body; Org contract remains separate/tagged | Complete |
+| `BEH-009` | Truthful task hosts and lifecycle | Team/Org task engines preserved; accepted Team task surface receives exact Org context and reference paths | Complete |
+| `BEH-010` | Current-only runtime, no retired fallback | No legacy decoder or opaque-event fallback added | Complete |
 
-All `AC-001`–`AC-022` have implementation paths. Independent executable coverage remains owned by API/E2E; this handoff makes no API/E2E pass claim.
+All `AC-001`–`AC-022` retain implementation paths. Independent source review and API/E2E remain required.
 
-## Key Files And Areas
+## Key Files Or Areas
 
-- Shared root-neutral execution: `autobyteus-server-ts/src/agent-collaboration/execution/`
-- Configured-Agent handle: `autobyteus-server-ts/src/agent-collaboration/execution/backends/configured-agent-execution-handle.ts`
-- Flat-Team local runtime: `autobyteus-server-ts/src/agent-team-execution/local/`
-- Standalone Team owner/materialization: `autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts`, `team-root-materializer.ts`
-- AgentOrg definition/runtime: `autobyteus-server-ts/src/agent-org-definition/`, `autobyteus-server-ts/src/agent-org-execution/`
-- Admission: `autobyteus-server-ts/src/collaboration-definition-admission/`
-- Two-family persistence/history: `autobyteus-server-ts/src/run-history/`
-- Migration: `autobyteus-server-ts/src/app-data-migrations/migrations/agent-org-flat-team-families-v1/`
-- API/transport: `autobyteus-server-ts/src/api/graphql/types/agent-org-definition.ts`, `agent-org-run.ts`, `collaboration-root-history.ts`; `src/services/agent-streaming/agent-org-*`
-- Shared stream contracts: `autobyteus-collaboration-stream-contracts/`
-- Org product surface: `autobyteus-web/components/agentOrgs/`, `components/workspace/org/`, `components/workspace/config/AgentOrg*`, `components/workspace/history/AgentOrg*`
-- Handoff product surface: `autobyteus-web/components/collaboration/handoffs/HandoffManager.vue`
-- Org stores/transports: `autobyteus-web/stores/agentOrg*`, `stores/rootExecutionViewStore.ts`, `services/rootExecution/`, `graphql/*/agentOrg*`
-- Flat-Team product cleanup: `autobyteus-web/components/agentTeams/`, `stores/agentTeamDefinitionStore.ts`, `pages/agent-teams.vue`
+- Root-neutral contract: `autobyteus-agent-presentation-contracts/`
+- Strict Team/Org envelopes: `autobyteus-team-stream-contracts/`, `autobyteus-collaboration-stream-contracts/`
+- Root-neutral server admission/projection: `autobyteus-server-ts/src/agent-collaboration/execution/events/`
+- Org stream/checkpoint projection: `autobyteus-server-ts/src/services/agent-streaming/agent-org-*`
+- Org history/context projection: `autobyteus-server-ts/src/run-history/services/agent-org-member-run-view-projection-service.ts`
+- Org reference ownership: `agent-org-reference-content-service.ts`, `api/rest/agent-org-references.ts`
+- Browser Org context: `autobyteus-web/services/agentOrgExecution/`, `stores/agentOrgContextsStore.ts`, `stores/activeContextStore.ts`
+- Accepted structural surfaces: `AgentWorkspaceSurface.vue`, `TeamWorkspaceSurface.vue`
+- Org wrapper/root lifecycle: `AgentOrgWorkspaceView.vue`, `AgentOrgRunHistoryPanel.vue`
+- Contextual browse/token/tools: `useEventMonitorFilePreview.ts`, `eventMonitorActiveTrace*`, `useTokenUsageWorkspaceScope.ts`, `RightSideTabs.vue`, `TerminalPanel.vue`
 
-## Task Design Health Assessment
+## Important Assumptions
 
-- Reviewed change posture: clean-cut replacement; exact Team and Org root families; no compatibility fallback.
-- Reviewed root-cause classification: recursive configured Team and Team-as-organization conflation.
+- Team-only wire compatibility and standalone Agent/Team behavior remain authoritative and were preserved rather than redesigned.
+- AgentOrg membership is fixed-depth and complete-scope; a mounted Team is a presentation/context projection under the Org, never a standalone Team root.
+- `RV-012`/`VIS-001`–`VIS-020` are normative. `BASELINE-PROMOTION-001` supplies only clean-route/default-baseline evidence.
+- External repositories remain read-only and outside this ticket's write, migration, commit and release ownership.
+
+## Known Risks
+
+- The change is structurally broad and remains `High` risk; independent source review must verify strict admission, checkpoint recovery, Team compatibility, contextual identity correlation and removal of the old Org presentation path.
+- Full web Nuxt typecheck remains repository-baseline red. The final run produced `448` diagnostic lines and exit `1`, but automated matching found `0` diagnostics referencing the `54` changed/untracked web source paths. No full typecheck pass is claimed.
+- API/E2E must repeat the real imported-package/Codex/browser journey and broader persistence/lifecycle coverage; implementation self-validation is not a substitute.
+
+## Task Design Health Assessment Implementation Check
+
+- Reviewed change posture: architecture-impact recovery and clean-cut presentation replacement.
+- Reviewed root-cause classification: `Boundary Or Ownership Issue` for `ADI-007`; the old Org workspace made transport envelopes and a second dashboard authoritative above accepted Agent/Team presentation owners.
 - Reviewed refactor decision: `Refactor Needed Now`
-- Implementation matches `AD-REV-005`: `Yes`
-- Evidence: shared execution does not import/expose `RootTeamRun`, `AgentOrgRun`, subject managers/stores/indexes/events, Team envelope aliases, or a public/durable generic root. Root owners construct narrow private adapters around shared handles/managers.
-- New architecture challenge: `None`
+- Implementation matched the reviewed assessment: `Yes`
+- If challenged, routed as Design Impact: `N/A — no new challenge remained`
+- Evidence: strict root-neutral presentation is below subject envelopes; `AgentOrgExecutionContext` is the browser authority; `AgentOrgWorkspaceView` depends only on the active-context facade and shared surfaces; whole-root lifecycle remains on the Org history root.
+- Render-discovered cold-start issue: `Local Implementation Defect`; the existing run-service/history owners were correct and only their initialization order was wrong.
 
-## Legacy / Compatibility Removal And Source Guardrails
+## Legacy / Compatibility Removal Check
 
 - Backward-compatibility mechanisms introduced: `None`
-- Current-runtime legacy definition/run decoder: `None`
-- Retired decoding/transform knowledge: confined to registered migration `20260901_agent_org_flat_team_families_v1`.
-- Recursive configured-Team/mixed-root production owners and obsolete tests: removed or replaced with current flat-Team/Org tests.
-- Changed production source files over 500 effective non-empty lines: `0`.
-- Changed areas over the 220-line review signal were assessed. Large tracked deltas are clean-cut replacement/deletion of recursive Team owners and schemas. New cohesive owners over the signal remain bounded below 500 lines: configured-Agent handle, root task engine, Org aggregate/registries/adapters, flat-Team manager, migration, readiness index, shared schema, Org experience, and handoff manager. Team root materialization was extracted from `AgentTeamRunManager` to keep the manager below the hard limit.
+- Legacy old behavior retained in scope: `No`
+- Dead/obsolete code and dormant replaced paths removed: `Yes` — raw/opaque Org event rendering, bespoke Org header/composer, duplicate Org state, direct send-only component path, member-header stop, and mounted-Team root control were removed.
+- Shared structures remain tight: `Yes` — the shared contract is strictly Agent presentation only; Team/Org specialize it in their own envelopes.
+- Canonical shared design guidance reapplied: `Yes`
+- Changed source implementation guardrails: `Yes`; zero changed production source files exceed `500` effective non-empty lines.
+- `>220` signals assessed: the root-neutral server adapter (`369` effective), Org stream owner (`257`), Org execution context (`240`) and hydration owner (`220`) are cohesive named owners below `500`. The large tracked Team adapter delta is clean-cut extraction/deletion; token-usage scope is a root-neutral replacement and ends at `180` effective lines.
 - `git diff --check`: passed.
 
 ## Persisted Data Transition Check
 
-- Decision: `Migration Required`.
-- Implementation: exact registered startup migration and registry/prerequisite wiring are present.
-- Native flat Team V2 cohort: strict zero execution-tree write/path/bytes cohort.
-- Organization-like Team V2 cohort: converts only to exact AgentOrg V1 and directly renames the whole package to the Org family after atomic write/reread.
-- Unsupported/deeper/ambiguous inputs: fail before mutation with bounded diagnostics.
-- Recovery: existing runner attempt/prerequisite/summary/detail/stale status and `RESTART_TO_RETRY`; no ticket-specific recovery subsystem.
-- External repositories: `/home/autobyteus/workspace/autobyteus-agents` and `/home/autobyteus/workspace/autobyteus-private-agents` were not edited, migrated, committed, released, or claimed complete by this ticket. The public repository currently has unrelated pre-existing/parallel dirty changes; the private repository is clean. No ticket diff targets either repository.
+- Approved decision: `Migration Required`
+- Design reference: `AD-REV-004` through cumulative `AD-REV-006`; `production_data_migration_conventions.md`
+- Implementation follows the approved decision without an unapproved migration or runtime fallback: `Yes`
+- IR-004 transition impact: `None`; no migration/schema or persistence-family behavior changed.
+- Existing guarantees retained: native flat Team V2 zero-write cohort; organization-like Team V2 promotion only to exact Org V1; complete preflight; ordinary relaunch recovery; direct atomic rename/reread/cleanup; current-only readiness; external repository zero-write.
+- Deviation: `None`
 
-## Local Implementation Checks
-
-### Server
-
-- IR-003 `pnpm build`: passed; TypeScript build, managed assets, built-in Agent bootstrap smoke, and sanitized built-module smoke passed. Log: `/tmp/aorg-ir003-server-build.log`.
-- IR-003 prepared server TypeScript `--noEmit` check: passed after the repository-required shared SDK preparation. Log: `/tmp/aorg-ir003-server-typecheck.log`.
-- IR-003 focused migration/startup-gate/GraphQL migration checks: `19/19` passed, including 10 migration cases. Logs: `/tmp/aorg-ir003-server-focused.log`, `/tmp/aorg-ir003-migration-tests.log`.
-- Exact reviewer probes rerun against the production build: invalid later child caused zero earlier-child mutation; process exit `77` after child commit resumed with `SUCCEEDED`, source removed, target present. Logs: `/tmp/aorg-ir003-review-migration-probe.log`, `/tmp/aorg-ir003-review-interruption-probe.log`.
-- IR-002 baseline `pnpm build`: passed after final production extraction; log `/tmp/aorg-server-build-final.log`.
-- Focused current architecture/runtime/migration/admission/persistence/stream checks: combined final result `95 passed`. The first combined invocation passed 94 and exposed one outdated architecture-source witness after the intentional Team materializer extraction; the witness was updated and its isolated suite rerun passed `14/14`. Log: `/tmp/aorg-server-focused-final.log` plus final rerun output.
-- Additional post-extraction lifecycle/physical-scope/supervisor tests: `14/14` passed.
-- New `@autobyteus/collaboration-stream-contracts` package build/test: `2/2` passed.
-- Full server unit/architecture run: `487` files passed, `17` failed; `2968` tests passed, `28` failed, `1` skipped. The failures are established unrelated repository baselines (media URL handling, stale provisioning/package/workspace/studio fixtures, Socratic renderer import, app journal recovery, retired read-only config test, file explorer baseline, Gemini selection, installed `repository_prisma` 1.0.10 versus expected 1.0.9, published artifact singleton, secret live harness, and workspace-manager baselines). Both architecture suites passed in that full run; final focused checks cover the later materializer/test adjustment. Log: `/tmp/aorg-full-final.log`.
-
-### Web
-
-- IR-003 production `pnpm build`: passed; Nuxt prerendered all 16 routes including `/agent-orgs` and `/agent-teams`. Log: `/tmp/aorg-ir003-web-build.log`.
-- IR-003 focused `AgentOrgExperience` component checks: `4/4` passed with nonempty hidden durable fields and partial-update preservation. Log: `/tmp/aorg-ir003-org-experience-tests.log`.
-- IR-002 production build baseline: passed; log `/tmp/aorg-web-build-final.log`.
-- Full Nuxt test run excluding the known unrelated fixed-px audit: `433` files passed, `2` skipped; `2392` tests passed, `2` skipped. Log: `/tmp/aorg-web-full-excluding-baseline.log`.
-- The ordinary full run leaves only the unrelated `app-font-size-fixed-px-audit.integration.test.ts` baseline, which reports 14 pre-existing settings/token-usage files not modified by this ticket.
-- Full repository Nuxt typecheck still has a broad pre-existing baseline; the affected Org/root/Team paths produced no errors in the captured check. No repository-wide typecheck pass is claimed. Log: `/tmp/aorg-web-typecheck.log`.
-
-These are implementation-scoped checks, not independent API/E2E validation.
-
-## Frontend Rendered-Result Check
-
-Production browser validation for IR-002 used the real Nuxt renderer and production components/stores with an isolated local server-data root. IR-003 changes only migration sequencing/diagnostics and the nonvisual edit mutation payload; the affected component test and production build were rerun, so no visual layout rerender was required. No desktop-only shell behavior was required for the equivalent web journeys.
-
-- Desktop `1440x900`: Org catalog, detail, edit/handoffs, config, placement overrides; Team catalog/detail/edit.
-- Narrow `390x844`: Org create picker/config; Team create.
-- Active Org: launch renders no initial focus and the required choose-an-Agent-or-Team guidance; exact direct Agent selection resolves `/requirements_engineer`; exact Team selection focuses `/software_engineering_team/architecture_designer` and its run; send payload carries exact `root_subject_kind`, root run, target run, and dedupe fields.
-- Across checked views: no `[role=dialog]` for in-flow authoring, no horizontal overflow, no browser console/page errors, no nested-Team authoring language, and configuration blocks Run until required workspace/config is valid.
-- Visual result was checked against RV-012/VIS-001–VIS-020 for hierarchy, density, narrow flow, From/To/When clarity, coordinator ingress, configuration, overrides, nullable focus, and exact later focus.
-- Evidence screenshots: `/tmp/aorg-visual/catalog.png`, `detail.png`, `edit-open-handoff.png`, `create-narrow-picker.png`, `config-narrow.png`, `config-desktop-overrides.png`, `team-list.png`, `team-detail.png`, `team-edit.png`, `team-create-narrow.png`, `active-unfocused.png`, `active-direct.png`, `active-team.png`.
-
-## Environment And Dependency Notes
+## Environment Or Dependency Notes
 
 - Worktree: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`
 - Branch: `requirements/flat-agent-organization-model`
-- Package manager: workspace `pnpm`; `/tmp/aorg-bin` supplied the local command shim during checks.
-- Generated build output from existing SDK packages was removed after validation. New `autobyteus-collaboration-stream-contracts/dist` is intentional package output because the package exports its built contract artifacts consistently with the existing Team stream contract package.
+- Package manager: workspace `pnpm`
+- New workspace package: `@autobyteus/agent-presentation-contracts`; built `dist` is intentional, matching the existing contract-package publication pattern.
+- Unrelated generated application SDK/Brief Studio `dist` directories remain untracked and were not committed.
+- Incoming API/E2E investigation/evidence/fixtures remain unstaged for the owning API/E2E stage; this implementation did not claim them as a completed validation result.
+- External `/home/autobyteus/workspace/autobyteus-agents` and `/home/autobyteus/workspace/autobyteus-private-agents` were not edited or claimed complete.
 
-## Downstream Coverage Hints
+## Local Implementation Checks Run
 
-Independent reviewers should prioritize:
+These are implementation-scoped checks, not API/E2E sign-off.
 
-1. negative import/boundary checks for the shared execution plane;
-2. complete Org fresh/restore/fail-stop/shutdown behavior and duplicate root registration;
-3. strict Team V2 native zero-write and Org V1 family/file/sidecar correlation;
-4. Org-root and mounted-Team task host arrays, task Team creation/settlement/review, and physical memory paths;
-5. compound active-root routing and same-bare-ID collision negatives;
-6. target-only admission/dependency diagnostics and family mismatch failures;
-7. migration interruption/relaunch, collision, cleanup, readiness, and external zero-write evidence;
-8. browser journeys for atomic handoff save/order, configuration inheritance/overrides, no-entry/no-focus launch, exact later focus, mixed history, and desktop/narrow parity.
+### Contract and server checks
 
-## API / E2E / Executable Coverage Still Required
+- `@autobyteus/agent-presentation-contracts` build/test: `1/1` passed.
+- `@autobyteus/collaboration-stream-contracts` build/test: `4/4` passed.
+- `@autobyteus/team-stream-contracts` build/test: `2/2` passed.
+- Changed/adjacent server suites: `6` files / `29` tests passed, covering the four updated Team integration suites, strict Org stream commands/projections, and Org reference content. Log: `/tmp/aorg-ir004-server-changed-tests.log`.
+- Cold-start history-order regression: `1/1` passed.
+- Org reference content service: `2/2` passed.
+- Server TypeScript `tsc -p tsconfig.build.json --noEmit`: passed.
+- Server production build and sanitized bootstrap smoke: passed. Log: `/tmp/aorg-ir004-server-build-final.log`.
 
-Independent Code Review and API/E2E validation remain pending and are not replaced by the local implementation checks above.
+### Web checks
+
+- Changed/adjacent workspace/context/projection suites: `15` files / `70` tests passed. Log: `/tmp/aorg-ir004-web-changed-tests.log`.
+- Active-context/Org wrapper rerun: `9/9` passed.
+- Final reference-viewer rerun after the typecheck-path correction: `13/13` passed. Log: `/tmp/aorg-ir004-reference-viewer-final.log`.
+- Web production build: passed; all `16` routes prerendered, including `/agent-orgs`, `/agent-teams` and `/workspace`. Log: `/tmp/aorg-ir004-web-build.log`.
+- Full Nuxt typecheck: exit `1` on broad repository baseline; changed-path correlation found `0` diagnostics across `54` changed/untracked web `.ts`/`.vue` paths. Log: `/tmp/aorg-ir004-web-typecheck.log`.
+
+## Frontend Rendered-Result Check
+
+- Affected journeys: active Org with no focus; direct Agent focus; Team focus to coordinator; real live Agent conversation; root stop placement; desktop/narrow responsive behavior.
+- Approved references: `RV-012` `ui-ux-spec.md` and all `VIS-001`–`VIS-020`; promotion images were used only as supplemental clean-entry evidence.
+- Existing design system/shared surfaces reviewed: current standalone `AgentWorkspaceView`, `TeamWorkspaceView`, conversation/composer, right-side tools, Team Messages/Tasks, history and adjacent navigation.
+- Rendered surface: real Nuxt development renderer against a freshly isolated current server/data root on owned ports; actual GraphQL creation, AgentOrg stream and Codex runtime were exercised for implementation feedback.
+- Desktop `1440x900`: unfocused guidance, direct Agent accepted workspace, Team-coordinator accepted workspace, and live conversation inspected.
+- Narrow `390x844`: unfocused guidance inspected; no horizontal overflow.
+- Live interaction: the UI sent a real prompt and rendered the exact assistant marker `AORG-IR004-VISUAL-PASS`.
+- Confirmed across inspected states: no raw JSON/protocol cards; no duplicate Org composer/header; no `Stop Org` on focused Agent/Team headers; accepted Agent and Team surfaces present; Team focus showed coordinator `lead` with Messages and Tasks; zero console/page errors.
+- Visual issues found and corrected: reference content parity was restored for Org messages/tasks; direct Org-store access was removed from the workspace wrapper; first cold-start Org launch was fixed as described above.
+- Evidence:
+  - `/tmp/aorg-ir004-render/active-unfocused-desktop.png`
+  - `/tmp/aorg-ir004-render/active-direct-agent-desktop.png`
+  - `/tmp/aorg-ir004-render/active-team-focus-desktop.png`
+  - `/tmp/aorg-ir004-render/active-unfocused-narrow.png`
+  - `/tmp/aorg-ir004-render/active-direct-agent-live-conversation.png`
+  - `/tmp/aorg-ir004-render/report.json`
+  - `/tmp/aorg-ir004-render/live-prompt-report.json`
+- Probe note: two coarse string probes in `report.json` record `composer:false`/`sharedPanels:false` because the accepted labels are `Type a message...` and the Team tab with `Messages`/`Tasks`; direct inspection and screenshots confirm those accepted surfaces.
+- Remaining unverified states: broader independent package import/migration/restore/failure journeys remain API/E2E-owned.
+
+## Downstream Coverage Hints / Suggested Scenarios
+
+1. Strict contract negatives: reject root identity and unknown/opaque payloads below both Team and Org envelopes; confirm every pre-existing Team-only outer message is byte/shape compatible.
+2. Org checkpoint hydration/recovery: complete member scope, no second store authority, stale/gap recovery, exact atomic publication and fail-stop on invalid envelopes.
+3. Active commands: send, interrupt, approve and deny for direct Agent and mounted-Team coordinator; reject wrong Org/member/run correlation.
+4. Contextual queries: Org-tagged trace, token, terminal/file and message/task reference content; ensure mounted Teams never register in standalone Team stores.
+5. Lifecycle: stop only from active Org history root; no focused member/mounted-Team stop; whole-Org shutdown order and restore.
+6. Real browser: imported package -> no-focus Org -> direct Agent live turn -> Team coordinator live turn -> history/restore/stop at desktop and narrow sizes; assert no raw JSON or duplicate presentation.
+7. Regression: standalone Agent and standalone Team accepted workspaces, Team messages/tasks/references, exact Team V2 persistence, Org V1 separation and startup migration guarantees.
+
+## API / E2E / Executable Coverage Investigation And Execution Still Required
+
+Yes. `API-REV-001` stopped after identifying `ADI-007`; the reviewed `IR-004` correction must return through independent source review and then resume API/E2E. This handoff makes no API/E2E pass claim.
