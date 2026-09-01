@@ -10,6 +10,7 @@
 | `CRR-004` | `code-review-report.md` | Implementation Review / IR-004 after API-REV-001 ADI-007 architecture recovery | `Pass` | `Fail — Local Fix` | `CR-FIND-004` |
 | `CRR-005` | `code-review-report.md` | Implementation Review / IR-005 strict-correlation correction re-entry | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-004`, `CR-FIND-005` |
 | `CRR-006` | `code-review-report.md` | Implementation Review / IR-006 fresh-task correction re-entry and full cumulative review | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-004`, `CR-FIND-005`, `CR-FIND-006` |
+| `CRR-007` | `code-review-report.md` | Implementation Review / IR-007 retired-generation correction re-entry and cumulative lifecycle review | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-006`, `CR-FIND-007` |
 
 ## Revision Entries
 
@@ -193,3 +194,41 @@ New finding:
 - Review accountability: CRR-005 correctly repaired its earlier fresh-run-model gap but did not evaluate queued old-socket work across the newly added activation checkpoint transition. The requested full cumulative review exposed the gap; it is now explicit in the production spine, scorecard, and required regression.
 - Recommended recipient: `/software_engineering_team/implementation_engineer`
 - Remaining risks or uncertainty: API/E2E remains stopped. After correction/source pass it must exercise real fresh Agent/Team activation with ongoing presentation during checkpoint replacement, task-bearing restore, and the existing imported-package/Codex/browser scenarios. The sole broad web failure remains the established unrelated fixed-px audit.
+
+### CRR-007 — IR-007 fixes queued retired frames; cumulative lifecycle review finds in-flight work surviving context release
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review`, round `7`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md`; `CR-FIND-006`; `CR-SCN-006`, `CR-SCN-009`, `CR-SCN-011`, `CR-SCN-012`
+- Relevant architecture design revision IDs: `AD-REV-006` (cumulative `AD-REV-005`)
+- Relevant architecture-review revision IDs: `ARCH-REV-004 / Pass`
+- Relevant implementation revision IDs: `IR-007`
+- Relevant API/E2E revision IDs: `API-REV-001 / stopped; no pass`
+- Relevant delivery revision IDs: `N/A — pending`
+- Prior authoritative result: `CRR-006 / Fail — Local Fix`
+- Current authoritative result: `Fail — Local Fix; return to Implementation Engineer`
+- What changed in the review result and why: IR-007 correctly captures a private generation for every socket/frame, retires the old generation before checkpoint close, ignores queued old-socket work, and preserves strict current-generation failures. This resolves the exact `CR-FIND-006` scenario. The cumulative review then followed the same generation owner through successful asynchronous continuations and the production context-release path. It found that generation is checked only before `await handleMessage()` and on error. If the component/store calls `disconnect()` while snapshot hydration or activation checkpoint retrieval is already in flight, the successful continuation still publishes a candidate or reconnects after its service/context was deleted.
+- Supported product scenario / material-premise basis changes: Added `CR-SCN-012`, grounded in the existing workspace/history navigation and the explicit `AgentOrgWorkspaceView -> disconnectAgentOrg -> AgentOrgContextsStore.disconnect` release path. Leaving a loading Org is a coherent supported navigation lifecycle, not an artificially timed contradictory workflow. No new Product behavior is inferred.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Migration complete-preflight source remains unchanged. |
+| `CR-FIND-002` | `Resolved` | `Resolved` | `IR-003`; `AR-PREM-001`; `CRR-003` | Ordinary prospective-state retry remains unchanged. |
+| `CR-FIND-003` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Org edit continues to preserve omitted durable fields. |
+| `CR-FIND-004` | `Resolved` | `Resolved` | `IR-006`; `CRR-006` | Fresh task identity/address admission and checkpoint hydration remain correct. |
+| `CR-FIND-005` | `Resolved` | `Resolved` | `IR-006`; `CRR-006` | Store-neutral Team focus/send workflow remains current and passing. |
+| `CR-FIND-006` | `Open` | `Resolved` | `IR-007`; `AD-REV-006`; `CRR-006` | Current source captures socket generation on queued frames; committed and reviewer exact suites prove the queued retired frame is inert and the replacement candidate publishes/remains open. |
+
+New finding:
+
+| Finding ID | Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- |
+| `CR-FIND-007` | `Open` | `IR-007`; `AD-REV-006`; `DS-018`; `CR-SCN-012` | `/tmp/aorg-crr007-retired-inflight-focused.log` and `/tmp/aorg-crr007-retired-inflight-probe.patch` show pending hydration publishing after release and pending activation checkpoint creating a replacement socket after release. |
+
+- New or remaining finding IDs: `CR-FIND-007`
+- Material score or classification changes: Score remains approximately stable at `8.9/10 (88.8/100)`: the exact prior defect is resolved, but cumulative lifecycle review found another High bounded release violation in the same owner. Classification remains `Local Fix`.
+- Review accountability: CRR-006's exact prescription was satisfied and is closed rather than moved. CRR-007 records the distinct release-during-await path found by continuing the requested cumulative review beyond that delta.
+- Recommended recipient: `/software_engineering_team/implementation_engineer`
+- Remaining risks or uncertainty: API/E2E remains stopped. After correction/source pass it must validate real fresh-task recovery and route/context release without stale republish or orphan sockets, plus the existing imported-package/Codex/browser, restore/migration, and Team-compatibility scenarios.

@@ -11,6 +11,7 @@
 | IR-005 | Code Reviewer / `CRR-004` / source-review Local Fix | `CR-FIND-004` | `Local Fix` | `AD-REV-006`, `ARCH-REV-004`, `CRR-003`, `CRR-004`, `API-REV-001`; Delivery `N/A` | Completed strict snapshot, event and command-ACK identity correlation; negative and unchanged-valid-path regressions pass and the cumulative package is ready to return to Code Review. |
 | IR-006 | Code Reviewer / `CRR-005` / source re-review Local Fix | `CR-FIND-004` remainder, `CR-FIND-005` | `Local Fix` | `AD-REV-006`, `ARCH-REV-004`, `CRR-003`–`CRR-005`, `API-REV-001`; Delivery `N/A` | Corrected fresh task Agent/Team address reuse and checkpoint hydration plus the stale Team focus/send harness; cumulative package is ready to return to Code Review. |
 | IR-007 | Code Reviewer / `CRR-006` / cumulative source-review Local Fix | `CR-FIND-006` | `Local Fix` | `AD-REV-006`, `ARCH-REV-004`, `CRR-003`–`CRR-006`, `API-REV-001`; Delivery `N/A` | Bound queued AgentOrg frames to their receiving socket generation so retired work cannot fail-close checkpoint replacement; cumulative package is ready to return to Code Review. |
+| IR-008 | Code Reviewer / `CRR-007` / cumulative lifecycle-review Local Fix | `CR-FIND-007` | `Local Fix` | `AD-REV-006`, `ARCH-REV-004`, `CRR-003`–`CRR-007`, `API-REV-001`; Delivery `N/A` | Made explicit AgentOrg service release terminal across pending hydration and checkpoint awaits so deleted contexts and sockets cannot be resurrected; cumulative package is ready to return to Code Review. |
 
 ## Revision Entries
 
@@ -172,3 +173,27 @@
 - Persisted-data result: no durable schema, codec, migration, package family, or persistence source changed; all previously reviewed Team V2/Org V1 transition guarantees remain intact.
 - Next recipient or routing: return the cumulative package through dynamic handoff rules; Large/High selects independent Code Review unless a returned rule says otherwise.
 - Remaining limitations or risks: `CR-FIND-006` requires independent verification. API/E2E remains stopped until source review passes, then must validate the real fresh-task checkpoint/replacement interleaving plus the cumulative imported-package/Codex/browser, restore/migration, and Team-compatibility journeys.
+
+### IR-008 — AgentOrg in-flight release ownership Local Fix
+
+- Triggering role, report path, and round: Code Reviewer `CRR-007 / Fail — Local Fix`; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`; cumulative lifecycle review after `IR-007`.
+- Triggering finding ID: `CR-FIND-007`.
+- Classification: `Local Fix`; task size remains `Large`, architectural risk remains `High`.
+- Prior authoritative implementation result: `IR-007` resolved queued retired-socket frame handling and all `CR-FIND-001`–`CR-FIND-006`, but already-running hydration/checkpoint work checked generation only outside its successful post-await continuation. Explicit workspace release could therefore be followed by a stale publish or reconnect.
+- Current authoritative implementation result: explicit release is terminal for the service. Pending snapshot hydration and activation checkpoint work revalidate exact service/generation ownership before post-await mutation, publication, close, or connect, so neither a deleted context nor an orphan socket is recreated. Still-owned manual recovery and strict current-generation handling remain. No Design Impact, Requirement Gap, Product UI gap, or blocker remains.
+- Related architecture design revision IDs: `AD-REV-006` (cumulative `AD-REV-005`).
+- Related architecture-review revision IDs: `ARCH-REV-004`.
+- Related code-review revision IDs: `CRR-003 / Pass`, `CRR-004`–`CRR-007 / Fail — Local Fix`.
+- Related API/E2E revision IDs: `API-REV-001` triggering evidence only; completed API/E2E result `N/A`.
+- Related delivery revision IDs: `N/A — pending`.
+- Why this revision is recorded: normal history/workspace navigation explicitly disconnects and deletes the Org service/context. The CRR-007 witnesses proved a Promise that had already started could resume successfully after that ownership ended and call the store publisher or create a replacement socket.
+- Approved behavior or requirement IDs affected: `BEH-005`, `BEH-006`, `BEH-009`; `REQ-015`, `REQ-016`, `REQ-025`; `AC-010`; `DS-005`, `DS-008`, `DS-016`, `DS-018`; review scenarios `CR-SCN-006`, `CR-SCN-009`, `CR-SCN-011`.
+- Implementation delta: added private terminal service release state; guarded `connect`; captured exact expected generation for manual/event reopen; made checkpoint success and error continuations inert after release or generation replacement; rechecked generation after hydration and recovery verification before candidate focus/context/phase/publication mutations; cleared the service-held context on disconnect; retained the single existing stream/context/checkpoint recovery system.
+- Changed files or areas: `autobyteus-web/services/agentOrgExecution/agentOrgStreamingService.ts` and its focused specification. Source commit: `ba7ba45decb64281687571db427620579c1455ad`.
+- Local validation and result: exact streaming suite `9/9`; broader focused Org/Team web set `53/53`; web production build passed and prerendered `16` routes; broad Nuxt typecheck retains the repository baseline exit `1`/`445` lines with zero diagnostics matching the changed production owner. Existing `IR-006` contract/server evidence remains current because no contract or server source changed.
+- Deterministic regression result: releasing during pending snapshot hydration produces no publish/context resurrection; releasing during pending fresh-activation checkpoint retrieval produces no replacement socket and deactivates the committed context. Existing manual reopen, retired-frame isolation, atomic replacement, and strict failure tests continue to pass.
+- Source-size assessment: the changed production owner is `329` effective non-empty lines; the production delta is `+38/-7`; neither guardrail threshold is exceeded, and `git diff --check` passed before source commit.
+- Frontend rendered-result assessment: `Not Applicable` for a new render round because no production component, style, layout, label, or valid visual state changed. The correction is private async lifecycle ownership below the accepted surfaces; `IR-004` rendered evidence remains authoritative.
+- Persisted-data result: no durable schema, codec, migration, package family, or persistence source changed; all previously reviewed Team V2/Org V1 transition guarantees remain intact.
+- Next recipient or routing: return the cumulative package through dynamic handoff rules; Large/High selects independent Code Review unless a returned rule says otherwise.
+- Remaining limitations or risks: `CR-FIND-007` requires independent verification. API/E2E remains stopped until source review passes, then must validate normal workspace release during loading/recovery plus the cumulative imported-package/Codex/browser, task, restore/migration, and Team-compatibility journeys.

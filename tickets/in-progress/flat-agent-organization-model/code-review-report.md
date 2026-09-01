@@ -15,19 +15,19 @@
 - Relevant Architecture Review Revision IDs: `ARCH-REV-004 / Pass`
 - Implementation Handoff Reviewed As Context: `implementation-handoff.md`
 - Implementation Revision Record Reviewed As Context: `implementation-revision-record.md`
-- Relevant Implementation Revision IDs: `IR-006` (cumulative `IR-001`–`IR-005` retained)
+- Relevant Implementation Revision IDs: `IR-007` (cumulative `IR-001`–`IR-006` retained)
 - Code Review Revision Record: `code-review-revision-record.md`
-- Current Code Review Revision ID: `CRR-006`
-- Current Review Round: `6`
-- Trigger: IR-006 source commit `d045e55e0` and artifact commit `2fd846fdd` returned after `CRR-005 / CR-FIND-004 / CR-FIND-005` Local Fix.
-- Prior Review Round Reviewed: `CRR-005 / Fail — Local Fix`
-- Latest Authoritative Round: `CRR-006`
+- Current Code Review Revision ID: `CRR-007`
+- Current Review Round: `7`
+- Trigger: IR-007 source commit `f26d6f502` and artifact commit `3d14678d5` returned after `CRR-006 / CR-FIND-006` Local Fix.
+- Prior Review Round Reviewed: `CRR-006 / Fail — Local Fix`
+- Latest Authoritative Round: `CRR-007`
 - Coverage Investigation Reviewed: `api-e2e-coverage-investigation.md` as prior stopped-validation context
 - Relevant API/E2E Revision IDs: `API-REV-001 / stopped; no pass`
 - Delivery Revision Record / IDs: `N/A — pending`
-- Failing Scenario IDs: `CR-SCN-011`
-- Exact Reviewer Commands / Execution Mode: full web Vitest run (including one temporary reviewer witness), focused exact AgentOrg streaming Vitest run, cumulative source-size/static audit, `git diff --check`
-- Failure Evidence Paths: `/tmp/aorg-crr006-stale-socket-focused.log`; `/tmp/aorg-crr006-stale-socket-probe.patch`; `/tmp/aorg-crr006-stale-socket-probe.log`; implementation evidence listed in `implementation-handoff.md`
+- Failing Scenario IDs: `CR-SCN-012`
+- Exact Reviewer Commands / Execution Mode: current exact AgentOrg streaming Vitest; temporary two-witness exact streaming Vitest; full cumulative production-path, static cleanup, size, legacy, and `git diff --check` review
+- Failure Evidence Paths: `/tmp/aorg-crr007-stream-current.log`; `/tmp/aorg-crr007-retired-inflight-focused.log`; `/tmp/aorg-crr007-retired-inflight-probe.patch`; implementation logs listed in `implementation-handoff.md`
 
 ## Routing Classification Review
 
@@ -35,130 +35,131 @@
 - Architectural risk: `High`
 - Selected route: `Implementation Review`
 - Independent source review required by the classification: `Yes`
-- Classification evidence or correction required: Confirmed. The cumulative package changes shared Team/Org contracts, execution, persistence/migration, projection/stream recovery, accepted workspace surfaces, and lifecycle behavior. No classification correction is required.
+- Classification evidence or correction required: Confirmed. The cumulative package changes shared contracts, Team/Org execution, persistence/migration, browser context/stream recovery, accepted workspace surfaces, and lifecycle behavior. No classification correction is required.
 
 ## Review Scope
 
-- Changed implementation and behavior reviewed: the complete cumulative implementation from approved requirements baseline `f3035a2d5..2fd846fdd`, not only the IR-006 delta. This full round was intentional after repeated Local Fixes. Round priority remained the IR-006 fresh-task identity/hydration correction and its interaction with the cumulative checkpointed stream state machine.
-- Files / areas reviewed: strict Team V2/Org V1 contracts; definition admission and startup migration; Org task engine/adapter/persistence/event publication; root event barrier and websocket handler; Org snapshot/hydration/context/streaming; command/focus/reference/workspace adapters; standalone Team preservation; presentation cleanup; current tests and validation evidence; all cumulative changed-source size signals.
-- Explicit exclusions: separately maintained external definition repositories remain read-only; incoming API/E2E artifacts and generated application `dist` directories are untracked and not attributed to IR-006; delivery remains pending.
+- Changed implementation and behavior reviewed: complete cumulative implementation from approved requirements baseline `f3035a2d5..3d14678d5`, not only the IR-007 two-file delta. This continues the requested full-review posture after repeated Local Fixes.
+- Files / areas reviewed: strict Team V2/Org V1 admission/persistence/migration; task execution/publication; root event barrier and stream handler; Org snapshot/hydration/context/streaming; context-store/component lifecycle; exact focus/commands/reference/workspace adapters; standalone Team preservation; retired presentation cleanup; current tests and all cumulative changed-source size signals.
+- Explicit exclusions: separately maintained external definition repositories remain read-only; incoming API/E2E artifacts and generated application `dist` directories are untracked and not attributed to IR-007; delivery remains pending.
 
 ## Independent Validation Performed
 
-- Rechecked every prior finding first. IR-006 now admits configured-address reuse by fresh task executions while keeping configured placements and run identities exact; task activation enters the existing checkpoint path; task-bearing hydration succeeds. The repaired store-neutral Team focus/send workflow passes.
-- Reviewed the cumulative production paths and structural boundaries rather than limiting the round to `f6e60dec0..d045e55e0`. Static cleanup searches found no retired mixed-Team model, raw/opaque Org presentation path, duplicate Org dashboard/composer, mounted-Team root registration, or Team-inside-Team configured authority.
-- Cumulative source audit from `f3035a2d5..HEAD`: `344` changed production-source files, `52` signals above 220 effective non-empty lines, `0` above 500. All signals were assessed; the changed AgentOrg context/stream owners remain cohesive, though the repeated recovery patches expose the session-transition gap in `CR-FIND-006`.
-- Cross-checked IR-006 evidence: collaboration contracts `6/6`; focused server `4 files / 23 tests`; focused web `11 files / 50 tests`; server and web production builds passed. The broad Nuxt typecheck retains the documented repository baseline with no IR-006 changed-path diagnostic.
-- Reviewer full web run, temporarily including one additional streaming witness: `438` files passed, `1` failed, `2` skipped; `2413` tests passed, `1` failed, `2` skipped. The sole failure is the established unrelated fixed-px audit. The IR-006 Team workflow and normal changed suites pass.
-- Reviewer focused stream run: `7/7` passed. The seventh temporary witness deliberately asserts the current wrong behavior: a valid post-activation presentation frame already queued from the retiring socket is processed after the replacement socket is installed, reports “before the snapshot barrier,” and closes the replacement before it can publish a candidate (`/tmp/aorg-crr006-stale-socket-focused.log`, exact patch in `/tmp/aorg-crr006-stale-socket-probe.patch`).
-- `git diff --check` passed. The temporary test was restored; the worktree returned to the incoming untracked-artifact state before report updates.
+- Rechecked `CR-FIND-006` first. IR-007 gives every socket/frame a private generation, retires the old generation before close, ignores a queued old-socket frame, and leaves current-generation strict failure intact. Source trace plus the committed deterministic regression verify the exact CRR-006 manifestation is resolved.
+- Independently reran the unmodified AgentOrg streaming suite: `7/7` passed (`/tmp/aorg-crr007-stream-current.log`). Cross-checked implementation evidence: broader focused Org/Team web `11 files / 51 tests`; web production build with `16` prerendered routes; broad Nuxt typecheck at the documented baseline with no changed-owner diagnostic.
+- Extended the same service temporarily with two cumulative-lifecycle witnesses. `9/9` passed while deliberately asserting current wrong behavior: (1) a snapshot already awaiting hydration publishes a live candidate after `disconnect()` releases the context; (2) an activation handler already awaiting its checkpoint creates a new open socket after `disconnect()` (`/tmp/aorg-crr007-retired-inflight-focused.log`; exact patch `/tmp/aorg-crr007-retired-inflight-probe.patch`). The temporary tests were restored.
+- Revalidated the full cumulative production spines and cleanup rather than inferring completeness from the two-file diff. Static searches found no retired recursive configured-Team model, duplicate/raw Org presentation, mounted-Team root registration, direct component socket path, or normal legacy parser.
+- Cumulative production-source audit from `f3035a2d5..HEAD`: `344` files, `52` signals above 220 effective non-empty lines, `0` above 500. All signals were re-assessed; `agentOrgStreamingService.ts` is now `300` and remains the correct cohesive owner.
+- `git diff --check` passed. The worktree returned to the incoming untracked-artifact state before report updates.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
-- Approved requirements basis understood: `RER-019` / cumulative `RER-018`, particularly `REQ-014`–`REQ-016`, `REQ-025`, `AC-009`–`AC-011`.
-- Design-spec behavior map verified against the implementation: Partial. Definition, runtime, migration, identity, presentation, focus, command, and fresh-task snapshot shapes match. The normal task activation-to-recovery path contradicts `DS-018` because queued work is not correlated to the websocket/session that owned it.
+- Approved requirements basis understood: `RER-019` / cumulative `RER-018`, especially `REQ-015`, `REQ-016`, `REQ-025`, `AC-010`, and the approved active-workspace/history navigation.
+- Design-spec behavior map verified against the implementation: Partial. IR-007 fixes retired queued-frame isolation, but context release does not cancel async work already executing for that generation. This contradicts the `AgentOrgContextsStore` lifecycle and `DS-018` candidate publication boundary.
 - Design review report and round confirmed: `ARCH-REV-004 / Pass` over `AD-REV-006`.
 - Behavior-basis status: `Contradicted`
-- Changed or newly discovered behavior: None. The defect occurs inside the already-approved normal fresh-task lifecycle and explicit checkpoint recovery contract.
+- Changed or newly discovered behavior: None. Navigating away from an active/loading Org and releasing its context is an existing workspace lifecycle.
 - Remaining material ambiguity: None.
 
 | Behavior ID | Current Status | Current Implementation Path And Lifecycle Evidence | Contradicting Evidence |
 | --- | --- | --- | --- |
-| `BEH-001` | `Confirmed` | Strict Org-only composition and Agent-only Teams remain enforced. | — |
-| `BEH-002` | `Confirmed` | One Org root still owns configured Agents, mounted Teams, tasks, lifecycle, and restore. | — |
+| `BEH-001` | `Confirmed` | AgentOrg remains the sole persistent multi-Team root; configured Teams remain Agent-only. | — |
+| `BEH-002` | `Confirmed` | One Org root owns its complete execution and lifecycle; no synthetic Team root returned. | — |
 | `BEH-003` | `Confirmed` | Ordered same-root handoffs and target-only routing remain. | — |
-| `BEH-004` | `Confirmed` | Org stays coordinator-free; exact Team focus uses the selected Team's stored direct coordinator. | — |
-| `BEH-005` | `Contradicted` | Strict tree/task identity and task-bearing snapshot admission are fixed. | During an ordinary task activation, the committed browser view can remain stuck in `reopen_required` because a retired-socket frame closes the candidate replacement stream. |
-| `BEH-006` | `Contradicted` | Accepted Agent/Team surfaces and truthful authoring/history remain. | The live task result cannot reliably reach those surfaces through the approved recovery lifecycle. |
-| `BEH-007` | `Confirmed` | Migration/external ownership remains unchanged from resolved CRR-003 evidence. | — |
-| `BEH-008` | `Confirmed` | Team V2 and Org V1 remain exact; IR-006 correctly scopes configured-address uniqueness separately from task run identity. | — |
-| `BEH-009` | `Contradicted` | The server creates and publishes the fresh task correctly. | Immediate task work can publish a valid follow-on frame while the browser's activation checkpoint is in flight; the frame is applied to replacement session state instead of retired-session state. |
-| `BEH-010` | `Confirmed` | Exact target definition admission and migration-private legacy decoding remain. | — |
+| `BEH-004` | `Confirmed` | Org remains coordinator-free; Team focus uses its exact stored direct coordinator. | — |
+| `BEH-005` | `Contradicted` | Snapshot/task identity and queued retired-frame isolation are correct. | A released Org context can be republished by in-flight hydration, creating state outside the owning store/service lifecycle. |
+| `BEH-006` | `Contradicted` | Accepted Agent/Team surfaces and truthful authoring/history remain. | Leaving a loading Org does not reliably release its browser context; stale state can re-enter the workspace store. |
+| `BEH-007` | `Confirmed` | Migration and external ownership remain unchanged from CRR-003. | — |
+| `BEH-008` | `Confirmed` | Exact Team V2/Org V1 families and task address/run identity remain. | — |
+| `BEH-009` | `Contradicted` | Fresh task activation and replacement work while the service remains owned. | If the user leaves during activation checkpoint retrieval, that retired handler reconnects an orphan service after release. |
+| `BEH-010` | `Confirmed` | Exact target admission and migration-private historical decoding remain. | — |
 
 ## Supported Product Scenario And Reachability Gate (Mandatory)
 
 | Scenario ID | Related Behavior / Contract IDs | Kind | Actor / Initiator | Coherent Goal Or Governing Event | Supported Entry Surface / Event | Scenario Shape | Forward Production Path / Lifecycle | Expected Outcome / Consequence | Independent Evidence | Scenario Validity | Review Use |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-SCN-001` | `BEH-007`; `REQ-012/013`; migration convention | `Operational` | Startup migration runner | Reject unexpected deep source without mutation | Registered startup migration | `Explicit Edge` | full preflight -> failure disposition | byte-faithful source and bounded reason | CRR-003 and convention | `Supported Explicit Edge Scenario` | `Use` |
-| `CR-SCN-002` | `BEH-007`; `AR-PREM-001` | `Operational` | Later ordinary application startup | Resume an interrupted one-level migration | `runPending()` startup | `Explicit Edge` | prospective-state recognition -> commit/cleanup | valid target, retired source removed | CRR-003 and convention | `Supported Explicit Edge Scenario` | `Use` |
-| `CR-SCN-003` | `BEH-001/003/006`; `REQ-023` | `User` | Org author | Edit an existing Org without losing hidden durable fields | `/agent-orgs` edit/save | `Normal` | visible draft -> partial update -> atomic package save | omitted durable fields preserved | Product/requirements and CRR-003 | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-004` | `BEH-004/006`; `REQ-004/016/019`; `VIS-017` | `User` | User with active Org | Focus a direct Agent and converse | Org workspace Agent selection/composer | `Normal` | focus -> exact target/port -> command/events -> shared Agent surface | normal conversation, no raw dashboard | Product/requirements and IR-004 evidence | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-005` | `BEH-004/006`; `REQ-003/004/011`; `VIS-018` | `User` | User with active Org | Focus a mounted Team or Team Agent | Org workspace Team selection | `Normal` | Team row -> stored coordinator/member -> Team view/target | exact accepted Team workspace | Product/requirements and current code | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-006` | `BEH-005/006/008`; `REQ-025`; `DS-016`–`DS-018` | `Contract` | Strict Org stream | Recover from malformed, miscorrelated, or gapped current-session input | Stream admission failure | `Explicit Edge` | reject -> `reopen_required` -> checkpoint/snapshot candidate -> atomic swap | committed context preserved; no raw fallback | reviewed `AD-REV-006` contract | `Supported Explicit Edge Scenario` | `Use` |
-| `CR-SCN-007` | `BEH-005/006`; `REQ-016`; `DS-019` | `User` | Operator | Stop an active whole Org | active Org history root row | `Normal` | stop guard -> root terminate -> history/context cleanup | whole-root stop only | requirements/design/Product | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-008` | `BEH-005/006`; history contract | `System` | First Org launch in a cold data root | Publish launch history in correct order | Org run service launch | `Normal` | initialize history -> publish package/run | launch visible without ordering failure | IR-004 source/regression | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-009` | `BEH-005/006/008/009`; `REQ-015`; `AC-010`; `DS-005/008` | `User` | Live Org Agent through bound `delegate_task` | Delegate work to a configured Agent or flat Team | bound task tool | `Normal` | fresh run at configured recipient -> durable tree/record -> activation -> task work/settlement | synchronized task lifecycle under same Org | requirements, contract, task engine/adapter | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-010` | `BEH-006/009`; `REQ-011/015` | `User` | Standalone Team user | Inspect delegated task detail and continue messaging focused configured Agent | Team workspace | `Normal` | task selection -> Team view -> preserved focus -> exact send | standalone Team behavior preserved | requirements, production caller, repaired regression | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-011` | `BEH-005/006/009`; `REQ-015/016/025`; `DS-005/008/016/018` | `System` / `Contract` | Fresh task activation and checkpoint recovery | Continue the single approved task lifecycle while its browser context checkpoint-replaces | committed `activated` event followed by normal task Agent presentation | `Normal` | server publishes activation -> releases work -> task Agent publishes presentation; browser activation handler fetches checkpoint -> retires old socket -> connects verified replacement | frames from the retired stream cannot mutate or close replacement state; replacement snapshot/events atomically publish | `AC-010`; reviewed recovery contract; `commitActivation()` -> `releaseWork()` -> `postMessage()` -> presentation publication; root publisher is synchronous | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-001` | `BEH-007`; `REQ-012/013`; migration convention | `Operational` | Startup runner | Reject unexpected deep migration input without mutation | registered startup migration | `Explicit Edge` | full preflight -> bounded failure | byte-faithful source | CRR-003/convention | `Supported Explicit Edge Scenario` | `Use` |
+| `CR-SCN-002` | `BEH-007`; `AR-PREM-001` | `Operational` | Later startup | Resume interrupted one-level migration | startup `runPending()` | `Explicit Edge` | prospective recognition -> commit/cleanup | exact target/retired cleanup | CRR-003/convention | `Supported Explicit Edge Scenario` | `Use` |
+| `CR-SCN-003` | `BEH-001/003/006`; `REQ-023` | `User` | Org author | Edit without losing hidden durable fields | `/agent-orgs` save | `Normal` | visible draft -> partial update -> atomic save | durable omissions preserved | Product/requirements/CRR-003 | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-004` | `BEH-004/006`; `REQ-004/016/019`; `VIS-017` | `User` | Active-Org user | Focus direct Agent and converse | Org workspace | `Normal` | focus -> exact target/port -> events -> shared Agent surface | accepted conversation | Product/requirements/IR-004 | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-005` | `BEH-004/006`; `REQ-003/004/011`; `VIS-018` | `User` | Active-Org user | Focus mounted Team/member | Org workspace Team row | `Normal` | Team row -> coordinator/member -> Team view | exact accepted Team workspace | Product/requirements/current code | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-006` | `BEH-005/006/008`; `REQ-025`; `DS-016`–`018` | `Contract` | Strict Org stream | Recover from malformed/miscorrelated/gapped current input | stream admission failure | `Explicit Edge` | reject -> reopen -> checkpoint candidate -> atomic swap | committed view preserved | reviewed AD-REV-006 | `Supported Explicit Edge Scenario` | `Use` |
+| `CR-SCN-007` | `BEH-005/006`; `REQ-016`; `DS-019` | `User` | Operator | Stop active whole Org | history root row | `Normal` | stop -> root terminate -> context/history cleanup | whole-root stop | requirements/design/Product | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-008` | `BEH-005/006`; history contract | `System` | First cold launch | Publish launch history in order | Org run launch | `Normal` | initialize history -> publish | visible launch | IR-004 | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-009` | `BEH-005/006/008/009`; `REQ-015`; `AC-010`; `DS-005/008` | `User` | Live Org Agent | Delegate to configured Agent/Team | bound `delegate_task` | `Normal` | fresh run -> durable record/tree -> activation/work/settlement | synchronized task lifecycle | requirements/contract/task runtime | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-010` | `BEH-006/009`; `REQ-011/015` | `User` | Standalone Team user | Inspect task and continue focused messaging | Team workspace | `Normal` | task detail -> preserved focus -> send | standalone Team preserved | requirements/current regression | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-011` | `BEH-005/006/009`; `REQ-015/016/025`; `DS-005/018` | `System` / `Contract` | Fresh task activation/recovery | Continue task work while activation checkpoint-replaces | activation then task presentation | `Normal` | old frame queued -> generation retired -> replacement snapshot | old frame inert; atomic candidate | AC-010, DS-018, server ordering | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-012` | `BEH-005/006/009`; `REQ-016/025`; `DS-018`; context lifecycle | `User` / `Contract` | User viewing an active/loading Org | Leave that Org to view another supported workspace while its asynchronous snapshot or activation recovery is still completing | history/workspace navigation; component unmount or Org-run-id change | `Normal` | `AgentOrgWorkspaceView` unmount/watch -> `disconnectAgentOrg` -> store deletes service/context -> retiring generation work finishes | release is final for that service: no later publish, shared-state mutation, or reconnect; next visit creates a fresh owned service | Product workspace/history navigation; explicit component/store disconnect path; DS-018 atomic registration boundary | `Supported Normal Scenario` | `Use` |
 
-`CR-SCN-011` is not a pair of contradictory or artificially concurrent user actions. It is one server-owned sequential task lifecycle plus the explicit recovery state machine required for an active stream with open execution work.
+`CR-SCN-012` is not a contradictory pair of user actions. Leaving a loading view is the coherent completion of its supported navigation/release lifecycle, and the production component explicitly invokes `disconnect()` for that event.
 
 ### Candidate Finding And Mechanism Gate
 
 | Candidate ID | Observation Or Mechanism | Scenario / Contract ID | Independent Trigger | Forward Path / Lifecycle / Consequence | Evidence | Disposition | Reason / Proportionate Response |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-CAND-001` | Prior migration wrote before complete preflight. | `CR-SCN-001` | startup migration | resolved preflight path | CRR-003; source unchanged | `Promote` | Verified resolved; no action. |
-| `CR-CAND-002` | Prior migration could not resume prospective output. | `CR-SCN-002` | later startup | resolved ordinary retry | CRR-003; source unchanged | `Promote` | Verified resolved; no action. |
-| `CR-CAND-003` | Prior Org edit cleared hidden fields. | `CR-SCN-003` | normal edit | resolved partial-update path | CRR-003; source unchanged | `Promote` | Verified resolved; no action. |
-| `CR-CAND-004` | Prior raw Org dashboard/direct paths bypassed accepted surfaces. | `CR-SCN-004/005/007` | normal focus/stop | resolved shared presentation path | IR-004 and current source | `Promote` | Verified resolved; no action. |
-| `CR-CAND-005` | Prior coordinator/message/ACK correlation gaps. | `CR-SCN-005/006` | exact focus/strict stream | resolved strict validation | IR-005/current tests | `Promote` | Verified resolved; no action. |
-| `CR-CAND-006` | Prior first-launch history ordering defect. | `CR-SCN-008` | cold launch | resolved ordering | IR-004/current source | `Promote` | Verified resolved; no action. |
-| `CR-CAND-007` | Prior fresh task address/run identity assumptions rejected valid activation/snapshot. | `CR-SCN-009` | bound task delegation | IR-006 scopes configured address and fresh task identity, then checkpoint-hydrates | current contract/context/hydration and focused tests | `Promote` | `CR-FIND-004` is resolved. |
-| `CR-CAND-008` | Prior Team workflow test omitted the store-neutral Team view. | `CR-SCN-010` | Team workflow regression | repaired harness reaches focus/send assertions | current test and full run | `Promote` | `CR-FIND-005` is resolved. |
-| `CR-CAND-009` | The serialized message queue stores only raw text, not its originating socket/session. An old-socket frame queued while `reopen()` awaits its checkpoint is later evaluated under the new socket's `awaiting_connected_root` phase and `failClosed()` closes that new socket. | `CR-SCN-006`, `CR-SCN-009`, `CR-SCN-011`; `DS-018` | normal fresh task activation followed by normal task work/presentation | activation handler awaits checkpoint -> old valid frame queues -> recovery installs replacement -> old frame resumes against replacement phase -> replacement closes before candidate snapshot | production source ordering plus focused reviewer witness/patch | `Promote` | Supported normal lifecycle and explicit recovery contract; add the missing stream-generation ownership check within the existing service and one deterministic regression. No new recovery subsystem is warranted. |
+| `CR-CAND-001` | Prior migration wrote before full preflight. | `CR-SCN-001` | startup migration | resolved | CRR-003/source unchanged | `Promote` | Verified resolved. |
+| `CR-CAND-002` | Prior migration retry gap. | `CR-SCN-002` | later startup | resolved | CRR-003/source unchanged | `Promote` | Verified resolved. |
+| `CR-CAND-003` | Prior Org edit cleared hidden fields. | `CR-SCN-003` | normal edit | resolved | CRR-003/source unchanged | `Promote` | Verified resolved. |
+| `CR-CAND-004` | Prior raw/duplicate Org workspace. | `CR-SCN-004/005/007` | focus/stop | resolved | IR-004/current source | `Promote` | Verified resolved. |
+| `CR-CAND-005` | Prior coordinator/message/ACK correlation gaps. | `CR-SCN-005/006` | strict focus/stream | resolved | IR-005/current tests | `Promote` | Verified resolved. |
+| `CR-CAND-006` | Prior cold-launch history ordering. | `CR-SCN-008` | first launch | resolved | IR-004/current source | `Promote` | Verified resolved. |
+| `CR-CAND-007` | Prior fresh task identity/address assumptions. | `CR-SCN-009` | delegation | resolved | IR-006/current source/tests | `Promote` | Verified resolved. |
+| `CR-CAND-008` | Prior stale Team workflow harness. | `CR-SCN-010` | Team regression | resolved | IR-006/current test | `Promote` | Verified resolved. |
+| `CR-CAND-009` | Prior queued old-socket frame executed against replacement phase. | `CR-SCN-011` | task activation/recovery | IR-007 frame captures generation; retired queued frame is inert; replacement publishes | current source, committed regression, reviewer `7/7` | `Promote` | `CR-FIND-006` is resolved. |
+| `CR-CAND-010` | Generation is checked only before `await handleMessage()` and on error. A current frame already awaiting hydration/checkpoint can survive `disconnect()`, then publish or reconnect after its generation/service is released. | `CR-SCN-012`; `DS-018` | ordinary route unmount/run switch invokes explicit context release | release deletes service/context -> in-flight `hydrate` resumes and calls `publish`, or in-flight activation `reopen` resumes and creates an unowned socket | component/store/service source plus two deterministic reviewer witnesses | `Promote` | Supported normal lifecycle with material stale-state/socket consequence. Complete the same owner's async generation/lifecycle guard and add release-during-await regressions; no new subsystem. |
 
 ## Structural / Design Checks
 
 | Check | Result | Evidence | Required Action |
 | --- | --- | --- | --- |
-| Task design health assessment is present, evidence-backed, and preserved by the implementation | `Pass` | Large/High classification and AD-REV-006 recovery remain explicit; no new design impact. | Preserve. |
-| Implementation matches approved behavior-defining supplemental artifacts | `Fail` | Identity/presentation paths match, but `CR-CAND-009` contradicts the approved atomic recovery outcome. | Resolve `CR-FIND-006`. |
-| Data-flow spine inventory clarity and preservation under shared principles | `Fail` | `DS-005` legitimately triggers `DS-018`; the queue then crosses a retired/current stream boundary without identity. | Correlate queue work to the owning stream generation. |
-| Ownership boundary preservation and clarity | `Fail` | `AgentOrgStreamingService` is the right owner, but its queued unit lacks the session identity needed to preserve that ownership across replacement. | Keep the fix in this owner and make the transition invariant explicit. |
-| Off-spine concern clarity | `Pass` | Hydration, presentation adaptation, persistence, focus, and component rendering stay attached to their owners. | Preserve. |
-| Existing capability/subsystem reuse check | `Pass` | Existing checkpoint/hydration/reconnect/context owners are reused; no second recovery system exists. | Preserve; do not add a parallel path. |
-| Reusable owned structures check | `Pass` | Shared task/identity DTOs and root-neutral presentation remain in appropriate shared owners. | Preserve. |
-| Shared-structure/data-model tightness check | `Pass` | IR-006 correctly separates configured placement uniqueness from task run identity and retains compound projection identity. | Preserve. |
-| Repeated coordination ownership check | `Pass` | One Org context/stream service owns browser sequencing and recovery. | Preserve. |
-| Empty indirection check | `Pass` | No pass-through-only boundary was introduced. | None. |
-| Scope-appropriate separation of concerns and file responsibility clarity | `Pass` | Contract, context, hydration, stream, and surface responsibilities remain coherent. | Keep correction local to stream session handling/test. |
-| Ownership-driven dependency check | `Pass` | Components use ports/context rather than Org runtime internals; server tool/adapter/root boundaries remain directed. | Preserve. |
-| Authoritative Boundary Rule check | `Pass` | No caller depends on both an outer runtime owner and its internal manager/repository. | Preserve. |
-| File placement check | `Pass` | IR-006 files live under their owning contract, Org execution, and Team workspace areas. | None. |
-| Flat-vs-over-split layout judgment | `Pass` | Cohesive owners remain readable; no size-only split is justified. | None. |
-| Interface/API/query/command/service-method boundary clarity | `Pass` | Public DTO/command/query identities are explicit; the defect is internal stream-generation coordination. | Preserve external contracts. |
-| Naming quality and naming-to-responsibility alignment check | `Pass` | Org/task/context/hydration names remain domain-aligned. | Name any generation/session token explicitly. |
-| No unjustified duplication of code / repeated structures in changed scope | `Pass` | No duplicate Org surface, identity model, or recovery authority returned. | Preserve. |
-| Patch-on-patch complexity control | `Fail` | Full cumulative review found the activation checkpoint patch transitions shared phase/socket state while earlier queued work has no ownership token. | Add the bounded generation invariant and regression before another delta-only pass. |
-| Dead/obsolete code cleanup completeness in changed scope | `Pass` | Retired raw dashboard/direct-send/component paths stay removed. | None. |
-| Relevant test scenarios and assertions are clear and requirement-aligned | `Fail` | Fresh task activation/hydration tests are strong, but none retains an old-socket follow-on frame while checkpoint retrieval is pending. | Add the `CR-SCN-011` regression and assert successful replacement. |
-| Test fixtures/helpers are reasonably reusable and test structure remains coherent | `Pass` | Team workspace view helper and Org snapshot fixtures are reusable and navigable. | Preserve. |
-| No stale, duplicated, or compatibility-only tests are retained in changed scope | `Pass` | `TeamFocusSendWorkflow` is current and passes; no obsolete Org dashboard tests remain. | None. |
-| API/E2E readiness for the next workflow stage | `Fail` | A normal task journey can close its replacement stream before the task-bearing candidate publishes. | Return to Implementation; API/E2E remains stopped. |
+| Task design health assessment is present, evidence-backed, and preserved by the implementation | `Pass` | Large/High and AD-REV-006 remain correct; new issue is bounded. | Preserve. |
+| Implementation matches approved behavior-defining supplemental artifacts | `Fail` | IR-007 matches queued-frame recovery, but context release is not final for already-running async work. | Resolve `CR-FIND-007`. |
+| Data-flow spine inventory clarity and preservation under shared principles | `Fail` | Route/context lifecycle reaches the stream owner, but its async continuation crosses the release boundary. | Extend generation/lifecycle validity through async commit points. |
+| Ownership boundary preservation and clarity | `Fail` | `AgentOrgStreamingService` is the right owner; an orphan socket/context can outlive deletion from `AgentOrgContextsStore`. | Prevent retired service work from publishing/reconnecting. |
+| Off-spine concern clarity | `Pass` | Hydration, presentation, persistence, focus, and components remain appropriately attached. | Preserve. |
+| Existing capability/subsystem reuse check | `Pass` | One stream/context/recovery system remains. | Keep fix local; no second recovery path. |
+| Reusable owned structures check | `Pass` | Shared DTOs/task records/presentation/view ports remain correctly owned. | Preserve. |
+| Shared-structure/data-model tightness check | `Pass` | Configured placement and fresh task identities remain exact. | Preserve. |
+| Repeated coordination ownership check | `Pass` | One Org stream service owns sequencing/recovery. | Preserve. |
+| Empty indirection check | `Pass` | No pass-through-only layer added. | None. |
+| Scope-appropriate separation of concerns and file responsibility clarity | `Pass` | The stream service remains cohesive at 300 lines. | Correct within it/store lifecycle boundary. |
+| Ownership-driven dependency check | `Pass` | Components depend on active/store ports rather than runtime internals. | Preserve. |
+| Authoritative Boundary Rule check | `Pass` | No mixed outer-owner/internal dependency found. | Preserve. |
+| File placement check | `Pass` | IR-007 source/test are in the correct Org stream owner. | None. |
+| Flat-vs-over-split layout judgment | `Pass` | No size-driven split is justified. | None. |
+| Interface/API/query/command/service-method boundary clarity | `Pass` | External command/checkpoint contracts are explicit. | Keep correction private to lifecycle/generation. |
+| Naming quality and naming-to-responsibility alignment check | `Pass` | `StreamGeneration` clearly names socket lifetime. | Extend its validity semantics through awaits. |
+| No unjustified duplication of code / repeated structures in changed scope | `Pass` | No duplicate Org context/recovery authority. | Preserve. |
+| Patch-on-patch complexity control | `Fail` | Generation guards cover queued-not-started frames but not already-running async continuations across release. | Add complete, tested transition guards before another delta-only conclusion. |
+| Dead/obsolete code cleanup completeness in changed scope | `Pass` | Retired presentation/direct paths stay removed. | None. |
+| Relevant test scenarios and assertions are clear and requirement-aligned | `Fail` | The new old-frame regression is good, but no test releases the service while hydration or checkpoint retrieval is pending. | Add both release-during-await assertions or one equivalent store-level lifecycle suite. |
+| Test fixtures/helpers are reasonably reusable and test structure remains coherent | `Pass` | Current socket/candidate fixtures are adequate. | Reuse them. |
+| No stale, duplicated, or compatibility-only tests are retained in changed scope | `Pass` | Current Team and Org tests remain purposeful. | None. |
+| API/E2E readiness for the next workflow stage | `Fail` | Route release can resurrect stale context or leave an unowned stream. | Return to Implementation; API/E2E remains stopped. |
 
 ## Source File Size And Structure Audit (If Applicable)
 
 Method: cumulative production changes from `f3035a2d5..HEAD`; `.ts/.tsx/.js/.mjs/.vue`, excluding tests, fixtures, test support, and `dist`. Result: `344` files, `52` signals above 220 effective non-empty lines, `0` above 500.
 
-| Source File / Cohort | Effective Non-Empty Lines | `>500` Hard-Limit Check | `>220` Delta Check | SoC / Ownership Check | Placement Check | Preliminary Classification | Required Action |
-| --- | ---: | --- | --- | --- | --- | --- | --- |
-| All cumulative changed production source | `344 files` | `Pass — 0` | `52 signals` | Assessed cumulatively; no general split requirement | `Pass` | Cohesive overall | None beyond finding. |
-| `agentOrgExecutionContext.ts` | `394` | `Pass` | `Signal` | One strict Org browser aggregate; IR-006 identity work belongs here | `Pass` | Accept | No split; preserve context authority. |
-| `agentOrgStreamingService.ts` | `272` | `Pass` | `Signal` | One stream/command/recovery state machine, but session-generation invariant is incomplete | `Pass` | `Local Fix` | Resolve `CR-FIND-006` in this owner. |
-| `agentOrgContextHydration.ts` | `218` | `Pass` | `No signal` | Candidate hydration remains focused and best-effort per AD-REV-006 | `Pass` | Accept | None. |
-| `root-execution-view-dtos.ts` | `156` | `Pass` | `No signal` | Exact shared wire correlation; IR-006 task identity correction is tight | `Pass` | Accept | None. |
-| Server activation path (`agent-org-task-lifecycle-adapter.ts`; `agent-org-root-agent-execution-registry.ts`) | `251`; `225` | `Pass` | `Signals` | Commit/publication and prepared execution registry are distinct cohesive owners | `Pass` | Accept | No server redesign; use ordering as regression basis. |
+| Source File / Cohort | Effective Non-Empty Lines | `>500` | `>220` | SoC / Ownership | Placement | Classification / Action |
+| --- | ---: | --- | --- | --- | --- | --- |
+| All cumulative changed production source | `344 files` | `Pass — 0` | `52 signals` | Re-assessed cumulatively | `Pass` | No general split. |
+| `agentOrgExecutionContext.ts` | `394` | `Pass` | `Signal` | Sole strict Org aggregate remains cohesive | `Pass` | Accept. |
+| `agentOrgStreamingService.ts` | `300` | `Pass` | `Signal` | Correct stream/recovery owner; release validity is incomplete after awaits | `Pass` | `Local Fix` for `CR-FIND-007`; no split. |
+| `agentOrgContextHydration.ts` | `218` | `Pass` | `No` | Focused candidate hydration | `Pass` | Accept. |
+| `root-execution-view-dtos.ts` | `156` | `Pass` | `No` | Exact wire correlation | `Pass` | Accept. |
+| Server activation owners | `251`; `225` | `Pass` | `Signals` | Cohesive commit/registry boundaries | `Pass` | No server redesign. |
 
 ## Legacy / Backward-Compatibility Verdict
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| No backward-compatibility mechanisms in changed scope | `Pass` | Current Team V2 and Org V1 families remain exact; no dual normal parser. |
-| No legacy old-behavior retention in changed scope | `Pass` | Recursive configured Team/runtime and raw Org presentation paths remain retired. |
-| Dead/obsolete code cleanup completeness in changed scope | `Pass` | No duplicate dashboard, component authority, mounted-Team root, or direct component socket path found. |
-| Approved persisted-data transition decision is followed without unnecessary migration work | `Pass` | Registered startup-only migration remains isolated and unchanged from resolved CRR-003. |
-| No version-specific dual reads/writes or request-time old-shape fallback exists | `Pass` | Readers remain family/path selected and strict. |
-| Approved transition mechanics match the reviewed design | `Pass` | Complete preflight, ordinary retry, exact reread, cleanup, and capability-scoped failure remain. |
+| No backward-compatibility mechanisms in changed scope | `Pass` | Exact current Team V2 and Org V1 families; no dual parser. |
+| No legacy old-behavior retention in changed scope | `Pass` | Recursive configured Team and raw Org presentation remain retired. |
+| Dead/obsolete code cleanup completeness in changed scope | `Pass` | No duplicate dashboard/component/socket authority found. |
+| Approved persisted-data transition decision is followed without unnecessary migration work | `Pass` | Startup-only migration remains isolated/unchanged. |
+| No version-specific dual reads/writes or request-time old-shape fallback exists | `Pass` | Family/path selection remains strict. |
+| Approved transition mechanics match the reviewed design | `Pass` | Preflight/retry/reread/cleanup/capability failure remain. |
 
 ## Dead / Obsolete / Legacy Items Requiring Removal (Mandatory If Any Exist)
 
@@ -167,7 +168,7 @@ None.
 ## Docs-Impact Verdict
 
 - Docs impact: `Yes` for the cumulative public Team/Org/runtime/stream/migration change; final delivery synchronization remains pending.
-- Why: New AgentOrg and narrowed AgentTeam contracts, runtime/history/stream identities, authoring, and migration behavior are public architecture/user concepts.
+- Why: AgentOrg/AgentTeam contracts, runtime/history/stream identities, authoring, and migration behavior are public architecture/user concepts.
 - Files or areas likely affected: AgentOrg/AgentTeam architecture and user docs, strict stream/command/query contracts, migration guidance, final ticket artifacts.
 
 ## Additional Material Premise Validation (When Required)
@@ -176,51 +177,50 @@ None.
 
 | Premise ID | Current Status | Changed Evidence / Reason |
 | --- | --- | --- |
-| `AR-PREM-001` | `Confirmed` | Migration interruption/relaunch remains resolved and unchanged. |
-| `AR-PREM-002` | `Confirmed` | Arbitrary corruption/tampering remains unsupported and drives no finding. `CR-FIND-006` uses a normal task lifecycle and explicit recovery contract. |
+| `AR-PREM-001` | `Confirmed` | Migration interruption/relaunch remains resolved. |
+| `AR-PREM-002` | `Confirmed` | Arbitrary corruption/tampering remains unsupported and drives no finding. |
 | `AR-PREM-003` | `Confirmed` | Subject fail-stop after indeterminate durability remains unchanged. |
 
-No new or reclassified premise is required; `CR-SCN-011` fully records the supported system/contract basis for the lifecycle ordering used by the finding.
+No new premise is required. `CR-SCN-012` records the supported navigation/context-release lifecycle directly.
 
 ## Review Scorecard (Mandatory)
 
 - Overall score (`/10`): `8.9/10`
-- Overall score (`/100`): `88.6/100`
-- Score calculation note: simple average across the ten categories; the decision remains `Fail` because four categories are below the `9.0` clean-pass target and `CR-FIND-006` is open.
+- Overall score (`/100`): `88.8/100`
+- Score calculation note: simple average; decision remains `Fail` because four categories are below `9.0` and `CR-FIND-007` is open.
 
 | Priority | Category | Score | Why This Score | What Is Weak / Holding It Down | What Should Improve |
 | --- | --- | ---: | --- | --- | --- |
-| `1` | Data-Flow Spine Inventory and Clarity | `8.6` | The full server/task/stream/hydration spine is explicit and most IR-006 identity work is correct. | `CR-CAND-009`: retired and replacement frames share one untagged processing queue. | Correlate each queued unit to its owning stream generation and preserve DS-018 atomic replacement. |
-| `2` | Ownership Clarity and Boundary Encapsulation | `8.7` | One stream service owns the transition; no duplicate recovery authority exists. | Its queue item does not carry the ownership identity needed when `socket` is replaced. | Make session/generation ownership explicit inside the same service. |
-| `3` | API / Interface / Query / Command Clarity | `9.1` | Strict root/recipient/run/command/checkpoint contracts are explicit and current. | Internal stream generation is implicit rather than represented. | Preserve external APIs; tighten the internal callback/queue contract. |
-| `4` | Separation of Concerns and File Placement | `9.0` | Contract, context, hydration, streaming, components, and server runtime are correctly placed. | Recovery logic is dense but still cohesive. | Keep the bounded correction in streaming service rather than extracting a second system. |
-| `5` | Shared-Structure / Data-Model Tightness and Reusable Owned Structures | `9.2` | IR-006 correctly models configured address uniqueness separately from fresh task run identity and reuses accepted view ports. | No material model gap remains. | Preserve the corrected compound identity. |
-| `6` | Naming Quality and Local Readability | `9.0` | Names are domain-specific and forward paths are traceable. | Stream lifetime identity is absent, so the code cannot name the retired/current distinction. | Add an explicit, readable session/generation identity. |
-| `7` | API/E2E Readiness | `8.2` | Builds and broad tests are otherwise clean against the documented baseline. | A normal fresh-task path can close the recovery socket before a candidate snapshot. | Add the interleaving regression, pass source review, then resume the stopped real task/browser validation. |
-| `8` | Runtime Correctness And Behavioral Fidelity | `8.2` | Fresh task snapshot/admission and Team compatibility are now correct. | Valid follow-on task activity can poison the replacement stream and prevent task UI synchronization. | Ignore only retired-generation work while keeping strict validation for the current generation. |
-| `9` | No Backward-Compatibility / No Legacy Retention | `9.3` | Exact current families and migration-only historical knowledge remain. | No material weakness. | Preserve. |
-| `10` | Cleanup Completeness | `9.3` | Retired Org presentation/direct paths remain removed and no new dead path was found. | No material weakness. | Preserve. |
+| `1` | Data-Flow Spine Inventory and Clarity | `8.7` | Cumulative spines are explicit and old queued frames are correctly isolated. | In-flight hydration/checkpoint work crosses route release. | Revalidate generation/ownership after async boundaries before side effects. |
+| `2` | Ownership Clarity and Boundary Encapsulation | `8.7` | One store/service/context owner exists. | Deleted service ownership can be bypassed by its own stale continuation. | Make release terminal for all work owned by that service instance. |
+| `3` | API / Interface / Query / Command Clarity | `9.1` | Strict external identities and checkpoints remain clear. | Internal lifecycle validity after awaits is incomplete. | Preserve APIs; tighten internal generation contract. |
+| `4` | Separation of Concerns and File Placement | `9.0` | Owners remain correctly separated and placed. | Stream state machine is dense but cohesive. | Keep bounded fix local. |
+| `5` | Shared-Structure / Data-Model Tightness and Reusable Owned Structures | `9.2` | Fresh task/configured identities and shared ports remain tight. | No material model gap. | Preserve. |
+| `6` | Naming Quality and Local Readability | `9.0` | `StreamGeneration` and phases are clear. | Validity is checked only at entry/error, not named at commit points. | Make post-await validity explicit. |
+| `7` | API/E2E Readiness | `8.3` | Current suites/build pass and CR-FIND-006's exact path is fixed. | A normal route release can resurrect context or orphan a socket. | Add regressions, pass review, then resume API/E2E. |
+| `8` | Runtime Correctness And Behavioral Fidelity | `8.2` | Normal live/recovery behavior mostly matches. | In-flight work survives explicit release with material stale-state/resource effects. | Cancel or no-op retired continuations before publish/reconnect. |
+| `9` | No Backward-Compatibility / No Legacy Retention | `9.3` | Exact current families and migration-only history remain. | No material weakness. | Preserve. |
+| `10` | Cleanup Completeness | `9.3` | Retired UI/direct paths remain removed. | No material weakness. | Preserve. |
 
 ## Findings
 
-### `CR-FIND-006` — High — A queued frame from the retired Org socket closes the checkpoint replacement stream
+### `CR-FIND-007` — High — In-flight Org stream work survives context release and can republish or reconnect an orphaned service
 
-- Candidate gate: `CR-CAND-009 / Promote`
-- Affected authority: `BEH-005`, `BEH-006`, `BEH-009`; `REQ-015`, `REQ-016`, `REQ-025`; `AC-010`; `DS-005`, `DS-008`, `DS-016`, `DS-018`; `CR-SCN-006`, `CR-SCN-009`, `CR-SCN-011`.
-- Supported trigger/path: A live Org Agent delegates a task through the bound task tool. The server durably attaches the fresh execution, publishes `activated`, then releases work. That task work publishes ordinary Agent presentation while the client is checkpoint-replacing for the activation. This is one supported task lifecycle, not contradictory user concurrency.
+- Candidate gate: `CR-CAND-010 / Promote`
+- Affected authority: `BEH-005`, `BEH-006`, `BEH-009`; `REQ-015`, `REQ-016`, `REQ-025`; `DS-018`; `CR-SCN-012`.
+- Supported trigger/path: A user opens an active Org and, while its asynchronous snapshot hydration or fresh-activation checkpoint is still completing, selects another supported workspace or Org. `AgentOrgWorkspaceView` explicitly releases the old Org on unmount/run change. Leaving a loading view is a normal navigation/cancellation lifecycle, not contradictory user concurrency.
 - Evidence:
-  1. `agent-org-task-lifecycle-adapter.ts:229-236` publishes activation and immediately calls `releaseWork()` after durability.
-  2. `agent-org-root-agent-execution-registry.ts:107-116` commits the fresh Agent and schedules its input with `queueMicrotask`; `configured-agent-execution-handle.ts:109-116,277-285` forwards normal task input/status/run presentation through the Org callback. The Team task registry uses the same release pattern.
-  3. `root-event-publisher.ts:31-45` sequences and publishes those events synchronously; the Org stream handler forwards each subscribed event.
-  4. `agentOrgStreamingService.ts:62-65` enqueues only raw message text. It does not capture the originating `socket` or a session/generation token.
-  5. The activation handler calls and awaits `reopen()` (`agentOrgStreamingService.ts:207-213`). `reopen()` waits for the checkpoint, closes the old socket, creates a replacement, and sets the shared phase to `awaiting_connected_root` (`:80-86`). A follow-on frame received from the old socket while the query was pending remains next in `processing`; when it resumes it hits `:204-205` under the replacement phase. `failClosed()` then closes `this.socket`, which is now the replacement (`:233-240`).
-  6. `/tmp/aorg-crr006-stale-socket-focused.log` records `7/7`; the added witness passes by asserting the observed wrong result: the replacement is closed, the committed context is marked for reopen, only the old context was published, and replacement hydration never starts. `/tmp/aorg-crr006-stale-socket-probe.patch` contains the exact witness.
-- Consequence: The approved fresh task exists and keeps running server-side, but the browser cannot complete the task-bearing atomic context swap. Live task conversation/status/result visibility remains stuck on the committed pre-task context until another reopen, and the same lifecycle ordering can repeat.
-- Required action: Within the existing `AgentOrgStreamingService`, associate queued processing with the socket/session generation that received it. Once checkpoint recovery intentionally retires a generation, do not apply its already-queued frames to replacement state; keep strict schema/root/sequence failure for frames belonging to the current generation. Add a deterministic regression that holds the checkpoint query, queues a valid post-activation Agent presentation from the old socket, completes the checkpoint, then proves the replacement `CONNECTED`/snapshot path remains open and atomically publishes the verified candidate. Do not add a second topology, fallback parser, or recovery authority.
-- Classification: `Local Fix` — AD-REV-006 already specifies the correct owner and recovery outcome; this is a bounded session-transition invariant and regression in implementation-owned code.
-- Review accountability: CRR-005 correctly identified the fresh-run model but did not evaluate how the new activation checkpoint transition interacts with already-queued socket work. This deliberate cumulative round exposes and records that review gap.
+  1. `AgentOrgWorkspaceView.vue:86-90` connects on mount and invokes `disconnectAgentOrg` on unmount or Org-run-id change.
+  2. `agentOrgContextsStore.ts:48-59` calls service `disconnect()`, deletes the service, then removes the context/error/focus records. This establishes final release ownership for that service instance.
+  3. `agentOrgStreamingService.ts:228-235` checks `isCurrent(generation)` before `await this.handleMessage(raw)` and only again on an exception. A successful async continuation has no post-await retirement check.
+  4. Snapshot handling awaits hydration and checkpoint verification at `:200-205`, then unconditionally replaces `this.context`, marks the shared phase `ready`, and calls `publish` at `:206-211`. If release occurred during either await, the store callback can recreate the deleted context without an owned service.
+  5. Fresh task activation awaits `reopen()` at `:221-223`; `reopen()` awaits its checkpoint then unconditionally writes recovery state, closes, and connects at `:90-96`. If release occurred while the checkpoint was pending, the deleted service creates a new open socket that the store can no longer disconnect.
+  6. `/tmp/aorg-crr007-retired-inflight-focused.log` records `9/9`; two temporary witnesses pass by asserting these wrong outcomes after explicit release. `/tmp/aorg-crr007-retired-inflight-probe.patch` contains the exact witnesses.
+- Consequence: The old Org may be reinserted into `contexts` after the caller deliberately removed it, so a later visit can briefly expose stale live state. The activation path can also leave an untracked websocket/service continuing to receive and publish updates with no store owner, producing stale mutations and a resource leak.
+- Required action: Within the existing `AgentOrgStreamingService`/context-lifecycle ownership, make every async frame/recovery continuation validate that its service/generation is still owned immediately before post-await mutation, publish, close, or connect. Explicit context release must make pending snapshot hydration and activation checkpoint work inert; preserve manual reopen for a still-owned fail-closed service and strict validation for current-generation frames. Add deterministic regressions for release during pending snapshot hydration and during pending activation checkpoint (or an equivalent store-level lifecycle test proving no context resurrection and no replacement socket). Do not add a second context, topology, or recovery subsystem.
+- Classification: `Local Fix` — the approved stream/context/store owners and DS-018 outcome remain correct; the cancellation/commit guard is a bounded implementation lifecycle defect.
 
-`CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003`, `CR-FIND-004`, and `CR-FIND-005` are resolved; their current verification is recorded in `CRR-006`.
+`CR-FIND-001`–`CR-FIND-006` are resolved. In particular, `CR-FIND-006` is closed because IR-007 now ignores queued-but-not-started frames from the retired checkpoint socket and preserves the replacement stream exactly as required.
 
 ## Classification
 
@@ -229,12 +229,12 @@ No new or reclassified premise is required; `CR-SCN-011` fully records the suppo
 ## Recommended Recipient
 
 - `implementation_engineer`
-- API/E2E must remain stopped until the bounded correction returns through cumulative source review and passes.
+- API/E2E must remain stopped until the correction returns through cumulative source review and passes.
 
 ## Residual Risks
 
-- API/E2E remains stopped at `API-REV-001`. After source pass it must repeat the real imported-package/Codex/browser task activation, task-bearing checkpoint/restore, contextual identity, lifecycle, Team compatibility, and migration/persistence scenarios.
-- The broad web suite is clean for this ticket except the established unrelated fixed-px audit; the broad Nuxt typecheck remains at its documented repository baseline.
+- API/E2E remains stopped at `API-REV-001`. After source pass it must repeat real imported-package/Codex/browser task activation, route/context release, task-bearing checkpoint/restore, contextual identity, lifecycle, Team compatibility, and migration/persistence scenarios.
+- The prior broad web suite remains clean for this ticket except the established unrelated fixed-px audit; the broad Nuxt typecheck remains at its documented repository baseline.
 - External definition publication remains separately owned and outside this ticket's write/release scope.
 
 ## Latest Authoritative Result
@@ -243,7 +243,7 @@ No new or reclassified premise is required; `CR-SCN-011` fully records the suppo
 - Review Entry Point: `Implementation Review`
 - Supported Product Scenario Gate: `Pass`
 - Material-Premise Gate: `Pass`
-- Score Summary: `8.9/10 (88.6/100)`; Data-Flow, Ownership, API/E2E Readiness, and Runtime Correctness are below target.
-- Failure Origin: `Implementation defect in AgentOrg browser stream-session transition ownership, exposed by the cumulative review after IR-006's otherwise-correct fresh-task checkpoint recovery.`
+- Score Summary: `8.9/10 (88.8/100)`; Data-Flow, Ownership, API/E2E Readiness, and Runtime Correctness are below target.
+- Failure Origin: `A new cumulative-review finding in AgentOrg browser context-release lifecycle: IR-007 fixes queued retired frames, but already-running async work can still outlive store/service ownership.`
 - Recommended Recipient: `implementation_engineer`
-- Notes: IR-006 resolves `CR-FIND-004` and `CR-FIND-005`. Source review remains failed only for `CR-FIND-006`: a normal follow-on task frame queued from the retiring socket can close the replacement before atomic hydration completes.
+- Notes: `CR-FIND-006` is resolved exactly. Source review remains failed only for `CR-FIND-007`, a bounded release-during-await defect in the existing stream/context owner.
