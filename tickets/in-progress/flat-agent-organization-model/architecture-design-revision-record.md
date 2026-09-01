@@ -13,6 +13,7 @@ does not revise intended behavior.
 | AD-REV-003 | Architecture Reviewer `ARCH-REV-001` plus Requirements Engineer approved `RER-018` / architecture-review recovery round | `AR-FIND-001`, `AR-FIND-002` | `Architecture Revision — Target Definition Admission, External Ownership, And Handoff Order` | `Architecture Design Complete`; both findings resolved; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-004 | User identification of the canonical server migration convention / architecture-impact correction round | `ADI-006` | `Architecture Revision — Forward-Only Convention-Compliant Migration Mechanics` | `Architecture Design Complete`; migration mechanics corrected without requirements/Product change; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-005 | Implementation Engineer `IR-001` / `IDI-001` after `ARCH-REV-002` Pass / implementation-impact recovery round | `IDI-001` | `Architecture Revision — Root-Neutral Configured Execution And AgentOrg Production Composition` | `Architecture Design Complete`; production extraction/composition boundary and self-validation added; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-006 | API/E2E Engineer real imported-package/browser validation after `IR-003` and `CRR-003` Pass / downstream design-impact recovery round | `ADI-007` | `Architecture Revision — Accepted Agent/Team Workspace Reuse And Strict AgentOrg Presentation` | `Architecture Design Complete`; raw Org runtime dashboard path removed by design; self-validation expanded to 22 cases; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -316,3 +317,84 @@ does not revise intended behavior.
   Design Impact rather than introduce a synthetic root, standalone mounted Team
   or Org Agent, Team-envelope reinterpretation, public generic root, bare-ID
   inference, or boundary bypass.
+
+### AD-REV-006 — Accepted Agent/Team Workspace Reuse And Strict AgentOrg Presentation
+
+- Triggering role, report path, and round: API/E2E Engineer downstream
+  validation after Implementation `IR-002/IR-003` at
+  `8e680617cf3684de137ae318a7fa46133b695d4d` and Code Review
+  `CRR-003` Pass. The real imported-package/full-stack/browser evidence is
+  recorded in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+  and
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-001/screenshots/03-org-live-raw-events-defect.png`.
+  This is the first API/E2E-impact architecture recovery round.
+- Triggering finding IDs: `ADI-007`. Configuration-first launch, initial null
+  focus and exact `/concierge` focus succeeded, but a real prompt rendered
+  low-level protocol envelopes through raw “AGENT RUN” JSON cards, a bespoke
+  “MEMBER INPUT” card/composer and a focused-member `Stop Org` control. Source
+  confirmed `AgentOrgWorkspaceView.vue` retained raw events and used
+  `JSON.stringify`; the Org contract used `unknown` events and a send-only
+  client command.
+- Prior authoritative design result: `AD-REV-005`, Architecture Design Complete,
+  at commit `9718fb36b68e0ffee554b9eb443c9e0bb9735aa1`; independent Architecture
+  Review `ARCH-REV-003` passed at
+  `ae61ecd38133d9db29eaf345acaf02a90e82e574`. Implementation and source-review
+  results were `IR-003` and `CRR-003` Pass before API/E2E exposed the defect.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as `AD-REV-006` and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Why this revision is recorded: AD-REV-005 made runtime execution constructible
+  but described the browser only as a tagged projection/focus path. It did not
+  map the approved VIS-017/018 experience to the mature production AgentContext,
+  event-monitor, composer, active-context, trace/tool/right-tab and Team
+  presentation boundaries. That gap allowed a second AgentOrg dashboard to
+  become authoritative. AD-REV-006 adds one strict root-neutral Agent
+  presentation admission contract beneath subject envelopes; one checkpointed
+  AgentOrg browser context with exact member hydration; four exact active-Agent
+  target/interaction branches; store-neutral accepted Agent/Team workspace
+  surfaces; Org command parity; Org-tagged trace/tool/token projections; and a
+  root-history termination action. It explicitly removes the raw dashboard,
+  JSON fallback, duplicate composer/header, send-only direct path and member-
+  header root control.
+- Approved behavior or requirement IDs affected: implementation path for
+  `BEH-004`-`BEH-006`, `BEH-008`, and `BEH-009`; `REQ-004`, `REQ-016`,
+  `REQ-019`, `REQ-024`, and `REQ-025`; `AC-009`, `AC-014`-`AC-020`; and
+  `SCN-002`, `SCN-007`, `SCN-009`, and `SCN-010`. Product `RV-012`, especially
+  VIS-016-VIS-018, remains the intended-behavior authority. RER-019 is only the
+  approved baseline activation/provenance update and changes no behavior.
+- Design-spec sections updated: current-state/evidence/classification and
+  AD-REV-006 impact decision; strict running-workspace projection/reuse
+  contract; Product-to-production mapping; scenarios and DS-016-DS-019 spines;
+  owners/boundaries/dependencies/interfaces; reusable structures; exact
+  file/folder/removal mapping; concrete/rejected shapes; sequencing; tradeoffs,
+  risks, and implementation/validation guidance.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` was updated from AD-REV-005 to
+  AD-REV-006. It retains the prior 17 cases and adds VAL-018-VAL-022 for a real
+  Org Agent conversation, mounted Team workspace reuse, send/interrupt/tool
+  parity, strict stream/hydration recovery, and root-stop ownership. Requirements,
+  Product prototype artifacts and downstream implementation/API evidence remain
+  read-only.
+- Downstream and architecture-review impact: classification remains `Large` /
+  `High`; another independent Architecture Review is mandatory before
+  Implementation reconciles the correction or API/E2E resumes. Review must
+  verify the strict presentation package/adapter is root-neutral, Team-only wire
+  stays compatible, the Org event/command branch contains no opaque payload,
+  Org hydration owns one correlated context, shared surfaces have no subject
+  store/socket dependency, mounted Teams acquire no root authority, contextual
+  trace/token/tool queries remain Org-tagged, and root stop is not attached to
+  focused members.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of the
+  cumulative `RER-019` / `RV-012` / `AD-REV-006` package. Implementation and
+  API/E2E remain stopped for this impacted path until review passes and the
+  source is reconciled.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, or material open
+  architecture decision remains after self-validation. Structural risk remains
+  high because the correction changes shared stream contracts/admission,
+  member projections, browser hydration/stream ownership, active-context
+  commands, accepted component extraction, contextual tools and root lifecycle
+  placement. The real-browser defect is retained as failing evidence and is not
+  claimed fixed by this architecture-only revision.

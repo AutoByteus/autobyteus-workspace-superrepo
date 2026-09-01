@@ -3,25 +3,28 @@
 ## Document Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Approved requirements revision: `RER-018`
+- Approved requirements revision: `RER-019`
 - Normative supplement: `AORG-CONTRACT-001`
 - Normative Product UI revision: `RV-012` / `VIS-001`-`VIS-020`
 - Architecture result: `Architecture Design Complete`
-- Architecture revision: `AD-REV-005`
+- Architecture revision: `AD-REV-006`
 - Date: 2026-09-01
 - Workspace: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`
-- Branch / approved revision commit: `requirements/flat-agent-organization-model` / `e1f26fbe128a33ef863a3735607b1b3857f161e6`
+- Branch / approved revision commit: `requirements/flat-agent-organization-model` / `f3035a2d5ba90e64c51113fcd957524a3afd9cf9`
 
 ## Current-State Read
 
-The product currently uses one recursively composable `AgentTeamDefinition` and
-one recursively shaped Team execution family. `AgentTeamDefinition.nodes`
-accepts both Agent and AgentTeam refs; `TeamDefinitionGraphResolver` recursively
-loads them; `TeamHandoffCompiler` recursively rebases handoffs; and
-`TeamDefinitionTopologyPlanner` can allocate configured child TeamRuns at
-arbitrary depth. `RootTeamRun`, `TeamExecutionIndex`, the mixed Team backend,
-GraphQL, the Team WebSocket contract, and the web workspace all encode the root
-as a Team.
+Before this ticket, the product used one recursively composable
+`AgentTeamDefinition` and one recursively shaped Team execution family.
+`AgentTeamDefinition.nodes` accepted both Agent and AgentTeam refs;
+`TeamDefinitionGraphResolver` recursively loaded them; `TeamHandoffCompiler`
+recursively rebased handoffs; and `TeamDefinitionTopologyPlanner` could allocate
+configured child TeamRuns at arbitrary depth. `RootTeamRun`,
+`TeamExecutionIndex`, the mixed Team backend, GraphQL, the Team WebSocket
+contract, and the web workspace all encoded the root as a Team. The current
+`8e680617c` implementation baseline has performed the approved split/extraction;
+this cumulative paragraph remains the pre-change architecture evidence rather
+than a claim that configured recursion is still current.
 
 The durable TeamRun V2 topology is nevertheless the right native contract for a
 standalone flat Team. It already persists the coordinator, direct Agents,
@@ -48,10 +51,11 @@ families:
   logical discriminator `root_subject_kind: "agent_team" | "agent_org"` and
   select the corresponding strict family before decoding.
 
-The supplied workspace is an isolated git worktree. Approved
-`RER-018@e1f26fbe1` is an ancestor of the current reviewed baseline
-`ARCH-REV-002@614f705ff`; the worktree now also contains Implementation's
-uncommitted `IR-001` draft. `AD-REV-001` remains in history at
+The supplied workspace is an isolated git worktree at implementation baseline
+`8e680617c`, with downstream-owned dirty/untracked API/test/review evidence left
+untouched. Approved `RER-019@f3035a2d5` changes only Product baseline
+activation/provenance; RER-018 remains the behavior/schema authority beneath
+it. The chronological architecture record begins with `AD-REV-001` at
 `36bc02deca363798b6eda878e5eb4850e624da6f`; `AD-REV-002` is the architecture
 impact revision that integrates approved Product `RV-012`, the RER-013
 configuration/focus behavior, and the later user-approved Team-V2/Org-V1 durable
@@ -76,9 +80,18 @@ Agent/flat-Team execution plane beneath two still-distinct public root
 aggregates, explicit Org sidecars and memory placement, subject adapters for
 tasks/messages/events/persistence, and defined construction/restore/shutdown
 order. The separate `architecture-design-self-validation.md` walks the revised
-design through supported use cases and dependency/boundary checks. The partial
-uncommitted implementation draft is evidence only and is not modified or
-claimed by this design round.
+design through supported use cases and dependency/boundary checks. Architecture
+Review `ARCH-REV-003@ae61ecd38` passed AD-REV-005. Implementation then completed
+`IR-002/IR-003` at `8e680617c`, and Code Review `CRR-003` passed. A real
+API/E2E browser run subsequently exposed `ADI-007`: the production Org workspace
+bypasses the accepted Agent/Team presentation stack, stores raw root events, and
+renders them through `JSON.stringify` plus a bespoke composer and member-header
+`Stop Org` action. AD-REV-006 corrects that production-surface boundary by
+making AgentOrg transport emit a strict Agent presentation stream, hydrating the
+same `AgentContext` read model, and routing exact Org focus through reusable
+Agent/Team workspace surfaces and the existing active-context command boundary.
+The implementation and API/E2E worktree changes remain downstream-owned evidence
+and are not modified or claimed by this design round.
 
 ## Task Size And Architectural Risk (Mandatory)
 
@@ -92,8 +105,10 @@ claimed by this design round.
   extraction, private Team/Org task-message-event adapters, process lifecycle,
   migration authority, launch/configuration APIs, history/stream/workspace
   discriminated projections, task host ownership,
-  atomic handoff authoring, and separate frontend definition/configuration
-  surfaces. A repository scan found 207 consumers of Team-root field names and
+  atomic handoff authoring, separate frontend definition/configuration
+  surfaces, and now the concrete Agent presentation stream/context/workspace
+  extraction required to reuse the accepted live conversation surface. A
+  repository scan found 207 consumers of Team-root field names and
   11 direct configured-definition recursion consumers before tests and generated
   transport code. Those structural surfaces, not record count, make the task
   Large.
@@ -108,8 +123,9 @@ claimed by this design round.
   either activate retired packages or strand compatible definitions globally.
 - Selected route: `Architecture Review`
 - Escalation trigger if implementation or validation discovers new impact:
-  `IDI-001` is resolved by AD-REV-005 without changing the approved durable
-  boundary. Return another `Design Impact` if implementation cannot realize the
+  `IDI-001` is resolved by AD-REV-005 and `ADI-007` is resolved by AD-REV-006
+  without changing the approved durable boundary or Product behavior. Return
+  another `Design Impact` if implementation cannot realize the
   specified root-neutral internal capability plane while preserving both public
   subject owners, or if it needs to change the approved exact
   Team V2 or AgentOrg V1 schema/file/path boundary, needs a generic persisted
@@ -145,9 +161,9 @@ claimed by this design round.
 
 | Source / Command / Probe | Exact Path / Reference | Observation | Design Decision Supported | Remaining Uncertainty |
 | --- | --- | --- | --- | --- |
-| Approved requirements package | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` | `RER-018` is Approved Architecture-Ready; it preserves RER-016 runtime families and adds REQ-026/027 exact definition versions, source ownership, target-only admission, and per-definition availability. | Keep external repositories read-only, convert only server-owned definitions, and make incompatible external definitions/dependent Orgs individually unavailable without global startup/history impact. | None. |
+| Approved requirements package | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` | `RER-019` is Approved Architecture-Ready. It preserves RER-018's runtime/definition/admission behavior and records only the user-authorized Product baseline activation/provenance update. | Keep the complete cumulative RER-018 behavior and external read-only boundary; treat clean normal Product routes as evidence, not a new behavior or architecture contract. | None. |
 | Normative contract | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Exact Team Definition Config V2, Org Definition Config V1, Team run V2, Org run V1, source classes, admission diagnostics, transition, and mixed-reader rules are approved. | Treat all four logical versions/shapes and ownership/admission behavior as upstream constraints. | Internal modules and rollout mechanics remain architecture-owned. |
-| Worktree verification | `git rev-parse HEAD`; `git worktree list --porcelain`; `git status --short --branch`; `git log --oneline` | Isolated task worktree; RER-018, AD-REV-001-004, ARCH-REV-002, and IR-001 evidence share one task history/worktree. The implementation draft is intentionally uncommitted. | Revise only canonical architecture artifacts in place as AD-REV-005; do not stage, reset, or claim the partial implementation. | Implementation must reconcile its draft only after the revised design passes review. |
+| Worktree verification | `git rev-parse HEAD`; `git worktree list --porcelain`; `git status --short --branch`; `git log --oneline` | Isolated task worktree at implementation baseline `8e680617c`; RER-019, AD-REV-001-005, ARCH-REV-001-003, IR-001-003 and CRR-001-003 share the task history. Downstream API/test/review files are dirty/untracked evidence. | Revise and commit only the three canonical architecture-owned artifacts as AD-REV-006; do not stage, reset, edit or claim downstream changes/evidence. | Implementation/API/E2E must resume only after the revised design passes review and is reconciled. |
 | Architecture Review round 1 | `design-review-report.md`; `architecture-review-revision-record.md`; `ARCH-REV-001@899c60a70` | Major design passed; AR-FIND-001 exposed the definition format/scope boundary and AR-FIND-002 exposed reversed handoff order. The user clarification converted AR-FIND-001 into the RER-018 requirement revision. | Implement RER-018 admission/ownership exactly and preserve current root-owned-before-Team-local effective order. | None. |
 | Canonical production migration convention | `autobyteus-server-ts/docs/design/production_data_migration_conventions.md`; server README `Production migration practice` | Requires known-source/fixed-target transformation, forward-only runtime, existing-runner retry, narrow final-state classification, bounded diagnostics, and no bespoke journal/restoration/crash matrix absent a separate reachable contract. | Replace AD-REV-003's custom journal/staging/backup protocol with atomic current-file writes, one package rename, ordinary startup retry, capability-scoped exclusion, runner-owned status/log/recovery action, and one interruption/idempotence test. | None. |
 | Existing app-data runner and startup | `autobyteus-server-ts/src/app-data-migrations/app-data-migration-runner.ts`; `domain/app-data-migration-types.ts`; `app-data-migration-registry.ts`; `migrations/team-run-execution-tree-v2-app-data-migration.ts`; `autobyteus-server-ts/src/server-runtime.ts` | Runner owns record/attempt/log, ordered prerequisites, `STARTUP_ONLY` `RESTART_TO_RETRY`, and aggregate status; server continues through capability-scoped migration failures and rebuilds strict catalogs. The prior Team Run V2 migration uses exact old/current classification, the established atomic writer, strict reread, sorted disposition counts, and at most five examples. | Register one startup-only definition after Team Run V2 and follow that migration's bounded result shape; do not add runner/ledger/Settings recovery machinery or a blanket fatal gate. | Exact root/definition readiness projection is new but bounded. |
@@ -158,7 +174,7 @@ claimed by this design round.
 | Team local execution coupling | `mixed-team-run-backend-factory.ts`; `mixed-sub-team-run-factory.ts`; `mixed-team-manager.ts`; `domain/team-run.ts` | A useful local Team execution exists, but its factory creates Team-root scope and its configured registry still materializes configured child Teams. Task-Team materialization is a separate valid recursive mechanism. | Extract `FlatTeamExecutionFactory` that accepts an explicit root host/scope, owns direct Agent handles plus task descendants, and never creates a root package; remove configured-child materialization. | None. |
 | Memory/location evidence | `agent-memory/store/agent-memory-layout.ts`; `agent-memory/services/agent-memory-location-service.ts`; representative Org-like package directory listing | Relative paths are already `<root>/<teamRunId...>/<agentRunId>`; a whole-package family rename preserves direct root Agent directories and Team/task lineage directories. | Use tagged root physical scope plus unchanged relative TeamRun lineage; Org direct Agents use zero Team ancestors and mounted Team Agents include the mounted Team run ID. | None. |
 | Process composition evidence | `agent-execution/runtime/general-process-run-supervisor.ts`; `application-platform/execution/application-execution-scope-kernel-builder.ts`; `application-execution-shutdown-coordinator.ts`; `global-agent-run-message-router.ts` | General and application scopes construct AgentRun then Team manager; shutdown stops Team then Agent; global same-root routing hard-codes `AgentTeamRunManager`. | General scope constructs shared execution factories/directory, then Team and Org managers; closes Org before Team before Agent. Application scope remains Team-only but uses the extracted factories. Global same-root delivery dispatches by tagged active-root directory. | None. |
-| Architecture self-validation | `tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md` | Supported fresh/restore/task/message/platform-binding/failure/migration/history/UI cases are walked end-to-end against owners, boundaries, dependency direction, durability, and forbidden shortcuts. | Make this a retained AD-REV-005 review input and implementation checklist, not executable-test evidence. | Downstream code/API/E2E validation remains required. |
+| Architecture self-validation | `tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md` | Twenty-two supported fresh/restore/task/message/platform-binding/failure/migration/history/UI/presentation/interaction/recovery/stop cases are walked end-to-end against owners, boundaries, dependency direction, durability, and forbidden shortcuts. | Make this a retained AD-REV-006 review input and implementation checklist, not executable-test evidence. | Revised downstream code/API/E2E validation remains required. |
 | Definition model/codec | `autobyteus-server-ts/src/agent-team-definition/domain/models.ts`; `providers/team-definition-config.ts` | Current unversioned config requires `refType: agent \| agent_team`; target Team V2 removes the field and target Org V1 retains explicit kind. | Add separate strict config file types/codecs and isolate the current parser as a migration-only server-owned decoder. | None. |
 | Recursive resolution/compiler | `autobyteus-server-ts/src/agent-team-definition/services/team-definition-graph-resolver.ts`; `team-handoff-compiler.ts` | Configured Teams are traversed recursively and local handoffs are recursively rebased. | Replace normal configured recursion with explicit Team-local and fixed-depth Org compilers; preserve recursive task traversal separately. | None. |
 | Persistence-before-validation pressure | `autobyteus-server-ts/src/agent-team-definition/services/agent-team-definition-service.ts`; `file-agent-team-definition-provider.ts` | Create can write before full graph validation/rollback; `team.md` and config files are not one crash-safe parent transaction. | Validate a complete candidate first and use a revisioned, journaled definition-package commit. | None. |
@@ -177,6 +193,12 @@ claimed by this design round.
 | Definition ownership/inventory | `team-definition-source-paths.ts`; `app-config.ts`; `git ls-files '*team-config.json'`; source scan | The 23 public/private roots are read-only external evidence (3 organization-like). Observed server-owned sources are one writable data-root Team and two built-in application Teams, all current legacy flat configs. | Inventory source classes separately; migrate only server-owned sources; never derive write permission from definition ID or runtime history. | Cutover inventory, not observed count, is authoritative. |
 | Run inventory | Python/`jq` re-probe of `/home/autobyteus/data/memory/agent_teams/*/team_run_execution_tree.json` | 43 readable V2 trees; 27 Agent-only; 16 one-level organization-like; none deeper. Runtime ownership is server-side regardless of definition origin. | Flat Team packages are no-op; convert every cutover-time organization-like package to Org V1. | Cutover inventory supersedes historical count 41. |
 | Representative Org-like V2 | `/home/autobyteus/data/memory/agent_teams/software_development_department_09e8e85e26524e7d9dd869866c27496b/team_run_execution_tree.json` | Root coordinator plus direct Agent/Team records; child Teams are Agent-only and coordinator-led. | Project only root subject/identity/coordinator semantics and package family; preserve direct records and task hosts. | Definition snapshot may differ from current package, so migrate run snapshots independently of mutable definitions. |
+| Requirements baseline promotion | `requirements-doc.md`; `requirements-revision-record.md`; `RER-019@f3035a2d5` | RER-019 records Product baseline activation only; BEH/REQ/AC/SCN and RV-012 behavior are unchanged. | Synchronize current authority to RER-019 without reopening prior durable/runtime decisions. | None. |
+| Approved active-workspace visuals | Product `ui-ux-spec.md`; VIS-016, VIS-017, VIS-018; baseline supplements VIS-PROMOTE-002/003/004 | The approved Org has a prompt-only unfocused center; direct Agent focus is the accepted Agent header/conversation/composer; Team focus is the accepted Team-member header/conversation/composer. There is no custom dashboard or focused-member `Stop Org` button. | Reuse concrete accepted Agent/Team surfaces through an Org focus adapter; root stop remains outside member header. | Header action commands must use subject ports while preserving visible accepted chrome. |
+| API/E2E real-browser Design Impact | `api-e2e-coverage-investigation.md`; `api-e2e-evidence/API-REV-001/screenshots/02-org-active-unfocused-desktop.png`; `03-org-live-raw-events-defect.png`; user VNC image `ctx_f8a08ac8c866__image.png` | Real imported definition/full stack/Codex launch and exact focus passed, but a real prompt rendered large raw AGENT RUN JSON and bespoke MEMBER INPUT cards; source fallback is `JSON.stringify(item.event)`. | Classify `ADI-007` as a presentation-contract/ownership defect and revise transport, browser state, component reuse, command parity and stop placement before testing resumes. | No Requirement/Product gap; executable validation must resume only after revised design review and implementation. |
+| Defective Org workspace source | `autobyteus-web/components/workspace/org/AgentOrgWorkspaceView.vue`; `stores/rootExecutionViewStore.ts`; `services/rootExecution/rootExecutionViewState.ts`; `@autobyteus/collaboration-stream-contracts/root-execution-view-dtos.ts` | One component owns header/raw events/composer/termination; store retains opaque events; live DTO uses `z.unknown`; client supports only SEND_MESSAGE. | Remove the parallel presentation path; strict typed event union, Org execution context, interaction port and thin focus adapter are required. | None. |
+| Accepted Team/Agent production presentation | `AgentWorkspaceView.vue`; `TeamWorkspaceView.vue`; `AgentTeamEventMonitor.vue`; `AgentEventMonitor.vue`; `AgentUserInputForm.vue`; `activeContextStore.ts`; `TeamStreamingService.ts`; `teamExecutionViewState.ts` | Mature path projects typed Team Agent messages into `AgentContext`, uses shared conversation/trace/composer, handles local submission, interrupt/tool approval, and supplies accepted headers/right tools. | Extract prop/port-driven surfaces and generalize the active-target facade; do not copy markup or register mounted Teams as standalone roots. | Team store dependencies inside accepted components must be removed from the reusable presentation core. |
+| Accepted root termination evidence | `WorkspaceHistoryWorkspaceSection.vue`; `TeamMembersPanel.vue`; `AgentOrgRunHistoryPanel.vue`; VIS-017/018 | Active Team history rows place stop at the root row; the separate Team members panel owns its existing terminate confirmation. Current Org places stop in a focused member header and its history row has none. | Add Org active-root history stop with Team-row interaction/pending/error parity; remove member-header stop; keep mounted Team non-terminable and standalone Team confirmation unchanged. | None. |
 | Concurrent draft | `origin/codex/dynamic-agent-team-runtime@7d9b4ba69`; merge-base check | Draft is not integrated and its behavior is outside this approved package. | Do not import recursive configured mutation; re-evaluate any later source conflict under REQ-017. | Branch may evolve before implementation. |
 
 ## Intended Change
@@ -195,7 +217,11 @@ with private Team/Org task/message/event/persistence adapters and strict Org
 sidecars; add truthful mixed-root projections, subject-specific GraphQL and
 definition/run services, configuration-first full-scope Org activation with nullable
 post-launch focus, complete atomic From/To/When authoring, root-first effective
-handoff ordering, and the approved separate Team/Org frontend journeys.
+handoff ordering, and the approved separate Team/Org frontend journeys. For
+an active AgentOrg, reuse the existing Agent conversation/event-monitor and Team
+member workspace presentation through a strict Org focus adapter; do not create
+an Org runtime dashboard, raw event cards, custom composer, or member-header root
+lifecycle action.
 
 ### AD-REV-002 Product, Runtime, And Durable Impact Decision
 
@@ -472,6 +498,30 @@ The same retired input in an `external_read_only` descriptor is **not**
 transformed: target admission returns `DEFINITION_SCHEMA_VERSION_UNSUPPORTED`
 and the external-owner action. This distinction closes AR-FIND-001 without a
 dual normal parser.
+
+### AD-REV-006 Accepted Running-Workspace And Typed Presentation Recovery
+
+Architecture impact ID: `ADI-007`, triggered by API/E2E real-browser scenario
+`API-E2E-005` after `CRR-003` Pass. It is an architecture-owned boundary defect,
+not a Requirement Gap: REQ-004/016/019/025, SCN-007/009, Product RV-012, and
+VIS-016-VIS-018 already require exact member focus to reuse the accepted Agent
+or Team workspace and explicitly reject a custom AgentOrg runtime dashboard.
+RER-019 only promotes that already-approved experience to the Product baseline.
+
+| Impact Surface | Observed Invalid Implementation / Missing Prior Design | AD-REV-006 Decision | Preserved Authority |
+| --- | --- | --- | --- |
+| Live Agent event projection | `AgentOrgRunEvent` carried raw `CollaborationAgentExecutionEvent`; `RootExecutionEventDto.event` was `unknown`; the web retained the envelope and rendered a `JSON.stringify` fallback. AD-REV-005 named a tagged stream but did not map it to the mature Agent presentation protocol. | Move the existing Team Agent-event admission logic into one root-neutral `CollaborationAgentPresentationAdapter`. Team and Org callbacks convert raw AgentRun/member-input/status/readiness events before publication. The Org wire branch is a strict discriminated presentation-event union; unsupported events are rejected and trigger stream recovery, never UI fallback rendering. | AgentRun remains runtime-event owner; Team and Org remain subject publishers; Team-only serialized messages remain wire compatible. |
+| Browser execution read model | `RootExecutionViewState` owned an array of opaque root events rather than per-Agent conversation/status/tool state. | Add `AgentOrgExecutionViewState` and `AgentOrgExecutionContext`: strict tree/tasks/messages/status snapshot plus exact `agentRunId -> AgentContext` map and nullable focus. Apply typed Agent presentation messages through the existing `dispatchAgentStreamMessage` handlers. Root topology and Agent presentation state have one Org context authority. | Org V1 remains durable topology authority; `AgentContext` remains accepted browser conversation/presentation state. |
+| Workspace component boundary | `AgentOrgWorkspaceView.vue` implemented a second header, event list, empty state, textarea and send button. Prior VIS mapping stopped at `RootExecutionViewStore`/focus and did not name reusable production components. | Extract prop/port-driven `AgentWorkspaceSurface` and `TeamWorkspaceSurface` from the accepted `AgentWorkspaceView`, `TeamWorkspaceView`, `AgentTeamEventMonitor`, and `AgentEventMonitor`. Existing standalone wrappers adapt their stores. `AgentOrgWorkspaceView` becomes only a three-branch focus adapter: no focus -> approved prompt; direct Agent -> Agent surface; mounted Team/Team Agent -> Team surface. It owns no event rendering, composer, or lifecycle action. | Accepted shell/header/conversation/composer/Team presentation in VIS-017/018; subject route and focus remain Org-owned. |
+| Input and command parity | Org used a direct one-off `SEND_MESSAGE`; accepted composer/tool cards require context attachments, local submission, interrupt, and approval/denial commands. | Generalize `useActiveContextStore` behind an exact tagged `ActiveAgentWorkspaceTarget` plus `AgentInteractionPort`. Standalone Agent, standalone Team member, direct Org Agent, and mounted Org Team member provide subject adapters. Extend the strict Org client command union and acknowledgements for send, interrupt, approve, and deny; the server invokes the already-existing exact `AgentOrgRun.executeAgentCommand`. | Recipient and root validation remain subject-owned; UI components depend only on the active-target boundary, never on Org/Team managers or sockets. |
+| Hydration and trace browse | The Org surface had no equivalent of Team member projection/hydration or active-trace browse. | Add Org-member run projection and active-trace queries keyed by `{orgRunId, memberAddress, agentRunId}` and backed by the strict Org execution location service. Org context hydration builds every configured/live AgentContext, starts focus `null`, hydrates current projection best-effort, and uses checkpointed replacement after a sequence gap. Add an `agentOrgMember` browse-subject branch to the existing event-monitor service. | Agent memory remains physically Org-owned; history is read from the run snapshot/location, never current definition or a synthetic Team root. |
+| Contextual Team/right-tool surfaces | Existing right tabs and Team overview infer only global standalone selection; registering a mounted Team as standalone would create false authority. | Introduce a read-only `TeamWorkspaceContextView` port. Standalone `AgentTeamContext` and an Org-mounted-Team adapter implement it. Right tabs, Team overview, files/activity/token/artifact surfaces resolve from `ActiveAgentWorkspaceTarget`, so Team focus exposes accepted Team UI without registering in `AgentTeamContextsStore` or writing a Team package. Org token/history queries remain Org-tagged. | Mounted Team runtime ownership remains AgentOrg; Team presentation reuse does not create a Team root. |
+| Headers and root stop | The bespoke focused-member header showed Org internals and placed `Stop Org` beside the member. Product images show the accepted member header/actions; established Team root termination is a root-level history action (and the separate Team members panel uses its existing confirmation). | Reuse the accepted member header and `WorkspaceHeaderActions` through subject action ports. Remove `Stop Org` from the member header. Put active Org termination on the AgentOrg history root-run row using the same stop-icon/pending/error interaction as the existing active Team history row. A mounted Team has no independent terminate action. Do not change the standalone Team panel confirmation behavior. | Root lifecycle remains AgentOrg-owned; member focus never masquerades as root ownership; no unrelated Team behavior change. |
+
+This correction does not change Org launch, focus semantics, durable schemas,
+memory paths, migration, handoff order, or accepted Product layout. It makes the
+previous abstract “workspace projection” statement constructible and removes the
+invalid parallel runtime presentation path.
 
 ## Target Run-Tree And Launch Contracts
 
@@ -951,6 +1001,139 @@ with a Team identity, do not construct `AgentOrgRunManager`, and retain
 surface while ensuring the shared extraction is production composition rather
 than a general-process-only special case.
 
+### AgentOrg Running-Workspace Projection And Reuse Contract (AD-REV-006)
+
+#### Tight transport and presentation shapes
+
+The shared element is an Agent presentation **message body**, not a Team/Org
+root envelope. A small new workspace package
+`@autobyteus/agent-presentation-contracts` owns strict Agent conversation,
+status, tool, activity, artifact/file, member-input, external-input, error, and
+token detail schemas without a root identifier or change sequence. Both subject
+stream packages compose those schemas:
+
+```ts
+type AgentPresentationMessage =
+  | { type: "SEGMENT_START"; payload: SegmentStartDetails }
+  | { type: "SEGMENT_CONTENT"; payload: SegmentContentDetails }
+  | { type: "SEGMENT_END"; payload: SegmentEndDetails }
+  | { type: "MEMBER_INPUT_MESSAGE"; payload: MemberInputDetails }
+  | { type: "AGENT_STATUS"; payload: AgentStatusDetails }
+  | { type: "TOOL_APPROVAL_REQUESTED"; payload: ToolApprovalDetails }
+  | { type: "TOKEN_USAGE_UPDATED"; payload: TokenUsageDetails }
+  | /* every currently supported accepted Agent monitor message */
+    { type: "ERROR"; payload: AgentPresentationErrorDetails };
+
+type AgentOrgExecutionEventDto =
+  | Readonly<{
+      kind: "agent_presentation";
+      member_address: AgentTeamAddress;
+      agent_run_id: string;
+      message: AgentPresentationMessage;
+    }>
+  | Readonly<{ kind: "task"; event: AgentOrgTaskEventDto }>
+  | Readonly<{ kind: "communication"; message: AgentOrgCommunicationMessageDto }>;
+
+type AgentOrgRootExecutionEventDto = Readonly<{
+  root_subject_kind: "agent_org";
+  root_run_id: string;
+  change_sequence: number;
+  event: AgentOrgExecutionEventDto;
+}>;
+```
+
+- `CollaborationAgentPresentationAdapter` accepts the internal
+  `CollaborationAgentExecutionEvent` plus exact tagged member identity, validates
+  raw AgentRun payloads, filters the same collaboration duplicates as the Team
+  path, and returns either one normalized presentation message, a filtered
+  disposition, or a typed rejection. It subsumes the subject-neutral part of
+  `TeamAgentEventAdapter`; Team callbacks and Team wire serializers keep their
+  current outer message shape and field spellings.
+- Token presentation uses a root-neutral internal summary plus subject-specific
+  serializers. The Team serializer continues to emit the existing
+  `root_team_run_id`; the Org serializer emits/correlates
+  `root_subject_kind:"agent_org"` and `root_run_id`. An Org event must never
+  carry a field whose semantics claim a Team root.
+- `AgentOrgRootExecutionViewDto` replaces `unknown` members/handoffs/tasks/
+  messages with exact Org V1 projection schemas and adds one exact status record
+  for every live Agent execution. Snapshot root ID, every Agent address/run ID,
+  task/message sidecar identity, and status identity must correlate before the
+  browser can publish the candidate context.
+- The browser parser has no `unknown`/`any` live-event branch. Invalid type,
+  identity, sequence, or payload closes the candidate stream, marks it
+  `reopen_required`, and preserves the last committed context until explicit
+  checkpointed recovery. There is no text/JSON fallback.
+- After Org envelope correlation, `AgentOrgStreamingService` composes the exact
+  `agent_run_id` and `change_sequence` with the root-neutral message body into
+  the existing internal Agent stream-presentation input expected by
+  `dispatchAgentStreamMessage`. This is an internal adapter, not a fabricated
+  Team envelope: it carries no `root_team_run_id`, Team root ID, or Team stream
+  discriminator, and it selects the target AgentContext only from the correlated
+  Org member index.
+
+#### Org context, hydration, and stream state machine
+
+`AgentOrgExecutionContext` is the sole active browser aggregate for one Org run.
+It owns a strict `AgentOrgExecutionViewState`, per-Agent `AgentContext`s,
+read-only mounted-Team projections, nullable exact focus, and synchronization
+phase. `rootExecutionViewStore` becomes a thin mixed-route/history facade over
+subject contexts; it does not retain a second Org tree or raw event log.
+
+Fresh open/restore follows:
+
+`AgentOrg history/route -> agentOrgRunContextHydrationService -> strict Org
+resume/tree/tasks/messages -> Org member projection service + workspace
+resolution -> AgentContext map with focus=null -> AgentOrgStreamingService
+CONNECTED -> exact snapshot barrier -> atomic context registration -> typed
+live messages -> dispatchAgentStreamMessage -> accepted conversation/event
+monitor`.
+
+The state machine mirrors the proven Team stream phases
+`disconnected -> awaiting_connected_root -> awaiting_snapshot -> ready`, with
+`reopen_required` on a schema/correlation/sequence failure. Recovery loads a
+complete candidate context, verifies an Org execution checkpoint before/after
+when open execution work permits, connects it at the expected base sequence,
+and swaps contexts atomically. It never clears conversation state or continues
+through an opaque raw event list; the previously committed context remains
+visible with the recovery notice until the candidate is complete.
+
+#### Exact focus and presentation targets
+
+```ts
+type ActiveAgentWorkspaceTarget =
+  | { kind: "standalone_agent"; context: AgentContext; interaction: AgentInteractionPort; browse: RunBrowseSubject }
+  | { kind: "standalone_team_member"; context: AgentContext; team: TeamWorkspaceContextView; interaction: AgentInteractionPort; browse: TeamBrowseSubject }
+  | { kind: "agent_org_direct_agent"; root: { orgRunId: string }; address: AgentTeamAddress; context: AgentContext; interaction: AgentInteractionPort; browse: OrgBrowseSubject }
+  | { kind: "agent_org_team_member"; root: { orgRunId: string }; team: TeamWorkspaceContextView; address: AgentTeamAddress; context: AgentContext; interaction: AgentInteractionPort; browse: OrgBrowseSubject };
+
+interface AgentInteractionPort {
+  send(input: AgentComposerSubmission): Promise<void>;
+  interrupt(): Promise<void> | void;
+  decideTool(input: ToolDecisionInput): Promise<void> | void;
+}
+```
+
+- `CollaborationFocusController` accepts only an exact address from the strict
+  Org view. A direct Team address resolves to its stored coordinator; an exact
+  Team Agent resolves to itself. It returns `null` for absent/stale/settled
+  targets and never repairs by first member or name.
+- `ActiveAgentWorkspaceTarget` is presentation/interaction state, not durable
+  topology. `useActiveContextStore`, input components, tool cards, right tabs,
+  activity/token/artifact/file surfaces depend on this boundary only.
+- `TeamWorkspaceContextView` exposes focused AgentContext, member presentation,
+  scoped messages/tasks and coordinator identity. Its Org adapter filters the
+  owning Org context by exact Team host/address and sends all commands through
+  the Org interaction port. It cannot stop/restore/register/persist a Team root.
+- Direct Org Agent focus renders `AgentWorkspaceSurface`; Team or Team-Agent focus
+  renders `TeamWorkspaceSurface`; both surfaces contain the existing accepted
+  `AgentEventMonitor`/`AgentConversationFeed`/`AgentUserInputForm` stack. Existing
+  standalone `AgentWorkspaceView` and `TeamWorkspaceView` are wrappers over the
+  same surfaces, so parity is structural rather than duplicated CSS.
+- Header settings/new-run events flow through subject-specific action ports.
+  They may navigate to a valid definition/run-config journey, but they never
+  mutate the immutable running snapshot or terminate the Org. Root termination
+  stays on the active history root row. Mounted-Team termination is forbidden.
+
 ### Effective Handoff Ordering Contract
 
 `CollaborationHandoffCompiler` produces one stable array and never relies on a
@@ -991,9 +1174,9 @@ nonmatching entries but cannot change the relative order of matches.
 | BEH-001 | Contract | REQ-001, REQ-002, REQ-008, REQ-018, REQ-020-REQ-023, REQ-026; AC-001, AC-005, AC-013, AC-015-AC-018, AC-021 | Create/update/import AgentOrg or AgentTeam and scope-owned handoffs. | Recursive unversioned Team model/resolver, incomplete authoring, write-then-validate pressure. | Exact Team Definition V2 or Org Definition V1; Org alone references Teams; Team contains Agents only; complete candidate/ordered handoffs validate before one revisioned atomic save; Org adoption does not copy/edit Team. | Target admission -> subject form/import -> subject GraphQL -> DefinitionService -> resolver/endpoint/handoff validation -> definition-package transaction -> catalog (DS-000, DS-001, DS-011). |
 | BEH-002 | System | REQ-004, REQ-005, REQ-011, REQ-024; AC-002, AC-007, AC-019 | Configure, launch, or restore Org/Team. | Recursive Team planner -> Team manager -> RootTeamRun; Team UI coordinator-focused. | Org full configuration resolves and activates complete scope unfocused; standalone Team remains coordinator-led. | Config UI/application -> subject run service -> configuration resolver -> subject planner/manager -> subject aggregate/adapters -> root-neutral Agent/flat-Team candidates -> durable full active scope (DS-002, DS-003, DS-012, DS-014, DS-015). |
 | BEH-003 | Contract | REQ-005-REQ-007, REQ-020-REQ-023; AC-003, AC-015-AC-018 | Author/inspect handoffs or Agent calls collaboration tools. | Recursive compiler emits root-owned handoffs first, then child Teams in stable member order; rule lookup filters without reordering. | Preserve ordered Agent-sourced routes: Org-owned saved order first, then each direct Team's local saved order in stable Org member order; Team-local edges rebase once; exact same-root resolution fails closed. | Definition candidate path (DS-011); fixed-depth ordered compilation (DS-009); member execution context -> bound owning-root message/task capability -> subject adapter/index -> AgentRun/coordinator (DS-004, DS-014). |
-| BEH-004 | User / contract | REQ-003, REQ-004, REQ-024; AC-002, AC-003, AC-019 | Launch Org, select workspace member, or address Team. | Required/repaired Team focus. | No Org coordinator/initial focus/fallback; explicit Agent focus is exact; Team focus uses its exact coordinator; no-focus blocks only recipient-required action. | Org launch -> focus=null; sidebar selection -> family-specific execution view/index -> send guard -> transport (DS-003, DS-004, DS-013). |
-| BEH-005 | System | REQ-012, REQ-014, REQ-016, REQ-025, REQ-027; AC-008, AC-009, AC-011, AC-020, AC-022 | Persist/restore/stream/history/archive/stop a run. | Strict Team V2 everywhere, including organization-like Team roots. | Flat Team remains native V2; Org uses separate V1; every cutover-time server memory package remains in scope regardless of current definition availability; mixed projections preserve history truth. | Subject aggregate -> subject tree/task/message persistence coordinator -> subject-tagged catalog -> mixed projector/stream/workspace; restore selects/correlates the strict complete package by family without live definition admission (DS-006T, DS-006O, DS-008, DS-014, DS-015). |
-| BEH-006 | User | REQ-001, REQ-002, REQ-004, REQ-011, REQ-016, REQ-018-REQ-027; AC-002, AC-007, AC-011, AC-013-AC-022 | Open catalog/authoring/detail/config/launch/history/workspace. | One Team catalog/form advertises nesting; shared runtime assumes Team root/non-null focus; discovery has no per-definition admission status. | Implement RV-012 for available target definitions and truthful runtime/history; incompatible external definitions/dependent Orgs are omitted from new-work surfaces with actionable diagnostics, without blocking compatible UI/history. | Definition admission index -> web subject stores/components -> subject GraphQL; mixed durable projection remains separately available (DS-000-DS-003, DS-008, DS-011-DS-013). |
+| BEH-004 | User / contract | REQ-003, REQ-004, REQ-024; AC-002, AC-003, AC-019 | Launch Org, select workspace member, or address Team. | Required/repaired Team focus. | No Org coordinator/initial focus/fallback; explicit Agent focus is exact; Team focus uses its exact coordinator; no-focus blocks only recipient-required action. | Org launch -> focus=null; sidebar selection -> Org context exact target -> accepted Agent/Team surface -> strict interaction port/transport (DS-003, DS-004, DS-013, DS-016-DS-018). |
+| BEH-005 | System | REQ-012, REQ-014, REQ-016, REQ-025, REQ-027; AC-008, AC-009, AC-011, AC-020, AC-022 | Persist/restore/stream/history/archive/stop a run. | Strict Team V2 everywhere, including organization-like Team roots. | Flat Team remains native V2; Org uses separate V1; every cutover-time server memory package remains in scope regardless of current definition availability; mixed projections preserve history truth. | Subject aggregate -> subject tree/task/message persistence coordinator -> subject-tagged catalog -> strict subject projector/stream/context; restore selects/correlates the complete package/member projections by family; root stop stays on root history (DS-006T, DS-006O, DS-008, DS-014-DS-019). |
+| BEH-006 | User | REQ-001, REQ-002, REQ-004, REQ-011, REQ-016, REQ-018-REQ-027; AC-002, AC-007, AC-011, AC-013-AC-022 | Open catalog/authoring/detail/config/launch/history/workspace. | One Team catalog/form advertises nesting; shared runtime assumes Team root/non-null focus; discovery has no per-definition admission status. | Implement RV-012 for available target definitions and truthful runtime/history; incompatible external definitions/dependent Orgs are omitted from new-work surfaces with actionable diagnostics, without blocking compatible UI/history. | Definition admission -> subject web/API; mixed durable history plus strict Org context -> shared accepted Agent/Team runtime surfaces and contextual tools (DS-000-DS-003, DS-008, DS-011-DS-013, DS-016-DS-019). |
 | BEH-007 | Operational | REQ-009, REQ-010, REQ-012, REQ-013, REQ-027; AC-004, AC-006, AC-008, AC-022 | Cut over server definitions/runtime while discovering external dependencies. | Unversioned recursive Team codec; 23 external evidence roots; 43 current server V2 trees; no deep topology. | Convert only server-owned definitions to target configs; never write external roots; flat runtime roots are no-op; one-level runtime roots convert to Org V1; unavailable external definitions do not block global readiness/history. | Existing startup migration runner -> separate definition/runtime inventories -> migration-owned atomic current-file writes and one direct package-family rename -> strict target admission/diagnostics -> per-item catalog rebuild/readiness (DS-000, DS-007, DS-010). |
 | BEH-008 | Contract | REQ-014, REQ-025; AC-009, AC-020 | Native durable write/read and mixed projection. | Exact Team V2 only. | Exact Team V2 preserved; exact Org V1 added; child/task records reused; family/payload/projection mismatch fails. | Team planner/root -> exact Team V2 tree/sidecars (DS-006T); Org planner/root -> exact Org V1 tree/Org sidecars (DS-006O); generic facade -> tagged union (DS-008); root-neutral execution callbacks remain internal (DS-014). |
 | BEH-009 | System | REQ-015; AC-010 | Delegate/settle/restore task execution. | Task records attach recursively to exact Team host. | Org root becomes a valid host; direct Org Team remains configured placement; fresh task Team remains task lineage at exact delegator host. | Agent tool -> bound member task commands -> root-neutral task engine -> private subject adapter -> exact root/Team host capability -> subject tree+sidecar -> settlement event (DS-005, DS-008, DS-014). |
@@ -1003,16 +1186,18 @@ nonmatching entries but cannot change the relative order of matches.
 
 | Artifact Path | Purpose | Related Requirement / Acceptance-Criteria IDs | Relationship To This Design | Status / Approval Applicability |
 | --- | --- | --- | --- | --- |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Normative configured structure, exact definition and run families, source ownership/admission, task ownership, handoff authoring/order, launch/configuration/focus, and mixed projections. | REQ-001-REQ-027; AC-001-AC-022; ORG-CASE-001-055 | Governs fixed-depth invariants, Team Definition V2 / Org Definition V1, native Team Run V2 / Org Run V1, target-only admission, two-family reuse, no-focus activation, transition, and failure-closed projection. | Approved through `RER-018`; authoritative. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md` | Requirements-owned evidence and current production-path inventory. | BEH-001-BEH-010; PRE-001-PRE-005 | Supplies approved behavior and inventory evidence; architecture evidence above extends rather than rewrites it. | Current through `RER-018`; not behavior authority by itself. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md` | Cumulative approval/navigation history. | RER-001-RER-018 | Establishes progressive Team reuse, Product UI, configuration-first launch, Team-V2/Org-V1 runtime correction, and external-definition scope/admission approval. | Approved/cumulative. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md` | Independent review result and finding history through AD-REV-004. | AR-FIND-001, AR-FIND-002; ARCH-REV-001/002 | Records resolution of definition transition, handoff order, and migration-convention impact. | `ARCH-REV-002@614f705ff` passed AD-REV-003/004; AD-REV-005 now requires another independent review because IDI-001 materially revises internal runtime ownership. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md` and `implementation-revision-record.md` | Implementation-owned Design Impact evidence. | IR-001; IDI-001 | Proves the reviewed lower-level reuse direction was not constructible and lists exact Team-root coupling. The partial uncommitted draft is evidence only. | Active AD-REV-005 recovery input; not merge/code-review ready. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md` | Architecture-owned use-case/data-flow self-validation requested by the user. | BEH-001-BEH-010; SCN-001-SCN-011; IDI-001 | Walks supported launch, collaboration, task, persistence, restore, shutdown, migration, history and UI cases through owner/boundary/dependency checks. | AD-REV-005 review input; design validation only, not executable evidence. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Normative configured structure, exact definition and run families, source ownership/admission, task ownership, handoff authoring/order, launch/configuration/focus, and mixed projections. | REQ-001-REQ-027; AC-001-AC-022; ORG-CASE-001-055 | Governs fixed-depth invariants, Team Definition V2 / Org Definition V1, native Team Run V2 / Org Run V1, target-only admission, two-family reuse, no-focus activation, transition, and failure-closed projection. | Approved through `RER-019`; authoritative. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md` | Requirements-owned evidence and current production-path inventory. | BEH-001-BEH-010; PRE-001-PRE-005 | Supplies approved behavior and inventory evidence; architecture evidence above extends rather than rewrites it. | Current through `RER-019`; not behavior authority by itself. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md` | Cumulative approval/navigation history. | RER-001-RER-019 | Establishes progressive Team reuse, Product UI, configuration-first launch, Team-V2/Org-V1 runtime correction, and external-definition scope/admission approval. | Approved/cumulative. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md` | Independent review result and finding history through AD-REV-005. | AR-FIND-001, AR-FIND-002; ARCH-REV-001-003 | Records resolution of definition transition, handoff order, migration convention, and root-neutral execution composition. | `ARCH-REV-003@ae61ecd38` passed AD-REV-005; AD-REV-006 now requires independent review because ADI-007 changes transport/presentation/active-context boundaries. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md` and `implementation-revision-record.md` | Implementation-owned history and Design Impact evidence. | IR-001-003; IDI-001 | IR-001 proved Team-root coupling; AD-REV-005 resolved it; IR-002/003 implemented the reviewed runtime and Code Review fixes. | Current implementation baseline is `8e680617c`; ADI-007 is a later API/E2E-discovered architecture impact. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md` and `api-e2e-evidence/API-REV-001/screenshots/02-org-active-unfocused-desktop.png`, `03-org-live-raw-events-defect.png` | API/E2E investigation and real-browser Design Impact evidence. | REQ-004, REQ-016, REQ-019, REQ-025; SCN-007/009; ADI-007 | Proves real launch/focus and exposes the raw-event/custom-runtime dashboard defect after a real prompt. | Downstream evidence only; API/E2E stopped pending AD-REV-006 review/implementation. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md` | Architecture-owned use-case/data-flow self-validation requested by the user. | BEH-001-BEH-010; SCN-001-SCN-011; IDI-001; ADI-007 | Walks supported launch, collaboration, task, persistence, restore, shutdown, migration, history, typed live conversation, command parity, focus reuse and stop ownership through owner/boundary/dependency checks. | AD-REV-006 review input; design validation only, not executable evidence. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/docs/design/production_data_migration_conventions.md` | Canonical server convention for known-source/fixed-target transformation, forward-only runtime, reachability, failure scope, recovery, residue, summaries/logs, and review. | REQ-012, REQ-013, REQ-027; AC-008, AC-022; SCN-004, SCN-011 | Governs AD-REV-004 migration mechanics; requirements continue to govern target state and availability. | Current repository architecture authority; explicitly identified by the user. |
 | `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md` | Normative Product interaction, visual, responsive, and accessibility contract. | REQ-019-REQ-024; AC-014-AC-019; SCN-007-SCN-009 | Governs production UI structure and state meaning; mocked persistence/runtime are explicitly non-authoritative. | Approved `RV-012`; authoritative. |
 | `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/visual-references/visual-reference-manifest.json` and sibling `VIS-001`-`VIS-020` images | Normative final visual references, routes, viewports, state descriptions, hashes, and fixture boundary. | REQ-019; AC-014 | Every visible non-fixture detail informs the file/component/state mapping and browser acceptance checks. | Approved after user review; authoritative. |
-| `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/user-decision-record.md` | Explicit Product approval record. | RER-014; REQ-019; AC-014 | Closes the Product gate; RER-018 makes no Product change. | Approved 2026-08-31. |
+| `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/user-decision-record.md` | Explicit Product approval record. | RER-014; REQ-019; AC-014 | Closes the Product gate; RER-019 changes only baseline activation/provenance. | Approved 2026-08-31. |
+| `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md` and VIS-PROMOTE-001-004 | Clean-route/default-baseline activation supplement. | RER-019; SCN-007 | Confirms the same approved Team/Org runtime on normal routes; supplements but does not replace RV-012/VIS-001-020. | User-authorized and integrated; no behavior change. |
 | `/home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/requirements_engineer_6568eac682114f2cb3ddb8f1d91d3c34/context_files/ctx_4cc02361f417__image.png` | Representative current hierarchy screenshot. | REQ-016; AC-011 | Current-state evidence only; it does not prescribe target layout/styling. | Evidence only; no separate approval. |
 | `origin/codex/flat-agent-team-domain-simplification@c3a318812` (local `ca6d24dfa`) | Prior concept evidence. | BEH-001, BEH-004, BEH-009 | Its supported decisions are already incorporated upstream; it is not a competing design. | Superseded by approved package. |
 
@@ -1024,8 +1209,9 @@ nonmatching entries but cannot change the relative order of matches.
 | VIS-009-VIS-013 | Org catalog, in-flow Agent/Team member authoring, clean detail, Org handoff detail, narrow authoring | `agentOrgDefinitionStore` complete Org draft; Org subject components | AgentOrgDefinition GraphQL/Service + Org endpoint catalog + revisioned provider commit | No Category/coordinator/overlay; referenced Team identity is query-only; Org From includes mounted Agents, To also direct Teams; exact addresses/coordinator metadata inspectable. |
 | VIS-019 | Org handoff CRUD/reorder/atomic-save state | Org definition draft plus shared handoff view/editor primitives | Complete-candidate validation and one Org definition CAS | No per-handoff write. Preserve failed draft; stale endpoints remain visible; typed errors map adjacent to handoff/field; success updates canonical revision. |
 | VIS-014, VIS-015, VIS-020 | One Org configuration, collapsed member overrides, Team/Agent specificity, workspace-required blocked state, narrow configuration | `agentOrgRunConfigStore` sparse intent; shared configuration components | CollaborationLaunchConfigurationResolver + AgentOrgRunService | UI preview uses same pure merge vocabulary; server recomputes; no recipient selector; no overlay/overflow; every mounted execution validates before create. |
-| VIS-016-VIS-018 | Full scope active unfocused; exact direct-Agent focus; direct-Team coordinator focus | Mixed `RootExecutionViewStore` plus `CollaborationFocusController` | Discriminated Team-V2/Org-V1 stream snapshot plus family-specific execution index; message boundary validates target AgentRun in root | Org focus starts `null`; prompt only; Team row maps to stored coordinator; no implicit fallback; standalone Team remains coordinator-first. |
+| VIS-016-VIS-018 | Full scope active unfocused; exact direct-Agent focus; direct-Team coordinator focus and accepted live conversation/composer | `AgentOrgExecutionContext` + `CollaborationFocusController` + tagged `ActiveAgentWorkspaceTarget`; `AgentOrgWorkspaceView` is a thin router to shared `AgentWorkspaceSurface` / `TeamWorkspaceSurface` | Strict AgentOrg snapshot/event/command contract; root-neutral Agent presentation adapter; Org member projection/trace service; exact `AgentOrgRun.executeAgentCommand` | Org focus starts `null` and renders prompt only. Direct Agent and Team/coordinator focus structurally reuse `AgentEventMonitor`, accepted header/actions, composer, tool/activity/files/token surfaces. No raw event cards, `JSON.stringify`, custom composer, implicit fallback, standalone Team registration, or member-header Org stop. |
 | VIS-016-VIS-018 and UI spec shared runtime/history | Org root, direct sibling Agents/Teams, Team children, task lineage/rails/selection | Mixed execution-tree projection and history navigation state | Subject-tagged history/stream facade over strict Team V2 and Org V1 projectors | Configured depth is fixed; task lineage remains recursive under host; ancestor rails/L-branches/depth/selected marker are normative; root subject labels are truthful. |
+| VIS-PROMOTE-001-VIS-PROMOTE-004 | Normal-route activation supplement: standalone Team config/history and AgentOrg active hierarchy | Existing Team contexts/history plus Org context/history facade on clean routes | Unchanged Team run boundary plus strict Org run boundary | These four images prove normal-route/default-baseline availability and standalone Team preservation; they supplement, never replace, VIS-001-VIS-020. Shared-surface extraction must keep the standalone Team active/history experience exact. |
 | REQ-026, REQ-027, AC-021, AC-022, SCN-011; RV-012 unchanged | New-work catalog/authoring/launch eligibility and separate operational definition diagnostics | Subject catalog stores consume only `available` admission rows; history store remains snapshot-backed | `DefinitionAdmissionService` plus dependency availability resolver and diagnostics query | Do not render an incompatible definition as launchable or silently normalize it. Keep compatible RV-012 cards/routes unchanged; an unavailable external definition/dependent Org is absent from new-work lists and queryable with package root, identity/path, expected family/version, reason, and owner action. Existing history remains reachable. |
 
 Implementation must use the accepted AutoByteus shell and visual vocabulary.
@@ -1050,6 +1236,11 @@ orchestration.
   on `RootTeamRun`, Team identity/physical scope, Team task/message sidecars, and
   Team event/persistence callbacks. Adding an Org activator around those internals
   would leave either a synthetic Team owner or an unowned Org execution graph.
+  ADI-007 provides a second, distinct boundary witness: the Org wire contract
+  admitted `unknown`, the browser root store retained opaque events, and the Org
+  Vue component owned protocol formatting, conversation rendering, input, and
+  root termination. That bypassed the accepted Agent presentation owner and
+  created a parallel product runtime surface.
 - Design response: separate AgentOrg and AgentTeam definition/run/persistence
   owners; keep native Team V2 and Team runtime intact where they are already
   truthful; add Org V1 and Org runtime; add exact subject definition codecs and
@@ -1058,7 +1249,11 @@ orchestration.
   replace configured recursion with fixed-depth validation and projection. Keep
   current source forward-only and isolate the known old-to-current transform in
   one registered migration that follows the existing runner/convention rather
-  than adding a second recovery architecture.
+  than adding a second recovery architecture. For ADI-007, move raw Agent event
+  admission to one root-neutral presentation adapter, create a strict Org
+  execution context/stream, extract reusable Agent/Team workspace surfaces and
+  make the active-target/interaction facade the sole component command boundary;
+  remove the bespoke Org runtime dashboard.
 - Refactor rationale: the durable correction specifically reduces the prior
   refactor: there is no justification to rename or replace the valid Team V2
   family. IDI-001 demonstrates that the runtime extraction cannot be deferred;
@@ -1126,7 +1321,7 @@ orchestration.
    `Target Run-Tree And Launch Contracts` for the solution boundary.
 2. Read the behavior map, Product mapping, and supported-scenario table for the
    approved behavior witnesses.
-3. Read DS-000-DS-015, especially the AD-REV-005 internal runtime composition
+3. Read DS-000-DS-019, especially the AD-REV-005 internal runtime composition and AD-REV-006 accepted-workspace projection
    contract, and the ownership/dependency sections for implementation control
    flow and encapsulation.
 4. Read the persisted-data decision/migration plan before changing any Team V2
@@ -1368,6 +1563,11 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 | Cut over with valid target definitions, incompatible external definitions, and a dependent Org | Supported Operational Scenario | SCN-011; REQ-026, REQ-027; AC-021, AC-022 | Admit only exact targets, exclude incompatible external/dependent definitions from new work, expose diagnostics, preserve compatible readiness/runtime migration/history, and prove external zero writes. |
 | Scan both runtime families and infer root kind from whichever payload parser accepts | Technically Possible but Explicitly Rejected | SCN-010; REQ-025, AC-020 | Select family from authoritative tagged location and fail on family/payload/projection mismatch; no guessing or auto-retyping. |
 | Retry the retired definition parser after target admission fails | Technically Possible but Explicitly Rejected | SCN-011; REQ-026, REQ-027; AC-021 | Return one unavailable diagnostic; do not normalize `refType`, construct a legacy definition, mutate the source, or activate it. |
+| User sends a real prompt to a focused direct Org Agent and receives a normal streamed answer | Supported Normal Scenario | REQ-004/016/019/025; SCN-007/009; VIS-017; API-E2E-005 real full-stack witness | Strictly project the exact Org member event into AgentContext and render through the accepted Agent conversation/event-monitor/composer surface; raw envelopes and JSON fallback are forbidden. |
+| User focuses a direct Team or Team Agent in an active Org and communicates through the accepted Team member workspace | Supported Normal Scenario | REQ-003/004/011/018; SCN-006/009; VIS-018 | Adapt the exact mounted Team scope to `TeamWorkspaceContextView`; Team selection maps to coordinator; reuse Team surface without standalone Team registration or independent termination. |
+| Focused Org Agent is running and the user presses the accepted red composer stop control or responds to a tool approval | Supported Normal Scenario | Existing accepted Agent/Team interaction surface incorporated by RV-012; real Agent provider lifecycle | Org interaction port sends exact interrupt/approve/deny commands with acknowledgements to AgentOrgRun; no custom composer and no direct socket call from components. |
+| Operator terminates an active AgentOrg | Supported Normal Lifecycle Scenario | REQ-016 launch/history/stop lifecycle; Product mock boundary names actual stop; existing Team root-row interaction | Stop is a root-run action in Org history with pending/error parity; it is not displayed as a focused member header action and cannot stop a mounted Team independently. |
+| Org live stream contains an unknown, malformed, miscorrelated, or sequence-gapped event | Supported Explicit Contract Failure | REQ-025 fail-closed projection plus established Team stream recovery contract | Reject the candidate message, enter `reopen_required`, and checkpoint-hydrate a replacement context; never stringify or display the protocol envelope. |
 
 ## Data-Flow Spine Inventory
 
@@ -1387,9 +1587,13 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 | DS-010 | Bounded Local | BEH-007 | One Org-like migration item | Valid Org file plus atomic package rename, or preserved failed source | Registered migration definition | Deterministic one-family cutover with ordinary relaunch idempotence. |
 | DS-011 | Primary End-to-End | BEH-001, BEH-003, BEH-006 | Definition/handoff draft save | Complete candidate committed once or unchanged with precise errors | Subject DefinitionService / package transaction | Atomic owner-separated authoring. |
 | DS-012 | Bounded Local | BEH-002, BEH-006 | Root choices + sparse overrides | Complete immutable settings for all placements | `CollaborationLaunchConfigurationResolver` | Owns fixed-depth precedence. |
-| DS-013 | Primary End-to-End | BEH-004, BEH-006 | Exact post-launch row selection/send action | Exact Agent/coordinator focus or blocked no-focus state | Web root execution view/focus owner | Focus stays exact, local, and non-durable. |
+| DS-013 | Primary End-to-End | BEH-004, BEH-006 | Exact post-launch row selection/send action | Exact Agent/coordinator focus or blocked no-focus state | AgentOrgExecutionContext / focus controller | Focus stays exact, local, non-durable, and bound to accepted presentation. |
 | DS-014 | Bounded Local / Return | BEH-002, BEH-003, BEH-005, BEH-009 | Subject manager has a validated Team/Org package plan | Complete configured Agent/flat-Team scope prepared, durably bound, published, or wholly aborted/fail-stopped | Subject root aggregate over root-neutral execution capabilities | Resolves IDI-001 without a synthetic Team/public generic root. |
 | DS-015 | Primary Operational | BEH-002, BEH-005, BEH-008, BEH-009 | General-process construction/restore/shutdown | Subject managers/services registered in order or all rooted executions stopped/released safely | GeneralProcessRunSupervisor | Makes Org, Team and Agent lifecycle composition and reverse cleanup explicit. |
+| DS-016 | Return/Event | BEH-004, BEH-005, BEH-006 | Raw AgentRun/member input/status event inside AgentOrg | Typed Agent presentation mutates the exact AgentContext or stream enters recovery | Subject callback + `CollaborationAgentPresentationAdapter` + `AgentOrgStreamingService` | Makes the accepted conversation surface consume the same strict presentation semantics as Team. |
+| DS-017 | Primary End-to-End | BEH-004, BEH-006 | User focuses an Org member and sends/interacts | Accepted Agent/Team workspace renders and exact Org Agent command is acknowledged | `AgentOrgExecutionContext` + active-target/interaction facade | Reuses production surfaces without a custom dashboard or standalone mounted root. |
+| DS-018 | Primary Read/Hydration | BEH-005, BEH-006 | Open/restore/recover active AgentOrg workspace | Complete strict Org context with Agent conversations/statuses and nullable focus is atomically published | AgentOrg member projection/hydration service | Prevents empty/raw UI after restore and preserves trace browsing. |
+| DS-019 | Primary Lifecycle/UI | BEH-005, BEH-006 | Operator activates stop on AgentOrg history root row | Whole Org terminates, UI marks root inactive, focus/contexts clean up | AgentOrg run store/service + root history action | Keeps root lifecycle control out of member presentation and forbids mounted-Team stop. |
 
 ## Primary Execution Spine(s)
 
@@ -1403,12 +1607,16 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 - **DS-006T Team persistence:** `RootTeamRun mutation/restore -> TeamRunPersistenceCoordinator -> strict TeamRunExecutionTreeStore V2 -> Team history/index -> AgentTeamRunManager`.
 - **DS-006O Org persistence:** `AgentOrgRun mutation/restore -> AgentOrgRunPersistenceCoordinator -> strict AgentOrgRunExecutionTreeStore V1 -> Org history/index -> AgentOrgRunManager`.
 - **DS-007 migration:** `Server startup -> AppDataMigrationRunner.runPending -> registered source-classified definition/runtime migration -> atomic current file/package transform + validation -> runner status/summary/log -> strict subject catalog rebuild -> per-item availability + target admission/dependency diagnostics -> compatible server startup`.
-- **DS-008 mixed projection:** `Subject root event or history catalog row -> subject projector/store -> RootExecutionTreeProjection(root_subject_kind) -> mixed stream/history GraphQL -> RootExecutionViewStore -> workspace/history components`.
+- **DS-008 mixed projection:** `Subject root event or history catalog row -> subject projector/store -> RootExecutionTreeProjection(root_subject_kind) -> strict subject stream/history GraphQL -> Team/Org context -> thin RootExecutionViewStore route/history facade -> workspace/history components`.
 - **DS-011 definition/handoff save:** `Complete reversible draft -> update mutation(expectedRevision) -> subject service candidate validation -> per-definition package transaction -> refreshed canonical revision, or typed failure with draft retained`.
 - **DS-012 configuration:** `Org definition launch defaults + root draft + exact Team/Agent patches -> fixed-depth address index -> specificity merge -> runtime/model/workspace validation -> complete plan`.
-- **DS-013 focus:** `active Org focus=null -> explicit Agent/Team sidebar row -> mixed view branch's exact index -> AgentRun or Team coordinator -> recipient guard; absent/stale focus -> no send`.
+- **DS-013 focus:** `active Org context focus=null -> explicit Agent/Team sidebar row -> strict Org placement/index -> exact AgentRun or Team coordinator -> ActiveAgentWorkspaceTarget/shared surface -> recipient guard; absent/stale focus -> no send`.
 - **DS-014 root-neutral execution composition:** `subject manager strict plan -> subject aggregate/adapters -> configured-Agent and flat-Team factories -> AgentRun candidates + staged provider bindings -> subject persistence coordinator -> AgentRun publication -> subject registry + active-root directory`; failure before durability aborts, indeterminate post-durability state fail-stops the subject root.
 - **DS-015 process lifecycle:** `server/application scope construction -> AgentRun infrastructure -> explicit locations/directory/factories -> Team manager -> Org manager/general services -> open admission`; shutdown is `close admission -> stop Org roots -> stop Team roots -> stop AgentRuns -> reverse release`.
+- **DS-016 typed Org Agent event:** `AgentRun event -> root-neutral presentation admission -> AgentOrg subject envelope with exact member identity/sequence -> strict Org WebSocket parse -> AgentOrgExecutionViewState -> dispatchAgentStreamMessage -> AgentContext conversation/status/tool/activity mutation -> AgentEventMonitor`.
+- **DS-017 focused interaction:** `Org sidebar exact address -> CollaborationFocusController -> ActiveAgentWorkspaceTarget -> shared AgentWorkspaceSurface or TeamWorkspaceSurface -> accepted AgentUserInputForm/tool card -> AgentInteractionPort -> strict Org command -> AgentOrgRun exact Agent handle -> command acknowledgement/presentation event`.
+- **DS-018 Org hydration/recovery:** `active Org route/restore or sequence failure -> Org checkpoint + strict resume snapshot -> Org location-backed member projections/workspaces -> candidate AgentOrgExecutionContext -> expected-sequence stream handshake -> atomic context swap -> accepted workspace`.
+- **DS-019 Org termination presentation:** `active Org history root row -> shared root stop action -> AgentOrgRunStore pending guard -> terminateAgentOrgRun -> AgentOrgRun whole-scope shutdown -> lifecycle event/history refresh -> active context cleanup`; no focused-member or mounted-Team stop path exists.
 
 ## Spine Narratives (Mandatory)
 
@@ -1429,6 +1637,10 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 | DS-013 | Org view begins unfocused; only explicit row action maps through the selected union branch to an AgentRun/coordinator; send stays blocked otherwise. | RootExecutionView; FocusTarget; AgentRun | Web focus controller | responsive sidebar, hydration, history row semantics |
 | DS-014 | A subject root assembles strict state and adapters, prepares every required Agent/local Team without publication, commits its own package/bindings, then publishes/registers the complete scope or aborts/fail-stops it as one root. | Subject root; ConfiguredAgentExecutionHandle; Flat Team execution; subject persistence | RootTeamRun or AgentOrgRun | AgentRun candidates, memory locator, platform binding, active-root directory |
 | DS-015 | Process composition constructs dependencies from provider/runtime infrastructure upward and tears them down in reverse root-ownership order so embedded Org Teams never appear in the Team root registry. | GeneralProcessRunSupervisor; AgentRunManager; subject managers; active-root directory | GeneralProcessRunSupervisor | application-scope Team-only specialization, aggregate error collection |
+| DS-016 | Every internal Org Agent event crosses one validating presentation adapter, one subject envelope and one strict web reducer before the existing Agent handlers mutate conversation/status/tool state. | AgentRun; presentation adapter; Org publisher/projector; Org stream state; AgentContext | AgentOrg subject event boundary | payload schemas, sequence recovery, token usage adapter |
+| DS-017 | Exact Org focus creates one tagged active workspace target; shared Agent/Team surfaces and their composer/tool actions call only its subject interaction port. | Focus controller; ActiveAgentWorkspaceTarget; shared workspace surface; AgentInteractionPort; AgentOrgRun | AgentOrgExecutionContext / active-context facade | header action adapter, file/activity/token scopes, a11y |
+| DS-018 | Open/restore/recovery hydrates a complete candidate Org context from strict snapshot locations and member projections, verifies checkpoint/stream base and swaps it atomically. | Org resume query; location service; member projections; context factory; candidate stream | AgentOrgRunContextHydrationService | workspace activation, active trace pages, recent-event baseline |
+| DS-019 | Root history owns the visible Org stop action and pending/error state; server termination stops the entire aggregate and clears the active presentation target. | Org history row; AgentOrgRunStore; GraphQL service; AgentOrgRun; lifecycle reducer | AgentOrg lifecycle owner | toast/error, history refresh, focus cleanup |
 
 ## Spine Actors / Main-Line Nodes
 
@@ -1463,8 +1675,17 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
   root can enter restore/history/stream catalogs, without decoding old content.
 - `RootExecutionProjectionService`: thin explicit-kind read/projection facade for
   mixed history/stream/workspace; owns no lifecycle or persistence.
-- Web `RootExecutionView` / `CollaborationFocusController`: mixed read model and
-  exact nullable focus behavior.
+- `CollaborationAgentPresentationAdapter`: root-neutral validation and
+  normalization of raw Agent callbacks; subject serializers retain root/sequence
+  ownership.
+- Web `AgentOrgExecutionContext` / `CollaborationFocusController`: one strict
+  Org browser aggregate, per-Agent AgentContexts, mounted-Team presentation,
+  checkpoint recovery and exact nullable focus.
+- Web `ActiveAgentWorkspaceTarget`, `AgentWorkspaceSurface` and
+  `TeamWorkspaceSurface`: exact interaction/browse/action ports and accepted
+  rendering shared across standalone and Org wrappers; no subject lifecycle.
+- Web `RootExecutionViewStore`: thin mixed route/history facade over subject
+  contexts; no raw event list or duplicate Org focus/tree.
 - `AgentOrgFlatTeamFamiliesV1AppDataMigration`: exclusive server-owned retired
   definition and old organization-like Team Run conversion owner.
 
@@ -1498,7 +1719,12 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 | RootExecutionProjectionService | Dispatch by explicit `root_subject_kind`, family/payload agreement, tagged union projection | Root lifecycle, file scanning/guessing, topology authority |
 | Migration | Source-classified server-owned retired definition/Org-like Run V2 transformation, atomic current-file write/one direct rename, validation, cleanup, bounded dispositions | External writes, definition-package transaction, custom runner/journal/recovery, normal target admission, feature behavior, deep conversion |
 | Web subject authoring stores | Separate complete drafts, revision, endpoint choices/errors | Live run event state or other-subject edits |
-| Web RootExecutionView | Tagged Team/Org snapshot, selectors/event reduction, nullable Org focus | Durable focus, definition rules, family inference |
+| CollaborationAgentPresentationAdapter | Validate/normalize raw AgentRun/member-input/status/readiness into closed presentation or filter/reject | Subject root/sequence envelope, browser state, rendering |
+| AgentOrgExecutionContext / context store | Strict Org view/tasks/messages/status, exact AgentContexts, mounted-Team presentation, nullable focus, hydration/stream phase and atomic recovery | Durable topology mutation, standalone Team registration, raw event journal |
+| ActiveAgentWorkspaceTarget / AgentInteractionPort | Exact focused Agent context, subject command/browse/action adaptation | Implicit focus, root lifecycle, component socket access |
+| TeamWorkspaceContextView | Read-only Team member/status/task/message presentation in either standalone or Org host | Team root registration/persistence/restore/stop |
+| AgentWorkspaceSurface / TeamWorkspaceSurface | Accepted header/status/event monitor/composer rendering from explicit ports | Subject stores, GraphQL/WebSocket, protocol parsing, root lifecycle |
+| Web RootExecutionViewStore | Tagged route/history subject delegation | Second Org tree/focus/events, direct Agent command, durable focus, family inference |
 
 ## Thin Entry Facades / Public Wrappers
 
@@ -1512,10 +1738,12 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 | GraphQL Team run resolver | AgentTeamRunService | Native Team launch/restore/terminate | Org semantics |
 | Mixed history/query resolver | RootExecutionProjectionService | Explicit-kind union mapping | Guessing kind or mutating subject roots |
 | Team-only stream handler | RootTeamRun publisher/projector | Preserve compatible Team stream surface | Org dispatch/lifecycle |
-| Mixed/Org stream handler | RootExecutionProjectionService + subject publisher | Frame tagged snapshot/events | Task/message/lifecycle state |
+| Mixed/Org stream handler | Org projector/publisher + AgentOrgRun command boundary | Frame strict snapshots/events/acks and map exact commands | Raw payload pass-through, task/message state ownership, focus fallback |
 | Agent definition tools | Subject DefinitionService | Agent-callable serialization | Alternate validation/compatibility parser |
 | Web handoff primitives | Subject draft adapter | From/To/When presentation and reversible commands | Endpoint policy/persistence/cross-owner mutation |
-| Web Org config/focus components | Org config store / RootExecutionView | Approved interactions | Server precedence, durable focus, fallback |
+| Web Org config/focus components | Org config store / AgentOrgExecutionContext | Approved interactions and exact shared-surface selection | Server precedence, durable focus, raw protocol rendering, fallback |
+| Agent/Team workspace wrappers | ActiveAgentWorkspaceTarget + shared surfaces | Adapt standalone or Org subject context/actions without duplicate rendering | Subject-agnostic socket logic, root lifecycle, copied Org dashboard |
+| AgentOrg history root row | AgentOrgRunStore/Service | Present root stop pending/error in the root's navigation location | Focused-member/mounted-Team termination policy |
 
 ## Removal / Decommission Plan (Mandatory)
 
@@ -1541,6 +1769,10 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 | Team UI Team selector/nested counts/warnings | Team authoring cannot advertise Teams. | Agent-only Team UI + separate Org UI | Task lineage still renders Team task nodes. |
 | Org `entryAddress` selector/input/result and initial focus fallback | Activation and targeting are separate. | Org config command + full activation + nullable focus | No ignored compatibility field. |
 | Org focus repair to coordinator/first Agent | Org has no default recipient. | Clear invalid focus and block recipient action | Standalone Team coordinator-first remains. |
+| Raw AgentOrg `events[]`, opaque DTO event, `any` render casts and `JSON.stringify` event fallback | Protocol envelopes are not a conversation model and violate failure-closed projection. | Strict presentation admission/envelope + AgentOrgExecutionContext + AgentContext handlers | Reject/recover an unknown event; never retain a hidden diagnostic dashboard fallback. |
+| Bespoke AgentOrg focused header/event cards/composer and direct send-only store call | Duplicates accepted Agent/Team ownership and loses context-file/interrupt/tool behavior. | Store-neutral Agent/Team surfaces + exact ActiveAgentWorkspaceTarget/AgentInteractionPort | Org view retains only null prompt and exact surface selection. |
+| Member-header `Stop Org` and any mounted-Team terminate action | Focused member/Team is not the root lifecycle owner. | Active AgentOrg history root-row stop/pending/error | Standalone Team members-panel confirmation remains unchanged. |
+| Duplicate Org tree/focus/raw-event state in RootExecutionViewStore | Creates two browser authorities and prevents atomic hydration/recovery. | AgentOrgExecutionContext + thin mixed route/history facade | Mixed store may hold route/connection handles only. |
 | Nested configured-Team supported fixtures/docs | Assert rejected target model. | Org fixed-depth + negative Team nesting fixtures | Convert rather than keep as alternate mode. |
 | Stale generated `.js` test/source mirrors, where repository convention confirms they are artifacts | Can retain obsolete inputs. | Canonical TypeScript sources/build output | Verify convention before deletion. |
 
@@ -1548,8 +1780,7 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 
 - **DS-008 Team event:** `ConfiguredAgent/task/message neutral body -> private Team adapter -> RootTeamRun/Team
   projector -> compatible Team stream and/or tagged mixed adapter -> web reducer`.
-- **DS-008 Org event:** `ConfiguredAgent/task/message neutral body -> private Org adapter -> AgentOrgRun/Org
-  V1 projector -> tagged mixed stream -> web RootExecutionView`.
+- **DS-008/DS-016 Org event:** `ConfiguredAgent raw event -> CollaborationAgentPresentationAdapter -> private Org adapter/publisher -> strict AgentOrg presentation envelope -> AgentOrgStreamingService -> AgentOrgExecutionViewState -> dispatchAgentStreamMessage -> exact AgentContext`. Root task/message events update the strict Org view separately. No opaque event list reaches a component.
 - **DS-004 exact-Agent route:** `GlobalAgentRunMessageRouter -> sender/target MemberExecutionContext tagged-root comparison -> ActiveCollaborationRootDirectory -> owning root message boundary -> exact Agent reservation/sidecar/event result`.
 - **History result:** `TeamHistoryStore + AgentOrgHistoryStore ->
   RootRunHistoryCatalogService merge/check -> tagged GraphQL result -> web
@@ -1558,8 +1789,10 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
   -> GraphQL canonical result/revision -> subject store/form`.
 - **Migration result:** `bounded dispositions -> existing runner summary/log/status
   -> strict current catalog availability -> RESTART_TO_RETRY for failed startup-only work`.
-- **Focus result:** `explicit sidebar selection -> exact focus state -> composer;
-  clear/invalid focus -> prompt and blocked send without changing root lifecycle`.
+- **Focus result:** `explicit sidebar selection -> exact ActiveAgentWorkspaceTarget -> shared Agent/Team workspace and composer -> subject interaction port; clear/invalid focus -> prompt and blocked send without changing root lifecycle`.
+- **Org command result:** `accepted composer/tool/interrupt action -> AgentInteractionPort -> strict Org client command -> exact AgentOrgRun member handle -> command acknowledgement plus typed presentation event -> existing UI state handlers`.
+- **Org stream failure result:** `schema/correlation/sequence rejection -> reopen_required -> checkpointed complete context hydration -> candidate snapshot barrier -> atomic context swap`; raw payload is never displayed.
+- **Org termination result:** `history root stop -> pending guard -> whole-root terminate -> lifecycle/history/context cleanup`; no member or mounted-Team terminate path.
 
 ## Bounded Local / Internal Spines
 
@@ -1567,6 +1800,9 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 - **DS-005 root-neutral task command:** `bound member capability -> root-neutral FIFO engine -> subject TaskRootAdapter authorize/resolve exact host -> host prepares task execution -> subject tree+sidecar durability -> local publication -> subject event`; no tool resolves a root aggregate.
 - **DS-004 root-neutral accepted message:** `bound delivery callback -> owning root authorization/address resolution -> exact receiver reservation -> subject message-sidecar durability -> input commit -> subject event`; Team and Org use distinct envelopes/publishers.
 - **DS-015 root termination:** `close external admission -> drain command/persistence queues -> freeze root host/direct handles/mounted Teams/task descendants -> interrupt -> deepest-first task settlement -> reverse local teardown -> root directory/manager unregister -> publisher clear`.
+- **DS-016 presentation admission:** `CollaborationAgentExecutionEvent + exact tagged member identity -> validate/normalize raw AgentRun or member-input/status/readiness variant -> filter collaboration duplicate or return strict AgentPresentationMessage -> subject serializer`; rejection becomes one typed stream failure/recovery signal, never JSON text.
+- **DS-017 active workspace target:** `strict focus address -> exact Org placement/run lookup -> direct-Agent or mounted-Team-member target -> bind AgentContext + AgentInteractionPort + browse subject + optional TeamWorkspaceContextView -> render shared surface`; clearing/root stop atomically invalidates the target.
+- **DS-018 candidate recovery:** `read Org checkpoint -> hydrate strict tree/tasks/messages/member projections -> create candidate contexts -> read checkpoint again -> require no open work/same sequence -> connect expected snapshot -> swap -> dispose failed stream/context`.
 - **DS-009, `CollaborationHandoffCompiler`:** `validate Org-owned and Team-local
   candidates without mutation -> append Org-owned saved order -> visit direct Team placements in
   stable Org member order -> validate/rebase each Team-local list once -> append
@@ -1603,6 +1839,10 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 | History/index projectors | DS-006T, DS-006O, DS-008 | Subject persistence/web | Subject rows plus tagged mixed merge | Derived only; cannot reinterpret definitions. |
 | Application-owned Team validation | DS-001, DS-002 | Team owner | Enforce Agent-only Team and standalone launch | Closes application recursion loophole. |
 | LLM instruction renderer | DS-004, DS-005 | Member context | Explain actual root/address/tool semantics | Keeps prose out of resolver. |
+| Agent presentation schemas/adapter | DS-008, DS-016-DS-018 | Team and Org subject publishers plus web stream reducers | Strict root-neutral presentation details, raw AgentRun admission, subject serialization | Prevents protocol envelopes/unknown payloads/JSON formatting from entering Vue components. |
+| AgentOrg context hydration/recovery | DS-016-DS-018 | Org route/store and accepted event monitor | Strict resume/member projections, workspace resolution, checkpointed candidate context swap | Prevents tree, AgentContext and raw event arrays becoming competing browser authorities. |
+| Active workspace target/interaction facade | DS-013, DS-017-DS-019 | Shared Agent/Team center and right-tool components | Exact AgentContext, optional Team presentation view, browse identity, command port | Prevents reusable components from reading both subject stores/sockets or registering mounted Teams as roots. |
+| Root termination action | DS-019 | Org/Team history presentation | Root-row stop placement, pending guard, error presentation | Keeps lifecycle out of focused member header and mounted-Team scope. |
 | UI accessibility/presentation | DS-001-DS-003, DS-008, DS-011-DS-013 | Web owners | RV-012 layout, focus, narrow, keyboard, validation | Prevents mock/prototype orchestration entering domain. |
 
 ## Ownership Boundaries
@@ -1641,6 +1881,23 @@ return a concrete aggregate. `AgentRunManager` remains the exact AgentRun
 registry. This two-index composition is intentional, not competing lifecycle
 authority.
 
+`AgentOrgExecutionContext` is the sole browser owner of one active Org
+snapshot, its per-Agent `AgentContext` map, mounted-Team presentation adapters,
+stream sequence/recovery and nullable focus. `rootExecutionViewStore` may expose
+mixed route/history selectors over that context but cannot retain another Org
+tree or opaque events. `useActiveContextStore` is the authoritative component
+facade for the exact active presentation target and interaction port. Center and
+right-side components cannot call subject stores, stream services or sockets
+beside that facade. `AgentOrgWorkspaceView` is a thin focus router, not a
+conversation/event/root-lifecycle owner.
+
+The server Agent presentation boundary sits between raw Agent execution and
+subject publication. The root-neutral adapter owns raw-event validation and
+normalization; Team/Org serializers own outer root/sequence/identity fields.
+Neither Vue nor a browser store accepts raw AgentRun domain objects. The Org
+member projection service reads through exact Org locations; it never calls the
+Team member service for a mounted Team.
+
 The Team V2 store and Org V1 store are both current. A mixed projection facade
 requires explicit kind and routes to the corresponding subject query/manager or
 history store; it cannot scan paths, inspect coordinator presence, or try both
@@ -1678,7 +1935,12 @@ handoffs.
 | Team V2 store / Org V1 store | exact schema/path/atomic writer | Respective persistence coordinator, migration target validator | Runtime reads JSON or wrong family | Add strict subject method. |
 | RootRunPackageReadinessIndex | family/path/target-manifest readiness and compound identity availability | subject run services, history/stream catalog rebuild | Decode legacy content, transform packages, or invoke both stores | Add `requireAvailable(kind,id)` and current-only rebuild methods. |
 | RootExecutionProjectionService | explicit-kind dispatch and tagged DTO | mixed history/stream/GraphQL | Infer kind or mutate root | Add explicit compound identity/result branch. |
-| RootExecutionView (web) | union selectors/reducer/focus mapping | workspace/history components | Components parse raw payload/use wrong subject store | Add root-kind-aware selectors. |
+| CollaborationAgentPresentationAdapter | Validate raw AgentRun/member input/status/readiness and produce strict presentation message or rejection | Team/Org subject callback adapters | Subject/projector/component parses raw AgentRun payload independently | Extend one strict presentation type/adapter and subject serializer. |
+| AgentOrgExecutionContext / AgentOrgStreamingService | Strict Org topology/tasks/messages/statuses, AgentContext map, sequence/recovery, nullable focus | Org route/history/focus and active-target resolver | Root store also retains tree/raw events; component owns socket/parser | Add context-owned selectors/commands and checkpointed candidate replacement. |
+| ActiveAgentWorkspaceTarget / useActiveContextStore | Exact active AgentContext, interaction port, browse subject and optional Team presentation view | Agent/Team shared center and right-tool components | Component imports Org/Team run stores, contexts and stream directly | Strengthen subject adapters behind the facade. |
+| Shared AgentWorkspaceSurface / TeamWorkspaceSurface | Accepted header/event monitor/composer presentation over explicit props/ports | Standalone wrappers and AgentOrg focus adapter | Surface reads global subject selection/store or renders raw payload | Add explicit presentation/action/interaction inputs. |
+| AgentOrg history root stop action | Whole-root termination UI command/pending/error | Active Org root row | Focused member header or mounted Team action terminates root | Reuse history root action pattern and AgentOrgRunStore. |
+| RootExecutionView facade (web) | mixed route/history selectors over subject context | workspace/history components | Own a second Org tree/raw event log or parse payload | Delegate to AgentOrgExecutionContext; no opaque events. |
 
 ## Dependency Rules
 
@@ -1726,6 +1988,12 @@ handoffs.
 16. Subject managers alone register compound roots in `ActiveCollaborationRootDirectory`. The directory may expose only a narrow active message/query boundary; global routing cannot use it to create, restore, stop, or cross-address roots.
 17. Root-neutral physical location dispatch requires the tagged root kind. Relative TeamRun ancestry is opaque physical lineage and cannot be used to infer configured topology.
 18. General-process composition constructs AgentRun infrastructure -> locations/directory/factories -> Team manager -> Org manager -> services, and tears down Org -> Team -> Agent before reverse release. Application scopes remain Team-only in public capability.
+19. Raw `AgentRunEvent`/`CollaborationAgentExecutionEvent` may flow only into `CollaborationAgentPresentationAdapter`; subject publishers and transport projectors consume the validated presentation result. Web contracts/components never import raw server domain events or accept `unknown` event payloads.
+20. `@autobyteus/agent-presentation-contracts` is lower than both Team and collaboration stream packages. It owns message details only and cannot import root/team/org snapshots. Team and Org packages add their own root, sequence, member identity and token-root correlation without changing Team wire.
+21. `AgentOrgExecutionContext` owns Org browser state. `rootExecutionViewStore`, history and workspace depend on its public selectors; none keeps a parallel Org tree/event array. The context depends on Org hydration/stream services, which depend on strict contracts and existing Agent message handlers.
+22. Shared Agent/Team workspace surfaces depend on explicit presentation/action inputs and the active-context facade. Standalone wrappers and Org focus adapters may build those inputs; the surfaces cannot import selection, subject contexts, run stores or sockets.
+23. Org member projection/trace/token queries require `{orgRunId, memberAddress, agentRunId}` and strict Org location correlation. A mounted Team never calls Team-root history/token APIs with its local TeamRun ID.
+24. Root termination is available only through subject root services/stores. Mounted Team presentation exposes no terminate capability; focused member headers expose none.
 
 Forbidden shortcuts:
 
@@ -1746,6 +2014,9 @@ Forbidden shortcuts:
 - No `AgentOrgExecutionActivator` catch-all, fake `RootTeamRun`, Team-family
   sidecar/package for an Org, independent mounted-Team root registration, or
   direct Org Agent launched as a standalone AgentRun outside the Org aggregate.
+- No `z.unknown`/`any` AgentOrg live event, opaque browser event list, `JSON.stringify`/generic object card, custom Org conversation/composer, or component-owned protocol formatting.
+- No direct Org stream/store/socket call from `AgentOrgWorkspaceView`, input components, tool cards or right panels; all actions use the exact active-target interaction port.
+- No mounted Team inserted into `AgentTeamContextsStore`, no Team-root trace/token API called for an Org member, no independent mounted-Team stop, and no `Stop Org` in a focused member header.
 
 ## Interface Boundary Mapping
 
@@ -1781,6 +2052,14 @@ Forbidden shortcuts:
 | GraphQL Team surfaces | Team external | Catalog/author/detail/standalone launch | Team-specific inputs/results | Agent-only members; Team-only compatibility where retained. |
 | Mixed stream handshake | Mixed root view | Tagged snapshot/events | `{root_subject_kind, root_run_id}` | Team-only stream may remain compatible. |
 | Existing application Team ref | Application launch | Continue flat Team resource launch | `{refType:'agent_team', definitionId}` | No application-owned Org surface this round. |
+| `CollaborationAgentPresentationAdapter.adapt(identity,event)` | Agent presentation | Validate/normalize one raw collaboration Agent event | tagged member identity + internal event | Returns publish/filter/reject; subject serializer adds root/sequence. |
+| `AgentOrgStreamingService.connect/replaceCandidate` | Org browser synchronization | Strict snapshot barrier, typed event reduction, command acks, recovery | exact Org run ID + AgentOrgExecutionContext | No raw event callback or direct component access. |
+| `AgentOrgMemberRunViewProjectionService.getProjection/getActiveTracePage` | Org member history | Hydrate accepted conversation/activity/trace from Org memory | `{orgRunId,memberAddress,agentRunId}` | Strict Org location/snapshot; no Team member service. |
+| `ActiveAgentWorkspaceTarget` / `AgentInteractionPort` | Web active interaction | Expose exact context, browse and send/interrupt/tool decision | tagged target branch | Components do not infer subject or call stores/sockets. |
+| `TeamWorkspaceContextView` | Team presentation | Read focused member/roster/messages/tasks/coordinator for accepted Team surface | standalone Team root or exact mounted Team adapter | Read-only presentation; Org variant cannot terminate/register/persist Team. |
+| GraphQL `getAgentOrgMemberRunProjection/getAgentOrgMemberEventMonitorActiveTracePage/getAgentOrgExecutionCheckpoint` | Org workspace hydration/recovery | Subject-specific member projection and stable recovery barrier | Org run + exact address/AgentRun | Fails family/address/run mismatch. |
+| Org stream client command union | Org interaction | SEND_MESSAGE, INTERRUPT_GENERATION, APPROVE_TOOL, DENY_TOOL plus typed ack | Org root + exact target AgentRun/command IDs | Dispatches only through AgentOrgRun.executeAgentCommand. |
+| `AgentOrgRunStore.terminate(orgRunId)` + history action | Org lifecycle UI | Pending-guarded whole-root termination and result | exact Org run ID | No focus/member/mounted Team input. |
 | Web `CollaborationFocusController.select(addressOrNull)` | Local focus | Exact selection/send readiness | address in current tagged snapshot | Team row -> coordinator; null never persists. |
 
 ## Interface Boundary Check
@@ -1802,6 +2081,11 @@ Forbidden shortcuts:
 | Mixed projection | Yes | Yes | Medium | Compound kind+ID; verify family/payload/branch. |
 | Recipient resolver | Yes | Yes | Low | Canonical parser/index; reject root/depth/unknown. |
 | Application Team launch | Yes | Yes | Medium | Preserve explicit Team ref and Team service. |
+| Agent presentation contract/adapter | Yes | Yes | High | Root-neutral strict message details; subject envelope supplies exact root/member/sequence; reject unknown/raw payload. |
+| AgentOrg browser context/stream | Yes | Yes | High | One strict context owner, complete candidate hydration, sequence barrier and recovery; no parallel root store. |
+| Active workspace target/interaction port | Yes | Yes | High | Tagged target branch carries exact context/commands/browse/optional Team view; shared surfaces cannot bypass. |
+| Org member projection/trace | Yes | Yes | Medium | Compound Org/member/run identity and strict location; no Team-root alias. |
+| Org root stop | Yes | Yes | Medium | Exact Org root only, pending/error guard; no member/mounted Team action. |
 | Web focus/send | Yes | Yes | Medium | Nullable for Org; exact mapping; never fallback. |
 
 ## Main Domain Subject Naming Check
@@ -1815,6 +2099,9 @@ Forbidden shortcuts:
 | Team durable tree | `TeamRunExecutionTreeFileV2` / same | Yes | Low | Preserve exact contract. |
 | Org durable tree | none / `AgentOrgRunExecutionTreeFileV1` | Yes | Low | Distinct exact contract. |
 | Mixed read DTO | Team-only view / `RootExecutionTreeProjection` | Yes | Medium | Always require `root_subject_kind`. |
+| Agent presentation message | Team-named payloads/raw Org event / `AgentPresentationMessage` | Yes | Medium | Root-neutral details only; Team/Org outer contracts remain subject-specific. |
+| Browser Org runtime state | raw `RootExecutionViewState` / `AgentOrgExecutionContext` | Yes | Low | Own exact topology, AgentContexts, stream/recovery and nullable focus. |
+| Mounted Team UI adapter | none / `TeamWorkspaceContextView` | Yes | Medium | Presentation view only; never call it a Team root/context authority. |
 | Logical address | `AgentTeamAddress` / `CollaborationAddress` | Yes | Low | String format unchanged; semantics span Org/Team. |
 | Org source scope | legacy `team_local` / `agent_org_owned` | Yes | Medium | Do not parse historical opaque ID prefix. |
 
@@ -1837,7 +2124,11 @@ Forbidden shortcuts:
 | Org durability/history | current atomic store/index patterns | Create subject store/index | Separate family/path/root invariant. |
 | Mixed projection | Team history/stream/projectors | Add thin explicit-kind facade; retain Team-only paths | Shared UI needs one union, but lifecycle/storage stay subject-owned. |
 | Migration | app-data migrations | Extend | Reuse the existing runner/record/log/restart policy; isolate legacy codecs and add no lazy compatibility or bespoke recovery. |
-| Web workspace | Team execution view components/state | Extract mixed read view around two union branches | Shared interactions should not duplicate; focus policy remains root-kind-specific. |
+| Agent event presentation | `TeamAgentEventAdapter`, Team projector, `dispatchAgentStreamMessage`, AgentContext handlers | Extract root-neutral presentation adapter/detail contract; compose current Team and strict Org envelopes | Mature Team validation/presentation is reusable; raw Org domain events and `unknown` transport are not. |
+| Agent conversation workspace | `AgentWorkspaceView`, `TeamWorkspaceView`, `AgentTeamEventMonitor`, `AgentEventMonitor`, `AgentUserInputForm` | Extract prop/port-driven Agent/Team surfaces and keep standalone wrappers | Product explicitly requires reuse; global store reads must move behind active-target facade rather than duplicate markup. |
+| Active interaction/right tools | `useActiveContextStore`, `RightSideTabs`, activity/token/file/artifact components | Generalize to exact tagged active target plus subject interaction/query adapters | Preserve accepted UI and commands without treating mounted Team/Org Agent as standalone. |
+| Org member history/trace | Team member projection/hydration/active trace pattern | Add Org-specific location-backed projection and candidate recovery; reuse presentation builders | Persistence location/root semantics differ; visual conversation shape is shared. |
+| Web workspace | Team execution view components/state | Refactor Org branch into AgentOrgExecutionContext plus shared presentation surfaces | One visual workspace; exact subject adapters and nullable Org focus. |
 | Org authoring | Team form primitives | New subject-specific UI | Membership/coordinator semantics differ. |
 | Launch precedence | current Team config hierarchy | Extract/extend | Existing root/placement logic; server authority is new. |
 | Definition atomic save | parent mutations + atomic file writer | Extend with a normal-authoring package transaction | Multiple package files need revisioned all-or-complete publication; data migration remains separate. |
@@ -1857,10 +2148,13 @@ Forbidden shortcuts:
 | Run History/Persistence | strict subject schemas/stores/indexes and tagged mixed catalog | DS-006T, DS-006O, DS-008 | Extend | Two authorities; mixed derived facade. |
 | App Data Migration | old config/Org-like V2 conversion, current-file writes, one direct family rename, cleanup, bounded dispositions | DS-007, DS-010 | Extend existing runner | Flat Team path is verification-only; no custom journal/staging/recovery owner. |
 | GraphQL/Application | subject definition/run plus mixed read contracts | DS-001-DS-003, DS-008 | Extend | No bypass; Team application ref preserved. |
-| Stream Contracts | compatible Team view + new Org/tagged mixed view | DS-008 | Extend | No forced Team wire rewrite. |
+| Agent Presentation Contracts | Root-neutral strict Agent conversation/status/tool/activity/input/error/token detail schemas | DS-016-DS-018 | Create by extraction | Lower than Team/Org envelopes; no root snapshot or runtime logic. |
+| Stream Contracts | compatible Team view + strict Org/tagged mixed view and command acks | DS-008, DS-016-DS-018 | Extend | Compose presentation details; no forced Team wire rewrite and no `unknown` Org live events. |
 | Web Definition Authoring | separate Team/Org surfaces + shared handoff primitives | DS-001, DS-011 | Create/Refactor | RV-012 normative. |
 | Web Launch Configuration | separate drafts + shared preview | DS-002, DS-003, DS-012 | Create/Refactor | Org no focus; Team coordinator-led. |
-| Web Root Workspace | tagged live/history projection + focus | DS-008, DS-013 | Refactor | Branch-specific selectors, one visual workspace. |
+| Web AgentOrg Execution Context | strict Org topology/tasks/messages/status, AgentContexts, stream/hydration/recovery, mounted-Team presentation adapters | DS-008, DS-013, DS-016-DS-018 | Create/Refactor | One active Org browser authority; no raw event list or standalone mounted root. |
+| Web Shared Agent/Team Workspace | accepted member header/event monitor/composer and active target/interaction/right tools | DS-013, DS-016-DS-019 | Refactor existing | Standalone and Org wrappers reuse structurally identical surfaces. |
+| Web Root Workspace | mixed history/route projection + exact focus/root lifecycle actions | DS-008, DS-013, DS-019 | Refactor | Delegates active Org state; one visual workspace; root stop stays in history. |
 
 ## Draft File Responsibility Mapping
 
@@ -1905,13 +2199,25 @@ Forbidden shortcuts:
 | `app-data-migrations/.../legacy-team-definition-config.ts` | Migration | Retired unversioned server-owned decoder | Cannot be imported by normal admission. |
 | `app-data-migrations/.../legacy-organization-like-team-run-v2.ts` | Migration | Strict released Team V2 organization-like classifier/decoder after current flat-V2 validation fails | Cannot be imported by current Team/Org stores or history. |
 | `app-data-migrations/.../team-v2-to-agent-org-v1-transformer.ts` | Migration | Org-like Run V2 mapping | Old runtime knowledge isolated. |
+| `autobyteus-agent-presentation-contracts/src/agent-presentation-message-dtos.ts` | Agent Presentation | Strict root-neutral conversation/status/tool/activity/input/error detail union | Shared by subject serializers; owns no root identity or sequence. |
+| `autobyteus-agent-presentation-contracts/src/token-usage-presentation-dto.ts` | Agent Presentation | Tight root-neutral token-usage detail | Team/Org serializers add their truthful outer identity fields. |
 | `autobyteus-team-stream-contracts/...` | Team Stream | Existing Team-only contract | Keep compatible where still used. |
-| new mixed/Org stream DTO file/package | Stream | `root_subject_kind` union | Adds Org without retyping Team-only callers. |
+| `autobyteus-collaboration-stream-contracts/src/root-execution-view-dtos.ts` | Mixed/Org Stream | Strict Org snapshot/event/lifecycle and client-command unions plus tagged mixed root dispatch | Adds Org without retyping Team-only callers; no `z.unknown()` in the Org live/view branch. |
+| `agent-collaboration/execution/events/collaboration-agent-presentation-adapter.ts` | Agent Presentation | Validate/normalize raw configured-Agent callbacks once for Team and Org | Returns publish/filter/reject; does not serialize a subject envelope. |
+| `services/agent-streaming/agent-org-execution-view-projector.ts` and `agent-org-stream-handler.ts` | Org Stream | Strict Org envelope/status/snapshot projection and send/interrupt/tool command handling | Use AgentOrgRun/query boundaries only; never expose raw runtime events. |
+| `run-history/services/agent-org-member-run-view-projection-service.ts` | Org Member Read | Conversation/activity projection for one exact Org member execution | Uses explicit Org location and compound identity, never a Team root lookup. |
 | `autobyteus-web/stores/agentOrgDefinitionStore.ts` | Web Authoring | Org catalog/draft/revision/errors | Separate subject state. |
 | `autobyteus-web/components/collaboration/handoffs/*` | Web Authoring | From/To/When cards/editor/reorder/errors | Shared presentation; owner supplies policy. |
 | `autobyteus-web/stores/agentOrgRunConfigStore.ts` | Web Config | Org root/Team/Agent sparse overrides | Org-specific intent. |
-| `autobyteus-web/stores/rootExecutionViewStore.ts` | Web Workspace | Tagged open/connect/history state | One mixed read owner, not persistence authority. |
-| `autobyteus-web/services/rootExecution/rootExecutionViewState.ts` | Web Workspace | union selectors/reducer/focus mapping | Branch-aware exact selection. |
+| `autobyteus-web/services/agentOrgExecution/agentOrgExecutionContext.ts` | Web Org Runtime | One Org topology/task/message/status, AgentContext, mounted-Team view and nullable-focus aggregate | Sole active Org browser authority. |
+| `autobyteus-web/services/agentOrgExecution/agentOrgExecutionContextHydrationService.ts` | Web Org Runtime | Strict candidate hydration, member projection and checkpoint verification | Publishes only a complete correlated context. |
+| `autobyteus-web/services/agentOrgExecution/AgentOrgStreamingService.ts` | Web Org Runtime | CONNECTED/snapshot/sequence state machine and typed message dispatch | No raw event retention or component callbacks. |
+| `autobyteus-web/stores/agentOrgContextsStore.ts` | Web Org Runtime | Active/historical Org context registration and exact focus | Does not register mounted Teams as standalone contexts. |
+| `autobyteus-web/stores/rootExecutionViewStore.ts` | Web Workspace | Tagged route/history/transport facade | Delegates Org context; no second tree, focus, or event array. |
+| `autobyteus-web/stores/activeContextStore.ts` | Web Interaction | Resolve exact active target and delegate send/interrupt/tool decisions | No direct selection-kind branching inside shared composer components. |
+| `autobyteus-web/components/workspace/agent/AgentWorkspaceSurface.vue` | Web Shared Workspace | Accepted Agent header, status, event monitor and composer from an explicit target/ports | No subject store imports. |
+| `autobyteus-web/components/workspace/team/TeamWorkspaceSurface.vue` | Web Shared Workspace | Accepted focused Team-member header, Team event monitor and composer from `TeamWorkspaceContextView` | No standalone Team registry assumption. |
+| `autobyteus-web/components/workspace/org/AgentOrgWorkspaceView.vue` | Web Org Workspace | Null-focus prompt or exact Agent/Team surface selection | No protocol formatting, composer, raw-event list or lifecycle button. |
 
 ## Reusable Owned Structures Check
 
@@ -1930,6 +2236,10 @@ Forbidden shortcuts:
 | Task delegation record/FIFO engine | Collaboration execution task owner | Both roots share record lifecycle/queue while adapters own exact host/tree commits | Root aggregate, subject tree union, or configured membership API |
 | Handoff UI model | web collaboration components | Display/edit commands repeat | Endpoint/persistence owner |
 | Mixed projection DTO | stream/history contract | Server/web share explicit union | Client-inferred kind |
+| Agent presentation message | `@autobyteus/agent-presentation-contracts` | Team and Org deliver the same accepted Agent conversation/status/tool/activity semantics | Root envelope, sequence, subject-specific token root field, or runtime event union |
+| `AgentOrgExecutionContext` | web AgentOrg execution | Org topology plus all derived live Agent/Team presentation must change as one candidate | Raw-event journal, durable focus, or second root authority |
+| `ActiveAgentWorkspaceTarget` / `AgentInteractionPort` | web active-context boundary | Existing composer/tool/header/right surfaces need one exact focused Agent and command owner | Generic root selector, socket access, or implicit focus fallback |
+| `TeamWorkspaceContextView` | web Team workspace presentation | Standalone and Org-mounted Teams share one accepted read-only view | Team lifecycle/store/registry interface or writable mounted root |
 | Definition package transaction | definition provider utility | Org/Team normal multi-file save needs the same atomic visibility and revision control | Domain validator, global lock, or migration mechanism |
 
 ## Shared Structure / Data Model Tightness Check
@@ -1953,6 +2263,10 @@ Forbidden shortcuts:
 | `PlacementLaunchOverride` | Yes | Medium | Exact address+subject kind; no focus. |
 | Internal root/host identity vs approved old task field spellings | Yes per boundary | Medium | Map once in versioned codec; do not rename persisted shared records. |
 | Migrated Org-owned definition ID | Yes, opaque | Medium | Source index owns mapping; never parse prefix. |
+| `AgentPresentationMessage` | Yes | Medium | One strict event-type/detail pair; root, member, run and sequence identity live only in subject envelopes. |
+| `AgentOrgExecutionContext` | Yes | Medium | One correlated Org view plus per-Agent presentation contexts; remove parallel root event arrays and duplicate focus. |
+| `ActiveAgentWorkspaceTarget` | Yes | Medium | Four exact tagged branches with mandatory subject command/browse ports; no optional identifiers or inferred selection. |
+| `TeamWorkspaceContextView` | Yes | Medium | Read-only presentation and scoped task/message access only; root lifecycle/persistence is deliberately absent. |
 
 ## Final File Responsibility Mapping
 
@@ -2025,17 +2339,38 @@ Forbidden shortcuts:
 | `.../api/graphql/types/definition-admission.ts` | GraphQL Operations | Unavailable definition/dependency diagnostics query | Admission service only; does not make invalid definitions launchable. |
 | `.../api/graphql/types/agent-org-definition.ts` | GraphQL | Org definitions/mutations | Org service only. |
 | `.../api/graphql/types/agent-org-run.ts` | GraphQL | Org config launch/lifecycle | Org run service only. |
+| `.../api/graphql/types/agent-org-member-run-view.ts` and existing active-trace type | GraphQL Org Read | Exact Org member conversation/activity/checkpoint and `agentOrgMember` trace browse | Require `{orgRunId,memberAddress,agentRunId}` and the Org projection service; never call Team member projection with an embedded Team ID. |
 | existing Team GraphQL definition/run files | GraphQL | Flat Team authoring/native launch | Remove nested input; preserve compatible Team results where possible. |
-| existing Team stream contract/projector files | Team Stream | Team-only V2-compatible snapshot/events | No Org payload. |
-| new `autobyteus-collaboration-stream-contracts/src/root-execution-view-dtos.ts` with package name `@autobyteus/collaboration-stream-contracts` | Mixed Stream | Tagged Team-V2/Org-V1 union | Must not replace Team-only contract unless all consumers intentionally migrate. |
+| `autobyteus-agent-presentation-contracts/src/agent-presentation-message-dtos.ts` | Agent Presentation Contract | Strict root-neutral Agent conversation/status/tool/activity/input/error schemas and parser | No root/member/run identity, sequence, subject snapshot or client command. |
+| `.../token-usage-presentation-dto.ts` | Agent Presentation Contract | Root-neutral token detail shared by subject serializers | No Team-named root field. |
+| `.../agent-collaboration/execution/events/collaboration-agent-presentation-adapter.ts` | Server Agent Presentation | Raw AgentRun/member-input/status/readiness admission into publish/filter/reject | No Team/Org envelope, broadcaster or persistence. |
+| `.../agent-team-execution/services/team-flat-execution-callbacks.ts` and existing Team stream projector | Team Presentation Adapter | Use the shared admission result, then serialize the unchanged Team message/envelope | Team-only wire remains a compatibility golden; no Org branch. |
+| existing Team stream contract/projector files | Team Stream | Team-only V2-compatible snapshot/events and current outer field spellings | Compose shared details internally; no Org payload or forced client migration. |
+| `autobyteus-collaboration-stream-contracts/src/root-execution-view-dtos.ts` with package name `@autobyteus/collaboration-stream-contracts` | Mixed/Org Stream | Exact Org snapshot/event/lifecycle, send/interrupt/approve/deny commands and command acknowledgements; tagged Team/Org dispatch | No `z.unknown()`/`any` inside the Org snapshot/live branch; must not replace Team-only contract unless all consumers intentionally migrate. |
+| `.../services/agent-streaming/agent-org-execution-view-projector.ts` | Org Stream Projection | Project correlated Org snapshot and strict Agent/task/communication event branches with one root sequence | Cannot pass through `AgentOrgRunEvent` or raw runtime payload. |
+| `.../services/agent-streaming/agent-org-stream-handler.ts` | Org Stream Commands | Parse strict Org commands, validate exact target/root, invoke `AgentOrgRun.executeAgentCommand`, publish typed ack/error | No one-off send-only path and no member fallback. |
+| `.../run-history/services/agent-org-member-run-view-projection-service.ts` | Org Member Projection | Hydration projection for exact Org direct/mounted/task Agent from Org location-backed traces | Explicit compound identity; no Team store/location/definition lookup. |
 | `autobyteus-web/stores/agentOrgDefinitionStore.ts` | Web Authoring | Org catalog/draft/revision/errors | Org GraphQL only. |
 | `autobyteus-web/stores/agentTeamDefinitionStore.ts` | Web Authoring | Flat Team draft/revision/errors | Team GraphQL only. |
 | `autobyteus-web/components/collaboration/handoffs/HandoffList.vue` | Web UI | Ordered From/To/When display/read-only owner label | Presentation only. |
 | `.../HandoffEditor.vue` | Web UI | Inline endpoint/condition CRUD/reorder/cancel/errors | Subject commands/catalog only. |
 | `autobyteus-web/stores/agentOrgRunConfigStore.ts` | Web Config | Org root + Team/Agent override intent | No focus. |
 | existing Team run config store (renamed only if repository convention demands) | Web Config | Simplified Team root/Agent overrides | Coordinator behavior retained. |
-| `autobyteus-web/stores/rootExecutionViewStore.ts` | Web Workspace | Tagged active/history view and transport lifecycle | Projection, not root authority. |
-| `autobyteus-web/services/rootExecution/rootExecutionViewState.ts` | Web Workspace | Union reducer/selectors/exact focus mapping | Clear invalid Org focus; never choose fallback. |
+| `autobyteus-web/services/agentOrgExecution/agentOrgExecutionContext.ts` | Web Org Runtime | Correlated Org view/tasks/messages/status, per-Agent `AgentContext`s, mounted-Team views, nullable focus and stream phase | Sole active Org authority; no raw event array or durable focus. |
+| `.../agentOrgExecutionContextHydrationService.ts` | Web Org Runtime | Build candidate context from strict resume/member projections/workspace resolution and checkpoint barriers | Last committed context remains visible until atomic swap. |
+| `.../AgentOrgStreamingService.ts` | Web Org Runtime | Strict handshake/snapshot/sequence recovery and exact `dispatchAgentStreamMessage` routing | Components never receive protocol envelopes; invalid messages enter `reopen_required`. |
+| `autobyteus-web/stores/agentOrgContextsStore.ts` | Web Org Runtime | Context lifecycle, exact focus and lookup by Org run | No registration in `agentTeamContextsStore`. |
+| `autobyteus-web/stores/rootExecutionViewStore.ts` | Web Workspace | Tagged route/history connection facade and subject delegation | Remove Org `events[]`, duplicate Org tree/focus and direct `sendAgentOrgMessage`. |
+| `autobyteus-web/stores/activeContextStore.ts` plus `types/workspace/activeAgentWorkspaceTarget.ts` | Web Interaction | Resolve four exact target branches and expose context plus `AgentInteractionPort` | Shared composer/tool components never switch on root stores/sockets. |
+| `autobyteus-web/services/eventMonitor/eventMonitorActiveTraceBrowse.ts` and page service | Web Trace Browse | Add strict `agentOrgMember` browse subject and Org projection query | No fake Team run ID or generic bare AgentRun lookup. |
+| `autobyteus-web/components/workspace/agent/AgentWorkspaceSurface.vue` | Web Shared Agent Surface | Accepted Agent header/status/event monitor/composer from explicit target/action props | No selection or subject store import. |
+| existing `.../agent/AgentWorkspaceView.vue` | Web Standalone Agent Wrapper | Adapt standalone Agent stores/actions into `AgentWorkspaceSurface` | No duplicated workspace markup. |
+| `autobyteus-web/components/workspace/team/TeamWorkspaceSurface.vue` | Web Shared Team Surface | Accepted Team-member header/recovery/event monitor/composer from `TeamWorkspaceContextView` and action ports | No Team registry/root lifecycle assumption. |
+| existing `.../team/TeamWorkspaceView.vue` | Web Standalone Team Wrapper | Adapt `AgentTeamContext` and standalone actions into Team surface | No duplicated workspace markup. |
+| existing `.../team/AgentTeamEventMonitor.vue` and `.../agent/AgentEventMonitor.vue` | Web Accepted Event Presentation | Render exact focused `AgentContext` conversation/tool/activity and accepted composer | Consume active-target/context ports only; no root event formatting. |
+| `autobyteus-web/components/workspace/org/AgentOrgWorkspaceView.vue` | Web Org Focus Adapter | Render approved null-focus prompt, Agent surface, or Team surface from exact Org target | Delete custom header/event cards/textarea/JSON fallback/Stop Org. |
+| `autobyteus-web/components/layout/RightSideTabs.vue` and Team overview/tool consumers | Web Contextual Tools | Resolve files/activity/token/artifact/Team view from `ActiveAgentWorkspaceTarget` | No global standalone-Team inference for mounted Teams and no wrong-family query. |
+| `autobyteus-web/components/workspace/history/AgentOrgRunHistoryPanel.vue` | Web Org Lifecycle | Active root-row stop/pending/error control with existing Team-history interaction placement | No member-header or mounted-Team stop; root service remains owner. |
 | approved Team/Org catalog/form/detail/config/workspace Vue components | Web UI | RV-012 states/layout/responsive/accessibility | Use production stores, never prototype mocks. |
 
 ## Applied Patterns
@@ -2064,6 +2399,19 @@ Forbidden shortcuts:
 - **Target-only admission result:** source classification and exact decoding
   produce available definitions or actionable data; there is no exception-driven
   fallback parse and live definition availability never reinterprets history.
+- **Strict presentation admission:** one root-neutral adapter transforms raw
+  Agent execution callbacks into a closed Agent presentation union before either
+  subject stream serializes it; rejection is a recovery signal, never renderable
+  content.
+- **Candidate context swap:** Org hydration and stream recovery build and
+  correlate an isolated `AgentOrgExecutionContext`, then publish it atomically;
+  the accepted surface never observes half-hydrated AgentContexts.
+- **Port-driven accepted workspace:** standalone Agent, standalone Team, Org
+  direct Agent, and Org Team member targets adapt into the same Agent/Team
+  surfaces and interaction ports. Reuse is structural, not copied markup.
+- **Root lifecycle action placement:** root stop belongs to the subject history
+  row; member focus and mounted-Team presentation cannot acquire root lifecycle
+  authority.
 
 ## Target Subsystem / Folder / File Mapping
 
@@ -2077,24 +2425,29 @@ Forbidden shortcuts:
 | `autobyteus-server-ts/src/agent-collaboration/execution/` | New extraction folder | Collaboration Execution | tagged identities/context, configured-Agent backend, task/message engines, active-root directory, mixed location facade | concrete RootTeamRun/AgentOrgRun, subject tree/store/event, GraphQL |
 | `autobyteus-server-ts/src/agent-team-execution/` | Existing folder | Team Execution | native RootTeamRun/manager/service, flat planner, Team adapters; `local/` owns root-neutral flat-Team execution | Org root, configured Team children, Org persistence |
 | `autobyteus-server-ts/src/agent-org-execution/` | New folder | Org Execution | AgentOrgRun/manager/service/planner/index, explicit scope builder, Org adapters/events/sidecars/persistence | Team V2 authority, coordinator, catch-all activator |
+| `autobyteus-agent-presentation-contracts/src/` | New workspace package | Agent Presentation Contract | strict root-neutral Agent presentation details and parsers | subject/root envelope, change sequence, stream socket or UI state |
 | `autobyteus-server-ts/src/run-history/domain/` | Existing folder | Persistence contracts | shared exact records + subject history rows | generic persisted root |
 | `autobyteus-server-ts/src/run-history/store/team-run-execution-tree-*.ts` | Existing files | Team Persistence | exact native V2 schema/path/store | Org keys or fallback |
 | `autobyteus-server-ts/src/run-history/store/agent-org-run-execution-tree-*.ts` | New files | Org Persistence | exact V1 schema/path/store | Team root or try-both logic |
 | `autobyteus-server-ts/src/agent-memory/store/agent-memory-layout.ts` and mixed location callers | Existing files | Memory layout | tagged family root plus unchanged relative TeamRun ancestry | shallow Org-only path, inferred kind, or flat-Team path rewrite |
 | `autobyteus-server-ts/src/run-history/services/root-*-projection*.ts` | New files | Mixed Read | explicit-kind derived catalog/tree projection | lifecycle, kind inference |
+| `autobyteus-server-ts/src/run-history/services/agent-org-member-run-view-projection-service.ts` | New file | Org Member Read | exact Org member conversation/activity/checkpoint projection | Team-root location, current definition reinterpretation |
 | `autobyteus-server-ts/src/run-history/services/root-run-package-readiness-index.ts` | New file | Current Run Readiness | family-path/target-manifest inventory and compound-kind readiness | legacy payload decoder, transformation, or try-both validation |
 | `autobyteus-server-ts/src/app-data-migrations/migrations/agent-org-flat-team-families-v1/` | New folder | Migration | server-owned retired definition and Org-like Team Run conversion knowledge | current services importing old codecs; external writers/converters |
 | `autobyteus-server-ts/src/api/graphql/types/agent-org-*.ts` | New files | GraphQL Org adapter | Org definitions/run APIs | Team coordinator default/focus |
 | `autobyteus-server-ts/src/api/graphql/types/definition-admission.ts` | New file | GraphQL Operations | actionable unavailable definition/dependency diagnostics | fallback activation or source mutation |
 | existing `agent-team-*.ts` GraphQL files | Existing files | GraphQL Team adapter | flat Team APIs | Team member kind containing Team |
 | `autobyteus-team-stream-contracts/` | Existing package | Team stream | compatible Team-only view/events | Org payload |
-| `autobyteus-collaboration-stream-contracts/` | New package | Mixed stream | tagged Team/Org snapshot/events | runtime logic or inferred kind |
+| `autobyteus-collaboration-stream-contracts/` | New package | Mixed/Org stream | tagged Team/Org dispatch plus strict Org snapshot/events/commands/acks | runtime logic, opaque payloads or inferred kind |
 | `autobyteus-web/components/agentOrgs/` | New folder | Web Org | RV-012 catalog/detail/builder | coordinator/entry/copy Team |
 | `autobyteus-web/components/agentTeams/` | Existing folder | Web Team | Agent-only Team authoring/detail | Team library/nesting UI |
 | `autobyteus-web/components/collaboration/handoffs/` | New shared UI | Handoff presentation | From/To/When list/editor/reorder/errors | endpoint/persistence policy |
 | subject run-config stores | Web config | Org/Team intent | separate root/placement drafts over shared pure merge | one conditional cross-subject blob |
-| `autobyteus-web/services/rootExecution/` | New/refactored | Web read model | tagged union reducers/selectors/focus | definition policy, family guessing |
-| workspace collaboration components | Web workspace | Product runtime presentation | full tree, tasks, messages, focus/prompt | recursive configured depth/persisted focus |
+| `autobyteus-web/services/rootExecution/` | New/refactored | Web mixed facade | tagged route/history dispatch | Org context duplication, raw event retention, definition policy, family guessing |
+| `autobyteus-web/services/agentOrgExecution/` and `stores/agentOrgContextsStore.ts` | New/refactored | Web Org runtime | strict context hydration, streaming, AgentContexts, mounted-Team views, nullable focus/recovery | standalone-Team registration, protocol rendering, durable focus |
+| `autobyteus-web/components/workspace/{agent,team}/*Surface.vue` | New by extraction | Web accepted workspace | store-neutral Agent/Team runtime presentation and action ports | root sockets, subject stores, copied Org markup |
+| `autobyteus-web/components/workspace/org/AgentOrgWorkspaceView.vue` | Replace in place | Web Org focus | approved no-focus prompt and exact shared-surface selection | raw event list, custom composer/header, JSON fallback, lifecycle button |
+| workspace collaboration/right-tool/history components | Existing/refactored | Web workspace | Product runtime hierarchy, context tools and root actions | recursive configured depth, persisted focus, mounted-Team root authority |
 | package `agent-orgs/<id>/org.md`, `org-config.json`, optional `agents/`, `agent-teams/` | Physical source | Org provider | Org plus owned sources/references | nested Org or Team-under-Team |
 | package `agent-teams/<id>/team.md`, `team-config.json`, optional `agents/` | Physical source | Team provider | reusable standalone Team | child `agent-teams/` source |
 | `$MEMORY_ROOT/agent_teams/<rootTeamRunId>/team_run_execution_tree.json` | Exact physical authority | Team V2 store | native Team execution tree/package | `subjectKind`, Org root, path move |
@@ -2132,6 +2485,26 @@ Forbidden shortcuts:
 - Regenerate `autobyteus-web/generated/graphql.ts` and mixed stream generated
   types from new authoritative schemas. Do not hand-maintain compatibility
   aliases.
+- Replace `AgentOrgWorkspaceView.vue` as a unit: delete its raw `events`/`focusedEvents`
+  consumption, `eventLabel`/`eventText`, `JSON.stringify` fallback, bespoke
+  textarea/send form, custom focused-member header and member-header `Stop Org`.
+  Delete the direct `rootExecutionViewStore.sendAgentOrgMessage` component path
+  and the Org `events[]` reducer state after the typed context/interaction path
+  is live. Do not leave the raw dashboard hidden behind a feature flag or error
+  fallback.
+- Extract the accepted markup/behavior from `AgentWorkspaceView.vue` and
+  `TeamWorkspaceView.vue` into their surface components, then keep the original
+  files only as standalone subject adapters. Do not copy those components under
+  `workspace/org`, and do not remove or reimplement `AgentEventMonitor`,
+  `AgentConversationFeed`, `AgentUserInputForm`, or the existing standalone Team
+  confirmation behavior.
+- Remove every `z.unknown()`/opaque payload in the AgentOrg snapshot/live-event
+  branch of `@autobyteus/collaboration-stream-contracts` and every `any` cast used
+  to render Org events. The Team-only contract may remain separately compatible;
+  no normal dual Org event parser or JSON text fallback survives.
+- Move Org root termination to the active `AgentOrgRunHistoryPanel` root row and
+  remove any terminate command from focused Agent/Team surfaces. A mounted Team
+  receives no stop control and is never inserted into standalone Team stores.
 - Runtime migration atomically renames only organization-like package
   directories directly from `agent_teams/<id>` to `agent_orgs/<id>` after the
   prospective Org tree and Org task/message sidecars validate/correlate inside the source package; flat Team
@@ -2154,9 +2527,12 @@ Forbidden shortcuts:
 | `agent-org-execution` | Org root runtime/adapters/sidecars | Yes | New lifecycle/persistence subject; composes only the Team-local factory and shared execution ports. |
 | `run-history/store` | Subject stores + tight record schemas | Yes | Two strict authorities remain visibly separate. |
 | migration folder | Historical transformation boundary | Yes | Only place old organization-like Team V2 is valid. |
+| `autobyteus-agent-presentation-contracts` | Root-neutral wire detail package | Yes | Closed Agent presentation bodies are reused below Team/Org envelopes; no runtime or root owner leaks inward. |
 | Team vs collaboration stream packages | Subject-only vs mixed transport | Yes | Avoids breaking Team-only consumers or false package naming. |
 | Web `agentOrgs` / `agentTeams` | Subject-specific presentation | Yes | Prevents conditional invalid form state. |
-| Web `rootExecution` | Mixed read-only/live projection | Yes | Shared workspace without owning definitions/persistence. |
+| Web `rootExecution` | Mixed route/history facade | Yes | Dispatches by explicit root kind without duplicating subject contexts. |
+| Web `agentOrgExecution` | Org browser aggregate | Yes | Hydration, stream, AgentContexts, mounted-Team views and focus recover together under one owner. |
+| Web Agent/Team surface components | Store-neutral presentation boundary | Yes | Accepted workspace reuse is structural while standalone/Org wrappers retain subject command ownership. |
 
 ## Concrete Examples / Shape Guidance
 
@@ -2177,6 +2553,11 @@ Forbidden shortcuts:
 | Definition save | Complete ordered candidate + expected revision -> validate -> normal-authoring atomic package commit | Per-handoff/per-file writes or silent stale repair | Atomicity/reversibility. |
 | Org configuration | root choices + `/team` patch + `/team/agent` patch -> server complete plan | Trust client expansion or Team defaults silently win | Deterministic specificity. |
 | Org focus | launch returns Org run ID/focus null; explicit Team row maps to stored coordinator | pre-launch entry, first Agent, durable focus | Activation/target separation. |
+| Org direct-Agent UI | strict Org event -> exact AgentContext -> `AgentWorkspaceSurface` -> accepted monitor/composer | raw root-event card or Org-specific textarea | VIS-017 is the accepted Agent conversation, not a dashboard. |
+| Org Team UI | exact Team focus -> mounted `TeamWorkspaceContextView` -> `TeamWorkspaceSurface` -> coordinator/member AgentContext | register mounted Team as standalone or duplicate Team markup | VIS-018 reuses Team presentation without creating Team lifecycle authority. |
+| Org Agent event | raw callback -> presentation adapter -> strict Org subject envelope -> stream reducer -> existing Agent handlers | `event: unknown`, component `any`, `JSON.stringify` | Protocol truth and UI state meet at one typed boundary. |
+| Org commands | active target port -> strict send/interrupt/approve/deny command -> exact AgentOrgRun command -> typed ack | component-owned socket/send-only special case | Accepted composer and tool cards retain behavior parity. |
+| Root stop | active Org history root-row action -> AgentOrgRunService termination | focused member header or mounted-Team terminate | Lifecycle action stays with its root owner. |
 | Migration | existing startup runner + server-owned definition conversion + flat runtime hash/path unchanged + validated Org target followed by one direct package rename; external roots zero-write | rewrite external projects, rewrite all runtime Teams, custom journal/staging/recovery, try-both reader, recursive flattening | Minimal in-scope change, forward-only runtime, and exact ownership/runtime contracts. |
 | API split | explicit Org and Team create/restore plus compound mixed read identity | `createGroupRun(id)` or `getRun(id)` guesses kind | Subject authority. |
 
@@ -2206,13 +2587,19 @@ Forbidden shortcuts:
 | Keep ignored Org `entryAddress` | Rejected | Coordinated Org API/UI cut; full-scope no-focus launch. |
 | Per-handoff mutations | Rejected | Complete revisioned parent candidate save. |
 | Force old Team-only consumers onto mixed DTO | Rejected as unnecessary break | Retain compatible Team-only surface; add mixed/Org contracts. |
+| Render raw AgentOrg events or keep a JSON fallback | Rejected | Strict Agent presentation admission, Org envelope, context reducer and accepted event monitor. |
+| Maintain a separate AgentOrg runtime dashboard/composer/header | Rejected | Thin focus adapter over extracted Agent/Team workspace surfaces. |
+| Register mounted Org Team in standalone Team stores to reuse UI | Rejected | Read-only `TeamWorkspaceContextView` adapter remains owned by `AgentOrgExecutionContext`. |
+| Put Stop Org on a focused member surface | Rejected | Active Org history root-row lifecycle action; mounted Team has no independent stop. |
+| Keep send-only Org socket commands | Rejected | Strict send/interrupt/approve/deny command and acknowledgement union behind `AgentInteractionPort`. |
 
 ## Derived Layering
 
 Explanatory only:
 
-1. **Presentation/transport:** subject GraphQL, Team-only and mixed streams,
-   Agent tools, web authoring/config/workspace.
+1. **Presentation/transport:** root-neutral Agent presentation details,
+   subject GraphQL, Team-only and mixed/Org streams, Agent tools, web
+   authoring/config and shared Agent/Team workspace surfaces.
 2. **Application boundaries:** subject definition/run services, definition
    transaction, configuration resolver, mixed projection service.
 3. **Domain/control:** Org/Team definitions, resolved topology, endpoint/handoff
@@ -2231,6 +2618,11 @@ Explanatory only:
 
 A caller may not use both an application boundary and its internal
 provider/manager/store.
+
+In the browser, `rootExecutionViewStore -> AgentOrgExecutionContext ->
+ActiveAgentWorkspaceTarget -> Agent|TeamWorkspaceSurface` is the corresponding
+authority chain. Components do not bypass the context to use the collaboration
+socket, raw root events, standalone Team stores, or subject GraphQL clients.
 
 ## Change / Refactor Sequence
 
@@ -2335,17 +2727,62 @@ provider/manager/store.
     configured-child APIs, placeholder Org activator, and stale generated mirrors
     where repository convention permits.
 21. **Validate in risk order.** Run the separate
-    `architecture-design-self-validation.md` use-case matrix as the design/code
+   `architecture-design-self-validation.md` use-case matrix as the design/code
     trace checklist, then exact definition/run/sidecar schemas; source ownership;
     Team regression; root-neutral factory contract tests; Org full activation/
     task/message/platform binding/restore/fail-stop/shutdown; migration; mixed
     mismatch; GraphQL/streams; VIS-001-VIS-020 browser journeys; full builds/
-    typechecks. No source-review handoff occurs until all partial-draft and
-    obsolete-test failures are resolved.
+   typechecks. No source-review handoff occurs until all partial-draft and
+   obsolete-test failures are resolved.
+22. **Freeze the API/E2E defect baseline before workspace recovery.** Preserve
+   the real-browser `03-org-live-raw-events-defect.png` and its imported-package
+   setup as failing evidence. Stop further API/E2E claims. Do not edit, reset,
+   stage or merge downstream-owned partial tests/reports while applying this
+   architecture revision.
+23. **Establish strict Agent presentation admission first.** Extract the closed
+   root-neutral Agent presentation schemas and server adapter from the accepted
+   Team path. Make Team callbacks use the adapter while golden-testing every
+   retained Team-only outer message. Replace the Org `unknown` event branch with
+   strict Agent/task/communication branches and strict identity/sequence
+   correlation before any Vue change.
+24. **Complete the Org server projection and command boundary.** Project only
+   admitted Agent presentation messages from Org callbacks; add exact Org member
+   resume/conversation/activity/trace projection; extend Org streaming commands
+   and acknowledgements for send, interrupt, approve and deny through
+   `AgentOrgRun.executeAgentCommand`. Prove wrong root/member/run correlations,
+   malformed messages and unsupported commands fail closed.
+25. **Build one checkpointed Org browser context.** Add
+   `AgentOrgExecutionContext`, hydration service, strict streaming state machine,
+   per-Agent AgentContexts, mounted-Team presentation views and nullable exact
+   focus. Candidate hydration/stream recovery must swap atomically. Reduce
+   `rootExecutionViewStore` to route/history delegation and delete its duplicate
+   Org tree/focus/raw-event authority.
+26. **Extract and route through the accepted workspace surfaces.** Extract
+   store-neutral `AgentWorkspaceSurface` and `TeamWorkspaceSurface` without
+   changing accepted standalone rendering. Generalize the active-context target,
+   interaction, trace, token/file/artifact and Team-view ports. Make the Org view
+   select only prompt/Agent surface/Team surface; remove every custom Org event
+   card, header, composer, JSON fallback and direct component socket call.
+27. **Correct lifecycle-action placement.** Add active Org stop/pending/error to
+   the Org history root row with established Team-history interaction placement;
+   remove Stop Org from member focus and prove mounted Teams expose no terminate
+   action. Retain the independent standalone Team members-panel confirmation
+   behavior unchanged.
+28. **Revalidate the accepted running experience before API/E2E resumes.** Run
+   strict contract/parser and Team-wire golden tests; Org hydration/sequence-
+   gap/reconnect tests; direct-Agent and mounted-Team conversation, context-file,
+   interrupt and tool-decision component/integration tests; root-stop and
+   mounted-Team negative tests; import-boundary scans; desktop/narrow/a11y
+   screenshot comparison against VIS-016-VIS-018 and VIS-PROMOTE-002-004; then a
+   real imported-package browser prompt that proves normal conversation/tool
+   rendering and absence of raw JSON/custom Org controls. Source review and
+   API/E2E may resume only after the revised independent Architecture Review
+   passes and Implementation reconciles this sequence.
 
 No temporary dual write, try-both runtime read, normal dual definition parser,
-external-source writer, generic V3 root, or public configured recursion may
-survive the cutover.
+external-source writer, generic V3 root, public configured recursion, raw Org
+event dashboard, JSON presentation fallback, duplicate Org composer, or
+standalone registration of a mounted Team may survive the cutover.
 
 ## Key Tradeoffs
 
@@ -2378,6 +2815,22 @@ survive the cutover.
 10. **Explicit internal extraction over copied Org runtime.** The extraction touches existing Team/Agent tool paths, but one common provider/local implementation is safer than duplicating Agent activation/task/message behavior and letting them diverge. Subject adapters make the risk reviewable.
 11. **Org-specific sidecar envelopes.** Two extra current codecs/files and a small migration envelope transform avoid reinterpreting `rootTeamRunId` inside an Org and permit strict family correlation. Record bodies and memory content do not move.
 12. **Prepare all Org configured Agents before root registration.** Launch work is larger than lazy synthetic composition, but it implements approved full-scope activation and gives one failure/teardown boundary with no partial active Org.
+13. **Root-neutral Agent presentation details, subject-specific envelopes.** A
+    small additional contract package avoids copying the large accepted Team
+    event mapping into Org while preserving the Team wire exactly. It is
+    intentionally narrower than a generic collaboration stream: it owns only
+    strict Agent-visible detail semantics, never root identity or sequencing.
+14. **Structural surface extraction over Org-specific visual replication.**
+    Extracting port-driven Agent/Team surfaces touches accepted components, but
+    makes parity mechanically enforceable and keeps four execution target kinds
+    from drifting into four dashboards. Standalone wrappers preserve their
+    subject stores and actions.
+15. **Hydrated context over append-only raw event inspection.** Building every
+    configured/live Org AgentContext costs projection requests and context state,
+    but supplies the accepted conversation/tool/activity model, truthful restore,
+    and checkpoint recovery. Lazy presentation may be optimized later only
+    behind the same context contract; an opaque raw-event fallback is not an
+    allowed performance trade.
 
 ## Risks
 
@@ -2408,7 +2861,15 @@ survive the cutover.
 | Runtime/durable state diverges | Low / Critical | prepare -> strict write -> live commit -> event sequence per subject | Existing indeterminate I/O remains operational risk. |
 | Stale generated/external consumers | Medium / High | Preserve Team-only contract, regenerate mixed clients, coordinated release | Out-of-repo mixed consumers require release notes. |
 | Dynamic Team work reintroduces recursion | Medium / High | REQ-017 dependency scan and reviews | Future approved behavior needs new design. |
-| UI diverges from RV-012 | Medium / High | VIS/browser/a11y/narrow checks | Fixture values remain illustrative. |
+| Team-only stream behavior drifts during shared presentation extraction | Medium / Critical | Golden every retained Team message/sequence/token/status shape before/after adapter extraction; full Team conversation/tool regression | Internal adapter placement changes, but public Team wire and surface must remain exact. |
+| Org event schema still admits opaque/raw payloads | Medium / Critical | Closed zod discriminants, compile-time no-`unknown`/`any` scan, invalid-event and identity/sequence recovery tests | Future Agent event types require explicit presentation-contract addition. |
+| Shared surface remains coupled to standalone stores | Medium / High | Surface import-boundary tests and required target/action props; standalone and Org wrapper tests | Some surrounding shell state remains shared through explicit ports. |
+| Org command parity is incomplete | Medium / Critical | Send/context-file, interrupt, approve and deny strict command/ack integration plus real-browser prompt/tool flow | New Agent commands must extend the same port and subject parser deliberately. |
+| Mounted Team presentation creates false Team root authority | Medium / Critical | Read-only TeamWorkspaceContextView, no Team-store registration/root APIs, negative stop/persistence/history tests | Team presentation evolves against two adapters. |
+| Org member hydration or sequence recovery loses/duplicates conversation | Medium / High | Compound identity/checkpoint barriers, candidate atomic swap, gap/reconnect/projection equivalence tests | Projection availability failures remain visible recovery states. |
+| Trace/token/file/tool queries use a Team family for an Org member | Medium / High | `agentOrgMember` compound query branch and Org location-backed service; cross-kind collision negatives | Cross-subject analytics facades require explicit tagged dispatch. |
+| Root stop remains attached to member focus or exposes mounted-Team stop | Low / High | History-root action assertions, member-header absence, mounted-Team negative tests, standalone Team confirmation regression | Product fixture labels/icons may evolve without changing ownership. |
+| UI diverges from RV-012 | Medium / High | Structural reuse plus VIS-016-VIS-018/VIS-PROMOTE-002-004 browser/a11y/narrow checks and real prompt evidence | Fixture values remain illustrative. |
 
 ## Guidance For Implementation
 
@@ -2475,6 +2936,46 @@ survive the cutover.
   `AgentOrgRootTaskHost`, not a fake Team.
 - General process assembly order is AgentRun infrastructure -> strict locations/directory/factories -> Team manager -> Org manager -> services. Shutdown closes admission and stops Org -> Team -> Agent before reverse release. Application scopes remain publicly Team-only while using the same extracted factories.
 - Global exact-Agent routing compares tagged member roots and uses `ActiveCollaborationRootDirectory`; no bare root ID or Team manager lookup may select an Org.
+- Admit raw configured-Agent events exactly once through
+  `CollaborationAgentPresentationAdapter`. Team and Org serializers may add only
+  their subject identity/sequence fields. Do not publish `AgentOrgRunEvent` as
+  an opaque value, add `unknown` to an Org stream schema, pass a protocol
+  envelope into Vue, or stringify an unrecognized event.
+- Preserve Team-only stream compatibility while extracting Agent presentation
+  details. Use golden messages for every current event kind, including member
+  input, status/readiness, errors and token usage; do not force Team consumers
+  onto the mixed contract to obtain reuse.
+- Build `AgentOrgExecutionContext` from strict snapshots and exact member
+  projections before it becomes active. It owns the AgentContext map,
+  mounted-Team presentation views, nullable focus and stream phase.
+  `rootExecutionViewStore` remains only a mixed route/history facade and must not
+  keep a second Org tree, event array, focus or command path.
+- Implement the four-branch `ActiveAgentWorkspaceTarget` and
+  `AgentInteractionPort`. The existing composer, tool cards, event monitor,
+  files/activity/tokens/artifacts and trace browse consume those ports; they do
+  not branch directly over standalone/Team/Org stores or open subject sockets.
+- Extract `AgentWorkspaceSurface` and `TeamWorkspaceSurface` from the accepted
+  production components. Standalone views become adapters and remain behavior-
+  compatible. The Org view may render only the approved no-focus prompt or one
+  of these surfaces. It must contain no event formatter, conversation card,
+  textarea/send implementation, custom member header, JSON fallback or stop
+  control.
+- Treat `TeamWorkspaceContextView` as presentation-only. Its Org adapter is
+  backed by the Org context and exact Team placement; never register that Team
+  with `AgentTeamRunManager`, `agentTeamContextsStore`, Team history, Team
+  persistence or Team termination.
+- Extend the strict Org command union/ack path for send, interrupt, approve and
+  deny and route each through the exact AgentOrgRun target. Context-file paths
+  and media/message identity follow the accepted composer contract. Reject
+  stale focus/root/member identities before execution; never fall back.
+- Add `agentOrgMember` run projection/active-trace subject keyed by
+  `{orgRunId,memberAddress,agentRunId}`. Files, traces, activity, token usage and
+  artifacts for Org focus use Org physical location/subject dispatch; they do
+  not manufacture a Team root ID from a mounted Team.
+- Put Org termination only on the active AgentOrg history root row using the
+  established root pending/error affordance. No focused member or mounted Team
+  can terminate the Org. Preserve the separate standalone Team members-panel
+  confirmation exactly.
 - Historical topology comes from its subject snapshot, not current definitions.
   Definition edits/deletion cannot change old subject kind, coordinator, task
   host, or addresses.
@@ -2503,7 +3004,12 @@ survive the cutover.
   handoff ordering through compilation/snapshot/migration/`get_handoff_rules`/
   projection; Org/Team GraphQL and streams; tasks/stop/restore/history; web
   From/To/When CRUD/order/cancel/save, config precedence, no-focus/exact focus,
-  history/task lineage, responsive/a11y, standalone Team create/launch/reuse.
+  history/task lineage, strict Agent presentation parsing, Team-wire golden
+  compatibility, Org member hydration/projection/checkpoint recovery,
+  send/context-file/interrupt/tool-decision command parity, structural shared-
+  surface reuse, raw-dashboard/JSON-fallback absence, root-stop placement,
+  responsive/a11y, standalone Team create/launch/reuse, and a real imported-
+  package prompt rendered through the accepted conversation/event monitor.
 - Before implementation handoff, search current source excluding migration and
   immutable historical docs for configured Team member recursion,
   `getOrCreateConfiguredChildTeam`, `MemberTaskRootResolver`, shared

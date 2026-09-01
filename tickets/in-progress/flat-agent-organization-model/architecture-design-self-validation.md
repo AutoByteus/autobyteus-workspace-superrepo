@@ -3,10 +3,10 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-005`
-- Requirements authority: `RER-018`
+- Architecture revision validated: `AD-REV-006`
+- Requirements authority: `RER-019` (activation/provenance-only update; approved behavior remains unchanged)
 - Product authority: `RV-012` / `VIS-001`-`VIS-020`
-- Trigger: user-requested use-case/data-flow/ownership/boundary/dependency self-validation plus Implementation Design Impact `IDI-001`
+- Trigger: user-requested use-case/data-flow/ownership/boundary/dependency self-validation; resolved Implementation Design Impact `IDI-001`; API/E2E real-browser Design Impact `ADI-007`
 - Date: 2026-09-01
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
@@ -37,8 +37,12 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-001/screenshots/03-org-live-raw-events-defect.png`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/docs/design/production_data_migration_conventions.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
+- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/visual-references/visual-reference-manifest.json`
+- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md`
 
 ## Universal Invariants Used By Every Walkthrough
 
@@ -55,6 +59,10 @@ Inputs:
 | Focus is not activation | Full Org scope activates before client focus; focus starts null and is never durable | Pass |
 | Current runtime is forward-only | Legacy decoding exists only in registered migration; no normal dual parser/reader | Pass |
 | External definition projects are read-only | Target admission/diagnostics only; no write, commit, release, or completion claim | Pass |
+| Agent-visible Org events are strictly projected | Raw Agent callbacks cross one presentation adapter and a strict Org envelope before AgentContext mutation; no opaque/JSON renderer | Pass |
+| Exact Org focus reuses accepted workspaces | Direct Agent uses Agent surface; Team/Team Agent uses Team surface; no custom Org runtime dashboard | Pass |
+| Browser Org state has one owner | One checkpointed AgentOrgExecutionContext owns view, AgentContexts, mounted-Team views, nullable focus and stream recovery | Pass |
+| Member presentation does not own root lifecycle | Org stop lives on active Org history root row; focused member and mounted Team have no root-stop action | Pass |
 
 ## Identity And Physical-Scope Truth Table
 
@@ -100,6 +108,11 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-015 | SCN-002/009; RV-012 | Full Org activation with no focus, then exact focus | DS-003, DS-013 | Pass |
 | VAL-016 | SCN-001/008; REQ-020-023 | Team/Org handoff authoring and atomic save | DS-001, DS-009, DS-011 | Pass |
 | VAL-017 | Existing application Team execution; REQ-018 scope | Application-owned flat Team after extraction | DS-002, DS-015 | Pass |
+| VAL-018 | SCN-007/009; REQ-004/016/019/025; VIS-017 | Real direct Org Agent conversation renders through accepted Agent workspace | DS-016-DS-018 | Pass |
+| VAL-019 | SCN-007/009; REQ-016/019; VIS-018 | Mounted Team/coordinator/exact Team Agent reuses accepted Team workspace | DS-013, DS-016-DS-018 | Pass |
+| VAL-020 | Accepted Agent interaction behavior; REQ-019 | Org send/context-file, interrupt and tool-decision parity | DS-017 | Pass |
+| VAL-021 | Existing strict stream/recovery and trace behavior; REQ-016/025 | Invalid Org event/sequence and restore hydration recover without raw fallback | DS-016, DS-018 | Pass |
+| VAL-022 | REQ-016/025; VIS-016-VIS-018; established Team history interaction | Org root termination placement and mounted-Team lifecycle boundary | DS-019 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -412,6 +425,133 @@ package-family rename. It does not infer logical topology from directory depth.
   of generalizing runtime.
 - **Result:** Pass.
 
+### VAL-018 — Real Direct Org Agent Conversation Uses Accepted Agent Workspace
+
+- **Trigger:** after configuration-first Org launch and explicit `/concierge`
+  selection, a user submits a real prompt through the accepted composer.
+- **Primary spine:** `accepted AgentUserInputForm -> ActiveAgentWorkspaceTarget
+  (agent_org_direct_agent) -> AgentInteractionPort -> strict Org SEND_MESSAGE ->
+  AgentOrg stream handler -> AgentOrgRun exact target command -> AgentRun -> raw
+  callback -> CollaborationAgentPresentationAdapter -> strict Org subject event
+  + sequence -> AgentOrgStreamingService -> exact AgentContext handlers ->
+  AgentWorkspaceSurface/AgentEventMonitor/AgentConversationFeed`.
+- **Return/event spine:** typed command acknowledgement clears submission state;
+  segment/status/tool/error messages mutate only the exact AgentContext; completed
+  conversation is visible through the same monitor as a standalone Agent.
+- **Owners:** AgentOrgRun owns target authorization/execution; presentation
+  adapter owns raw-event admission; Org stream owns envelope/sequence; Org
+  context owns browser correlation; AgentContext owns accepted conversation and
+  composer state; surface owns rendering only.
+- **Boundary check:** the surface never sees a WebSocket envelope or imports an
+  Org store/socket; the stream service never renders; the root facade does not
+  retain a second event list.
+- **Dependency check:** subject runtime -> presentation adapter -> strict Org
+  contract -> Org context -> existing Agent handlers -> shared surface. No
+  component-to-socket or component-to-raw-event edge exists.
+- **Rejected shortcut:** `event: unknown`, `any` casting, `JSON.stringify`, a
+  bespoke Org event card/composer, or translating only the assistant-complete
+  case while losing streaming/tool/status semantics.
+- **Outcome:** the real prompt is an ordinary accepted conversation, not an
+  “AGENT RUN” protocol dashboard.
+- **Result:** Pass.
+
+### VAL-019 — Mounted Team Reuses Accepted Team Workspace Without Becoming A Root
+
+- **Trigger:** user selects a direct Team row (initial exact coordinator) or an
+  exact Agent within that Team after the Org is active.
+- **Primary spine:** `Org sidebar exact address -> CollaborationFocusController
+  -> AgentOrgExecutionContext -> Org-mounted TeamWorkspaceContextView ->
+  ActiveAgentWorkspaceTarget(agent_org_team_member) -> TeamWorkspaceSurface ->
+  accepted header/status/AgentTeamEventMonitor/composer + Team contextual tab`.
+- **Event spine:** exact mounted Agent callback follows VAL-018's presentation
+  path and mutates its AgentContext; Team view derives member/status/tasks/
+  messages from the owning Org context.
+- **Owners:** Org context owns focus and mounted-Team projection; read-only Team
+  view owns presentation selection/filtering; Team surface owns rendering; Org
+  interaction port owns every command.
+- **Boundary check:** the adapter exposes no Team root stop/restore/persistence/
+  registry method and never enters `AgentTeamRunManager`, Team history, Team
+  persistence, or `agentTeamContextsStore`.
+- **Dependency check:** Org context -> read-only Team view -> shared Team surface.
+  The surface does not depend on either standalone or Org root internals.
+- **Rejected shortcut:** launch/register the mounted Team independently, use its
+  TeamRun ID as a Team root ID, or copy `TeamWorkspaceView` markup into the Org
+  component.
+- **Outcome:** VIS-018 parity is structural while AgentOrg remains the sole
+  lifecycle/durability owner.
+- **Result:** Pass.
+
+### VAL-020 — Org Interaction Command Parity
+
+- **Trigger:** on the accepted Org-focused conversation a user sends text with
+  context files, interrupts a running turn, or approves/denies a tool request.
+- **Primary spine:** `accepted composer/tool card -> useActiveContextStore ->
+  exact ActiveAgentWorkspaceTarget -> AgentInteractionPort -> strict Org client
+  command + identity/dedupe fields -> AgentOrg stream parser -> AgentOrgRun
+  executeAgentCommand -> exact Agent handle/AgentRun -> typed acknowledgement and
+  presentation events -> AgentContext state`.
+- **Owners:** active-context facade owns primary-action gating; target port owns
+  subject command adaptation; Org stream handler owns parsing/acknowledgement;
+  AgentOrgRun owns target validation; AgentRun owns execution.
+- **Boundary check:** shared input/tool components cannot distinguish sockets or
+  call Org/Team stores directly. Org handler receives no inferred focus; every
+  command carries/validates exact root and Agent identity.
+- **Dependency check:** view components -> active-context boundary -> subject
+  interaction port -> subject stream/root. No send-only parallel client exists.
+- **Rejected shortcut:** support only SEND_MESSAGE, drop context attachments,
+  approve through Team APIs, or treat missing/stale focus as the coordinator.
+- **Outcome:** direct and mounted Org Agents preserve accepted send/interrupt/
+  tool-decision behavior.
+- **Result:** Pass.
+
+### VAL-021 — Strict Org Stream Failure And Checkpointed Recovery
+
+- **Trigger:** a supported live connection observes an invalid Org event payload,
+  identity mismatch, sequence gap, reconnect, or opens a stopped/restored Org
+  requiring conversation/activity hydration.
+- **Primary spine:** `Org route/history -> hydration service -> strict Org
+  snapshot + exact member run projections + workspace resolution -> candidate
+  AgentOrgExecutionContext -> checkpoint barrier -> strict stream handshake/
+  snapshot -> atomic context publication -> typed events`; on failure:
+  `strict parser/reducer -> reopen_required -> preserve committed context +
+  notice -> new candidate hydration/checkpoint -> atomic swap`.
+- **Bounded spine:** `raw callback -> presentation admission -> publish/filter/
+  reject`; rejection becomes stream recovery/error, never content.
+- **Owners:** projection service owns historical conversation/activity from Org
+  location; hydration owns candidate construction; stream state machine owns
+  sequence; context store owns atomic publication; AgentContext owns rendered
+  state.
+- **Boundary check:** current definitions and Team projection/location services
+  are absent; the old context is not mutated by an unverified candidate.
+- **Dependency check:** route -> Org projection/hydration -> Org context ->
+  accepted surface. Root facade delegates; component never parses protocol.
+- **Rejected shortcut:** append unknown payloads, clear conversation on a gap,
+  try Team restore, or show raw JSON until reconnect succeeds.
+- **Outcome:** restore/reconnect preserves truthful conversation/trace state and
+  fails closed visibly when recovery cannot complete.
+- **Result:** Pass.
+
+### VAL-022 — Org Root Termination Placement And Ownership
+
+- **Trigger:** user stops an active AgentOrg from its active root history row
+  while no member, a direct Agent, or a mounted Team is focused.
+- **Primary spine:** `AgentOrgRunHistoryPanel root-row stop -> pending state ->
+  AgentOrgRunStore/GraphQL lifecycle mutation -> AgentOrgRunService -> manager ->
+  whole AgentOrgRun reverse termination/persistence -> lifecycle event/history
+  row inactive -> Org context disconnect/cleanup`.
+- **Owners:** history root row owns only action presentation/pending/error;
+  AgentOrgRunService/manager/aggregate own lifecycle; member surfaces own none.
+- **Boundary check:** focus does not alter root stop availability/identity; a
+  TeamWorkspaceContextView has no terminate capability; standalone Team panel
+  confirmation remains its separate established behavior.
+- **Dependency check:** history UI -> Org lifecycle store/API -> Org service/root.
+  No focused member component or Team adapter is involved.
+- **Rejected shortcut:** `Stop Org` in the focused header, independent mounted-
+  Team stop, or changing standalone Team confirmation to make Org simpler.
+- **Outcome:** root lifecycle control is consistent with root history placement
+  and cannot be mistaken for a member/Team action.
+- **Result:** Pass.
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -429,11 +569,21 @@ package-family rename. It does not infer logical topology from directory depth.
 | Global exact-Agent router | AgentRunManager + ActiveCollaborationRootDirectory | Team and Org managers together | Pass |
 | Mixed projection | explicit subject query boundaries | subject stores/files plus manager | Pass |
 | GeneralProcessRunSupervisor | subject managers/services | local Team/Agent handles | Pass |
+| Team/Org subject callback | CollaborationAgentPresentationAdapter then subject serializer | raw AgentRun payload published directly or component formatter | Pass |
+| RootExecutionViewStore | AgentOrgContextsStore / subject context boundary | duplicate Org tree/focus/events and direct Org socket command | Pass |
+| AgentOrgExecutionContext | strict hydration/stream/member projection ports | standalone Team context/store or current definition fallback | Pass |
+| Agent/Team workspace surface | ActiveAgentWorkspaceTarget and explicit action/view ports | subject store, GraphQL client, socket or raw event | Pass |
+| Mounted Team presentation adapter | TeamWorkspaceContextView | Team lifecycle/persistence/registration/termination | Pass |
+| AgentOrgRunHistoryPanel | Org lifecycle store/service | focused member surface or mounted-Team stop | Pass |
 
 ## Dependency-Direction Audit
 
 ```text
 Transport/UI
+  -> shared Agent/Team surfaces -> ActiveAgentWorkspaceTarget
+  -> AgentOrgExecutionContext | standalone Agent/Team context
+  -> strict subject streaming/projection
+  -> root-neutral Agent presentation details
   -> subject services or explicit mixed projection
   -> subject managers
   -> RootTeamRun | AgentOrgRun
@@ -448,6 +598,9 @@ Migration -> isolated legacy codecs + current target validators/writers
 Current runtime -X-> migration
 AgentOrg -X-> AgentTeamRunManager / Team root store
 Shared execution -X-> concrete Team/Org root/tree/store/event types
+Agent presentation details -X-> Team/Org root identity, sequence or runtime
+AgentOrg surface -X-> raw events / socket / standalone Team stores
+Mounted Team view -X-> Team lifecycle, root store or Team registration
 ```
 
 No upward bypass is needed in any validated use case. The active-root directory
@@ -467,6 +620,11 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Process shutdown child error | GeneralProcessRunSupervisor | aggregate error and continue later cleanup steps | No skipped owner | Pass |
 | Unsupported deep migration item | Migration | zero preflight writes; failed/unavailable item; continue compatible items | Source preserved | Pass |
 | Incompatible external definition | Admission | unavailable diagnostic; no source write; compatible runtime/history continue | No invalid new work | Pass |
+| Raw Agent callback cannot be admitted | Presentation adapter + subject stream | publish typed failure/recovery signal; do not publish/render raw payload | No protocol content exposed | Pass |
+| Org stream identity/sequence/schema mismatch | AgentOrgStreamingService | enter `reopen_required`, preserve last committed context, hydrate/checkpoint candidate, swap only when complete | No partial candidate or JSON fallback | Pass |
+| Org member projection/hydration fails | Org hydration service/context store | keep prior context/history state and visible recovery error; do not guess from Team/current definition | No false conversation authority | Pass |
+| Org command acknowledgement fails or target is stale | Active target/Org stream handler | preserve draft/tool decision state as appropriate and surface typed error; execute no fallback target | No wrong Agent command | Pass |
+| Org root termination fails | Org lifecycle service + history row | clear pending into root-row error; focused surface remains non-authoritative | No mounted Team stopped independently | Pass |
 
 ## Removal And Forbidden-Shortcut Audit
 
@@ -485,13 +643,19 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Team sidecar envelope reused for Org | Rejected | strict Org sidecars |
 | Try-both reader/root-kind inference | Rejected | compound identity + strict family selection |
 | Migration-specific journal/backup/restore | Rejected | existing runner + atomic write/direct rename/restart retry |
+| Opaque AgentOrg event schema / `any` / JSON renderer | Yes | closed Agent presentation + Org event contracts and strict context reducer |
+| Bespoke AgentOrg runtime header/event cards/composer | Yes | thin Org focus adapter over shared Agent/Team workspace surfaces |
+| Direct Org send-only component/store socket path | Yes | ActiveAgentWorkspaceTarget + AgentInteractionPort + strict command union |
+| Parallel Org raw event array / duplicate focus authority | Yes | one AgentOrgExecutionContext; mixed root store delegates |
+| Mounted Team registered as standalone for UI reuse | Rejected | read-only TeamWorkspaceContextView backed by Org context |
+| Member-header Stop Org / mounted-Team stop | Yes / Rejected | root history-row action owned by AgentOrg lifecycle |
 
 ## Design-Principle Self-Check
 
 | Principle | Evidence In Revised Design | Result |
 | --- | --- | --- |
 | Approved behavior first | Every case cites REQ/AC/SCN/Product or established runtime contract; no new product behavior | Pass |
-| Supported-scenario gate | 17 concrete supported cases; contrived global lookup/tampering/deep conversion remain rejected | Pass |
+| Supported-scenario gate | 22 concrete supported cases; real browser prompt/focus/interaction/recovery/stop are included; contrived global lookup/tampering/deep conversion remain rejected | Pass |
 | Spine span sufficiency | Each primary case spans initiating caller through owner/durability/provider to result/event | Pass |
 | Multiple primary spines | Definition, Team launch, Org launch, message, task, persistence, migration, mixed read, focus, process lifecycle are distinct | Pass |
 | Ownership clarity | Root aggregates own lifecycle/state; lower capabilities own local mechanics; adapters own translation | Pass |
@@ -502,6 +666,9 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Persisted-data proportionality | Flat Team no-op; Org-like fixed transform; strict Org sidecars; no per-Agent move/custom recovery | Pass |
 | Dependency direction | Subject roots depend on capabilities; capabilities do not import roots; current runtime does not import migration | Pass |
 | File placement follows ownership | shared execution under collaboration; local Team under Team execution; subject adapters/sidecars remain in subject folders | Pass |
+| Accepted production reuse | Direct Org Agent and Team focus terminate in extracted accepted surfaces; Org view is only an adapter | Pass |
+| Strict presentation boundary | Raw callbacks are admitted once, subject-enveloped strictly, reduced into AgentContext and never formatted as protocol JSON | Pass |
+| Lifecycle/action ownership | Org stop is a root history action; focused Agent and mounted Team surfaces expose no root lifecycle capability | Pass |
 
 ## Questions / Open Decisions
 
@@ -511,20 +678,27 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
   import rules remain obvious and the design artifact is updated before a
   material boundary change.
 - Implementation evidence still required: all tests and rendered/API/E2E checks
-  named in `design-spec.md`; the uncommitted IR-001 draft is not validated by
-  this artifact.
+  named in `design-spec.md`, especially Team-wire compatibility, strict Org
+  presentation/command parsing, checkpointed member hydration, structural
+  workspace reuse and the real imported-package prompt/browser comparison. The
+  downstream implementation/test changes and evidence are not validated or
+  claimed by this artifact.
 
 ## Self-Validation Conclusion
 
-`AD-REV-005` resolves `IDI-001` at the architecture boundary. All supported
+`AD-REV-005` continues to resolve `IDI-001`; `AD-REV-006` resolves real-browser
+`ADI-007` at the architecture boundary. All supported
 walkthroughs have a complete production spine, one authoritative root owner,
 strict durable identity, explicit failure/restore/shutdown behavior, and a
 one-directional dependency path. No walkthrough requires a synthetic Team root,
 standalone mounted Team, standalone direct Org Agent, Team sidecar reinterpretation,
-public generic root, or boundary bypass.
+public generic root, raw Org dashboard, opaque/JSON event fallback, component-
+owned Org socket, or boundary bypass.
 
 The self-validation therefore passes. Because the correction materially changes
 shared Agent execution/tool context, Team local runtime extraction, tasks,
-messages, memory, sidecars, global routing and process lifecycle, classification
-remains `Large / High` and independent Architecture Review is mandatory before
-implementation resumes.
+messages, memory, sidecars, global routing, process lifecycle, shared presentation
+contracts, Org stream/member projection, browser context ownership and accepted
+workspace component boundaries, classification remains `Large / High` and
+independent Architecture Review is mandatory before implementation or API/E2E
+resumes.
