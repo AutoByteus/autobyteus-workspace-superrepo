@@ -19,6 +19,7 @@ import {
 } from './agentOrgTeamPresentation'
 
 export type AgentOrgSyncPhase = 'hydrating' | 'live' | 'reopen_required' | 'closed'
+export type AgentOrgEventApplication = 'applied' | 'checkpoint_required'
 
 export interface AgentOrgCommandTransport {
   interactionFor(agentRunId: string): AgentInteractionPort
@@ -39,6 +40,7 @@ type TaskTeamMember = TaskTeam['members'][number]
 type TaskTeamNode = TaskTeam | Extract<TaskTeamMember, { teamRunId: string }>
 type TaskRecord = AgentOrgExecutionViewDto['task_records']['records'][number]
 type TaskEvent = Extract<AgentOrgExecutionEventDto, { kind: 'task' }>['event']
+type ConfiguredPlacementKind = 'agent' | 'team'
 
 const nameAt = (address: string): string => address.split('/').filter(Boolean).at(-1)?.replace(/[_-]+/g, ' ') || address
 
@@ -51,6 +53,9 @@ export class AgentOrgExecutionContext {
   private readonly contexts = shallowReactive(new Map<string, AgentContext>())
   private readonly addressByRunId = new Map<string, AgentTeamAddress>()
   private readonly addressByTeamRunId = new Map<string, AgentTeamAddress>()
+  private readonly configuredPlacementKindByAddress = new Map<AgentTeamAddress, ConfiguredPlacementKind>()
+  private readonly taskAgentAddressByRunId = new Map<string, AgentTeamAddress>()
+  private readonly taskTeamAddressByRunId = new Map<string, AgentTeamAddress>()
   private nextChangeSequence: number
 
   constructor(input: Readonly<{
@@ -71,7 +76,7 @@ export class AgentOrgExecutionContext {
       this.contexts.set(entry.agentRunId, context)
       this.addressByRunId.set(entry.agentRunId, entry.memberAddress)
     }
-    this.indexAndValidateTeamIdentities()
+    this.indexAndValidateIdentities()
     for (const status of input.view.agent_statuses) {
       const address = this.addressByRunId.get(status.agent_run_id)
       if (address !== status.member_address) {
@@ -167,7 +172,7 @@ export class AgentOrgExecutionContext {
     })
   }
 
-  applyEvent(changeSequence: number, event: AgentOrgExecutionEventDto): void {
+  applyEvent(changeSequence: number, event: AgentOrgExecutionEventDto): AgentOrgEventApplication {
     if (this.phase !== 'live') throw new Error('AgentOrg context is not accepting stream events.')
     if (changeSequence !== this.nextChangeSequence) {
       this.requireReopen(`Expected change sequence ${this.nextChangeSequence}, received ${changeSequence}.`)
@@ -188,7 +193,9 @@ export class AgentOrgExecutionContext {
         },
       )
     } else if (event.kind === 'task') {
-      this.validateTaskEvent(event.event)
+      if (this.validateTaskEvent(event.event) === 'checkpoint_required') {
+        return 'checkpoint_required'
+      }
       const records = [...this.view.task_records.records]
       const index = records.findIndex((record) => record.taskId === event.event.task.taskId)
       if (index >= 0) records[index] = event.event.task
@@ -213,6 +220,7 @@ export class AgentOrgExecutionContext {
       }
     }
     this.nextChangeSequence += 1
+    return 'applied'
   }
 
   setActive(active: boolean): void {
@@ -233,15 +241,22 @@ export class AgentOrgExecutionContext {
       'teamRunId' in member && member.members.some((agent) => agent.address === address)) ?? null
   }
 
-  private indexAndValidateTeamIdentities(): void {
+  private indexAndValidateIdentities(): void {
     for (const member of this.executionTree.rootOrg.members) {
-      if (!('teamRunId' in member)) continue
+      if ('agentRunId' in member) {
+        this.registerConfiguredPlacement(member.address, 'agent')
+        this.requireAgentContextIdentity(member.agentRunId, member.address, 'Configured Agent')
+        continue
+      }
+      this.registerConfiguredPlacement(member.address, 'team')
       this.registerTeamIdentity(member.teamRunId, member.address)
       for (const agent of member.members) {
-        if (this.addressByRunId.get(agent.agentRunId) !== agent.address
-          || !this.contexts.has(agent.agentRunId)) {
-          throw new Error(`Configured Team '${member.address}' member '${agent.address}' has no exact AgentOrg context.`)
-        }
+        this.registerConfiguredPlacement(agent.address, 'agent')
+        this.requireAgentContextIdentity(
+          agent.agentRunId,
+          agent.address,
+          `Configured Team '${member.address}' member`,
+        )
       }
       if (!this.teamCoordinator(member)) {
         throw new Error(`Configured Team '${member.address}' coordinator is not one of its direct Agent members.`)
@@ -249,6 +264,21 @@ export class AgentOrgExecutionContext {
       member.taskExecutions.forEach((task) => this.indexTaskExecution(task))
     }
     this.executionTree.rootOrg.taskExecutions.forEach((task) => this.indexTaskExecution(task))
+    for (const task of this.view.task_records.records) this.validateSnapshotTask(task)
+  }
+
+  private registerConfiguredPlacement(address: string, kind: ConfiguredPlacementKind): void {
+    const parsed = parseAgentTeamAddress(address)
+    if (this.configuredPlacementKindByAddress.has(parsed)) {
+      throw new Error(`Duplicate AgentOrg configured address '${parsed}'.`)
+    }
+    this.configuredPlacementKindByAddress.set(parsed, kind)
+  }
+
+  private requireAgentContextIdentity(agentRunId: string, address: string, label: string): void {
+    if (this.addressByRunId.get(agentRunId) !== address || !this.contexts.has(agentRunId)) {
+      throw new Error(`${label} '${address}' has no exact AgentOrg context.`)
+    }
   }
 
   private registerTeamIdentity(teamRunId: string, address: string): void {
@@ -259,13 +289,25 @@ export class AgentOrgExecutionContext {
   }
 
   private indexTaskExecution(task: TaskExecution): void {
-    if ('teamRunId' in task) this.indexTaskTeam(task)
+    if ('agentRunId' in task) {
+      this.requireAgentContextIdentity(task.agentRunId, task.address, 'Task Agent')
+      this.taskAgentAddressByRunId.set(task.agentRunId, parseAgentTeamAddress(task.address))
+      return
+    }
+    this.indexTaskTeam(task, true)
   }
 
-  private indexTaskTeam(team: TaskTeamNode): void {
+  private indexTaskTeam(team: TaskTeamNode, taskExecutionRoot: boolean): void {
     this.registerTeamIdentity(team.teamRunId, team.address)
+    if (taskExecutionRoot) {
+      this.taskTeamAddressByRunId.set(team.teamRunId, parseAgentTeamAddress(team.address))
+    }
     team.members.forEach((member) => {
-      if ('teamRunId' in member) this.indexTaskTeam(member)
+      if ('agentRunId' in member) {
+        this.requireAgentContextIdentity(member.agentRunId, member.address, 'Task Team Agent')
+      } else {
+        this.indexTaskTeam(member, false)
+      }
     })
     team.taskExecutions.forEach((task) => this.indexTaskExecution(task))
   }
@@ -279,24 +321,51 @@ export class AgentOrgExecutionContext {
       : null
   }
 
-  private validateTaskEvent(event: TaskEvent): void {
+  private validateTaskEvent(event: TaskEvent): AgentOrgEventApplication {
     const task = event.task
     if (!this.addressByRunId.has(task.delegatorAgentRunId)) {
       this.correlationFailure(`AgentOrg task '${task.taskId}' delegator identity mismatch.`)
     }
-    const executionAddress = 'agentRunId' in task.taskExecution
-      ? this.addressByRunId.get(task.taskExecution.agentRunId)
-      : this.addressByTeamRunId.get(task.taskExecution.teamRunId)
-    if (executionAddress !== task.recipientAddress) {
-      this.correlationFailure(`AgentOrg task '${task.taskId}' execution identity mismatch.`)
-    }
     const existing = this.view.task_records.records.find((record) => record.taskId === task.taskId)
     if (event.kind === 'activated') {
       if (existing) this.correlationFailure(`AgentOrg task '${task.taskId}' activation is duplicated.`)
-      return
+      this.validateFreshTaskExecution(task)
+      return 'checkpoint_required'
     }
-    if (!existing || !this.sameTaskIdentity(existing, task)) {
+    if (!existing || !this.sameTaskIdentity(existing, task)
+      || !this.taskExecutionMatchesConfiguredRecipient(task)) {
       this.correlationFailure(`AgentOrg task '${task.taskId}' lifecycle identity mismatch.`)
+    }
+    return 'applied'
+  }
+
+  private validateSnapshotTask(task: TaskRecord): void {
+    if (!this.addressByRunId.has(task.delegatorAgentRunId)
+      || !this.taskExecutionMatchesConfiguredRecipient(task)) {
+      throw new Error(`AgentOrg task '${task.taskId}' snapshot identity mismatch.`)
+    }
+  }
+
+  private taskExecutionMatchesConfiguredRecipient(task: TaskRecord): boolean {
+    const recipient = parseAgentTeamAddress(task.recipientAddress)
+    if ('agentRunId' in task.taskExecution) {
+      return this.configuredPlacementKindByAddress.get(recipient) === 'agent'
+        && this.taskAgentAddressByRunId.get(task.taskExecution.agentRunId) === recipient
+    }
+    return this.configuredPlacementKindByAddress.get(recipient) === 'team'
+      && this.taskTeamAddressByRunId.get(task.taskExecution.teamRunId) === recipient
+  }
+
+  private validateFreshTaskExecution(task: TaskRecord): void {
+    const recipient = parseAgentTeamAddress(task.recipientAddress)
+    const expectedKind = 'agentRunId' in task.taskExecution ? 'agent' : 'team'
+    const runId = 'agentRunId' in task.taskExecution
+      ? task.taskExecution.agentRunId
+      : task.taskExecution.teamRunId
+    if (this.configuredPlacementKindByAddress.get(recipient) !== expectedKind
+      || this.addressByRunId.has(runId)
+      || this.addressByTeamRunId.has(runId)) {
+      this.correlationFailure(`AgentOrg task '${task.taskId}' execution identity mismatch.`)
     }
   }
 

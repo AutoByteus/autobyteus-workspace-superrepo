@@ -85,8 +85,8 @@ const snapshot = {
   },
 }
 
-const candidate = (selectedAddress: string | null = null) => ({
-  phase: 'live', changeSequence: 4, selectedAddress,
+const candidate = (selectedAddress: string | null = null, changeSequence = 4) => ({
+  phase: 'live', changeSequence, selectedAddress,
   select: vi.fn(), setActive: vi.fn(), applyEvent: vi.fn(), requireReopen: vi.fn(),
 }) as unknown as AgentOrgExecutionContext
 
@@ -147,6 +147,51 @@ describe('AgentOrgStreamingService', () => {
       expect.stringContaining('snapshot arrived before CONNECTED'),
     ))
     expect(mocks.hydrate).not.toHaveBeenCalled()
+  })
+
+  it('checkpoint-hydrates a fresh task activation instead of publishing a partial context', async () => {
+    const first = candidate()
+    vi.mocked(first.applyEvent).mockReturnValue('checkpoint_required')
+    const second = candidate(null, 5)
+    mocks.hydrate.mockResolvedValueOnce(first).mockResolvedValueOnce(second)
+    mocks.query.mockResolvedValue({
+      data: { getAgentOrgExecutionCheckpoint: {
+        orgRunId: 'org-run', changeSequence: 5, hasOpenExecutionWork: true,
+      } },
+    })
+    const publish = vi.fn()
+    const reportError = vi.fn()
+    const service = new AgentOrgStreamingService({ orgRunId: 'org-run', publish, reportError })
+
+    service.connect()
+    const initialSocket = TestWebSocket.instances[0]!
+    initialSocket.emit(connected)
+    initialSocket.emit(snapshot)
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+
+    initialSocket.emit({
+      type: 'ROOT_EXECUTION_EVENT',
+      payload: {
+        root_subject_kind: 'agent_org', root_run_id: 'org-run', change_sequence: 5,
+        event: { kind: 'task', event: { kind: 'activated', task: {
+          taskId: 'task-fresh', delegatorAgentRunId: 'agent-run',
+          recipientAddress: '/direct', taskExecution: { agentRunId: 'agent-task-fresh' },
+          description: 'Fresh task', referenceFiles: [], status: 'active', updates: [],
+          createdAt: '2026-09-01T00:00:01.000Z',
+        } } },
+      },
+    })
+
+    await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
+    expect(publish).toHaveBeenCalledTimes(1)
+    const recoverySocket = TestWebSocket.instances[1]!
+    recoverySocket.emit(connected)
+    recoverySocket.emit(snapshot)
+    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second))
+    expect(first.applyEvent).toHaveBeenCalledWith(5, expect.objectContaining({ kind: 'task' }))
+    expect(first.requireReopen).not.toHaveBeenCalled()
+    expect(reportError).not.toHaveBeenCalled()
+    expect(mocks.query).toHaveBeenCalledTimes(2)
   })
 
   it('completes a command only from an ACK with the exact command type and target', async () => {

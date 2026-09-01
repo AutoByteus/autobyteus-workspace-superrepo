@@ -84,6 +84,18 @@ const status = (member_address, agent_run_id) => ({
   error_details: null,
 });
 
+const taskRecord = (taskId, delegatorAgentRunId, recipientAddress, taskExecution) => ({
+  taskId,
+  delegatorAgentRunId,
+  recipientAddress,
+  taskExecution,
+  description: `Task ${taskId}`,
+  referenceFiles: [],
+  status: "active",
+  updates: [],
+  createdAt: "2026-09-01T00:00:01.000Z",
+});
+
 test("requires explicit family and exact matching branch", () => {
   assert.equal(RootExecutionViewDtoSchema.parse({ root_subject_kind: "agent_team", root_run_id: "t", schema_version: 2, root_team: {} }).root_subject_kind, "agent_team");
   assert.equal(RootExecutionViewDtoSchema.parse(orgSnapshot()).root_subject_kind, "agent_org");
@@ -209,4 +221,64 @@ test("requires each configured Team coordinator to be one of that Team's direct 
     () => RootExecutionViewDtoSchema.parse(miscorrelated),
     /coordinator is not one of its direct Agent members/,
   );
+});
+
+test("correlates task-bearing restored or migrated state by fresh run identity while reusing configured addresses", () => {
+  const snapshot = orgSnapshot();
+  snapshot.root_org.execution_tree.rootOrg.members.push(
+    configuredAgent("/director", "agent-run-director"),
+    configuredAgent("/worker", "agent-run-worker-configured"),
+    configuredTeam("/team", "team-run-configured", "/team/lead", [
+      configuredAgent("/team/lead", "agent-run-lead-configured"),
+      configuredAgent("/team/worker", "agent-run-team-worker-configured"),
+    ]),
+  );
+  snapshot.root_org.execution_tree.rootOrg.taskExecutions.push({
+    address: "/worker",
+    agentRunId: "agent-run-worker-task",
+    platformAgentRunId: null,
+    startedAt: "2026-09-01T00:00:01.000Z",
+    settledAt: null,
+  }, {
+    address: "/team",
+    teamRunId: "team-run-task",
+    members: [
+      { address: "/team/lead", agentRunId: "agent-run-task-lead", platformAgentRunId: null },
+      { address: "/team/worker", agentRunId: "agent-run-task-worker", platformAgentRunId: null },
+    ],
+    taskExecutions: [],
+    startedAt: "2026-09-01T00:00:02.000Z",
+    settledAt: null,
+  });
+  snapshot.root_org.task_records.records.push(
+    taskRecord("task-agent", "agent-run-director", "/worker", { agentRunId: "agent-run-worker-task" }),
+    taskRecord("task-team", "agent-run-director", "/team", { teamRunId: "team-run-task" }),
+  );
+  snapshot.root_org.agent_statuses.push(
+    status("/director", "agent-run-director"),
+    status("/worker", "agent-run-worker-configured"),
+    status("/team/lead", "agent-run-lead-configured"),
+    status("/team/worker", "agent-run-team-worker-configured"),
+    status("/worker", "agent-run-worker-task"),
+    status("/team/lead", "agent-run-task-lead"),
+    status("/team/worker", "agent-run-task-worker"),
+  );
+
+  const parsed = RootExecutionViewDtoSchema.parse(snapshot);
+  assert.equal(parsed.root_org.task_records.records.length, 2);
+  assert.equal(parsed.root_org.agent_statuses.filter((entry) => entry.member_address === "/worker").length, 2);
+
+  const configuredRunAsTask = structuredClone(snapshot);
+  configuredRunAsTask.root_org.task_records.records[0].taskExecution = { agentRunId: "agent-run-worker-configured" };
+  assert.throws(() => RootExecutionViewDtoSchema.parse(configuredRunAsTask), /task 'task-agent'.*execution identity mismatch/);
+
+  const wrongExecutionAddress = structuredClone(snapshot);
+  wrongExecutionAddress.root_org.execution_tree.rootOrg.taskExecutions[0].address = "/director";
+  assert.throws(() => RootExecutionViewDtoSchema.parse(wrongExecutionAddress), /task 'task-agent'.*execution identity mismatch/);
+
+  const duplicateConfiguredAddress = structuredClone(snapshot);
+  duplicateConfiguredAddress.root_org.execution_tree.rootOrg.members.push(
+    configuredAgent("/worker", "agent-run-duplicate-configured"),
+  );
+  assert.throws(() => RootExecutionViewDtoSchema.parse(duplicateConfiguredAddress), /configured address '\/worker'.*duplicated/);
 });

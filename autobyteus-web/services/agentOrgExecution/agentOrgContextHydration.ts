@@ -97,13 +97,11 @@ const collectAgentSeeds = (view: AgentOrgExecutionViewDto): readonly AgentSeed[]
   }
   root.taskExecutions.forEach((task) => collectTaskSeeds(task, root.defaultLaunchConfiguration, output))
   const runIds = new Set<string>()
-  const addresses = new Set<string>()
   for (const seed of output) {
-    if (runIds.has(seed.agentRunId) || addresses.has(seed.address)) {
-      throw new Error(`Duplicate AgentOrg Agent identity '${seed.agentRunId}' at '${seed.address}'.`)
+    if (runIds.has(seed.agentRunId)) {
+      throw new Error(`Duplicate AgentOrg AgentRun identity '${seed.agentRunId}'.`)
     }
     runIds.add(seed.agentRunId)
-    addresses.add(seed.address)
   }
   return Object.freeze(output)
 }

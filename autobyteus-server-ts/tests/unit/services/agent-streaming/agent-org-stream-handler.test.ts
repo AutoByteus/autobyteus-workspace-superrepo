@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { CollaborationStreamServerMessageSchema } from "@autobyteus/collaboration-stream-contracts";
 import { AgentOrgStreamHandler } from "../../../../src/services/agent-streaming/agent-org-stream-handler.js";
 import { RootEventPublisher } from "../../../../src/agent-collaboration/execution/services/root-event-publisher.js";
-import { testAgentOrgExecutionTree, testOrgAgentNode } from "../../../fixtures/current-agent-org-run-fixtures.js";
+import { testAgentOrgExecutionTree, testOrgAgentNode, testOrgTeamNode } from "../../../fixtures/current-agent-org-run-fixtures.js";
 import type { AgentOrgRunEvent } from "../../../../src/agent-org-execution/domain/agent-org-run-event.js";
 import { createAgentOrgRootExecutionIdentity, createCollaborationMemberExecutionIdentity } from "../../../../src/agent-collaboration/execution/domain/root-execution-identity.js";
 
@@ -22,18 +22,69 @@ const statuses = [{
   statusHint: "IDLE" as const,
 }];
 
+const taskBearingPackage = () => {
+  const worker = testOrgAgentNode("/worker", "agent-worker-configured");
+  const lead = testOrgAgentNode("/team/lead", "agent-lead-configured");
+  const teamWorker = testOrgAgentNode("/team/worker", "agent-team-worker-configured");
+  const team = testOrgTeamNode({
+    address: "/team", teamRunId: "team-run-configured",
+    coordinatorAddress: lead.address, members: [lead, teamWorker],
+  });
+  const base = testAgentOrgExecutionTree({ orgRunId, members: [agent, worker, team] });
+  const taskAgent = {
+    address: worker.address, agentRunId: "agent-worker-task", platformAgentRunId: null,
+    startedAt: "2026-09-01T00:00:01.000Z", settledAt: null,
+  } as const;
+  const taskTeam = {
+    address: team.address, teamRunId: "team-run-task",
+    members: [
+      { address: lead.address, agentRunId: "agent-task-lead", platformAgentRunId: null },
+      { address: teamWorker.address, agentRunId: "agent-task-worker", platformAgentRunId: null },
+    ],
+    taskExecutions: [], startedAt: "2026-09-01T00:00:02.000Z", settledAt: null,
+  } as const;
+  const executionTree = {
+    ...base,
+    rootOrg: { ...base.rootOrg, taskExecutions: [taskAgent, taskTeam] },
+  };
+  const taskRecords = {
+    schemaVersion: 1 as const, subjectKind: "agent_org" as const, orgRunId,
+    records: [{
+      taskId: "task-agent", delegatorAgentRunId: agent.agentRunId,
+      recipientAddress: worker.address, taskExecution: { agentRunId: taskAgent.agentRunId },
+      description: "Agent task", referenceFiles: [], status: "active" as const, updates: [],
+      createdAt: taskAgent.startedAt,
+    }, {
+      taskId: "task-team", delegatorAgentRunId: agent.agentRunId,
+      recipientAddress: team.address, taskExecution: { teamRunId: taskTeam.teamRunId },
+      description: "Team task", referenceFiles: [], status: "active" as const, updates: [],
+      createdAt: taskTeam.startedAt,
+    }],
+  };
+  const taskStatuses = [worker, lead, teamWorker, taskAgent, ...taskTeam.members].map((member) => ({
+    execution: createCollaborationMemberExecutionIdentity({
+      root: createAgentOrgRootExecutionIdentity(orgRunId),
+      memberAddress: member.address,
+      agentRunId: member.agentRunId,
+    }),
+    details: { status: "idle" as const, trigger: null, errorMessage: null },
+    statusHint: "IDLE" as const,
+  }));
+  return { tree: executionTree, tasks: taskRecords, messages, statuses: [...statuses, ...taskStatuses] };
+};
+
 const connection = () => {
   const sent: string[] = [];
   return { sent, socket: { send: (value: string) => sent.push(value), close: vi.fn() } };
 };
 
-const harness = () => {
+const harness = (snapshot = { tree, tasks, messages, statuses }) => {
   const publisher = new RootEventPublisher<AgentOrgRunEvent>();
   const executeAgentCommand = vi.fn(async () => ({ accepted: true }));
   const run = {
     orgRunId,
     isActive: () => true,
-    openPackageSnapshotConnection: () => publisher.openSnapshotConnection(() => ({ tree, tasks, messages, statuses })),
+    openPackageSnapshotConnection: () => publisher.openSnapshotConnection(() => snapshot),
     executeAgentCommand,
   };
   const manager = { getActive: vi.fn((id: string) => id === orgRunId ? run : null) };
@@ -61,6 +112,28 @@ describe("AgentOrgStreamHandler", () => {
     expect(emitted.map((message) => message.type)).toEqual(["ROOT_EXECUTION_EVENT", "ROOT_LIFECYCLE"]);
     expect(emitted[0]).toMatchObject({ payload: { root_subject_kind: "agent_org", root_run_id: orgRunId, change_sequence: 1, event: { kind: "agent_presentation" } } });
     expect(emitted[1]).toMatchObject({ payload: { root_subject_kind: "agent_org", root_run_id: orgRunId, is_active: false } });
+  });
+
+  it("projects restored task Agent and Team runs at their configured recipient addresses", async () => {
+    const test = harness(taskBearingPackage()); const client = connection();
+    const sessionId = await test.handler.connect(client.socket, orgRunId);
+    expect(sessionId, client.sent.at(-1)).toBeTruthy();
+
+    const snapshot = client.sent.map((value) => CollaborationStreamServerMessageSchema.parse(JSON.parse(value)))
+      .find((message) => message.type === "ROOT_EXECUTION_VIEW_SNAPSHOT");
+    expect(snapshot).toMatchObject({
+      type: "ROOT_EXECUTION_VIEW_SNAPSHOT",
+      payload: { root_org: {
+        execution_tree: { rootOrg: { taskExecutions: [
+          { address: "/worker", agentRunId: "agent-worker-task" },
+          { address: "/team", teamRunId: "team-run-task" },
+        ] } },
+        task_records: { records: [
+          { recipientAddress: "/worker", taskExecution: { agentRunId: "agent-worker-task" } },
+          { recipientAddress: "/team", taskExecution: { teamRunId: "team-run-task" } },
+        ] },
+      } },
+    });
   });
 
   it("rejects wrong-root commands and routes a correlated command only to the exact AgentRun", async () => {

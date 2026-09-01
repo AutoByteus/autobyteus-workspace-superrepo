@@ -208,7 +208,8 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
       if (message.payload.root_subject_kind !== 'agent_org') {
         throw new Error('AgentOrg stream supplied a non-Org event.')
       }
-      this.context.applyEvent(message.payload.change_sequence, message.payload.event)
+      const application = this.context.applyEvent(message.payload.change_sequence, message.payload.event)
+      if (application === 'checkpoint_required') await this.reopen()
       return
     }
     this.context.setActive(message.payload.is_active)

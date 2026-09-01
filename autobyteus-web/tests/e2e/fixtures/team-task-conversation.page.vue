@@ -1,13 +1,13 @@
 <template>
   <main class="min-h-screen bg-slate-100 p-6" data-test="team-task-conversation-probe">
     <section class="mx-auto h-[760px] max-w-[1180px] overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
-      <TeamOverviewPanel />
+      <TeamOverviewPanel :team="team" />
     </section>
   </main>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue';
+import { onBeforeUnmount, onMounted, shallowRef } from 'vue';
 import type {
   TaskDelegationRecordDto,
   TeamCommunicationMessageDto,
@@ -23,6 +23,7 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
+import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
 
 const ROOT_TEAM_RUN_ID = 'browser-team-run';
 const TEACHER_RUN_ID = 'teacher-run';
@@ -161,6 +162,8 @@ const restoredContext = buildTestTeamContext({
 
 const teamStore = useAgentTeamContextsStore();
 const selectionStore = useAgentSelectionStore();
+const team = shallowRef(testTeamWorkspaceContextView(initialContext));
+const refreshTeam = () => { team.value = testTeamWorkspaceContextView(initialContext); };
 teamStore.addTeamContext(initialContext);
 selectionStore.setRunSelection(ROOT_TEAM_RUN_ID, 'team');
 
@@ -206,12 +209,24 @@ type TeamTaskConversationProbeControl = {
 onMounted(() => {
   const globalWindow = window as typeof window & { __teamTaskConversationProbe?: TeamTaskConversationProbeControl };
   globalWindow.__teamTaskConversationProbe = {
-    hydrate: () => initialContext.view.applySnapshot(snapshot()).disposition,
-    acceptLive: () => initialContext.view.applyMessage({
-      type: 'TASK_DELEGATION_EVENT',
-      payload: { event_type: 'TASK_CHANGED', change_sequence: 41, task: acceptedTask },
-    }).disposition,
-    focus: (agentRunId) => initialContext.view.focusAgent(agentRunId).disposition,
+    hydrate: () => {
+      const result = initialContext.view.applySnapshot(snapshot()).disposition;
+      refreshTeam();
+      return result;
+    },
+    acceptLive: () => {
+      const result = initialContext.view.applyMessage({
+        type: 'TASK_DELEGATION_EVENT',
+        payload: { event_type: 'TASK_CHANGED', change_sequence: 41, task: acceptedTask },
+      }).disposition;
+      refreshTeam();
+      return result;
+    },
+    focus: (agentRunId) => {
+      const result = initialContext.view.focusAgent(agentRunId).disposition;
+      refreshTeam();
+      return result;
+    },
     setLocale: async (locale) => { await setPreference(locale); },
     ids: Object.freeze({
       acceptedTaskId: ACCEPTED_TASK_ID,

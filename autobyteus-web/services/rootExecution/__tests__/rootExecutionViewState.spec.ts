@@ -78,7 +78,7 @@ const agentContext = (runId: string, name: string) => new AgentContext({
   updatedAt: '2026-09-01T00:00:00.000Z', agentDefinitionId: `${name}-def`,
   agentName: name, llmModelIdentifier: launch.llmModelIdentifier,
 }))
-const build = (snapshot = view()) => {
+const build = (snapshot = view(), taskEntries: ConstructorParameters<typeof AgentOrgExecutionContext>[0]['entries'] = []) => {
   const send = vi.fn().mockResolvedValue(undefined)
   const context = new AgentOrgExecutionContext({
     orgRunId: 'org-run', view: snapshot,
@@ -86,17 +86,19 @@ const build = (snapshot = view()) => {
       { agentRunId: 'agent-direct', memberAddress: parseAgentTeamAddress('/direct'), context: agentContext('agent-direct', 'Direct') },
       { agentRunId: 'agent-coordinator', memberAddress: parseAgentTeamAddress('/team/coordinator'), context: agentContext('agent-coordinator', 'Coordinator') },
       { agentRunId: 'agent-member', memberAddress: parseAgentTeamAddress('/team/member'), context: agentContext('agent-member', 'Member') },
+      ...taskEntries,
     ],
     transport: { interactionFor: () => ({ send, interrupt: vi.fn(), decideTool: vi.fn() }) },
   })
   return { context, send }
 }
 
-const task = (): AgentOrgTaskRecordDto => ({
+const task = (overrides: Partial<AgentOrgTaskRecordDto> = {}): AgentOrgTaskRecordDto => ({
   taskId: 'task-1', delegatorAgentRunId: 'agent-coordinator',
-  recipientAddress: '/team/member', taskExecution: { agentRunId: 'agent-member' },
+  recipientAddress: '/team/member', taskExecution: { agentRunId: 'agent-task-fresh' },
   description: 'Verify the bounded result.', referenceFiles: [], status: 'active', updates: [],
   createdAt: '2026-09-01T00:00:01.000Z',
+  ...overrides,
 })
 
 const communication = (senderAgentRunId = 'agent-direct', receiverAgentRunId = 'agent-member') => ({
@@ -166,8 +168,19 @@ describe('AgentOrgExecutionContext', () => {
 
   it('accepts correlated task and communication events without changing their valid path', () => {
     const snapshot = view()
+    snapshot.execution_tree.rootOrg.taskExecutions.push({
+      address: '/team/member', agentRunId: 'agent-task-fresh', platformAgentRunId: null,
+      startedAt: '2026-09-01T00:00:01.000Z', settledAt: null,
+    })
     snapshot.task_records.records.push(task())
-    const { context } = build(snapshot)
+    snapshot.agent_statuses.push({
+      member_address: '/team/member', agent_run_id: 'agent-task-fresh', status: 'idle',
+      trigger: null, tool_name: null, error_message: null, error_details: null,
+    })
+    const { context } = build(snapshot, [{
+      agentRunId: 'agent-task-fresh', memberAddress: parseAgentTeamAddress('/team/member'),
+      context: agentContext('agent-task-fresh', 'Task Member'),
+    }])
     const submission = {
       submissionId: 'submission-1', message: 'verified', referenceFiles: [],
       createdAt: '2026-09-01T00:00:02.000Z',
@@ -188,6 +201,26 @@ describe('AgentOrgExecutionContext', () => {
     })
   })
 
+  it('routes a fresh task Agent or Team activation to checkpoint hydration without partial mutation', () => {
+    const { context } = build()
+    const committed = structuredClone(context.view)
+
+    expect(context.applyEvent(5, {
+      kind: 'task', event: { kind: 'activated', task: task() },
+    })).toBe('checkpoint_required')
+    expect(context.applyEvent(5, {
+      kind: 'task', event: { kind: 'activated', task: task({
+        taskId: 'task-team',
+        recipientAddress: '/team',
+        taskExecution: { teamRunId: 'team-task-fresh' },
+      }) },
+    })).toBe('checkpoint_required')
+
+    expect(context.phase).toBe('live')
+    expect(context.changeSequence).toBe(4)
+    expect(context.view).toEqual(committed)
+  })
+
   it.each([
     ['communication sender', communication('unknown-agent', 'agent-member')],
     ['communication receiver', communication('agent-direct', 'unknown-agent')],
@@ -195,9 +228,13 @@ describe('AgentOrgExecutionContext', () => {
       kind: 'task' as const,
       event: { kind: 'activated' as const, task: { ...task(), taskId: 'task-2', delegatorAgentRunId: 'unknown-agent' } },
     }],
-    ['task execution', {
+    ['task execution kind', {
       kind: 'task' as const,
-      event: { kind: 'activated' as const, task: { ...task(), taskId: 'task-2', taskExecution: { agentRunId: 'unknown-agent' } } },
+      event: { kind: 'activated' as const, task: { ...task(), taskId: 'task-2', taskExecution: { teamRunId: 'fresh-team' } } },
+    }],
+    ['reused configured execution', {
+      kind: 'task' as const,
+      event: { kind: 'activated' as const, task: { ...task(), taskId: 'task-2', taskExecution: { agentRunId: 'agent-member' } } },
     }],
   ] satisfies readonly (readonly [string, AgentOrgExecutionEventDto])[])(
     'fails closed before mutating a miscorrelated %s event', (_label, event) => {

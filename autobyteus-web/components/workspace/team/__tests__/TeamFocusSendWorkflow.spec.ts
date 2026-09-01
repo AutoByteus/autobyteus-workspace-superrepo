@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { defineComponent, nextTick } from 'vue';
+import { defineComponent, nextTick, type PropType } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import TeamOverviewPanel from '../TeamOverviewPanel.vue';
@@ -14,6 +14,8 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
+import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
+import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget';
 
 const labels: Record<string, string> = {
   'agentInput.components.agentInput.AgentUserInputTextArea.type_a_message': 'Type a message...',
@@ -33,13 +35,16 @@ const labels: Record<string, string> = {
 
 const WorkflowHarness = defineComponent({
   components: { TeamOverviewPanel, AgentTeamEventMonitor, AgentUserInputTextArea },
-  template: '<div><TeamOverviewPanel /><AgentTeamEventMonitor /><AgentUserInputTextArea data-test="workflow-composer" /></div>',
+  props: {
+    team: { type: Object as PropType<TeamWorkspaceContextView>, required: true },
+  },
+  template: '<div><TeamOverviewPanel :team="team" /><AgentTeamEventMonitor /><AgentUserInputTextArea data-test="workflow-composer" /></div>',
 });
 
 const TeamCommunicationPanelStub = defineComponent({
   name: 'TeamCommunicationPanel',
-  props: ['teamContext', 'focusedAgentRunId'],
-  template: '<div data-test="team-communication-panel" :data-team-run-id="teamContext.view.getRootTeamRunId()" :data-focused-agent-run-id="focusedAgentRunId" />',
+  props: ['team'],
+  template: '<div data-test="team-communication-panel" :data-team-run-id="team.rootRunId" :data-focused-agent-run-id="team.focusedAgentRunId" />',
 });
 
 const mountWorkflow = () => {
@@ -74,6 +79,7 @@ const mountWorkflow = () => {
   const teamRunStore = useAgentTeamRunStore();
   const sendMessageSpy = vi.spyOn(teamRunStore, 'sendMessageToFocusedMember').mockResolvedValue(undefined);
   const wrapper = mount(WorkflowHarness, {
+    props: { team: testTeamWorkspaceContextView(teamContext) },
     global: {
       stubs: {
         Icon: true,
