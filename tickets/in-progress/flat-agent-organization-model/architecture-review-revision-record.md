@@ -11,6 +11,7 @@ concise chronological architecture-review history.
 | ARCH-REV-002 | Round 2 / cumulative re-review after approved `RER-018`, `AD-REV-003` finding recovery, and `AD-REV-004` migration-convention correction | `AD-REV-003`, `AD-REV-004` | Fail — Design Impact | Pass | `AR-FIND-001`, `AR-FIND-002`, `ADI-006` |
 | ARCH-REV-003 | Round 3 / re-review after implementation `IR-001` returned composition impact `IDI-001` and `AD-REV-005` defined the production runtime extraction | `AD-REV-005` | Pass | Pass | `IDI-001` |
 | ARCH-REV-004 | Round 4 / re-review after API/E2E real-browser execution exposed raw Org presentation impact `ADI-007` and `AD-REV-006` defined strict accepted-workspace reuse | `AD-REV-006` | Pass | Pass | `ADI-007` |
+| ARCH-REV-005 | Round 5 / re-review after `API-FIND-007` / `CR-FIND-011`, approved `RER-021` and focused Product status authority, and `AD-REV-007` defined the mounted-Team projection | `AD-REV-007` | Pass | Pass | `API-FIND-007`, `CR-FIND-011` |
 
 ## Revision Entries
 
@@ -104,3 +105,29 @@ None.
 - Material classification changes: The authoritative result remains `Pass`; task size remains `Large`, architectural risk remains `High`, and no Requirement Gap or Product UI gap exists. The result validates architecture only and does not claim the impacted implementation or API/E2E path is fixed.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must reconcile `IR-003` with AD-REV-006, preserve every Team-only outer message and standalone Agent/Team workspace behavior, eliminate all opaque Org/event/dashboard/direct-socket paths, prove exact Org member hydration/command/contextual-query correlation and recovery, keep mounted Teams outside Team root stores/registries/lifecycle, and re-run source review plus real browser/API/E2E evidence. These are controlled High implementation risks, not open design decisions.
+
+### ARCH-REV-005 — Exact mounted-Team aggregate status projection pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 5; API/E2E `API-FIND-007` and Code Review `CRR-009` / `CR-FIND-011` identified that the AgentOrg history tree omitted the established Team aggregate signal. Requirements `RER-021` and the explicitly user-approved `AORG-FLAT-TEAM-STATUS-001` supplement closed the behavior/Product gate, and `AD-REV-007` requested independent re-review.
+- Triggering role, report path, and finding IDs: Architecture Designer, based on `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`, `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`, and the approved focused Product package; `API-FIND-007`, `CR-FIND-011`.
+- Relevant architecture design revision IDs: `AD-REV-007`
+- Prior authoritative decision: `Pass` (`ARCH-REV-004`)
+- Current authoritative decision: `Pass`
+- What changed in the review result or what baseline was established: Independently confirmed the supported active/collapsed/stopped user path, the current Team-dot omission and hard-coded Agent dot, the retained five-state Team-history implementation, the strict Org configured/task topology, exact reactive AgentContext status ownership, and the absence of durable historical per-Agent status. The revised design now projects one exact configured Team branch—including recursive task-scoped Agents—before visibility filtering, injects the exact live/history status source, shares one pure precedence/normalization policy and one accessible Team dot with retained Team history, preserves exact Agent signals, and explicitly adds no backend, persisted, polling, mounted-root, lifecycle, focus, routing, readiness, or command authority.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001` | Resolved in `ARCH-REV-002` | Remains resolved | `RER-018`, `AD-REV-003`-`AD-REV-007` | Target-only Team V2/Org V1 definition admission, server-owned conversion, and external read-only ownership are unchanged. |
+| `AR-FIND-002` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-003`-`AD-REV-007` | Org/root-owned handoffs still precede stable Team-local lists; status projection does not inspect or reorder handoffs. |
+| `ADI-006` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-004`-`AD-REV-007` | Canonical startup runner/direct-rename/relaunch behavior and native flat-Team zero-write remain unchanged. |
+| `IDI-001` | Resolved in `ARCH-REV-003` | Remains resolved | `AD-REV-005`-`AD-REV-007` | Mounted Teams remain local AgentOrg-owned executions with no Team package, registry, or public/durable root union. |
+| `ADI-007` | Resolved in `ARCH-REV-004` | Remains resolved | `AD-REV-006`, `AD-REV-007` | One strict Org browser context and accepted Agent/Team surfaces remain authoritative; the status delta composes below the hierarchy row and adds no alternate transport/dashboard. |
+| `API-FIND-007` / `CR-FIND-011` | Product/requirements/architecture recovery open after `CRR-009` | Resolved at design boundary | `RER-021`, `AORG-FLAT-TEAM-STATUS-001`, `AD-REV-007`; VAL-023-VAL-025 | Exact branch traversal, precedence, collapsed reactivity, historical authority, accessibility, exact Agent coexistence, file mapping, forbidden shortcuts, and validation sequence are complete. Implementation/API evidence remains pending. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: The authoritative result remains `Pass`; the focused correction is `Medium / Low`, while the cumulative package remains `Large / High` and requires the normal reviewed implementation/source/API route. No Requirement Gap or Product UI gap remains.
+- Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+- Remaining risks or uncertainty: Implementation must compute from the complete strict Team branch rather than visible rows, include recursive task Agents without sibling/root leakage, preserve exact Agent dots and retained Team history behavior, gate live authority on the exact active context, demote stale live-only historical states, use one shared fold/a11y dot, and introduce no backend status field, polling, mounted-Team lifecycle, or configured recursion. Source review and real browser/API/E2E validation remain required; these are controlled implementation risks, not open architecture decisions.
