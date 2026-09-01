@@ -4,9 +4,9 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-018`
-- Status: `Approved`
-- Approval reference: Behavior/Product UI and the Team V2 / AgentOrg V1 runtime contract through `RER-016` remain approved. The user explicitly clarified that the public/private external definition repositories are separate owner projects outside this ticket and explicitly approved the exact `RER-017` target definition versions, target-only normal admission, and non-blocking per-definition availability policy on 2026-09-01. `RER-018` records approval closure.
+- Requirements revision: `RER-020`
+- Status: `Approved behavior — focused Product evidence pending`
+- Approval reference: Behavior/runtime/admission through `RER-019` remain approved. During real-browser validation, the user explicitly directed that a reusable Team mounted in an AgentOrg retain the original Team-row aggregate status signal in addition to exact Agent-row signals. `RER-020` approves the presentation-only semantics and negative lifecycle boundary in `ORG-CASE-056`–`ORG-CASE-058`; a focused Product supplement/reference revision is pending before architecture re-entry.
 - Owner/date: Requirements Engineer / 2026-09-01
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
@@ -54,6 +54,7 @@ AgentTeamDefinition
 11. AgentOrg configuration applies root choices across the scope, then direct Team placement and exact Agent placement overrides by increasing specificity; it does not mutate referenced definitions or alter Team coordinator ingress.
 12. Standalone Team runs remain native Team V2 packages; AgentOrg runs use a separate AgentOrg V1 package/file. Shared record shapes do not imply a generic persisted root union.
 13. Definition source ownership is independent of runtime snapshot ownership: external definition repositories are read-only dependencies for this ticket, while every server memory run package remains in the runtime transition cohort.
+14. A direct Team placement in an AgentOrg retains one presentation-only aggregate status signal over the exact Agent statuses in its branch; this does not create Team-root lifecycle or persistence ownership.
 
 ## Behavioral Contract Cases
 
@@ -172,6 +173,14 @@ defaults still seed the definition's standalone launch journey.
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
 | ORG-CASE-031 | User adds a previously tested standalone AgentTeam definition to AgentOrg and authors Org-scoped handoffs | Org references the same Team definition identity and preserves its coordinator, Agent members, Team-local handoffs, independent launchability, and prior run history | No copy, fork, Org-specific Team subtype, or Team-within-Team placement is required. |
+
+### Mounted Team Aggregate Status — Approved In RER-020
+
+| Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
+| --- | --- | --- | --- |
+| ORG-CASE-056 | Render a direct Team placement in an active AgentOrg hierarchy | Show one Team-row aggregate status in the established status position and retain every descendant Agent's exact status signal | The Team row is not status-less, and the aggregate does not replace or overwrite Agent-row states. |
+| ORG-CASE-057 | Aggregate the mounted Team while its branch is expanded or collapsed, then inspect history/stopped state | Fold only exact Agent execution statuses projected inside that Team branch—including configured and task-scoped descendant Agents—with precedence `running > initializing > error > idle > offline`; unknown/missing/empty is `offline`; keep the Team signal visible while collapsed; historical/stopped presentation uses truthful historical/terminal Agent projection and never retains unowned stale live activity | The Team container, direct Org Agents, ancestors, sibling Teams, and rows outside the Team subtree do not contribute; no independent polling or alternate status authority is introduced. |
+| ORG-CASE-058 | User perceives or interacts near the mounted Team status | Expose Team identity and aggregate state without color alone while preserving the original Team-tree appearance as far as the fixed-depth model allows | The signal is presentation-only: no Team-root persistence/transport field, independent Stop/restore/archive action, lifecycle ownership, focus/routing/readiness/command effect, or synthetic standalone mounted-Team run is created. |
 
 ## Normative Definition Package And Admission Contract — Approved In RER-018
 
@@ -606,6 +615,7 @@ identity.
 | ORG-VERIFY-008 | ORG-CASE-043–048 | Direct-to-Org configuration, Org → Team → Agent effective-setting precedence, referenced-definition immutability, complete launch validation, full-scope activation, and no initial focus. |
 | ORG-VERIFY-009 | Mixed-root projection contract | Mandatory `root_subject_kind`, correct Team V2/AgentOrg V1 union branch, Team-only compatibility, package/payload/projection agreement, and failure-closed mismatch handling. |
 | ORG-VERIFY-010 | ORG-CASE-049–055 | Exact Team Definition V2 / Org Definition V1 codecs, source ownership, migration-only legacy decoding, target-only normal admission, external dependency diagnostics, runtime independence, and approved per-definition availability. |
+| ORG-VERIFY-011 | ORG-CASE-056–058 | Mounted Team aggregate status over exact in-branch Agent projections; five-state precedence; collapsed visibility; accessible meaning; truthful stopped/history behavior; no Team-root lifecycle or persistence authority. |
 
 ## Contract Non-Goals
 
@@ -624,6 +634,7 @@ identity.
 - Editing, migrating, committing, or releasing either separately maintained external definition repository.
 - A normal dual parser, silent field normalization, or legacy definition fallback for out-of-scope packages.
 - Making existing run history unavailable solely because its definition package has not yet published the target version.
+- Persisting or transporting an independent mounted-Team aggregate status, registering a mounted Team as another collaboration root, or adding mounted-Team Stop/restore/archive lifecycle actions inside an AgentOrg.
 
 ## Approval Basis
 
@@ -680,9 +691,21 @@ change its visible Team/Org, handoff, configuration, focus, or runtime/history
 behavior; production mixed-root APIs must simply discriminate those approved
 root identities truthfully.
 
+The later user-authorized `API-FIND-007` correction is integrated in `RER-020`.
+A configured Team row mounted beneath an AgentOrg retains the established
+five-state aggregate over exact descendant Agent status projections, remains
+visible when collapsed, and coexists with every Agent-row signal. The aggregate
+is presentation-only and does not create a Team root, status authority,
+persistence field, or lifecycle action. A focused Product-owned supplement and
+reference revision must make this correction reviewable without reopening
+unrelated `RV-012` behavior before the package returns to Architecture Design.
+
 `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
 and `VIS-001`–`VIS-020` under that ticket's `visual-references/` directory are
-the normative product presentation of these cases. Product-declared fixture
+the normative product presentation of the prior cases, subject only to the
+explicit `API-FIND-007` omission above. The returned focused Product supplement
+will become the presentation authority for `ORG-CASE-056`–`ORG-CASE-058` after
+user approval. Product-declared fixture
 names/values remain illustrative, and the prototype's local mocked persistence,
 services, orchestration, streams, and writes do not define production
 architecture.
