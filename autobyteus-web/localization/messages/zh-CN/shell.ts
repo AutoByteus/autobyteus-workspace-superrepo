@@ -3,6 +3,7 @@ import type { TranslationCatalog } from '../../runtime/types';
 const shellMessages = {
   'shell.navigation.agents': '智能体',
   'shell.navigation.agentTeams': '智能体团队',
+  'shell.navigation.agentOrgs': '智能体组织',
   'shell.navigation.applications': '应用程序',
   'shell.navigation.skills': '技能',
   'shell.navigation.memory': '记忆',

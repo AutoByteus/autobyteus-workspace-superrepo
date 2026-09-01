@@ -1,4 +1,5 @@
-import type { TeamRunExecutionTreeLocationService } from "../../run-history/services/team-run-execution-tree-location-service.js";
+import type { CollaborationExecutionLocationService, LocatedCollaborationAgentExecution } from "../../agent-collaboration/execution/services/collaboration-execution-location-service.js";
+import type { LocatedTeamAgentExecution } from "../../run-history/services/team-run-execution-tree-location-service.js";
 import type {
   ContextFileFinalOwnerDescriptor,
   ContextFileResolvedFinalOwnerDescriptor,
@@ -7,7 +8,10 @@ import type {
 export class ContextFileOwnerResolver {
   constructor(
     input: {
-      locations: Pick<TeamRunExecutionTreeLocationService, "findAgent" | "findAgentSync">;
+      locations: {
+        findAgent(input: { rootSubjectKind?: "agent_org"; rootRunId?: string; containingTeamRunId?: string; memberAddress?: string }): Promise<LocatedCollaborationAgentExecution | LocatedTeamAgentExecution | null>;
+        findAgentSync(input: { rootSubjectKind?: "agent_org"; rootRunId?: string; containingTeamRunId?: string; memberAddress?: string }): LocatedCollaborationAgentExecution | LocatedTeamAgentExecution | null;
+      };
     },
   ) {
     if (
@@ -20,20 +24,27 @@ export class ContextFileOwnerResolver {
     this.locations = input.locations;
   }
 
-  private readonly locations: Pick<
-    TeamRunExecutionTreeLocationService,
-    "findAgent" | "findAgentSync"
-  >;
+  private readonly locations: {
+    findAgent(input: { rootSubjectKind?: "agent_org"; rootRunId?: string; containingTeamRunId?: string; memberAddress?: string }): Promise<LocatedCollaborationAgentExecution | LocatedTeamAgentExecution | null>;
+    findAgentSync(input: { rootSubjectKind?: "agent_org"; rootRunId?: string; containingTeamRunId?: string; memberAddress?: string }): LocatedCollaborationAgentExecution | LocatedTeamAgentExecution | null;
+  };
 
   async resolveFinalOwner(
     owner: ContextFileFinalOwnerDescriptor,
   ): Promise<ContextFileResolvedFinalOwnerDescriptor> {
     if (owner.kind === "agent_final") return owner;
     const location = await this.locations.findAgent({
-      containingTeamRunId: owner.teamRunId,
+      rootSubjectKind: owner.kind === "org_member_final" ? "agent_org" : undefined,
+      rootRunId: owner.kind === "org_member_final" ? owner.orgRunId : undefined,
+      containingTeamRunId: owner.kind === "team_member_final" ? owner.teamRunId : undefined,
       memberAddress: owner.memberAddress,
     });
-    if (!location) throw this.notFound(owner.teamRunId, owner.memberAddress);
+    const rootKind = location && "rootSubjectKind" in location ? location.rootSubjectKind : "agent_team";
+    const rootRunId = location && "rootRunId" in location ? location.rootRunId : location?.rootTeamRunId;
+    if (!location || owner.kind === "team_member_final" && rootKind !== "agent_team"
+      || owner.kind === "org_member_final" && (rootKind !== "agent_org" || rootRunId !== owner.orgRunId)) {
+      throw this.notFound(owner.kind === "team_member_final" ? owner.teamRunId : owner.orgRunId, owner.memberAddress);
+    }
     return this.result(owner, location);
   }
 
@@ -42,29 +53,44 @@ export class ContextFileOwnerResolver {
   ): ContextFileResolvedFinalOwnerDescriptor {
     if (owner.kind === "agent_final") return owner;
     const location = this.locations.findAgentSync({
-      containingTeamRunId: owner.teamRunId,
+      rootSubjectKind: owner.kind === "org_member_final" ? "agent_org" : undefined,
+      rootRunId: owner.kind === "org_member_final" ? owner.orgRunId : undefined,
+      containingTeamRunId: owner.kind === "team_member_final" ? owner.teamRunId : undefined,
       memberAddress: owner.memberAddress,
     });
-    if (!location) throw this.notFound(owner.teamRunId, owner.memberAddress);
+    const rootKind = location && "rootSubjectKind" in location ? location.rootSubjectKind : "agent_team";
+    const rootRunId = location && "rootRunId" in location ? location.rootRunId : location?.rootTeamRunId;
+    if (!location || owner.kind === "team_member_final" && rootKind !== "agent_team"
+      || owner.kind === "org_member_final" && (rootKind !== "agent_org" || rootRunId !== owner.orgRunId)) {
+      throw this.notFound(owner.kind === "team_member_final" ? owner.teamRunId : owner.orgRunId, owner.memberAddress);
+    }
     return this.result(owner, location);
   }
 
   private result(
-    owner: Extract<ContextFileFinalOwnerDescriptor, { kind: "team_member_final" }>,
-    location: import("../../run-history/services/team-run-execution-tree-location-service.js").LocatedTeamAgentExecution,
+    owner: Exclude<ContextFileFinalOwnerDescriptor, { kind: "agent_final" }>,
+    location: LocatedCollaborationAgentExecution | LocatedTeamAgentExecution,
   ): ContextFileResolvedFinalOwnerDescriptor {
+    if (owner.kind === "org_member_final") return {
+      ...owner,
+      rootSubjectKind: "agent_org",
+      rootRunId: "rootRunId" in location ? location.rootRunId : location.rootTeamRunId,
+      ancestorTeamRunIds: [...location.ancestorTeamRunIds],
+      agentRunId: location.agentRunId,
+      memoryDir: location.memoryDir,
+    };
     return {
       ...owner,
-      rootTeamRunId: location.rootTeamRunId,
+      rootTeamRunId: "rootRunId" in location ? location.rootRunId : location.rootTeamRunId,
       ancestorTeamRunIds: [...location.ancestorTeamRunIds],
       agentRunId: location.agentRunId,
       memoryDir: location.memoryDir,
     };
   }
 
-  private notFound(teamRunId: string, memberAddress: string): Error {
+  private notFound(rootRunId: string, memberAddress: string): Error {
     return new Error(
-      `Unable to resolve context-file owner member '${memberAddress}' for TeamRun '${teamRunId}'.`,
+      `Unable to resolve context-file owner member '${memberAddress}' for collaboration root '${rootRunId}'.`,
     );
   }
 }

@@ -18,6 +18,7 @@ import { TeamRunExecutionTreeV1AppDataMigration } from "./migrations/team-run-ex
 import { TokenUsageRunRecordsV1AppDataMigration } from "./migrations/token-usage-run-records-v1/token-usage-run-records-v1-app-data-migration.js";
 import { TeamAgentMemoryLayoutAppDataMigration } from "./migrations/team-agent-memory-layout-app-data-migration.js";
 import { TeamRunExecutionTreeV2AppDataMigration } from "./migrations/team-run-execution-tree-v2-app-data-migration.js";
+import { AgentOrgFlatTeamFamiliesV1AppDataMigration } from "./migrations/agent-org-flat-team-families-v1/agent-org-flat-team-families-v1-app-data-migration.js";
 
 export class AppDataMigrationRegistry {
   private readonly definitions: AppDataMigrationDefinition[];
@@ -38,6 +39,9 @@ export class AppDataMigrationRegistry {
         appConfigProvider.config.getMemoryDir(),
       ),
       new TeamRunExecutionTreeV2AppDataMigration(
+        appConfigProvider.config.getMemoryDir(),
+      ),
+      new AgentOrgFlatTeamFamiliesV1AppDataMigration(
         appConfigProvider.config.getMemoryDir(),
       ),
       new RemoveExternalRuntimeWorkingContextSnapshotsMigration(

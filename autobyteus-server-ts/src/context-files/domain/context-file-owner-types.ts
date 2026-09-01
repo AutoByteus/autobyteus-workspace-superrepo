@@ -13,17 +13,26 @@ const filename = (value: string): string => {
 
 export type StandaloneDraftContextFileOwner = { kind: "agent_draft"; draftRunId: string };
 export type TeamMemberDraftContextFileOwner = { kind: "team_member_draft"; teamDraftId: string; memberAddress: AgentTeamAddress };
+export type AgentOrgMemberDraftContextFileOwner = { kind: "org_member_draft"; orgDraftId: string; memberAddress: AgentTeamAddress };
 export type StandaloneFinalContextFileOwner = { kind: "agent_final"; runId: string };
 export type TeamMemberFinalContextFileOwner = { kind: "team_member_final"; teamRunId: string; memberAddress: AgentTeamAddress };
+export type AgentOrgMemberFinalContextFileOwner = { kind: "org_member_final"; orgRunId: string; memberAddress: AgentTeamAddress };
 export type ResolvedTeamMemberFinalContextFileOwner = TeamMemberFinalContextFileOwner & {
   rootTeamRunId: string;
   ancestorTeamRunIds: string[];
   agentRunId: string;
   memoryDir: string;
 };
-export type ContextFileDraftOwnerDescriptor = StandaloneDraftContextFileOwner | TeamMemberDraftContextFileOwner;
-export type ContextFileFinalOwnerDescriptor = StandaloneFinalContextFileOwner | TeamMemberFinalContextFileOwner;
-export type ContextFileResolvedFinalOwnerDescriptor = StandaloneFinalContextFileOwner | ResolvedTeamMemberFinalContextFileOwner;
+export type ResolvedAgentOrgMemberFinalContextFileOwner = AgentOrgMemberFinalContextFileOwner & {
+  rootSubjectKind: "agent_org";
+  rootRunId: string;
+  ancestorTeamRunIds: string[];
+  agentRunId: string;
+  memoryDir: string;
+};
+export type ContextFileDraftOwnerDescriptor = StandaloneDraftContextFileOwner | TeamMemberDraftContextFileOwner | AgentOrgMemberDraftContextFileOwner;
+export type ContextFileFinalOwnerDescriptor = StandaloneFinalContextFileOwner | TeamMemberFinalContextFileOwner | AgentOrgMemberFinalContextFileOwner;
+export type ContextFileResolvedFinalOwnerDescriptor = StandaloneFinalContextFileOwner | ResolvedTeamMemberFinalContextFileOwner | ResolvedAgentOrgMemberFinalContextFileOwner;
 
 const record = (value: unknown): Record<string, unknown> => {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("owner descriptor is invalid.");
@@ -37,6 +46,11 @@ export const parseDraftContextFileOwnerDescriptor = (value: unknown): ContextFil
     teamDraftId: required(String(input.teamDraftId ?? ""), "teamDraftId"),
     memberAddress: assertAgentTeamAddress(String(input.memberAddress ?? "")),
   };
+  if (input.kind === "org_member_draft") return {
+    kind: "org_member_draft",
+    orgDraftId: required(String(input.orgDraftId ?? ""), "orgDraftId"),
+    memberAddress: assertAgentTeamAddress(String(input.memberAddress ?? "")),
+  };
   throw new Error(`Unsupported draft owner kind '${String(input.kind)}'.`);
 };
 export const parseFinalContextFileOwnerDescriptor = (value: unknown): ContextFileFinalOwnerDescriptor => {
@@ -47,16 +61,25 @@ export const parseFinalContextFileOwnerDescriptor = (value: unknown): ContextFil
     teamRunId: required(String(input.teamRunId ?? ""), "teamRunId"),
     memberAddress: assertAgentTeamAddress(String(input.memberAddress ?? "")),
   };
+  if (input.kind === "org_member_final") return {
+    kind: "org_member_final",
+    orgRunId: required(String(input.orgRunId ?? ""), "orgRunId"),
+    memberAddress: assertAgentTeamAddress(String(input.memberAddress ?? "")),
+  };
   throw new Error(`Unsupported final owner kind '${String(input.kind)}'.`);
 };
 export const buildDraftContextFileLocator = (owner: ContextFileDraftOwnerDescriptor, storedFilename: string): string =>
   owner.kind === "agent_draft"
     ? `/rest/drafts/agent-runs/${encodeURIComponent(owner.draftRunId)}/context-files/${encodeURIComponent(filename(storedFilename))}`
-    : `/rest/drafts/team-runs/${encodeURIComponent(owner.teamDraftId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodeURIComponent(filename(storedFilename))}`;
+    : owner.kind === "team_member_draft"
+      ? `/rest/drafts/team-runs/${encodeURIComponent(owner.teamDraftId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodeURIComponent(filename(storedFilename))}`
+      : `/rest/drafts/agent-org-runs/${encodeURIComponent(owner.orgDraftId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodeURIComponent(filename(storedFilename))}`;
 export const buildFinalContextFileLocator = (owner: ContextFileFinalOwnerDescriptor, storedFilename: string): string =>
   owner.kind === "agent_final"
     ? `/rest/runs/${encodeURIComponent(owner.runId)}/context-files/${encodeURIComponent(filename(storedFilename))}`
-    : `/rest/team-runs/${encodeURIComponent(owner.teamRunId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodeURIComponent(filename(storedFilename))}`;
+    : owner.kind === "team_member_final"
+      ? `/rest/team-runs/${encodeURIComponent(owner.teamRunId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodeURIComponent(filename(storedFilename))}`
+      : `/rest/agent-org-runs/${encodeURIComponent(owner.orgRunId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodeURIComponent(filename(storedFilename))}`;
 export const getStoredFilenameFromLocator = (locator: string): string | null => {
   const raw = locator.trim(); if (!raw) return null;
   const pathname = raw.startsWith("http://") || raw.startsWith("https://") ? new URL(raw).pathname : raw;

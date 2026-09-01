@@ -13,9 +13,13 @@ import { ContextFileOwnerResolver } from "./context-file-owner-resolver.js";
 const AGENT_FINAL_ROUTE = /^\/rest\/runs\/([^/]+)\/context-files\/([^/?#]+)$/;
 const TEAM_MEMBER_FINAL_ROUTE =
   /^\/rest\/team-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
+const ORG_MEMBER_FINAL_ROUTE =
+  /^\/rest\/agent-org-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
 const AGENT_DRAFT_ROUTE = /^\/rest\/drafts\/agent-runs\/([^/]+)\/context-files\/([^/?#]+)$/;
 const TEAM_MEMBER_DRAFT_ROUTE =
   /^\/rest\/drafts\/team-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
+const ORG_MEMBER_DRAFT_ROUTE =
+  /^\/rest\/drafts\/agent-org-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
 
 const isLoopbackHostname = (hostname: string): boolean =>
   hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
@@ -90,6 +94,15 @@ export class ContextFileLocalPathResolver {
       );
     }
 
+    const orgDraftMatch = pathname.match(ORG_MEMBER_DRAFT_ROUTE);
+    if (orgDraftMatch?.[1] && orgDraftMatch?.[2] && orgDraftMatch?.[3]) {
+      return this.resolveExistingDraftPath(parseDraftContextFileOwnerDescriptor({
+        kind: "org_member_draft",
+        orgDraftId: decodePathSegment(orgDraftMatch[1]),
+        memberAddress: decodePathSegment(orgDraftMatch[2]),
+      }), decodePathSegment(orgDraftMatch[3]));
+    }
+
     const agentMatch = pathname.match(AGENT_FINAL_ROUTE);
     if (agentMatch?.[1] && agentMatch?.[2]) {
       return this.resolveExistingFinalPath(
@@ -111,6 +124,15 @@ export class ContextFileLocalPathResolver {
         }),
         decodePathSegment(teamMatch[3]),
       );
+    }
+
+    const orgMatch = pathname.match(ORG_MEMBER_FINAL_ROUTE);
+    if (orgMatch?.[1] && orgMatch?.[2] && orgMatch?.[3]) {
+      return this.resolveExistingFinalPath(parseFinalContextFileOwnerDescriptor({
+        kind: "org_member_final",
+        orgRunId: decodePathSegment(orgMatch[1]),
+        memberAddress: decodePathSegment(orgMatch[2]),
+      }), decodePathSegment(orgMatch[3]));
     }
 
     return null;

@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { RootTeamRun } from "../../../src/agent-team-execution/domain/root-team-run.js";
 import { AgentTeamRunManager } from "../../../src/agent-team-execution/services/agent-team-run-manager.js";
-import type { MixedTeamRunBackendFactory } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-backend-factory.js";
+import { FlatTeamExecutionFactory } from "../../../src/agent-team-execution/local/flat-team-execution-factory.js";
+import { MemberExecutionContextBuilder } from "../../../src/agent-team-execution/services/member-team-context-builder.js";
+import { ActiveCollaborationRootDirectory } from "../../../src/agent-collaboration/execution/services/active-collaboration-root-directory.js";
 import { createTaskExecutionIdentityCapabilities } from "../../../src/agent-team-execution/task-delegation/task-execution-identity-capabilities.js";
 
 const taskExecutionIdentity = createTaskExecutionIdentityCapabilities({
@@ -14,20 +16,18 @@ const modelConfigValidator = Object.freeze({
   }),
 });
 
-const backendFactory = Object.freeze({
-  createBackend: async () => {
-    throw new Error("Lifecycle fixture must not create backends.");
-  },
-  restoreBackend: async () => {
-    throw new Error("Lifecycle fixture must not restore backends.");
-  },
-}) as unknown as MixedTeamRunBackendFactory;
+const flatTeamExecutionFactory = new FlatTeamExecutionFactory();
+const memberExecutionContextBuilder = new MemberExecutionContextBuilder({
+  getDefinitionById: async () => null,
+} as never);
 
 const createManager = () => new AgentTeamRunManager({
   memoryDir: "/tmp/api-e2e-agent-team-run-manager",
-  mixedTeamRunBackendFactory: backendFactory,
+  flatTeamExecutionFactory,
+  memberExecutionContextBuilder,
   taskExecutionIdentity,
   modelConfigValidator,
+  activeRootDirectory: new ActiveCollaborationRootDirectory(),
 });
 
 const createRoot = (input: {
@@ -37,6 +37,7 @@ const createRoot = (input: {
 } = {}) => ({
   teamRunId: input.teamRunId ?? "team-run-1",
   isActive: input.active ?? (() => true),
+  deliverExactAgentMessage: vi.fn(async () => ({ accepted: true })),
   terminate: vi.fn(input.terminate ?? (async () => ({ accepted: true }))),
 }) as unknown as RootTeamRun;
 
@@ -47,28 +48,30 @@ const unregister = (manager: AgentTeamRunManager, id: string, root: RootTeamRun)
   (manager as unknown as { unregister(id: string, root: RootTeamRun): boolean }).unregister(id, root);
 
 describe("AgentTeamRunManager root lifecycle", () => {
-  it("requires an explicit backend factory and keeps process lookup non-constructing", () => {
+  it("requires the rootless flat-Team factory and keeps process lookup non-constructing", () => {
     expect(() => AgentTeamRunManager.getInstance()).toThrow(
       "The process AgentTeamRunManager is not initialized.",
     );
     for (const value of ["omitted", null, undefined] as const) {
       const options: Record<string, unknown> = {
         memoryDir: "/tmp/api-e2e-agent-team-run-manager",
-        mixedTeamRunBackendFactory: backendFactory,
+        flatTeamExecutionFactory,
+        memberExecutionContextBuilder,
         taskExecutionIdentity,
         modelConfigValidator,
       };
-      if (value === "omitted") delete options.mixedTeamRunBackendFactory;
-      else options.mixedTeamRunBackendFactory = value;
+      if (value === "omitted") delete options.flatTeamExecutionFactory;
+      else options.flatTeamExecutionFactory = value;
       expect(
         () => Reflect.construct(AgentTeamRunManager, [options]),
         String(value),
-      ).toThrow("mixedTeamRunBackendFactory is required.");
+      ).toThrow("flatTeamExecutionFactory is required.");
     }
     for (const value of ["omitted", null, undefined] as const) {
       const options: Record<string, unknown> = {
         memoryDir: "/tmp/api-e2e-agent-team-run-manager",
-        mixedTeamRunBackendFactory: backendFactory,
+        flatTeamExecutionFactory,
+        memberExecutionContextBuilder,
         taskExecutionIdentity,
         modelConfigValidator,
       };

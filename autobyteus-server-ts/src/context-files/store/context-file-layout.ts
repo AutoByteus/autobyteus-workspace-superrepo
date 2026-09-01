@@ -40,8 +40,8 @@ export class ContextFileLayout {
 
     return resolveSafeChildPath(
       this.draftRootDir,
-      "team-runs",
-      owner.teamDraftId,
+      owner.kind === "team_member_draft" ? "team-runs" : "agent-org-runs",
+      owner.kind === "team_member_draft" ? owner.teamDraftId : owner.orgDraftId,
       "members",
       encodeURIComponent(owner.memberAddress),
       "context_files",

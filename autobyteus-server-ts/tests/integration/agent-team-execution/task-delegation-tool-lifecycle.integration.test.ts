@@ -9,7 +9,7 @@ import type { AgentRunInputOptions, AgentRunInputReservationResult } from "../..
 import { AgentRunIdentityAllocator } from "../../../src/agent-execution/services/agent-run-identity-allocator.js";
 import type { AgentTeamAddress } from "../../../src/agent-collaboration/domain/agent-team-address.js";
 import type { TeamRunBackend } from "../../../src/agent-team-execution/backends/team-run-backend.js";
-import { MixedAgentMemberContext, MixedTeamRunContext } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-context.js";
+import { FlatAgentExecutionContext, FlatTeamExecutionContext } from "../../../src/agent-team-execution/local/flat-team-execution-context.js";
 import type { PreparedLocalExecutionTermination } from "../../../src/agent-team-execution/domain/prepared-local-execution-termination.js";
 import type { PreparedTaskExecution } from "../../../src/agent-team-execution/domain/prepared-task-execution.js";
 import type { PreparedTaskSettlement } from "../../../src/agent-team-execution/domain/prepared-task-settlement.js";
@@ -18,7 +18,7 @@ import { createTaskExecutionIdentityCapabilities } from "../../../src/agent-team
 import type { PrepareTaskAgentInput } from "../../../src/agent-team-execution/domain/task-agent-execution.js";
 import type { PrepareTaskTeamInput } from "../../../src/agent-team-execution/domain/task-team-execution.js";
 import { TeamBackendKind } from "../../../src/agent-team-execution/domain/team-backend-kind.js";
-import { createTeamMemberExecutionIdentity } from "../../../src/agent-team-execution/domain/team-member-execution-identity.js";
+import { createCollaborationMemberExecutionIdentity } from "../../../src/agent-collaboration/execution/domain/root-execution-identity.js";
 import type { TeamMemberExecutionCommand } from "../../../src/agent-team-execution/domain/team-member-execution-command.js";
 import { TeamRun } from "../../../src/agent-team-execution/domain/team-run.js";
 import type { TeamRunAgentTeamNode, TeamRunConfig } from "../../../src/agent-team-execution/domain/team-run-config.js";
@@ -92,8 +92,8 @@ class PreparedTask implements PreparedTaskExecution {
 
 class TestTeamBackend implements TeamRunBackend {
   readonly teamBackendKind = TeamBackendKind.MIXED;
-  readonly runtimeContext: MixedTeamRunContext;
-  readonly context: TeamRunContext<MixedTeamRunContext>;
+  readonly runtimeContext: FlatTeamExecutionContext;
+  readonly context: TeamRunContext<FlatTeamExecutionContext>;
   readonly preparedAgents: PrepareTaskAgentInput[] = [];
   readonly preparedTeams: PrepareTaskTeamInput[] = [];
   readonly commands: Array<{ agentRunId: string; command: TeamMemberExecutionCommand }> = [];
@@ -105,9 +105,9 @@ class TestTeamBackend implements TeamRunBackend {
     readonly teamNode: TeamRunAgentTeamNode,
     readonly config: TeamRunConfig,
   ) {
-    this.runtimeContext = new MixedTeamRunContext({
+    this.runtimeContext = new FlatTeamExecutionContext({
       memberContexts: teamNode.children.filter((node) => node.kind === "agent").map((node) =>
-        new MixedAgentMemberContext({
+        new FlatAgentExecutionContext({
           address: node.address,
           agentRunId: node.agentRunId,
           runtimeKind: node.runtimeKind,
@@ -126,7 +126,7 @@ class TestTeamBackend implements TeamRunBackend {
 
   get rootTeamRunId(): string { return this.physicalScope.rootTeamRunId; }
   get teamRunId(): string { return this.teamNode.teamRunId; }
-  getRuntimeContext(): MixedTeamRunContext { return this.runtimeContext; }
+  getRuntimeContext(): FlatTeamExecutionContext { return this.runtimeContext; }
   isActive(): boolean { return this.active; }
   getLeafAgentStatusSnapshots() { return []; }
   hasOpenExecutionWork(): boolean { return false; }
@@ -303,7 +303,7 @@ const context = (
   agentRunId: string,
   rootId = rootTeamRunId,
 ) => Object.freeze({
-  identity: createTeamMemberExecutionIdentity({ rootTeamRunId: rootId, memberAddress, agentRunId }),
+  identity: createCollaborationMemberExecutionIdentity({ rootTeamRunId: rootId, memberAddress, agentRunId }),
   rootResolver,
 });
 

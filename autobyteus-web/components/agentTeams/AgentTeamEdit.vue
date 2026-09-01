@@ -74,12 +74,19 @@ onMounted(async () => {
   }
 });
 
-const handleUpdate = async (formData: UpdateAgentTeamDefinitionInput) => {
+const handleUpdate = async (formData: Omit<UpdateAgentTeamDefinitionInput, 'id' | 'expectedRevision'>) => {
   isSubmitting.value = true;
   notification.value = null;
 
+  const revision = teamDef.value?.revision
+  if (!revision) {
+    showNotification($t('agentTeams.components.agentTeams.AgentTeamEdit.unexpectedError'), 'error')
+    isSubmitting.value = false
+    return
+  }
   const updateInput: UpdateAgentTeamDefinitionInput = {
     id: teamDefinitionId.value,
+    expectedRevision: revision,
     ...formData,
   };
 

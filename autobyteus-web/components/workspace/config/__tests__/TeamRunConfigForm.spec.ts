@@ -20,25 +20,18 @@ vi.mock('~/composables/useLocalization', () => ({
   }),
 }))
 
-const nestedDefinition: AgentTeamDefinition = {
-  id: 'study-def', name: 'Student Study Group', description: '', instructions: '',
-  coordinatorMemberName: 'student_one',
-  nodes: [
-    { memberName: 'student_one', ref: 'student-one-def', refType: 'AGENT' },
-    { memberName: 'student_two', ref: 'student-two-def', refType: 'AGENT' },
-  ],
-}
 const rootDefinition: AgentTeamDefinition = {
-  id: 'classroom-def', name: 'Nested Classroom', description: '', instructions: '',
+  id: 'classroom-def', name: 'Flat Classroom', description: '', instructions: '',
   coordinatorMemberName: 'teacher',
   nodes: [
-    { memberName: 'teacher', ref: 'teacher-def', refType: 'AGENT' },
-    { memberName: 'StudentStudyGroup', ref: 'study-def', refType: 'AGENT_TEAM' },
+    { memberName: 'teacher', ref: 'teacher-def' },
+    { memberName: 'student_one', ref: 'student-one-def' },
+    { memberName: 'student_two', ref: 'student-two-def' },
   ],
 }
 const config = (changes: Partial<TeamRunConfig> = {}): TeamRunConfig => ({
   teamDefinitionId: 'classroom-def',
-  teamDefinitionName: 'Nested Classroom',
+  teamDefinitionName: 'Flat Classroom',
   rootConfig: {
     runtimeKind: 'codex_app_server',
     workspace: {
@@ -56,10 +49,7 @@ const config = (changes: Partial<TeamRunConfig> = {}): TeamRunConfig => ({
   teamOverrides: {}, agentOverrides: {}, isLocked: false,
   ...changes,
 })
-const definitions = new Map([
-  [rootDefinition.id, rootDefinition],
-  [nestedDefinition.id, nestedDefinition],
-])
+const definitions = new Map([[rootDefinition.id, rootDefinition]])
 const idleCatalog: EditableRuntimeCatalogOperationState = { status: 'idle', error: null }
 const editableModel = (input: {
   config?: TeamRunConfig
@@ -113,7 +103,7 @@ const existingModel = () => {
 const mountForm = (model: TeamRunFormModel = editableModel()) => shallowMount(TeamRunConfigForm, { props: { model } })
 
 describe('TeamRunConfigForm launch and existing-run presentation', () => {
-  it('preserves the personal-baseline root order and projects inherited nested Team/Agent values', () => {
+  it('preserves the personal-baseline root order and projects inherited direct-Agent values', () => {
     const wrapper = mountForm()
     const root = wrapper.findComponent(TeamScopeConfigEditor)
     const tree = wrapper.findComponent(TeamMemberConfigTree)
@@ -133,57 +123,45 @@ describe('TeamRunConfigForm launch and existing-run presentation', () => {
       }),
     }))
     const members = tree.props('memberNodes') as any[]
-    expect(members[1].scope).toEqual(expect.objectContaining({
-      address: '/StudentStudyGroup', isCustomized: false,
-      effectiveConfig: expect.objectContaining({ llmModelIdentifier: 'gpt-5.6-luna' }),
-    }))
-    expect(members[1].children[1]).toEqual(expect.objectContaining({
-      address: '/StudentStudyGroup/student_two',
+    expect(members.map((member) => member.address)).toEqual(['/teacher', '/student_one', '/student_two'])
+    expect(members[1]).toEqual(expect.objectContaining({
+      kind: 'agent', address: '/student_one', isCustomized: false,
       effectiveConfig: expect.objectContaining({ runtimeKind: 'codex_app_server', skillAccessMode: 'PRELOADED_ONLY' }),
     }))
   })
 
-  it('emits exact typed editable Team/reset/Agent/root/workspace commands', async () => {
-    const nestedSelection = { mode: 'new' as const, existingWorkspaceId: 'root-ws', newWorkspacePath: '/workspace/study' }
+  it('emits exact typed editable root, direct-Agent, and root-workspace commands', async () => {
     const wrapper = mountForm(editableModel({
       config: config({
-        teamOverrides: {
-          '/StudentStudyGroup': { runtimeKind: 'claude_agent_sdk', llmModelIdentifier: 'claude-sonnet', llmConfig: null },
+        agentOverrides: {
+          '/student_one': { runtimeKind: 'claude_agent_sdk', llmModelIdentifier: 'claude-sonnet', llmConfig: null },
         },
       }),
-      selections: { '/StudentStudyGroup': nestedSelection },
     }))
     const root = wrapper.findComponent(TeamScopeConfigEditor)
     const tree = wrapper.findComponent(TeamMemberConfigTree)
     const members = tree.props('memberNodes') as any[]
-    expect(members[1].scope.isCustomized).toBe(true)
-    expect(members[1].scope.workspaceSelection).toEqual(nestedSelection)
+    expect(members[1].isCustomized).toBe(true)
 
     root.vm.$emit('update-root', 'model', 'gpt-5.5')
     root.vm.$emit('update:workspace-selection', '/', { mode: 'existing', existingWorkspaceId: 'ws-next', newWorkspacePath: '' })
-    tree.vm.$emit('update-team', '/StudentStudyGroup', { autoExecuteTools: true })
-    tree.vm.$emit('reset-team', '/StudentStudyGroup')
-    tree.vm.$emit('update-agent', '/StudentStudyGroup/student_two', { llmModelIdentifier: 'claude-haiku' })
-    tree.vm.$emit('update:workspace-selection', '/StudentStudyGroup', nestedSelection)
+    tree.vm.$emit('update-agent', '/student_two', { llmModelIdentifier: 'claude-haiku' })
     tree.vm.$emit('retry-runtime-catalog', 'claude_agent_sdk')
     await wrapper.vm.$nextTick()
 
     expect(wrapper.emitted('edit-config')).toEqual([
       [{ kind: 'set_root_model', llmModelIdentifier: 'gpt-5.5' }],
-      [{ kind: 'set_team_override', teamAddress: '/StudentStudyGroup', override: { autoExecuteTools: true } }],
-      [{ kind: 'reset_team_override', teamAddress: '/StudentStudyGroup' }],
-      [{ kind: 'set_agent_override', agentAddress: '/StudentStudyGroup/student_two', override: { llmModelIdentifier: 'claude-haiku' } }],
+      [{ kind: 'set_agent_override', agentAddress: '/student_two', override: { llmModelIdentifier: 'claude-haiku' } }],
     ])
     expect(wrapper.emitted('update:workspaceSelection')).toEqual([
       ['/', { mode: 'existing', existingWorkspaceId: 'ws-next', newWorkspacePath: '' }],
-      ['/StudentStudyGroup', nestedSelection],
     ])
     expect(wrapper.emitted('retry-runtime-catalog')).toEqual([['claude_agent_sdk']])
   })
 
   it('shows sorted topology repairs and exposes an operable members disclosure', async () => {
-    const wrapper = mountForm(editableModel({ repairs: ['/Removed', '/StudentStudyGroup/old'] }))
-    expect(wrapper.get('[data-test="team-topology-repair-notice"]').text()).toContain('/Removed, /StudentStudyGroup/old')
+    const wrapper = mountForm(editableModel({ repairs: ['/removed', '/student_old'] }))
+    expect(wrapper.get('[data-test="team-topology-repair-notice"]').text()).toContain('/removed, /student_old')
     const disclosure = wrapper.get('button[aria-controls="team-member-overrides-panel"]')
     expect(disclosure.text()).toContain('team_members_override (3)')
     expect(disclosure.attributes('aria-expanded')).toBe('false')

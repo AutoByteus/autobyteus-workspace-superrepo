@@ -62,6 +62,7 @@ export class AgentRunManager {
   private readonly providerInputNormalizer: Pick<AgentRunProviderInputNormalizer, "normalizeForProvider">;
   private readonly agentToolMcpRunSessionDeactivator: AgentToolMcpRunSessionDeactivator;
   private readonly inFlightPreparations = new Set<Promise<AgentRunActivationCandidate>>();
+  private activationAdmissionOpen = true;
   private readonly managedTerminationPreparations = new WeakMap<
     AgentRun,
     Promise<PreparedAgentRunTermination>
@@ -117,6 +118,7 @@ export class AgentRunManager {
     runId: string;
     config: AgentRunConfig;
   }): Promise<AgentRunActivationCandidate> {
+    this.assertActivationAdmissionOpen();
     const runId = normalizeRequiredRunId(input.runId);
     return this.prepareCandidate({
       runId,
@@ -128,6 +130,7 @@ export class AgentRunManager {
   prepareRestoreAgentRun(
     context: AgentRunContext<RuntimeAgentRunContext>,
   ): Promise<AgentRunActivationCandidate> {
+    this.assertActivationAdmissionOpen();
     return this.prepareCandidate({
       runId: normalizeRequiredRunId(context.runId),
       runtimeKind: context.config.runtimeKind,
@@ -140,6 +143,7 @@ export class AgentRunManager {
     config: AgentRunConfig;
     platformAgentRunId: string;
   }): Promise<AgentRunActivationCandidate> {
+    this.assertActivationAdmissionOpen();
     const runId = normalizeRequiredRunId(input.runId);
     const platformAgentRunId = input.platformAgentRunId?.trim();
     if (!platformAgentRunId || platformAgentRunId === runId) {
@@ -166,6 +170,10 @@ export class AgentRunManager {
     }
     return candidate;
   }
+
+  closeActivationAdmission(): void { this.activationAdmissionOpen = false; }
+
+  private assertActivationAdmissionOpen(): void { if (!this.activationAdmissionOpen) throw new AgentCreationError("AgentRun activation admission is closed for process shutdown."); }
 
   hasActiveRun(runId: string): boolean { return this.getActiveRun(runId) !== null; }
 
@@ -513,7 +521,7 @@ export class AgentRunManager {
           autoExecuteTools: config.autoExecuteTools,
         }),
         carpenterSystemPrompt: "Pending runtime bootstrap.",
-        runtimeToolExposure: buildRuntimeAgentToolExposure([], config.memberTeamContext),
+        runtimeToolExposure: buildRuntimeAgentToolExposure([], config.memberExecutionContext),
         sessionId: platformAgentRunId,
       });
     }

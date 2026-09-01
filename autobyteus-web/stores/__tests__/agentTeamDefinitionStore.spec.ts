@@ -66,7 +66,7 @@ describe('agentTeamDefinitionStore', () => {
     expect(store.agentTeamDefinitions[0].id).toBe('team-1');
   });
 
-  it('keeps team-local child teams out of the root catalog projection', () => {
+  it('projects every admitted flat Team definition as an independent root', () => {
     const store = useAgentTeamDefinitionStore();
     store.agentTeamDefinitions = [
       {
@@ -79,16 +79,6 @@ describe('agentTeamDefinitionStore', () => {
         ownershipScope: 'SHARED',
       },
       {
-        id: 'team-local-team:company:research',
-        name: 'Research',
-        description: 'Local department',
-        instructions: 'Coordinate research',
-        coordinatorMemberName: 'lead',
-        nodes: [],
-        ownershipScope: 'TEAM_LOCAL',
-        ownerTeamId: 'company',
-      },
-      {
         id: 'bundle-team__pkg__app__review',
         name: 'Review',
         description: 'Application-owned review team',
@@ -97,14 +87,11 @@ describe('agentTeamDefinitionStore', () => {
         nodes: [],
         ownershipScope: 'APPLICATION_OWNED',
       },
-    ] as any;
+    ];
 
     expect(store.rootAgentTeamDefinitions.map((definition) => definition.id)).toEqual([
       'company',
       'bundle-team__pkg__app__review',
-    ]);
-    expect(store.getTeamLocalTeamDefinitionsByOwnerTeamId('company')).toEqual([
-      expect.objectContaining({ id: 'team-local-team:company:research' }),
     ]);
   });
 

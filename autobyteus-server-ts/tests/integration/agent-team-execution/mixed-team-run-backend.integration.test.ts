@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AgentInputUserMessage } from "autobyteus-ts/agent/message/agent-input-user-message.js";
-import { MixedTeamRunBackend } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-backend.js";
-import { MixedAgentMemberContext, MixedTeamRunContext } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-context.js";
+import { FlatTeamRunBackend } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-backend.js";
+import { FlatAgentExecutionContext, FlatTeamExecutionContext } from "../../../src/agent-team-execution/local/flat-team-execution-context.js";
 import { TeamBackendKind } from "../../../src/agent-team-execution/domain/team-backend-kind.js";
 import { TeamRunContext } from "../../../src/agent-team-execution/domain/team-run-context.js";
 import { createRootTeamRunPhysicalScope } from "../../../src/agent-team-execution/domain/team-run-physical-scope.js";
@@ -23,8 +23,8 @@ const createHarness = () => {
     coordinatorAddress: coordinator.address,
     children: [coordinator, reviewer],
   });
-  const runtimeContext = new MixedTeamRunContext({
-    memberContexts: [coordinator, reviewer].map((node) => new MixedAgentMemberContext({
+  const runtimeContext = new FlatTeamExecutionContext({
+    memberContexts: [coordinator, reviewer].map((node) => new FlatAgentExecutionContext({
       address: node.address,
       agentRunId: node.agentRunId,
       runtimeKind: node.runtimeKind,
@@ -55,12 +55,12 @@ const createHarness = () => {
     prepareTermination: vi.fn(),
     terminate: vi.fn(async () => ({ accepted: true })),
   };
-  return { backend: new MixedTeamRunBackend(context, manager as never), context, manager };
+  return { backend: new FlatTeamRunBackend(context, manager as never), context, manager };
 };
 
 afterEach(() => vi.clearAllMocks());
 
-describe("MixedTeamRunBackend exact local facade integration", () => {
+describe("FlatTeamRunBackend exact local facade integration", () => {
   it("exposes one concrete TeamRun identity and current runtime context", () => {
     const { backend, context, manager } = createHarness();
     expect(backend.teamRunId).toBe("team-mixed-1");

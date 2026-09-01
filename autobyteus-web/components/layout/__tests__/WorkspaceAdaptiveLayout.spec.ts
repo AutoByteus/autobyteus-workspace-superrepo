@@ -18,6 +18,7 @@ const routerMock = vi.hoisted(() => ({
 const routeMock = vi.hoisted(() => ({
   path: '/workspace',
   fullPath: '/workspace',
+  query: {} as Record<string, string>,
 }));
 
 vi.mock('vue-router', () => ({
@@ -78,6 +79,7 @@ describe('WorkspaceAdaptiveLayout', () => {
   beforeEach(() => {
     routerMock.push.mockReset();
     routerMock.push.mockResolvedValue(undefined);
+    routeMock.query = {};
     mockClientWidth = 1200;
     mockClientHeight = 700;
     setViewport(1440, 900);
@@ -131,6 +133,8 @@ describe('WorkspaceAdaptiveLayout', () => {
           AgentWorkspaceView: AgentWorkspaceViewValue,
           TeamWorkspaceView: TeamWorkspaceViewValue,
           RunConfigPanel: RunConfigPanelValue,
+          AgentOrgRunConfigPanel: { template: '<div class="org-config-view"></div>' },
+          AgentOrgWorkspaceView: { template: '<div class="org-workspace-view"></div>' },
         },
         provide: {
           [RESPONSIVE_WORKSPACE_SHELL_KEY]: responsiveWorkspaceShellState,

@@ -13,6 +13,8 @@ import { ContextFileLayout } from "../../context-files/store/context-file-layout
 import { ContextFileOwnerResolver } from "../../context-files/services/context-file-owner-resolver.js";
 import { createStoredTeamRunExecutionTreeLocationService } from "../../run-history/services/team-run-execution-tree-location-service.js";
 import { appConfigProvider } from "../../config/app-config-provider.js";
+import { AgentOrgExecutionTreeLocationService } from "../../agent-org-execution/services/agent-org-execution-tree-location-service.js";
+import { CollaborationExecutionLocationService } from "../../agent-collaboration/execution/services/collaboration-execution-location-service.js";
 
 const logger = {
   error: (...args: unknown[]) => console.error(...args),
@@ -26,7 +28,10 @@ const buildServices = () => {
     memoryDir,
   });
   const ownerResolver = new ContextFileOwnerResolver({
-    locations: createStoredTeamRunExecutionTreeLocationService(memoryDir),
+    locations: new CollaborationExecutionLocationService({
+      teams: createStoredTeamRunExecutionTreeLocationService(memoryDir),
+      orgs: new AgentOrgExecutionTreeLocationService({ memoryDir }),
+    }),
   });
   const cleanupService = new ContextFileDraftCleanupService(layout);
   return {
@@ -130,6 +135,19 @@ export async function registerContextFileRoutes(app: FastifyInstance): Promise<v
   });
 
   app.get<{
+    Params: { orgDraftId: string; memberAddress: string; storedFilename: string };
+  }>("/drafts/agent-org-runs/:orgDraftId/members/:memberAddress/context-files/:storedFilename", async (request, reply) => {
+    const owner = parseDraftContextFileOwnerDescriptor({
+      kind: "org_member_draft",
+      orgDraftId: request.params.orgDraftId,
+      memberAddress: request.params.memberAddress,
+    });
+    const filePath = await readService.getDraftFilePath(owner, request.params.storedFilename);
+    if (!filePath) return reply.code(404).send({ detail: "File not found." });
+    return sendFile(filePath, reply);
+  });
+
+  app.get<{
     Params: { teamDraftId: string; memberAddress: string; storedFilename: string };
   }>("/drafts/team-runs/:teamDraftId/members/:memberAddress/context-files/:storedFilename", async (request, reply) => {
     const owner = parseDraftContextFileOwnerDescriptor({
@@ -187,6 +205,19 @@ export async function registerContextFileRoutes(app: FastifyInstance): Promise<v
     if (!filePath) {
       return reply.code(404).send({ detail: "File not found." });
     }
+    return sendFile(filePath, reply);
+  });
+
+  app.get<{
+    Params: { orgRunId: string; memberAddress: string; storedFilename: string };
+  }>("/agent-org-runs/:orgRunId/members/:memberAddress/context-files/:storedFilename", async (request, reply) => {
+    const owner = parseFinalContextFileOwnerDescriptor({
+      kind: "org_member_final",
+      orgRunId: request.params.orgRunId,
+      memberAddress: request.params.memberAddress,
+    });
+    const filePath = await readService.getFinalFilePath(owner, request.params.storedFilename);
+    if (!filePath) return reply.code(404).send({ detail: "File not found." });
     return sendFile(filePath, reply);
   });
 }

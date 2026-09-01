@@ -10,7 +10,7 @@ import {
 } from "../../agent-execution/domain/agent-run-event.js";
 import type { TeamAgentEvent, TeamTokenUsageDetails } from "../domain/team-agent-event.js";
 import { createTeamAgentStatusDetails } from "../domain/team-agent-status.js";
-import type { TeamMemberExecutionIdentity } from "../domain/team-member-execution-identity.js";
+import type { CollaborationMemberExecutionIdentity } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
 import { isAgentSegmentType } from "../../agent-execution/domain/agent-segment.js";
 import { resolveAgentRunErrorEvidence } from "../../agent-execution/domain/agent-run-error-evidence.js";
 import type {
@@ -26,7 +26,7 @@ export type TeamAgentEventAdaptationResult =
   | Readonly<{ kind: "filtered_collaboration_duplicate" }>
   | Readonly<{ kind: "rejected"; code: "TEAM_AGENT_EVENT_ADMISSION_FAILED"; message: string }>;
 
-export type ResolveTeamMemberIdentityByAgentRunId = (agentRunId: string) => TeamMemberExecutionIdentity | null;
+export type ResolveTeamMemberIdentityByAgentRunId = (agentRunId: string) => CollaborationMemberExecutionIdentity | null;
 
 const raw = (payload: Record<string, unknown>, snake: string, camel?: string): unknown =>
   payload[snake] ?? (camel ? payload[camel] : undefined);
@@ -152,7 +152,7 @@ const fileChange = (event: AgentRunEvent): TeamFileChangeDetails => {
 
 const tokenRunSummary = (
   payload: Record<string, unknown>,
-  expectedIdentity: TeamMemberExecutionIdentity,
+  expectedIdentity: CollaborationMemberExecutionIdentity,
 ): TokenUsageRunSummaryPayload | null => {
   const value = Object.prototype.hasOwnProperty.call(payload, "run_summary_after_event")
     ? payload.run_summary_after_event
@@ -160,17 +160,17 @@ const tokenRunSummary = (
   if (value === null) return null;
   const summary = tokenUsageRunSummaryDtoSchema.parse(value) as TokenUsageRunSummaryPayload;
   if (summary.run_id !== expectedIdentity.agentRunId) throw new Error("run_summary_after_event run_id is invalid");
-  if (summary.root_team_run_id !== expectedIdentity.rootTeamRunId) {
+  if (summary.root_team_run_id !== expectedIdentity.root.rootRunId) {
     throw new Error("run_summary_after_event root_team_run_id is invalid");
   }
   return summary;
 };
 
-const token = (payload: Record<string, unknown>, expectedIdentity: TeamMemberExecutionIdentity): TeamTokenUsageDetails => {
+const token = (payload: Record<string, unknown>, expectedIdentity: CollaborationMemberExecutionIdentity): TeamTokenUsageDetails => {
   if (required(raw(payload, "run_id", "runId"), "run_id") !== expectedIdentity.agentRunId) {
     throw new Error("run_id does not match the AgentRun event");
   }
-  if (required(raw(payload, "root_team_run_id", "rootTeamRunId"), "root_team_run_id") !== expectedIdentity.rootTeamRunId) {
+  if (required(raw(payload, "root_team_run_id", "rootTeamRunId"), "root_team_run_id") !== expectedIdentity.root.rootRunId) {
     throw new Error("root_team_run_id does not match the TeamRun execution");
   }
   return Object.freeze({

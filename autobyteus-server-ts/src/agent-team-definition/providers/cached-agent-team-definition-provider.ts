@@ -1,4 +1,4 @@
-import { AgentTeamDefinition } from "../domain/models.js";
+import { AgentTeamDefinition } from "../domain/agent-team-definition.js";
 import { AgentTeamDefinitionPersistenceProvider } from "./agent-team-definition-persistence-provider.js";
 import { createServerLogger } from "../../logging/server-app-logger.js";
 

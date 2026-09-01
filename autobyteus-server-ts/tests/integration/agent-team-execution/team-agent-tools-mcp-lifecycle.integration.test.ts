@@ -14,13 +14,13 @@ import { AgentRunManager } from "../../../src/agent-execution/services/agent-run
 import { buildRuntimeAgentToolExposure } from "../../../src/agent-execution/shared/runtime-agent-tool-exposure.js";
 import { MixedAgentMemberHandle } from "../../../src/agent-team-execution/backends/mixed/members/mixed-agent-member-handle.js";
 import type {
-  MixedTeamRunBackendFactory,
+  FlatTeamRunBackendFactory,
 } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-backend-factory.js";
 import {
-  MixedAgentMemberContext,
-  MixedTeamRunContext,
-  type MixedConfiguredMemberActivationMode,
-} from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-context.js";
+  FlatAgentExecutionContext,
+  FlatTeamExecutionContext,
+  type ConfiguredMemberActivationMode,
+} from "../../../src/agent-team-execution/local/flat-team-execution-context.js";
 import { TeamBackendKind } from "../../../src/agent-team-execution/domain/team-backend-kind.js";
 import type { PreparedLocalExecutionTermination } from "../../../src/agent-team-execution/domain/prepared-local-execution-termination.js";
 import type { TeamRunAgentNode } from "../../../src/agent-team-execution/domain/team-run-config.js";
@@ -33,7 +33,7 @@ import { RuntimeKind } from "../../../src/runtime-management/runtime-kind-enum.j
 import { createAgentRunManagerInfrastructureFixture } from "../../fixtures/agent-run-manager-infrastructure-fixtures.js";
 import {
   testAgentNode,
-  testMemberTaskRootResolver,
+  testMemberTaskCommandCapability,
   testTeamRunConfig,
 } from "../../fixtures/current-team-run-fixtures.js";
 
@@ -181,17 +181,17 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
       let currentRun: AgentRun | null = null;
       let currentCycle = 0;
       const buildTeamBackend = (
-        mode: MixedConfiguredMemberActivationMode,
+        mode: ConfiguredMemberActivationMode,
       ) => {
         const run = currentRun;
         if (!run) throw new Error("Team member AgentRun was not published.");
-        const memberContext = new MixedAgentMemberContext({
+        const memberContext = new FlatAgentExecutionContext({
           address: memberNode.address,
           agentRunId: memberNode.agentRunId,
           runtimeKind: memberNode.runtimeKind,
           platformAgentRunId: null,
         });
-        const runtimeContext = new MixedTeamRunContext({
+        const runtimeContext = new FlatTeamExecutionContext({
           memberContexts: [memberContext],
           configuredMemberActivationMode: mode,
         });
@@ -209,8 +209,8 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
           config: memberNode,
           activationMode: mode,
           agentRunManager,
-          memberTeamContextBuilder: { build: vi.fn(async () => null) } as never,
-          taskRootResolver: testMemberTaskRootResolver(),
+          memberExecutionContextBuilder: { build: vi.fn(async () => null) } as never,
+          taskCommands: testMemberTaskCommandCapability(),
           publish: vi.fn(),
           acceptPlatformBinding: vi.fn(async () => undefined),
           deliverInterAgentMessage: vi.fn(async () => ({ accepted: true })),
@@ -246,7 +246,7 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
       const teamBackendFactory = {
         createBackend: vi.fn(async () => buildTeamBackend("fresh")),
         restoreBackend: vi.fn(async () => buildTeamBackend("restore")),
-      } as unknown as MixedTeamRunBackendFactory;
+      } as unknown as FlatTeamRunBackendFactory;
       const taskExecutionIdentity = createTaskExecutionIdentityCapabilities(
         AgentRunIdentityAllocator.getInstance({
           memoryDir,

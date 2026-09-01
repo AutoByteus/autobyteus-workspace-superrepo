@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CachedAgentTeamDefinitionProvider } from "../../../src/agent-team-definition/providers/cached-agent-team-definition-provider.js";
-import { AgentTeamDefinition, TeamMember } from "../../../src/agent-team-definition/domain/models.js";
-import { NodeType } from "../../../src/agent-team-definition/domain/enums.js";
+import { AgentTeamDefinition, TeamMember } from "../../../src/agent-team-definition/domain/agent-team-definition.js";
 
 describe("CachedAgentTeamDefinitionProvider", () => {
   let persistenceProvider: {
@@ -16,11 +15,12 @@ describe("CachedAgentTeamDefinitionProvider", () => {
       id: "1",
       name: "Team1",
       description: "Desc1",
+      instructions: "Coordinate.",
       nodes: [
         new TeamMember({
           memberName: "coord1",
-          referenceId: "agent1",
-          referenceType: NodeType.AGENT,
+          ref: "agent1",
+          refScope: "shared",
         }),
       ],
       coordinatorMemberName: "coord1",
@@ -29,11 +29,12 @@ describe("CachedAgentTeamDefinitionProvider", () => {
       id: "2",
       name: "Team2",
       description: "Desc2",
+      instructions: "Coordinate.",
       nodes: [
         new TeamMember({
           memberName: "coord2",
-          referenceId: "agent2",
-          referenceType: NodeType.AGENT_TEAM,
+          ref: "agent2",
+          refScope: "shared",
         }),
       ],
       coordinatorMemberName: "coord2",
@@ -90,7 +91,8 @@ describe("CachedAgentTeamDefinitionProvider", () => {
       id: "3",
       name: "New Team",
       description: "New",
-      nodes: [],
+      instructions: "Coordinate.",
+      nodes: [new TeamMember({ memberName: "coord3", ref: "agent3", refScope: "shared" })],
       coordinatorMemberName: "coord3",
     });
     persistenceProvider.create.mockResolvedValue(newDef);
@@ -111,7 +113,8 @@ describe("CachedAgentTeamDefinitionProvider", () => {
       id: "1",
       name: "Updated",
       description: "Updated Desc",
-      nodes: [],
+      instructions: "Coordinate.",
+      nodes: [new TeamMember({ memberName: "coord1", ref: "agent1", refScope: "shared" })],
       coordinatorMemberName: "coord1",
     });
     persistenceProvider.update.mockResolvedValue(updatedDef);

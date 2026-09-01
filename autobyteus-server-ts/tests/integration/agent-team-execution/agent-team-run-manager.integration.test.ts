@@ -6,10 +6,10 @@ import { AgentMemoryLayout } from "../../../src/agent-memory/store/agent-memory-
 import { AgentMemoryLocationService } from "../../../src/agent-memory/services/agent-memory-location-service.js";
 import { AgentRunIdentityAllocator } from "../../../src/agent-execution/services/agent-run-identity-allocator.js";
 import type {
-  MixedTeamRunBackendFactory,
+  FlatTeamRunBackendFactory,
   MixedTeamRunCallbacks,
 } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-backend-factory.js";
-import { MixedAgentMemberContext, MixedTeamRunContext } from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-context.js";
+import { FlatAgentExecutionContext, FlatTeamExecutionContext } from "../../../src/agent-team-execution/local/flat-team-execution-context.js";
 import { TeamBackendKind } from "../../../src/agent-team-execution/domain/team-backend-kind.js";
 import { TeamRunContext } from "../../../src/agent-team-execution/domain/team-run-context.js";
 import { createRootTeamRunPhysicalScope } from "../../../src/agent-team-execution/domain/team-run-physical-scope.js";
@@ -85,10 +85,10 @@ const createFactory = (input: {
     configuredMemberActivationMode: "fresh" | "restore",
   ) => {
     callbacks.push(callback);
-    const runtimeContext = new MixedTeamRunContext({
+    const runtimeContext = new FlatTeamExecutionContext({
       memberContexts: config.rootTeam.children
         .filter((node) => node.kind === "agent")
-        .map((node) => new MixedAgentMemberContext({
+        .map((node) => new FlatAgentExecutionContext({
           address: node.address,
           agentRunId: node.agentRunId,
           runtimeKind: node.runtimeKind,
@@ -134,7 +134,7 @@ const createFactory = (input: {
   const restoreBackend = vi.fn((config, teamRunId, callback) =>
     buildBackend(config, teamRunId, callback, "restore"));
   return {
-    factory: { createBackend, restoreBackend } as unknown as MixedTeamRunBackendFactory,
+    factory: { createBackend, restoreBackend } as unknown as FlatTeamRunBackendFactory,
     createBackend,
     restoreBackend,
     callbacks,
@@ -234,7 +234,7 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
       expect.objectContaining({ rootTeam: config.rootTeam }),
       "team-runtime-root",
       expect.objectContaining({
-        taskRootResolver: expect.objectContaining({ resolveActiveRoot: expect.any(Function) }),
+        taskCommands: expect.objectContaining({ resolveActiveRoot: expect.any(Function) }),
         publish: expect.any(Function),
         deliverInterAgentMessage: expect.any(Function),
       }),
@@ -281,7 +281,7 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
     );
     const config = createConfig([RuntimeKind.AUTOBYTEUS]);
     const beforeBackendReturn = vi.fn(async (callbacks: MixedTeamRunCallbacks) => {
-      await expect(callbacks.taskRootResolver.resolveActiveRoot()).rejects.toMatchObject({
+      await expect(callbacks.taskCommands.resolveActiveRoot()).rejects.toMatchObject({
         code: "TEAM_ROOT_NOT_BOUND",
       });
     });
@@ -289,7 +289,7 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
     const manager = new AgentTeamRunManager({ memoryDir, mixedTeamRunBackendFactory: factory.factory, taskExecutionIdentity, modelConfigValidator });
 
     const root = await manager.createTeamRun({ config, teamDefinitionName: "Resolver Team" });
-    const resolver = factory.callbacks[0]!.taskRootResolver;
+    const resolver = factory.callbacks[0]!.taskCommands;
     await expect(resolver.resolveActiveRoot()).resolves.toBe(root);
     await expect(manager.terminateTeamRun(root.teamRunId)).resolves.toBe(true);
     await expect(resolver.resolveActiveRoot()).rejects.toMatchObject({
@@ -339,7 +339,7 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
       config.rootTeam.teamRunId,
       expect.any(Object),
     );
-    const restoredRuntime = (restoredFactory.backends[0]?.getRuntimeContext as (() => MixedTeamRunContext))();
+    const restoredRuntime = (restoredFactory.backends[0]?.getRuntimeContext as (() => FlatTeamExecutionContext))();
     expect(restoredRuntime.configuredMemberActivationMode).toBe("restore");
   });
 
