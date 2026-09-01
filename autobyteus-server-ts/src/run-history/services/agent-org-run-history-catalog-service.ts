@@ -42,6 +42,7 @@ export class AgentOrgRunHistoryCatalogService {
     await this.ensureInitialized();
     return Object.freeze([...this.rows.values()].sort((left, right) => right.createdAt.localeCompare(left.createdAt)));
   }
+  async initialize(): Promise<void> { await this.ensureInitialized(); }
   async recordCreated(tree: AgentOrgRunExecutionTreeSnapshot): Promise<void> { await this.upsert(tree, false); }
   async recordRestored(tree: AgentOrgRunExecutionTreeSnapshot): Promise<void> { await this.upsert(tree, true); }
   async recordTerminated(orgRunId: string, terminatedAt = new Date().toISOString()): Promise<void> {

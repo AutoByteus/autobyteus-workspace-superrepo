@@ -13,6 +13,7 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
+import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
 
 const labels: Record<string, string> = {
   'workspace.components.workspace.team.TeamOverviewPanel.messages': 'Messages',
@@ -26,7 +27,7 @@ const labels: Record<string, string> = {
 
 const TeamCommunicationPanelStub = defineComponent({
   name: 'TeamCommunicationPanel',
-  props: ['teamContext', 'focusedAgentRunId'],
+  props: ['team'],
   template: '<div data-test="team-communication-panel" />',
 });
 
@@ -88,6 +89,7 @@ const seedNestedTeam = () => {
 };
 
 const mountSubject = () => mount(TeamOverviewPanel, {
+  props: { team: testTeamWorkspaceContextView(useAgentTeamContextsStore().activeTeamContext!) },
   global: {
     stubs: { TeamCommunicationPanel: TeamCommunicationPanelStub },
     mocks: { $t: (key: string) => labels[key] ?? key },
@@ -155,12 +157,12 @@ describe('TeamOverviewPanel current execution aggregate', () => {
     const wrapper = mountSubject();
     await wrapper.get('[data-test="team-delegated-tasks-header"]').trigger('click');
     const nested = seedNestedTeam();
+    await wrapper.setProps({ team: testTeamWorkspaceContextView(nested) });
     await nextTick();
     expect(messagesVisible(wrapper)).toBe(true);
     expect(tasksVisible(wrapper)).toBe(false);
     const panel = wrapper.getComponent({ name: 'TeamCommunicationPanel' });
-    expect(panel.props('teamContext')).toBe(nested);
-    expect(panel.props('focusedAgentRunId')).toBe('review-run');
+    expect(panel.props('team').focusedAgentRunId).toBe('review-run');
     expect(wrapper.get('[data-test="team-messages-header"]').text()).toContain('1 Messages');
   });
 });

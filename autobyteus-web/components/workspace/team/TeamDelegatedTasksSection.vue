@@ -76,6 +76,9 @@
           :selected-item="selectedItem"
           :selected-reference="selectedReference"
           :reference-refresh-signal="referenceRefreshSignal"
+          :reference-content-path="selectedEntry && selectedReference
+            ? team.taskReferenceContentPath(selectedEntry.taskId, selectedReference.referenceId)
+            : ''"
         />
       </div>
     </div>
@@ -85,10 +88,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
-import type { AgentTeamContext } from '~/types/agent/AgentTeamContext';
+import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget';
 import { useHorizontalSplitResize } from '~/composables/useHorizontalSplitResize';
 import {
-  deriveDelegatedTaskEntries,
   type DelegatedTaskEntry,
   type DelegatedTaskItemLocator,
   type DelegatedTaskLifecycleItem,
@@ -98,11 +100,9 @@ import TeamDelegatedTaskDetailPane from '~/components/workspace/team/TeamDelegat
 import TeamDelegatedTaskNavigator from '~/components/workspace/team/TeamDelegatedTaskNavigator.vue';
 
 const props = withDefaults(defineProps<{
-  teamContext: AgentTeamContext;
-  focusedAgentRunId?: string | null;
+  team: TeamWorkspaceContextView;
   collapsed?: boolean;
 }>(), {
-  focusedAgentRunId: undefined,
   collapsed: false,
 });
 
@@ -120,10 +120,9 @@ const { paneWidth: leftPaneWidth, startResize } = useHorizontalSplitResize({
   maxWidth: 360,
 });
 
-const rootTeamRunId = computed(() => props.teamContext.view.getRootTeamRunId());
-const delegatedTaskEntries = computed<DelegatedTaskEntry[]>(() => deriveDelegatedTaskEntries(
-  props.teamContext,
-  props.focusedAgentRunId,
+const rootTeamRunId = computed(() => props.team.rootRunId);
+const delegatedTaskEntries = computed<readonly DelegatedTaskEntry[]>(() => (
+  props.team.listDelegatedTaskEntries()
 ));
 const selectedEntry = computed(() => (
   delegatedTaskEntries.value.find((entry) => entry.entryKey === selectedEntryKey.value) ?? null

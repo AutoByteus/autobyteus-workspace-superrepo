@@ -187,6 +187,20 @@ export const GetTeamMemberEventMonitorActiveTracePage = gql`
   ${activeTracePageFields}
 `;
 
+export const GetAgentOrgMemberEventMonitorActiveTracePage = gql`
+  query GetAgentOrgMemberEventMonitorActiveTracePage(
+    $orgRunId: String!, $memberAddress: String!, $agentRunId: String!, $beforeCursor: String
+  ) {
+    getAgentOrgMemberEventMonitorActiveTracePage(
+      orgRunId: $orgRunId, memberAddress: $memberAddress,
+      agentRunId: $agentRunId, beforeCursor: $beforeCursor
+    ) {
+      ...EventMonitorActiveTracePageFields
+    }
+  }
+  ${activeTracePageFields}
+`;
+
 export const GetTeamRunResumeConfig = gql`
   query GetTeamRunResumeConfig($teamRunId: String!) {
     getTeamRunResumeConfig(teamRunId: $teamRunId) {
@@ -220,6 +234,34 @@ export const GetTeamMemberRunProjection = gql`
       conversation
       activities
       hasEarlierActiveTraceEvents
+    }
+  }
+`;
+
+export const GetAgentOrgMemberRunProjection = gql`
+  query GetAgentOrgMemberRunProjection(
+    $orgRunId: String!, $memberAddress: String!, $agentRunId: String!
+  ) {
+    getAgentOrgMemberRunProjection(
+      orgRunId: $orgRunId, memberAddress: $memberAddress, agentRunId: $agentRunId
+    ) {
+      agentRunId
+      memberAddress
+      summary
+      lastActivityAt
+      conversation
+      activities
+      hasEarlierActiveTraceEvents
+    }
+  }
+`;
+
+export const GetAgentOrgExecutionCheckpoint = gql`
+  query GetAgentOrgExecutionCheckpoint($orgRunId: String!) {
+    getAgentOrgExecutionCheckpoint(orgRunId: $orgRunId) {
+      orgRunId
+      changeSequence
+      hasOpenExecutionWork
     }
   }
 `;

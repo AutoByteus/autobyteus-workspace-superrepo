@@ -8,32 +8,21 @@ import type { AgentRunBackend } from "../../../src/agent-execution/backends/agen
 import type { AgentRunBackendFactory } from "../../../src/agent-execution/backends/agent-run-backend-factory.js";
 import { AgentRunConfig } from "../../../src/agent-execution/domain/agent-run-config.js";
 import { AgentRunContext } from "../../../src/agent-execution/domain/agent-run-context.js";
-import type { AgentRun } from "../../../src/agent-execution/domain/agent-run.js";
 import { AgentRunIdentityAllocator } from "../../../src/agent-execution/services/agent-run-identity-allocator.js";
 import { AgentRunManager } from "../../../src/agent-execution/services/agent-run-manager.js";
 import { buildRuntimeAgentToolExposure } from "../../../src/agent-execution/shared/runtime-agent-tool-exposure.js";
-import { MixedAgentMemberHandle } from "../../../src/agent-team-execution/backends/mixed/members/mixed-agent-member-handle.js";
-import type {
-  FlatTeamRunBackendFactory,
-} from "../../../src/agent-team-execution/backends/mixed/mixed-team-run-backend-factory.js";
-import {
-  FlatAgentExecutionContext,
-  FlatTeamExecutionContext,
-  type ConfiguredMemberActivationMode,
-} from "../../../src/agent-team-execution/local/flat-team-execution-context.js";
-import { TeamBackendKind } from "../../../src/agent-team-execution/domain/team-backend-kind.js";
-import type { PreparedLocalExecutionTermination } from "../../../src/agent-team-execution/domain/prepared-local-execution-termination.js";
+import { FlatTeamExecutionFactory } from "../../../src/agent-team-execution/local/flat-team-execution-factory.js";
 import type { TeamRunAgentNode } from "../../../src/agent-team-execution/domain/team-run-config.js";
-import { TeamRunContext } from "../../../src/agent-team-execution/domain/team-run-context.js";
-import { createRootTeamRunPhysicalScope } from "../../../src/agent-team-execution/domain/team-run-physical-scope.js";
 import { AgentTeamRunManager } from "../../../src/agent-team-execution/services/agent-team-run-manager.js";
 import { createTaskExecutionIdentityCapabilities } from "../../../src/agent-team-execution/task-delegation/task-execution-identity-capabilities.js";
+import { RootedAgentMemoryLocator } from "../../../src/agent-collaboration/execution/services/rooted-agent-memory-locator.js";
+import { ActiveCollaborationRootDirectory } from "../../../src/agent-collaboration/execution/services/active-collaboration-root-directory.js";
 import { createAgentToolsMcpHost } from "../../../src/agent-tools/mcp/agent-tools-mcp-host.js";
 import { RuntimeKind } from "../../../src/runtime-management/runtime-kind-enum.js";
 import { createAgentRunManagerInfrastructureFixture } from "../../fixtures/agent-run-manager-infrastructure-fixtures.js";
 import {
   testAgentNode,
-  testMemberTaskCommandCapability,
+  testMemberExecutionContext,
   testTeamRunConfig,
 } from "../../fixtures/current-team-run-fixtures.js";
 
@@ -178,75 +167,17 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
         children: [memberNode],
       });
 
-      let currentRun: AgentRun | null = null;
       let currentCycle = 0;
-      const buildTeamBackend = (
-        mode: ConfiguredMemberActivationMode,
-      ) => {
-        const run = currentRun;
-        if (!run) throw new Error("Team member AgentRun was not published.");
-        const memberContext = new FlatAgentExecutionContext({
-          address: memberNode.address,
-          agentRunId: memberNode.agentRunId,
-          runtimeKind: memberNode.runtimeKind,
-          platformAgentRunId: null,
-        });
-        const runtimeContext = new FlatTeamExecutionContext({
-          memberContexts: [memberContext],
-          configuredMemberActivationMode: mode,
-        });
-        const teamContext = new TeamRunContext({
-          physicalScope: createRootTeamRunPhysicalScope(teamConfig.rootTeam.teamRunId),
-          teamRunId: teamConfig.rootTeam.teamRunId,
-          teamBackendKind: TeamBackendKind.MIXED,
-          teamNode: teamConfig.rootTeam,
-          handoffs: teamConfig.handoffs,
-          runtimeContext,
-        });
-        const handle = new MixedAgentMemberHandle({
-          teamContext,
-          context: memberContext,
-          config: memberNode,
-          activationMode: mode,
-          agentRunManager,
-          memberExecutionContextBuilder: { build: vi.fn(async () => null) } as never,
-          taskCommands: testMemberTaskCommandCapability(),
-          publish: vi.fn(),
-          acceptPlatformBinding: vi.fn(async () => undefined),
-          deliverInterAgentMessage: vi.fn(async () => ({ accepted: true })),
-        });
-        (handle as unknown as { agentRun: AgentRun }).agentRun = run;
-
-        let active = true;
-        let prepared: PreparedLocalExecutionTermination | null = null;
-        return {
-          teamRunId: teamConfig.rootTeam.teamRunId,
-          teamBackendKind: TeamBackendKind.MIXED,
-          getTeamRunContext: () => teamContext,
-          getRuntimeContext: () => runtimeContext,
-          isActive: () => active,
-          isTerminated: () => !active,
-          getLeafAgentStatusSnapshots: () => handle.getLeafAgentStatusSnapshots(),
-          hasOpenExecutionWork: () => false,
-          freezeForRootTermination: () => ({
-            interruptActiveTurns: () => handle.interruptForRootTermination(),
-            prepareMemberRuns: async () => {
-              prepared ??= await handle.prepareTermination();
-            },
-            finish: async () => {
-              prepared ??= await handle.prepareTermination();
-              const result = await prepared.commit().finish();
-              if (result.accepted) active = false;
-              return result;
-            },
-          }),
-        };
-      };
-
-      const teamBackendFactory = {
-        createBackend: vi.fn(async () => buildTeamBackend("fresh")),
-        restoreBackend: vi.fn(async () => buildTeamBackend("restore")),
-      } as unknown as FlatTeamRunBackendFactory;
+      let hasNativeConversationActivity = false;
+      const teamExecutionFactory = new FlatTeamExecutionFactory({
+        agentRunManager,
+        memoryLocator: new RootedAgentMemoryLocator({ memoryDir }),
+        activityInspector: {
+          inspect: vi.fn(() => hasNativeConversationActivity
+            ? { kind: "present" as const }
+            : { kind: "none" as const }),
+        },
+      });
       const taskExecutionIdentity = createTaskExecutionIdentityCapabilities(
         AgentRunIdentityAllocator.getInstance({
           memoryDir,
@@ -261,8 +192,17 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
       );
       const teamRunManager = new AgentTeamRunManager({
         memoryDir,
-        mixedTeamRunBackendFactory: teamBackendFactory,
+        flatTeamExecutionFactory: teamExecutionFactory,
+        memberExecutionContextBuilder: {
+          build: vi.fn(async ({ teamContext, agentNode, taskCommands }) => testMemberExecutionContext({
+            memberAddress: agentNode.address,
+            rootTeamRunId: teamContext.rootIdentity.rootRunId,
+            agentRunId: agentNode.agentRunId,
+            taskCommands,
+          })),
+        } as never,
         taskExecutionIdentity,
+        activeRootDirectory: new ActiveCollaborationRootDirectory(),
         modelConfigValidator: {
           validate: vi.fn(async ({ llmConfig }) => ({
             kind: "valid" as const,
@@ -294,15 +234,13 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
         ],
       });
       createBackends.push(firstBackend);
-      currentRun = (await agentRunManager.prepareNewAgentRun({
-        runId: memberNode.agentRunId,
-        config: createAgentConfig(),
-      })).commitPublication();
-      const firstServerUrl = activate();
       await teamRunManager.createTeamRun({
         config: teamConfig,
         teamDefinitionName: "Agent Tools lifecycle Team",
       });
+      const currentRun = agentRunManager.getActiveRun(memberNode.agentRunId);
+      expect(currentRun).not.toBeNull();
+      const firstServerUrl = activate();
 
       await expectMcpStatus(firstServerUrl, 200);
       await expect(
@@ -327,21 +265,19 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
         terminationResults: [{ accepted: true }],
         context: restoredContext,
       }));
-      currentRun = (await agentRunManager.prepareRestoreAgentRun(
-        restoredContext,
-      )).commitPublication();
+      hasNativeConversationActivity = true;
+      await teamRunManager.restoreTeamRun(teamConfig.rootTeam.teamRunId);
+      const restoredRun = agentRunManager.getActiveRun(memberNode.agentRunId);
+      expect(restoredRun).not.toBeNull();
+      expect(restoredRun).not.toBe(currentRun);
       const restoredServerUrl = activate();
       expect(restoredServerUrl).toBe(firstServerUrl);
-
-      await teamRunManager.restoreTeamRun(teamConfig.rootTeam.teamRunId);
       await expectMcpStatus(restoredServerUrl, 200);
       await expect(
         teamRunManager.terminateTeamRun(teamConfig.rootTeam.teamRunId),
       ).resolves.toBe(true);
       expect(agentRunManager.getActiveRun(memberNode.agentRunId)).toBeNull();
       await expectMcpStatus(restoredServerUrl, 404);
-      expect(teamBackendFactory.createBackend).toHaveBeenCalledTimes(1);
-      expect(teamBackendFactory.restoreBackend).toHaveBeenCalledTimes(1);
       expect(agentBackendFactory.createBackend).toHaveBeenCalledTimes(1);
       expect(agentBackendFactory.restoreBackend).toHaveBeenCalledTimes(1);
     } finally {

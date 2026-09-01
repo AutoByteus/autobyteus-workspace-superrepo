@@ -83,8 +83,7 @@ import FileViewer from '~/components/fileExplorer/FileViewer.vue';
 import { authorizedFetch } from '~/utils/remoteAccess/authorizedTransport';
 
 const props = defineProps<{
-  teamRunId: string;
-  messageId: string;
+  contentPath: string;
   reference: TeamCommunicationReferenceFile;
   refreshSignal?: number;
   disableRichTextPreview?: boolean;
@@ -118,7 +117,7 @@ const supportsPreview = computed(() => {
 });
 const contentUrl = computed(() => {
   const restBaseUrl = windowNodeContextStore.getBoundEndpoints().rest.replace(/\/$/, '');
-  return `${restBaseUrl}/team-runs/${encodeURIComponent(props.teamRunId)}/team-communication/messages/${encodeURIComponent(props.messageId)}/references/${encodeURIComponent(props.reference.referenceId)}/content`;
+  return `${restBaseUrl}/${props.contentPath.replace(/^\/+/, '')}`;
 });
 const displayContent = computed(() => fileType.value === 'Text' ? (fetchedContent.value ?? '') : null);
 const displayUrl = computed(() => fileType.value === 'Text' ? null : resolvedUrl.value);
@@ -226,7 +225,7 @@ onBeforeUnmount(() => {
 });
 
 watch(
-  () => [props.teamRunId, props.messageId, props.reference.referenceId, props.reference.path, props.reference.type, props.reference.updatedAt, props.refreshSignal ?? 0],
+  () => [props.contentPath, props.reference.referenceId, props.reference.path, props.reference.type, props.reference.updatedAt, props.refreshSignal ?? 0],
   () => { void syncReferenceView(); },
   { immediate: true },
 );

@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils';
 import TeamWorkspaceView from '../TeamWorkspaceView.vue';
 import { AgentStatus } from '~/types/agent/AgentStatus';
 import { buildTestTeamContext, testAgentNode, testSubTeamNode } from '~/test-support/currentTeamTestFixtures';
+import { createPinia, setActivePinia } from 'pinia';
 
 const { state, teamContextsStoreMock, agentDefinitionStoreMock, teamRunConfigStoreMock,
   agentRunConfigStoreMock, selectionStoreMock, workspaceCenterViewStoreMock, agentTeamRunStoreMock } = vi.hoisted(() => {
@@ -19,7 +20,7 @@ const { state, teamContextsStoreMock, agentDefinitionStoreMock, teamRunConfigSto
     },
     teamRunConfigStoreMock: { setConfig: vi.fn() },
     agentRunConfigStoreMock: { clearConfig: vi.fn() },
-    selectionStoreMock: { clearSelection: vi.fn() },
+    selectionStoreMock: { selectedType: 'team', clearSelection: vi.fn() },
     workspaceCenterViewStoreMock: { showConfig: vi.fn() },
     agentTeamRunStoreMock: {
       getTeamStreamRecoveryNotice: vi.fn(() => localState.recoveryNotice),
@@ -51,6 +52,7 @@ const buildTeamContext = (input: { focusedAgentRunId?: string; configuration?: R
 
 describe('TeamWorkspaceView current aggregate', () => {
   beforeEach(() => {
+    setActivePinia(createPinia());
     vi.clearAllMocks();
     state.activeTeamContext = buildTeamContext();
     state.recoveryNotice = null;
@@ -80,7 +82,7 @@ describe('TeamWorkspaceView current aggregate', () => {
     expect(wrapper.find('h4').text()).toBe('Professor');
     expect(wrapper.get('[data-test="header-status"]').text()).toBe(AgentStatus.Running);
     expect(wrapper.get('img[alt="Professor avatar"]').attributes('src')).toBe('https://example.com/professor.png');
-    expect(wrapper.get('[data-test="team-event-monitor"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="agent-event-monitor"]').exists()).toBe(true);
     const cta = wrapper.get('[data-test="skill-improvement-cta"]');
     expect(cta.attributes()).toMatchObject({
       'data-kind': 'team-member', 'data-team-run-id': 'team-1', 'data-agent-run-id': 'professor-run',

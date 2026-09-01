@@ -1,4 +1,4 @@
-import type { TeamCommunicationMessageDto, TeamReferenceFileDto } from '@autobyteus/team-stream-contracts';
+import type { TeamReferenceFileDto } from '@autobyteus/team-stream-contracts';
 
 export type TeamCommunicationReferenceFileType = TeamReferenceFileDto['type'];
 export interface TeamCommunicationReferenceFile {
@@ -21,7 +21,6 @@ export interface TeamCommunicationPerspectiveMessage {
   direction: TeamCommunicationDirection;
   counterpartAgentRunId: string;
   counterpartLabel: string;
-  message: TeamCommunicationMessageDto;
 }
 
 export interface TeamCommunicationPerspective {

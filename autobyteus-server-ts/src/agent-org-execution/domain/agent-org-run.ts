@@ -26,11 +26,14 @@ import { adoptAgentOrgPlatformBinding } from "../services/agent-org-run-executio
 import type { TaskExecutionIdentityCapabilities } from "../../agent-team-execution/task-delegation/task-execution-identity-capabilities.js";
 import type { FlatTeamExecutionCallbacks } from "../../agent-team-execution/local/flat-team-execution-callbacks.js";
 import type { RootSnapshotConnection } from "../../agent-collaboration/execution/services/root-event-publisher.js";
+import type { CollaborationAgentStatusSnapshot } from "../../agent-collaboration/execution/domain/collaboration-agent-execution-event.js";
+import { CollaborationAgentPresentationEventAdapter } from "../../agent-collaboration/execution/events/collaboration-agent-presentation-event-adapter.js";
 
 export type AgentOrgRunPackageSnapshot = Readonly<{
   tree: AgentOrgRunExecutionTreeSnapshot;
   tasks: AgentOrgTaskDelegationRecordsFileV1;
   messages: AgentOrgCommunicationMessagesFileV1;
+  statuses: readonly CollaborationAgentStatusSnapshot[];
 }>;
 
 /** Native coordinator-free AgentOrg aggregate and sole live owner of its scope. */
@@ -42,6 +45,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   private index: AgentOrgExecutionIndex;
   private readonly taskEngine: RootTaskLifecycleEngine<ResolvedAgentOrgRecipient>;
   private readonly communication: RootCommunicationEngine;
+  private readonly presentation: CollaborationAgentPresentationEventAdapter;
   private termination: Promise<AgentOperationResult> | null = null;
 
   constructor(private readonly options: Readonly<{
@@ -62,6 +66,12 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     this.messages = options.messages;
     this.index = new AgentOrgExecutionIndex(this.tree);
     this.assertCorrelation();
+    this.presentation = new CollaborationAgentPresentationEventAdapter((agentRunId) => {
+      const agent = this.index.getAgent(agentRunId);
+      return agent && this.index.isLiveAgent(agentRunId)
+        ? this.identityFor(agent.agentRunId, agent.address)
+        : null;
+    });
     this.taskEngine = new RootTaskLifecycleEngine(new AgentOrgTaskLifecycleAdapter({
       root: options.root,
       initial: options.tasks,
@@ -101,6 +111,27 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   getExecutionTreeSnapshot(): AgentOrgRunExecutionTreeSnapshot { return this.tree; }
   getTaskRecordsSnapshot(): AgentOrgTaskDelegationRecordsFileV1 { return this.tasks; }
   getCommunicationSnapshot(): AgentOrgCommunicationMessagesFileV1 { return this.messages; }
+  getAgentStatusSnapshots(): readonly CollaborationAgentStatusSnapshot[] {
+    const direct = this.options.rootAgents.listHandles().map((handle) => handle.getStatusSnapshot());
+    const mounted = this.options.teams.list().flatMap((team) => team.getLeafAgentStatusSnapshots());
+    return Object.freeze([...direct, ...mounted]);
+  }
+  hasOpenExecutionWork(): boolean {
+    return this.taskEngine.hasOpenWork()
+      || this.options.rootAgents.listHandles().some((handle) => handle.hasOpenExecutionWork())
+      || this.options.teams.list().some((team) => team.hasOpenExecutionWork());
+  }
+  getExecutionCheckpoint(): Readonly<{
+    orgRunId: string;
+    changeSequence: number;
+    hasOpenExecutionWork: boolean;
+  }> {
+    return Object.freeze({
+      orgRunId: this.orgRunId,
+      changeSequence: this.options.publisher.getCurrentChangeSequence(),
+      hasOpenExecutionWork: this.hasOpenExecutionWork(),
+    });
+  }
 
   resolveRecipient(addressInput: string): ResolvedAgentOrgRecipient {
     this.assertAdmitting();
@@ -184,7 +215,14 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
 
   onAgentExecutionEvent(identity: CollaborationMemberExecutionIdentity, event: CollaborationAgentExecutionEvent): void {
     if (!sameRootExecutionIdentity(identity.root, this.options.root)) throw new Error("AgentOrg event belongs to another root.");
-    this.options.publisher.publish({ kind: "agent", execution: identity, event });
+    const adapted = this.presentation.adapt(identity, event);
+    if (adapted.kind === "rejected") {
+      this.enterFailStop();
+      throw new Error(adapted.message);
+    }
+    if (adapted.kind === "publish") {
+      this.options.publisher.publish({ kind: "agent_presentation", execution: identity, message: adapted.message });
+    }
     if ((event.kind === "status_overlay" && (event.snapshot.details.status === "idle" || event.snapshot.details.status === "offline"))
       || (event.kind === "agent_run" && event.event.eventType === "AGENT_STATUS"
         && (event.event.payload.status === "idle" || event.event.payload.status === "offline"))) {
@@ -201,6 +239,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
       tree: this.tree,
       tasks: this.tasks,
       messages: this.messages,
+      statuses: this.getAgentStatusSnapshots(),
     }));
   }
 

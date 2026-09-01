@@ -40,7 +40,6 @@ export const projectTeamCommunicationPerspective = (input: {
       direction: sent ? 'sent' : 'received',
       counterpartAgentRunId,
       counterpartLabel: memberAddressBasename(counterpartAddress),
-      message,
     }];
   }).sort(compareDesc);
   return { messages };

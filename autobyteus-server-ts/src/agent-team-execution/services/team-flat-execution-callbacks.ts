@@ -1,11 +1,10 @@
 import type { FlatTeamExecutionCallbacks } from "../local/flat-team-execution-callbacks.js";
 import { buildDeliveryEndpointForParticipant, type InterAgentMessageDeliveryHandler } from "../domain/inter-agent-message-delivery.js";
 import { createTeamAgentPlatformBinding, type TeamAgentPlatformBinding } from "../domain/team-agent-platform-binding.js";
-import { createTeamAgentStatusEvent, createTeamAgentStatusSnapshot } from "../domain/team-agent-status.js";
 import { TeamRunEventSourceType, type TeamRunEvent } from "../domain/team-run-event.js";
 import type { TeamRunContext } from "../domain/team-run-context.js";
-import { TeamAgentEventAdapter } from "./team-agent-event-adapter.js";
-import { buildTeamMemberInputEventPayload } from "./team-member-input-event-builder.js";
+import { toTeamAgentEvent } from "./team-agent-event-adapter.js";
+import { CollaborationAgentPresentationEventAdapter } from "../../agent-collaboration/execution/events/collaboration-agent-presentation-event-adapter.js";
 import { MemberExecutionContextBuilder } from "./member-team-context-builder.js";
 import type { MemberTaskCommandCapability } from "../../agent-collaboration/execution/task/member-task-command-capability.js";
 
@@ -30,59 +29,38 @@ export const createTeamFlatExecutionCallbacks = (input: {
     return context;
   }),
   publishAgentEvent: (identity, event) => {
-    if (event.kind === "status_overlay") {
-      input.publish(createTeamAgentStatusEvent(createTeamAgentStatusSnapshot({
-        execution: identity,
-        details: { ...event.snapshot.details, toolName: null, errorDetails: null },
-      })));
-      return;
-    }
-    if (event.kind === "member_input") {
+    const adapted = new CollaborationAgentPresentationEventAdapter(
+      (agentRunId) => agentRunId === identity.agentRunId ? identity : null,
+    ).adapt(identity, event);
+    if (adapted.kind === "filtered_collaboration_duplicate") return;
+    if (adapted.kind === "publish" && adapted.event.eventType === "MEMBER_INPUT_MESSAGE") {
       input.publish({
         eventSourceType: TeamRunEventSourceType.MEMBER_INPUT,
         agentRunId: identity.agentRunId,
-        payload: buildTeamMemberInputEventPayload({
-          rootTeamRunId: identity.root.rootRunId,
+        payload: Object.freeze({
           recipientAgentRunId: identity.agentRunId,
-          message: event.message,
+          ...adapted.event.details,
         }),
       });
       return;
     }
-    if (event.kind === "readiness_failure") {
-      input.publish({
-        eventSourceType: TeamRunEventSourceType.AGENT,
-        execution: identity,
-        payload: {
-          eventType: "ERROR",
+    const eventPayload = adapted.kind === "publish"
+      ? toTeamAgentEvent(adapted.event, identity)
+      : {
+          eventType: "ERROR" as const,
           details: Object.freeze({
-            code: event.code,
-            message: event.message,
-            errorScope: "runtime",
-            errorEffect: "terminal",
+            code: adapted.code,
+            message: adapted.message,
+            errorScope: "runtime" as const,
+            errorEffect: "terminal" as const,
             turnId: null,
           }),
-          statusHint: "ERROR",
-        },
-      });
-      return;
-    }
-    const adapted = new TeamAgentEventAdapter((agentRunId) => agentRunId === identity.agentRunId ? identity : null).adapt(event.event);
-    if (adapted.kind === "filtered_collaboration_duplicate") return;
+          statusHint: "ERROR" as const,
+        };
     input.publish({
       eventSourceType: TeamRunEventSourceType.AGENT,
       execution: identity,
-      payload: adapted.kind === "publish" ? adapted.event : {
-        eventType: "ERROR",
-        details: Object.freeze({
-          code: adapted.code,
-          message: adapted.message,
-          errorScope: "runtime",
-          errorEffect: "terminal",
-          turnId: null,
-        }),
-        statusHint: "ERROR",
-      },
+      payload: eventPayload,
     });
   },
   acceptPlatformBinding: (_identity, binding) => input.acceptPlatformBinding(createTeamAgentPlatformBinding(binding)),

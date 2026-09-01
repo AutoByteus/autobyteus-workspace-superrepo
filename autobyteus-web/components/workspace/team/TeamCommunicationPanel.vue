@@ -4,7 +4,7 @@
       {{ $t('workspace.components.workspace.team.TeamCommunicationPanel.no_focused_member') }}
     </div>
 
-    <div v-else-if="perspective.messages.length === 0" class="flex flex-1 flex-col items-center justify-center p-6 text-center text-gray-400">
+    <div v-else-if="displayMessages.length === 0" class="flex flex-1 flex-col items-center justify-center p-6 text-center text-gray-400">
       <Icon icon="heroicons:chat-bubble-left-right" class="mb-2 h-9 w-9 text-gray-300" />
       <p class="text-sm font-medium text-gray-500">{{ $t('workspace.components.workspace.team.TeamCommunicationPanel.empty_title') }}</p>
       <p class="mt-1 text-sm">{{ $t('workspace.components.workspace.team.TeamCommunicationPanel.empty_detail') }}</p>
@@ -88,8 +88,7 @@
       <main class="min-h-0 min-w-0 flex-1 overflow-hidden" data-test="team-communication-detail-pane">
         <div v-if="selectedType === 'reference' && selectedMessage && selectedReference" class="h-full">
           <TeamCommunicationReferenceViewer
-            :team-run-id="teamRunId"
-            :message-id="selectedMessage.messageId"
+            :content-path="team.communicationReferenceContentPath(selectedMessage.messageId, selectedReference.referenceId)"
             :reference="selectedReference"
             :refresh-signal="referenceRefreshSignal"
           />
@@ -139,8 +138,7 @@ import type {
   TeamCommunicationPerspectiveMessage,
   TeamCommunicationReferenceFile,
 } from '~/stores/teamCommunicationTypes';
-import type { AgentTeamContext } from '~/types/agent/AgentTeamContext';
-import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective';
+import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget';
 import MarkdownRenderer from '~/components/conversation/segments/renderer/MarkdownRenderer.vue';
 import {
   referenceFileIcon,
@@ -149,8 +147,7 @@ import {
 import TeamCommunicationReferenceViewer from './TeamCommunicationReferenceViewer.vue';
 
 const props = defineProps<{
-  teamContext: AgentTeamContext;
-  focusedAgentRunId: string;
+  team: TeamWorkspaceContextView;
 }>();
 
 const { t } = useLocalization();
@@ -165,17 +162,13 @@ const { paneWidth: leftPaneWidth, startResize } = useHorizontalSplitResize({
 });
 
 const hasFocusedMemberIdentity = computed(() => Boolean(
-  props.focusedAgentRunId && props.teamContext.view.hasAgentRun(props.focusedAgentRunId),
+  props.team.focusedAgentRunId
+    && props.team.listMembers().some((member) => member.agentRunId === props.team.focusedAgentRunId),
 ));
-const teamRunId = computed(() => props.teamContext.view.getRootTeamRunId());
-const perspective = computed(() => projectTeamCommunicationPerspective({
-  view: props.teamContext.view,
-  messages: props.teamContext.view.listCommunicationMessages(),
-  focusedAgentRunId: props.focusedAgentRunId,
-}));
-const displayMessages = computed(() => perspective.value.messages);
+const teamRunId = computed(() => props.team.rootRunId);
+const displayMessages = computed(() => props.team.listCommunicationMessages());
 const selectedMessage = computed(() =>
-  perspective.value.messages.find((message) => message.messageId === selectedMessageId.value) || null,
+  displayMessages.value.find((message) => message.messageId === selectedMessageId.value) || null,
 );
 const selectedReference = computed(() =>
   selectedMessage.value?.referenceFiles.find((reference) => reference.referenceId === selectedReferenceId.value) || null,

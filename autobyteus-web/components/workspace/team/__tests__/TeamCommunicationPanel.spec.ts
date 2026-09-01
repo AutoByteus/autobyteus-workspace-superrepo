@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import TeamCommunicationPanel from '../TeamCommunicationPanel.vue';
 import { buildTestTeamContext, testAgentNode, testTaskRecord } from '~/test-support/currentTeamTestFixtures';
+import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
 
 const labels: Record<string, string> = {
   'workspace.components.workspace.team.TeamCommunicationPanel.to_counterpart': 'to',
@@ -32,12 +33,16 @@ const team = buildTestTeamContext({
   ],
 });
 const mountSubject = (focusedAgentRunId = 'focused-run') => mount(TeamCommunicationPanel, {
-  props: { teamContext: team, focusedAgentRunId },
+  props: {
+    team: focusedAgentRunId === 'focused-run'
+      ? testTeamWorkspaceContextView(team, focusedAgentRunId)
+      : { ...testTeamWorkspaceContextView(team), focusedAgentRunId },
+  },
   global: {
     stubs: {
       Icon: { props: ['icon'], template: '<span v-bind="$attrs" :data-icon="icon"></span>' },
       MarkdownRenderer: { props: ['content'], template: '<article data-test="markdown-renderer">{{ content }}</article>' },
-      TeamCommunicationReferenceViewer: { props: ['teamRunId', 'messageId', 'reference'], template: '<div data-test="reference-viewer">{{ teamRunId }}:{{ messageId }}:{{ reference.referenceId }}</div>' },
+      TeamCommunicationReferenceViewer: { props: ['contentPath', 'reference'], template: '<div data-test="reference-viewer">{{ contentPath }}:{{ reference.referenceId }}</div>' },
     },
     mocks: { $t: (key: string) => labels[key] ?? key },
   },
@@ -67,6 +72,6 @@ describe('TeamCommunicationPanel current AgentRun perspective', () => {
     const wrapper = mountSubject();
     await wrapper.vm.$nextTick();
     await wrapper.get('[data-test="team-communication-reference-row"]').trigger('click');
-    expect(wrapper.get('[data-test="reference-viewer"]').text()).toBe('team-1:message-sent:ref-1');
+    expect(wrapper.get('[data-test="reference-viewer"]').text()).toBe('team-runs/team-1/team-communication/messages/message-sent/references/ref-1/content:ref-1');
   });
 });

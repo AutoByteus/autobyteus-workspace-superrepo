@@ -4,7 +4,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import TeamCommunicationReferenceViewer from '../TeamCommunicationReferenceViewer.vue';
 import { useMobileNodeSessionStore } from '~/stores/mobileNodeSessionStore';
 import type { TeamCommunicationReferenceFileType } from '~/stores/teamCommunicationTypes';
-import type { FileDataType } from '~/stores/fileExplorer';
+import type { FileDataType } from '~/stores/fileExplorerState';
 import { mobileCredentialStorage } from '~/utils/remoteAccess/mobileCredentialStorage';
 import type { MobileNodeSession } from '~/types/remoteAccess';
 
@@ -61,8 +61,7 @@ const storedSession = (): MobileNodeSession => ({
 
 const mountSubject = (props: Record<string, unknown> = {}) => mount(TeamCommunicationReferenceViewer, {
   props: {
-    teamRunId: 'team run/1',
-    messageId: 'message/1',
+    contentPath: 'team-runs/team%20run%2F1/team-communication/messages/message%2F1/references/ref%3Awith%2Fslash/content',
     reference: baseReference,
     ...props,
   },
@@ -146,6 +145,7 @@ describe('TeamCommunicationReferenceViewer.vue', () => {
       });
 
       const wrapper = mountSubject({
+        contentPath: `team-runs/team%20run%2F1/team-communication/messages/message%2F1/references/${referenceType}-ref/content`,
         reference: {
           ...baseReference,
           referenceId: `${referenceType}-ref`,

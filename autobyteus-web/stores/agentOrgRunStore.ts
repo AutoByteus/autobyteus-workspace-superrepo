@@ -26,6 +26,8 @@ export const useAgentOrgRunStore = defineStore('agentOrgRun', () => {
   const restoring = ref(false)
   const history = ref<AgentOrgHistoryItem[]>([])
   const historyError = ref<string | null>(null)
+  const terminatingRunIds = ref<ReadonlySet<string>>(new Set())
+  const terminationErrors = ref<Record<string, string | null>>({})
 
   const launch = async (input: AgentOrgLaunchInput): Promise<string> => {
     launching.value = true
@@ -70,13 +72,26 @@ export const useAgentOrgRunStore = defineStore('agentOrgRun', () => {
   }
 
   const terminate = async (orgRunId: string): Promise<void> => {
-    const { data, errors: gqlErrors } = await getApolloClient().mutate({ mutation: TerminateAgentOrgRun, variables: { agentOrgRunId: orgRunId } })
-    if (gqlErrors?.length) throw new Error(gqlErrors.map((entry: { message: string }) => entry.message).join(', '))
-    if (!data?.terminateAgentOrgRun?.success) throw new Error(data?.terminateAgentOrgRun?.message || 'AgentOrg termination failed.')
-    await fetchHistory().catch(() => undefined)
+    if (terminatingRunIds.value.has(orgRunId)) return
+    terminatingRunIds.value = new Set([...terminatingRunIds.value, orgRunId])
+    terminationErrors.value = { ...terminationErrors.value, [orgRunId]: null }
+    try {
+      const { data, errors: gqlErrors } = await getApolloClient().mutate({ mutation: TerminateAgentOrgRun, variables: { agentOrgRunId: orgRunId } })
+      if (gqlErrors?.length) throw new Error(gqlErrors.map((entry: { message: string }) => entry.message).join(', '))
+      if (!data?.terminateAgentOrgRun?.success) throw new Error(data?.terminateAgentOrgRun?.message || 'AgentOrg termination failed.')
+      await fetchHistory().catch(() => undefined)
+    } catch (cause) {
+      const detail = cause instanceof Error ? cause.message : String(cause)
+      terminationErrors.value = { ...terminationErrors.value, [orgRunId]: detail }
+      throw cause
+    } finally {
+      const next = new Set(terminatingRunIds.value)
+      next.delete(orgRunId)
+      terminatingRunIds.value = next
+    }
   }
   return {
-    launching, restoring, history, historyError,
+    launching, restoring, history, historyError, terminatingRunIds, terminationErrors,
     launch, restore, fetchHistory, terminate,
   }
 })

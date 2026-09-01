@@ -1,7 +1,11 @@
 import { SkillAccessMode } from "autobyteus-ts/agent/context/skill-access-mode.js";
 import { GraphQLJSON } from "graphql-scalars";
-import { Arg, Field, InputType, Mutation, ObjectType, Resolver } from "type-graphql";
+import { Arg, Field, InputType, Int, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { getStudioAgentOrgRunService } from "../studio-application-api-services.js";
+import { EventMonitorActiveTracePageObject } from "./event-monitor-active-trace-page.js";
+import { getAgentOrgMemberRunViewProjectionService } from "../../../run-history/services/agent-org-member-run-view-projection-service.js";
+import { AgentOrgRunManager } from "../../../agent-org-execution/services/agent-org-run-manager.js";
+import { TokenUsageRunSummaryGraphql, toTokenUsageRunSummaryGraphql } from "./token-usage-stats.js";
 
 @InputType()
 export class AgentOrgRootLaunchConfigurationInput {
@@ -48,9 +52,74 @@ export class AgentOrgRunMutationResult {
   @Field(() => String, { nullable: true }) agentOrgRunId?: string | null;
 }
 
+@ObjectType()
+export class AgentOrgMemberRunProjectionPayload {
+  @Field(() => String) agentRunId!: string;
+  @Field(() => String) memberAddress!: string;
+  @Field(() => [GraphQLJSON]) conversation!: unknown[];
+  @Field(() => [GraphQLJSON]) activities!: unknown[];
+  @Field(() => String, { nullable: true }) summary?: string | null;
+  @Field(() => String, { nullable: true }) lastActivityAt?: string | null;
+  @Field(() => Boolean) hasEarlierActiveTraceEvents!: boolean;
+}
+
+@ObjectType()
+export class AgentOrgExecutionCheckpointPayload {
+  @Field(() => String) orgRunId!: string;
+  @Field(() => Int) changeSequence!: number;
+  @Field(() => Boolean) hasOpenExecutionWork!: boolean;
+}
+
 @Resolver()
 export class AgentOrgRunResolver {
   private readonly service = getStudioAgentOrgRunService();
+  private readonly memberViews = getAgentOrgMemberRunViewProjectionService();
+
+  @Query(() => AgentOrgMemberRunProjectionPayload)
+  async getAgentOrgMemberRunProjection(
+    @Arg("orgRunId", () => String) orgRunId: string,
+    @Arg("memberAddress", () => String) memberAddress: string,
+    @Arg("agentRunId", () => String) agentRunId: string,
+  ): Promise<AgentOrgMemberRunProjectionPayload> {
+    return this.memberViews.getProjection(orgRunId, memberAddress, agentRunId);
+  }
+
+  @Query(() => EventMonitorActiveTracePageObject)
+  async getAgentOrgMemberEventMonitorActiveTracePage(
+    @Arg("orgRunId", () => String) orgRunId: string,
+    @Arg("memberAddress", () => String) memberAddress: string,
+    @Arg("agentRunId", () => String) agentRunId: string,
+    @Arg("beforeCursor", () => String, { nullable: true }) beforeCursor?: string | null,
+  ): Promise<EventMonitorActiveTracePageObject> {
+    return this.memberViews.getActiveTracePage(
+      orgRunId,
+      memberAddress,
+      agentRunId,
+      beforeCursor,
+    );
+  }
+
+  @Query(() => AgentOrgExecutionCheckpointPayload)
+  getAgentOrgExecutionCheckpoint(
+    @Arg("orgRunId", () => String) orgRunId: string,
+  ): AgentOrgExecutionCheckpointPayload {
+    const run = AgentOrgRunManager.getInstance().getActive(orgRunId);
+    if (!run) throw new Error(`Active AgentOrg '${orgRunId}' was not found.`);
+    return run.getExecutionCheckpoint();
+  }
+
+  @Query(() => TokenUsageRunSummaryGraphql)
+  async getAgentOrgMemberTokenUsageSummary(
+    @Arg("orgRunId", () => String) orgRunId: string,
+    @Arg("memberAddress", () => String) memberAddress: string,
+    @Arg("agentRunId", () => String) agentRunId: string,
+  ): Promise<TokenUsageRunSummaryGraphql> {
+    return toTokenUsageRunSummaryGraphql(await this.memberViews.getTokenUsageSummary(
+      orgRunId,
+      memberAddress,
+      agentRunId,
+    ));
+  }
 
   @Mutation(() => AgentOrgRunMutationResult)
   async createAgentOrgRun(

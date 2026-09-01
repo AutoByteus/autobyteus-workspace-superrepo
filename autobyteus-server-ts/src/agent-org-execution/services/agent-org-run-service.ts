@@ -48,7 +48,7 @@ export class AgentOrgRunService {
     workspaces: Pick<WorkspaceManager, "ensureWorkspaceByRootPath">;
     admission: Pick<DefinitionAdmissionService, "requireAvailable">;
     modelConfigValidator: RunModelConfigValidator;
-    history: Pick<AgentOrgRunHistoryCatalogService, "recordCreated" | "recordRestored" | "recordTerminated">;
+    history: Pick<AgentOrgRunHistoryCatalogService, "initialize" | "recordCreated" | "recordRestored" | "recordTerminated">;
   }>) {}
 
   async create(command: CreateAgentOrgRunCommand): Promise<AgentOrgRun> {
@@ -81,6 +81,10 @@ export class AgentOrgRunService {
       agentOverrides,
       applicationBinding: command.applicationBinding ?? null,
     });
+    // Establish the derived history baseline before the new current package is
+    // published, otherwise a first-ever history read would discover that same
+    // package and misclassify recordCreated as a duplicate.
+    await this.dependencies.history.initialize();
     const run = await this.dependencies.manager.create(tree);
     try {
       await this.dependencies.history.recordCreated(run.getExecutionTreeSnapshot());

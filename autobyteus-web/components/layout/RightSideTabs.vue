@@ -32,10 +32,14 @@
         class="h-full min-h-0"
         data-test="right-side-files-panel"
       >
-        <FileExplorerLayout :active="isFilesTabActive" :layout="fileExplorerLayout" />
+        <FileExplorerLayout
+          :active="isFilesTabActive"
+          :layout="fileExplorerLayout"
+          :workspace-id="activeWorkspaceId"
+        />
       </div>
       <div v-if="effectiveActiveTab === 'teamMembers'" class="h-full min-h-0">
-        <TeamOverviewPanel />
+        <TeamOverviewPanel v-if="activeTeamView" :team="activeTeamView" />
       </div>
       <div
         v-if="shouldMountTerminalPanel"
@@ -43,7 +47,10 @@
         class="h-full min-h-0"
         data-test="right-side-terminal-panel"
       >
-        <TerminalPanel :active="isTerminalTabActive" />
+        <TerminalPanel
+          :active="isTerminalTabActive"
+          :workspace-metadata="activeWorkspaceMetadata"
+        />
       </div>
       <div v-if="effectiveActiveTab === 'vnc'" class="h-full min-h-0">
         <VncViewer />
@@ -71,7 +78,6 @@ import { useAgentTodoStore } from '~/stores/agentTodoStore';
 import { useRightPanel } from '~/composables/useRightPanel';
 import { useRightPanelOpenFileAutoSwitch } from '~/composables/useRightPanelOpenFileAutoSwitch';
 import { useRightSideTabs } from '~/composables/useRightSideTabs';
-import { useAgentSelectionStore } from '~/stores/agentSelectionStore';
 import TabList from '~/components/tabs/TabList.vue';
 import TeamOverviewPanel from '~/components/workspace/team/TeamOverviewPanel.vue';
 import TerminalPanel from '~/components/workspace/tools/TerminalPanel.vue';
@@ -88,7 +94,6 @@ const props = withDefaults(defineProps<{
   mode: 'desktop',
 });
 
-const selectionStore = useAgentSelectionStore();
 const activeContextStore = useActiveContextStore();
 const todoStore = useAgentTodoStore();
 
@@ -96,6 +101,14 @@ const { activeTab, visibleTabs: baseVisibleTabs, setActiveTab } = useRightSideTa
 const { toggleRightPanel } = useRightPanel();
 
 const currentAgentRunId = computed(() => activeContextStore.activeAgentContext?.state.runId ?? '');
+const activeWorkspaceId = computed(() => activeContextStore.activeWorkspaceTarget?.context.config.workspaceId ?? undefined);
+const activeWorkspaceMetadata = computed(() => activeContextStore.activeWorkspaceTarget?.context.config.workspaceMetadata ?? null);
+const activeTeamView = computed(() => {
+  const target = activeContextStore.activeWorkspaceTarget;
+  return target?.kind === 'standalone_team_member' || target?.kind === 'agent_org_team_member'
+    ? target.team
+    : null;
+});
 const filesTabEnabled = computed(() => props.mode !== 'mobile-tools');
 const fileExplorerLayout = computed(() => props.mode === 'desktop' ? 'split' : 'stacked');
 const showPanelToggle = computed(() => props.mode === 'desktop');
@@ -125,10 +138,10 @@ const handleTabSelect = (tabName: string) => {
 };
 
 // Watch for changes in the selected profile type to adjust the active tab via the composable logic
-watch(() => selectionStore.selectedType, (newType) => {
-  if (newType === 'team') {
+watch(() => activeContextStore.activeWorkspaceTarget?.kind, (kind) => {
+  if (kind === 'standalone_team_member' || kind === 'agent_org_team_member') {
     setActiveTab('teamMembers');
-  } else if (newType === 'agent') {
+  } else if (kind === 'standalone_agent' || kind === 'agent_org_direct_agent') {
     setActiveTab('progress');
   }
 }, { immediate: true });
@@ -155,7 +168,7 @@ watch(isTerminalTabActive, (isActive) => {
 
 // Watch the ToDo list for the active agent. If it becomes populated, switch to the To-Do tab.
 watch(() => currentAgentRunId.value ? todoStore.getTodos(currentAgentRunId.value) : [], (newTodoList) => {
-  if (selectionStore.selectedType === 'agent' && newTodoList.length > 0 && activeTab.value !== 'progress') {
+  if (activeContextStore.activeWorkspaceTarget && newTodoList.length > 0 && activeTab.value !== 'progress') {
     setActiveTab('progress');
   }
 });

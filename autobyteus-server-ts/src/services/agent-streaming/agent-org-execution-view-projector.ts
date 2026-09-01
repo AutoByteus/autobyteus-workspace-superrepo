@@ -22,15 +22,37 @@ export const projectAgentOrgExecutionView = (
     execution_tree: snapshot.tree,
     task_records: snapshot.tasks,
     communication_messages: snapshot.messages,
+    agent_statuses: snapshot.statuses.map((status) => ({
+      member_address: status.execution.memberAddress,
+      agent_run_id: status.execution.agentRunId,
+      status: status.details.status,
+      trigger: status.details.trigger,
+      tool_name: null,
+      error_message: status.details.errorMessage,
+      error_details: null,
+    })),
   },
 });
 
 export const projectAgentOrgExecutionEvent = (
   run: AgentOrgRun,
   sequenced: SequencedRootEvent<AgentOrgRunEvent>,
-): RootExecutionEventDto => RootExecutionEventDtoSchema.parse({
-  root_subject_kind: "agent_org",
-  root_run_id: run.orgRunId,
-  change_sequence: sequenced.changeSequence,
-  event: sequenced.event,
-});
+): RootExecutionEventDto | null => {
+  if (sequenced.event.kind === "lifecycle") return null;
+  const event = sequenced.event.kind === "agent_presentation"
+    ? {
+        kind: "agent_presentation" as const,
+        member_address: sequenced.event.execution.memberAddress,
+        agent_run_id: sequenced.event.execution.agentRunId,
+        message: sequenced.event.message,
+      }
+    : sequenced.event.kind === "task"
+      ? { kind: "task" as const, event: sequenced.event.event }
+      : { kind: "communication" as const, message: sequenced.event.message };
+  return RootExecutionEventDtoSchema.parse({
+    root_subject_kind: "agent_org",
+    root_run_id: run.orgRunId,
+    change_sequence: sequenced.changeSequence,
+    event,
+  });
+};

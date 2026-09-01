@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue';
 import { useAgentSelectionStore } from '~/stores/agentSelectionStore';
 import { useBrowserShellStore } from '~/stores/browserShellStore';
+import { useRoute } from 'vue-router';
+import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore';
 import {
   getWorkspaceToolOrder,
   type WorkspaceToolName,
@@ -20,6 +22,8 @@ const activeTab = ref<TabName>('terminal');
 export function useRightSideTabs() {
   const selectionStore = useAgentSelectionStore();
   const browserShellStore = useBrowserShellStore();
+  const orgContexts = useAgentOrgContextsStore();
+  const route = useRoute();
   const { t, resolvedLocale } = useLocalization();
 
   const tabLabels = computed<Record<TabName, string>>(() => {
@@ -46,10 +50,16 @@ export function useRightSideTabs() {
   });
 
   const visibleTabs = computed(() => {
+    const orgRunId = String(route?.query.orgRunId || '');
+    const orgTarget = route?.query.rootSubjectKind === 'agent_org'
+      ? orgContexts.contextFor(orgRunId)?.activeTarget() ?? null
+      : null;
+    const teamWorkspace = selectionStore.selectedType === 'team'
+      || orgTarget?.kind === 'agent_org_team_member';
     return allTabs.value.filter(tab => {
       if (tab.name === 'browser' && !browserShellStore.browserAvailable) return false;
       if (tab.requires === 'any') return true;
-      return tab.requires === selectionStore.selectedType;
+      return tab.requires === 'team' && teamWorkspace;
     });
   });
 

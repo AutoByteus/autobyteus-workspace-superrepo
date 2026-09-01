@@ -4,12 +4,23 @@ import { AgentOrgStreamHandler } from "../../../../src/services/agent-streaming/
 import { RootEventPublisher } from "../../../../src/agent-collaboration/execution/services/root-event-publisher.js";
 import { testAgentOrgExecutionTree, testOrgAgentNode } from "../../../fixtures/current-agent-org-run-fixtures.js";
 import type { AgentOrgRunEvent } from "../../../../src/agent-org-execution/domain/agent-org-run-event.js";
+import { createAgentOrgRootExecutionIdentity, createCollaborationMemberExecutionIdentity } from "../../../../src/agent-collaboration/execution/domain/root-execution-identity.js";
 
 const orgRunId = "org-run-1";
 const agent = testOrgAgentNode("/director", "agent-run-1");
 const tree = testAgentOrgExecutionTree({ orgRunId, members: [agent] });
 const tasks = { schemaVersion: 1 as const, subjectKind: "agent_org" as const, orgRunId, records: [] };
 const messages = { schemaVersion: 1 as const, subjectKind: "agent_org" as const, orgRunId, messages: [] };
+const execution = createCollaborationMemberExecutionIdentity({
+  root: createAgentOrgRootExecutionIdentity(orgRunId),
+  memberAddress: agent.address,
+  agentRunId: agent.agentRunId,
+});
+const statuses = [{
+  execution,
+  details: { status: "idle" as const, trigger: null, errorMessage: null },
+  statusHint: "IDLE" as const,
+}];
 
 const connection = () => {
   const sent: string[] = [];
@@ -22,7 +33,7 @@ const harness = () => {
   const run = {
     orgRunId,
     isActive: () => true,
-    openPackageSnapshotConnection: () => publisher.openSnapshotConnection(() => ({ tree, tasks, messages })),
+    openPackageSnapshotConnection: () => publisher.openSnapshotConnection(() => ({ tree, tasks, messages, statuses })),
     executeAgentCommand,
   };
   const manager = { getActive: vi.fn((id: string) => id === orgRunId ? run : null) };
@@ -37,22 +48,54 @@ describe("AgentOrgStreamHandler", () => {
     expect(initial.map((message) => message.type)).toEqual(["CONNECTED", "ROOT_EXECUTION_VIEW_SNAPSHOT", "ROOT_LIFECYCLE"]);
     const snapshot = initial[1]; expect(snapshot.type).toBe("ROOT_EXECUTION_VIEW_SNAPSHOT");
     if (snapshot.type === "ROOT_EXECUTION_VIEW_SNAPSHOT") expect(snapshot.payload).toMatchObject({ root_subject_kind: "agent_org", root_run_id: orgRunId, root_org: { execution_tree: { rootOrg: { orgRunId } } } });
+    test.publisher.publish({
+      kind: "agent_presentation",
+      execution,
+      message: { type: "AGENT_STATUS", payload: {
+        status: "running", trigger: "user", tool_name: null,
+        error_message: null, error_details: null,
+      } },
+    });
     test.publisher.publish({ kind: "lifecycle", isActive: false });
     const emitted = client.sent.slice(3).map((value) => CollaborationStreamServerMessageSchema.parse(JSON.parse(value)));
     expect(emitted.map((message) => message.type)).toEqual(["ROOT_EXECUTION_EVENT", "ROOT_LIFECYCLE"]);
-    expect(emitted[0]).toMatchObject({ payload: { root_subject_kind: "agent_org", root_run_id: orgRunId, change_sequence: 1 } });
+    expect(emitted[0]).toMatchObject({ payload: { root_subject_kind: "agent_org", root_run_id: orgRunId, change_sequence: 1, event: { kind: "agent_presentation" } } });
+    expect(emitted[1]).toMatchObject({ payload: { root_subject_kind: "agent_org", root_run_id: orgRunId, is_active: false } });
   });
 
   it("rejects wrong-root commands and routes a correlated command only to the exact AgentRun", async () => {
     const test = harness(); const client = connection(); const sessionId = await test.handler.connect(client.socket, orgRunId); expect(sessionId).toBeTruthy();
-    const command = (rootRunId: string) => JSON.stringify({ type: "SEND_MESSAGE", payload: { root_subject_kind: "agent_org", root_run_id: rootRunId, target_agent_run_id: agent.agentRunId, content: "Hello", context_file_paths: ["/tmp/context.txt"], image_urls: [], message_id: "message-1", dedupe_key: "dedupe-1" } });
-    await test.handler.handleMessage(sessionId!, command("another-org"));
+    const command = (rootRunId: string, commandId: string) => JSON.stringify({ type: "SEND_MESSAGE", payload: { root_subject_kind: "agent_org", root_run_id: rootRunId, target_agent_run_id: agent.agentRunId, command_id: commandId, content: "Hello", context_file_paths: ["/tmp/context.txt"], image_urls: [], message_id: "message-1", dedupe_key: "dedupe-1" } });
+    await test.handler.handleMessage(sessionId!, command("another-org", "wrong-root"));
     expect(test.executeAgentCommand).not.toHaveBeenCalled();
-    expect(JSON.parse(client.sent.at(-1) ?? "{}")).toMatchObject({ type: "ERROR", payload: { code: "AGENT_ORG_COMMAND_REJECTED" } });
-    await test.handler.handleMessage(sessionId!, command(orgRunId));
+    expect(JSON.parse(client.sent.at(-1) ?? "{}")).toMatchObject({ type: "AGENT_COMMAND_ACK", payload: { command_id: "wrong-root", state: "failed", code: "AGENT_ORG_COMMAND_FAILED" } });
+    await test.handler.handleMessage(sessionId!, command(orgRunId, "accepted"));
     expect(test.executeAgentCommand).toHaveBeenCalledTimes(1);
     expect(test.executeAgentCommand.mock.calls[0]?.[0]).toBe(agent.agentRunId);
     expect(test.executeAgentCommand.mock.calls[0]?.[1]).toMatchObject({ kind: "post_message", message: { content: "Hello", metadata: { message_id: "message-1", dedupe_key: "dedupe-1" } } });
+    expect(JSON.parse(client.sent.at(-1) ?? "{}")).toMatchObject({ type: "AGENT_COMMAND_ACK", payload: { command_id: "accepted", state: "accepted" } });
+  });
+
+  it.each([
+    ["INTERRUPT_GENERATION", { kind: "interrupt" }],
+    ["APPROVE_TOOL", { kind: "approve_tool", invocationId: "tool-1", approved: true, reason: "safe" }],
+    ["DENY_TOOL", { kind: "approve_tool", invocationId: "tool-1", approved: false, reason: "blocked" }],
+  ] as const)("acknowledges the strict %s command", async (type, expected) => {
+    const test = harness(); const client = connection();
+    const sessionId = await test.handler.connect(client.socket, orgRunId); expect(sessionId).toBeTruthy();
+    const payload = {
+      root_subject_kind: "agent_org", root_run_id: orgRunId,
+      target_agent_run_id: agent.agentRunId, command_id: `command-${type}`,
+      ...(type === "APPROVE_TOOL" || type === "DENY_TOOL"
+        ? { invocation_id: "tool-1", reason: type === "APPROVE_TOOL" ? "safe" : "blocked" }
+        : {}),
+    };
+    await test.handler.handleMessage(sessionId!, JSON.stringify({ type, payload }));
+    expect(test.executeAgentCommand).toHaveBeenCalledWith(agent.agentRunId, expected);
+    expect(JSON.parse(client.sent.at(-1) ?? "{}")).toMatchObject({
+      type: "AGENT_COMMAND_ACK",
+      payload: { command_id: `command-${type}`, command_type: type, state: "accepted" },
+    });
   });
 
   it("fails closed when the requested Org root is not active", async () => {

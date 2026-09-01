@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAgentSelectionStore } from './agentSelectionStore';
 import { useAgentContextsStore } from './agentContextsStore';
 import { useAgentTeamContextsStore } from './agentTeamContextsStore';
@@ -12,6 +13,15 @@ import type { ContextFilePath } from '~/types/conversation';
 import type { ToolApprovalTarget } from '~/types/segments';
 import { AgentStatus } from '~/types/agent/AgentStatus';
 import { resolveAgentPrimaryAction } from '~/services/runSubmission/agentPrimaryAction';
+import { useAgentOrgContextsStore } from './agentOrgContextsStore';
+import type {
+  ActiveAgentWorkspaceTarget,
+  TeamWorkspaceContextView,
+} from '~/types/workspace/activeAgentWorkspaceTarget';
+import type { AgentTeamContext } from '~/types/agent/AgentTeamContext';
+import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress';
+import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective';
+import { deriveDelegatedTaskEntries } from '~/utils/teamDelegatedTaskEntries';
 
 /**
  * @store useActiveContextStore
@@ -25,21 +35,107 @@ export const useActiveContextStore = defineStore('activeContext', () => {
   const agentRunStore = useAgentRunStore();
   const agentTeamRunStore = useAgentTeamRunStore();
   const contextFileUploadStore = useContextFileUploadStore();
+  const agentOrgContextsStore = useAgentOrgContextsStore();
+  const route = useRoute();
 
-  const activeAgentContext = computed<AgentContext | null>(() => {
+  const standaloneTeamView = (team: AgentTeamContext): TeamWorkspaceContextView => {
+    const view = team.view;
+    const tree = view.getExecutionTree();
+    const focusedContext = view.getFocusedAgentContext();
+    if (!focusedContext) throw new Error('Standalone Team has no focused Agent context.');
+    const entries = view.listAgentContextEntries();
+    return Object.freeze({
+      rootKind: 'agent_team', rootRunId: view.getRootTeamRunId(),
+      teamRunId: view.getRootTeamRunId(), teamAddress: parseAgentTeamAddress('/'),
+      teamDefinitionName: view.getTeamDefinitionName(),
+      coordinatorAddress: parseAgentTeamAddress(tree.root_team.coordinator_address),
+      focusedMemberAddress: view.getFocusedMemberAddress(),
+      focusedAgentRunId: view.getFocusedAgentRunId(), focusedAgentContext: focusedContext,
+      listMembers: () => Object.freeze(entries.map((entry) => Object.freeze({
+        address: entry.memberAddress, agentRunId: entry.agentRunId,
+        context: entry.agentContext, coordinator: entry.memberAddress === tree.root_team.coordinator_address,
+      }))),
+      senderNameByAgentRunId: () => Object.freeze(Object.fromEntries(entries.map((entry) => [
+        entry.agentRunId,
+        entry.memberAddress.split('/').at(-1)?.replace(/[_-]+/g, ' ') || entry.memberAddress,
+      ]))),
+      listCommunicationMessages: () => Object.freeze(projectTeamCommunicationPerspective({
+        view,
+        messages: view.listCommunicationMessages(),
+        focusedAgentRunId: view.getFocusedAgentRunId(),
+      }).messages),
+      listDelegatedTaskEntries: () => Object.freeze(deriveDelegatedTaskEntries(
+        team,
+        view.getFocusedAgentRunId(),
+      )),
+      communicationReferenceContentPath: (messageId: string, referenceId: string) =>
+        `team-runs/${encodeURIComponent(view.getRootTeamRunId())}/team-communication/messages/${encodeURIComponent(messageId)}/references/${encodeURIComponent(referenceId)}/content`,
+      taskReferenceContentPath: (taskId: string, referenceId: string) =>
+        `team-runs/${encodeURIComponent(view.getRootTeamRunId())}/task-delegations/${encodeURIComponent(taskId)}/references/${encodeURIComponent(referenceId)}/content`,
+    });
+  };
+
+  const activeWorkspaceTarget = computed<ActiveAgentWorkspaceTarget | null>(() => {
+    if (route?.query.rootSubjectKind === 'agent_org' && route.query.mode === 'active') {
+      const orgRunId = String(route.query.orgRunId || '');
+      return agentOrgContextsStore.contextFor(orgRunId)?.activeTarget() ?? null;
+    }
     if (selectionStore.selectedType === 'agent') {
-      return agentContextsStore.activeRun || null;
+      const context = agentContextsStore.activeRun || null;
+      if (!context) return null;
+      return Object.freeze({
+        kind: 'standalone_agent', context,
+        interaction: Object.freeze({
+          send: async () => { await agentRunStore.sendUserInputAndSubscribe(); },
+          interrupt: async () => { await agentRunStore.interruptGeneration(context.state.runId); },
+          decideTool: async (invocationId: string, approved: boolean, reason: string | null) => {
+            await agentRunStore.postToolExecutionApproval(context.state.runId, invocationId, approved, reason);
+          },
+        }),
+        browse: Object.freeze({ kind: 'run', runId: context.state.runId }),
+      });
     }
     if (selectionStore.selectedType === 'team') {
-      const activeTeam = agentTeamContextsStore.activeTeamContext;
-      if (!activeTeam) {
-        return null;
-      }
-
-      return agentTeamContextsStore.activeExecutionFocusedMemberContext || null;
+      const team = agentTeamContextsStore.activeTeamContext;
+      const context = team?.view.getFocusedAgentContext() ?? null;
+      if (!team || !context) return null;
+      const teamView = standaloneTeamView(team);
+      return Object.freeze({
+        kind: 'standalone_team_member', context, team: teamView,
+        interaction: Object.freeze({
+          send: async (content: string, paths: readonly ContextFilePath[]) => {
+            await agentTeamRunStore.sendMessageToFocusedMember(content, [...paths]);
+          },
+          interrupt: async () => { await agentTeamRunStore.interruptFocusedMemberGeneration({
+            teamRunId: team.view.getRootTeamRunId(), agentRunId: context.state.runId,
+          }); },
+          decideTool: async (
+            invocationId: string,
+            approved: boolean,
+            reason: string | null,
+            target?: ToolApprovalTarget | null,
+          ) => {
+            await agentTeamRunStore.postToolExecutionApproval(invocationId, approved, reason, target);
+          },
+        }),
+        browse: Object.freeze({
+          kind: 'teamMember', teamRunId: team.view.getRootTeamRunId(),
+          memberAddress: team.view.getFocusedMemberAddress(), agentRunId: context.state.runId,
+        }),
+      });
     }
     return null;
   });
+
+  const activeAgentContext = computed<AgentContext | null>(() => {
+    return activeWorkspaceTarget.value?.context ?? null;
+  });
+
+  const connectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.connect(orgRunId);
+  const reopenAgentOrg = (orgRunId: string): Promise<void> => agentOrgContextsStore.reopen(orgRunId);
+  const disconnectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.disconnect(orgRunId);
+  const agentOrgContextFor = (orgRunId: string) => agentOrgContextsStore.contextFor(orgRunId);
+  const agentOrgErrorFor = (orgRunId: string): string | null => agentOrgContextsStore.errorFor(orgRunId);
 
   const submissionPending = computed<boolean>(() => activeAgentContext.value?.submissionPending ?? false);
   const currentStatus = computed<AgentStatus>(
@@ -101,15 +197,9 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     reason: string | null = null,
     approvalTarget: ToolApprovalTarget | null = null,
   ) => {
-    if (selectionStore.selectedType === 'agent') {
-      const context = activeAgentContext.value;
-      _assertContext(context);
-      await agentRunStore.postToolExecutionApproval(context.state.runId, invocationId, isApproved, reason);
-    } else if (selectionStore.selectedType === 'team') {
-      await agentTeamRunStore.postToolExecutionApproval(invocationId, isApproved, reason, approvalTarget);
-    } else {
-      throw new Error('Cannot approve tool: Unknown selection type.');
-    }
+    const target = activeWorkspaceTarget.value;
+    if (!target) throw new Error('Cannot approve tool: No active workspace target.');
+    await target.interaction.decideTool(invocationId, isApproved, reason, approvalTarget);
   };
 
   const send = async () => {
@@ -129,13 +219,9 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     }
 
     try {
-      if (selectionStore.selectedType === 'agent') {
-        await agentRunStore.sendUserInputAndSubscribe();
-      } else if (selectionStore.selectedType === 'team') {
-        await agentTeamRunStore.sendMessageToFocusedMember(context.requirement, context.contextFilePaths);
-      } else {
-        throw new Error('Cannot send: Unknown selection type.');
-      }
+      const target = activeWorkspaceTarget.value;
+      if (!target) throw new Error('Cannot send: No active workspace target.');
+      await target.interaction.send(context.requirement, context.contextFilePaths);
     } catch (error) {
       console.error('Failed to send message via activeContextStore:', error);
       throw error;
@@ -158,36 +244,26 @@ export const useActiveContextStore = defineStore('activeContext', () => {
       return;
     }
 
-    if (selectionStore.selectedType === 'agent') {
-      return agentRunStore.interruptGeneration(context.state.runId);
+    const target = activeWorkspaceTarget.value;
+    if (!target || target.context !== context) {
+      throw new Error('Cannot interrupt generation: Active workspace target is stale.');
     }
-
-    if (selectionStore.selectedType === 'team') {
-      const activeTeam = agentTeamContextsStore.activeTeamContext;
-      if (!activeTeam) {
-        throw new Error('Cannot interrupt generation: No active team context.');
-      }
-      const agentRunId = activeTeam.view.getFocusedAgentRunId();
-      const focusedMember = agentTeamContextsStore.activeExecutionFocusedMemberContext;
-      if (!focusedMember || focusedMember !== context) {
-        throw new Error('Cannot interrupt generation: Focused team member target is stale.');
-      }
-      return agentTeamRunStore.interruptFocusedMemberGeneration({
-        teamRunId: activeTeam.view.getRootTeamRunId(),
-        agentRunId,
-      });
-    }
-
-    throw new Error('Cannot interrupt generation: Unknown selection type.');
+    return target.interaction.interrupt();
   };
 
   return {
     activeAgentContext,
+    activeWorkspaceTarget,
     submissionPending,
     currentStatus,
     currentRequirement,
     currentContextPaths,
     activeConfig,
+    connectAgentOrg,
+    reopenAgentOrg,
+    disconnectAgentOrg,
+    agentOrgContextFor,
+    agentOrgErrorFor,
     updateRequirementForContext,
     updateRequirement,
     addContextFilePathForContext,

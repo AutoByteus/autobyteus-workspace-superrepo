@@ -35,8 +35,22 @@
                     <span class="truncate font-medium">{{ run.summary || `New - ${orgGroup.name}` }}</span>
                   </button>
                   <button v-if="!run.is_active" type="button" class="ml-1 rounded px-1.5 py-0.5 text-[0.6875rem] font-semibold text-indigo-600 hover:bg-indigo-50" :disabled="store.restoring" @click.stop="restore(run)">Restore</button>
+                  <button
+                    v-else
+                    type="button"
+                    class="ml-1 inline-flex h-5 w-5 items-center justify-center rounded text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    title="Stop Agent Org"
+                    aria-label="Stop Agent Org"
+                    :disabled="store.terminatingRunIds.has(run.root_run_id)"
+                    @click.stop="stopOrg(run)"
+                  >
+                    <Icon icon="heroicons:stop-20-solid" class="h-3.5 w-3.5" />
+                  </button>
                   <span class="ml-2 text-xs text-gray-400">{{ relative(run.created_at) }}</span>
                 </div>
+                <p v-if="store.terminationErrors[run.root_run_id]" class="px-7 py-1 text-xs text-red-600" role="alert">
+                  {{ store.terminationErrors[run.root_run_id] }}
+                </p>
 
                 <div v-if="isRunExpanded(run.root_run_id)" class="team-execution-tree ml-3 space-y-0.5" role="tree" :aria-label="`${orgGroup.name} execution hierarchy`">
                   <template v-for="display in rowsFor(run)" :key="display.row.key">
@@ -70,14 +84,14 @@ import { Icon } from '@iconify/vue'
 import { useRoute, useRouter } from 'vue-router'
 import WorkspaceHierarchyBranches from '~/components/workspace/history/WorkspaceHierarchyBranches.vue'
 import { useAgentOrgRunStore, type AgentOrgHistoryItem } from '~/stores/agentOrgRunStore'
-import { useRootExecutionViewStore } from '~/stores/rootExecutionViewStore'
-import { executionTreeFromView, isAgentOrgAgentNode, isAgentOrgTaskAgentNode, type AgentOrgExecutionTree, type AgentOrgTaskExecutionNode } from '~/types/collaboration/agentOrgExecution'
+import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
+import { parseAgentOrgExecutionTree, isAgentOrgAgentNode, isAgentOrgTaskAgentNode, type AgentOrgExecutionTree, type AgentOrgTaskExecutionNode } from '~/types/collaboration/agentOrgExecution'
 
 type Row = { key: string; kind: 'agent'; address: string; depth: number } | { key: string; kind: 'team'; address: string; coordinatorAddress: string; depth: number } | { key: string; kind: 'task'; address: string; taskKind: 'agent' | 'team'; depth: number }
 type DisplayRow = { row: Row; continuingAncestorDepths: number[]; hasFollowingSibling: boolean }
-const store = useAgentOrgRunStore(); const rootViews = useRootExecutionViewStore(); const route = useRoute(); const router = useRouter()
+const store = useAgentOrgRunStore(); const orgContexts = useAgentOrgContextsStore(); const route = useRoute(); const router = useRouter()
 const expandedWorkspaces = ref(new Set<string>()); const expandedOrgs = ref(new Set<string>()); const expandedRuns = ref(new Set<string>()); const expandedTeams = ref(new Set<string>())
-const treeFor = (run: AgentOrgHistoryItem): AgentOrgExecutionTree => executionTreeFromView(rootViews.stateFor('agent_org', run.root_run_id)?.view) ?? run.org as unknown as AgentOrgExecutionTree
+const treeFor = (run: AgentOrgHistoryItem): AgentOrgExecutionTree => orgContexts.contextFor(run.root_run_id)?.executionTree ?? parseAgentOrgExecutionTree(run.org)
 const workspaceFor = (run: AgentOrgHistoryItem) => String(treeFor(run).rootOrg.defaultLaunchConfiguration.workspaceRootPath || 'No workspace')
 const groups = computed(() => { const workspaces = new Map<string, Map<string, { definitionId: string; name: string; runs: AgentOrgHistoryItem[] }>>(); for (const run of store.history) { const tree = treeFor(run); const workspace = workspaceFor(run); const byOrg = workspaces.get(workspace) ?? new Map<string, { definitionId: string; name: string; runs: AgentOrgHistoryItem[] }>(); const definitionId = tree.rootOrg.orgDefinitionId; const group = byOrg.get(definitionId) ?? { definitionId, name: tree.rootOrg.orgDefinitionName, runs: [] as AgentOrgHistoryItem[] }; group.runs.push(run); byOrg.set(definitionId, group); workspaces.set(workspace, byOrg) } return [...workspaces].map(([workspace, orgs]) => ({ workspace, orgs: [...orgs.values()] })) })
 const toggle = (state: typeof expandedWorkspaces, key: string) => { const next = new Set(state.value); next.has(key) ? next.delete(key) : next.add(key); state.value = next }
@@ -92,12 +106,13 @@ const relative = (createdAt: string) => { const seconds = Math.max(0, Math.floor
 const flattenTasks = (tasks: readonly AgentOrgTaskExecutionNode[], depth: number): Row[] => tasks.flatMap((task) => isAgentOrgTaskAgentNode(task) ? [{ key: `task-agent:${task.agentRunId}`, kind: 'task' as const, taskKind: 'agent' as const, address: task.address, depth }] : [{ key: `task-team:${task.teamRunId}`, kind: 'task' as const, taskKind: 'team' as const, address: task.address, depth }, ...task.taskExecutions.flatMap((child) => flattenTasks([child], depth + 1))])
 const rowsFor = (run: AgentOrgHistoryItem): DisplayRow[] => { const tree = treeFor(run); const rows: Row[] = []; for (const member of tree.rootOrg.members) { if (isAgentOrgAgentNode(member)) rows.push({ key: `agent:${member.agentRunId}`, kind: 'agent', address: member.address, depth: 0 }); else { rows.push({ key: `team:${member.teamRunId}`, kind: 'team', address: member.address, coordinatorAddress: member.coordinatorAddress, depth: 0 }); if (isTeamExpanded(run.root_run_id, member.address)) { rows.push(...member.members.map((agent) => ({ key: `agent:${agent.agentRunId}`, kind: 'agent' as const, address: agent.address, depth: 1 }))); rows.push(...flattenTasks(member.taskExecutions, 1)) } } } rows.push(...flattenTasks(tree.rootOrg.taskExecutions, 0)); const hasSibling = (index: number, depth: number) => { for (let next = index + 1; next < rows.length; next++) { if (rows[next].depth < depth) return false; if (rows[next].depth === depth) return true } return false }; return rows.map((row, index) => ({ row, continuingAncestorDepths: Array.from({ length: row.depth }, (_, depth) => depth).filter((depth) => hasSibling(index, depth)), hasFollowingSibling: hasSibling(index, row.depth) })) }
 const rowStyle = (depth: number) => ({ paddingLeft: `calc((${depth} + 1) * 0.875rem)` })
-const isSelected = (runId: string, address: string) => String(route.query.orgRunId || '') === runId && rootViews.stateFor('agent_org', runId)?.selectedAddress === address
+const isSelected = (runId: string, address: string) => String(route.query.orgRunId || '') === runId && orgContexts.contextFor(runId)?.selectedAddress === address
 const activateRoute = (run: AgentOrgHistoryItem) => router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId: treeFor(run).rootOrg.orgDefinitionId, orgRunId: run.root_run_id, mode: 'active' } })
-const openRun = async (run: AgentOrgHistoryItem) => { if (!run.is_active) { toggle(expandedRuns, run.root_run_id); return } if (!isRunExpanded(run.root_run_id)) toggle(expandedRuns, run.root_run_id); rootViews.connectAgentOrg(run.root_run_id); await activateRoute(run) }
-const focusAgent = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; rootViews.selectAddress('agent_org', run.root_run_id, address); await activateRoute(run) }
-const focusTeam = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; const key = teamKey(run.root_run_id, address); if (!expandedTeams.value.has(key)) toggle(expandedTeams, key); rootViews.selectAddress('agent_org', run.root_run_id, address); await activateRoute(run) }
-const restore = async (run: AgentOrgHistoryItem) => { const runId = await store.restore(run.root_run_id); rootViews.selectAddress('agent_org', runId, null); rootViews.connectAgentOrg(runId); await activateRoute({ ...run, root_run_id: runId, is_active: true }) }
+const openRun = async (run: AgentOrgHistoryItem) => { if (!run.is_active) { toggle(expandedRuns, run.root_run_id); return } if (!isRunExpanded(run.root_run_id)) toggle(expandedRuns, run.root_run_id); orgContexts.connect(run.root_run_id); await activateRoute(run) }
+const focusAgent = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
+const focusTeam = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; const key = teamKey(run.root_run_id, address); if (!expandedTeams.value.has(key)) toggle(expandedTeams, key); orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
+const restore = async (run: AgentOrgHistoryItem) => { const runId = await store.restore(run.root_run_id); orgContexts.select(runId, null); orgContexts.connect(runId); await activateRoute({ ...run, root_run_id: runId, is_active: true }) }
+const stopOrg = async (run: AgentOrgHistoryItem) => { await store.terminate(run.root_run_id).catch(() => undefined); if (!store.terminationErrors[run.root_run_id]) orgContexts.disconnect(run.root_run_id) }
 const refresh = () => store.fetchHistory().catch(() => undefined)
 onMounted(async () => { await refresh(); const activeRunId = String(route.query.orgRunId || ''); const active = store.history.find((item) => item.root_run_id === activeRunId); if (active) { expandedWorkspaces.value.add(workspaceFor(active)); expandedOrgs.value.add(treeFor(active).rootOrg.orgDefinitionId); expandedRuns.value.add(activeRunId) } })
 </script>

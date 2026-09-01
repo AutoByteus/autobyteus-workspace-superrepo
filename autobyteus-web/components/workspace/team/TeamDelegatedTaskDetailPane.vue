@@ -2,8 +2,7 @@
   <main class="min-h-0 min-w-0 flex-1 overflow-hidden" data-test="delegated-task-detail-pane">
     <div v-if="selectedEntry && selectedItem && selectedReference" class="h-full" data-test="delegated-task-reference-preview">
       <TeamTaskReferenceViewer
-        :team-run-id="selectedEntry.teamRunId"
-        :task-id="selectedEntry.taskId"
+        :content-path="referenceContentPath"
         :reference="selectedReference"
         :refresh-signal="referenceRefreshSignal"
       />
@@ -32,8 +31,10 @@ withDefaults(defineProps<{
   selectedItem: DelegatedTaskLifecycleItem | null;
   selectedReference?: TeamReferenceFile | null;
   referenceRefreshSignal?: number;
+  referenceContentPath?: string;
 }>(), {
   selectedReference: null,
   referenceRefreshSignal: 0,
+  referenceContentPath: '',
 });
 </script>

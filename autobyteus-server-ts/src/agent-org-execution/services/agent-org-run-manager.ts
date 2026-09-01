@@ -6,6 +6,8 @@ import type { AgentOrgRunExecutionTreeFileV1 } from "../domain/agent-org-run-exe
 import { AgentOrgRun } from "../domain/agent-org-run.js";
 import { AgentOrgTaskDelegationRecordsV1Store } from "../persistence/agent-org-task-delegation-records-v1-store.js";
 import { AgentOrgCommunicationMessagesV1Store } from "../persistence/agent-org-communication-messages-v1-store.js";
+import type { AgentOrgTaskDelegationRecordsFileV1 } from "../persistence/agent-org-task-delegation-records-v1.js";
+import type { AgentOrgCommunicationMessagesFileV1 } from "../persistence/agent-org-communication-messages-v1.js";
 import { validateAgentOrgTaskDelegationRecordsV1 } from "../persistence/agent-org-task-delegation-records-v1-schema.js";
 import { validateAgentOrgCommunicationMessagesV1 } from "../persistence/agent-org-communication-messages-v1-schema.js";
 import { AgentOrgStatePackageLoader } from "./agent-org-state-package-loader.js";
@@ -21,6 +23,11 @@ export type AgentOrgRunManagerOptions = Readonly<{
   taskRecordsStore?: AgentOrgTaskDelegationRecordsV1Store;
   communicationStore?: AgentOrgCommunicationMessagesV1Store;
   activeRootDirectory?: ActiveCollaborationRootDirectory;
+}>;
+
+export type AgentOrgCollaborationRecordsSnapshot = Readonly<{
+  tasks: AgentOrgTaskDelegationRecordsFileV1;
+  messages: AgentOrgCommunicationMessagesFileV1;
 }>;
 
 /** Org-family lifecycle/registry owner. Mounted Teams never enter the Team root manager. */
@@ -102,6 +109,23 @@ export class AgentOrgRunManager {
   getActive(orgRunIdInput: string): AgentOrgRun | null {
     const run = this.active.get(required(orgRunIdInput, "orgRunId")) ?? null;
     return run?.isActive() ? run : null;
+  }
+  async getCollaborationRecordsSnapshot(orgRunIdInput: string): Promise<AgentOrgCollaborationRecordsSnapshot> {
+    const orgRunId = required(orgRunIdInput, "orgRunId");
+    const active = this.getActive(orgRunId);
+    if (active) return Object.freeze({
+      tasks: active.getTaskRecordsSnapshot(),
+      messages: active.getCommunicationSnapshot(),
+    });
+    const orgDir = this.layout.getOrgDirPath(orgRunId);
+    const [tasks, messages] = await Promise.all([
+      this.taskRecordsStore.read(orgDir, orgRunId),
+      this.communicationStore.read(orgDir, orgRunId),
+    ]);
+    if (!tasks || !messages) {
+      throw new Error(`AgentOrg collaboration records for '${orgRunId}' were not found.`);
+    }
+    return Object.freeze({ tasks, messages });
   }
   listActiveOrgRunIds(): readonly string[] { return Object.freeze([...this.active.keys()].filter((id) => this.getActive(id))); }
 

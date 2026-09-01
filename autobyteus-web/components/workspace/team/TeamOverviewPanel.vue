@@ -40,22 +40,20 @@
       </button>
 
       <TeamCommunicationPanel
-        v-if="activeTeamContext"
+        v-if="team"
         v-show="messagesExpanded"
-        :team-context="activeTeamContext"
-        :focused-agent-run-id="focusedAgentRunId"
+        :team="team"
         class="min-h-0 flex-1"
       />
     </section>
 
     <div
-      v-if="activeTeamContext"
+      v-if="team"
       class="flex flex-col transition-all duration-300 ease-in-out"
       :class="delegatedTasksExpanded ? 'min-h-0 flex-1' : 'flex-none'"
     >
       <TeamDelegatedTasksSection
-        :team-context="activeTeamContext"
-        :focused-agent-run-id="focusedAgentRunId"
+        :team="team"
         :collapsed="!delegatedTasksExpanded"
         class="h-full"
         @toggle="toggleSection('delegatedTasks')"
@@ -66,31 +64,20 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useAgentTeamContextsStore } from '~/stores/agentTeamContextsStore';
 import TeamCommunicationPanel from '~/components/workspace/team/TeamCommunicationPanel.vue';
 import TeamDelegatedTasksSection from '~/components/workspace/team/TeamDelegatedTasksSection.vue';
-import { deriveDelegatedTaskEntries } from '~/utils/teamDelegatedTaskEntries';
-import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective';
+import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget';
 
 type TeamOverviewSection = 'messages' | 'delegatedTasks';
 
-const teamContextsStore = useAgentTeamContextsStore();
-const activeTeamContext = computed(() => teamContextsStore.activeTeamContext);
-const activeTeamRunId = computed(() => activeTeamContext.value?.view.getRootTeamRunId() || '');
+const props = defineProps<{ team: TeamWorkspaceContextView }>();
+const team = computed(() => props.team);
+const activeTeamRunId = computed(() => team.value.rootRunId);
 const expandedSection = ref<TeamOverviewSection | null>('messages');
 const lastAutoOpenedDelegatedTaskSignatureKey = ref('');
 const messagesExpanded = computed(() => expandedSection.value === 'messages');
 const delegatedTasksExpanded = computed(() => expandedSection.value === 'delegatedTasks');
-const focusedAgentRunId = computed(() => activeTeamContext.value?.view.getFocusedAgentRunId() ?? '');
-const delegatedTaskEntries = computed(() => {
-  const teamContext = activeTeamContext.value;
-  return teamContext
-    ? deriveDelegatedTaskEntries(
-      teamContext,
-      focusedAgentRunId.value,
-    )
-    : [];
-});
+const delegatedTaskEntries = computed(() => team.value.listDelegatedTaskEntries());
 const delegatedTaskSignature = computed(() => delegatedTaskEntries.value
   .map((entry) => [
     entry.entryKey,
@@ -101,13 +88,7 @@ const delegatedTaskSignature = computed(() => delegatedTaskEntries.value
   .sort()
   .join('|'));
 const messageCount = computed(() => {
-  const teamContext = activeTeamContext.value;
-  if (!teamContext) return 0;
-  return projectTeamCommunicationPerspective({
-    view: teamContext.view,
-    messages: teamContext.view.listCommunicationMessages(),
-    focusedAgentRunId: focusedAgentRunId.value,
-  }).messages.length;
+  return team.value.listCommunicationMessages().length;
 });
 
 watch(
