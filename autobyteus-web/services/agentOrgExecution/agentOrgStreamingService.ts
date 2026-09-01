@@ -29,6 +29,10 @@ type ExecutionCheckpoint = Readonly<{
   changeSequence: number
   hasOpenExecutionWork: boolean
 }>
+type StreamGeneration = Readonly<{
+  id: number
+  socket: WebSocket
+}>
 type AgentOrgStreamPhase = 'disconnected' | 'awaiting_connected_root' | 'awaiting_snapshot' | 'ready'
 
 const attachmentLocator = (attachment: ContextFilePath): string => attachment.locator
@@ -38,6 +42,8 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   private context: AgentOrgExecutionContext | null = null
   private processing: Promise<void> = Promise.resolve()
   private readonly pending = new Map<string, PendingCommand>()
+  private nextGenerationId = 0
+  private activeGeneration: StreamGeneration | null = null
   private intentionalClose = false
   private recoveryCheckpoint: ExecutionCheckpoint | null = null
   private recoveryFocus: string | null = null
@@ -56,18 +62,22 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
       endpoint,
       getActiveRemoteAccessCredential() ?? '',
     ))
+    const generation = Object.freeze({ id: ++this.nextGenerationId, socket })
     this.intentionalClose = false
     this.socket = socket
+    this.activeGeneration = generation
     this.streamPhase = 'awaiting_connected_root'
     socket.onmessage = (raw) => {
       this.processing = this.processing
-        .then(() => this.handleMessage(String(raw.data)))
-        .catch((cause) => this.failClosed(cause))
+        .then(() => this.processFrame(generation, String(raw.data)))
     }
-    socket.onerror = () => this.options.reportError('AgentOrg stream connection failed.')
+    socket.onerror = () => {
+      if (this.isCurrent(generation)) this.options.reportError('AgentOrg stream connection failed.')
+    }
     socket.onclose = () => {
-      if (this.socket && this.socket !== socket) return
-      if (this.socket === socket) this.socket = null
+      if (!this.isCurrent(generation)) return
+      this.socket = null
+      this.activeGeneration = null
       this.streamPhase = 'disconnected'
       if (!this.intentionalClose && this.context?.phase === 'live') {
         this.context.requireReopen('AgentOrg stream closed; reopen is required.')
@@ -215,6 +225,21 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     this.context.setActive(message.payload.is_active)
   }
 
+  private async processFrame(generation: StreamGeneration, raw: string): Promise<void> {
+    if (!this.isCurrent(generation)) return
+    try {
+      await this.handleMessage(raw)
+    } catch (cause) {
+      if (this.isCurrent(generation)) this.failClosed(cause, generation)
+    }
+  }
+
+  private isCurrent(generation: StreamGeneration): boolean {
+    return this.activeGeneration?.id === generation.id
+      && this.activeGeneration.socket === generation.socket
+      && this.socket === generation.socket
+  }
+
   private acknowledge(message: CommandAck): void {
     const command = this.pending.get(message.payload.command_id)
     if (!command) {
@@ -230,21 +255,26 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     else command.reject(new Error(message.payload.message ?? message.payload.code ?? 'AgentOrg command rejected.'))
   }
 
-  private failClosed(cause: unknown): void {
+  private failClosed(cause: unknown, generation: StreamGeneration): void {
+    if (!this.isCurrent(generation)) return
     const detail = cause instanceof Error ? cause.message : String(cause)
     this.context?.requireReopen(detail)
     this.options.reportError(detail)
     this.intentionalClose = true
     this.streamPhase = 'disconnected'
+    this.socket = null
+    this.activeGeneration = null
     this.rejectPending(detail)
-    this.socket?.close(1002, 'Invalid AgentOrg stream')
+    generation.socket.close(1002, 'Invalid AgentOrg stream')
   }
 
   private closeSocket(reason: string): void {
+    const generation = this.activeGeneration
     this.intentionalClose = true
     this.streamPhase = 'disconnected'
-    this.socket?.close(1000, reason)
     this.socket = null
+    this.activeGeneration = null
+    generation?.socket.close(1000, reason)
     this.rejectPending('AgentOrg stream closed before command acknowledgement.')
   }
 
