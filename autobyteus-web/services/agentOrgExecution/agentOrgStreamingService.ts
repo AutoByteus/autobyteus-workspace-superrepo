@@ -44,6 +44,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   private readonly pending = new Map<string, PendingCommand>()
   private nextGenerationId = 0
   private activeGeneration: StreamGeneration | null = null
+  private released = false
   private intentionalClose = false
   private recoveryCheckpoint: ExecutionCheckpoint | null = null
   private recoveryFocus: string | null = null
@@ -56,6 +57,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   }>) {}
 
   connect(): void {
+    if (this.released) return
     if (this.socket?.readyState === WebSocket.OPEN || this.socket?.readyState === WebSocket.CONNECTING) return
     const endpoint = `${useWindowNodeContextStore().getBoundEndpoints().orgWs}/${encodeURIComponent(this.options.orgRunId)}`
     const socket = new WebSocket(buildAuthenticatedWebSocketUrl(
@@ -88,16 +90,31 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   }
 
   async reopen(): Promise<void> {
-    const checkpoint = await this.fetchCheckpoint()
+    await this.reopenOwned(this.activeGeneration)
+  }
+
+  private async reopenOwned(generation: StreamGeneration | null): Promise<void> {
+    if (!this.ownsOperation(generation)) return
+    let checkpoint: ExecutionCheckpoint
+    try {
+      checkpoint = await this.fetchCheckpoint()
+    } catch (cause) {
+      if (!this.ownsOperation(generation)) return
+      throw cause
+    }
+    if (!this.ownsOperation(generation)) return
     this.recoveryCheckpoint = checkpoint
     this.recoveryFocus = this.context?.selectedAddress ?? null
     this.closeSocket('AgentOrg checkpointed recovery')
+    if (this.released) return
     this.connect()
   }
 
   disconnect(): void {
+    this.released = true
     this.closeSocket('AgentOrg context released')
     this.context?.setActive(false)
+    this.context = null
     this.recoveryCheckpoint = null
     this.recoveryFocus = null
     this.rejectPending('AgentOrg context was released.')
@@ -167,7 +184,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     })
   }
 
-  private async handleMessage(raw: string): Promise<void> {
+  private async handleMessage(generation: StreamGeneration, raw: string): Promise<void> {
     const message = CollaborationStreamServerMessageSchema.parse(JSON.parse(raw))
     if (message.type === 'ERROR') {
       this.options.reportError(`${message.payload.code}: ${message.payload.message}`)
@@ -202,7 +219,9 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
         view: message.payload.root_org,
         transport: this,
       })
-      await this.verifyRecoveryCandidate(candidate)
+      if (!this.isCurrent(generation)) return
+      if (!await this.verifyRecoveryCandidate(candidate, generation)) return
+      if (!this.isCurrent(generation)) return
       if (previousFocus) candidate.select(previousFocus)
       this.context = candidate
       this.recoveryCheckpoint = null
@@ -219,7 +238,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
         throw new Error('AgentOrg stream supplied a non-Org event.')
       }
       const application = this.context.applyEvent(message.payload.change_sequence, message.payload.event)
-      if (application === 'checkpoint_required') await this.reopen()
+      if (application === 'checkpoint_required') await this.reopenOwned(generation)
       return
     }
     this.context.setActive(message.payload.is_active)
@@ -228,7 +247,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   private async processFrame(generation: StreamGeneration, raw: string): Promise<void> {
     if (!this.isCurrent(generation)) return
     try {
-      await this.handleMessage(raw)
+      await this.handleMessage(generation, raw)
     } catch (cause) {
       if (this.isCurrent(generation)) this.failClosed(cause, generation)
     }
@@ -238,6 +257,13 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     return this.activeGeneration?.id === generation.id
       && this.activeGeneration.socket === generation.socket
       && this.socket === generation.socket
+  }
+
+  private ownsOperation(generation: StreamGeneration | null): boolean {
+    if (this.released) return false
+    return generation === null
+      ? this.activeGeneration === null && this.socket === null
+      : this.isCurrent(generation)
   }
 
   private acknowledge(message: CommandAck): void {
@@ -294,10 +320,14 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     return checkpoint
   }
 
-  private async verifyRecoveryCandidate(candidate: AgentOrgExecutionContext): Promise<void> {
+  private async verifyRecoveryCandidate(
+    candidate: AgentOrgExecutionContext,
+    generation: StreamGeneration,
+  ): Promise<boolean> {
     const before = this.recoveryCheckpoint
-    if (!before) return
+    if (!before) return true
     const after = await this.fetchCheckpoint()
+    if (!this.isCurrent(generation)) return false
     if (candidate.changeSequence < before.changeSequence
       || candidate.changeSequence > after.changeSequence) {
       throw new Error('AgentOrg recovery snapshot does not fall within the verified checkpoint window.')
@@ -307,6 +337,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
         || candidate.changeSequence !== after.changeSequence)) {
       throw new Error('AgentOrg recovery checkpoint changed without open execution work.')
     }
+    return true
   }
 
   private rejectPending(message: string): void {
