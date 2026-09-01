@@ -13,6 +13,7 @@ concise chronological architecture-review history.
 | ARCH-REV-004 | Round 4 / re-review after API/E2E real-browser execution exposed raw Org presentation impact `ADI-007` and `AD-REV-006` defined strict accepted-workspace reuse | `AD-REV-006` | Pass | Pass | `ADI-007` |
 | ARCH-REV-005 | Round 5 / re-review after `API-FIND-007` / `CR-FIND-011`, approved `RER-021` and focused Product status authority, and `AD-REV-007` defined the mounted-Team projection | `AD-REV-007` | Pass | Pass | `API-FIND-007`, `CR-FIND-011` |
 | ARCH-REV-006 | Round 6 / re-review after exact `API-FIND-008` correlation and `AD-REV-008` defined non-blocking settlement and interrupt-before-drain shutdown | `AD-REV-008` | Pass | Blocked — Unclear | `AR-FIND-003`, `API-FIND-008`, `CR-CAND-020` |
+| ARCH-REV-007 | Round 7 / `AD-REV-009` supported-reachability recovery and proportionate settlement/shutdown redesign | `AD-REV-009` | Blocked — Unclear | Fail — Design Impact | `AR-FIND-003`, `AR-FIND-004`, `API-FIND-008`, `CR-CAND-020` |
 
 ## Revision Entries
 
@@ -159,3 +160,31 @@ None.
 - Material classification changes: The cumulative classification remains `Large / High`, and the focused delta remains `Medium / High`. The authoritative review changes from `Pass` for AD-REV-007 to `Blocked / Unclear` for AD-REV-008. No Requirement Gap or Product UI gap is identified.
 - Recommended recipient: `/software_engineering_team/architecture_designer`
 - Remaining risks or uncertainty: Architecture must establish an independent supported terminal-provider-wait and derived shutdown path or remove/narrow DS-022, VAL-026-029, and the new coordinator/token/dependency/root-ordering scope. No speculative timeout, replay, force-kill, persisted settling state, or self-review support is authorized. Implementation and API/E2E remain held on the impacted path.
+
+### ARCH-REV-007 — Supported settlement recovery with pending-input shutdown correction
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 7; `AD-REV-009` responded to `ARCH-REV-006 / AR-FIND-003` with independent supported submit/accept and approval-wait/SIGTERM paths, withdrew AD-REV-008's coordinator/token/job/dependency machinery, and requested re-review of the narrower AgentRun quiescence and root interrupt-before-drain design.
+- Triggering role, report path, and finding IDs: Architecture Designer; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; prior `AR-FIND-003`, current `AR-FIND-004`, retained `API-FIND-008` / `CR-CAND-020`.
+- Relevant architecture design revision IDs: `AD-REV-009`
+- Prior authoritative decision: `Blocked — Unclear` (`ARCH-REV-006`)
+- Current authoritative decision: `Fail — Design Impact`
+- What changed in the review result or what baseline was established: The valid trace prefix proves a normal assignee submit result followed by independent authorized delegator acceptance while the same provider turn continues; Product auto-approval control, application SIGTERM, task execution configuration, and the accepted pending-approval interruption test independently establish legitimate approval-wait shutdown. AR-FIND-003 is therefore resolved. The revised one-FIFO, prepared-or-null, idle-retry, recursive-cancel design is proportionate, and all AD-REV-008-only machinery is correctly withdrawn. Independent current-code tracing found one remaining complete-scope shutdown gap: normal task activation asynchronously releases its initial input; AgentRun can admit/start provider dispatch before canonical `TURN_STARTED`; the active-turn interrupt then returns `NO_ACTIVE_TURN`, which root termination treats as success. A later turn/approval wait can start after the interrupt phase and stall settlement or remaining local teardown. AD-REV-009 provides no AgentRun shutdown fence or validation for that phase.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001` | Resolved in `ARCH-REV-002` | Remains resolved | `RER-018`, `AD-REV-003`-`AD-REV-009` | Target-only Team V2/Org V1 admission, server-owned migration, and external read-only ownership are unchanged. |
+| `AR-FIND-002` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-003`-`AD-REV-009` | Org/root-owned handoffs still precede stable Team-local lists; settlement/shutdown changes do not alter order. |
+| `ADI-006` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-004`-`AD-REV-009` | Canonical migration runner/direct rename/relaunch and flat-Team zero-write behavior are unchanged. |
+| `IDI-001` | Resolved in `ARCH-REV-003` | Remains resolved | `AD-REV-005`-`AD-REV-009` | Root-neutral execution, exact task hosts, and no mounted-Team root/package remain intact. |
+| `ADI-007` | Resolved in `ARCH-REV-004` | Remains resolved | `AD-REV-006`-`AD-REV-009` | Strict Org presentation/context and accepted workspace reuse are unchanged. |
+| `API-FIND-007` / `CR-FIND-011` | Resolved in `ARCH-REV-005` | Remains resolved | `RER-021`, `AD-REV-007`-`AD-REV-009` | Exact mounted-Team status projection remains presentation-only and unchanged. |
+| `AR-FIND-003` | Open `Unclear` in `ARCH-REV-006` | Resolved | `AD-REV-009`; `AR-PREM-004`, `AR-PREM-005` | Successful submit at `1788292703.598`, independent accept at `1788292706.652`, same provider turn continuing at `1788292709.931`; Product/SIGTERM/task-config/runtime-interrupt evidence separately establishes legitimate approval-wait shutdown. Invalid self-review is excluded. |
+| `API-FIND-008` / `CR-CAND-020` | Architecture-held under AR-FIND-003 | Supported Design Impact basis confirmed; target still not complete | `AD-REV-009`; `AR-FIND-004`, `AR-PREM-006` | Narrow settlement deferral is justified, but normal task `releaseWork -> postMessage -> pending provider dispatch` can escape the one-shot active-turn interrupt during SIGTERM. |
+
+- New or remaining finding IDs: `AR-FIND-004`
+- Material classification changes: The material-premise gate changes from `Blocked` to `Pass`; the review decision becomes `Fail / Design Impact` because the supported lifecycle and exact missing boundary are now known. Cumulative classification remains `Large / High`; focused delta remains `Medium / High`. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: `/software_engineering_team/architecture_designer`
+- Remaining risks or uncertainty: Architecture must add a bounded AgentRun-owned shutdown admission/dispatch/interrupt phase for configured/task Agents and recursive task Teams, update DS-015/VAL-027/file/interface maps, and require deterministic pre-turn-start SIGTERM coverage. Preserve the one FIFO, existing prepared settlement, null deferral/idle retry, and rejection of coordinator/token/jobs, timeout, replay, force-kill, self-review support, and new persisted state.
