@@ -4,9 +4,9 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-020`
-- Status: `Approved behavior — focused Product evidence pending`
-- Approval reference: Behavior/runtime/admission through `RER-019` remain approved. During real-browser validation, the user explicitly directed that a reusable Team mounted in an AgentOrg retain the original Team-row aggregate status signal in addition to exact Agent-row signals. `RER-020` approves the presentation-only semantics and negative lifecycle boundary in `ORG-CASE-056`–`ORG-CASE-058`; a focused Product supplement/reference revision is pending before architecture re-entry.
+- Requirements revision: `RER-021`
+- Status: `Approved`
+- Approval reference: Behavior/runtime/admission through `RER-019` remain approved. `RER-020` records the user-approved presentation-only mounted-Team aggregate semantics and negative lifecycle boundary in `ORG-CASE-056`–`ORG-CASE-058`. Focused Product ticket `AORG-FLAT-TEAM-STATUS-001` returned with explicit user approval, normative `VIS-STATUS-001`–`VIS-STATUS-003`, and no requirement-impact finding; `RER-021` integrates that evidence and reopens the Architecture Design route.
 - Owner/date: Requirements Engineer / 2026-09-01
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
@@ -691,21 +691,23 @@ change its visible Team/Org, handoff, configuration, focus, or runtime/history
 behavior; production mixed-root APIs must simply discriminate those approved
 root identities truthfully.
 
-The later user-authorized `API-FIND-007` correction is integrated in `RER-020`.
+The later user-authorized `API-FIND-007` correction is integrated in `RER-020`
+and its Product evidence is approved in `RER-021`.
 A configured Team row mounted beneath an AgentOrg retains the established
 five-state aggregate over exact descendant Agent status projections, remains
 visible when collapsed, and coexists with every Agent-row signal. The aggregate
 is presentation-only and does not create a Team root, status authority,
-persistence field, or lifecycle action. A focused Product-owned supplement and
-reference revision must make this correction reviewable without reopening
-unrelated `RV-012` behavior before the package returns to Architecture Design.
+persistence field, or lifecycle action. The user further confirmed that the UI
+aggregation is behaviorally the same as the prior nested-AgentTeam aggregate;
+this does not prescribe a component, state store, or code-reuse decision.
 
 `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
 and `VIS-001`–`VIS-020` under that ticket's `visual-references/` directory are
-the normative product presentation of the prior cases, subject only to the
-explicit `API-FIND-007` omission above. The returned focused Product supplement
-will become the presentation authority for `ORG-CASE-056`–`ORG-CASE-058` after
-user approval. Product-declared fixture
+the normative product presentation of the prior cases. The focused
+`/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/ui-ux-spec.md`
+and `VIS-STATUS-001`–`VIS-STATUS-003` are the user-approved presentation
+authority for `ORG-CASE-056`–`ORG-CASE-058` and supersede only the prior
+`API-FIND-007` omission. Product-declared fixture
 names/values remain illustrative, and the prototype's local mocked persistence,
 services, orchestration, streams, and writes do not define production
 architecture.
