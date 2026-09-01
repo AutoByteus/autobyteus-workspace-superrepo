@@ -11,6 +11,8 @@
 | `CRR-005` | `code-review-report.md` | Implementation Review / IR-005 strict-correlation correction re-entry | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-004`, `CR-FIND-005` |
 | `CRR-006` | `code-review-report.md` | Implementation Review / IR-006 fresh-task correction re-entry and full cumulative review | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-004`, `CR-FIND-005`, `CR-FIND-006` |
 | `CRR-007` | `code-review-report.md` | Implementation Review / IR-007 retired-generation correction re-entry and cumulative lifecycle review | `Fail — Local Fix` | `Fail — Local Fix` | `CR-FIND-006`, `CR-FIND-007` |
+| `CRR-008` | `code-review-report.md` | Implementation Review / IR-008 terminal-release correction re-entry and full cumulative review | `Fail — Local Fix` | `Pass` | `CR-FIND-007` |
+| `CRR-009` | `code-review-report.md` | API/E2E Failure-Origin Review / corrected API-REV-001 Fail | `Pass` | `Fail — mixed origin` | `CR-FIND-008`–`CR-FIND-011`; `API-FIND-002`–`API-FIND-004` |
 
 ## Revision Entries
 
@@ -232,3 +234,71 @@ New finding:
 - Review accountability: CRR-006's exact prescription was satisfied and is closed rather than moved. CRR-007 records the distinct release-during-await path found by continuing the requested cumulative review beyond that delta.
 - Recommended recipient: `/software_engineering_team/implementation_engineer`
 - Remaining risks or uncertainty: API/E2E remains stopped. After correction/source pass it must validate real fresh-task recovery and route/context release without stale republish or orphan sockets, plus the existing imported-package/Codex/browser, restore/migration, and Team-compatibility scenarios.
+
+### CRR-008 — IR-008 makes Org context release terminal and passes cumulative source review
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review`, round `8`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md`; `CR-FIND-007`; `CR-SCN-006`, `CR-SCN-009`, `CR-SCN-011`, `CR-SCN-012`
+- Relevant architecture design revision IDs: `AD-REV-006` (cumulative `AD-REV-005`)
+- Relevant architecture-review revision IDs: `ARCH-REV-004 / Pass`
+- Relevant implementation revision IDs: `IR-008`
+- Relevant API/E2E revision IDs: `API-REV-001 / stopped; no pass`
+- Relevant delivery revision IDs: `N/A — pending`
+- Prior authoritative result: `CRR-007 / Fail — Local Fix`
+- Current authoritative result: `Pass — ready for API/E2E`
+- What changed in the review result and why: IR-008 adds a terminal private released state to the existing AgentOrg stream owner, revalidates exact service/generation ownership after asynchronous hydration/checkpoint boundaries, deactivates and drops the committed context on release, and prevents stale mutation/publication/close/reconnect. Independent source tracing and the exact `9/9` suite verify the two CRR-007 manifestations while preserving manual reopen for a still-owned fail-closed service and strict current-generation failure. At the user's advance request after repeated Local Fixes, the result is based on another full cumulative implementation, production-spine, source-size, cleanup, legacy, and patch-on-patch review rather than a delta-only conclusion.
+- Supported product scenario / material-premise basis changes: None. `CR-SCN-012` remains the supported workspace navigation/release lifecycle with an independently evidenced component/store path. IR-008 now produces its approved outcome. `AR-PREM-001`–`003` remain confirmed.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Complete migration preflight remains before all writes. |
+| `CR-FIND-002` | `Resolved` | `Resolved` | `IR-003`; `AR-PREM-001`; `CRR-003` | Exact prospective-state ordinary retry remains unchanged. |
+| `CR-FIND-003` | `Resolved` | `Resolved` | `IR-003`; `CRR-003` | Org edit continues to preserve omitted durable fields. |
+| `CR-FIND-004` | `Resolved` | `Resolved` | `IR-006`; `CRR-006` | Strict correlation and fresh task identity/address admission remain correct. |
+| `CR-FIND-005` | `Resolved` | `Resolved` | `IR-006`; `CRR-006` | Store-neutral standalone Team focus/send workflow remains current and passing. |
+| `CR-FIND-006` | `Resolved` | `Resolved` | `IR-007`; `CRR-007` | Socket/frame generation isolation remains intact; queued retired work is inert. |
+| `CR-FIND-007` | `Open` | `Resolved` | `IR-008`; `AD-REV-006`; `DS-018`; `CR-SCN-012` | Current source marks release terminal and rechecks ownership after awaits; independent exact suite passes `9/9`, including pending hydration and activation-checkpoint release cases with no publication, resurrection, or replacement socket. |
+
+- New or remaining finding IDs: `None`
+- Material score or classification changes: Score improves from `8.9/10 (88.8/100)` to `9.2/10 (91.6/100)`; `Local Fix` failure is replaced by clean `Pass`.
+- Recommended recipient: Primary `/software_engineering_team/api_e2e_engineer`; informational `/software_engineering_team/implementation_engineer` after primary handoff succeeds.
+- Remaining risks or uncertainty: API/E2E has not passed and must resume the real imported-package/Codex/browser, route-release, task-bearing recovery, Team-compatibility, persistence/restore, and migration scenarios. The documented repository typecheck/fixed-px baselines and separate external definition publication remain outside the source pass.
+
+### CRR-009 — API-REV-001 failure-origin review separates source defects, invalid validation paths, and the RER-020 gap
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `API/E2E Failure-Origin Review`, round `9`
+- Triggering role, report path, and finding or scenario IDs: API/E2E Engineer / `api-e2e-execution-coverage-report.md`; corrected `API-FIND-001`–`API-FIND-007`; `APP-001/002`, `ORG-010`, `RST-002/005/006/007`, `UI-001`
+- Relevant architecture design revision IDs: `AD-REV-006`; `RER-020` impact pending
+- Relevant architecture-review revision IDs: `ARCH-REV-004 / Pass`; no review yet covers `RER-020`
+- Relevant implementation revision IDs: `IR-008`
+- Relevant API/E2E revision IDs: `API-REV-001 / Fail / 81.3%`
+- Relevant delivery revision IDs: `N/A — pending`
+- Prior authoritative result: `CRR-008 / Pass — ready for API/E2E`
+- Current authoritative result: `Fail — mixed-origin API/E2E failure`
+- What changed in the review result and why: Real cumulative application/provider/restart/browser evidence found three supported production failures: Brief Studio package validation supplies an incomplete current definition-root config (`CR-FIND-008`), explicit Org Restore cannot restore an idle never-messaged Codex member (`CR-FIND-009`), and a config-to-launch transition leaves the exact focus tree collapsed (`CR-FIND-010`). Focused tracing separately proved that `API-FIND-002` is a stale integration owner field, corrected `API-FIND-003` is an invalid task-tool fixture, and `API-FIND-004` incorrectly treated active-stream Reconnect as automatic reactivation after shutdown. The user-confirmed Team status omission was a Product/requirement gap at execution time; Requirements Engineering now records its semantics and pending Product gate in `RER-020` (`CR-FIND-011`).
+- Supported product scenario / material-premise basis changes: Added `CR-SCN-013`–`CR-SCN-019`. `CR-SCN-016B` explicitly rejects stale-context automatic reactivation because no independent requirement or lifecycle contract supports it. `CR-SCN-019` uses current `RER-020`, not the screenshot alone, as the behavior authority.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001`–`CR-FIND-007` | `Resolved` | `Resolved` | `IR-003`–`IR-008`; `CRR-003`–`CRR-008` | No API-REV-001 evidence reopens the earlier migration, hidden-field, strict-correlation, task-identity, Team-workflow, generation, or terminal-release findings. |
+
+New findings:
+
+| Finding ID | Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- |
+| `CR-FIND-008` | `Open` | `API-REV-001`; `AC-021/022`; `CR-SCN-013` | Incomplete validator config plus exact real Brief Studio pack failure. |
+| `CR-FIND-009` | `Open` | `API-REV-001`; `AC-009`; `CR-SCN-017` | Persisted idle `/verifier`, system-instruction-only trace, unconditional Codex resume, and real `no rollout found` failure. |
+| `CR-FIND-010` | `Open` | `API-REV-001`; `AC-002/011`; `CR-SCN-018` | One-time `onMounted` expansion and two real post-launch collapsed-tree reproductions. |
+| `CR-FIND-011` | `Open — upstream recovery` | `API-FIND-007`; `RER-020`; `REQ-028`; `AC-023`; `CR-SCN-019` | Original/current screenshots and current Team-row source; Product supplement/approval and architecture impact remain pending. |
+
+- New or remaining finding IDs: `CR-FIND-008`, `CR-FIND-009`, `CR-FIND-010`, `CR-FIND-011`; API-owned corrections `API-FIND-002`–`API-FIND-004`
+- Material score or classification changes: No score is produced for a failure-origin-only round. Latest decision changes from historical `CRR-008 / Pass` to `Fail`; classifications are implementation `Local Fix`, API/E2E `Local Fix`, and `Requirement Gap` already in `RER-020` recovery.
+- Review accountability: `CRR-008` should have caught the incomplete application-provider config, the stale changed MCP integration field, and the post-launch expansion lifecycle. The idle Codex “thread ID without rollout” restore failure depended on real provider behavior and was not reasonably detectable in static source review. The task fixture correction and unsupported Reconnect expectation are API/E2E-owned, not implementation defects.
+- Recommended recipient: Implementation Engineer for `CR-FIND-008`–`010`; API/E2E Engineer for `API-FIND-002`–`004`; Architecture Designer for the already-recorded `RER-020` recovery, all subject to exact dynamic handoff rules and current Product gating.
+- Remaining risks or uncertainty: Formal task lifecycle, successful full Org Restore, correct restart Refresh → Restore, remaining stopped API cohorts, and `RER-020` Product/architecture evidence remain unproven. No delivery readiness is claimed.
