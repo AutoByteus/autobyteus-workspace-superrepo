@@ -4,9 +4,9 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-016`
-- Status: `Approved`
-- Approval reference: Behavior through `RER-014` remains approved. During the `RER-014` → `AD-REV-002` impact round, the user explicitly corrected the persistence direction and, on 2026-09-01, explicitly approved the exact `RER-015` Team V2 / AgentOrg V1 file, schema, generic projection, and migration boundary. `RER-016` records that approval closure.
+- Requirements revision: `RER-017`
+- Status: `Ready for Approval — External Definition Scope Requirement Impact`
+- Approval reference: Behavior/Product UI and the Team V2 / AgentOrg V1 runtime contract through `RER-016` remain approved. The user explicitly clarified that the public/private external definition repositories are separate projects maintained by other owners and are not implementation/migration scope for this ticket. The exact target definition versions, normal admission behavior, and proposed per-definition availability boundary below require approval.
 - Owner/date: Requirements Engineer / 2026-09-01
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
@@ -53,6 +53,7 @@ AgentTeamDefinition
 10. AgentOrg activation and recipient focus are separate: `Run` opens Org configuration, launch activates the full Org without focus, and a later exact Agent/Team focus is required only for a recipient-requiring interaction.
 11. AgentOrg configuration applies root choices across the scope, then direct Team placement and exact Agent placement overrides by increasing specificity; it does not mutate referenced definitions or alter Team coordinator ingress.
 12. Standalone Team runs remain native Team V2 packages; AgentOrg runs use a separate AgentOrg V1 package/file. Shared record shapes do not imply a generic persisted root union.
+13. Definition source ownership is independent of runtime snapshot ownership: external definition repositories are read-only dependencies for this ticket, while every server memory run package remains in the runtime transition cohort.
 
 ## Behavioral Contract Cases
 
@@ -171,6 +172,108 @@ defaults still seed the definition's standalone launch journey.
 | Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
 | --- | --- | --- | --- |
 | ORG-CASE-031 | User adds a previously tested standalone AgentTeam definition to AgentOrg and authors Org-scoped handoffs | Org references the same Team definition identity and preserves its coordinator, Agent members, Team-local handoffs, independent launchability, and prior run history | No copy, fork, Org-specific Team subtype, or Team-within-Team placement is required. |
+
+## Normative Definition Package And Admission Contract — Proposed In RER-017
+
+Definition config versions are independent of execution-tree versions. The
+normal server definition codecs accept only the following target config files;
+the related `team.md` and `org.md` continue to carry the definition's authored
+name, description, category, and instructions.
+
+### AgentTeam Definition Config V2
+
+```text
+AgentTeamDefinitionConfigFileV2
+agent-teams/<teamDefinitionId>/team-config.json
+```
+
+```json
+{
+  "schemaVersion": 2,
+  "coordinatorMemberName": "researcher",
+  "members": [
+    {
+      "memberName": "researcher",
+      "ref": "researcher",
+      "refScope": "team_local"
+    }
+  ],
+  "handoffs": [],
+  "avatarUrl": null,
+  "defaultLaunchConfig": null
+}
+```
+
+Team Definition V2 rules:
+
+1. Normal writes emit exactly the top-level keys shown above.
+2. `schemaVersion` is numeric `2` and is unrelated to Team run execution-tree V2 even though both currently use version 2.
+3. A member has exactly `memberName`, `ref`, and `refScope`; it has no `refType` because every configured Team member is an Agent.
+4. Supported `refScope` values remain `shared`, `team_local`, or `application_owned` when valid for the source owner.
+5. `coordinatorMemberName` resolves to exactly one direct member.
+6. An unversioned file, `refType`, Team/Org member, unsupported key/scope, unresolved reference, invalid coordinator, or wrong family/version fails target admission.
+
+### AgentOrg Definition Config V1
+
+```text
+AgentOrgDefinitionConfigFileV1
+agent-orgs/<orgDefinitionId>/org-config.json
+```
+
+```json
+{
+  "schemaVersion": 1,
+  "members": [
+    {
+      "memberName": "software_engineering_team",
+      "ref": "software-engineering-team",
+      "refType": "agent_team",
+      "refScope": "shared"
+    }
+  ],
+  "handoffs": [],
+  "avatarUrl": null,
+  "defaultLaunchConfig": null
+}
+```
+
+AgentOrg Definition V1 rules:
+
+1. Normal writes emit exactly the top-level keys shown above.
+2. `schemaVersion` is numeric `1`.
+3. A member has exactly `memberName`, `ref`, `refType`, and `refScope`; `refType` is exactly `agent` or `agent_team`.
+4. Supported `refScope` values are `shared`, `agent_org_owned`, or `application_owned` when valid for the source owner.
+5. The config has no `coordinatorMemberName`, recipient, focus, or fallback field.
+6. A nested Org, Team-owned Team, unresolved reference, unsupported key/scope, wrong version/family, or Org referring to an unavailable Team fails target admission.
+
+### Source Ownership And Normal Admission
+
+| Source Class | This Ticket May Write/Migrate It? | Required Cutover Outcome |
+| --- | --- | --- |
+| Writable server data root, including `$DATA_DIR/agent-teams/**` | Yes | Migration-only legacy decoder may convert eligible sources to Team Definition V2 or Org Definition V1 before normal target-only admission. |
+| Definitions versioned in the implementation repository, including `applications/**/agent-teams/**` | Yes | Update atomically with the server codec and validate as exact target versions. In-repository test fixtures are validation assets, not customer migration records. |
+| `/home/autobyteus/workspace/autobyteus-agents` | No | Separate owner publishes target Team Definition V2 / Org Definition V1 packages. This ticket reads it only through normal target-version admission after cutover. |
+| `/home/autobyteus/workspace/autobyteus-private-agents` | No | Separate owner publishes target Team Definition V2 / Org Definition V1 packages. This ticket reads it only through normal target-version admission after cutover. |
+| `$MEMORY_ROOT/agent_teams/*` execution packages | Runtime migration only; definition-source ownership is irrelevant | Every package present at cutover remains in scope under the approved Team V2 / AgentOrg V1 runtime-family transition. |
+
+Normal admission never retries an unversioned/retired definition parser after
+target validation fails. It reports package root, definition identity/path,
+expected family/version, and reason, and does not mutate the source. A rejected
+external definition, plus an Org that depends on its unavailable Team, is
+excluded from new-run catalog/launch/authoring until its owner publishes the
+target version. Under the proposed rollout policy, this per-definition
+unavailability does not block server startup, compatible definitions, server
+memory migration, or history/inspection of existing durable run snapshots.
+
+| Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
+| --- | --- | --- | --- |
+| ORG-CASE-049 | Admit exact Team Definition Config V2 | Accept an Agent-only Team with one direct Agent coordinator | No `refType`, Team member, Org member, or implicit legacy normalization. |
+| ORG-CASE-050 | Admit exact AgentOrg Definition Config V1 | Accept direct Agents/Teams with explicit member kind and no coordinator | No Team-as-Org alias, coordinator, or recipient fallback. |
+| ORG-CASE-051 | Normal admission receives unversioned/wrong-version/retired definition | Reject with root, definition/path, expected version, and reason | Do not retry a legacy codec, silently add/remove fields, or write the source. |
+| ORG-CASE-052 | Ticket encounters either separately maintained external repository | Treat as read-only; record separate owner follow-up | Do not migrate, edit, commit, release, or claim completion for that project. |
+| ORG-CASE-053 | Runtime inventory includes a run whose definition source is external/incompatible | Keep the run in the server runtime transition and history scope | Do not drop or skip runtime state because the current definition source is unavailable. |
+| ORG-CASE-054 | Org definition references an unavailable/rejected Team definition | Reject the Org from new-run admission with the dependency diagnostic | Do not partially admit, copy, infer, or fall back to an old Team parser. |
+| ORG-CASE-055 | Server cutover includes compatible and incompatible external definitions | Compatible definitions and server/history functions remain ready; incompatible definitions are individually unavailable until owner update | No global startup block and no hidden compatibility activation. |
 
 ## Current TeamRun V2 Assessment
 
@@ -447,17 +550,20 @@ Rules:
 
 ## Migration Preconditions / Preknown Conditions
 
-1. All relevant definitions and live/historical execution data derive from the currently managed AgentTeam definitions.
-2. Configured topology has at most one Team-membership edge: current root Team → optional direct child Team → Agents.
-3. No relevant root Team → child Team → grandchild Team data exists.
-4. Existing data has exactly two configured cohorts: Agent-only roots and one-level organization-like roots.
+1. Definition-source ownership and runtime-package ownership are separate. This ticket writes only server-owned definition sources and server memory runtime packages.
+2. The two external definition repositories are read-only dependencies and separate owner work. Their 23 inspected roots remain topology evidence, not definition migration inputs.
+3. Configured topology has at most one Team-membership edge: current root Team → optional direct child Team → Agents. No inspected server runtime has a grandchild configured Team.
+4. Server memory runtime has exactly two configured cohorts: Agent-only roots and one-level organization-like roots. Every package present at cutover is inventoried regardless of definition origin.
 5. Task-scoped Team lineage is not configured Team nesting and remains anchored to its exact runtime host.
-6. Migration does not need recursive flattening or a deep legacy compatibility branch.
-7. An unexpected precondition violation stops before writes and reports the invariant; it does not guess a conversion.
+6. A migration-only legacy definition decoder may operate on server-owned sources; normal target admission has no legacy fallback.
+7. Migration does not need recursive flattening or a deep legacy compatibility branch. An unexpected in-scope precondition violation stops before writes; an incompatible external definition is rejected by admission rather than migrated.
 
-Observed evidence: 23 root package definitions and 41 readable stored TeamRun
-trees; 27 stored roots are Agent-only and 14 have exactly one direct Team level;
-none is deeper. The user confirmed this is the relevant migration population.
+Observed evidence: 23 external root definitions establish the zero/one-level
+shape but are outside this ticket's definition writes. The original runtime
+inventory contained 41 readable stored TeamRun trees (27 flat, 14 one-level).
+The `RER-017` re-probe found 43 readable trees (27 flat, 16 one-level), none
+deeper. The cutover inventory, rather than either historical count, is the
+authoritative runtime workset.
 
 ## Fixed-Depth Family Transition
 
@@ -476,12 +582,15 @@ none is deeper. The user confirmed this is the relevant migration population.
 | Content, memory, messages, task ledgers, history | Keep in native Team package; no destructive rewrite | Move/project to the Org package without identity/content loss; rebuild only derived indexes/caches after canonical commit. |
 | Generic indexes/projections | Add/retain `root_subject_kind: agent_team` where mixed | Set `root_subject_kind: agent_org`; never infer from legacy coordinator. |
 
-The transition is fixed-depth and idempotent. It MUST commit and validate the
-canonical AgentOrg definition/execution package before retiring the legacy
-organization-like Team authority or rebuilding derived indexes. Flat Team V2
-packages are not migration output writes; they are already the native target.
-A crash or validation failure cannot leave both families simultaneously
-advertised as active canonical authority for the same root identity.
+The runtime transition is fixed-depth and idempotent. It MUST commit and
+validate the canonical AgentOrg execution package before retiring the legacy
+organization-like Team runtime authority or rebuilding derived indexes. The
+matching definition source is converted in the same ticket only when it is
+server-owned; an external source remains separate owner work. Flat Team V2 run
+packages are not migration output writes; they are already the native runtime
+target. A crash or validation failure cannot leave both runtime families
+simultaneously advertised as active canonical authority for the same root
+identity.
 
 ## Contract Verification Matrix
 
@@ -496,6 +605,7 @@ advertised as active canonical authority for the same root identity.
 | ORG-VERIFY-007 | ORG-CASE-032–042 | Explicit From/To/When detail and authoring; eligible endpoint projection; coordinator indication; address visibility; CRUD/order/validation/cancel/atomic save; Org-versus-Team ownership separation. |
 | ORG-VERIFY-008 | ORG-CASE-043–048 | Direct-to-Org configuration, Org → Team → Agent effective-setting precedence, referenced-definition immutability, complete launch validation, full-scope activation, and no initial focus. |
 | ORG-VERIFY-009 | Mixed-root projection contract | Mandatory `root_subject_kind`, correct Team V2/AgentOrg V1 union branch, Team-only compatibility, package/payload/projection agreement, and failure-closed mismatch handling. |
+| ORG-VERIFY-010 | ORG-CASE-049–055 | Exact Team Definition V2 / Org Definition V1 codecs, source ownership, migration-only legacy decoding, target-only normal admission, external dependency diagnostics, runtime independence, and proposed per-definition availability. |
 
 ## Contract Non-Goals
 
@@ -511,6 +621,9 @@ advertised as active canonical authority for the same root identity.
 - Recursive legacy topology migration.
 - Removing supported task-scoped Team delegation.
 - Executable/scheduled handoff policy, a graphical workflow engine, or automatic evaluation of `When` prose.
+- Editing, migrating, committing, or releasing either separately maintained external definition repository.
+- A normal dual parser, silent field normalization, or legacy definition fallback for out-of-scope packages.
+- Making existing run history unavailable solely because its definition package has not yet published the target version.
 
 ## Approval Basis
 
@@ -542,6 +655,14 @@ The handoff semantic information and required authoring capabilities defined by
 the experience must communicate and enable, not how Product Prototyper must
 compose the UI. Product Prototyper owns the concrete prototype and visual/
 interaction solution.
+
+The external source ownership correction is explicit: this ticket does not
+write `/home/autobyteus/workspace/autobyteus-agents` or
+`/home/autobyteus/workspace/autobyteus-private-agents`. `RER-017` proposes the
+remaining approval boundary: exact Team Definition Config V2 / AgentOrg
+Definition Config V1 normal admission, no legacy fallback, and temporary
+unavailability limited to incompatible external definitions and their dependent
+Orgs without globally blocking server readiness or existing run history.
 
 The launch/configuration/focus behavior defined by `ORG-CASE-008`–`ORG-CASE-011`
 and `ORG-CASE-043`–`ORG-CASE-048` was approved in `RER-013` from the user's
