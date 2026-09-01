@@ -259,15 +259,15 @@ const messages = {
     "Updated {{time}}",
   "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.temporary_execution_title":
     "Temporary task execution",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_running":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_running":
     "Team status: Running",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_initializing":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_initializing":
     "Team status: Initializing",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_error":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_error":
     "Team status: Error",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_idle":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_idle":
     "Team status: Idle",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_offline":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_offline":
     "Team status: Offline",
   "workspace.history.hierarchy.tree_label": "{{name}} organization tree",
   "workspace.history.hierarchy.role.agent_team": "Agent team",

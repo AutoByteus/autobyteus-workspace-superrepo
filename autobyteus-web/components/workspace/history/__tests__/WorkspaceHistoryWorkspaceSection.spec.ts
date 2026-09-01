@@ -147,11 +147,11 @@ const mountSubject = (options: {
         'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.no_active_team_runs': 'No active team runs',
         'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.active_team_run': 'Active team run',
         'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.inactive_team_run': 'Inactive team run',
-        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_running': 'Team status: Running',
-        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_initializing': 'Team status: Initializing',
-        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_error': 'Team status: Error',
-        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_idle': 'Team status: Idle',
-        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_offline': 'Team status: Offline',
+        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_running': 'Team status: Running',
+        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_initializing': 'Team status: Initializing',
+        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_error': 'Team status: Error',
+        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_idle': 'Team status: Idle',
+        'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_offline': 'Team status: Offline',
         'workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.delete_team_history_permanently': 'Localized delete team history permanently',
       }[key] ?? key) },
     },
@@ -382,8 +382,8 @@ describe('WorkspaceHistoryWorkspaceSection current execution rows', () => {
     });
     const nestedRow = wrapper.get('[data-test="workspace-team-member-team-run-1-/product_team"]');
     expect(wrapper.find('[data-test="workspace-team-member-team-run-1-/product_team/product_prototyper"]').exists()).toBe(false);
-    expect(nestedRow.findAll('[data-test="nested-team-aggregate-status-dot"]')).toHaveLength(1);
-    let dot = nestedRow.get('[data-test="nested-team-aggregate-status-dot"]');
+    expect(nestedRow.findAll('[data-test="team-aggregate-status-dot"]')).toHaveLength(1);
+    let dot = nestedRow.get('[data-test="team-aggregate-status-dot"]');
     expect(dot.attributes()).toMatchObject({
       'data-status': AgentStatus.Running,
       'aria-label': 'Team status: Running',
@@ -406,7 +406,7 @@ describe('WorkspaceHistoryWorkspaceSection current execution rows', () => {
     });
     await wrapper.setProps({ workspaceTeams: [{ ...team, executionRows: idleRows }] });
     await wrapper.vm.$nextTick();
-    dot = nestedRow.get('[data-test="nested-team-aggregate-status-dot"]');
+    dot = nestedRow.get('[data-test="team-aggregate-status-dot"]');
     expect(dot.attributes()).toMatchObject({
       'data-status': AgentStatus.Idle,
       'aria-label': 'Team status: Idle',

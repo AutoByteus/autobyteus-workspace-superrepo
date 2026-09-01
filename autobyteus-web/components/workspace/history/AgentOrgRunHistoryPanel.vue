@@ -54,17 +54,66 @@
 
                 <div v-if="isRunExpanded(run.root_run_id)" class="team-execution-tree ml-3 space-y-0.5" role="tree" :aria-label="`${orgGroup.name} execution hierarchy`">
                   <template v-for="display in rowsFor(run)" :key="display.row.key">
-                    <button v-if="display.row.kind === 'agent'" type="button" class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm" :class="isSelected(run.root_run_id, display.row.address) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'" :style="rowStyle(display.row.depth)" role="treeitem" @click="focusAgent(run, display.row.address)">
+                    <button
+                      v-if="display.row.kind === 'agent'"
+                      type="button"
+                      class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm"
+                      :class="isSelected(run.root_run_id, display.row.address) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'"
+                      :style="rowStyle(display.row.depth)"
+                      :aria-label="agentRowLabel(display.row)"
+                      :aria-level="display.row.depth + 1"
+                      :data-test="`agent-org-agent-row-${display.row.agentRunId}`"
+                      :data-status="display.row.status"
+                      role="treeitem"
+                      @click="focusAgent(run, display.row.address)"
+                    >
                       <WorkspaceHierarchyBranches :depth="display.row.depth" :continuing-ancestor-depths="display.continuingAncestorDepths" :has-following-sibling="display.hasFollowingSibling" />
-                      <span class="ml-2 mr-1 h-3.5 w-3.5 flex-none" /><span class="mr-1.5 h-2 w-2 flex-none rounded-full bg-emerald-500" /><span class="mr-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-gray-200 text-[0.5625rem] font-semibold text-gray-600">{{ initials(display.row.address) }}</span><span class="truncate">{{ label(display.row.address) }}</span>
+                      <span class="ml-2 mr-1 h-3.5 w-3.5 flex-none" aria-hidden="true" />
+                      <StatusDot class="mr-1.5" :status="display.row.status" />
+                      <span class="mr-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-gray-200 text-[0.5625rem] font-semibold text-gray-600">{{ initials(display.row.address) }}</span>
+                      <span class="truncate">{{ label(display.row.address) }}</span>
                     </button>
-                    <button v-else-if="display.row.kind === 'team'" type="button" class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm" :class="isSelected(run.root_run_id, display.row.address) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'" :style="rowStyle(display.row.depth)" :aria-expanded="isTeamExpanded(run.root_run_id, display.row.address)" role="treeitem" @click="focusTeam(run, display.row.address)">
+                    <button
+                      v-else-if="display.row.kind === 'team'"
+                      type="button"
+                      class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm"
+                      :class="isSelected(run.root_run_id, display.row.address) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'"
+                      :style="rowStyle(display.row.depth)"
+                      :aria-expanded="isTeamExpanded(run.root_run_id, display.row.address)"
+                      :aria-label="teamRowLabel(display.row)"
+                      :aria-level="display.row.depth + 1"
+                      :data-test="`agent-org-team-row-${display.row.teamRunId}`"
+                      role="treeitem"
+                      @click="focusTeam(run, display.row.address)"
+                    >
                       <WorkspaceHierarchyBranches :depth="display.row.depth" :continuing-ancestor-depths="display.continuingAncestorDepths" :has-following-sibling="display.hasFollowingSibling" />
-                      <Icon icon="heroicons:chevron-down-20-solid" class="ml-2 mr-1 h-3.5 w-3.5 text-gray-400" :class="isTeamExpanded(run.root_run_id, display.row.address) ? '' : '-rotate-90'" /><Icon icon="heroicons:user-group-20-solid" class="mr-1.5 h-4 w-4 text-gray-500" /><span class="truncate font-semibold">{{ label(display.row.address) }}</span>
+                      <Icon icon="heroicons:chevron-down-20-solid" class="ml-2 mr-1 h-3.5 w-3.5 text-gray-400" :class="isTeamExpanded(run.root_run_id, display.row.address) ? '' : '-rotate-90'" />
+                      <TeamAggregateStatusDot class="mr-1.5" :status="display.row.status" />
+                      <Icon icon="heroicons:user-group-20-solid" class="mr-1.5 h-4 w-4 text-gray-500" />
+                      <span class="truncate font-semibold">{{ label(display.row.address) }}</span>
                     </button>
-                    <div v-else-if="display.row.kind === 'task'" class="org-execution-row relative flex min-h-7 w-full items-center rounded-md bg-indigo-50/70 text-sm text-indigo-900" :style="rowStyle(display.row.depth)" role="treeitem">
+                    <div
+                      v-else-if="display.row.kind === 'task_agent'"
+                      class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-sm"
+                      :class="display.row.taskKind === 'direct' ? 'bg-indigo-50/70 text-indigo-900' : 'text-gray-600'"
+                      :style="rowStyle(display.row.depth)"
+                      :aria-label="agentRowLabel(display.row)"
+                      :aria-level="display.row.depth + 1"
+                      :data-test="`agent-org-task-agent-row-${display.row.agentRunId}`"
+                      :data-status="display.row.status"
+                      role="treeitem"
+                    >
                       <WorkspaceHierarchyBranches :depth="display.row.depth" :continuing-ancestor-depths="display.continuingAncestorDepths" :has-following-sibling="display.hasFollowingSibling" />
-                      <span class="ml-2 mr-1 h-3.5 w-3.5" /><Icon :icon="display.row.taskKind === 'team' ? 'heroicons:user-group-20-solid' : 'svg-spinners:ring-resize'" class="mr-1.5 h-3.5 w-3.5 text-indigo-600" /><span class="truncate">Task: {{ label(display.row.address) }}</span>
+                      <span class="ml-2 mr-1 h-3.5 w-3.5 flex-none" aria-hidden="true" />
+                      <StatusDot class="mr-1.5" :status="display.row.status" :variant="display.row.taskKind === 'direct' ? 'transient' : 'solid'" />
+                      <span v-if="display.row.taskKind === 'team_member'" class="mr-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-gray-200 text-[0.5625rem] font-semibold text-gray-600">{{ initials(display.row.address) }}</span>
+                      <span class="truncate">{{ display.row.taskKind === 'direct' ? `Task: ${label(display.row.address)}` : label(display.row.address) }}</span>
+                    </div>
+                    <div v-else class="org-execution-row relative flex min-h-7 w-full items-center rounded-md bg-indigo-50/70 text-sm text-indigo-900" :style="rowStyle(display.row.depth)" :aria-level="display.row.depth + 1" :data-test="`agent-org-task-team-row-${display.row.teamRunId}`" role="treeitem">
+                      <WorkspaceHierarchyBranches :depth="display.row.depth" :continuing-ancestor-depths="display.continuingAncestorDepths" :has-following-sibling="display.hasFollowingSibling" />
+                      <span class="ml-2 mr-1 h-3.5 w-3.5" aria-hidden="true" />
+                      <Icon icon="heroicons:user-group-20-solid" class="mr-1.5 h-3.5 w-3.5 text-indigo-600" />
+                      <span class="truncate">Task: {{ label(display.row.address) }}</span>
                     </div>
                   </template>
                 </div>
@@ -82,14 +131,38 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRoute, useRouter } from 'vue-router'
+import StatusDot from '~/components/workspace/common/StatusDot.vue'
+import TeamAggregateStatusDot from '~/components/workspace/history/TeamAggregateStatusDot.vue'
 import WorkspaceHierarchyBranches from '~/components/workspace/history/WorkspaceHierarchyBranches.vue'
+import { useLocalization } from '~/composables/useLocalization'
+import { projectAgentOrgTeamBranchStatus } from '~/services/agentOrgExecution/agentOrgTeamBranchStatus'
 import { useAgentOrgRunStore, type AgentOrgHistoryItem } from '~/stores/agentOrgRunStore'
 import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
-import { parseAgentOrgExecutionTree, isAgentOrgAgentNode, isAgentOrgTaskAgentNode, type AgentOrgExecutionTree, type AgentOrgTaskExecutionNode } from '~/types/collaboration/agentOrgExecution'
+import { AgentStatus } from '~/types/agent/AgentStatus'
+import {
+  parseAgentOrgExecutionTree,
+  isAgentOrgAgentNode,
+  isAgentOrgTaskAgentNode,
+  type AgentOrgExecutionTree,
+  type AgentOrgTaskExecutionNode,
+  type AgentOrgTaskTeamMember,
+} from '~/types/collaboration/agentOrgExecution'
+import { foldTeamAggregateStatus, type TeamStatusAuthority } from '~/utils/workspaceTeamAggregateStatus'
 
-type Row = { key: string; kind: 'agent'; address: string; depth: number } | { key: string; kind: 'team'; address: string; coordinatorAddress: string; depth: number } | { key: string; kind: 'task'; address: string; taskKind: 'agent' | 'team'; depth: number }
+type AgentRow = { key: string; kind: 'agent'; address: string; agentRunId: string; status: AgentStatus; depth: number }
+type TeamRow = { key: string; kind: 'team'; address: string; teamRunId: string; coordinatorAddress: string; status: AgentStatus; depth: number }
+type TaskAgentRow = { key: string; kind: 'task_agent'; taskKind: 'direct' | 'team_member'; address: string; agentRunId: string; status: AgentStatus; depth: number }
+type TaskTeamRow = { key: string; kind: 'task_team'; address: string; teamRunId: string; depth: number }
+type Row = AgentRow | TeamRow | TaskAgentRow | TaskTeamRow
 type DisplayRow = { row: Row; continuingAncestorDepths: number[]; hasFollowingSibling: boolean }
-const store = useAgentOrgRunStore(); const orgContexts = useAgentOrgContextsStore(); const route = useRoute(); const router = useRouter()
+type TaskBranchNode = AgentOrgTaskExecutionNode | AgentOrgTaskTeamMember
+type TaskTeamNode = Exclude<TaskBranchNode, { agentRunId: string }>
+type StatusSource = Readonly<{
+  authority: TeamStatusAuthority;
+  statusForAgentRunId(agentRunId: string): AgentStatus | string | null | undefined;
+}>
+
+const store = useAgentOrgRunStore(); const orgContexts = useAgentOrgContextsStore(); const route = useRoute(); const router = useRouter(); const { t } = useLocalization()
 const expandedWorkspaces = ref(new Set<string>()); const expandedOrgs = ref(new Set<string>()); const expandedRuns = ref(new Set<string>()); const expandedTeams = ref(new Set<string>())
 const treeFor = (run: AgentOrgHistoryItem): AgentOrgExecutionTree => orgContexts.contextFor(run.root_run_id)?.executionTree ?? parseAgentOrgExecutionTree(run.org)
 const workspaceFor = (run: AgentOrgHistoryItem) => String(treeFor(run).rootOrg.defaultLaunchConfiguration.workspaceRootPath || 'No workspace')
@@ -103,14 +176,67 @@ const label = (address: string) => address.split('/').filter(Boolean).at(-1)?.re
 const initials = (address: string) => label(address).split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('')
 const workspaceLabel = (workspace: string) => workspace === 'No workspace' ? workspace : workspace.split(/[\\/]/).filter(Boolean).at(-1) || workspace
 const relative = (createdAt: string) => { const seconds = Math.max(0, Math.floor((Date.now() - Date.parse(createdAt)) / 1000)); if (seconds < 60) return 'now'; if (seconds < 3600) return `${Math.floor(seconds / 60)}m`; if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`; return `${Math.floor(seconds / 86400)}d` }
-const flattenTasks = (tasks: readonly AgentOrgTaskExecutionNode[], depth: number): Row[] => tasks.flatMap((task) => isAgentOrgTaskAgentNode(task) ? [{ key: `task-agent:${task.agentRunId}`, kind: 'task' as const, taskKind: 'agent' as const, address: task.address, depth }] : [{ key: `task-team:${task.teamRunId}`, kind: 'task' as const, taskKind: 'team' as const, address: task.address, depth }, ...task.taskExecutions.flatMap((child) => flattenTasks([child], depth + 1))])
-const rowsFor = (run: AgentOrgHistoryItem): DisplayRow[] => { const tree = treeFor(run); const rows: Row[] = []; for (const member of tree.rootOrg.members) { if (isAgentOrgAgentNode(member)) rows.push({ key: `agent:${member.agentRunId}`, kind: 'agent', address: member.address, depth: 0 }); else { rows.push({ key: `team:${member.teamRunId}`, kind: 'team', address: member.address, coordinatorAddress: member.coordinatorAddress, depth: 0 }); if (isTeamExpanded(run.root_run_id, member.address)) { rows.push(...member.members.map((agent) => ({ key: `agent:${agent.agentRunId}`, kind: 'agent' as const, address: agent.address, depth: 1 }))); rows.push(...flattenTasks(member.taskExecutions, 1)) } } } rows.push(...flattenTasks(tree.rootOrg.taskExecutions, 0)); const hasSibling = (index: number, depth: number) => { for (let next = index + 1; next < rows.length; next++) { if (rows[next].depth < depth) return false; if (rows[next].depth === depth) return true } return false }; return rows.map((row, index) => ({ row, continuingAncestorDepths: Array.from({ length: row.depth }, (_, depth) => depth).filter((depth) => hasSibling(index, depth)), hasFollowingSibling: hasSibling(index, row.depth) })) }
+const statusLabelKey = (status: AgentStatus) => `workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_${status}`
+const agentStatusLabelKey = (status: AgentStatus) => `workspace.history.hierarchy.status.${status}`
+const agentRowLabel = (row: AgentRow | TaskAgentRow) => `${label(row.address)}, ${t(agentStatusLabelKey(row.status))}`
+const teamRowLabel = (row: TeamRow) => `${label(row.address)}. ${t(statusLabelKey(row.status))}`
+
+const statusSourceFor = (run: AgentOrgHistoryItem): StatusSource => {
+  const context = orgContexts.contextFor(run.root_run_id)
+  const live = Boolean(
+    run.is_active
+    && context?.orgRunId === run.root_run_id
+    && context.executionTree.rootOrg.orgRunId === run.root_run_id
+    && context.isActive
+    && context.phase === 'live',
+  )
+  return {
+    authority: live ? 'live' : 'historical',
+    statusForAgentRunId: (agentRunId) => live
+      ? context?.getAgentContext(agentRunId)?.state.currentStatus
+      : undefined,
+  }
+}
+const exactAgentStatus = (source: StatusSource, agentRunId: string): AgentStatus =>
+  foldTeamAggregateStatus([source.statusForAgentRunId(agentRunId)], source.authority)
+
+const flattenTaskTeam = (team: TaskTeamNode, depth: number, source: StatusSource): Row[] => {
+  const rows: Row[] = [{ key: `task-team:${team.teamRunId}`, kind: 'task_team', address: team.address, teamRunId: team.teamRunId, depth }]
+  for (const member of team.members) {
+    if (isAgentOrgTaskAgentNode(member)) {
+      rows.push({ key: `task-team-agent:${member.agentRunId}`, kind: 'task_agent', taskKind: 'team_member', address: member.address, agentRunId: member.agentRunId, status: exactAgentStatus(source, member.agentRunId), depth: depth + 1 })
+    } else rows.push(...flattenTaskTeam(member, depth + 1, source))
+  }
+  for (const task of team.taskExecutions) rows.push(...flattenTask(task, depth + 1, source))
+  return rows
+}
+const flattenTask = (task: AgentOrgTaskExecutionNode, depth: number, source: StatusSource): Row[] =>
+  isAgentOrgTaskAgentNode(task)
+    ? [{ key: `task-agent:${task.agentRunId}`, kind: 'task_agent', taskKind: 'direct', address: task.address, agentRunId: task.agentRunId, status: exactAgentStatus(source, task.agentRunId), depth }]
+    : flattenTaskTeam(task, depth, source)
+
+const rowsFor = (run: AgentOrgHistoryItem): DisplayRow[] => {
+  const tree = treeFor(run); const source = statusSourceFor(run); const rows: Row[] = []
+  for (const member of tree.rootOrg.members) {
+    if (isAgentOrgAgentNode(member)) {
+      rows.push({ key: `agent:${member.agentRunId}`, kind: 'agent', address: member.address, agentRunId: member.agentRunId, status: exactAgentStatus(source, member.agentRunId), depth: 0 })
+      continue
+    }
+    rows.push({ key: `team:${member.teamRunId}`, kind: 'team', address: member.address, teamRunId: member.teamRunId, coordinatorAddress: member.coordinatorAddress, status: projectAgentOrgTeamBranchStatus({ team: member, ...source }), depth: 0 })
+    if (!isTeamExpanded(run.root_run_id, member.address)) continue
+    rows.push(...member.members.map((agent) => ({ key: `agent:${agent.agentRunId}`, kind: 'agent' as const, address: agent.address, agentRunId: agent.agentRunId, status: exactAgentStatus(source, agent.agentRunId), depth: 1 })))
+    for (const task of member.taskExecutions) rows.push(...flattenTask(task, 1, source))
+  }
+  for (const task of tree.rootOrg.taskExecutions) rows.push(...flattenTask(task, 0, source))
+  const hasSibling = (index: number, depth: number) => { for (let next = index + 1; next < rows.length; next++) { if (rows[next].depth < depth) return false; if (rows[next].depth === depth) return true } return false }
+  return rows.map((row, index) => ({ row, continuingAncestorDepths: Array.from({ length: row.depth }, (_, depth) => depth).filter((depth) => hasSibling(index, depth)), hasFollowingSibling: hasSibling(index, row.depth) }))
+}
 const rowStyle = (depth: number) => ({ paddingLeft: `calc((${depth} + 1) * 0.875rem)` })
 const isSelected = (runId: string, address: string) => String(route.query.orgRunId || '') === runId && orgContexts.contextFor(runId)?.selectedAddress === address
 const activateRoute = (run: AgentOrgHistoryItem) => router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId: treeFor(run).rootOrg.orgDefinitionId, orgRunId: run.root_run_id, mode: 'active' } })
 const openRun = async (run: AgentOrgHistoryItem) => { if (!run.is_active) { toggle(expandedRuns, run.root_run_id); return } if (!isRunExpanded(run.root_run_id)) toggle(expandedRuns, run.root_run_id); orgContexts.connect(run.root_run_id); await activateRoute(run) }
 const focusAgent = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
-const focusTeam = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; const key = teamKey(run.root_run_id, address); if (!expandedTeams.value.has(key)) toggle(expandedTeams, key); orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
+const focusTeam = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; toggle(expandedTeams, teamKey(run.root_run_id, address)); orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
 const restore = async (run: AgentOrgHistoryItem) => { const runId = await store.restore(run.root_run_id); orgContexts.select(runId, null); orgContexts.connect(runId); await activateRoute({ ...run, root_run_id: runId, is_active: true }) }
 const stopOrg = async (run: AgentOrgHistoryItem) => { await store.terminate(run.root_run_id).catch(() => undefined); if (!store.terminationErrors[run.root_run_id]) orgContexts.disconnect(run.root_run_id) }
 const refresh = () => store.fetchHistory().catch(() => undefined)

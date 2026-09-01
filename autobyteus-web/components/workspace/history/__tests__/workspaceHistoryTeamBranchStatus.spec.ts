@@ -6,7 +6,7 @@ import type {
   RunHistoryTransientExecutionRow,
   TeamMemberTreeRow,
 } from '~/stores/runHistoryTypes';
-import { aggregateNestedTeamAgentStatus } from '../workspaceHistoryNestedTeamStatus';
+import { aggregateTeamBranchAgentStatus } from '../workspaceHistoryTeamBranchStatus';
 
 const memberTreeRow = (
   kind: TeamMemberTreeRow['kind'],
@@ -99,7 +99,7 @@ const taskTeamRow = (
   hasChildren: true,
 });
 
-describe('aggregateNestedTeamAgentStatus', () => {
+describe('aggregateTeamBranchAgentStatus', () => {
   it.each([
     [[AgentStatus.Running, AgentStatus.Idle], AgentStatus.Running],
     [[AgentStatus.Initializing, AgentStatus.Error, AgentStatus.Idle], AgentStatus.Initializing],
@@ -113,7 +113,7 @@ describe('aggregateNestedTeamAgentStatus', () => {
       ...statuses.map((status, index) => taskAgentRow(`agent-${index}`, 1, status)),
     ];
 
-    expect(aggregateNestedTeamAgentStatus(rows, team)).toBe(expected);
+    expect(aggregateTeamBranchAgentStatus(rows, team)).toBe(expected);
   });
 
   it.each(
@@ -136,7 +136,7 @@ describe('aggregateNestedTeamAgentStatus', () => {
       taskAgentRow('right-agent', 1, right),
     ];
 
-    expect(aggregateNestedTeamAgentStatus(rows, team)).toBe(expected);
+    expect(aggregateTeamBranchAgentStatus(rows, team)).toBe(expected);
   });
 
   it('falls back to offline for empty descendants and non-Team targets', () => {
@@ -144,9 +144,9 @@ describe('aggregateNestedTeamAgentStatus', () => {
     const agent = stableAgentRow('agent', 1, AgentStatus.Running);
     const absentTeam = stableTeamRow('absent-team', 0);
 
-    expect(aggregateNestedTeamAgentStatus([team], team)).toBe(AgentStatus.Offline);
-    expect(aggregateNestedTeamAgentStatus([agent], agent)).toBe(AgentStatus.Offline);
-    expect(aggregateNestedTeamAgentStatus([team], absentTeam)).toBe(AgentStatus.Offline);
+    expect(aggregateTeamBranchAgentStatus([team], team)).toBe(AgentStatus.Offline);
+    expect(aggregateTeamBranchAgentStatus([agent], agent)).toBe(AgentStatus.Offline);
+    expect(aggregateTeamBranchAgentStatus([team], absentTeam)).toBe(AgentStatus.Offline);
   });
 
   it('includes recursive task-scoped Agent kinds while isolating ancestors, containers, and sibling Teams', () => {
@@ -166,8 +166,8 @@ describe('aggregateNestedTeamAgentStatus', () => {
       taskAgentRow('sibling-running-agent', 1, AgentStatus.Running),
     ];
 
-    expect(aggregateNestedTeamAgentStatus(rows, nestedTeam)).toBe(AgentStatus.Initializing);
-    expect(aggregateNestedTeamAgentStatus(rows, teamA)).toBe(AgentStatus.Initializing);
-    expect(aggregateNestedTeamAgentStatus(rows, teamB)).toBe(AgentStatus.Running);
+    expect(aggregateTeamBranchAgentStatus(rows, nestedTeam)).toBe(AgentStatus.Initializing);
+    expect(aggregateTeamBranchAgentStatus(rows, teamA)).toBe(AgentStatus.Initializing);
+    expect(aggregateTeamBranchAgentStatus(rows, teamB)).toBe(AgentStatus.Running);
   });
 });

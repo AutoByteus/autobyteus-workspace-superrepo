@@ -258,15 +258,15 @@ const messages = {
     "更新于 {{time}}",
   "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.temporary_execution_title":
     "临时任务执行",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_running":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_running":
     "团队状态：运行中",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_initializing":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_initializing":
     "团队状态：正在初始化",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_error":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_error":
     "团队状态：错误",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_idle":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_idle":
     "团队状态：空闲",
-  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.nested_team_status_offline":
+  "workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_offline":
     "团队状态：离线",
   "workspace.history.hierarchy.tree_label": "{{name}}组织树",
   "workspace.history.hierarchy.role.agent_team": "智能体团队",
