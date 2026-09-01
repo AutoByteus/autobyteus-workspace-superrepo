@@ -88,7 +88,7 @@ describe('AgentOrgExperience', () => {
     const wrapper = await mountExperience('org-create')
     await wrapper.get('[data-test="open-member-picker"]').trigger('click')
 
-    expect(wrapper.get('[data-test="org-member-picker"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="org-member-picker"]').exists()).toBe(true)
     expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
     await wrapper.findAll('[role="tab"]')[1].trigger('click')
     expect(wrapper.get('[data-test="member-picker-teams"]').text()).toContain('Software Engineering')

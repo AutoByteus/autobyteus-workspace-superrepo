@@ -5,6 +5,10 @@ import { AgentRunState } from '~/types/agent/AgentRunState'
 import { AgentStatus } from '~/types/agent/AgentStatus'
 import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { AgentOrgExecutionViewDto } from '@autobyteus/collaboration-stream-contracts'
+import type {
+  AgentOrgExecutionEventDto,
+  AgentOrgTaskRecordDto,
+} from '@autobyteus/collaboration-stream-contracts'
 
 const launch = {
   runtimeKind: 'codex_app_server' as const,
@@ -74,10 +78,10 @@ const agentContext = (runId: string, name: string) => new AgentContext({
   updatedAt: '2026-09-01T00:00:00.000Z', agentDefinitionId: `${name}-def`,
   agentName: name, llmModelIdentifier: launch.llmModelIdentifier,
 }))
-const build = () => {
+const build = (snapshot = view()) => {
   const send = vi.fn().mockResolvedValue(undefined)
   const context = new AgentOrgExecutionContext({
-    orgRunId: 'org-run', view: view(),
+    orgRunId: 'org-run', view: snapshot,
     entries: [
       { agentRunId: 'agent-direct', memberAddress: parseAgentTeamAddress('/direct'), context: agentContext('agent-direct', 'Direct') },
       { agentRunId: 'agent-coordinator', memberAddress: parseAgentTeamAddress('/team/coordinator'), context: agentContext('agent-coordinator', 'Coordinator') },
@@ -87,6 +91,22 @@ const build = () => {
   })
   return { context, send }
 }
+
+const task = (): AgentOrgTaskRecordDto => ({
+  taskId: 'task-1', delegatorAgentRunId: 'agent-coordinator',
+  recipientAddress: '/team/member', taskExecution: { agentRunId: 'agent-member' },
+  description: 'Verify the bounded result.', referenceFiles: [], status: 'active', updates: [],
+  createdAt: '2026-09-01T00:00:01.000Z',
+})
+
+const communication = (senderAgentRunId = 'agent-direct', receiverAgentRunId = 'agent-member') => ({
+  kind: 'communication' as const,
+  message: {
+    messageId: 'message-1', senderAgentRunId, receiverAgentRunId,
+    content: 'hello', messageType: 'agent_message', referenceFiles: [],
+    createdAt: '2026-09-01T00:00:01.000Z',
+  },
+})
 
 describe('AgentOrgExecutionContext', () => {
   it('starts unfocused and resolves direct Team focus only to its exact coordinator', () => {
@@ -134,4 +154,60 @@ describe('AgentOrgExecutionContext', () => {
       context: { state: { runId: 'agent-direct' } },
     })
   })
+
+  it('rejects a Team coordinator that is not that Team\'s direct Agent', () => {
+    const snapshot = view()
+    const team = snapshot.execution_tree.rootOrg.members[1]!
+    if (!('teamRunId' in team)) throw new Error('Expected Team fixture.')
+    team.coordinatorAddress = '/direct'
+
+    expect(() => build(snapshot)).toThrow(/coordinator is not one of its direct Agent members/)
+  })
+
+  it('accepts correlated task and communication events without changing their valid path', () => {
+    const snapshot = view()
+    snapshot.task_records.records.push(task())
+    const { context } = build(snapshot)
+    const submission = {
+      submissionId: 'submission-1', message: 'verified', referenceFiles: [],
+      createdAt: '2026-09-01T00:00:02.000Z',
+    }
+    context.applyEvent(5, communication())
+    context.applyEvent(6, {
+      kind: 'task',
+      event: {
+        kind: 'submitted', submission,
+        task: { ...task(), status: 'awaiting_review', updates: [submission] },
+      },
+    })
+
+    expect(context.changeSequence).toBe(6)
+    expect(context.view.communication_messages.messages).toHaveLength(1)
+    expect(context.view.task_records.records[0]).toMatchObject({
+      taskId: 'task-1', status: 'awaiting_review',
+    })
+  })
+
+  it.each([
+    ['communication sender', communication('unknown-agent', 'agent-member')],
+    ['communication receiver', communication('agent-direct', 'unknown-agent')],
+    ['task delegator', {
+      kind: 'task' as const,
+      event: { kind: 'activated' as const, task: { ...task(), taskId: 'task-2', delegatorAgentRunId: 'unknown-agent' } },
+    }],
+    ['task execution', {
+      kind: 'task' as const,
+      event: { kind: 'activated' as const, task: { ...task(), taskId: 'task-2', taskExecution: { agentRunId: 'unknown-agent' } } },
+    }],
+  ] satisfies readonly (readonly [string, AgentOrgExecutionEventDto])[])(
+    'fails closed before mutating a miscorrelated %s event', (_label, event) => {
+      const { context } = build()
+      const committed = structuredClone(context.view)
+
+      expect(() => context.applyEvent(5, event)).toThrow(/identity mismatch/)
+      expect(context.phase).toBe('reopen_required')
+      expect(context.changeSequence).toBe(4)
+      expect(context.view).toEqual(committed)
+    },
+  )
 })

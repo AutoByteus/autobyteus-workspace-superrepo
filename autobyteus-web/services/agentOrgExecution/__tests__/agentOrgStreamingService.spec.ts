@@ -148,4 +148,75 @@ describe('AgentOrgStreamingService', () => {
     ))
     expect(mocks.hydrate).not.toHaveBeenCalled()
   })
+
+  it('completes a command only from an ACK with the exact command type and target', async () => {
+    const context = candidate()
+    mocks.hydrate.mockResolvedValue(context)
+    const reportError = vi.fn()
+    const service = new AgentOrgStreamingService({
+      orgRunId: 'org-run', publish: vi.fn(), reportError,
+    })
+    service.connect()
+    const socket = TestWebSocket.instances[0]!
+    socket.emit(connected)
+    socket.emit(snapshot)
+    await vi.waitFor(() => expect(mocks.hydrate).toHaveBeenCalled())
+
+    const completed = service.interactionFor('agent-run').interrupt()
+    await vi.waitFor(() => expect(socket.sent).toHaveLength(1))
+    const command = JSON.parse(socket.sent[0]!)
+    socket.emit({
+      type: 'AGENT_COMMAND_ACK',
+      payload: {
+        root_subject_kind: 'agent_org', root_run_id: 'org-run',
+        command_id: command.payload.command_id,
+        command_type: 'INTERRUPT_GENERATION', target_agent_run_id: 'agent-run',
+        state: 'accepted', code: null, message: null,
+      },
+    })
+
+    await expect(completed).resolves.toBeUndefined()
+    expect(reportError).not.toHaveBeenCalled()
+    expect(context.requireReopen).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['command type', 'SEND_MESSAGE', 'agent-run'],
+    ['target AgentRun', 'INTERRUPT_GENERATION', 'other-agent-run'],
+  ] as const)('fails closed and rejects the pending command for a miscorrelated ACK %s', async (
+    _mismatch,
+    commandType,
+    targetAgentRunId,
+  ) => {
+    const context = candidate()
+    mocks.hydrate.mockResolvedValue(context)
+    const reportError = vi.fn()
+    const service = new AgentOrgStreamingService({
+      orgRunId: 'org-run', publish: vi.fn(), reportError,
+    })
+    service.connect()
+    const socket = TestWebSocket.instances[0]!
+    socket.emit(connected)
+    socket.emit(snapshot)
+    await vi.waitFor(() => expect(mocks.hydrate).toHaveBeenCalled())
+
+    const rejected = service.interactionFor('agent-run').interrupt()
+    await vi.waitFor(() => expect(socket.sent).toHaveLength(1))
+    const command = JSON.parse(socket.sent[0]!)
+    socket.emit({
+      type: 'AGENT_COMMAND_ACK',
+      payload: {
+        root_subject_kind: 'agent_org', root_run_id: 'org-run',
+        command_id: command.payload.command_id,
+        command_type: commandType, target_agent_run_id: targetAgentRunId,
+        state: 'accepted', code: null, message: null,
+      },
+    })
+
+    await expect(rejected).rejects.toThrow(/identity mismatch/)
+    await vi.waitFor(() => expect(reportError).toHaveBeenCalledWith(
+      expect.stringContaining('identity mismatch'),
+    ))
+    expect(context.requireReopen).toHaveBeenCalledWith(expect.stringContaining('identity mismatch'))
+  })
 })

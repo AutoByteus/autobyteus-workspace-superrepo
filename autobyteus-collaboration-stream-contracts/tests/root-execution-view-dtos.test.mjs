@@ -62,6 +62,18 @@ const configuredAgent = (address, agentRunId) => ({
   launchConfiguration,
 });
 
+const configuredTeam = (address, teamRunId, coordinatorAddress, members) => ({
+  address,
+  teamDefinitionId: `definition-${teamRunId}`,
+  role: null,
+  description: null,
+  teamRunId,
+  coordinatorAddress,
+  defaultLaunchConfiguration: launchConfiguration,
+  members,
+  taskExecutions: [],
+});
+
 const status = (member_address, agent_run_id) => ({
   member_address,
   agent_run_id,
@@ -173,4 +185,28 @@ test("rejects duplicate and sidecar AgentOrg member identities", () => {
     createdAt: "2026-09-01T00:00:00.000Z",
   });
   assert.throws(() => RootExecutionViewDtoSchema.parse(sidecars), /communication message.*identity mismatch/);
+});
+
+test("requires each configured Team coordinator to be one of that Team's direct Agents", () => {
+  const valid = orgSnapshot();
+  valid.root_org.execution_tree.rootOrg.members.push(
+    configuredAgent("/direct", "agent-run-direct"),
+    configuredTeam("/team", "team-run", "/team/lead", [
+      configuredAgent("/team/lead", "agent-run-lead"),
+      configuredAgent("/team/worker", "agent-run-worker"),
+    ]),
+  );
+  valid.root_org.agent_statuses.push(
+    status("/direct", "agent-run-direct"),
+    status("/team/lead", "agent-run-lead"),
+    status("/team/worker", "agent-run-worker"),
+  );
+  assert.equal(RootExecutionViewDtoSchema.parse(valid).root_subject_kind, "agent_org");
+
+  const miscorrelated = structuredClone(valid);
+  miscorrelated.root_org.execution_tree.rootOrg.members[1].coordinatorAddress = "/direct";
+  assert.throws(
+    () => RootExecutionViewDtoSchema.parse(miscorrelated),
+    /coordinator is not one of its direct Agent members/,
+  );
 });

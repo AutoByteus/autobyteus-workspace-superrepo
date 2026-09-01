@@ -33,7 +33,15 @@ const configuredTeam = z.object({
     role: z.string().nullable(), description: z.string().nullable(), teamRunId: nonEmptyStringSchema,
     coordinatorAddress: agentAddressSchema, defaultLaunchConfiguration: agentOrgLaunchConfigurationDtoSchema,
     members: z.array(configuredAgent), taskExecutions: z.array(taskExecution),
-}).strict();
+}).strict().superRefine((team, context) => {
+    if (!team.members.some((member) => member.address === team.coordinatorAddress)) {
+        context.addIssue({
+            code: "custom",
+            path: ["coordinatorAddress"],
+            message: `Configured Team '${team.address}' coordinator is not one of its direct Agent members.`,
+        });
+    }
+});
 const handoff = z.object({ from: agentAddressSchema, to: agentAddressSchema, rules: z.array(nonEmptyStringSchema).min(1) }).strict();
 export const agentOrgExecutionTreeDtoSchema = z.object({
     schemaVersion: z.literal(1), subjectKind: z.literal("agent_org"), createdAt: timestamp,

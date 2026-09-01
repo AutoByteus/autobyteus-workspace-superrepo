@@ -18,6 +18,8 @@ import {
 
 type CommandAck = Extract<CollaborationStreamServerMessage, { type: 'AGENT_COMMAND_ACK' }>
 type PendingCommand = Readonly<{
+  commandType: CollaborationStreamClientMessage['type']
+  targetAgentRunId: string
   resolve(): void
   reject(error: Error): void
   timeout: ReturnType<typeof setTimeout>
@@ -144,7 +146,13 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
         this.pending.delete(message.payload.command_id)
         reject(new Error(`AgentOrg command '${message.payload.command_id}' acknowledgement timed out.`))
       }, 15_000)
-      this.pending.set(message.payload.command_id, Object.freeze({ resolve, reject, timeout }))
+      this.pending.set(message.payload.command_id, Object.freeze({
+        commandType: message.type,
+        targetAgentRunId: message.payload.target_agent_run_id,
+        resolve,
+        reject,
+        timeout,
+      }))
       socket.send(JSON.stringify(message))
     })
   }
@@ -208,7 +216,13 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
 
   private acknowledge(message: CommandAck): void {
     const command = this.pending.get(message.payload.command_id)
-    if (!command) return
+    if (!command) {
+      throw new Error(`AgentOrg command acknowledgement '${message.payload.command_id}' has no pending command.`)
+    }
+    if (command.commandType !== message.payload.command_type
+      || command.targetAgentRunId !== message.payload.target_agent_run_id) {
+      throw new Error(`AgentOrg command acknowledgement '${message.payload.command_id}' identity mismatch.`)
+    }
     clearTimeout(command.timeout)
     this.pending.delete(message.payload.command_id)
     if (message.payload.state === 'accepted') command.resolve()
@@ -221,8 +235,8 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     this.options.reportError(detail)
     this.intentionalClose = true
     this.streamPhase = 'disconnected'
-    this.socket?.close(1002, 'Invalid AgentOrg stream')
     this.rejectPending(detail)
+    this.socket?.close(1002, 'Invalid AgentOrg stream')
   }
 
   private closeSocket(reason: string): void {
