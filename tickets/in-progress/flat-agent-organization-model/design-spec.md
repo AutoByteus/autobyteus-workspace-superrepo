@@ -3,128 +3,160 @@
 ## Document Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Approved requirements revision: `RER-009`
+- Approved requirements revision: `RER-016`
 - Normative supplement: `AORG-CONTRACT-001`
+- Normative Product UI revision: `RV-012` / `VIS-001`-`VIS-020`
 - Architecture result: `Architecture Design Complete`
-- Architecture revision: `AD-REV-001`
-- Date: 2026-08-31
+- Architecture revision: `AD-REV-002`
+- Date: 2026-09-01
 - Workspace: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`
-- Branch / approved starting commit: `requirements/flat-agent-organization-model` / `c7b711b1cbd98bca0c6f7c61dc77ae1afbecfcd1`
+- Branch / approved revision commit: `requirements/flat-agent-organization-model` / `4ffc9fe3c119cf11bfcedb6b3fd1cb093a1edb81`
 
 ## Current-State Read
 
-The product currently has one recursively composable `AgentTeamDefinition` and
-one recursively shaped Team execution root. `AgentTeamDefinition.nodes` accepts
-both Agent and AgentTeam refs; `TeamDefinitionGraphResolver` recursively loads
-them; `TeamHandoffCompiler` recursively rebases their handoffs; and
-`TeamDefinitionTopologyPlanner` allocates a root TeamRun plus arbitrarily nested
-configured TeamRuns. `RootTeamRun`, `TeamExecutionIndex`, the mixed runtime
-backend, task delegation, memory layout, strict V2 persistence, GraphQL, the
-Team WebSocket contract, history projections, and the web workspace all encode
-that root as a Team.
+The product currently uses one recursively composable `AgentTeamDefinition` and
+one recursively shaped Team execution family. `AgentTeamDefinition.nodes`
+accepts both Agent and AgentTeam refs; `TeamDefinitionGraphResolver` recursively
+loads them; `TeamHandoffCompiler` recursively rebases handoffs; and
+`TeamDefinitionTopologyPlanner` can allocate configured child TeamRuns at
+arbitrary depth. `RootTeamRun`, `TeamExecutionIndex`, the mixed Team backend,
+GraphQL, the Team WebSocket contract, and the web workspace all encode the root
+as a Team.
 
-The execution topology itself is not the design defect. The current V2 tree is
-already a generic aggregate with direct Agent/Team placements, canonical
-addresses, handoffs, launch configuration, IDs, and host-owned task lineage.
-The defect is that the definition and root subject boundaries are conflated:
-an organization-like root is forced to be a Team with a coordinator, while a
-Team is allowed to contain another Team. This duplicates organization and Team
-semantics across domain, transport, runtime, persistence, and UI owners.
+The durable TeamRun V2 topology is nevertheless the right native contract for a
+standalone flat Team. It already persists the coordinator, direct Agents,
+launch settings, handoffs, application binding, timestamps, task executions,
+and package identity under
+`$MEMORY_ROOT/agent_teams/<rootTeamRunId>/team_run_execution_tree.json`. An
+Agent-only root already satisfies the approved target without a version, key,
+file, path, or byte-shape rewrite. The model defect is configured ownership:
+an organization-like root is forced to be a Team with a coordinator while a
+Team may contain a Team.
 
-The target therefore preserves the generic execution topology but makes its
-root a strict `AgentOrg | AgentTeam` union. An AgentOrg root may contain direct
-Agents and flat AgentTeams and has no coordinator. An AgentTeam root or child
-contains Agents only and has one direct Agent coordinator. Recursive task Team
-lineage remains separate and unchanged in meaning.
+The target therefore uses two truthful root subjects and two strict durable
+families:
 
-The supplied workspace is a clean, isolated git worktree. `HEAD` equals the
-approved requirements commit, its merge base with `personal` is
-`80e2bd195c42ea3ced778dbc051d4d00edaef16f`, and the branch is ten commits ahead
-with no unrelated working-tree changes before this architecture round.
+- a standalone `AgentTeam` keeps native `TeamRunExecutionTreeFileV2`, a required
+  direct-Agent coordinator, and Agent-only configured membership;
+- an `AgentOrg` gains `AgentOrgRunExecutionTreeFileV1` under the separate
+  `agent_orgs` package family, has no coordinator, and contains direct Agents
+  and direct flat Teams;
+- common configured Agent/Team, handoff, launch, binding/timestamp, and task
+  records are reused as tight shared record modules without creating a generic
+  persisted root union; and
+- mixed history, stream, GraphQL, and workspace projections carry the explicit
+  logical discriminator `root_subject_kind: "agent_team" | "agent_org"` and
+  select the corresponding strict family before decoding.
+
+The supplied workspace is an isolated git worktree. `HEAD` equals approved
+`RER-016@4ffc9fe3c`. `AD-REV-001` remains in history at
+`36bc02deca363798b6eda878e5eb4850e624da6f`; `AD-REV-002` is the architecture
+impact revision that integrates approved Product `RV-012`, the RER-013
+configuration/focus behavior, and the later user-approved Team-V2/Org-V1 durable
+correction. No application source changed between those requirements rounds.
 
 ## Task Size And Architectural Risk (Mandatory)
 
 - Task size: `Large`
-- Size rationale and supporting evidence: The implementation changes definition
-  ownership and file formats, root runtime ownership, launch/entry APIs,
-  collaboration addressing text/types, strict persistence and migration,
-  history/memory layout, GraphQL and WebSocket contracts, application/package
-  integration, and separate web authoring plus shared workspace execution.
-  A repository scan found 207 source consumers of current root-Team field names
-  and 11 direct definition-recursion consumers, before tests and generated
-  transport code. The 23 definition roots and 41 execution trees are a small
-  payload inventory; they do not drive the size. The structural production
-  surfaces do.
+- Size rationale and supporting evidence: The payload population is only 23
+  inspected definition roots and 41 readable execution trees, but the code
+  delta changes definition ownership, flatness validators, a new AgentOrg
+  runtime aggregate and durable store, migration authority, launch/configuration
+  APIs, history/stream/workspace discriminated projections, task host ownership,
+  atomic handoff authoring, and separate frontend definition/configuration
+  surfaces. A repository scan found 207 consumers of Team-root field names and
+  11 direct configured-definition recursion consumers before tests and generated
+  transport code. Those structural surfaces, not record count, make the task
+  Large.
 - Architectural risk: `High`
-- Risk rationale and supporting evidence: This is a material shared-contract,
-  persisted-root-invariant, migration, lifecycle, identity, ownership-boundary,
-  API, and UI change. A faulty root classification or cutover can make run
-  history, tasks, memory, or package definitions unreachable. The design also
-  intersects application launches, external-channel targeting, memory sync, and
-  a separate unmerged dynamic-Team draft.
+- Risk rationale and supporting evidence: The work changes public contracts,
+  persistence family selection, lifecycle/identity ownership, startup migration,
+  definition transaction semantics, and frontend/runtime projection across
+  multiple repositories. A wrong family classification or partial cutover can
+  make run history, tasks, memory, or packages unreachable or create two
+  canonical authorities for one identity.
 - Selected route: `Architecture Review`
-- Escalation trigger if implementation or validation discovers new impact: Return
-  `Design Impact` if implementation requires a second Org/Team execution-tree
-  family, a compatibility reader in normal runtime, a different addressing or
-  entry contract, configured Team depth beyond Org -> Team -> Agent, mutation of
-  reusable Team definitions on Org adoption, shared Agent runtime instances, a
-  non-atomic migration posture, or a new application/security/concurrency
-  contract. Return `Requirement Gap` if evidence contradicts `PRE-001`-
-  `PRE-005` or a product decision is needed rather than an implementation
-  choice.
+- Escalation trigger if implementation or validation discovers new impact:
+  return `Design Impact` if implementation needs to change the approved exact
+  Team V2 or AgentOrg V1 schema/file/path boundary, needs a generic persisted
+  root file, cannot preserve Team-only wire compatibility where retained, needs
+  configured depth beyond Org -> Team -> Agent, requires a new cross-run route,
+  or changes launch/focus/handoff semantics. Return `Requirement Gap` if any
+  approved durable key/version/path/discriminator must change, a Product decision
+  is required, or evidence contradicts `PRE-001`-`PRE-005`.
 
 ### Structural Versus Payload Classification
 
-- Payload inventory: 23 inspected root definition packages, 41 readable V2 run
-  trees, their Markdown/JSON bodies, derived catalogs/indexes, fixtures,
-  generated GraphQL, and documentation.
-- Structural surfaces: definition subjects and validators; source ownership;
-  launch planners and public APIs; root/member runtime ownership; addresses and
-  handoffs; task host ownership; strict persistence readers/writers and physical
-  layout; migration; history/memory; WebSocket/GraphQL; application resources;
-  and web authoring/workspace state.
-- House test: Existing structural contracts cannot consume AgentOrg truthfully:
-  V2 requires a root coordinator, Team definitions accept Teams, the runtime
-  root is a `RootTeamRun`, and transport exposes `root_team`. This is not a bulk
-  content conversion through an unchanged contract.
-- Target-versus-delta result: The fixed-depth AgentOrg/AgentTeam model, V3 root
-  union, affected APIs/UI, migration, and recursive configured-Team removal are
-  explicitly in this implementation round. Unrelated task settlement semantics,
-  dynamic membership, or cross-run routing are not.
+- Payload surfaces: 23 definition packages, 41 Team V2 trees, their Markdown and
+  JSON bodies, derived catalogs/indexes, fixtures, generated code, and Product
+  reference assets.
+- Structural surfaces: domain subjects and validators; definition source
+  ownership; root run owners; strict readers/writers and two physical package
+  families; fixed-depth migration; history/stream/GraphQL unions; launch and
+  focus semantics; address/handoff/task ownership; and frontend stores/routes.
+- House test: the existing structure cannot expose coordinator-free AgentOrg
+  truthfully, because normal roots are `RootTeamRun`, strict storage requires
+  `rootTeam.coordinatorAddress`, configured Team recursion is legal, and mixed
+  transport has no root-kind discriminator. Conversely, it already consumes a
+  flat Team correctly and must not be rewritten.
+- Target-versus-delta result: the separate AgentOrg root/runtime/store, preserved
+  Team V2 family, mixed projections, fixed-depth conversion of only the
+  organization-like cohort, recursive configured-Team removal, and approved UI
+  are in this round. Dynamic membership, cross-run routing, shared Agent
+  instances, and new task settlement semantics are not.
 
 ## Architecture Investigation Evidence
 
 | Source / Command / Probe | Exact Path / Reference | Observation | Design Decision Supported | Remaining Uncertainty |
 | --- | --- | --- | --- | --- |
-| Approved requirements package | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` | `RER-009` is Approved and explicitly selects Architecture Design with preliminary Large/High. | Intended behavior and route are ready; no requirement elicitation is needed. | None. |
-| Normative contract | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | One generic V3 root union and unchanged member/handoff/task meanings are mandatory. | Do not create parallel Org/Team topology families or a `FlatTeam` subtype. | Physical target paths and type/module names were architecture-owned and are fixed below. |
-| Worktree verification | `git rev-parse HEAD`; `git worktree list --porcelain`; `git merge-base HEAD personal`; `git status --short --branch` | Isolated worktree, approved `HEAD=c7b711b1c`, clean starting state, known `personal` merge base. | Continue in supplied worktree; do not create another workspace. | Implementation must refresh the base before source work if `personal` advances. |
-| Definition model | `autobyteus-server-ts/src/agent-team-definition/domain/models.ts` | `TeamMember.refType` is `agent | agent_team`; `AgentTeamDefinition` owns both recursive membership and the coordinator. | Split AgentOrg and flat AgentTeam into separate domain subjects and inputs. | None. |
-| Recursive resolver/compiler | `autobyteus-server-ts/src/agent-team-definition/services/team-definition-graph-resolver.ts`; `team-handoff-compiler.ts` | Both recursively traverse configured Team membership and use root-relative rebasing. | Replace with a fixed-depth collaboration topology resolver and one compiler that combines Org handoffs plus once-rebased Team-local handoffs. | None. |
-| Persistence-before-validation defect | `autobyteus-server-ts/src/agent-team-definition/services/agent-team-definition-service.ts`; `file-agent-team-definition-provider.ts` | Create writes a definition and then validates/rolls back; file writes are not an authoritative pre-persistence invariant boundary. | New definition services must validate complete candidates before any provider mutation and stage atomic file replacement. | None. |
-| Planner/config | `autobyteus-server-ts/src/agent-team-execution/domain/team-run-config.ts`; `services/team-definition-topology-planner.ts` | Root is always `TeamRunAgentTeamNode`; planner indexes and allocates recursive Teams. | Introduce a discriminated root config union and fixed-depth planner; Team nodes are Agent-only at type and validator level. | None. |
-| Root runtime | `autobyteus-server-ts/src/agent-team-execution/domain/root-team-run.ts`; `domain/team-run.ts`; `backends/mixed/mixed-team-manager.ts` | `RootTeamRun` is the public aggregate; the mixed manager already owns generic direct Agent/Team activation, tasks, events, and termination. | Generalize the authoritative root to `RootCollaborationRun`, keep `TeamRun` only for actual Team executions, and reuse/specialize the mixed member mechanics. | Exact implementation split may adjust without weakening the public boundaries below. |
-| Recipient resolution | `autobyteus-server-ts/src/agent-team-execution/services/team-recipient-resolver.ts`; `services/team-execution-index.ts` | `/` is rejected, Agent resolves directly, Team resolves through `coordinatorAddress`, but traversability is recursively generic. | Preserve resolution semantics while constraining configured addresses to standalone `/agent` or Org `/agent`, `/team`, `/team/agent`. | None. |
-| Task lineage | `autobyteus-server-ts/src/agent-team-execution/task-delegation/**`; `domain/team-run-execution-tree.ts` | Task Agent/Team records are attached to an exact host and recursive task lineage is separate from configured membership. | Preserve task record shapes and recursive task lineage; generalize host ownership so an Org root is not treated as a Team. | No new standalone-Team-to-unmounted-Team selector is authorized. |
-| Strict V2 schema | `autobyteus-server-ts/src/run-history/store/team-run-execution-tree-schema.ts`; `team-run-execution-tree-store.ts` | Exact keys require `rootTeam`, root Team fields, schema 2, and a root coordinator. Normal reader is strict/current-only. | Build a strict V3-only normal reader and confine V2 decoding to migration code. | None. |
-| Physical memory layout | `autobyteus-server-ts/src/agent-memory/store/agent-memory-layout.ts` and `rg 'getTeamRootDirPath|agent_teams' autobyteus-server-ts/src` | Root runs live below `memory/agent_teams`; memory, history, migrations, sync, and runtime classifiers depend on this Team-only name. | Move native root packages to generic `memory/collaboration_runs` during the required cutover and update all current owners together. | Imported/exported old snapshots are not a continuing runtime format; they must be migrated before import admission. |
-| Stream/API truth | `autobyteus-team-stream-contracts/src/team-execution-view-dtos.ts`; `autobyteus-server-ts/src/services/agent-streaming/team-execution-view-projector.ts`; GraphQL AgentTeam types | Stream schema/version and GraphQL authoring/launch expose root-Team and recursive Team member semantics. | Publish a V3 root union, separate AgentOrg definition/launch APIs, and a generic collaboration execution stream. | Generated client regeneration is required. |
-| Web authoring/workspace | `autobyteus-web/components/agentTeams/**`; `stores/agentTeamDefinitionStore.ts`; `stores/agentTeamRunStore.ts`; `services/teamExecution/**` | Team form offers Team members; detail shows nested Teams; runtime contexts assume a root Team. | Separate Org authoring from flat Team authoring and extract one generic collaboration-run workspace state owner. | Exact styling is implementation-owned; no prototype is required. |
-| Definition inventory probe | Python scan of `/home/autobyteus/workspace/autobyteus-agents/agent-teams/*/team-config.json` and `/home/autobyteus/workspace/autobyteus-private-agents/agent-teams/*/team-config.json` | 23 roots; 3 organization-like; no child Team contains another Team. | Use exhaustive fixed-depth definition classification, not recursive flattening. | External roots must remain writable during the maintenance cutover or be updated by their owning deployment step. |
-| V2 run probe | Python/`jq` scan of `/home/autobyteus/data/memory/agent_teams/*/team_run_execution_tree.json` | 41 readable V2 trees; 14 have one direct configured Team level; none is deeper; task records remain separate. | Use deterministic root-subject/key projection and preserve task hosts. | Exact production volume outside the approved population is intentionally not a design obligation. |
-| Representative stored Org-like tree | `/home/autobyteus/data/memory/agent_teams/software_development_department_09e8e85e26524e7d9dd869866c27496b/team_run_execution_tree.json` | Root coordinator plus direct Agent/Team records; every direct Team has Agent-only members and its own coordinator. | Remove only root coordinator semantics; preserve direct Team records and IDs. | This stored definition predates current package content, so migration must trust snapshots, not mutable definitions, for run conversion. |
-| Concurrent draft check | `origin/codex/dynamic-agent-team-runtime@7d9b4ba69`; `git merge-base --is-ancestor 7d9b4ba69 HEAD` | Draft commit is not in the task branch and currently adds only ticket artifacts, but its approved direction is not part of this package. | Do not import recursive configured mutation. Reconcile any later code at rebase against `REQ-017`. | Branch may evolve before implementation. |
+| Approved requirements package | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` | `RER-016` is Approved Architecture-Ready; REQ-014/REQ-025 fix the two-family durable boundary and mixed projection discriminator. | Preserve Team V2 exactly; add AgentOrg V1; revise AD-REV-001 rather than reinterpret behavior. | None. |
+| Normative contract | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Exact Team V2 and AgentOrg V1 keys, versions, paths, reused records, transition, and failure-closed mixed-reader rules are approved. | Treat logical file/schema/path/discriminator details as upstream constraints. | Internal modules and rollout mechanics remain architecture-owned. |
+| Worktree verification | `git rev-parse HEAD`; `git worktree list --porcelain`; `git status --short --branch`; `git log --oneline` | Isolated task worktree at approved `HEAD=4ffc9fe3c`; AD-REV-001 and cumulative requirements are in one history. | Update canonical architecture artifacts in place as AD-REV-002. | Implementation refreshes its base if the integration branch advances. |
+| Definition model | `autobyteus-server-ts/src/agent-team-definition/domain/models.ts` | `TeamMember.refType` accepts `agent \| agent_team`; Team owns both recursion and coordinator. | Split AgentOrg and flat AgentTeam subjects and input types. | None. |
+| Recursive resolution/compiler | `autobyteus-server-ts/src/agent-team-definition/services/team-definition-graph-resolver.ts`; `team-handoff-compiler.ts` | Configured Teams are traversed recursively and local handoffs are recursively rebased. | Replace normal configured recursion with explicit Team-local and fixed-depth Org compilers; preserve recursive task traversal separately. | None. |
+| Persistence-before-validation pressure | `autobyteus-server-ts/src/agent-team-definition/services/agent-team-definition-service.ts`; `file-agent-team-definition-provider.ts` | Create can write before full graph validation/rollback; `team.md` and config files are not one crash-safe parent transaction. | Validate a complete candidate first and use a revisioned, journaled definition-package commit. | None. |
+| Planner/config | `autobyteus-server-ts/src/agent-team-execution/domain/team-run-config.ts`; `services/team-definition-topology-planner.ts` | Root is always a Team node and planner/index construction is recursive. | Keep a flat Team planner/service and add a fixed-depth Org planner/service; share only tight placement/config primitives. | None. |
+| Existing configuration precedence | `autobyteus-web/types/agent/TeamRunConfig.ts`; `utils/teamRunLaunchHierarchy.ts`; `stores/teamRunConfigStore.ts`; server `team-definition-topology-planner.ts` | Root, Team-placement, and Agent-placement overrides already exist conceptually and are expanded before activation. | Extract a server-authoritative fixed-depth resolver for Org and root->Agent specialization for Team; web preview mirrors the pure merge vocabulary. | Workspace creation stays separate from focus. |
+| Team runtime | `autobyteus-server-ts/src/agent-team-execution/domain/root-team-run.ts`; `domain/team-run.ts`; `backends/mixed/mixed-team-manager.ts` | `RootTeamRun` correctly owns standalone Team lifecycle; mixed mechanics can materialize direct Agent/Team placements but currently assume a Team root. | Retain Team aggregate/service/manager for standalone Team; add an AgentOrg aggregate/service/manager that composes direct Agents/TeamRuns and reuses lower-level execution mechanisms. | Exact extraction boundaries may adjust if ownership rules remain intact. |
+| Recipient resolution | `autobyteus-server-ts/src/agent-team-execution/services/team-recipient-resolver.ts`; `services/team-execution-index.ts` | `/` is rejected; Agent resolves directly; Team resolves through coordinator; current traversal is recursively generic. | Give Team and Org aggregates explicit same-root resolver methods over a shared canonical address parser and exact execution index. | None. |
+| Web focus | `autobyteus-web/services/teamExecution/teamExecutionViewState.ts`; `stores/agentTeamContextsStore.ts`; `stores/agentSelectionStore.ts`; `stores/runHistorySelectionActions.ts` | Current Team focus is non-null and repaired to coordinator/first Agent. | Preserve coordinator-first standalone Team behavior; add nullable Org focus and remove fallback from the mixed Org view path. | None. |
+| Task lineage | `autobyteus-server-ts/src/agent-team-execution/task-delegation/**`; `domain/team-run-execution-tree.ts` | Task Agent/Team records attach to an exact host; task Team recursion is distinct from configured membership. | Reuse task record shapes and lifecycle services; add Org root as a legal host without adding configured members. | No unmounted/global task selector is authorized. |
+| Native Team V2 | `autobyteus-server-ts/src/run-history/store/team-run-execution-tree-schema.ts`; `team-run-execution-tree-path.ts`; `team-run-execution-tree-store.ts`; `agent-memory-layout.ts` | Exact schema 2/rootTeam/file/path is already authoritative and strict. | Keep current store/path and exact serialized keys; narrow configured `rootTeam.members` validation to Agents. | Existing organization-like roots must be converted before normal flat-Team restore. |
+| New Org V1 need | Same Team V2 sources plus approved `AORG-CONTRACT-001` | Team V2 cannot encode `rootOrg` or omit root coordinator under exact validation. | Add separate strict AgentOrg V1 domain/schema/path/store under `$MEMORY_ROOT/agent_orgs`. | None. |
+| Mixed stream/API truth | `autobyteus-team-stream-contracts/src/team-execution-view-dtos.ts`; server team execution projector; current GraphQL history types | Current external shape is Team-only. | Retain Team-only DTOs/endpoints where useful and compatible; add discriminated mixed-root contracts with `root_subject_kind`; never guess a family from payload shape. | Generated clients must be regenerated for new mixed/Org surfaces. |
+| Current definition UI/API | `autobyteus-web/components/agentTeams/**`; `useAgentTeamDefinitionFormState.ts`; `agentTeamDefinitionStore.ts`; server GraphQL `agent-team-definition.ts` | Team form offers nested Teams; complete handoff authoring is absent; parent mutation already exists. | Separate Org and Team drafts; add owner-scoped From/To/When editing; save the complete parent candidate with CAS. | None. |
+| Approved Product UI | `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`; `user-decision-record.md`; `visual-references/visual-reference-manifest.json`; `VIS-001`-`VIS-020` | RV-012 is approved and normative for distinct surfaces, direct-to-config Org Run, full-scope/no-focus activation, exact focus, task lineage, desktop and narrow views. | Map normative UI state to production owners without adopting mocked persistence/orchestration. | None. |
+| Product validation | `browser-validation-rv-012.json`; `validation/final-package/final-package-validation.json` | 59/59 browser checks, 6/6 package checks, and 20/20 image hashes/dimensions pass. | Product gate is closed. | Production correctness remains downstream engineering work. |
+| Definition inventory | Python scan of shared/private `agent-teams/*/team-config.json` | 23 roots; 3 organization-like; none deeper. | Use exhaustive two-cohort fixed-depth classification; no recursive flattening. | External package roots must be writable or updated by their deployment owner. |
+| Run inventory | Python/`jq` scan of `/home/autobyteus/data/memory/agent_teams/*/team_run_execution_tree.json` | 41 readable V2 trees; 27 Agent-only; 14 one-level organization-like; none deeper. | Flat Team packages are no-op; convert only organization-like packages to Org V1. | Approved population boundary is authoritative. |
+| Representative Org-like V2 | `/home/autobyteus/data/memory/agent_teams/software_development_department_09e8e85e26524e7d9dd869866c27496b/team_run_execution_tree.json` | Root coordinator plus direct Agent/Team records; child Teams are Agent-only and coordinator-led. | Project only root subject/identity/coordinator semantics and package family; preserve direct records and task hosts. | Definition snapshot may differ from current package, so migrate run snapshots independently of mutable definitions. |
+| Concurrent draft | `origin/codex/dynamic-agent-team-runtime@7d9b4ba69`; merge-base check | Draft is not integrated and its behavior is outside this approved package. | Do not import recursive configured mutation; re-evaluate any later source conflict under REQ-017. | Branch may evolve before implementation. |
 
 ## Intended Change
 
-Introduce AgentOrg as a first-class definition and root execution subject while
-contracting AgentTeam to one coordinator-led Agent-only unit. Persist both with
-one strict generic V3 execution tree. Replace configured recursive-Team runtime
-ownership with a fixed root union and one Org-to-Team hop, while preserving
-recursive task execution lineage. Add truthful, separate definition/launch
-surfaces for AgentOrg and AgentTeam, a generic collaboration execution/history
-transport, fixed-depth web authoring/workspace projection, and a preflighted,
-restart-safe migration for both approved existing-data cohorts.
+Introduce `AgentOrg` as the sole persistent multi-Team composition subject and
+contract `AgentTeam` to an Agent-only coordinator-led unit. Preserve native
+standalone TeamRun V2 state and its package path. Add a distinct AgentOrg run
+aggregate plus strict V1 store/path over reused configured/member/handoff/task
+records. Convert only the approved one-level organization-like definition/run
+cohort; leave already-flat Team V2 packages byte/physically unchanged. Add
+truthful mixed-root projections, subject-specific GraphQL and definition/run
+services, configuration-first full-scope Org activation with nullable
+post-launch focus, complete atomic From/To/When authoring, and the approved
+separate Team/Org frontend journeys.
+
+### AD-REV-002 Product, Runtime, And Durable Impact Decision
+
+| Impact ID | Approved Evidence | AD-REV-001 / Earlier Draft Position | AD-REV-002 Decision |
+| --- | --- | --- | --- |
+| ADI-001 | REQ-004, REQ-024, SCN-002, SCN-009, VIS-014-VIS-018 | Org launch accepted `entryAddress` and yielded a focused Agent. | Remove entry selection/input/result. Resolve full effective configuration, activate every mounted execution, return Org run identity, and initialize Org focus to `null`. |
+| ADI-002 | REQ-024, AC-019, VIS-014, VIS-015, VIS-020 | Configuration precedence had no single owner. | Add server-authoritative `CollaborationLaunchConfigurationResolver`: Org root -> Team placement -> exact Agent; root -> exact Agent for direct Org Agents/standalone Teams. Definitions stay immutable. |
+| ADI-003 | REQ-020-REQ-023, SCN-008, VIS-004, VIS-008, VIS-013, VIS-019 | Handoff compilation existed; authoring/save lifecycle was underspecified. | Add owner-scoped endpoint catalogs, reversible complete drafts, typed validation, optimistic revision checks, and one journaled atomic parent-definition commit. |
+| ADI-004 | REQ-019, AC-014, RV-012, VIS-001-VIS-020 | UI layout was implementation-owned and had no approved prototype authority. | Treat `ui-ux-spec.md` and all non-fixture visible reference details as normative; validate desktop/narrow/accessibility behavior. |
+| ADI-005 | REQ-012, REQ-014, REQ-025, AORG-CONTRACT-001@RER-016 | AD-REV-001 and the superseded RER-014 impact draft proposed one generic V3 root/store/path. | Preserve exact Team V2 and add separate AgentOrg V1. Share only tight child/handoff/launch/task record modules. Add `root_subject_kind` solely to mixed projections. Flat Team packages are no-op; one-level Org-like packages convert atomically to Org V1. |
+
+All five impacts are resolved within the approved package. No requirement or
+Product UI gap remains.
 
 ## Target Definition And Source Contracts
 
@@ -185,8 +217,11 @@ type AgentOrgDefinition = Readonly<{
   opaque stable IDs. The target `agent_org_owned` source scope and physical Org
   source path determine ownership; current code must not infer Team nesting from
   or recursively resolve the historic prefix. New Org-owned local sources use
-  the same stable namespace so there is one identity rule rather than migrated
-  and native aliases.
+  truthful opaque namespaces such as
+  `agent-org-owned-agent:<org-id>:<local-id>` and
+  `agent-org-owned-team:<org-id>:<local-id>`. The source index maps either
+  opaque ID directly; no current path branches on the prefix or creates an
+  alias for a migrated identity.
 - Shared AgentTeams referenced by an Org retain their existing definition ID
   and physical source unchanged. Adding the reference or Org handoffs does not
   edit the Team. Existing application-owned AgentTeams remain flat, but this
@@ -195,823 +230,1164 @@ type AgentOrgDefinition = Readonly<{
   be owned by another Org. Existing application-owned AgentTeams remain valid
   only after they satisfy the flat Team contract; adding application-owned
   AgentOrg authoring is not required by this package.
+- Definition query results include an opaque `revision` computed by the provider
+  from the canonical normalized definition package content (for example a
+  SHA-256 digest), not a user-editable config field. Update supplies
+  `expectedRevision`; under a per-definition lock the provider re-reads and
+  compares the current digest, stages a complete package directory, and commits
+  it through the journaled old-directory-to-backup/stage-to-canonical rename
+  transaction specified below. Readers/catalog publication share that lock and
+  recovery completes before admission, so they observe the prior or complete
+  next package, never mixed `md/config` files. A mismatch returns
+  `DEFINITION_REVISION_CONFLICT` with zero mutation. Create still rejects an
+  existing canonical ID.
+
+## Target Run-Tree And Launch Contracts
+
+The two durable root families remain subject-owned. Reuse is by composition of
+approved record shapes, not inheritance into an optional-field root blob and
+not a generic persisted root union.
+
+```ts
+// Existing native Team authority. Serialized keys/file/path stay exact.
+type TeamRunExecutionTreeFileV2 = Readonly<{
+  schemaVersion: 2;
+  createdAt: string;
+  archivedAt: string | null;
+  applicationBinding: ApplicationBinding | null;
+  handoffs: readonly PersistedCollaborationHandoff[];
+  rootTeam: PersistedFlatRootTeam; // coordinator required, Agent members only
+}>;
+
+type AgentOrgRunExecutionTreeFileV1 = Readonly<{
+  schemaVersion: 1;
+  subjectKind: "agent_org";
+  createdAt: string;
+  archivedAt: string | null;
+  applicationBinding: ApplicationBinding | null;
+  handoffs: readonly PersistedCollaborationHandoff[];
+  rootOrg: Readonly<{
+    address: "/";
+    orgDefinitionId: string;
+    orgDefinitionName: string;
+    orgRunId: string;
+    defaultLaunchConfiguration: LaunchConfiguration;
+    members: readonly (PersistedConfiguredAgent | PersistedFlatConfiguredTeam)[];
+    taskExecutions: readonly PersistedTaskExecution[];
+  }>;
+}>;
+
+type RootExecutionTreeProjection =
+  | Readonly<{
+      root_subject_kind: "agent_team";
+      execution_tree: TeamRunExecutionTreeDtoV2;
+    }>
+  | Readonly<{
+      root_subject_kind: "agent_org";
+      execution_tree: AgentOrgRunExecutionTreeDtoV1;
+    }>;
+
+type CreateAgentOrgRunCommand = Readonly<{
+  agentOrgDefinitionId: string;
+  rootConfiguration: LaunchConfiguration;
+  teamOverrides: readonly PlacementLaunchOverride[];
+  agentOverrides: readonly PlacementLaunchOverride[];
+  applicationBinding?: ApplicationBinding | null;
+}>;
+```
+
+- `TeamRunExecutionTreeFileV2` stays at
+  `$MEMORY_ROOT/agent_teams/<rootTeamRunId>/team_run_execution_tree.json`. Its
+  exact top-level/root keys and `schemaVersion: 2` stay unchanged. The only
+  current-contract narrowing is that `rootTeam.members` accepts configured
+  Agent records only, and `coordinatorAddress` must resolve to one of them.
+- `AgentOrgRunExecutionTreeFileV1` is written only at
+  `$MEMORY_ROOT/agent_orgs/<orgRunId>/agent_org_run_execution_tree.json`. Its
+  strict validator requires the exact RER-016 keys, `subjectKind: "agent_org"`,
+  coordinator-free `rootOrg`, fixed configured depth, and exact root ID/path
+  correlation.
+- `PersistedConfiguredAgent`, `PersistedFlatConfiguredTeam`, handoff,
+  application-binding, timestamp, launch configuration, task Agent, task Team,
+  and task-Team-member records are extracted from the current V2 code into
+  persistence-owned shared record modules without changing their serialized
+  keys. Team and Org schemas compose those modules independently.
+- `AgentTeamRunService` and `AgentTeamRunManager` remain the authoritative public
+  Team creation/restore/active registry. `RootTeamRun` remains the standalone
+  Team aggregate, contracted to direct configured Agents. Team-only consumers
+  may keep current identifiers and wire shapes.
+- `AgentOrgRunService` and `AgentOrgRunManager` are new subject boundaries.
+  `AgentOrgRun` owns direct Agent executions and direct flat `TeamRun` handles,
+  the Org address/handoff/task/lifecycle scope, an Org execution index, Org V1
+  persistence correlation, and Org events. It has no coordinator method.
+- Lower-level Agent runtime factories, `TeamRun` execution mechanics, task
+  delegation primitives, event types, fail-stop commit helpers, launch fields,
+  and address parsing are reused where their meaning is identical. A single
+  public generic root manager/aggregate is not introduced because it would
+  erase the approved durable/lifecycle ownership split.
+- `CollaborationLaunchConfigurationResolver` loads a fixed-depth immutable
+  definition graph, validates unique exact override addresses, applies
+  `Org root -> Team placement -> exact Agent placement` specificity (or Team
+  root -> exact Agent for standalone Team), and produces complete settings for
+  every mounted execution before any run ID, workspace, runtime, or tree write.
+- AgentOrg launch returns `{agentOrgRunId}` only and activates the complete
+  mounted scope. It persists no recipient or focus. Web/session focus is
+  nullable; explicit Agent selection maps to that AgentRun and explicit direct
+  Team selection maps through the Org snapshot/index to its coordinator AgentRun.
+  Recipient-requiring actions fail before send when focus is absent/stale.
+- Standalone Team launch and Team-only UI preserve coordinator-led initial
+  focus. That is subject-specific preserved behavior, not a fallback applied to
+  AgentOrg.
+- Generic history/stream/workspace APIs select a family from an authoritative
+  subject-tagged catalog/location, call that family's strict reader, and return
+  the matching projection branch. Requested branch, package family, payload,
+  and root identity must agree; mismatch fails closed.
 
 ## Relevant Behavior And Production-Path Map (Mandatory)
 
-| Behavior ID | Kind | Approved Requirement / Intent And Acceptance-Criteria IDs | Approved Trigger Or Governing Contract | Relevant Existing Behavior And Evidence Reference | Approved Change Or Preserved Outcome | Target Production Path / Lifecycle And Spine ID(s) |
+| Behavior ID | Kind | Approved Requirement / Acceptance IDs | Trigger / Governing Contract | Existing Path | Approved Outcome | Target Production Path / Spine(s) |
 | --- | --- | --- | --- | --- | --- | --- |
-| BEH-001 | Contract | REQ-001, REQ-002, REQ-008, REQ-018; AC-001, AC-005, AC-013 | Author/create/update/import an AgentOrg or AgentTeam definition. | Recursive `AgentTeamDefinition`, graph resolver, and package config; requirements investigation code facts. | AgentOrg alone may reference Teams; Team accepts Agents only; all boundaries fail before mutation; Org stores Team references without copying. | Org/Team UI or package import -> subject-specific GraphQL/service -> strict candidate resolver/validator -> atomic provider -> catalog (DS-001). |
-| BEH-002 | System | REQ-004, REQ-005, REQ-011; AC-002, AC-007 | Launch/restore an Org or standalone Team. | Recursive topology planner -> `TeamRunConfig` -> `AgentTeamRunManager` -> `RootTeamRun`. | One root collaboration scope uses AgentOrg-or-AgentTeam config; Org has no coordinator and requires exact entry selection; Team uses its coordinator. | Launch UI/application -> subject-specific launch service -> fixed-depth planner -> root manager -> selected Agent/Team ingress (DS-002, DS-003). |
-| BEH-003 | Contract | REQ-005-REQ-007; AC-003, AC-004 | Agent calls handoff tools inside an active root. | Recursive handoff compiler plus same-root recipient resolver. | Preserve ordered Agent-sourced handoffs and same-root failure-closed resolution; compile Team-local handoffs once at mount and Org edges at root. | Member context -> handoff rules -> collaboration root -> fixed-depth address resolver -> exact Agent or Team coordinator (DS-004). |
-| BEH-004 | Contract | REQ-003, REQ-004; AC-002, AC-003 | Caller targets a Team or chooses Org entry. | Every root/child Team has coordinator; root `/` is not recipient. | Actual Teams retain direct coordinator ingress; AgentOrg omits coordinator and never guesses an entry. | Entry/recipient address -> collaboration resolver -> Team coordinator or exact Agent -> active AgentRun (DS-003, DS-004). |
-| BEH-005 | System | REQ-012, REQ-014, REQ-016; AC-008, AC-009, AC-011 | Persist, restore, stream, inspect, archive, or stop a run. | V2 strict root Team plus recursive configured members across persistence/history/web. | V3 strict root union with fixed configured depth; task/content/history/memory identity preserved; transport and UI show subject truth. | Root mutation -> V3 store -> generic stream/history projection -> web workspace; restore reverses through V3-only reader (DS-006, DS-008). |
-| BEH-006 | User | REQ-001, REQ-002, REQ-004, REQ-011, REQ-016, REQ-018; AC-002, AC-007, AC-011, AC-013 | Open authoring, catalog, detail, launch, history, or workspace. | One Agent Teams catalog/form supports nested Teams and nested hierarchy labels. | Separate Org and Team catalogs/forms, exact Org entry chooser, reusable Team library, and fixed-depth runtime/history presentation. | Web routes/stores -> distinct GraphQL contracts -> shared collaboration execution view (DS-001-DS-003, DS-006). |
-| BEH-007 | Operational | REQ-009, REQ-010, REQ-012, REQ-013; AC-004, AC-006, AC-008 | Upgrade the approved definition/run population. | 23 roots and 41 V2 trees; no deep configured topology. | Flat roots stay Teams; one-level roots become Orgs; unexpected depth stops globally before writes; no recursive flattening. | Startup maintenance gate -> exhaustive classifier -> backup/stage/promote -> V3 validation -> rebuild projections -> release gate (DS-007). |
-| BEH-008 | Contract | REQ-014; AC-009 | Native write/read/restore of durable root state. | Exact V2 `rootTeam` schema and generic child/task records. | One `RunExecutionTreeFileV3` with root discriminator and conditional coordinator; configured Team members are Agent-only. | Planner/root -> V3 builder/schema/store -> V3 restore/config builder (DS-006). |
-| BEH-009 | System | REQ-015; AC-010 | Delegate a task to a mounted Agent/Team and settle/restore it. | Task Agent/Team records live under exact Team host; task Team lineage can recurse. | AgentOrg root becomes a valid host scope without becoming a Team; direct Org Team tasks start through coordinator; task lineage stays recursive and non-configured. | Agent tool -> root task service -> target/host resolver -> fresh task Agent/Team -> durable host task array -> settlement event (DS-005, DS-008). |
+| BEH-001 | Contract | REQ-001, REQ-002, REQ-008, REQ-018, REQ-020-REQ-023; AC-001, AC-005, AC-013, AC-015-AC-018 | Create/update/import AgentOrg or AgentTeam and scope-owned handoffs. | Recursive Team model/resolver, incomplete authoring, write-then-validate pressure. | Org alone references Teams; Team contains Agents only; complete candidate and ordered handoffs validate before one revisioned atomic save; Org adoption does not copy/edit Team. | Subject form/import -> subject GraphQL -> DefinitionService -> resolver/endpoint/handoff validation -> definition-package transaction -> catalog (DS-001, DS-011). |
+| BEH-002 | System | REQ-004, REQ-005, REQ-011, REQ-024; AC-002, AC-007, AC-019 | Configure, launch, or restore Org/Team. | Recursive Team planner -> Team manager -> RootTeamRun; Team UI coordinator-focused. | Org full configuration resolves and activates complete scope unfocused; standalone Team remains coordinator-led. | Config UI/application -> subject run service -> configuration resolver -> subject planner/manager -> full active scope (DS-002, DS-003, DS-012). |
+| BEH-003 | Contract | REQ-005-REQ-007, REQ-020-REQ-023; AC-003, AC-015-AC-018 | Author/inspect handoffs or Agent calls collaboration tools. | Recursive compiler plus Team-root recipient resolver. | Preserve ordered Agent-sourced routes; Team-local edges rebase once; Org edges remain Org-owned; exact same-root Agent/Team-coordinator resolution fails closed. | Definition candidate path (DS-011); member context -> subject root resolver -> AgentRun/coordinator (DS-004, DS-009). |
+| BEH-004 | User / contract | REQ-003, REQ-004, REQ-024; AC-002, AC-003, AC-019 | Launch Org, select workspace member, or address Team. | Required/repaired Team focus. | No Org coordinator/initial focus/fallback; explicit Agent focus is exact; Team focus uses its exact coordinator; no-focus blocks only recipient-required action. | Org launch -> focus=null; sidebar selection -> family-specific execution view/index -> send guard -> transport (DS-003, DS-004, DS-013). |
+| BEH-005 | System | REQ-012, REQ-014, REQ-016, REQ-025; AC-008, AC-009, AC-011, AC-020 | Persist/restore/stream/history/archive/stop a run. | Strict Team V2 everywhere, including organization-like Team roots. | Flat Team remains native V2; Org uses separate V1; mixed projections discriminate root kind; content/task/history identity preserved. | Subject aggregate -> subject store -> subject-tagged catalog -> mixed projector/stream/workspace; restore selects strict store by family (DS-006T, DS-006O, DS-008). |
+| BEH-006 | User | REQ-001, REQ-002, REQ-004, REQ-011, REQ-016, REQ-018-REQ-025; AC-002, AC-007, AC-011, AC-013-AC-020 | Open catalog/authoring/detail/config/launch/history/workspace. | One Team catalog/form advertises nesting; shared runtime assumes Team root/non-null focus. | Implement RV-012 separate Team/Org authoring/config and truthful mixed workspace/history, including responsive/accessibility expectations. | Web subject stores/components -> subject GraphQL -> mixed read-only execution projection (DS-001-DS-003, DS-008, DS-011-DS-013). |
+| BEH-007 | Operational | REQ-009, REQ-010, REQ-012, REQ-013; AC-004, AC-006, AC-008 | Upgrade approved definition/run population. | 23 roots/41 V2 trees; no deep configured topology. | Agent-only roots/files are no-op; one-level roots convert to Org definition/V1 package; unexpected depth stops before writes. | Startup migration gate -> exhaustive plan -> backup/stage/promote Org cohort -> strict rescan -> derived rebuild -> readiness (DS-007, DS-010). |
+| BEH-008 | Contract | REQ-014, REQ-025; AC-009, AC-020 | Native durable write/read and mixed projection. | Exact Team V2 only. | Exact Team V2 preserved; exact Org V1 added; child/task records reused; family/payload/projection mismatch fails. | Team planner/root -> Team V2 store (DS-006T); Org planner/root -> Org V1 store (DS-006O); generic facade -> tagged union (DS-008). |
+| BEH-009 | System | REQ-015; AC-010 | Delegate/settle/restore task execution. | Task records attach recursively to exact Team host. | Org root becomes a valid host; direct Org Team remains configured placement; fresh task Team remains task lineage at exact delegator host. | Agent tool -> subject root task boundary -> target/host resolver -> task factory -> host task array -> settlement event (DS-005, DS-008). |
 
 ## Relevant Supplemental Task Artifacts
 
 | Artifact Path | Purpose | Related Requirement / Acceptance-Criteria IDs | Relationship To This Design | Status / Approval Applicability |
 | --- | --- | --- | --- | --- |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Normative configured structure, V3 logical schema, task ownership, and V2 mapping. | REQ-001-REQ-018; AC-001-AC-013 | Governs the root union, fixed-depth invariants, reuse rules, and migration projection. | Approved in `RER-009`; authoritative. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Normative configured structure, exact Team V2 / AgentOrg V1 durable families, task ownership, handoff authoring, launch/configuration/focus, and mixed projections. | REQ-001-REQ-025; AC-001-AC-020 | Governs fixed-depth invariants, two-family reuse, precedence, no-focus activation, transition, and failure-closed projection. | Approved through `RER-016`; authoritative. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md` | Requirements-owned evidence and current production-path inventory. | BEH-001-BEH-009; PRE-001-PRE-005 | Supplies the approved behavior evidence; architecture evidence above extends rather than rewrites it. | Current evidence; not behavior authority by itself. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md` | Cumulative approval/navigation history. | RER-001-RER-009 | Establishes that the minimal-delta V3 and progressive Team reuse are approved. | Approved/cumulative. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md` | Cumulative approval/navigation history. | RER-001-RER-016 | Establishes progressive Team reuse, Product UI, configuration-first launch, and the final Team-V2/Org-V1 correction. | Approved/cumulative. |
+| `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md` | Normative Product interaction, visual, responsive, and accessibility contract. | REQ-019-REQ-024; AC-014-AC-019; SCN-007-SCN-009 | Governs production UI structure and state meaning; mocked persistence/runtime are explicitly non-authoritative. | Approved `RV-012`; authoritative. |
+| `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/visual-references/visual-reference-manifest.json` and sibling `VIS-001`-`VIS-020` images | Normative final visual references, routes, viewports, state descriptions, hashes, and fixture boundary. | REQ-019; AC-014 | Every visible non-fixture detail informs the file/component/state mapping and browser acceptance checks. | Approved after user review; authoritative. |
+| `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/user-decision-record.md` | Explicit Product approval record. | RER-014; REQ-019; AC-014 | Closes the prior Product gate and authorizes architecture review re-entry. | Approved 2026-08-31. |
 | `/home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/requirements_engineer_6568eac682114f2cb3ddb8f1d91d3c34/context_files/ctx_4cc02361f417__image.png` | Representative current hierarchy screenshot. | REQ-016; AC-011 | Current-state evidence only; it does not prescribe target layout/styling. | Evidence only; no separate approval. |
 | `origin/codex/flat-agent-team-domain-simplification@c3a318812` (local `ca6d24dfa`) | Prior concept evidence. | BEH-001, BEH-004, BEH-009 | Its supported decisions are already incorporated upstream; it is not a competing design. | Superseded by approved package. |
+
+## Approved Product UI To Production Mapping
+
+| Normative References | Product Surface / State | Production State Owner | Production API / Domain Owner | Required Implementation Boundary And Validation |
+| --- | --- | --- | --- | --- |
+| VIS-001-VIS-008 | Baseline Team catalog, Agent-only builder/detail, coordinator, Team-local From/To/When, narrow builder | `agentTeamDefinitionStore` complete Team draft; Team subject components | AgentTeamDefinition GraphQL/Service + Team endpoint catalog + revisioned provider commit | Remove Team library/nesting; preserve baseline shell/cards; direct Agent endpoints only; one coordinator; inline reversible handoff editor; keyboard/click fallback. |
+| VIS-009-VIS-013 | Org catalog, in-flow Agent/Team member authoring, clean detail, Org handoff detail, narrow authoring | `agentOrgDefinitionStore` complete Org draft; Org subject components | AgentOrgDefinition GraphQL/Service + Org endpoint catalog + revisioned provider commit | No Category/coordinator/overlay; referenced Team identity is query-only; Org From includes mounted Agents, To also direct Teams; exact addresses/coordinator metadata inspectable. |
+| VIS-019 | Org handoff CRUD/reorder/atomic-save state | Org definition draft plus shared handoff view/editor primitives | Complete-candidate validation and one Org definition CAS | No per-handoff write. Preserve failed draft; stale endpoints remain visible; typed errors map adjacent to handoff/field; success updates canonical revision. |
+| VIS-014, VIS-015, VIS-020 | One Org configuration, collapsed member overrides, Team/Agent specificity, workspace-required blocked state, narrow configuration | `agentOrgRunConfigStore` sparse intent; shared configuration components | CollaborationLaunchConfigurationResolver + AgentOrgRunService | UI preview uses same pure merge vocabulary; server recomputes; no recipient selector; no overlay/overflow; every mounted execution validates before create. |
+| VIS-016-VIS-018 | Full scope active unfocused; exact direct-Agent focus; direct-Team coordinator focus | Mixed `RootExecutionViewStore` plus `CollaborationFocusController` | Discriminated Team-V2/Org-V1 stream snapshot plus family-specific execution index; message boundary validates target AgentRun in root | Org focus starts `null`; prompt only; Team row maps to stored coordinator; no implicit fallback; standalone Team remains coordinator-first. |
+| VIS-016-VIS-018 and UI spec shared runtime/history | Org root, direct sibling Agents/Teams, Team children, task lineage/rails/selection | Mixed execution-tree projection and history navigation state | Subject-tagged history/stream facade over strict Team V2 and Org V1 projectors | Configured depth is fixed; task lineage remains recursive under host; ancestor rails/L-branches/depth/selected marker are normative; root subject labels are truthful. |
+
+Implementation must use the accepted AutoByteus shell and visual vocabulary.
+Prototype fixture names, messages, IDs, timestamps, paths, and record values are
+illustrative; layout, hierarchy, labels, controls, validation/focus states,
+responsive behavior, and interaction meanings are normative. Production code
+must not import prototype local persistence, simulated streams, or mocked
+orchestration.
 
 ## Task Design Health Assessment (Mandatory)
 
 - Change posture: `Larger Requirement` and `Refactor`
 - Current design issue found: `Yes`
-- Root cause classification: `Boundary Or Ownership Issue` with
-  `Duplicated Policy Or Coordination`, `Shared Structure Looseness`, and
-  `Legacy Or Compatibility Pressure` consequences.
+- Root cause classification: `Boundary Or Ownership Issue`, with
+  `Duplicated Policy Or Coordination` and `Shared Structure Looseness` in the
+  recursive configured hierarchy.
 - Refactor needed now: `Yes`
-- Evidence: The main definition subject owns both Team and Org semantics;
-  callers depend on recursive graph internals; normal root runtime, persistence,
-  history, and transports require Team semantics even for organization roots;
-  UI and APIs advertise nested Team composition. Retaining those paths beside
-  AgentOrg would create two overlapping hierarchy models and violate REQ-001,
-  REQ-002, and REQ-008.
-- Design response: Split AgentOrg and AgentTeam definition owners, extract a
-  semantically tight collaboration topology/handoff owner, generalize only the
-  root execution aggregate and V3 schema, keep Team execution explicit, remove
-  configured recursion, and isolate V2 knowledge in one migration boundary.
-- Refactor rationale: Addition-only AgentOrg would leave recursive Team APIs,
-  validators, and runtime behavior as a second supported model. A clean-cut
-  structural refactor is required for the approved exclusive boundary.
-- Intentional deferrals and residual risk: Dynamic membership, distributed
-  cross-run routing, shared Agent instances, arbitrary departments, and new task
-  settlement semantics remain out of scope. The historic encoded
-  `team-local-*` definition IDs for migrated Org-owned sources remain opaque
-  stable identities because REQ-012/REQ-014 require identity preservation; new
-  target code must not interpret that string prefix as permission for Team-in-
-  Team ownership. This is a naming residue in an external identity namespace,
-  not a legacy runtime behavior path.
+- Evidence: one Team definition/runtime subject owns ordinary Team and
+  organization behavior; recursive graph/planner/transport/UI contracts legalize
+  Team-in-Team; organization roots require a fake Team coordinator. Adding Org
+  alongside those paths would leave two configured multi-Team models.
+- Design response: separate AgentOrg and AgentTeam definition/run/persistence
+  owners; keep native Team V2 and Team runtime intact where they are already
+  truthful; add Org V1 and Org runtime; extract only semantically tight shared
+  Agent/Team/handoff/launch/task records and low-level execution mechanisms;
+  replace configured recursion with fixed-depth validation and projection.
+- Refactor rationale: the durable correction specifically reduces the prior
+  refactor: there is no justification to rename or replace the valid Team V2
+  family. Refactor remains required at definition recursion, organization
+  runtime ownership, mixed projection, and frontend boundaries.
+- Intentional deferrals/residual risk: dynamic membership, distributed cross-run
+  routing, shared Agent instances, new application-owned Org resources, and new
+  task settlement semantics remain out of scope. Historical opaque
+  `team-local-*` definition IDs may remain as identity strings; current code
+  must never parse that prefix as configured nesting permission.
 
 ## Terminology
 
-- **Root collaboration run**: one active/persisted root execution whose subject
-  is either AgentOrg or standalone AgentTeam. It owns the address, handoff,
-  task, event, lifecycle, and persistence aggregate.
-- **Configured scope**: the AgentOrg root, standalone AgentTeam root, or direct
-  AgentTeam placement that directly owns configured Agent executions. Only an
-  AgentOrg configured scope may own configured Team placements.
-- **Org-owned definition source**: a Team or Agent source physically packaged
-  below an AgentOrg for the migrated/current package cohort. It is still a
-  distinct reusable definition identity, not a nested Team member.
-- **Host scope**: the exact Org root, Team, or task Team whose `taskExecutions`
-  array owns a fresh task execution.
+- **Standalone Team run:** native `RootTeamRun`/TeamRun aggregate persisted as
+  exact `TeamRunExecutionTreeFileV2` under `agent_teams`.
+- **AgentOrg run:** coordinator-free Org aggregate persisted as strict
+  `AgentOrgRunExecutionTreeFileV1` under `agent_orgs`; it owns direct Agent and
+  flat Team placements in one collaboration scope.
+- **Root execution projection:** non-authoritative mixed transport/history DTO
+  tagged with `root_subject_kind`, containing either Team V2 or Org V1 view.
+- **Configured scope:** standalone Team root, Org root, or direct Team placement
+  that owns configured Agent executions. Only Org may own configured Teams.
+- **Org-owned definition source:** a Team/Agent package physically owned under an
+  Org source boundary for the migrated cohort. It remains a distinct reusable
+  definition identity, not a Team nested in another Team.
+- **Host scope:** exact Org root, Team, or task Team whose `taskExecutions` array
+  owns a fresh task execution.
+- **Activation:** create/restore complete configured scope; does not select a
+  communication recipient.
+- **Communication focus:** nullable client/session selection of an exact AgentRun
+  (or Team row resolved to its coordinator); never persisted in either family.
+- **Definition revision:** opaque provider-issued hash/token used only for one
+  complete parent-definition compare-and-swap transaction.
+
+## Design Reading Order
+
+1. Read `Intended Change`, `Target Definition And Source Contracts`, and
+   `Target Run-Tree And Launch Contracts` for the solution boundary.
+2. Read the behavior map, Product mapping, and supported-scenario table for the
+   approved behavior witnesses.
+3. Read DS-001-DS-013 and ownership/dependency sections for implementation
+   control flow and encapsulation.
+4. Read the persisted-data decision/migration plan before changing any Team V2
+   schema, history, or memory code; flat Team is deliberately a no-op cohort.
+5. Use the final file mapping, removal plan, sequence, risks, and implementation
+   guidance as the implementation/review checklist.
 
 ## Legacy Removal Policy (Mandatory)
 
-- Policy: `No backward compatibility; remove legacy code paths.`
-- Required action: Delete recursive configured-Team definition resolution,
-  validation, launch planning, public inputs, WebSocket/GraphQL fields, UI
-  selectors, and normal V2 readers in this change. Remove V2 files only after
-  each target V3 package validates.
-- Clean-cut boundary: Normal definition/runtime/history code accepts only the
-  target AgentOrg/AgentTeam and V3 contracts. Historical V2 types/decoders live
-  only under the named migration folder and are never imported by current
-  business services or stores.
-- No dual API/stream: Do not retain old recursive GraphQL inputs, `root_team`
-  stream payloads, or client fallbacks beside the target contracts.
+- Policy: clean-cut removal of recursive configured-Team behavior; no runtime
+  compatibility branch for unsupported configured depth.
+- Preserve (not compatibility): exact Team V2 normal store/path/schema and
+  Team-only APIs/DTOs that remain semantically valid for flat Teams, as required
+  by REQ-014/REQ-025.
+- Remove from normal code: Team-member input beneath Team, recursive configured
+  definition resolution/planning, recursive Team selectors, Org-as-Team
+  coordinator semantics, Org entry selector/fallback focus, and mixed readers
+  that infer root kind.
+- Historical boundary: the old organization-like Team V2 decoder/transformer and
+  recursive old definition parser exist only inside the named migration module.
+  Flat Team V2 is not historical and continues through the native store.
+- No dual authority: migrated organization-like roots cannot remain advertised
+  under both `agent_teams` and `agent_orgs`; current services never auto-retype,
+  auto-move, or try both validators.
 
 ## Persisted Data / State Transition Decision (Mandatory When Persisted Data May Be Affected)
 
-- Stored subject, location, representative shape, and approximate volume:
-  definitions below configured `agent-teams/**` package roots; 23 inspected root
-  definitions, three organization-like. Runtime packages below
-  `/home/autobyteus/data/memory/agent_teams/<rootTeamRunId>/`; 41 readable V2
-  execution trees, 14 organization-like, plus task/communication/memory/history
-  content. Representative V2 evidence is listed above.
-- Relevant code-model, serialization, semantic, or physical-store change:
-  definition roots split into `agent-orgs` and flat `agent-teams`; Team configs
-  become Agent-only; execution tree changes from V2 `rootTeam` to V3 `root`
-  union; root fields become generic; Org root drops coordinator; native root-run
-  packages move to `memory/collaboration_runs`; generic history/index and tree
-  filenames replace Team-only names.
-- Normal reader/writer behavior and representative evidence: Current definition
-  readers recursively discover Team-local Teams; current execution-tree reader
-  validates exact V2 keys and cannot represent coordinator-free AgentOrg. Direct
-  use would either reject AgentOrg or preserve false Team/coordinator semantics.
-- Required semantics and invariants under direct use: preserve definition/run
-  identities, mounted addresses, Team coordinators, launch configuration,
-  handoffs, content, tasks, task hosts, Agent memory reachability, timestamps,
-  application binding, and history; classify only the two approved cohorts; no
-  configured Team below a Team; no Org coordinator.
-- Physical-store, privacy/security, disposal/rebuild, and operational
-  constraints: Durable content cannot be discarded. Derived catalogs/indexes
-  may be rebuilt. Cutover runs before definition/run services admit work, with
-  one process and no concurrent old/new application access. Package source
-  roots must be writable or updated by their owning deployment step before the
-  gate can pass.
-- Decision: `Migration Required`
-- Decision rationale, including concrete benefit versus I/O, downtime,
-  corruption, recovery, and rollout cost: An unchanged V2 file cannot encode an
-  Org root without a false coordinator and the normal exact reader will reject
-  a V3 projection. Definition location/subject also changes. The approved
-  population is small, the transform is deterministic, and directory renames
-  plus atomic JSON commits avoid bulk content rewriting. The concrete benefit
-  is a single truthful current schema and removal of all dual-shape business
-  logic. A short maintenance/startup gate, backups, and restart-safe promotion
-  are proportionate to the identity/history risk.
-- Acceptance criteria or design constraints supported by this decision:
-  AC-004, AC-006, AC-008-AC-010; QR-002-QR-005; PRE-001-PRE-005.
+- Stored subjects/locations/volume: 23 inspected definition roots (3
+  organization-like) and 41 readable Team V2 runtime packages (27 Agent-only,
+  14 organization-like) under
+  `$MEMORY_ROOT/agent_teams/<rootTeamRunId>/`, including task, communication,
+  memory, and history content.
+- Code/serialization/physical change: Team definition membership narrows to
+  Agents. Flat Team runtime JSON/path stays exact V2. One-level organization-like
+  definitions become AgentOrg definitions; their runtime packages move to
+  `$MEMORY_ROOT/agent_orgs/<sameRootRunId>/` and receive strict Org V1 tree JSON.
+  Mixed derived projections gain `root_subject_kind`. Focus is not persisted.
+- Normal reader/writer evidence: the Team V2 reader is strict and directly usable
+  for Agent-only roots. It cannot represent coordinator-free `rootOrg`; an
+  organization-like root cannot remain a valid flat Team. An Org V1 reader must
+  be separate and strict.
+- Required preserved semantics: definition/run IDs, addresses, direct Team
+  coordinators, launch configuration, ordered handoffs, application binding,
+  timestamps, tasks and exact task hosts, memory/messages/content/history, and
+  standalone Team history. The migrated legacy root coordinator becomes an
+  ordinary direct Org Agent and never an initial focus/default recipient.
+- Physical/operational constraints: durable package content cannot be discarded.
+  Derived indexes/caches can be rebuilt. The migration executes under exclusive
+  startup/maintenance admission before definition/run/history/stream services.
+  The memory root must be one filesystem so directory renames across its two
+  family parents are atomic; preflight fails otherwise. External definition
+  package roots must be writable or converted by their owning deployment step.
+- Decision by cohort:
+  - Agent-only definition roots: `Directly Usable — No Migration` for their
+    Team V2 execution package; definition config may receive only the normal
+    flat-validator/catalog cutover, with no execution file/path write.
+  - One-level organization-like roots: `Migration Required` to change definition
+    subject and runtime root/file/package family.
+  - Derived mixed catalogs/indexes: `Discard or Rebuild` from the two strict
+    subject catalogs after canonical package commits.
+- Rationale: rewriting flat Team packages would add I/O/corruption risk with no
+  semantic benefit and violate the approved contract. Organization-like roots
+  need transformation because exact Team V2 root/coordinator semantics are
+  false for AgentOrg. The approved small, fixed-depth cohort and same-filesystem
+  package rename make an isolated restart-safe transition proportionate.
+- Supported criteria: AC-004, AC-006, AC-008-AC-010, AC-020; QR-002-QR-005;
+  PRE-001-PRE-005.
 
 ### Migration Plan
 
-- Current canonical schema / version: AgentTeam package roots with recursive
-  `team-config.json`; `TeamRunExecutionTreeFileV2` in
-  `memory/agent_teams/<rootTeamRunId>/team_run_execution_tree.json`; Team history
-  index V2.
-- Older persisted schema version(s) that require transformation: exact V2 only
-  for this migration. Earlier TeamRun migrations remain prerequisites and must
-  have succeeded first.
-- Why direct use and discard/rebuild are insufficient: V2 requires a root Team
-  coordinator and wrong root keys/semantics; definitions must change subject and
-  reject Team members. Durable content/history may not be discarded.
-- Migration trigger: `Startup maintenance gate`, also callable through the
-  existing app-data migration administration surface for retry while runtime
-  admission remains closed.
-- Migration owner and file / subsystem location:
-  `autobyteus-server-ts/src/app-data-migrations/migrations/agent-org-flat-team-v3/agent-org-flat-team-v3-app-data-migration.ts`
-  with plan, definition transformer, V2 decoder/transformer, promoter, and
-  validator files confined to that folder.
-- Normal business/runtime path that remains current-schema-only: AgentOrg/Team
-  providers, collaboration planner/manager, `RunExecutionTreeStore`, history,
-  GraphQL, stream projector, and web client accept only target definitions/V3.
-- Historical-shape types or decoders confined to migration-owned code: exact V2
-  tree type/schema plus old recursive Team config parser. They may not be
-  imported from `agent-org-definition`, `agent-team-definition`,
-  `agent-collaboration-execution`, run-history current stores, or transport.
-- Completion marker / version ledger: existing app-data migration repository
-  record with ID `20260831_agent_org_flat_team_v3`; a durable per-item promotion
-  journal and backup manifest under
-  `<appData>/migration-backups/20260831_agent_org_flat_team_v3/<attempt>/`.
-- Restart-safety or idempotency strategy: A preflight produces a complete plan
-  before writes. Every item is then classified as exact source, exact target,
-  staged, promoted, or conflicting. Target-valid/source-absent is skipped;
-  source-valid/target-absent is transformed; source and target collision or an
-  invalid target fails closed. For run packages, the old V2 file is the
-  promotion marker and is removed/moved to backup only after the new V3 file and
-  unchanged task/communication package validate together. Directory promotion
-  uses same-filesystem atomic rename and fsync.
-- Validation before current runtime proceeds: validate every definition graph
-  against fixed depth, every V3 tree against strict schema and identity/address/
-  coordinator/task-host invariants, package cross-file root ID correlation,
-  source/target counts, and exact classification coverage. Any deep configured
-  topology discovered during preflight returns a `PRE-002` violation before any
-  backup/promotion write.
-- Backup / rollback / quarantine / operator-recovery strategy: Copy definition
-  source files and V2 tree/index authorities into the attempt backup before
-  promotion; never duplicate large Agent trace/content trees. Atomic directory
-  renames preserve those subtrees. On pre-promotion failure, no source changes.
-  On interrupted promotion, runtime remains gated and retry completes from the
-  journal. Operator rollback is offline restoration of the complete attempt
-  backup plus directory rename reversal; there is no runtime fallback reader.
-- Concurrent old/new application access risk and cutover / maintenance /
-  deployment-sequencing decision: Migration is registered after existing V2
-  prerequisites and before server definition catalogs, root managers, memory
-  sync, or GraphQL/WebSocket admission. A single-process lock rejects a second
-  migrator. Old application binaries must be stopped for the cutover.
-- Historical migration retention decision: Retain the migration and its V2
-  decoder as isolated historical migration code while supported installations
-  may still hold V2. Remove only under a separately approved minimum-version and
-  backup-retention policy; never promote it to a normal reader.
+- Native current families after cutover:
+  - Team: `TeamRunExecutionTreeFileV2` at
+    `agent_teams/<rootTeamRunId>/team_run_execution_tree.json`.
+  - Org: `AgentOrgRunExecutionTreeFileV1` at
+    `agent_orgs/<orgRunId>/agent_org_run_execution_tree.json`.
+- Historical input requiring transformation: only a strict Team V2 root whose
+  configured `rootTeam.members` contains at least one direct configured Team and
+  whose configured topology satisfies the approved one-level precondition.
+- Trigger/owner: existing `AppDataMigrationRunner` startup maintenance gate,
+  with an offline retry/status entry; migration ID
+  `20260901_agent_org_flat_team_families_v1`.
+- Proposed location:
+  `autobyteus-server-ts/src/app-data-migrations/migrations/agent-org-flat-team-families-v1/`
+  containing plan, old-definition classifier, Org definition transformer,
+  Team-V2-to-Org-V1 transformer, runtime package promoter, journal/recovery, and
+  verification files.
+- Normal paths: Team definition/run services keep using the native Team V2
+  store. Org services use only Org V1. Only the migration may admit
+  organization-like Team V2 or recursive old definitions.
+- Flat Team no-op proof: preflight validates exact V2, Agent-only configured
+  membership, direct coordinator, package/root ID correlation, and absence of a
+  conflicting Org target. It records classification in the plan/summary but
+  performs no mkdir, rename, file rewrite, timestamp update, index mutation, or
+  backup for that package.
+- Org conversion mapping: preserve the root run-ID value as `orgRunId`; map root
+  definition ID/name to Org fields; omit root coordinator field while retaining
+  that coordinator record as an ordinary direct Org Agent; preserve root
+  default launch config, all direct Agent records, direct Team records and
+  coordinators, handoffs, task arrays/hosts, binding/timestamps, and all
+  non-tree package content. Write exactly `subjectKind: "agent_org"` and the
+  approved `rootOrg` keys.
+- Completion/backup: durable attempt journal and manifests below
+  `<appData>/migration-backups/20260901_agent_org_flat_team_families_v1/<attempt>/`.
+  Back up/hash small definition/tree/index authorities; the runtime directory is
+  moved, not bulk-copied. The original Team tree stays in the protected attempt
+  backup, outside both active family paths, until retention policy allows
+  cleanup.
+- Atomic canonical-family transaction for one Org-like runtime package:
+  1. with global migration lock and runtime closed, fsync plan/journal;
+  2. atomically rename
+     `agent_teams/<id>` to `agent_orgs/.migration-staging/<attempt>/<id>`;
+     source family is no longer discoverable before target exists;
+  3. retain the original Team tree in the protected backup, write Org V1 through
+     the normal Org store into staging, fsync, remove the old tree from staging,
+     and validate the complete staged package;
+  4. atomically rename staged directory to `agent_orgs/<id>`, fsync both parent
+     directories, and journal `PROMOTED`;
+  5. rebuild subject indexes only after all planned packages/definitions pass.
+  At no time are source and target active canonical paths both present. A crash
+  may temporarily leave the package only under the non-discoverable staging
+  path; startup remains gated and recovery continues or restores it.
+- Definition package transaction: stage a complete target Org package, validate
+  all IDs/refs/handoffs/source indexes, then use the same journaled
+  old-directory-to-backup and stage-to-canonical rename discipline. A Team
+  referenced by the Org is not copied or edited. If an old organization-root
+  package owns local Agents/Teams, move their source subtree as one package while
+  preserving canonical definition IDs and ref mappings.
+- Idempotency state matrix:
+  - source present, staging/target absent: not started;
+  - staging present, source/target absent: resume validation/promotion or restore
+    source from staged+backup according to journal;
+  - target valid, source/staging absent: committed/skip;
+  - source and target both present, wrong-family payload, invalid target, ID
+    mismatch, or unjournaled staging: conflict; keep runtime closed and require
+    operator recovery. Never pick whichever is newer.
+- Preflight/validation: enumerate every definition/runtime root before any write;
+  enforce two exhaustive cohorts, zero deep configured Team edges, resolvable
+  references, Team coordinator/member correctness, unique canonical addresses,
+  writable paths, same filesystem, collision-free targets, existing migration
+  prerequisites, package/tree/root ID correlation, and complete source-index
+  coverage. Unexpected depth reports exact invariant/path and performs zero
+  writes.
+- Recovery/rollback: before per-item move, backup/readback/hash its mutable
+  authorities. Pre-move failure leaves source canonical. Staged failure restores
+  the staged directory and old tree to the Team source path. Post-promotion
+  failure does not expose the old Team path; it restores the whole committed Org
+  package back to its Team source only as an offline full-attempt rollback using
+  journaled originals. No normal reader falls back to the old family.
+- Derived history/catalog handling: retain the existing Team history/index owner
+  for native Teams; add an Org history/index owner. Rebuild both from strict
+  family packages and expose a `RootRunHistoryCatalogService` that merges tagged
+  rows. A derived row carries `root_subject_kind`, matching definition/run ID,
+  and family location. It is never topology authority and is discarded/rebuilt
+  on partial failure.
+- Retention: keep the isolated historical transformer while supported
+  installations may still contain organization-like Team V2. Remove it only
+  under a separately approved minimum-version/backup-retention policy. Native
+  Team V2 schema/store is permanent current code, not migration code.
 
-| Migration Step | Source Shape / Version | Target Shape / Version | Transformation Owner | Validation | Failure / Recovery Behavior |
+| Migration Step | Source | Target | Owner | Validation | Failure / Recovery |
 | --- | --- | --- | --- | --- | --- |
-| 1. Global preflight | All discovered old/new definition roots, V2/V3 run roots, existing migration ledger | Immutable migration plan | `agent-org-flat-team-v3-plan.ts` | Two exhaustive cohorts; no depth violation; all refs resolvable; target paths collision-free; source roots writable; previous migrations complete | Stop before writes and report exact item/path/invariant. No recursive flattening. |
-| 2. Backup/journal | Planned definition files, V2 trees, old derived index | Attempt backup + per-item journal | `agent-org-flat-team-v3-promoter.ts` | Hash/size/readback of backup and fsync | Leave sources authoritative; runtime stays gated. |
-| 3. Definitions | Agent-only Team root or one-level organization-like Team root | Flat `agent-teams/<id>` or `agent-orgs/<id>` with strict configs; Org-owned sources physically below Org | `agent-org-definition-v1-transformer.ts` | IDs/refs/handoffs/coordinator rules; all Team members Agent-only; Org has no coordinator; known package case snapshots | Atomic promote each planned source; retry from journal. Invalid/collision quarantines target and restores source name. |
-| 4. Run packages | Exact V2 root Team file under `memory/agent_teams` | Exact V3 root union under `memory/collaboration_runs/<rootRunId>/run_execution_tree.json` | `run-execution-tree-v2-to-v3-transformer.ts` and promoter | Strict V2 before; strict V3 after; root ID and child/task records preserved; Org coordinator removed only at root | Old V2 marker remains migration-owned until complete; no normal runtime admission. |
-| 5. Derived projections | `team_run_history_index.json`, old catalog/cache projections | `collaboration_run_history_index.json` and regenerated catalogs | current history/catalog rebuild services | Row count and root kind/ID/definition correlation against every V3 root | Rebuild is repeatable; discard partial derived target and retry. |
-| 6. Completion | All items promoted and package-valid | Migration ledger `SUCCEEDED` / services admitted | app-data migration runner + readiness gate | Full rescan finds only target forms and expected counts | Any failed item marks migration failed; app exposes migration recovery status but does not launch/restore/mutate runs or definitions. |
+| 1. Global preflight | Definitions, Team V2 packages, prior ledgers, possible targets | Immutable two-cohort plan | `agent-org-flat-team-family-plan.ts` | Exact cohort/depth/ref/path/filesystem/collision coverage | Stop before any source or target write and report exact item/invariant. |
+| 2. No-op Team cohort | Agent-only Team definitions and exact Team V2 packages | Same native Team definitions/V2 paths | Planner/flat validators | Coordinator direct; Agent-only; IDs/path exact; no Org collision | Record plan/result only; zero package/file/path writes. |
+| 3. Backup/journal | Org-like definition/tree/index authorities | Hash-verified attempt backup and item state | transaction journal | Readback hashes, fsync | Sources remain canonical until corresponding move begins. |
+| 4. Definitions | One-level organization-like Team root package | AgentOrg package plus unchanged Team refs/IDs | definition transformer/promoter | Strict Org/Team configs; handoffs; refs; no copied Team | Recover source or continue from journal; no partial catalog admission. |
+| 5. Runtime packages | Org-like Team V2 directory | AgentOrg V1 directory with unchanged non-tree content | runtime package promoter + Org V1 store | Strict old before; strict Org V1 after; field/host/ID preservation; no old tree in target | Source->staging->target state machine; runtime remains gated. |
+| 6. Derived projections | Team index rows and caches | Native Team index + Org index + tagged mixed rows | subject history stores/catalog facade | Counts, kind/ID/location correlation to strict packages | Discard partial indexes and rebuild. |
+| 7. Completion | All plan items | Ledger `SUCCEEDED`, services admitted | migration runner/readiness | Full rescan: flat Team unchanged; Org cohort only in Org family; no conflicts/staging | Any failure retains gate; operator status/retry available, no run mutation/admission. |
 
 ## Supported Scenario And Reachability Classification
 
 | Scenario / Premise | Classification | Witness / Governing Basis | Design Consequence |
 | --- | --- | --- | --- |
-| Author AgentOrg with direct Agents/Teams and launch through an exact mounted entry | Supported Normal Scenario | SCN-001, SCN-002; AgentOrg web/GraphQL/package surfaces -> launch service -> selected address | Provide separate AgentOrg definition/launch boundaries and no coordinator fallback. |
+| Author AgentOrg with direct Agents/Teams, configure once, and launch the full scope unfocused | Supported Normal Scenario | SCN-001, SCN-002, SCN-009; AgentOrg web/GraphQL/package surfaces -> configuration resolver -> full activation | Provide separate AgentOrg definition/launch boundaries, sparse placement overrides, nullable focus, and no coordinator/fallback. |
 | Launch/test flat Team, later reference same Team in Org | Supported Normal Scenario | SCN-006; Team catalog/launch history then Org member ref | Org stores only definition identity; no copy or mutation of Team source/history. |
+| After Org launch, user explicitly selects a direct Agent, Team, or Team Agent | Supported Normal Scenario | REQ-004, AC-002, VIS-016-VIS-018 | Web focus is nullable and exact; Team row maps to stored coordinator; no first/name fallback or durable focus field. |
+| Author/reorder/cancel/save Org-owned or Team-local From/To/When handoffs | Supported Normal Scenario | SCN-008; AC-015-AC-018; VIS-008, VIS-019 | One subject-owned definition draft validates all members/handoffs and commits atomically with revision protection. |
 | Org Agent delegates to direct mounted Team | Supported Normal Scenario | AC-010, ORG-CASE-028; `/team` resolves to coordinator | Fresh task Team is stored at exact delegator host and has no configured membership/address effect. |
 | Standalone Team Agent delegates to one of its mounted Agents | Supported Normal Scenario | REQ-015 preserved task behavior and current tool path | Task remains owned by standalone Team root. |
 | Standalone Team Agent delegates to an unrelated/unmounted Team by logical address | Technically Possible only if a new selector/global lookup were invented; unsupported/contrived | REQ-007, ORG-CASE-025, and current resolver prohibit cross-root discovery; no independent approved entry surface exists | Do not add definition-ID or global Team discovery to `delegate_task`. This premise cannot justify new API/security machinery. |
 | Historical recursive task Team has another task Team below it | Supported Explicit Edge Scenario | PRE-005 and reused task record contract | Preserve recursive task lineage and its restore/index traversal even though configured Team depth is fixed. |
 | Deep configured Team appears during migration | Supported Explicit Operational Failure | REQ-013, PRE-002, QR-003 | Fail the global preflight before writes; report invariant; do not design conversion. |
+| Preserve native flat Team V2 and add strict AgentOrg V1 over reused records | Supported Governing Contract Scenario | REQ-014, REQ-025; AORG-CONTRACT-001@RER-016 | Implement separate subject-owned stores/paths and a discriminated mixed projection; this is the approved durable boundary, not an optional architecture choice. |
+| Scan both package families and infer root kind from whichever payload parser accepts | Technically Possible but Explicitly Rejected | REQ-025, AC-020 | Select family from authoritative tagged location and fail on family/payload/projection mismatch; no guessing or auto-retyping. |
 
 ## Data-Flow Spine Inventory
 
-| Spine ID | Scope | Related Behavior ID(s) | Start | End | Governing Owner | Why It Matters |
+| Spine ID | Scope | Behavior(s) | Start | End | Governing Owner | Why It Matters |
 | --- | --- | --- | --- | --- | --- | --- |
-| DS-001 | Primary End-to-End | BEH-001, BEH-006 | Definition author/import action | Atomically persisted and cataloged AgentOrg or flat AgentTeam | Subject-specific definition service | Establishes exclusive model and pre-persistence validation. |
-| DS-002 | Primary End-to-End | BEH-002, BEH-004, BEH-006 | Standalone Team launch | Team coordinator AgentRun ready/focused | `AgentTeamRunService` behind root collaboration manager | Preserves independent Team behavior and history. |
-| DS-003 | Primary End-to-End | BEH-002, BEH-004, BEH-006 | AgentOrg launch plus entry address | Exact Agent execution, or selected Team coordinator, ready/focused | `AgentOrgRunService` plus `RootCollaborationRun` | Ensures no synthetic Org coordinator or guessed entry. |
-| DS-004 | Primary End-to-End | BEH-003, BEH-004 | Mounted Agent requests/sends a handoff | Exact same-root AgentRun accepts message or request fails closed | `RootCollaborationRun` collaboration boundary | Preserves scope isolation and Team ingress. |
-| DS-005 | Primary End-to-End | BEH-009 | Mounted Agent delegates task | Fresh task Agent/Team execution durably attached to exact host and lifecycle result returned | Root task-delegation service | Separates task lineage from configured membership. |
-| DS-006 | Primary End-to-End | BEH-005, BEH-008 | Root creation/mutation or restore request | Strict V3 package committed/restored with identities and task hosts intact | Run persistence/history subsystem | Makes the root union durable without parallel schemas. |
-| DS-007 | Primary End-to-End | BEH-007, BEH-008 | Startup migration gate | Entire approved population promoted or runtime remains closed | App-data migration subsystem | Protects existing definitions/history and enforces preconditions. |
-| DS-008 | Return-Event | BEH-005, BEH-009 | Agent/task/lifecycle event in active root | Web collaboration workspace/history state reflects sequenced event | Root event publisher and collaboration stream | Carries truthful root subject and unchanged task semantics to UI. |
-| DS-009 | Bounded Local | BEH-003 | Fixed-depth definition graph | Validated compiled handoff snapshot | Collaboration topology compiler | Rebase Team-local rules once, merge Org rules, reject duplicates/self targets. |
-| DS-010 | Bounded Local | BEH-007 | One migration plan item | Journaled staged/promoted/validated disposition | V3 migration promoter | Provides idempotency and failure-closed cutover. |
+| DS-001 | Primary End-to-End | BEH-001, BEH-006 | Definition author/import | Revisioned atomically persisted/cataloged Org or flat Team | Subject DefinitionService | Exclusive configured model and pre-write validation. |
+| DS-002 | Primary End-to-End | BEH-002, BEH-004, BEH-006 | Standalone Team launch | Native Team scope active, coordinator ready/focused | `AgentTeamRunService` / `RootTeamRun` | Preserves independent Team behavior and V2 history. |
+| DS-003 | Primary End-to-End | BEH-002, BEH-004, BEH-006 | Valid Org configuration | Complete Org scope active, focus absent | `AgentOrgRunService` / `AgentOrgRun` | Separates activation from communication target. |
+| DS-004 | Primary End-to-End | BEH-003, BEH-004 | Mounted Agent handoff/message | Exact same-root AgentRun accepts or request fails closed | Subject root collaboration boundary | Preserves isolation and Team coordinator ingress. |
+| DS-005 | Primary End-to-End | BEH-009 | Mounted Agent delegation | Fresh task execution attached to exact host and lifecycle returned | Subject root task boundary | Separates task lineage from configured topology. |
+| DS-006T | Primary End-to-End | BEH-005, BEH-008 | Team root mutation/restore | Exact Team V2 package committed/restored | Team run persistence/history owner | Proves Team JSON/path remains native. |
+| DS-006O | Primary End-to-End | BEH-005, BEH-008 | Org root mutation/restore | Exact Org V1 package committed/restored | Org run persistence/history owner | Gives Org truthful coordinator-free authority. |
+| DS-007 | Primary End-to-End | BEH-007, BEH-008 | Startup migration gate | All cohorts verified/converted or runtime closed | App-data migration subsystem | Protects identities and single canonical family. |
+| DS-008 | Return/Event | BEH-005, BEH-009 | Subject-root event/history query | Tagged mixed projection reaches web/history consumer | Subject event publisher + mixed projection facade | Mixed UI cannot infer family. |
+| DS-009 | Bounded Local | BEH-003 | Fixed-depth definition graph | Valid compiled handoff snapshot | Collaboration handoff compiler | One rebase and owner-separated routes. |
+| DS-010 | Bounded Local | BEH-007 | One Org-like migration item | Journaled staged/promoted/verified disposition | Runtime package promoter | Restart-safe family cutover. |
+| DS-011 | Primary End-to-End | BEH-001, BEH-003, BEH-006 | Definition/handoff draft save | Complete candidate committed once or unchanged with precise errors | Subject DefinitionService / package transaction | Atomic owner-separated authoring. |
+| DS-012 | Bounded Local | BEH-002, BEH-006 | Root choices + sparse overrides | Complete immutable settings for all placements | `CollaborationLaunchConfigurationResolver` | Owns fixed-depth precedence. |
+| DS-013 | Primary End-to-End | BEH-004, BEH-006 | Exact post-launch row selection/send action | Exact Agent/coordinator focus or blocked no-focus state | Web root execution view/focus owner | Focus stays exact, local, and non-durable. |
 
 ## Primary Execution Spine(s)
 
-- **DS-001 Org definition:** `AgentOrg form/package import -> AgentOrg GraphQL/import boundary -> AgentOrgDefinitionService -> fixed-depth AgentOrgDefinitionResolver + CollaborationHandoffCompiler -> FileAgentOrgDefinitionProvider atomic commit -> Org catalog projection`
-- **DS-001 Team definition:** `AgentTeam form/package import -> AgentTeam GraphQL/import boundary -> AgentTeamDefinitionService -> flat Team validator + local handoff validator -> FileAgentTeamDefinitionProvider atomic commit -> Team catalog projection`
-- **DS-002 standalone Team launch:** `Team catalog/run action -> createAgentTeamRun -> AgentTeamRunService -> CollaborationTopologyPlanner -> CollaborationRunManager/RootCollaborationRun -> TeamRun -> coordinator AgentRun`
-- **DS-003 Org launch:** `Org catalog/run action + exact entryAddress -> createAgentOrgRun -> AgentOrgRunService -> CollaborationTopologyPlanner -> CollaborationRunManager/RootCollaborationRun -> fixed-depth recipient resolver -> exact AgentRun or Team coordinator`
-- **DS-004 handoff/message:** `Mounted Agent tool -> MemberCollaborationContext -> RootCollaborationRun -> CollaborationExecutionIndex + CollaborationRecipientResolver -> owning AgentOrgRun/TeamRun -> recipient AgentRun`
-- **DS-005 task delegation:** `Mounted Agent tool -> RootCollaborationRun TaskDelegationService -> host/target resolution -> fresh task AgentRun or flat TeamRun -> V3 host task array + task records commit -> target ingress/result lifecycle`
-- **DS-006 persistence/restore:** `Root state mutation/restore request -> RunPersistenceCoordinator -> strict RunExecutionTreeStore V3 -> package validator/history catalog -> CollaborationRunConfig builder -> CollaborationRunManager`
-- **DS-007 migration:** `Server startup -> AppDataMigrationRunner -> global V2/config preflight -> backup/journal -> definition and run promoters -> strict target rescan -> derived history rebuild -> readiness gate release`
+- **DS-001 Org definition:** `AgentOrg form/import -> AgentOrg GraphQL -> AgentOrgDefinitionService -> fixed-depth resolver + endpoint/handoff validator -> FileAgentOrgDefinitionProvider definition-package transaction -> Org catalog`.
+- **DS-001 Team definition:** `AgentTeam form/import -> AgentTeam GraphQL -> AgentTeamDefinitionService -> Agent-only/coordinator/local-handoff validator -> FileAgentTeamDefinitionProvider definition-package transaction -> Team catalog`.
+- **DS-002 standalone Team launch:** `Team Run action -> createAgentTeamRun -> AgentTeamRunService -> TeamLaunchConfigurationResolver -> FlatTeamTopologyPlanner -> AgentTeamRunManager -> RootTeamRun -> coordinator AgentRun -> Team V2 store/history`.
+- **DS-003 Org launch:** `Org Run action -> Org configuration draft -> createAgentOrgRun(rootConfiguration, sparse overrides) -> AgentOrgRunService -> CollaborationLaunchConfigurationResolver -> AgentOrgTopologyPlanner -> AgentOrgRunManager/AgentOrgRun -> all direct Agent/Team executions -> Org V1 store; focus=null`.
+- **DS-004 handoff/message:** `Mounted Agent tool -> MemberCollaborationContext -> owning RootTeamRun or AgentOrgRun -> subject execution index + recipient resolver -> exact AgentRun or Team coordinator AgentRun`.
+- **DS-005 task delegation:** `Mounted Agent tool -> subject root TaskDelegationService -> exact host/target -> fresh task AgentRun or TeamRun -> subject tree host task array commit -> ingress/settlement lifecycle`.
+- **DS-006T Team persistence:** `RootTeamRun mutation/restore -> TeamRunPersistenceCoordinator -> strict TeamRunExecutionTreeStore V2 -> Team history/index -> AgentTeamRunManager`.
+- **DS-006O Org persistence:** `AgentOrgRun mutation/restore -> AgentOrgRunPersistenceCoordinator -> strict AgentOrgRunExecutionTreeStore V1 -> Org history/index -> AgentOrgRunManager`.
+- **DS-007 migration:** `Server startup -> AppDataMigrationRunner -> global cohort preflight -> no-op flat verification + journaled Org-like definition/runtime family promotion -> strict subject rescans -> derived index rebuild -> readiness release`.
+- **DS-008 mixed projection:** `Subject root event or history catalog row -> subject projector/store -> RootExecutionTreeProjection(root_subject_kind) -> mixed stream/history GraphQL -> RootExecutionViewStore -> workspace/history components`.
+- **DS-011 definition/handoff save:** `Complete reversible draft -> update mutation(expectedRevision) -> subject service candidate validation -> per-definition package transaction -> refreshed canonical revision, or typed failure with draft retained`.
+- **DS-012 configuration:** `Org definition launch defaults + root draft + exact Team/Agent patches -> fixed-depth address index -> specificity merge -> runtime/model/workspace validation -> complete plan`.
+- **DS-013 focus:** `active Org focus=null -> explicit Agent/Team sidebar row -> mixed view branch's exact index -> AgentRun or Team coordinator -> recipient guard; absent/stale focus -> no send`.
 
 ## Spine Narratives (Mandatory)
 
-| Spine ID | Short Narrative | Main Domain Subject Nodes | Governing Owner | Key Off-Spine Concerns |
+| Spine ID | Short Narrative | Main Nodes | Governing Owner | Key Off-Spine Concerns |
 | --- | --- | --- | --- | --- |
-| DS-001 | Each public boundary constructs one complete subject-specific candidate. The service resolves refs and compiles handoffs before the provider stages files; only a fully valid candidate is atomically promoted. | AgentOrgDefinition or AgentTeamDefinition; DefinitionService; Provider | The subject-specific definition service | Source discovery, Markdown/config codecs, package sync, cache invalidation. |
-| DS-002 | A standalone Team planner loads one flat Team, validates root/team/member launch settings, allocates IDs only after coverage validation, snapshots handoffs, creates the root aggregate, and focuses the coordinator. | AgentTeamDefinition; AgentTeamRootConfig; RootCollaborationRun; TeamRun; AgentRun | AgentTeamRunService | Identity allocation, workspace activation, persistence/history. |
-| DS-003 | An Org planner loads direct Agents and Team definitions by reference, validates fixed depth and launch settings, allocates the Org root/direct Team/member IDs, creates one root scope, and resolves the caller's exact entry. | AgentOrgDefinition; AgentOrgRootConfig; RootCollaborationRun; AgentOrgRun; TeamRun/AgentRun | AgentOrgRunService | Team definition lookup, entry validation, workspace activation, history. |
-| DS-004 | A member sees only compiled outgoing rules for its mounted address. Sending resolves within the immutable root snapshot; an Agent target maps directly and a Team target maps to its coordinator. | MemberCollaborationContext; RootCollaborationRun; CollaborationExecutionIndex; AgentRun | RootCollaborationRun | Address parser, LLM instruction renderer, communication persistence. |
-| DS-005 | Delegation authorizes the current Agent identity, finds the exact host scope and configured target, prepares a fresh task execution, durably commits tree plus task record, then activates ingress. Task Team descendants remain task lineage. | TaskDelegationService; HostScope; TaskExecution; Task TeamRun/AgentRun | RootCollaborationRun task boundary | Run-ID allocation, reference files, system messages, settlement/review. |
-| DS-006 | Every mutation commits one V3 root union through a strict store. Restore loads/repairs the current package, rebuilds current config and indexes, then materializes the correct root subject without consulting mutable definitions for topology. | RunExecutionTreeV3; RunStatePackage; RootCollaborationRun | Run persistence/history subsystem | Atomic writer, task/message correlation, memory layout, derived indexes. |
-| DS-007 | Startup scans the complete approved population, stops before writes on a precondition violation, then backs up and promotes definitions and run packages item-by-item with a durable journal. No current service opens until the target rescan succeeds. | MigrationPlan; MigrationItem; Promoter; ReadinessGate | App-data migration subsystem | Filesystem locks, backup manifest, derived rebuild, operator diagnostics. |
-| DS-008 | Root events are sequenced once, projected into the generic V3 collaboration stream, validated by the contracts package, and applied to one web collaboration execution view whose root discriminator controls labels/entry behavior. | Root event; Stream DTO; CollaborationExecutionView | Root event publisher / stream session | WebSocket recovery, generated types, UI selectors. |
+| DS-001 | One subject-specific candidate is resolved/validated before a crash-recoverable package commit; only fully valid state enters its catalog. | Definition; DefinitionService; Provider | Subject DefinitionService | source discovery, codecs, revision lock, cache invalidation |
+| DS-002 | Team launch validates one flat Team, allocates IDs after configuration coverage, creates native RootTeamRun, persists V2, then exposes coordinator-led interaction. | AgentTeamDefinition; Team plan; RootTeamRun; AgentRun | AgentTeamRunService | workspace prep, ID allocation, Team history |
+| DS-003 | Org launch resolves referenced Teams without mutating them, computes full settings, creates one Org scope and all direct placements, persists V1, and returns without focus. | AgentOrgDefinition; Org plan; AgentOrgRun; TeamRun/AgentRun | AgentOrgRunService | Team definition query, workspace prep, activation rollback |
+| DS-004 | The mounted Agent sees only its ordered outgoing rules; the owning subject aggregate resolves within its immutable snapshot and Team targets through exact coordinator. | Member context; RootTeamRun/AgentOrgRun; execution index; AgentRun | Subject root aggregate | address parser, instruction renderer, message persistence |
+| DS-005 | Delegation authorizes exact caller/host, prepares and durably attaches a fresh task execution, then activates ingress; recursive task descendants stay task records. | Task service; HostScope; TaskExecution | Subject root task boundary | run IDs, reference files, settlement/review |
+| DS-006T | Team mutations and restore pass only through strict V2 schema/store; flat Team snapshots never move or acquire Org fields. | Team V2 file; Team package; RootTeamRun | Team persistence coordinator | atomic writer, Team history, memory layout |
+| DS-006O | Org mutations and restore pass only through strict V1 schema/store; root has no coordinator/focus and direct Teams remain flat. | Org V1 file; Org package; AgentOrgRun | Org persistence coordinator | atomic writer, Org history, memory layout |
+| DS-007 | Startup classifies all roots before writes, performs zero writes for flat packages, transitions Org-like items through journaled non-discoverable staging, and admits services only after strict rescan. | MigrationPlan; ItemTransaction; ReadinessGate | App-data migration subsystem | filesystem lock, backups, operator diagnostics |
+| DS-008 | Each subject publisher/projector preserves its native snapshot; a thin mixed facade attaches/checks root kind and clients reduce the correct union branch. | Subject event/snapshot; tagged DTO; web view | Subject publisher + projection facade | WebSocket recovery, generated clients, selectors |
+| DS-011 | Save sends the whole draft and expected revision; current members and every ordered handoff validate under the owning subject before one package transaction. | Draft; candidate validator; definition revision | Subject DefinitionService | endpoint catalog, accessible reorder, journal recovery |
+| DS-012 | Resolver seeds root, overlays Team placement then exact Agent, validates all placements, and freezes plan before activation or IDs. | Root config; PlacementOverride; EffectivePlan | LaunchConfigurationResolver | runtime/model catalogs, workspace normalization |
+| DS-013 | Org view begins unfocused; only explicit row action maps through the selected union branch to an AgentRun/coordinator; send stays blocked otherwise. | RootExecutionView; FocusTarget; AgentRun | Web focus controller | responsive sidebar, hydration, history row semantics |
 
 ## Spine Actors / Main-Line Nodes
 
-- `AgentOrgDefinitionService` and `AgentTeamDefinitionService`: authoritative
-  mutation/query boundaries for their respective definition subjects.
-- `CollaborationTopologyPlanner`: compiles a validated immutable runtime plan
-  from either root subject without allocating IDs before validation completes.
-- `AgentOrgRunService` / `AgentTeamRunService`: subject-specific public launch
-  owners; neither exposes the other's selector semantics.
-- `CollaborationRunManager`: owns active/restored root registration and lifecycle
-  for both root kinds.
-- `RootCollaborationRun`: sole public operation boundary for one root aggregate.
-- `AgentOrgRun`: configured Org root scope; may own direct Agent and Team handles,
-  but no coordinator.
-- `TeamRun`: actual Team execution; owns direct Agent handles and Team coordinator
-  invariant, never a configured child Team.
-- `RunExecutionTreeStore`: current V3 persistence boundary.
-- `CollaborationExecutionView` (transport/web): immutable/read-model root union.
-- `AgentOrgFlatTeamV3AppDataMigration`: exclusive historical conversion owner.
+- `AgentOrgDefinitionService` / `AgentTeamDefinitionService`: authoritative
+  candidate validation, mutation, and query boundaries for their subjects.
+- `CollaborationLaunchConfigurationResolver`: authoritative fixed-depth effective
+  setting computation; no focus or runtime activation.
+- `AgentOrgTopologyPlanner` / `FlatTeamTopologyPlanner`: build immutable
+  subject-specific run plans only after complete validation.
+- `AgentOrgRunService` / `AgentTeamRunService`: explicit public launch/restore
+  owners.
+- `AgentOrgRunManager` / `AgentTeamRunManager`: separate active registries and
+  root factories; each owns one durable family.
+- `AgentOrgRun`: Org aggregate, direct Agent/Team execution handles, no
+  coordinator, Org V1 correlation.
+- `RootTeamRun`: native standalone Team aggregate, direct Agents/coordinator,
+  Team V2 correlation.
+- `TeamRun`: coordinator-led Team execution used as the standalone root body or
+  direct Org Team placement; cannot own configured Teams.
+- `TeamRunExecutionTreeStoreV2` / `AgentOrgRunExecutionTreeStoreV1`: strict
+  subject stores over shared record validators.
+- `RootExecutionProjectionService`: thin explicit-kind read/projection facade for
+  mixed history/stream/workspace; owns no lifecycle or persistence.
+- Web `RootExecutionView` / `CollaborationFocusController`: mixed read model and
+  exact nullable focus behavior.
+- `AgentOrgFlatTeamFamiliesV1AppDataMigration`: exclusive old organization-like
+  Team conversion owner.
 
 ## Ownership Map
 
 | Node | Owns | Does Not Own |
 | --- | --- | --- |
-| AgentOrgDefinitionService | Org candidate validation, direct ref resolution, Org handoff compilation inputs, atomic provider orchestration, catalog invalidation | Team mutation/copying, runtime IDs, migration decoding |
-| AgentTeamDefinitionService | Agent-only membership, direct coordinator, Team-local handoffs, atomic provider orchestration | Org membership/handoffs, child Team discovery |
-| CollaborationTopologyPlanner | Fixed-depth resolved topology, launch coverage, address placement, immutable IDs/config snapshot | Filesystem definition mutation, active lifecycle |
-| AgentOrgRunService | Org launch input and exact entry semantics | Standalone Team coordinator semantics, application-owned Org authoring, low-level member materialization |
-| AgentTeamRunService | Standalone Team launch/coordinator semantics | Org entry selection or Org membership |
-| CollaborationRunManager | Root registration, restore/create/stop, readiness, root package construction | Definition authoring and GraphQL presentation |
-| RootCollaborationRun | Aggregate authorization, task/communication/event sequencing, index, persistence correlation, lifecycle | Provider-specific Agent execution details or historical decoding |
-| AgentOrgRun | Direct configured Agent/Team activation and Org root task host | Coordinator, configured grandchild Team |
-| TeamRun | Direct Agents, direct coordinator, Team task host, task children | Configured Team membership or Org-wide source resolution |
-| CollaborationExecutionIndex | Derived immutable address/run/host lookup over validated V3 | Lifecycle mutation or fallback discovery |
-| V3 migration | V2/config classification, transformation, backup, promotion, old physical layout | Normal reads, feature behavior, deep conversion |
-| Web AgentOrg/Team authoring stores | Subject-specific form/query/mutation state | Shared live run event ownership |
-| Web collaboration run store/view | Generic V3 active/history execution state keyed by root ID and subject kind | Definition mutation rules |
+| AgentOrgDefinitionService | Direct Agent/Team refs, Org endpoint catalog/handoffs, complete candidate validation, definition transaction orchestration | Team-local edits, Team copies, runtime IDs, migration decoding |
+| AgentTeamDefinitionService | Agent-only members, direct coordinator, Team-local endpoints/handoffs, complete candidate validation | Org membership/handoffs, child Team discovery |
+| DefinitionPackageTransaction | Per-definition lock, expected revision, staged directory, journaled atomic visibility/recovery, canonical revision publication | Domain validation or cross-definition policy |
+| CollaborationLaunchConfigurationResolver | Root/Team/Agent precedence, placement validation, complete effective plan | Focus, definition mutation, runtime activation |
+| AgentOrgTopologyPlanner | Fixed Org -> direct Team -> Agent addresses/IDs/config snapshot | Filesystem writes or live lifecycle |
+| FlatTeamTopologyPlanner | One Team -> Agents addresses/IDs/config snapshot | Org members or configured child Team |
+| AgentOrgRunService / Manager | Org launch/restore/stop, active Org registry, Org V1 package correlation | Team-only registry, focus, definition mutation |
+| AgentTeamRunService / Manager | Native Team launch/restore/stop, active Team registry, Team V2 package correlation | Org registry/configuration inheritance |
+| AgentOrgRun | Org address/handoff/task/lifecycle scope, direct Agent/Team handles, Org execution index/events | Coordinator, configured Team below Team |
+| RootTeamRun | Team address/handoff/task/lifecycle scope, direct Agents, coordinator, Team execution index/events | Org semantics or configured child Team |
+| TeamRun | Direct Agents, exact coordinator, Team-local task host/task descendants | Configured Team children or Org-wide resolution |
+| Subject tree stores | Exact family schema/path/atomic file reads/writes | Trying the other validator, mixed kind inference, migration selection |
+| RootExecutionProjectionService | Dispatch by explicit `root_subject_kind`, family/payload agreement, tagged union projection | Root lifecycle, file scanning/guessing, topology authority |
+| Migration | Exhaustive cohort plan, old definition/V2 transform, staging/promotion/recovery, derived rebuild | Normal Team reads, feature behavior, deep conversion |
+| Web subject authoring stores | Separate complete drafts, revision, endpoint choices/errors | Live run event state or other-subject edits |
+| Web RootExecutionView | Tagged Team/Org snapshot, selectors/event reduction, nullable Org focus | Durable focus, definition rules, family inference |
 
 ## Thin Entry Facades / Public Wrappers
 
 | Facade / Entry Wrapper | Governing Owner Behind It | Why It Exists | Must Not Secretly Own |
 | --- | --- | --- | --- |
-| GraphQL `AgentOrgDefinitionResolver` | AgentOrgDefinitionService | Transport mapping/errors | Definition validation or filesystem writes |
-| GraphQL `AgentTeamDefinitionResolver` | AgentTeamDefinitionService | Transport mapping/errors | Org/Team policy or provider access |
-| GraphQL `AgentOrgRunResolver` | AgentOrgRunService | Typed Org launch/restore/terminate API | Entry fallback or direct manager internals |
-| GraphQL `AgentTeamRunResolver` | AgentTeamRunService | Typed Team launch/restore/terminate API | Org semantics |
-| Collaboration WebSocket handler | RootCollaborationRun and event publisher | Session/DTO framing and recovery | Task, message, or lifecycle state |
-| Agent management tools for Org/Team | Subject-specific definition services | Agent-callable transport and serialization | Alternate validation or compatibility parsing |
+| GraphQL Org definition resolver | AgentOrgDefinitionService | Transport mapping/errors | Validation/filesystem writes |
+| GraphQL Team definition resolver | AgentTeamDefinitionService | Transport mapping/errors | Org policy/provider access |
+| GraphQL Org run resolver | AgentOrgRunService | Typed config/launch/restore/terminate | Focus or manager/store internals |
+| GraphQL Team run resolver | AgentTeamRunService | Native Team launch/restore/terminate | Org semantics |
+| Mixed history/query resolver | RootExecutionProjectionService | Explicit-kind union mapping | Guessing kind or mutating subject roots |
+| Team-only stream handler | RootTeamRun publisher/projector | Preserve compatible Team stream surface | Org dispatch/lifecycle |
+| Mixed/Org stream handler | RootExecutionProjectionService + subject publisher | Frame tagged snapshot/events | Task/message/lifecycle state |
+| Agent definition tools | Subject DefinitionService | Agent-callable serialization | Alternate validation/compatibility parser |
+| Web handoff primitives | Subject draft adapter | From/To/When presentation and reversible commands | Endpoint policy/persistence/cross-owner mutation |
+| Web Org config/focus components | Org config store / RootExecutionView | Approved interactions | Server precedence, durable focus, fallback |
 
 ## Removal / Decommission Plan (Mandatory)
 
-| Item To Remove / Decommission | Why It Becomes Unnecessary | Replaced By Which Owner / File / Structure | Scope | Notes |
-| --- | --- | --- | --- | --- |
-| Recursive `TeamMember.refType: agent_team` in AgentTeam inputs/config | Team is Agent-only. | Flat AgentTeam member type/config/validator | In This Change | Unsupported extra/member kind fails with offending placement. |
-| `team-definition-graph-resolver.ts` and recursive graph validator | No configured Team recursion exists. | AgentOrg fixed-depth resolver + flat Team validator | In This Change | Do not leave a recursive utility callable by import/launch. |
-| Recursive `TeamHandoffCompiler.visit` | Team-local rules need one mount rebase only. | `CollaborationHandoffCompiler` | In This Change | Org and Team rules merge once with duplicate/self checks. |
-| Team-local Team discovery/source ownership under a Team | A Team cannot own Team members. | AgentOrg-owned Team discovery under `agent-orgs/<id>/agent-teams` | In This Change | Team-local Agents remain valid. |
-| Recursive configured Team planner/index/config types | Fixed-depth root union makes recursion invalid. | `CollaborationTopologyPlanner` and discriminated config nodes | In This Change | Recursive task types remain. |
-| `RootTeamRun` as generic root and `AgentTeamRunManager` as both-root owner | AgentOrg is not a Team. | `RootCollaborationRun` and `CollaborationRunManager` | In This Change | `TeamRun` remains for actual Teams. |
-| `getOrCreateConfiguredChildTeam` on TeamRun/backend | Team cannot have configured Team child. | AgentOrgRun direct Team materializer | In This Change | Task Team preparation remains on TeamRun. |
-| `AgentTeamAddress` and recursive Team-specific LLM address text | Same scope can now be an Org or standalone Team. | `CollaborationAddress` and root-kind-aware renderer | In This Change | Wire address strings remain identical/canonical. |
-| Normal V2 schema/store reader and `team_run_execution_tree.json` | Native state is V3 only. | V3 `RunExecutionTreeStore`; isolated migration decoder | In This Change | Remove source file after successful per-package promotion. |
-| Runtime `memory/agent_teams` and `team_run_history_index.json` ownership | Root may be Org. | `memory/collaboration_runs`; generic history index | In This Change | Historical migration modules may mention old paths only. |
-| `root_team`, `root_team_run_id`, schema 2 stream view | External stream must be truthful. | V3 generic root/`root_run_id` contracts | In This Change | Regenerate all clients; no fallback parser. |
-| Team form Team selector, nested-Team detail/count/warnings, recursive configured launch tree | Flat Team authoring cannot advertise Teams. | Agent-only Team form plus separate AgentOrg form | In This Change | History still renders task Team lineage distinctly. |
-| Nested configured-Team tests/fixtures/docs as supported behavior | They assert rejected target behavior. | Org fixed-depth and rejection/migration cases | In This Change | Convert `nested-classroom-test` into AgentOrg + flat child Team coverage. |
-| Parallel `.js` source tests mirroring `.ts` Team definition/tool tests where stale generated copies exist | They can preserve old inputs and drift. | Canonical TypeScript tests/build output | In This Change | Verify repository test convention before deletion; do not edit generated copies as source. |
+| Item To Remove / Decommission | Why | Replacement | Scope / Preservation Note |
+| --- | --- | --- | --- |
+| `TeamMember.refType: agent_team` in Team inputs/config | Team is Agent-only. | Agent-only Team member type/schema/validator | Remove from current Team authoring/import/launch; old parser only migration. |
+| Recursive configured Team graph resolver/validator | No current configured Team recursion. | AgentOrg fixed-depth resolver + flat Team resolver | Task recursion is separate and retained. |
+| Recursive Team handoff compiler traversal | Team-local handoffs rebase once. | Explicit `compileTeam` / `compileOrg` methods | Preserve order, owner, duplicate/self checks. |
+| Team-local Team source ownership under a Team | Team cannot own Team member. | Org-owned source discovery or shared Team reference | Team-local Agent sources remain. |
+| Recursive configured planner/index/config types | Fixed configured depth. | Subject-specific Org/Team plan types plus shared placement records | Recursive task types remain. |
+| `getOrCreateConfiguredChildTeam` on Team runtime/backend | A Team cannot materialize configured Team child. | `AgentOrgRun` direct Team materializer | Task Team preparation remains task-owned. |
+| Treating `RootTeamRun`/`AgentTeamRunManager` as Org owner | Org is not Team. | New AgentOrgRun/Manager/Service | Preserve RootTeamRun/Team manager for native Team. |
+| Root-generic V3 schema/store/path proposal | Superseded by RER-016 and violates native Team contract. | Exact Team V2 + exact Org V1 stores/paths | No `collaboration_runs` directory or Team rewrite. |
+| Inferring root kind from coordinator/member/version | Two families must fail closed. | Explicit tagged catalog/location and strict store dispatch | No “try both” reader. |
+| Recursive Team-specific LLM hierarchy prose | Agents must see Org/flat-Team truth. | Root-kind-aware renderer over canonical address parser | String address format stays unchanged. |
+| Team UI Team selector/nested counts/warnings | Team authoring cannot advertise Teams. | Agent-only Team UI + separate Org UI | Task lineage still renders Team task nodes. |
+| Org `entryAddress` selector/input/result and initial focus fallback | Activation and targeting are separate. | Org config command + full activation + nullable focus | No ignored compatibility field. |
+| Org focus repair to coordinator/first Agent | Org has no default recipient. | Clear invalid focus and block recipient action | Standalone Team coordinator-first remains. |
+| Nested configured-Team supported fixtures/docs | Assert rejected target model. | Org fixed-depth + negative Team nesting fixtures | Convert rather than keep as alternate mode. |
+| Stale generated `.js` test/source mirrors, where repository convention confirms they are artifacts | Can retain obsolete inputs. | Canonical TypeScript sources/build output | Verify convention before deletion. |
 
 ## Return Or Event Spine(s)
 
-- **DS-008 active event:** `AgentRun/TaskDelegation/Communication -> configured scope backend -> RootCollaborationRun event publisher -> Collaboration WebSocket projector -> @autobyteus/collaboration-stream-contracts validation -> CollaborationStreamingService -> CollaborationExecutionView -> workspace/history components`.
-- **Definition result:** `Provider atomic commit -> DefinitionService -> GraphQL result/cache refetch -> AgentOrg/AgentTeam store -> catalog/detail form`.
-- **Migration result:** `Per-item disposition -> app-data migration summary/ledger -> app migration GraphQL/status UI -> operator retry or readiness release`.
+- **DS-008 Team event:** `RootTeamRun/Agent/task event -> Team publisher -> Team
+  projector -> compatible Team stream and/or tagged mixed adapter -> web reducer`.
+- **DS-008 Org event:** `AgentOrgRun/Agent/Team/task event -> Org publisher -> Org
+  V1 projector -> tagged mixed stream -> web RootExecutionView`.
+- **History result:** `TeamHistoryStore + AgentOrgHistoryStore ->
+  RootRunHistoryCatalogService merge/check -> tagged GraphQL result -> web
+  history navigation`.
+- **Definition result:** `DefinitionPackageTransaction commit -> DefinitionService
+  -> GraphQL canonical result/revision -> subject store/form`.
+- **Migration result:** `Item journal -> migration ledger/status -> operator retry
+  or readiness release`.
+- **Focus result:** `explicit sidebar selection -> exact focus state -> composer;
+  clear/invalid focus -> prompt and blocked send without changing root lifecycle`.
 
 ## Bounded Local / Internal Spines
 
-- **DS-009, parent owner `CollaborationHandoffCompiler`:**
-  `Validate flat Team handoffs -> rebase at direct Team mount -> validate Org handoffs -> resolve fixed-depth endpoints -> resolve Team target coordinator for self-check -> deduplicate ordered edges -> freeze snapshot`.
-  It matters because Team reuse requires local rules to remain unchanged while
-  Org rules connect mounted peers without recursive compilation.
-- **DS-010, parent owner `AgentOrgFlatTeamV3AppDataMigration`:**
-  `DISCOVER -> PREFLIGHTED -> BACKED_UP -> STAGED -> PROMOTED -> VALIDATED -> RECORDED`.
-  A process crash may resume only from journal-observed states; runtime cannot
-  enter between them.
-- **Root persistence commit loop, parent owner `RootCollaborationRun`:**
-  `Prepare against current snapshot -> atomically write V3/tree or task record -> commit live state after durability -> publish sequenced event`; it preserves the current fail-stop rule and prevents live/durable divergence.
+- **DS-009, `CollaborationHandoffCompiler`:** `validate Team-local handoffs ->
+  rebase once at Org placement when applicable -> validate Org handoffs ->
+  resolve fixed-depth endpoints/coordinator self-check -> deduplicate ordered
+  edges -> freeze snapshot`.
+- **DS-010, migration item:** `PLANNED -> BACKED_UP -> SOURCE_MOVED_TO_STAGING ->
+  TARGET_WRITTEN -> VALIDATED -> PROMOTED -> RECORDED`; runtime admission is
+  closed until all items and indexes complete.
+- **DS-006T Team commit:** `prepare RootTeamRun snapshot -> strict Team V2 atomic
+  write -> commit live state -> publish Team event`.
+- **DS-006O Org commit:** `prepare AgentOrgRun snapshot -> strict Org V1 atomic
+  write -> commit live state -> publish Org event`.
+- **DS-011 definition commit:** `normalize -> resolve -> endpoint/handoff validate
+  -> lock -> compare revision -> stage full package -> journaled promote/recover
+  -> cache publish`.
+- **DS-012 configuration:** `seed Org root -> Team patch -> exact Agent patch ->
+  validate all resolved records -> freeze plan`; no definition/focus mutation.
 
 ## Off-Spine Concerns Around The Spine
 
-| Off-Spine Concern | Related Spine ID(s) | Serves Which Owner | Responsibility | Why It Exists | Risk If Misplaced On Main Line |
-| --- | --- | --- | --- | --- | --- |
-| Definition source discovery/codecs | DS-001, DS-007 | Definition services/migration | Locate shared, Org-owned, and application-owned Markdown/config sources and serialize exact subject shapes. | Physical packaging varies by owner. | Provider details would leak into domain validation. |
-| Definition identity allocation | DS-001, DS-007 | Definition providers/migration | Preserve current IDs and allocate stable new IDs, including opaque migrated local IDs. | History/progressive reuse depend on identity. | Planner or UI could copy/rename Teams. |
-| Address parser | DS-003-DS-005, DS-009 | Topology/compiler/root resolver | Canonical rooted parsing and fixed-depth placement checks. | Shared contract across definition/runtime/transport. | Each caller would apply inconsistent fallback/depth policy. |
-| Workspace/runtime catalog activation | DS-002, DS-003 | Run services/planner | Resolve workspace and runtime/model choices before activation. | Existing launch behavior must remain. | Root aggregate would mix external setup with lifecycle. |
-| Identity allocators | DS-002, DS-003, DS-005 | Planner/task service | Allocate root, Team, and Agent execution IDs only after validation. | Prevent partial identity side effects. | Resolver/transport could allocate during validation. |
-| Package validation/atomic writer | DS-006, DS-007 | Persistence/migration | Strict cross-file correlation and durable promotion. | Tree/tasks/messages must agree. | Runtime service would contain historical/file-commit branches. |
-| History/index projection | DS-006-DS-008 | Root persistence/web | Build generic root rows and execution rows from V3. | Derived views are rebuildable and should not be authorities. | History could reinterpret mutable definitions. |
-| Application-owned Team validation | DS-001, DS-002 | Application bundle/Team definition owners | Enforce Agent-only Team membership for application-owned Team sources and preserve their standalone launch behavior. | Application bundles are an existing Team definition boundary. | App parsing could retain a recursive Team loophole. |
-| LLM collaboration instruction renderer | DS-004, DS-005 | Member context | Explain actual root kind, fixed-depth examples, and tools. | Agents must not be taught recursive Teams. | Core resolver would own prose/presentation. |
-| UI localization/presentation | DS-001-DS-003, DS-006 | Web authoring/workspace | Subject-correct labels, errors, and hierarchy. | No prototype is needed, but semantic truth is. | Stores/domain could absorb visual choices. |
+| Concern | Spines | Serves | Responsibility | Why / Misplacement Risk |
+| --- | --- | --- | --- | --- |
+| Definition source discovery/codecs | DS-001, DS-007 | Definition services/migration | Locate/serialize shared, Org-owned, Team-owned Agent, application Team sources | Prevents filesystem rules leaking into domain. |
+| Definition package transaction | DS-001, DS-011 | Definition services | Revision lock, staged directory, journal/recovery, fsync | Prevents partial `md/config` visibility and lost updates. |
+| Canonical address parser | DS-003-DS-005, DS-009 | Resolvers/compilers | Rooted parse/build/rebase/depth checks | Avoids divergent fallback/depth policy. |
+| Workspace/runtime catalog activation | DS-002, DS-003, DS-012 | Run services | Validate runtime/model/workspace and prepare resources before activation | Keeps external setup out of aggregate. |
+| Identity allocators | DS-002, DS-003, DS-005 | Planner/task service | Allocate IDs after validation | Avoids validation side effects. |
+| Shared persisted record schemas | DS-006T, DS-006O | Subject stores | Exact common Agent/Team/handoff/launch/task record keys | Reuse without root-family conflation. |
+| History/index projectors | DS-006T, DS-006O, DS-008 | Subject persistence/web | Subject rows plus tagged mixed merge | Derived only; cannot reinterpret definitions. |
+| Application-owned Team validation | DS-001, DS-002 | Team owner | Enforce Agent-only Team and standalone launch | Closes application recursion loophole. |
+| LLM instruction renderer | DS-004, DS-005 | Member context | Explain actual root/address/tool semantics | Keeps prose out of resolver. |
+| UI accessibility/presentation | DS-001-DS-003, DS-008, DS-011-DS-013 | Web owners | RV-012 layout, focus, narrow, keyboard, validation | Prevents mock/prototype orchestration entering domain. |
 
 ## Ownership Boundaries
 
-The definition boundary ends after a validated immutable definition/reference
-graph is available; launch planning must not read raw files or call providers.
-The planner owns the immutable execution plan but not active state. The root
-manager is the only active/restored aggregate registry. `RootCollaborationRun`
-is the sole operation boundary for task, message, command, platform-binding,
-snapshot, and lifecycle operations; callers must not combine it with an
-internal AgentOrgRun/TeamRun manager or persistence store.
+Definition services return validated immutable definitions; planners never read
+raw files/providers. Each run service calls only its own manager. Each manager
+owns its own active registry, aggregate factory, and persistence coordinator.
+Upstream callers do not call a subject manager and its store/index together.
 
-AgentOrgRun and TeamRun share provider mechanics but not invariants. The former
-may materialize direct configured Teams and has no coordinator API. The latter
-has one coordinator and cannot materialize a configured Team. Recursive task
-Team factories are explicitly task-owned and cannot be used to add configured
-members.
+`AgentOrgRun` and `RootTeamRun` are peers, not variants behind a shared public
+aggregate. Both may compose tight shared mechanisms (Agent factory, flat
+`TeamRun`, task service primitives, event/commit helpers), but no shared base may
+expose optional coordinator/root identity fields. `AgentOrgRun` alone may own
+direct configured TeamRun handles. `RootTeamRun`/`TeamRun` cannot.
 
-Current persistence stores accept only V3. The migration boundary alone may
-read V2/old definition files or old physical directories. History and UI read
-the durable run snapshot and subject discriminator; they do not re-resolve
-current definitions to reinterpret old runs.
+The Team V2 store and Org V1 store are both current. A mixed projection facade
+requires explicit kind and routes to the corresponding subject query/manager or
+history store; it cannot scan paths, inspect coordinator presence, or try both
+validators. The migration alone may decode organization-like Team V2 and old
+recursive definitions.
+
+Configuration and focus are separate. The server resolver owns effective launch
+settings and complete activation. Web focus is local, nullable for Org, exact,
+and absent from both durable families. An exact member history row selection may
+focus because the row click is explicit; a root open remains unfocused.
+
+Definition authoring and runtime compilation are separate. The subject service
+validates and commits one complete candidate under expected revision. Runtime
+compilers consume saved immutable snapshots and never repair/reorder/write
+handoffs.
 
 ## Boundary Encapsulation Map
 
-| Authoritative Boundary | Internal Owned Mechanism(s) It Encapsulates | Upstream Callers That Must Use The Boundary | Forbidden Bypass Shape | If Boundary API Is Too Thin, Fix By |
+| Authoritative Boundary | Encapsulates | Callers | Forbidden Bypass | Fix If Too Thin |
 | --- | --- | --- | --- | --- |
-| AgentOrgDefinitionService | Resolver, Org provider, ref lookup, compiler orchestration | GraphQL, tools, package sync/import, UI backend | Caller writes Org files then asks validator to roll back | Add candidate/preview/validate methods to service before exposing provider. |
-| AgentTeamDefinitionService | Flat validator, Team provider, local-Agent resolver | GraphQL, tools, package sync/import, application bundle | Import/converter accepts `agent_team` then relies on launch rejection | Strengthen subject-specific input and service error contract. |
-| AgentOrgRunService / AgentTeamRunService | Planner invocation, typed input normalization, manager call, catalog record | GraphQL, application orchestration, external channels | Caller invokes planner and manager/store directly | Add explicit subject-specific launch/restore method. |
-| CollaborationRunManager | root factory, readiness, active registry, restore package loader | Run services, WebSocket session resolver | API uses manager plus persistence store/index | Add query/lifecycle method to manager/root. |
-| RootCollaborationRun | index, task service, communication service, internal scope resolver, persistence coordinator, event publisher | Tools, stream handler, command/task/history live projections | Caller uses root and internal TeamRun/AgentRun manager together | Expose the required operation on root with exact identity. |
-| RunExecutionTreeStore | V3 schema/atomic writer/path | persistence coordinator, package loader, migration target validator | Runtime reads JSON or V2 decoder directly | Add strict V3 store method. |
-| CollaborationExecutionView (web) | tree selectors, context factory, event reducer | workspace/history/running components | Components parse raw union and use Team-only stores | Add root-kind-aware selector/computed API. |
+| AgentOrgDefinitionService | Org resolver/provider/ref queries/candidate validation | GraphQL, tools, import/UI backend | Write Org files then validate/rollback | Add preview/validate/update method. |
+| AgentTeamDefinitionService | Flat validator/provider/Agent resolver | GraphQL, tools, import/application | Accept child Team then rely on launch rejection | Strengthen typed candidate/input. |
+| DefinitionPackageTransaction | lock/revision/staging/journal/promotion/recovery | Subject DefinitionServices only | Per-file writes or UI last-write-wins | Add `commit(candidate, expectedRevision)`. |
+| AgentOrgRunService | config resolver/Org planner/Org manager | GraphQL/application Org launch | Caller uses planner/manager/store directly | Add typed create/restore/stop method. |
+| AgentTeamRunService | Team config/Team planner/Team manager | GraphQL/application Team launch | Caller uses manager/store directly | Add typed Team method. |
+| AgentOrgRunManager / AgentTeamRunManager | subject registry/factory/package loader | Respective run service, explicit-kind projection adapter | One caller queries manager plus store | Add subject query/snapshot method. |
+| AgentOrgRun / RootTeamRun | subject index/task/message/event/persistence coordination | tools/stream/live queries through subject boundary | Caller reaches inner TeamRun/AgentRun manager | Expose exact root operation. |
+| Team V2 store / Org V1 store | exact schema/path/atomic writer | Respective persistence coordinator, migration target validator | Runtime reads JSON or wrong family | Add strict subject method. |
+| RootExecutionProjectionService | explicit-kind dispatch and tagged DTO | mixed history/stream/GraphQL | Infer kind or mutate root | Add explicit compound identity/result branch. |
+| RootExecutionView (web) | union selectors/reducer/focus mapping | workspace/history components | Components parse raw payload/use wrong subject store | Add root-kind-aware selectors. |
 
 ## Dependency Rules
 
-1. Transport/adapters -> subject-specific application services -> domain
-   definition/planner/root boundaries -> provider/persistence mechanisms.
-2. AgentOrg definition may reference AgentTeam definition identity through the
-   AgentTeam query boundary; it may not mutate, clone, or depend on Team provider
-   internals.
-3. The collaboration compiler depends on resolved topology types, addresses,
-   and handoff contracts, not file providers or GraphQL types.
-4. AgentTeam definition code must not import AgentOrg membership types to make
-   Team nodes generic. AgentOrg may import the public Team definition query
-   interface.
-5. Root execution may depend on strict V3 domain types; V3 current code must not
-   import migration V2 types.
-6. AgentOrgRun may own direct TeamRun handles. TeamRun may own task TeamRun
-   handles, but never configured TeamRun handles.
-7. Task code uses generic `rootRunId`/host-scope domain identities. Versioned
-   task/message codecs may retain approved existing on-disk field names such as
-   `rootTeamRunId`, but those names do not leak back into current Org ownership.
-8. GraphQL and WebSocket projectors map domain -> transport only. The web client
-   consumes generated/contract types; it does not infer subject from member
-   depth or missing coordinator.
-9. History projections depend on V3 snapshots and indexes, not mutable
-   definitions. Definition deletion/change cannot rewrite historical subject.
-10. Migration may depend on both old isolated codecs and current strict
-    validators; current services cannot depend on migration.
+1. Transport/presentation -> subject application service -> subject domain owner
+   -> subject provider/store. Mixed read presentation -> explicit-kind projection
+   service -> subject query boundaries.
+2. AgentOrg definitions query AgentTeam identity/content through the public Team
+   query boundary only; no mutation, clone, or Team provider dependency.
+3. Collaboration address/handoff compilers depend on resolved topology records,
+   not providers or GraphQL types.
+4. AgentTeam definition/runtime code does not import Org member/root types to make
+   Team generic. AgentOrg may compose public flat Team plan/runtime mechanisms.
+5. Team V2 and Org V1 schemas compose common persisted-record validators but do
+   not import each other's root schema/store/path.
+6. `AgentOrgRun` may own direct configured `TeamRun`; `TeamRun` may own task
+   TeamRun descendants only, never configured TeamRun.
+7. Task domain code uses subject-neutral root/host identities internally; any
+   approved old on-disk field spelling remains confined to versioned codecs.
+8. Mixed GraphQL/stream/web types require `root_subject_kind`; subject-only Team
+   types may remain compatible. No client inference from tree shape.
+9. History topology comes from persisted snapshot, never current mutable
+   definition. Subject indexes are derived and rebuildable.
+10. Migration may import old codecs plus both current validators. No current
+    service imports migration.
+11. Web preview may share pure merge functions; server recomputes/validates the
+    authoritative effective plan.
+12. Org and Team draft stores are separate. Shared handoff components accept an
+    owner-provided endpoint catalog/commands only.
+13. Focus is absent from launch commands, durable schemas, root lifecycle, and
+    history authority.
 
 Forbidden shortcuts:
 
-- No `AgentOrgDefinition extends AgentTeamDefinition` with optional coordinator.
-- No root type with mostly optional Org/Team fields; use a discriminator union.
-- No recursive generic `members` type for configured Team nodes.
-- No V2/V3 branch in the normal store, planner, root manager, stream projector,
-  or web reducer.
-- No implicit default Org entry, global address lookup, Team-definition copy,
-  or direct UI filesystem mutation.
-- No application/external-channel path bypassing the subject-specific run
-  service.
+- No generic persisted root V3, `collaboration_runs` path, optional-coordinator
+  root blob, or `AgentOrgDefinition extends AgentTeamDefinition`.
+- No configured recursive `members` under Team and no reuse of task factories
+  for configured membership.
+- No normal reader that tries both stores, scans both family paths for an ID,
+  auto-moves/retypes payload, or infers kind.
+- No caller depending on a subject service/manager and its provider/store at the
+  same level.
+- No pre-launch Org entry/focus, fallback recipient, global address lookup, Team
+  copy, client-authoritative launch plan, last-write-wins definition save,
+  per-handoff write, or stale-handoff auto-repair.
 
 ## Interface Boundary Mapping
 
-| Interface / API / Query / Command / Method | Subject Owned | Responsibility | Accepted Identity Shape(s) | Notes |
+| Interface / Method | Subject | Responsibility | Identity Shape | Notes |
 | --- | --- | --- | --- | --- |
-| `AgentOrgDefinitionService.create/update/get/list` | AgentOrg definition | Validate/persist/query Org and direct refs | `agentOrgDefinitionId`; Org member refs with explicit kind/scope | No coordinator field. |
-| `AgentTeamDefinitionService.create/update/get/list` | AgentTeam definition | Validate/persist/query flat Team | `agentTeamDefinitionId`; Agent refs only | Coordinator resolves one direct Agent. |
-| `CollaborationHandoffCompiler.compileOrg/compileTeam` | Handoff snapshot | Compile fixed-depth effective edges | Resolved Org topology or flat Team | One owner, two explicit subject entry methods. |
-| `AgentOrgRunService.create({agentOrgDefinitionId, entryAddress, ...})` | AgentOrg root launch | Validate exact entry and create Org run | compound `{subjectKind:'agent_org', definitionId}` plus CollaborationAddress | Returns `{agentOrgRunId, entryAgentRunId}`. |
-| `AgentTeamRunService.create({agentTeamDefinitionId, ...})` | standalone Team root launch | Create Team and coordinator ingress | compound `{subjectKind:'agent_team', definitionId}` | Returns `{teamRunId, entryAgentRunId}`. |
-| `CollaborationRunManager.restore({rootRunId, expectedSubjectKind})` | persisted root | Restore exact V3 root | `{rootRunId, expectedSubjectKind}` | Type mismatch fails, never coerces. |
-| `RootCollaborationRun.resolveRecipient(address)` | active configured target | Same-root exact resolution | canonical non-root `CollaborationAddress` | Team returns coordinator ingress. |
-| `RootCollaborationRun.delegateTask(identity,input)` | task lifecycle | Authorize, prepare, commit, activate fresh execution | exact root member identity + mounted address | No definition/global selector. |
-| `RunExecutionTreeStore.read/write(rootDir, rootRunId)` | durable V3 tree | Strict current schema persistence | physical root path + exact root ID | V3 only. |
-| GraphQL `agentOrgDefinitions`, `createAgentOrgDefinition`, `createAgentOrgRun` | Org external contract | Catalog/author/launch Org | Org-specific inputs/results | Separate from Team API. |
-| GraphQL `agentTeamDefinitions`, `createAgentTeamDefinition`, `createAgentTeamRun` | Team external contract | Catalog/author/launch Team | Team-specific inputs/results | Team member input has no Team kind. |
-| Collaboration stream handshake/snapshot | active root view | Stream generic V3 root and sequenced events | `{rootRunId, subjectKind}` | Contract package validates root union. |
-| Existing application Team resource ref | application launch resource | Continue selecting a flat AgentTeam | `{refType:'agent_team', definitionId}` | Route through AgentTeamRunService; no AgentOrg application resource is added in this round. |
+| `AgentOrgDefinitionService.create/update/get/list` | Org definition | Complete Org/ref/handoff CRUD | Org definition ID; explicit Agent/Team refs; expected revision | No coordinator; typed candidate/conflict result. |
+| `AgentTeamDefinitionService.create/update/get/list` | Team definition | Complete flat Team/local-handoff CRUD | Team definition ID; Agent refs only; expected revision | Coordinator is exact direct Agent. |
+| `DefinitionEndpointCatalog.project(candidate)` | Handoff choices | Eligible exact From/To and Team coordinator metadata | subject kind + complete candidate | Server validator authoritative. |
+| `CollaborationHandoffCompiler.compileOrg/compileTeam` | Runtime handoff snapshot | Fixed-depth effective ordered edges | resolved Org or flat Team | Explicit subject methods; no recursive current input. |
+| `CollaborationLaunchConfigurationResolver.resolveOrg/resolveTeam` | Launch config | Produce complete effective settings | root config + unique exact patches | No focus/definition mutation. |
+| `AgentOrgRunService.create(command)` | Org launch | Validate/activate full Org scope | `{agentOrgDefinitionId, rootConfiguration, teamOverrides, agentOverrides}` | Returns `{agentOrgRunId}` only. |
+| `AgentTeamRunService.create(command)` | Team launch | Native coordinator-led flat Team | `{agentTeamDefinitionId, rootConfiguration, agentOverrides}` | Returns Team run ID; existing result naming may remain. |
+| `AgentOrgRunManager.restore(orgRunId)` | Org runtime | Restore exact Org V1 | Org run ID already known as Org | Calls only Org store; no guessing. |
+| `AgentTeamRunManager.restore(rootTeamRunId)` | Team runtime | Restore exact Team V2 | Team run ID already known as Team | Calls only Team store. |
+| `AgentOrgRun.resolveRecipient(address)` / `RootTeamRun.resolveRecipient(address)` | Active target | Same-root exact resolution | canonical non-root address | Team address uses coordinator in Org; Team root has Agent destinations. |
+| subject root `delegateTask(caller,input)` | Task lifecycle | Authorize/prepare/commit/activate task | exact caller identity + mounted address | No global definition selector. |
+| `TeamRunExecutionTreeStoreV2.read/write(rootTeamRunId)` | Team durability | Exact native Team V2 | Team package identity | Existing path/file/keys unchanged. |
+| `AgentOrgRunExecutionTreeStoreV1.read/write(orgRunId)` | Org durability | Exact Org V1 | Org package identity | `subjectKind/rootOrg`, no coordinator. |
+| `RootExecutionProjectionService.get({root_subject_kind, root_run_id})` | Mixed query | Explicit dispatch and union projection | compound kind + ID | Payload/family/result branch must agree. |
+| GraphQL Org surfaces | Org external | Catalog/author/detail/config/launch | Org-specific inputs/results | No entry selector or per-handoff mutation. |
+| GraphQL Team surfaces | Team external | Catalog/author/detail/standalone launch | Team-specific inputs/results | Agent-only members; Team-only compatibility where retained. |
+| Mixed stream handshake | Mixed root view | Tagged snapshot/events | `{root_subject_kind, root_run_id}` | Team-only stream may remain compatible. |
+| Existing application Team ref | Application launch | Continue flat Team resource launch | `{refType:'agent_team', definitionId}` | No application-owned Org surface this round. |
+| Web `CollaborationFocusController.select(addressOrNull)` | Local focus | Exact selection/send readiness | address in current tagged snapshot | Team row -> coordinator; null never persists. |
 
 ## Interface Boundary Check
 
-| Interface | Responsibility Is Singular? | Identity Shape Is Explicit? | Ambiguous Selector Risk | Corrective Action |
+| Interface | Singular? | Explicit Identity? | Risk | Corrective Action |
 | --- | --- | --- | --- | --- |
-| AgentOrg definition service/API | Yes | Yes | Low | Reject coordinator and nested Org fields at input schema. |
-| AgentTeam definition service/API | Yes | Yes | Low | Remove member-kind enum; Agent-only type. |
-| Subject-specific run services | Yes | Yes | Low | Keep common mechanics behind manager, not a public generic `create(any)`. |
-| Root collaboration manager | Yes | Yes | Low | Require `expectedSubjectKind` on subject-specific restore paths. |
-| Recipient resolver | Yes | Yes | Low | Canonical parser + immutable root index; reject `/` and invalid depth. |
-| Application resource launch | Yes | Yes | Medium | Add explicit `refType`/`entryAddress`; do not infer from definition lookup order. |
-| History/open route | Yes | Yes | Low | Row carries `subjectKind` and `rootRunId`. |
+| Org definition API | Yes | Yes | Low | Reject coordinator/nested Org. |
+| Team definition API | Yes | Yes | Low | Agent-only member input. |
+| Definition transaction | Yes | Yes | Medium | Complete candidate + expected revision + package journal. |
+| Subject run services/managers | Yes | Yes | Low | No public generic create/restore guessing kind. |
+| Configuration resolver | Yes | Yes | Medium | Exact patches; server recomputes; all-or-nothing validation. |
+| Subject tree stores | Yes | Yes | Low | Each path/store accepts one family/version/root only. |
+| Mixed projection | Yes | Yes | Medium | Compound kind+ID; verify family/payload/branch. |
+| Recipient resolver | Yes | Yes | Low | Canonical parser/index; reject root/depth/unknown. |
+| Application Team launch | Yes | Yes | Medium | Preserve explicit Team ref and Team service. |
+| Web focus/send | Yes | Yes | Medium | Nullable for Org; exact mapping; never fallback. |
 
 ## Main Domain Subject Naming Check
 
-| Node / Subject | Current / Proposed Name | Natural And Self-Descriptive? | Naming Drift Risk | Corrective Action |
+| Subject | Current / Target Name | Natural? | Risk | Action |
 | --- | --- | --- | --- | --- |
-| Multi-Team composition | `AgentTeamDefinition` / `AgentOrgDefinition` | Yes (proposed) | Low | Delete recursive Team representation. |
-| Flat work unit | `AgentTeamDefinition` / same, Agent-only | Yes | Low | Do not introduce `FlatTeam`. |
-| Generic root aggregate | `RootTeamRun` / `RootCollaborationRun` | Yes | Low | TeamRun remains only for actual Team. |
-| Generic durable tree | `TeamRunExecutionTreeFileV2` / `RunExecutionTreeFileV3` | Yes | Low | Root discriminator supplies subject. |
-| Logical address | `AgentTeamAddress` / `CollaborationAddress` | Yes | Low | Wire format remains rooted string. |
-| Root manager | `AgentTeamRunManager` / `CollaborationRunManager` | Yes | Low | Subject-specific creation stays in services. |
-| Org-local source scope | `team_local` for nested Team / `agent_org_owned` | Yes | Medium due old opaque IDs | Keep old encoded values isolated as identity strings; new domain scope is truthful. |
+| Multi-Team composition | recursive `AgentTeamDefinition` / `AgentOrgDefinition` | Yes | Low | Delete recursive Team representation. |
+| Flat unit | `AgentTeamDefinition` / same, Agent-only | Yes | Low | Never add `FlatTeam`. |
+| Team root aggregate | `RootTeamRun` / same, flat | Yes | Low | Preserve native Team owner/name. |
+| Org root aggregate | none / `AgentOrgRun` | Yes | Low | New subject; no generic root wrapper. |
+| Team durable tree | `TeamRunExecutionTreeFileV2` / same | Yes | Low | Preserve exact contract. |
+| Org durable tree | none / `AgentOrgRunExecutionTreeFileV1` | Yes | Low | Distinct exact contract. |
+| Mixed read DTO | Team-only view / `RootExecutionTreeProjection` | Yes | Medium | Always require `root_subject_kind`. |
+| Logical address | `AgentTeamAddress` / `CollaborationAddress` | Yes | Low | String format unchanged; semantics span Org/Team. |
+| Org source scope | legacy `team_local` / `agent_org_owned` | Yes | Medium | Do not parse historical opaque ID prefix. |
 
 ## Existing Capability / Subsystem Reuse Check
 
-| Need / Concern | Existing Capability Area / Subsystem | Decision | Why | If New, Why Existing Areas Are Not Right |
-| --- | --- | --- | --- | --- |
-| Org definition persistence | AgentTeam definition provider patterns + package roots | Create New subject, reuse provider primitives | Org has distinct invariant/files and no coordinator; common Markdown/atomic utilities are reusable. | Team service cannot own Org without recreating conflation. |
-| Fixed-depth topology/handoffs | `agent-collaboration` + current graph/compiler | Extend | Addresses/handoff records and compiler checks already fit. | N/A |
-| Root execution | `agent-team-execution` mixed runtime | Refactor/Rename existing | Member activation, task, message, event, fail-stop, termination mechanisms are reusable. | Parallel Org runtime would duplicate state/coordination. |
-| Strict V3 persistence | current execution-tree schema/store/writer | Extend and rename | Same envelope/child/task records and atomic writer. | Separate Org store is forbidden. |
-| Migration | app-data migrations | Extend | Existing registry, ledger, status, backups, and startup ordering pattern. | Ad hoc startup compatibility is unsafe. |
-| History/memory | current Team run history and Agent memory layout | Extend and rename root owner | Same data, generic subject needed. | Parallel Org history would fragment workspace. |
-| Stream | team stream contracts/projector | Refactor/Rename existing | Same events/tasks/messages; root view needs union. | Two sockets would duplicate live state. |
-| Web live workspace | Team execution stores/services/components | Extract generic owner | Same communication/task/event interaction applies to both roots. | Duplicated Org workspace store would diverge. |
-| Org authoring UI | Agent Team authoring | Create New subject-specific UI, reuse form primitives | Member libraries and coordinator behavior differ materially. | One form with conditional fields risks invalid mixed state. |
+| Need | Existing Capability | Decision | Why / Boundary |
+| --- | --- | --- | --- |
+| Org definition | Team provider/package patterns | New subject; reuse Markdown/config/source/transaction primitives | Team owner cannot absorb coordinator-free direct Team refs. |
+| Flat Team definition | AgentTeam definition | Refactor existing | Retain ID/source/catalog; remove Team member kind/recursion. |
+| Addresses/handoffs | `agent-collaboration` and current compiler | Extend | Same canonical addresses/records; compiler becomes explicit fixed-depth. |
+| Standalone Team runtime | `agent-team-execution` | Preserve/refactor locally | It already owns native Team lifecycle/V2; contract configured children out. |
+| Org runtime | mixed Team backend/TeamRun/Agent factory/task primitives | New `agent-org-execution`; compose narrow public mechanisms | Separate aggregate/store is required; duplicating Agent/Team execution loops is not. |
+| Persisted records | current Team tree domain/schema | Extract tight shared record types/validators | Reuse exact fields without generic root. |
+| Team durability/history | current Team store/index/memory layout | Preserve and narrow | Byte/path compatibility is approved. |
+| Org durability/history | current atomic store/index patterns | Create subject store/index | Separate family/path/root invariant. |
+| Mixed projection | Team history/stream/projectors | Add thin explicit-kind facade; retain Team-only paths | Shared UI needs one union, but lifecycle/storage stay subject-owned. |
+| Migration | app-data migrations | Extend | Existing ledger/readiness; no lazy compatibility. |
+| Web workspace | Team execution view components/state | Extract mixed read view around two union branches | Shared interactions should not duplicate; focus policy remains root-kind-specific. |
+| Org authoring | Team form primitives | New subject-specific UI | Membership/coordinator semantics differ. |
+| Launch precedence | current Team config hierarchy | Extract/extend | Existing root/placement logic; server authority is new. |
+| Definition atomic save | parent mutations + atomic file writer | Extend with package transaction | Multiple package files need revision/journal/recovery. |
+| Handoff UI | current record + Product design | Shared presentational primitives | Endpoint eligibility/persistence remain subject owners. |
 
 ## Subsystem / Capability-Area Allocation
 
-| Subsystem / Capability Area | Owns Which Concerns | Related Spine ID(s) | Governing Owner(s) Served | Decision | Notes |
-| --- | --- | --- | --- | --- | --- |
-| AgentOrg Definition | Org domain/config/source/ref validation/catalog | DS-001, DS-007 | AgentOrgDefinitionService | Create New | May query Team definitions, never mutate them. |
-| AgentTeam Definition | Flat Team and direct coordinator/local Agent source | DS-001, DS-002 | AgentTeamDefinitionService | Refactor Existing | Remove Team-local Team ownership. |
-| Agent Collaboration | address, handoff records/compiler, member collaboration contract | DS-003, DS-004, DS-009 | Planner/RootCollaborationRun | Extend | Root-kind-aware prose and fixed-depth compiler. |
-| Collaboration Execution | root union config/runtime/index/lifecycle/tasks/events | DS-002-DS-006, DS-008 | Run services/RootCollaborationRun | Refactor/Rename Existing | TeamRun remains a specialized local execution. |
-| Run Persistence/History/Memory | V3 store, package, generic physical layout/index | DS-006-DS-008 | Root manager/history | Refactor Existing | Derived catalogs rebuild. |
-| App Data Migration | exact old-shape conversion and promotion | DS-007, DS-010 | Startup readiness | Extend Existing | Sole V2/recursive-config owner. |
-| GraphQL/Application Integration | subject-specific public Org/Team definitions/launch; existing flat application Team resources | DS-001-DS-003, DS-006 | Definition/run services | Extend Existing | No provider/manager bypass; no new application-owned Org surface. |
-| Collaboration Stream Contracts | V3 root DTO, messages/tasks/events | DS-008 | Stream projector/web client | Refactor/Rename Existing Package | One generic stream. |
-| Web Definition Authoring | separate Org and Team catalogs/forms/details | DS-001-DS-003 | Definition APIs | Create/Refactor | Shared visual primitives only. |
-| Web Collaboration Workspace | live/history state, selectors, stream hydration, configuration | DS-002-DS-006, DS-008 | V3 transport | Refactor/Rename Existing | Root discriminator drives subject behavior. |
+| Subsystem | Owns | Spines | Decision | Notes |
+| --- | --- | --- | --- | --- |
+| AgentOrg Definition | Org domain/config/source/ref/candidate/catalog | DS-001, DS-007, DS-011 | Create | Query Team definitions only. |
+| AgentTeam Definition | Agent-only Team/coordinator/local source | DS-001, DS-002, DS-011 | Refactor | Remove Team-owned Team sources. |
+| Agent Collaboration | address/handoff/endpoint catalog/task delegation primitives | DS-003-DS-005, DS-009 | Extend | Shared mechanisms, not generic root authority. |
+| AgentTeam Execution | RootTeamRun/TeamRun/Team manager/service/V2 persistence coordination | DS-002, DS-004-DS-006T | Refactor/Preserve | Native Team family retained. |
+| AgentOrg Execution | AgentOrgRun/manager/service/planner/index/V1 persistence coordination | DS-003-DS-006O | Create | Composes direct Agent and flat Team mechanisms. |
+| Run History/Persistence | strict subject schemas/stores/indexes and tagged mixed catalog | DS-006T, DS-006O, DS-008 | Extend | Two authorities; mixed derived facade. |
+| App Data Migration | old config/Org-like V2 conversion and promotion | DS-007, DS-010 | Extend | Flat Team path is verification-only. |
+| GraphQL/Application | subject definition/run plus mixed read contracts | DS-001-DS-003, DS-008 | Extend | No bypass; Team application ref preserved. |
+| Stream Contracts | compatible Team view + new Org/tagged mixed view | DS-008 | Extend | No forced Team wire rewrite. |
+| Web Definition Authoring | separate Team/Org surfaces + shared handoff primitives | DS-001, DS-011 | Create/Refactor | RV-012 normative. |
+| Web Launch Configuration | separate drafts + shared preview | DS-002, DS-003, DS-012 | Create/Refactor | Org no focus; Team coordinator-led. |
+| Web Root Workspace | tagged live/history projection + focus | DS-008, DS-013 | Refactor | Branch-specific selectors, one visual workspace. |
 
 ## Draft File Responsibility Mapping
 
-| Candidate File | Owning Subsystem | Owner / Boundary | Concrete Concern | Why This Is One File | Reuses Shared Structure? |
-| --- | --- | --- | --- | --- | --- |
-| `agent-org-definition/domain/agent-org-definition.ts` | AgentOrg Definition | AgentOrgDefinition | Org metadata/direct member/handoff model | One domain subject | Collaboration handoff, launch default |
-| `agent-team-definition/domain/agent-team-definition.ts` | AgentTeam Definition | AgentTeamDefinition | Agent-only Team/coordinator model | One domain subject | Agent member ref, handoff |
-| `agent-collaboration/definition/resolved-collaboration-topology.ts` | Agent Collaboration | resolved topology | Discriminated fixed-depth resolved root | Shared compiler/planner input | Yes |
-| `agent-collaboration/definition/collaboration-handoff-compiler.ts` | Agent Collaboration | compiler | Team local rebase + Org edge compile | One ordered policy | Yes |
-| `agent-collaboration-execution/domain/collaboration-run-config.ts` | Collaboration Execution | immutable plan | Root config union and flat Team nodes | One runtime config authority | launch config/address |
-| `agent-collaboration-execution/domain/run-execution-tree.ts` | Run Persistence | V3 domain contract | Root union + reused nodes/tasks | One durable schema family | Yes |
-| `agent-collaboration-execution/domain/root-collaboration-run.ts` | Collaboration Execution | root aggregate | public operations/state/lifecycle | Sole root boundary | execution index/tasks/events |
-| `agent-collaboration-execution/services/collaboration-topology-planner.ts` | Collaboration Execution | planner | validated topology to IDs/config | One plan compiler | resolved topology |
-| `run-history/store/run-execution-tree-schema.ts` | Persistence | V3 validator | exact keys and invariants | One current schema | V3 types/address |
-| `app-data-migrations/.../run-execution-tree-v2-to-v3-transformer.ts` | Migration | historical transformer | deterministic V2 -> V3 only | Old knowledge isolated | current validator target |
-| `autobyteus-collaboration-stream-contracts/src/run-execution-view-dtos.ts` | Stream contract | DTO schema | V3 external root union | One wire authority | configured/task DTOs |
-| `autobyteus-web/stores/agentOrgDefinitionStore.ts` | Web authoring | Org state | Org query/mutation/cache | Subject-specific state | generated GraphQL |
-| `autobyteus-web/stores/collaborationRunStore.ts` | Web workspace | root live state | connect/open/command lifecycle | Shared execution owner | collaboration view |
+| Candidate File | Subsystem | Concern | Why One File / Reuse |
+| --- | --- | --- | --- |
+| `agent-org-definition/domain/agent-org-definition.ts` | Org Definition | Org direct members/handoffs/defaults | One subject; reuse address/handoff types. |
+| `agent-team-definition/domain/agent-team-definition.ts` | Team Definition | Agent-only members/coordinator | Existing subject narrowed. |
+| `agent-collaboration/definition/resolved-collaboration-topology.ts` | Collaboration | Explicit Org and Team resolved variants | Shared compiler input, never recursive generic. |
+| `agent-collaboration/definition/collaboration-handoff-compiler.ts` | Collaboration | `compileOrg`/`compileTeam` | One ordered endpoint policy. |
+| `agent-collaboration/definition/definition-endpoint-catalog.ts` | Collaboration | From/To eligibility/coordinator metadata | One authoring vocabulary. |
+| `agent-collaboration/services/collaboration-launch-configuration-resolver.ts` | Collaboration | Fixed-depth effective settings | One precedence owner. |
+| `run-history/domain/run-execution-tree-shared-records.ts` | Persistence | Exact shared envelope field/Agent/Team/task record types | No root union; both subject trees compose. |
+| `run-history/store/run-execution-tree-shared-record-schemas.ts` | Persistence | Exact reusable zod schemas | Avoid duplicate field validators. |
+| existing `agent-team-execution/domain/team-run-execution-tree.ts` | Team Execution | Exact Team V2 domain/root | Preserve native owner. |
+| existing `run-history/store/team-run-execution-tree-*.ts` | Team Persistence | Exact V2 schema/path/store | Preserve file/path/keys; narrow configured members. |
+| `agent-org-execution/domain/agent-org-run-execution-tree.ts` | Org Execution | Exact Org V1 domain/root | New subject contract. |
+| `run-history/store/agent-org-run-execution-tree-*.ts` | Org Persistence | Exact V1 schema/path/store | New family-specific store. |
+| `agent-org-execution/domain/agent-org-run.ts` | Org Execution | Org aggregate/direct handles/index | No coordinator/generic root. |
+| `agent-org-execution/services/agent-org-topology-planner.ts` | Org Execution | Fixed Org plan | Subject-specific IDs/placements. |
+| `agent-org-execution/services/agent-org-run-manager.ts` | Org Execution | Active Org registry/restore | One family manager. |
+| `run-history/services/root-execution-projection-service.ts` | Mixed Read | Explicit-kind dispatch/tagged DTO | Thin derived facade only. |
+| `app-data-migrations/.../team-v2-to-agent-org-v1-transformer.ts` | Migration | Org-like V2 mapping | Old knowledge isolated. |
+| `autobyteus-team-stream-contracts/...` | Team Stream | Existing Team-only contract | Keep compatible where still used. |
+| new mixed/Org stream DTO file/package | Stream | `root_subject_kind` union | Adds Org without retyping Team-only callers. |
+| `autobyteus-web/stores/agentOrgDefinitionStore.ts` | Web Authoring | Org catalog/draft/revision/errors | Separate subject state. |
+| `autobyteus-web/components/collaboration/handoffs/*` | Web Authoring | From/To/When cards/editor/reorder/errors | Shared presentation; owner supplies policy. |
+| `autobyteus-web/stores/agentOrgRunConfigStore.ts` | Web Config | Org root/Team/Agent sparse overrides | Org-specific intent. |
+| `autobyteus-web/stores/rootExecutionViewStore.ts` | Web Workspace | Tagged open/connect/history state | One mixed read owner, not persistence authority. |
+| `autobyteus-web/services/rootExecution/rootExecutionViewState.ts` | Web Workspace | union selectors/reducer/focus mapping | Branch-aware exact selection. |
 
 ## Reusable Owned Structures Check
 
-| Repeated Structure / Logic | Candidate Shared File | Owning Subsystem | Why Shared | Redundant Attributes Removed? | Overlapping Representations Removed? | Must Not Become |
-| --- | --- | --- | --- | --- | --- | --- |
-| Root definition topology for compiler/planner | `resolved-collaboration-topology.ts` | Agent Collaboration | Org and standalone Team both compile handoffs/plans | Yes | Yes | Generic recursive tree |
-| Canonical rooted addresses | `collaboration-address.ts` | Agent Collaboration | Definition/runtime/transport use one parser | Yes | Yes | Global run locator |
-| V3 configured/task records | `run-execution-tree.ts` | Persistence | Both root variants reuse exact nodes/tasks | Yes | Yes | Two schema families or optional-field blob |
-| Runtime root config | `collaboration-run-config.ts` | Collaboration Execution | Planner, builder, root manager share immutable plan | Yes | Yes | `AgentOrgDefinition extends AgentTeamDefinition` |
-| Launch configuration | existing launch-preferences / config type | Launch/Execution | Same defaults per root/team/agent | Yes | Yes | Coordinator semantics |
-| V3 transport root | collaboration stream DTO | Stream | Server/web share exact wire schema | Yes | Yes | Client-inferred union |
-| Web execution selectors/reducer | `services/collaborationExecution/**` | Web Workspace | Org/Team live/history actions are the same after root discrimination | Yes | Yes | Definition authoring policy owner |
+| Structure / Logic | Shared Owner | Why Shared | Must Not Become |
+| --- | --- | --- | --- |
+| Canonical address | `agent-collaboration/domain/collaboration-address.ts` | Definition/runtime/transport share exact string rules | Global run locator |
+| Resolved topology variants | `resolved-collaboration-topology.ts` | Compiler/endpoint/config use same fixed-depth placements | Recursive generic tree |
+| Persisted Agent/Team/handoff/launch/task records | `run-history/domain` + `store` shared-record files | Keys/meaning are approved identical | Generic root schema or optional-field blob |
+| Launch configuration merge | Collaboration resolver + pure field merge module | Org and Team reuse field precedence | Focus/coordinator policy |
+| Task delegation mechanism | Collaboration task service interface | Both roots authorize/commit fresh tasks similarly | Configured membership API |
+| Handoff UI model | web collaboration components | Display/edit commands repeat | Endpoint/persistence owner |
+| Mixed projection DTO | stream/history contract | Server/web share explicit union | Client-inferred kind |
+| Definition package transaction | definition provider utility | Org/Team multi-file save needs same crash safety | Domain validator or global lock |
 
 ## Shared Structure / Data Model Tightness Check
 
-| Shared Structure / Type / Schema | One Clear Meaning Per Field? | Redundant Attributes Removed? | Parallel / Overlapping Representation Risk | Corrective Action |
-| --- | --- | --- | --- | --- |
-| `AgentOrgDefinition` | Yes | Yes | Low | No coordinator or inherited Team fields. |
-| `AgentTeamDefinition` | Yes | Yes | Low | Agent-only member type; no redundant Team member kind. |
-| `CollaborationResolvedRoot` union | Yes | Yes | Low | Discriminator and variant-specific coordinator. |
-| `CollaborationRunConfig` root union | Yes | Yes | Low | Team node member type is Agent-only. |
-| `RunExecutionTreeFileV3` | Yes | Yes | Low | Root-only discriminator; reuse child/task records; exact schemas. |
-| Domain `rootRunId` vs on-disk task `rootTeamRunId` | Yes at each boundary | N/A (on-disk shape approved unchanged) | Medium | Confine old field spelling to versioned codec/record modules; map once at persistence boundary. |
-| Migrated Org-owned definition ID | Yes (opaque identity) | N/A | Medium | Source index owns the mapping; do not parse its historical prefix as topology. |
+| Structure | Singular Meaning? | Overlap Risk | Corrective Action |
+| --- | --- | --- | --- |
+| `AgentOrgDefinition` | Yes | Low | No coordinator/inherited Team fields. |
+| `AgentTeamDefinition` | Yes | Low | Agent-only member record. |
+| Shared persisted configured/task records | Yes | Medium | Exact current fields only; no root IDs/discriminator added. |
+| `TeamRunExecutionTreeFileV2` | Yes | Low | Remains exact native Team family. |
+| `AgentOrgRunExecutionTreeFileV1` | Yes | Low | Exact Org keys; no optional coordinator/focus. |
+| `RootExecutionTreeProjection` | Yes | Medium | `root_subject_kind` selects exact DTO branch; projection only. |
+| `DefinitionRevision` | Yes | Low | Opaque provider token only. |
+| `PlacementLaunchOverride` | Yes | Medium | Exact address+subject kind; no focus. |
+| Internal root/host identity vs approved old task field spellings | Yes per boundary | Medium | Map once in versioned codec; do not rename persisted shared records. |
+| Migrated Org-owned definition ID | Yes, opaque | Medium | Source index owns mapping; never parse prefix. |
 
 ## Final File Responsibility Mapping
 
-| File | Owning Subsystem | Owner / Boundary | Concrete Concern | Why This Is One File | Reuses Shared Structure? |
-| --- | --- | --- | --- | --- | --- |
-| `autobyteus-server-ts/src/agent-org-definition/domain/agent-org-definition.ts` | AgentOrg Definition | AgentOrgDefinition | Org metadata, direct members, handoffs, defaults, ownership | One subject invariant | Yes |
-| `.../agent-org-definition/providers/agent-org-definition-config.ts` | AgentOrg Definition | config codec | Strict `org-config.json` normalization/build | One physical contract | handoffs/defaults |
-| `.../agent-org-definition/providers/file-agent-org-definition-provider.ts` | AgentOrg Definition | provider | shared/Org-owned/application source reads and atomic writes | One I/O owner | store utilities |
-| `.../agent-org-definition/services/agent-org-definition-resolver.ts` | AgentOrg Definition | resolver | Fixed direct Agent/Team ref resolution, names, depth | One topology boundary | Team query interface |
-| `.../agent-org-definition/services/agent-org-definition-service.ts` | AgentOrg Definition | public owner | validate-before-write CRUD/catalog | One authoritative boundary | resolver/compiler/provider |
-| `.../agent-team-definition/domain/agent-team-definition.ts` | AgentTeam Definition | Team subject | Agent-only members and coordinator | One subject invariant | handoffs/defaults |
-| `.../agent-team-definition/services/agent-team-definition-service.ts` | AgentTeam Definition | public owner | flat validate-before-write CRUD/catalog | One authoritative boundary | provider/compiler |
-| `.../agent-collaboration/domain/collaboration-address.ts` | Agent Collaboration | address contract | Canonical string parse/build/rebase/depth helpers | One shared identity format | N/A |
-| `.../agent-collaboration/definition/collaboration-handoff-compiler.ts` | Agent Collaboration | compiler | Compile standalone Team or Org+mounted Team rules | One ordered edge policy | resolved topology |
-| `.../agent-collaboration-execution/domain/collaboration-run-config.ts` | Collaboration Execution | runtime config | Root discriminated union, Agent/Team nodes, launch projections | One immutable plan authority | address/launch/handoffs |
-| `.../agent-collaboration-execution/domain/run-execution-tree.ts` | Persistence domain | V3 contract | Generic envelope/root union/reused member/task records | One logical family | address/launch |
-| `.../agent-collaboration-execution/domain/root-collaboration-run.ts` | Collaboration Execution | root aggregate | public live operations and snapshot ownership | One aggregate boundary | services below |
-| `.../agent-collaboration-execution/domain/agent-org-run.ts` | Collaboration Execution | Org local run | direct Agent/Team handles, no coordinator | Variant-specific behavior | configured-scope backend |
-| `.../agent-collaboration-execution/domain/team-run.ts` | Collaboration Execution | Team local run | direct Agents/coordinator/task children | Variant-specific behavior | configured-scope backend |
-| `.../agent-collaboration-execution/services/collaboration-topology-planner.ts` | Collaboration Execution | planner | fixed-depth plan and ID allocation after validation | One plan compiler | resolved definitions |
-| `.../agent-collaboration-execution/services/collaboration-execution-index.ts` | Collaboration Execution | derived index | configured fixed depth + recursive task host/run lookup | One immutable index | V3 types |
-| `.../agent-collaboration-execution/services/collaboration-recipient-resolver.ts` | Collaboration Execution | recipient policy | same-root exact Agent/Team ingress resolution | One routing policy | address/index |
-| `.../agent-collaboration-execution/services/collaboration-run-manager.ts` | Collaboration Execution | root registry | create/restore/stop/readiness | One process owner | root factory/package loader |
-| `.../agent-collaboration-execution/services/agent-org-run-service.ts` | Collaboration Execution | Org app service | typed launch/entry/application behavior | Subject-specific boundary | planner/manager |
-| `.../agent-collaboration-execution/services/agent-team-run-service.ts` | Collaboration Execution | Team app service | typed standalone launch/coordinator behavior | Subject-specific boundary | planner/manager |
-| `.../run-history/store/run-execution-tree-schema.ts` | Persistence | strict V3 schema | exact keys/root conditional/fixed depth/task correlation | One current validator | V3 types |
-| `.../run-history/store/run-execution-tree-store.ts` | Persistence | V3 store | generic filename and atomic current read/write | One current I/O boundary | schema/writer |
-| `.../app-data-migrations/migrations/agent-org-flat-team-v3/*` | Migration | historical owner | plan/old codecs/transform/promote/recover | Separate files by concern within one migration | current target validators |
-| `.../api/graphql/types/agent-org-definition.ts` | GraphQL | Org transport | Org queries/mutations/types | One subject surface | Org service |
-| `.../api/graphql/types/agent-team-definition.ts` | GraphQL | Team transport | flat Team queries/mutations/types | One subject surface | Team service |
-| `.../api/graphql/types/agent-org-run.ts` | GraphQL | Org launch transport | create/restore/terminate typed results | One subject surface | Org run service |
-| `.../api/graphql/types/agent-team-run.ts` | GraphQL | Team launch transport | standalone Team lifecycle | One subject surface | Team run service |
-| `autobyteus-collaboration-stream-contracts/src/run-execution-view-dtos.ts` | Stream contract | V3 wire | generic root union and reused node/task DTOs | One current schema | zod helpers |
-| `autobyteus-server-ts/src/services/agent-streaming/collaboration-execution-view-projector.ts` | Stream adapter | projector | V3 domain -> wire mapping | One adapter | stream DTO |
-| `autobyteus-web/stores/agentOrgDefinitionStore.ts` | Web authoring | Org state | Org catalog/CRUD | Subject-specific | GraphQL |
-| `autobyteus-web/stores/agentTeamDefinitionStore.ts` | Web authoring | Team state | flat Team catalog/CRUD | Subject-specific | GraphQL |
-| `autobyteus-web/stores/collaborationRunStore.ts` | Web workspace | live root state | subject-generic open/connect/input/stop/recovery | One active execution owner | V3 view/stream |
-| `autobyteus-web/services/collaborationExecution/collaborationExecutionViewState.ts` | Web workspace | immutable view | V3 root union selectors/event reduction | One read-model owner | generated contracts |
+| File / Path | Owner | Concrete Responsibility | Dependency Rule |
+| --- | --- | --- | --- |
+| `autobyteus-server-ts/src/agent-org-definition/domain/agent-org-definition.ts` | Org Definition | Org metadata/direct member/handoff/default/source invariant | Imports public Agent/Team ref and collaboration types only. |
+| `.../agent-org-definition/providers/agent-org-definition-config.ts` | Org Definition | Strict Org config codec | No Team root config alias. |
+| `.../agent-org-definition/providers/file-agent-org-definition-provider.ts` | Org Definition | Org source reads + definition-package transaction adapter | Provider not called above service. |
+| `.../agent-org-definition/services/agent-org-definition-resolver.ts` | Org Definition | Direct Agent/Team ref resolution/depth | Team query interface only. |
+| `.../agent-org-definition/services/agent-org-definition-service.ts` | Org Definition | Authoritative validate-before-write CRUD/catalog | Encapsulates resolver/provider. |
+| `.../agent-team-definition/domain/agent-team-definition.ts` | Team Definition | Agent-only Team/coordinator | No Org or Team member union. |
+| `.../agent-team-definition/services/agent-team-definition-service.ts` | Team Definition | Flat validate-before-write CRUD/catalog | Encapsulates provider. |
+| `.../agent-team-definition/providers/definition-package-transaction.ts` (or neutral sibling provider utility) | Definition persistence | Revision lock/stage/journal/promote/recover | Used only by subject providers/services. |
+| `.../agent-collaboration/domain/collaboration-address.ts` | Collaboration | Parse/build/rebase/depth | Not a global locator. |
+| `.../agent-collaboration/definition/collaboration-handoff-compiler.ts` | Collaboration | Explicit Team/Org compile | Resolved topology only. |
+| `.../agent-collaboration/definition/definition-endpoint-catalog.ts` | Collaboration | Eligible endpoints/coordinator metadata | Candidate topology only. |
+| `.../agent-collaboration/services/collaboration-launch-configuration-resolver.ts` | Collaboration | Org/Team effective launch settings | No activation/focus. |
+| `.../run-history/domain/run-execution-tree-shared-records.ts` | Persistence | Shared exact record types | No root union. |
+| `.../run-history/store/run-execution-tree-shared-record-schemas.ts` | Persistence | Shared exact record validators | No path/family selection. |
+| existing `.../agent-team-execution/domain/team-run-execution-tree.ts` | Team Execution | Exact Team V2 domain/root | Compose shared records; Agent-only members. |
+| existing `.../run-history/store/team-run-execution-tree-schema.ts` | Team Persistence | Strict V2 exact keys/invariants | Never accept Org V1. |
+| existing `.../run-history/store/team-run-execution-tree-path.ts` | Team Persistence | `$MEMORY_ROOT/agent_teams/<id>/team_run_execution_tree.json` | Unchanged. |
+| existing `.../run-history/store/team-run-execution-tree-store.ts` | Team Persistence | Native V2 atomic read/write | No try-Org fallback. |
+| existing `.../run-history/store/team-run-file-commit-writer.ts` | Team Persistence | Correlated Team V2 tree/task/metadata commit sequence | Retain Team-only semantics and package path. |
+| `.../agent-org-execution/domain/agent-org-run-execution-tree.ts` | Org Execution | Exact Org V1 domain/root | Compose shared records. |
+| `.../agent-org-execution/domain/agent-org-run.ts` | Org Execution | Org aggregate/direct Agent/Team handles/index/events | No coordinator; owns Org operations. |
+| `.../agent-org-execution/services/agent-org-topology-planner.ts` | Org Execution | Fixed-depth run plan/IDs | No raw provider reads. |
+| `.../agent-org-execution/services/agent-org-run-manager.ts` | Org Execution | Org active registry/factory/restore | Calls Org store only. |
+| `.../agent-org-execution/services/agent-org-run-service.ts` | Org Execution | Config-first full-scope create/restore/stop | Public Org boundary. |
+| `.../agent-team-execution/services/flat-team-topology-planner.ts` | Team Execution | Team->Agents plan | Replaces configured recursive planning. |
+| existing Team run manager/service/root files | Team Execution | Native Team lifecycle/registry/coordinator | Call Team V2 store only. |
+| `.../run-history/store/agent-org-run-execution-tree-schema.ts` | Org Persistence | Strict Org V1 keys/invariants | Never accept Team V2. |
+| `.../run-history/store/agent-org-run-execution-tree-path.ts` | Org Persistence | `$MEMORY_ROOT/agent_orgs/<id>/agent_org_run_execution_tree.json` | Exact approved path. |
+| `.../run-history/store/agent-org-run-execution-tree-store.ts` | Org Persistence | Native Org V1 atomic read/write | No try-Team fallback. |
+| `.../run-history/store/agent-org-run-file-commit-writer.ts` | Org Persistence | Correlated Org V1 tree/task/metadata commit sequence | Mirrors fail-stop mechanics, not Team root semantics. |
+| existing `.../agent-memory/store/agent-memory-layout.ts` | Memory layout | Preserve Team package locator; add explicit Org package locator and compound-kind projection mapping | No kind inference or one generic physical root. |
+| `.../run-history/domain/agent-org-run-history-index.ts` + store/service | Org History | Org history rows/index | Subject-specific authority. |
+| existing Team history index/store/service | Team History | Native Team history | Retained for Team. |
+| `.../run-history/services/root-run-history-catalog-service.ts` | Mixed Read | Merge tagged Team/Org derived rows | Calls subject query boundaries. |
+| `.../run-history/services/root-execution-projection-service.ts` | Mixed Read | Explicit compound identity -> tagged tree DTO | No file scan/guess/lifecycle. |
+| `.../app-data-migrations/migrations/agent-org-flat-team-families-v1/*` | Migration | Plan/old codecs/transform/stage/promote/recover/verify | Only old-shape owner. |
+| `.../api/graphql/types/agent-org-definition.ts` | GraphQL | Org definitions/mutations | Org service only. |
+| `.../api/graphql/types/agent-org-run.ts` | GraphQL | Org config launch/lifecycle | Org run service only. |
+| existing Team GraphQL definition/run files | GraphQL | Flat Team authoring/native launch | Remove nested input; preserve compatible Team results where possible. |
+| existing Team stream contract/projector files | Team Stream | Team-only V2-compatible snapshot/events | No Org payload. |
+| new `autobyteus-collaboration-stream-contracts/src/root-execution-view-dtos.ts` with package name `@autobyteus/collaboration-stream-contracts` | Mixed Stream | Tagged Team-V2/Org-V1 union | Must not replace Team-only contract unless all consumers intentionally migrate. |
+| `autobyteus-web/stores/agentOrgDefinitionStore.ts` | Web Authoring | Org catalog/draft/revision/errors | Org GraphQL only. |
+| `autobyteus-web/stores/agentTeamDefinitionStore.ts` | Web Authoring | Flat Team draft/revision/errors | Team GraphQL only. |
+| `autobyteus-web/components/collaboration/handoffs/HandoffList.vue` | Web UI | Ordered From/To/When display/read-only owner label | Presentation only. |
+| `.../HandoffEditor.vue` | Web UI | Inline endpoint/condition CRUD/reorder/cancel/errors | Subject commands/catalog only. |
+| `autobyteus-web/stores/agentOrgRunConfigStore.ts` | Web Config | Org root + Team/Agent override intent | No focus. |
+| existing Team run config store (renamed only if repository convention demands) | Web Config | Simplified Team root/Agent overrides | Coordinator behavior retained. |
+| `autobyteus-web/stores/rootExecutionViewStore.ts` | Web Workspace | Tagged active/history view and transport lifecycle | Projection, not root authority. |
+| `autobyteus-web/services/rootExecution/rootExecutionViewState.ts` | Web Workspace | Union reducer/selectors/exact focus mapping | Clear invalid Org focus; never choose fallback. |
+| approved Team/Org catalog/form/detail/config/workspace Vue components | Web UI | RV-012 states/layout/responsive/accessibility | Use production stores, never prototype mocks. |
 
 ## Applied Patterns
 
-- **Discriminated root union:** AgentOrg and AgentTeam share the generic envelope
-  but keep coordinator/member invariants variant-specific.
-- **Immutable topology snapshot:** launch compiles the current definitions once;
-  restore uses the durable snapshot rather than mutable definitions.
-- **Thin subject-specific facade over shared mechanics:** Org/Team APIs and run
-  services remain truthful while sharing planner/root/persistence internals.
-- **Validate-plan-promote:** definitions and migration validate all semantic
-  facts before atomic write/promotion.
-- **Current-schema runtime plus isolated migration:** V2 is historical input only.
-- **Derived immutable index:** addresses, host ancestry, and run IDs are indexed
-  from a validated V3 tree; no fallback discovery.
+- **Subject-specific aggregates and stores:** Team and Org are peers with exact
+  invariants; no optional-field generic root.
+- **Composition of tight shared records:** approved child/handoff/launch/task
+  shapes are shared without merging root schemas or paths.
+- **Explicit discriminated projection:** `root_subject_kind` exists at mixed
+  read/stream/workspace boundaries, never as a substitute persisted Team field.
+- **Immutable topology snapshot:** launch snapshots definitions; restore never
+  reinterprets topology from mutable definitions.
+- **Validate-plan-commit:** validation completes before IDs/persistence/runtime.
+- **Revisioned package transaction:** complete definition files commit/recover as
+  one aggregate under lock and expected revision.
+- **Most-specific configuration overlay:** root, Team placement, exact Agent.
+- **Nullable client focus:** Org activation owns no recipient; explicit selection
+  creates temporary exact focus.
+- **Native current stores plus isolated migration:** Team V2 and Org V1 are both
+  current; only organization-like old Team V2 is historical migration input.
+- **Derived tagged catalog:** mixed history/stream rows are rebuildable and never
+  topology authority.
 
 ## Target Subsystem / Folder / File Mapping
 
-| Path | Kind | Owner / Boundary | Responsibility | Why It Belongs Here | Must Not Contain |
-| --- | --- | --- | --- | --- | --- |
-| `autobyteus-server-ts/src/agent-org-definition/` | Folder | AgentOrg Definition | New Org domain/provider/service/source ownership | Distinct product subject | runtime managers, Team mutation |
-| `autobyteus-server-ts/src/agent-team-definition/` | Folder | AgentTeam Definition | Contract to Agent-only Team and direct coordinator | Existing subject remains | Org members, recursive resolver |
-| `autobyteus-server-ts/src/agent-collaboration/definition/` | Folder | Agent Collaboration | resolved topology and handoff compile policy | Existing address/handoff capability | file I/O, active runs |
-| `autobyteus-server-ts/src/agent-collaboration-execution/` | Folder | Collaboration Execution | Move/refactor current `agent-team-execution` root/runtime/task capability | Root may be Org or Team | definition CRUD, V2 migration types |
-| `.../agent-collaboration-execution/backends/mixed/` | Folder | provider/local execution | Reuse current mixed Agent/Team mechanics with Org-vs-Team specialization | Provider mechanics remain cohesive | public root orchestration, configured Team recursion in TeamRun |
-| `autobyteus-server-ts/src/run-history/store/run-execution-tree-*.ts` | Files | Persistence | V3 generic path/schema/store | Current run history owns durable root package | V2 decoding |
-| `autobyteus-server-ts/src/app-data-migrations/migrations/agent-org-flat-team-v3/` | Folder | Migration | All old definition/V2/layout knowledge | Explicit historical boundary | imports from current business code into old codecs |
-| `autobyteus-server-ts/src/api/graphql/types/agent-org-*.ts` | Files | GraphQL Org adapter | Org definition/run catalog and mutations | Truthful external subject | Team coordinator defaults |
-| `autobyteus-server-ts/src/api/graphql/types/agent-team-*.ts` | Files | GraphQL Team adapter | Flat Team definition/run API | Truthful Team subject | Team member enum containing Team |
-| `autobyteus-server-ts/src/application-*/**` | Existing files | Application integration | Remove recursive Team assumptions and keep application-owned/resource Teams flat through AgentTeamRunService | Existing app owner | AgentOrg application authoring or raw provider/manager access |
-| `autobyteus-server-ts/src/agent-packages/**` and `src/config/app-config.ts` | Existing files | package/config | Discover/count `agent-orgs`; expose target definition/run roots | Existing package/config authority | subject validation duplicates |
-| `autobyteus-collaboration-stream-contracts/` | Folder/Package | Stream contract | Rename/migrate current Team stream package to generic V3 root contract | External contract now spans both roots | V2 union/fallback parser |
-| `autobyteus-web/components/agentOrgs/` | Folder | Web Org authoring | Org list/detail/create/edit/member/handoff/entry UI | New subject-specific experience | coordinator control, copied Team definitions |
-| `autobyteus-web/components/agentTeams/` | Folder | Web Team authoring | Agent-only Team list/detail/create/edit | Existing Team UX contracted | Team library/nested Team counts |
-| `autobyteus-web/services/collaborationExecution/` | Folder | Web live/history domain | Rename/extract current `teamExecution` state/selectors/hydration | Shared root execution semantics | definition form policy |
-| `autobyteus-web/components/workspace/collaboration/` | Folder | Web workspace | Generic execution tree, messages, tasks, overview | Both roots share runtime interactions | recursive configured hierarchy assumptions |
-| `autobyteus-web/pages/agent-orgs.vue` | File | Web route | AgentOrg catalog/CRUD navigation | Distinct product surface | Team-specific views |
-| `autobyteus-web/pages/agent-teams.vue` | File | Web route | Flat Team catalog/CRUD navigation | Preserve standalone Team path | nested Team navigation |
-| Package sources: `agent-orgs/<org-id>/org.md`, `org-config.json`, optional `agents/`, `agent-teams/` | Physical contract | AgentOrg provider | Org metadata/config and owned definition sources | Truthful containment owner | nested AgentOrg; Team under Team |
-| Package sources: `agent-teams/<team-id>/team.md`, `team-config.json`, optional `agents/` | Physical contract | AgentTeam provider | Reusable standalone flat Team | Preserves current Team development flow | `agent-teams/` child folder |
-| Runtime: `<memory>/collaboration_runs/<rootRunId>/run_execution_tree.json` | Physical contract | V3 store | Generic root package authority | Root may be Org or Team | V2 file/root-Team schema |
-| Runtime: `<memory>/collaboration_run_history_index.json` | Physical contract | history store | Derived generic root catalog | Truthful root union | authoritative topology/content |
+| Path | Kind | Owner | Responsibility | Must Not Contain |
+| --- | --- | --- | --- | --- |
+| `autobyteus-server-ts/src/agent-org-definition/` | New folder | Org Definition | Org domain/provider/service/source ownership | runtime managers, Team mutation |
+| `autobyteus-server-ts/src/agent-team-definition/` | Existing folder | Team Definition | Agent-only Team/coordinator/local Agents | Org members, recursive resolver |
+| `autobyteus-server-ts/src/agent-collaboration/definition/` | Existing/extended | Collaboration | resolved variants, endpoint catalog, handoff compilation | file I/O, live runs |
+| `autobyteus-server-ts/src/agent-collaboration/services/` | Existing/extended | Collaboration | configuration resolver and reusable root-scope mechanisms | root registry or persisted root union |
+| `autobyteus-server-ts/src/agent-team-execution/` | Existing folder | Team Execution | native RootTeamRun/TeamRun/manager/service, flat planner | Org root, configured Team children |
+| `autobyteus-server-ts/src/agent-org-execution/` | New folder | Org Execution | AgentOrgRun/manager/service/planner/index | Team V2 authority, coordinator |
+| `autobyteus-server-ts/src/run-history/domain/` | Existing folder | Persistence contracts | shared exact records + subject history rows | generic persisted root |
+| `autobyteus-server-ts/src/run-history/store/team-run-execution-tree-*.ts` | Existing files | Team Persistence | exact native V2 schema/path/store | Org keys or fallback |
+| `autobyteus-server-ts/src/run-history/store/agent-org-run-execution-tree-*.ts` | New files | Org Persistence | exact V1 schema/path/store | Team root or try-both logic |
+| `autobyteus-server-ts/src/agent-memory/store/agent-memory-layout.ts` and memory sync/classifier callers | Existing files | Memory layout | retain Team paths; add Org paths and explicit-kind dispatch | inferred kind or path rewrite for flat Teams |
+| `autobyteus-server-ts/src/run-history/services/root-*-projection*.ts` | New files | Mixed Read | explicit-kind derived catalog/tree projection | lifecycle, kind inference |
+| `autobyteus-server-ts/src/persistence/file/atomic-directory-transaction.ts` | New shared file | File persistence | lock-agnostic staged directory promotion/recovery primitive | definition rules or root-family policy |
+| `autobyteus-server-ts/src/app-data-migrations/migrations/agent-org-flat-team-families-v1/` | New folder | Migration | all old recursive/Org-like Team conversion knowledge | imports from current services into old codecs |
+| `autobyteus-server-ts/src/api/graphql/types/agent-org-*.ts` | New files | GraphQL Org adapter | Org definitions/run APIs | Team coordinator default/focus |
+| existing `agent-team-*.ts` GraphQL files | Existing files | GraphQL Team adapter | flat Team APIs | Team member kind containing Team |
+| `autobyteus-team-stream-contracts/` | Existing package | Team stream | compatible Team-only view/events | Org payload |
+| `autobyteus-collaboration-stream-contracts/` | New package | Mixed stream | tagged Team/Org snapshot/events | runtime logic or inferred kind |
+| `autobyteus-web/components/agentOrgs/` | New folder | Web Org | RV-012 catalog/detail/builder | coordinator/entry/copy Team |
+| `autobyteus-web/components/agentTeams/` | Existing folder | Web Team | Agent-only Team authoring/detail | Team library/nesting UI |
+| `autobyteus-web/components/collaboration/handoffs/` | New shared UI | Handoff presentation | From/To/When list/editor/reorder/errors | endpoint/persistence policy |
+| subject run-config stores | Web config | Org/Team intent | separate root/placement drafts over shared pure merge | one conditional cross-subject blob |
+| `autobyteus-web/services/rootExecution/` | New/refactored | Web read model | tagged union reducers/selectors/focus | definition policy, family guessing |
+| workspace collaboration components | Web workspace | Product runtime presentation | full tree, tasks, messages, focus/prompt | recursive configured depth/persisted focus |
+| package `agent-orgs/<id>/org.md`, `org-config.json`, optional `agents/`, `agent-teams/` | Physical source | Org provider | Org plus owned sources/references | nested Org or Team-under-Team |
+| package `agent-teams/<id>/team.md`, `team-config.json`, optional `agents/` | Physical source | Team provider | reusable standalone Team | child `agent-teams/` source |
+| `$MEMORY_ROOT/agent_teams/<rootTeamRunId>/team_run_execution_tree.json` | Exact physical authority | Team V2 store | native Team execution tree/package | `subjectKind`, Org root, path move |
+| `$MEMORY_ROOT/agent_orgs/<orgRunId>/agent_org_run_execution_tree.json` | Exact physical authority | Org V1 store | native Org execution tree/package | coordinator/focus, Team root |
+| `$MEMORY_ROOT/team_run_history_index.json` | Existing derived file | Team History | native Team rows | Org rows after migration |
+| `$MEMORY_ROOT/agent_org_run_history_index.json` | New derived file | Org History | Org rows | Team rows |
 
 ### Files/Paths Deleted Or Renamed As A Unit
 
-- Move/refactor `autobyteus-server-ts/src/agent-team-execution/**` to
-  `autobyteus-server-ts/src/agent-collaboration-execution/**`; retain `team-run*`
-  names only for files/classes whose subject is an actual Team execution.
-- Rename `autobyteus-team-stream-contracts` and package imports to
-  `autobyteus-collaboration-stream-contracts` / corresponding package name.
-- Delete
-  `agent-team-definition/services/team-definition-graph-resolver.ts`,
-  `team-definition-graph-validator.ts`,
-  `providers/team-local-team-discovery.ts`, and Team-ref resolution functions
-  after the Org owners replace every call site.
-- Rename current generic web runtime files/stores/services from `teamExecution`,
-  `AgentTeamContext`, `TeamStreamingService`, and root-Team terminology to
-  collaboration-run terminology. Keep Team-named authoring and actual Team
-  execution presentation components where the subject is truly Team.
-- Regenerate `autobyteus-web/generated/graphql.ts`; do not hand-maintain old
-  recursive types.
+- Do **not** rename/move `agent-team-execution`, Team V2 store/path files,
+  `autobyteus-team-stream-contracts`, or native flat Team runtime directories as
+  a generic collaboration subsystem. RER-016 explicitly retains them.
+- Delete configured-recursion owners after all callers move: recursive Team
+  graph resolver/validator, Team-local Team discovery, recursive configured
+  planner branches/types, configured-child-Team factory path, nested Team
+  selectors/inputs, and Org-as-Team UI/API code.
+- Add `agent-org-execution` beside Team execution. Extract only concrete shared
+  records/mechanisms; do not move the whole Team subsystem to manufacture a
+  generic root.
+- Regenerate `autobyteus-web/generated/graphql.ts` and mixed stream generated
+  types from new authoritative schemas. Do not hand-maintain compatibility
+  aliases.
+- Runtime migration moves only organization-like package directories from
+  `agent_teams` through non-discoverable staging to `agent_orgs`; flat Team
+  directories/files are untouched.
 
 ## Folder Boundary Check
 
-| Path / Folder | Intended Structural Depth | Ownership Boundary Is Clear? | Mixed-Layer Or Over-Split Risk | Justification / Corrective Action |
-| --- | --- | --- | --- | --- |
-| `agent-org-definition` | Main-Line Domain-Control + provider subfolder | Yes | Low | Domain/services/providers remain separated within one subject capability. |
-| `agent-team-definition` | Main-Line Domain-Control + provider subfolder | Yes | Low | Flat Team remains independently owned. |
-| `agent-collaboration/definition` | Off-Spine Concern | Yes | Low | Shared compile/address policy serves both definition roots. |
-| `agent-collaboration-execution` | Main-Line Domain-Control with backend/task modules | Yes | Medium | Existing subsystem is large; preserve domain/services/backends/task subfolders rather than flattening. |
-| `run-history/store` | Persistence-Provider | Yes | Low | Current schema/store separate from migration. |
-| `app-data-migrations/.../agent-org-flat-team-v3` | Off-Spine Concern | Yes | Low | Historical knowledge is intentionally isolated by migration. |
-| `autobyteus-collaboration-stream-contracts` | Transport | Yes | Low | No runtime/business logic. |
-| Web `agentOrgs` / `agentTeams` | Mixed Justified (subject-specific presentation/state wrappers) | Yes | Low | Separate subject flows reduce conditional-form state. |
-| Web `services/collaborationExecution` | Main-Line Domain-Control read model | Yes | Low | Generic live/history state stays out of presentation. |
+| Folder | Depth / Boundary | Clear? | Justification |
+| --- | --- | --- | --- |
+| `agent-org-definition` | Subject domain/services/providers | Yes | Org has independent authoring/source invariant. |
+| `agent-team-definition` | Subject domain/services/providers | Yes | Flat Team remains independently launchable/reusable. |
+| `agent-collaboration` | Shared address/handoff/config mechanisms | Yes | Tight cross-root semantics; no root authority. |
+| `agent-team-execution` | Team runtime root + Team mechanics | Yes | Existing ownership retained; configured recursion removed. |
+| `agent-org-execution` | Org root runtime | Yes | New lifecycle/persistence subject; composes public Team mechanisms. |
+| `run-history/store` | Subject stores + tight record schemas | Yes | Two strict authorities remain visibly separate. |
+| migration folder | Historical transformation boundary | Yes | Only place old organization-like Team V2 is valid. |
+| Team vs collaboration stream packages | Subject-only vs mixed transport | Yes | Avoids breaking Team-only consumers or false package naming. |
+| Web `agentOrgs` / `agentTeams` | Subject-specific presentation | Yes | Prevents conditional invalid form state. |
+| Web `rootExecution` | Mixed read-only/live projection | Yes | Shared workspace without owning definitions/persistence. |
 
 ## Concrete Examples / Shape Guidance
 
-| Topic | Good Example | Bad / Avoided Shape | Why The Example Matters |
+| Topic | Good Shape | Avoid | Why |
 | --- | --- | --- | --- |
-| Definition reuse | `AgentOrgMember {kind:'agent_team', ref:'software-engineering-team'}` -> query same Team definition; Org handoffs stored only in Org | Copy Team members/coordinator into Org config or create `OrgTeamDefinition` subtype | REQ-018 requires identity/history/standalone reuse. |
-| Root V3 union | `{subjectKind:'agent_org', definitionId, runId, members}` or `{subjectKind:'agent_team', ..., coordinatorAddress, members: Agent[]}` | One root type with optional coordinator and recursive `members:any[]` | Conditional invariants stay type/schema-enforced. |
-| Fixed depth | Org `/software_engineering_team/architecture_designer`; standalone Team `/architecture_designer` | `/department/team/subteam/agent` | Address contract and configured ownership are explicit. |
-| Task host | Independent Org Agent delegates `/software_engineering_team`; fresh task Team is added to Org root `taskExecutions` and uses configured Team address | Add fresh task Team to Org `members` or assign a permanent `/task-team` address | Preserves PRE-005/configured-vs-task distinction. |
-| Handoff compile | Team `/reviewer -> /implementer` rebases once to `/software_engineering_team/reviewer -> /software_engineering_team/implementer`; Org cross-Team edge merges afterward | Recursive compiler walks Team definitions indefinitely or Team local edge directly names an Org peer | Teams remain reusable standalone; Org owns cross-member workflow. |
-| Migration | Preflight all 23/41 items, backup, atomic per-item promote, strict target rescan | Read V2 lazily in current store or flatten unknown depth during restore | Protects data and removes compatibility runtime. |
-| API split | `createAgentOrgRun(definitionId, entryAddress)` and `createAgentTeamRun(definitionId)` over shared manager | `createGroupRun({definitionId})` infers kind and chooses first member | Subject and entry semantics remain explicit. |
+| Team reuse | Org member stores `{kind:'agent_team', ref:'software-engineering-team'}` and Org handoffs; Team source/ID/history unchanged | Copy/fork Team into Org subtype | REQ-018. |
+| Team durable tree | Existing flat Team stays `schemaVersion:2`, `rootTeam`, same file/path | Add subjectKind/root rename or version bump | Approved native no-op. |
+| Org durable tree | `schemaVersion:1`, `subjectKind:'agent_org'`, `rootOrg`, no coordinator, separate path | Generic root file with optional coordinator | Exact approved Org truth. |
+| Mixed projection | `{root_subject_kind:'agent_team', execution_tree: teamV2Dto}` or Org branch | Infer from missing coordinator/version/name | Fail-closed correctness. |
+| Fixed depth | Org `/software_engineering_team/architecture_designer`; Team `/architecture_designer` | `/department/team/subteam/agent` | Explicit configured ownership. |
+| Task host | Org Agent delegates to `/software_engineering_team`; fresh task Team lives in exact host `taskExecutions` | Add task Team to Org `members` | Configured vs task distinction. |
+| Handoff compile | Team local edge rebases once at mount; Org edge merges afterward | Recursive indefinite compiler or Team local edge names Org peer | Team reuse/owner separation. |
+| Definition save | Complete ordered candidate + expected revision -> validate -> journaled package commit | Per-handoff/per-file writes or silent stale repair | Atomicity/reversibility. |
+| Org configuration | root choices + `/team` patch + `/team/agent` patch -> server complete plan | Trust client expansion or Team defaults silently win | Deterministic specificity. |
+| Org focus | launch returns Org run ID/focus null; explicit Team row maps to stored coordinator | pre-launch entry, first Agent, durable focus | Activation/target separation. |
+| Migration | flat package hash/path unchanged; Org-like source -> staging -> strict Org target | Rewrite all Teams, try-both reader, recursive flattening | Minimal risk and exact contract. |
+| API split | explicit Org and Team create/restore plus compound mixed read identity | `createGroupRun(id)` or `getRun(id)` guesses kind | Subject authority. |
 
 ## Backward-Compatibility Rejection Log (Mandatory)
 
-| Candidate Compatibility Mechanism | Why It Was Considered | Rejection Decision | Clean-Cut Replacement / Removal Plan |
-| --- | --- | --- | --- |
-| Keep recursive Team definitions beside AgentOrg | Easier additive rollout | Rejected | Migrate known one-level roots to Org; Team inputs/config reject Team members everywhere. |
-| Make coordinator optional on current root Team | Minimal type edit | Rejected | Discriminated AgentOrg/AgentTeam root union; coordinator absent/required by variant. |
-| Parallel AgentOrg tree/store | Avoid refactoring Team runtime | Rejected | One `RunExecutionTreeFileV3` and `RootCollaborationRun`. |
-| Normal store dual-read V2/V3 | Lazy migration convenience | Rejected | Startup migration gate; V3-only current store. |
-| Preserve old Team stream/GraphQL fields with aliases | Client transition convenience | Rejected | One coordinated server/contracts/web cutover and generated clients. |
-| Recursively flatten unexpected legacy definitions | Defensive compatibility | Rejected | PRE-002 violation before writes and operator-visible failure. |
-| Keep `AgentTeamAddress` and recursive LLM wording | Wire strings are unchanged | Rejected | Rename semantic type/renderer; retain only canonical string format. |
-| Copy Team definition on Org adoption | Simplifies local editing | Rejected | Reference same identity; Org owns only placement and Org handoffs. |
-| Global Team lookup in `delegate_task` for standalone Team | Could manufacture standalone-to-Team tasks | Rejected | Same-root mounted address contract only; no approved cross-run/security behavior. |
-| Leave `memory/agent_teams` as native location indefinitely | Avoid path migration | Rejected | Preflighted atomic move to `memory/collaboration_runs`; old path exists only in migration. |
+| Candidate | Decision | Clean-Cut Replacement / Preservation |
+| --- | --- | --- |
+| Keep recursive Team definitions beside Org | Rejected | Convert known Org roots; all current Team inputs reject Team members. |
+| Make Team coordinator optional | Rejected | Separate coordinator-free AgentOrg subject/root. |
+| Generic persisted V3/root union/store/path | Rejected and superseded | Exact Team V2 + exact Org V1. |
+| Rewrite/move flat Team V2 | Rejected | Leave file/path/bytes native; only stricter validation. |
+| Normal reader tries Team then Org | Rejected | Explicit family/kind dispatch and strict one-family reader. |
+| Leave migrated Org-like Team package in both paths | Rejected | Journaled source removal/staging/promotion; one canonical active path. |
+| Auto-retype/move wrong-family payload on restore | Rejected | Failure-closed mismatch; migration is offline/startup only. |
+| Recursively flatten unexpected depth | Rejected | PRE-002 failure before writes. |
+| Copy Team on Org adoption | Rejected | Stable definition reference and Org-owned handoffs. |
+| Global Team lookup in delegation | Rejected | Same-root mounted address only. |
+| Keep ignored Org `entryAddress` | Rejected | Coordinated Org API/UI cut; full-scope no-focus launch. |
+| Per-handoff mutations | Rejected | Complete revisioned parent candidate save. |
+| Force old Team-only consumers onto mixed DTO | Rejected as unnecessary break | Retain compatible Team-only surface; add mixed/Org contracts. |
 
 ## Derived Layering
 
-As explanatory structure only:
+Explanatory only:
 
-1. **Transport/presentation:** GraphQL, collaboration WebSocket contracts,
-   application adapters, Agent tools, web authoring/workspace.
-2. **Application boundaries:** subject-specific definition services and run
-   services; collaboration root manager/history services.
-3. **Domain/control:** AgentOrg/AgentTeam definitions, resolved topology,
-   planner, root aggregate, AgentOrgRun/TeamRun, address/handoff/task invariants.
-4. **Provider/persistence:** file providers, mixed Agent execution backends,
-   V3 tree/task/message stores, memory/history indexes.
-5. **Migration boundary:** old config/V2/layout decoders and promoters; no
-   upward dependency from current layers.
+1. **Presentation/transport:** subject GraphQL, Team-only and mixed streams,
+   Agent tools, web authoring/config/workspace.
+2. **Application boundaries:** subject definition/run services, definition
+   transaction, configuration resolver, mixed projection service.
+3. **Domain/control:** Org/Team definitions, resolved topology, endpoint/handoff
+   policy, subject planners/aggregates/indexes/task host invariants.
+4. **Providers/persistence:** subject definition providers, Team V2 and Org V1
+   stores/history/memory, lower-level Agent/Team runtime factories.
+5. **Migration:** old configured recursion and organization-like Team V2 codecs,
+   transaction journal/promoter; no upward dependency from current code.
 
-No higher layer may call both an application boundary and its internal provider
-or manager.
+A caller may not use both an application boundary and its internal
+provider/manager/store.
 
 ## Change / Refactor Sequence
 
-1. **Refresh and freeze the implementation base.** Rebase/merge the latest
-   authorized `personal` into the task branch, verify worktree isolation, inspect
-   any evolved dynamic-Team code, and reject recursive configured mutation per
-   REQ-017. Do not modify approved requirement artifacts.
-2. **Introduce subject-specific definition types and strict config codecs.** Add
-   AgentOrg definition/source/service and contract AgentTeam members to Agents.
-   Add fixed-depth resolved topology and collaboration compiler. Make create and
-   update validate before any provider write. Keep old config parsing only in the
-   future migration folder.
-3. **Add current V3 domain/schema/store and generic physical paths.** Implement
-   strict root union, fixed-depth configured invariant, recursive task invariant,
-   generic store/history/memory layout, and package validation. Do not yet admit
-   runtime until the manager is converted.
-4. **Refactor the runtime root boundary.** Rename/extract collaboration execution,
-   create `RootCollaborationRun`, `AgentOrgRun`, flat `TeamRun`, generic index and
-   recipient resolver. Remove configured child-Team capability from TeamRun while
-   preserving task Team factories, fail-stop persistence, messages, commands,
-   events, stop, and restore.
-5. **Replace planning and public run services.** Fixed-depth planner compiles both
-   roots; subject-specific services own launch inputs. Add exact Org entry
-   resolution and keep Team coordinator ingress. Update application/external
-   channel routes to explicit subject kinds.
-6. **Convert persistence/history/memory consumers.** Update task/message codecs at
-   one boundary, package loader, memory location classifier/sync, model config,
-   token/history projections, archive/delete, and live projection to generic
-   root IDs/subject kind. Remove current-code `rootTeam` assumptions.
-7. **Implement and register migration.** Place it after existing V2 prerequisites
-   and before service admission. Add definition/run fixtures for both cohorts,
-   task host preservation, collisions, crash states, and PRE-002 failures. Prove
-   that precondition violation causes zero source writes.
-8. **Cut external contracts.** Rename stream contracts package/schema/projector;
-   add AgentOrg GraphQL and flat Team GraphQL; update tools/package summaries/
-   application manifests; regenerate GraphQL. Delete recursive/old fields rather
-   than aliasing them.
-9. **Cut web authoring and shared runtime state.** Add `/agent-orgs`, AgentOrg
-   store/components and entry chooser; contract Team form/detail; migrate live/
-   history stores/services/components to the V3 collaboration view. Preserve
-   desktop/web-equivalent interaction and task lineage displays.
-10. **Convert canonical example packages and tests.** Software Development
-    Department, Northstar, and nested classroom become AgentOrg packages;
-    referenced shared Teams stay unchanged; Org-owned flat Teams move under the
-    Org source boundary with preserved canonical IDs. Replace nested configured
-    tests with fixed-depth, reuse, negative validation, and task-lineage cases.
-11. **Remove temporary seams.** Delete recursive resolvers/planners/Team members,
-    Team-root generic classes, old normal stores/paths, old contracts/package,
-    old UI selectors/fallbacks, and stale docs. Search for forbidden names/
-    paths outside migration and versioned unchanged record codecs.
-12. **Validate in risk order.** Unit schema/domain/compiler tests; migration
-    fixture tests; server integration/e2e for definition, Team/Org launch, entry,
-    handoff, tasks, stop/restore/history; stream contract tests; web unit and
-    browser flows; full builds/type checks. API/E2E Engineer owns final durable
-    executable validation after source review.
+1. **Refresh/freeze base.** Integrate the latest authorized implementation base,
+   verify worktree isolation, inspect any evolved dynamic-Team branch, and reject
+   recursive configured mutation under REQ-017.
+2. **Add shared exact record modules and golden fixtures.** Extract current V2
+   configured Agent/Team, handoff, launch, binding/timestamp, task Agent/Team
+   field shapes without serialized change. Freeze byte-level native Team V2
+   fixtures before modifying validators.
+3. **Split definition subjects.** Add AgentOrg domain/config/provider/service;
+   narrow AgentTeam to Agents; add fixed-depth resolved variants, endpoint
+   catalog, explicit compiler methods, and full candidate typed errors.
+4. **Add crash-safe definition aggregate save.** Implement generic atomic
+   directory transaction primitive plus subject revision locks/adapters. Verify
+   create/update/cancel/conflict/crash recovery and zero partial visibility.
+5. **Preserve/contract Team runtime.** Keep RootTeamRun, Team manager/service,
+   Team V2 store/path/history; replace configured recursive planner/index/factory
+   with flat Team plan and Agent-only validation. Do not migrate flat packages.
+6. **Add Org runtime/persistence.** Implement AgentOrg plan/run/manager/service,
+   Org V1 tree schema/path/store/history/memory classification, direct TeamRun
+   materialization through a narrow Team factory, host task ownership, and
+   fail-stop commit/events.
+7. **Add configuration resolver.** Server-authoritative Org root->Team->Agent and
+   Team root->Agent resolution; validate all settings/workspaces before IDs and
+   activation. Org returns no focus/entry.
+8. **Add explicit mixed projections.** Preserve Team-only endpoints/contracts;
+   add tagged history/tree/stream GraphQL and contract package, with family-
+   payload-branch agreement and negative mismatch tests.
+9. **Implement/register migration.** Place after prior V2 prerequisites and
+   before service admission. Test 27 no-op flat cases (no filesystem mutation),
+   14 Org-like mappings, definition packages, task hosts, collisions, cross-
+   filesystem rejection, all crash states, and PRE-002 zero-write failure.
+10. **Cut definition/launch external contracts.** Add Org GraphQL/tools/package
+    discovery; remove nested Team input; preserve compatible Team-only run DTOs;
+    regenerate GraphQL/contracts.
+11. **Implement web/Product cut.** Add separate Team/Org catalog/builder/detail,
+    owner-scoped handoff drafts, Org config, tagged workspace/history, nullable
+    Org focus, exact Team-coordinator mapping, and RV-012 desktop/narrow/a11y.
+12. **Convert examples and remove recursion.** Convert Software Development
+    Department/Northstar/classroom organization roots; keep referenced shared
+    Teams unchanged; delete current recursive configured owners/selectors/docs.
+13. **Validate in risk order.** Golden schemas; definition transactions; subject
+    runtimes/stores; migration; task restore; mixed projection mismatch; GraphQL/
+    streams; web unit/browser flows for VIS-001-VIS-020; full builds/typechecks.
 
-No temporary dual read/write or public compatibility seam may survive step 11.
+No temporary dual write, try-both read, generic V3 root, or public configured
+recursion may survive the cutover.
 
 ## Key Tradeoffs
 
-1. **Generic internal root with subject-specific public services.** This avoids
-   two runtime/persistence families while preventing ambiguous create/entry
-   semantics.
-2. **Physical root-run directory rename now.** It increases migration surface but
-   prevents the new native Org path from permanently living under a false
-   `agent_teams` owner. Atomic same-filesystem moves avoid rewriting large Agent
-   content.
-3. **Separate Org and Team authoring UI.** Some primitives are duplicated at the
-   wrapper level, but invalid conditional form states and hidden coordinator
-   semantics are avoided. Shared runtime workspace state is extracted instead.
-4. **Preserve opaque local definition IDs.** The historic encoded prefix is not
-   ideal, but rewriting it would violate durable identity and the approved V3
-   minimal mapping. Ownership is determined by indexed source metadata/path,
-   never by parsing the label as topology.
-5. **One coordinated contract cutover.** Server/contracts/web must land together;
-   this is operationally stricter but satisfies the no-compatibility rule and
-   avoids two externally supported hierarchy models.
+1. **Two subject aggregates/stores over shared records.** Some orchestration is
+   duplicated, but it preserves exact Team V2 and truthful Org V1 ownership;
+   shared Agent/Team/task mechanisms keep duplication bounded.
+2. **No-op flat cohort.** It intentionally leaves Team-named paths/contracts
+   because they remain accurate, avoiding unnecessary I/O and client breakage.
+3. **Separate Org history/stream projection plus mixed facade.** More adapters
+   than one generic store, but no false single authority or kind inference.
+4. **Journaled directory promotion.** Strong crash recovery and one canonical
+   family require staging/journal/fsync complexity; moving directories avoids
+   copying large durable content.
+5. **Separate authoring UIs.** Wrapper duplication avoids invalid conditional
+   state; handoff/config/workspace primitives are shared below subject owners.
+6. **Opaque identity preservation.** Historical name prefixes may look stale but
+   are not topology; changing them would break approved identity/history.
+7. **Sparse client intent/server complete plan.** Adds mapping code but prevents
+   drift and definition defaults from silently overriding Org choices.
+8. **Revisioned parent save.** Larger payload and transaction machinery preserve
+   member/handoff referential integrity and zero partial persistence.
 
 ## Risks
 
 | Risk | Likelihood / Impact | Control | Residual |
 | --- | --- | --- | --- |
-| A root is misclassified during migration | Low / Critical | Exhaustive preflight; direct configured-Team presence is the cohort discriminator; strict old/new validation; fixtures from both real cases | Unexpected contradictory data blocks rollout as required. |
-| Definition/file move breaks a package ref | Medium / High | Plan all refs and target paths globally, preserve IDs, validate full target catalog before promotion completion | Read-only external package roots require operator/deployment action. |
-| Task Team lineage is accidentally removed with configured recursion | Medium / Critical | Separate types/folders/tests; keep recursive task records/index traversal and task factory; negative configured-depth tests | Future refactors must retain the explicit distinction. |
-| Org root is still treated as Team internally through old names | Medium / High | Root/manager/address/stream/history semantic rename and forbidden-name search outside codecs/migration | Versioned task/message fields retain approved old spelling at codec boundary. |
-| Entry fallback reappears in UI/application route | Medium / High | Required `entryAddress` in Org interaction launch, resolver validation, negative no-selection/`/` tests | Inspection-only history open need not activate an entry. |
-| Shared Team adoption mutates or forks Team | Low / High | Org member is definition reference only; service dependency is query-only; regression tests compare ID/coordinator/handoffs/history | Org-owned migrated source has physical ownership but remains an exact identity. |
-| Runtime and durable snapshot diverge during commit | Low / Critical | Preserve prepare/durable/commit/publish fail-stop sequence and package correlation | Existing indeterminate finalization handling remains operationally relevant. |
-| Contract cutover leaves stale generated/client code | Medium / High | Rename package, regenerate, type-check all workspace consumers, no old parser | External consumers outside repository require coordinated release notice. |
-| Dynamic-Team work reintroduces recursion | Medium / High | Refresh branch and search dependencies; REQ-017 gate; architecture/code review | Later independently approved dynamic membership may require new design. |
-| No prototype leads to inconsistent visual terminology | Low / Medium | Requirements specify semantic states; browser validation across catalog/form/launch/history/workspace and localization audit | Styling/layout remain implementation choices. |
+| Flat Team is accidentally rewritten/moved | Medium / Critical | Golden bytes/path/inode/mtime no-op tests; migration write audit | Validation code changes but serialized native contract stays. |
+| Root misclassified | Low / Critical | Exhaustive preflight, direct configured-Team cohort rule, strict fixtures | Contradictory data blocks rollout. |
+| Both families become canonical for one ID | Low / Critical | Exclusive gate, source->staging->target journal, conflict matrix, parent fsync | Manual tampering requires operator recovery. |
+| Definition/package ref breaks on Org conversion | Medium / High | Global ref plan, preserve IDs, full target catalog validation | Read-only external roots need deployment action. |
+| Task Team lineage removed with configured recursion | Medium / Critical | Separate types/folders/tests; recursive task records/factory retained | Future refactors need explicit distinction. |
+| Org code bypasses Team public factory and reaches Team manager internals | Medium / High | Narrow embedded TeamRun factory and encapsulation tests/review | Some existing mixed backend code may require extraction. |
+| Wrong-family mixed restore/stream succeeds | Low / Critical | Compound kind+ID, subject location, strict store, mismatch tests | Corrupt/manual states remain blocked. |
+| Org focus created on launch/recovery | Medium / High | No durable/input field; nullable view; negative fallback tests | Explicit member-row click may focus by design. |
+| Config preview/server precedence drifts | Medium / High | Server authority + shared pure fixtures across web/server | Catalog evolution needs tests. |
+| Concurrent definition edits partially apply | Medium / High | revision lock, full validation, directory journal/recovery | External file edits cause explicit conflict/refetch. |
+| Shared Team is copied/mutated | Low / High | Query-only dependency and identity/coordinator/handoff/history regression tests | Org-owned migrated source remains physically Org-owned but distinct. |
+| Runtime/durable state diverges | Low / Critical | prepare -> strict write -> live commit -> event sequence per subject | Existing indeterminate I/O remains operational risk. |
+| Stale generated/external consumers | Medium / High | Preserve Team-only contract, regenerate mixed clients, coordinated release | Out-of-repo mixed consumers require release notes. |
+| Dynamic Team work reintroduces recursion | Medium / High | REQ-017 dependency scan and reviews | Future approved behavior needs new design. |
+| UI diverges from RV-012 | Medium / High | VIS/browser/a11y/narrow checks | Fixture values remain illustrative. |
 
 ## Guidance For Implementation
 
-- Treat `requirements-doc.md` and `agent-org-contract.md` as read-only. Use their
-  IDs in tests and code comments when an invariant is non-obvious.
-- Compile-time types and strict schemas must both encode the root union and flat
-  configured Team. Do not rely on one late validator around a recursive type.
-- Validate complete definition/launch/migration input before ID allocation or
-  persistent mutation. Errors must name the offending member/address/path.
-- Keep the V3 child/task field meanings exactly as approved. Root
-  `subjectKind` is the only new discriminator; do not add `kind` to configured or
-  task nodes or create `FlatTeam` records.
-- Resolve Org entry only after the immutable plan exists and before accepting an
-  initial user interaction. Team address entry resolves to its direct
-  coordinator. Never persist an Org coordinator.
-- Preserve same-root recipient isolation. A canonical logical address is never
-  a global run locator.
-- Keep task Team creation in task-delegation code. A task Team can appear below
-  an Org/Team/task host in `taskExecutions`, but never in configured `members`.
-- Use the current atomic writer/fail-stop patterns rather than bespoke JSON
-  writes. Migration staging and backups must fsync before source promotion.
-- Ensure migration preflight performs no source/target mutation, including no
-  implicit directory creation in source roots. Test this with filesystem
-  snapshots.
-- History/workspace restore must use the V3 snapshot. Current Team definition
-  changes after a run must not change historical topology, coordinator, or root
-  kind.
-- Frontend form state should have separate Org and Team types. Shared visual
-  primitives may be parameterized, but do not use one union form whose invalid
-  fields are hidden conditionally.
-- Run focused tests without watch mode per repository instructions. Minimum
-  implementation-scoped evidence should include server and contracts builds,
-  exact V3 schema/migration suites, Org/Team GraphQL/integration suites, web
-  authoring/workspace unit suites, and browser rendering for Org create/launch/
-  entry/history plus standalone Team create/launch/reuse.
-- Before handoff, search current source (excluding migration/versioned record
-  codecs and historical docs) for `rootTeam`, `root_team`, recursive configured
-  `agent_team` Team members, `getOrCreateConfiguredChildTeam`, old stream package
-  imports, and native `memory/agent_teams` paths. Every remaining occurrence
-  needs a subject-accurate justification.
+- Treat approved requirements, `AORG-CONTRACT-001`, `ui-ux-spec.md`, decision
+  record, manifest, and VIS-001-VIS-020 as read-only authorities. Prototype
+  services/persistence are mocked and must not be imported.
+- Preserve exact Team V2 `schemaVersion`, top/root keys, file name, package path,
+  and existing Team-only wire surfaces selected for compatibility. Narrow only
+  configured membership/coordinator validation. Add no `subjectKind` to Team.
+- Implement exact Org V1 `schemaVersion:1`, `subjectKind:'agent_org'`, `rootOrg`,
+  file/path, coordinator-free root, default configuration, direct Agent/flat
+  Team members, and root task records. Add no persisted focus.
+- Share exact child/handoff/launch/task record types/schemas, not root envelopes,
+  stores, paths, or optional-field roots. No `FlatTeam` type.
+- Every mixed response/event requires `root_subject_kind`; dispatch from known
+  subject/family and validate agreement. Never scan/guess/try both/auto-move.
+- Validate complete definition and launch input before ID allocation or durable
+  mutation. Errors include stable code, candidate path/address/handoff, and
+  message. Expected revision comparison and package promotion occur under the
+  same subject lock.
+- Use journaled staged directory transaction for multi-file definition saves and
+  migration. Test recovery after every filesystem transition/fsync boundary.
+- Migration preflight must create nothing. For flat Team packages prove byte,
+  path, mtime, and directory inventory unchanged. Org-like packages alone move
+  through non-discoverable staging to Org family; never advertise both paths.
+- Org launch settings resolve server-side from root plus sparse exact Team/Agent
+  patches. Activate all placements, return no entry/focus, and never mutate
+  referenced definitions.
+- Org web focus starts/clears to `null`; exact Agent focuses directly; exact Team
+  maps through Org snapshot to stored coordinator. Recipient actions validate
+  focus both client- and server-side; no fallback repair.
+- Keep task Team creation in task-delegation code. Task Teams may recurse only in
+  `taskExecutions` at exact host and never configured `members`.
+- Historical topology comes from its subject snapshot, not current definitions.
+  Definition edits/deletion cannot change old subject kind, coordinator, task
+  host, or addresses.
+- Separate Org and Team form/config state. Shared UI primitives accept explicit
+  owner view models/commands and cannot query providers or mutate the other
+  subject.
+- Preserve handoff array/When order. Rename/removal keeps stale entries visible,
+  blocks parent save, and requires explicit author resolution. Org never edits
+  Team-local handoffs; effective combined view is labeled/read-only.
+- Implement RV-012 desktop and `390x844`: no modal Org member/config picker, no
+  document horizontal overflow, keyboard/click control access, position-aware
+  reorder labels, visible focus, safe canonical addresses, and adjacent errors.
+- Minimum implementation evidence: Team V2 byte/path golden tests; Org V1 exact
+  schema/store/restore; family mismatch negatives; no-op and Org-like migration
+  with crash/collision/deep-precondition cases; definition transaction conflict/
+  crash cases; Org/Team GraphQL and streams; tasks/stop/restore/history; web
+  From/To/When CRUD/order/cancel/save, config precedence, no-focus/exact focus,
+  history/task lineage, responsive/a11y, standalone Team create/launch/reuse.
+- Before implementation handoff, search current source excluding migration and
+  immutable historical docs for configured Team member recursion,
+  `getOrCreateConfiguredChildTeam`, Org-as-RootTeam assumptions, Org
+  `entryAddress`, required/fallback Org focus, root-kind inference, and generic
+  V3/`collaboration_runs` artifacts. Also review every remaining `rootTeam`,
+  `team_run_execution_tree.json`, and `agent_teams` occurrence: they are expected
+  and correct in native Team code, but forbidden as Org/mixed authority.
