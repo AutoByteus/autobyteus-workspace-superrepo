@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRoute, useRouter } from 'vue-router'
 import WorkspaceHierarchyBranches from '~/components/workspace/history/WorkspaceHierarchyBranches.vue'
@@ -114,7 +114,23 @@ const focusTeam = async (run: AgentOrgHistoryItem, address: string) => { if (!ru
 const restore = async (run: AgentOrgHistoryItem) => { const runId = await store.restore(run.root_run_id); orgContexts.select(runId, null); orgContexts.connect(runId); await activateRoute({ ...run, root_run_id: runId, is_active: true }) }
 const stopOrg = async (run: AgentOrgHistoryItem) => { await store.terminate(run.root_run_id).catch(() => undefined); if (!store.terminationErrors[run.root_run_id]) orgContexts.disconnect(run.root_run_id) }
 const refresh = () => store.fetchHistory().catch(() => undefined)
-onMounted(async () => { await refresh(); const activeRunId = String(route.query.orgRunId || ''); const active = store.history.find((item) => item.root_run_id === activeRunId); if (active) { expandedWorkspaces.value.add(workspaceFor(active)); expandedOrgs.value.add(treeFor(active).rootOrg.orgDefinitionId); expandedRuns.value.add(activeRunId) } })
+const expandActivePath = () => {
+  const activeRunId = String(route.query.orgRunId || '')
+  const active = store.history.find((item) => item.root_run_id === activeRunId)
+  if (!active) return
+  expandedWorkspaces.value = new Set([...expandedWorkspaces.value, workspaceFor(active)])
+  expandedOrgs.value = new Set([...expandedOrgs.value, treeFor(active).rootOrg.orgDefinitionId])
+  expandedRuns.value = new Set([...expandedRuns.value, activeRunId])
+}
+watch(
+  [
+    () => String(route.query.orgRunId || ''),
+    () => store.history.map((item) => item.root_run_id).join('\0'),
+  ],
+  expandActivePath,
+  { flush: 'post' },
+)
+onMounted(async () => { await refresh(); expandActivePath() })
 </script>
 
 <style scoped>

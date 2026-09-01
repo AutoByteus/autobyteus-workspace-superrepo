@@ -48,10 +48,21 @@ export class ConfiguredAgentActivationPlanner {
       return Object.freeze({ kind: "new" });
     }
     if (external) {
+      const activity = this.inspectConversationActivity(config);
+      if (activity.kind === "none") return Object.freeze({ kind: "new" });
+      if (activity.kind === "indeterminate") {
+        throw new CollaborationAgentActivationError(
+          "COLLABORATION_AGENT_CONTINUATION_STATE_UNREADABLE",
+          "The local conversation state cannot be inspected safely.",
+          { cause: activity.error },
+        );
+      }
       const platformAgentRunId = this.input.platformAgentRunId?.trim() || null;
       if (platformAgentRunId) return Object.freeze({ kind: "restore_external", platformAgentRunId });
-      this.assertNoPriorConversationActivity(config);
-      return Object.freeze({ kind: "new" });
+      throw new CollaborationAgentActivationError(
+        "COLLABORATION_AGENT_CONTINUATION_BINDING_MISSING",
+        "This conversation has local history but no provider binding and cannot be continued safely.",
+      );
     }
     const activity = this.inspectConversationActivity(config);
     if (activity.kind === "present") return Object.freeze({ kind: "restore_native" });

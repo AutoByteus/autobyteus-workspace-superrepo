@@ -33,9 +33,10 @@ const store = reactive({
   terminate: vi.fn().mockResolvedValue(undefined),
 })
 const disconnect = vi.fn()
+const route = reactive({ query: { orgRunId: 'org-run' } })
 
 vi.mock('vue-router', () => ({
-  useRoute: () => reactive({ query: { orgRunId: 'org-run' } }),
+  useRoute: () => route,
   useRouter: () => ({ push: vi.fn() }),
 }))
 vi.mock('~/stores/agentOrgRunStore', () => ({ useAgentOrgRunStore: () => store }))
@@ -46,7 +47,14 @@ vi.mock('~/stores/agentOrgContextsStore', () => ({
 }))
 
 describe('AgentOrgRunHistoryPanel', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    route.query.orgRunId = 'org-run'
+    store.history = [{
+      root_subject_kind: 'agent_org', root_run_id: 'org-run', created_at: '2026-09-01T00:00:00.000Z',
+      archived_at: null, is_active: true, summary: 'Active Org', org: tree,
+    }]
+  })
 
   it('owns whole-Org stop on the active root row and exposes no member stop action', async () => {
     const wrapper = mount(AgentOrgRunHistoryPanel, {
@@ -60,5 +68,30 @@ describe('AgentOrgRunHistoryPanel', () => {
     await flushPromises()
     expect(store.terminate).toHaveBeenCalledWith('org-run')
     expect(disconnect).toHaveBeenCalledWith('org-run')
+  })
+
+  it('expands a newly launched active Org after history and route update without remounting', async () => {
+    store.history = []
+    route.query.orgRunId = ''
+    const wrapper = mount(AgentOrgRunHistoryPanel, {
+      global: { stubs: { Icon: true, WorkspaceHierarchyBranches: true } },
+    })
+    await flushPromises()
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(0)
+
+    store.history = [{
+      root_subject_kind: 'agent_org', root_run_id: 'org-run', created_at: '2026-09-01T00:00:00.000Z',
+      archived_at: null, is_active: true, summary: 'Active Org', org: tree,
+    }]
+    await flushPromises()
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(0)
+
+    route.query.orgRunId = 'org-run'
+    await flushPromises()
+
+    expect(wrapper.get('section > button').attributes('aria-expanded')).toBe('true')
+    expect(wrapper.get('button[aria-expanded="true"] span.font-medium').text()).toBe('Agent Org')
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(1)
+    expect(wrapper.get('[role="treeitem"]').text()).toContain('lead')
   })
 })
