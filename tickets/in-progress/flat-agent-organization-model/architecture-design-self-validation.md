@@ -3,10 +3,10 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-006`
-- Requirements authority: `RER-019` (activation/provenance-only update; approved behavior remains unchanged)
-- Product authority: `RV-012` / `VIS-001`-`VIS-020`
-- Trigger: user-requested use-case/data-flow/ownership/boundary/dependency self-validation; resolved Implementation Design Impact `IDI-001`; API/E2E real-browser Design Impact `ADI-007`
+- Architecture revision validated: `AD-REV-007`
+- Requirements authority: `RER-021` (approved BEH-011/REQ-028/AC-023/SCN-012 status supplement; prior runtime/durable behavior unchanged)
+- Product authority: `RV-012` / `VIS-001`-`VIS-020`; focused `AORG-FLAT-TEAM-STATUS-001` / `VIS-STATUS-001`-`VIS-STATUS-003`
+- Trigger: user-requested use-case/data-flow/ownership/boundary/dependency self-validation; resolved `IDI-001` and `ADI-007`; API-FIND-007 / CR-FIND-011 recovery under approved RER-021
 - Date: 2026-09-01
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
@@ -42,6 +42,11 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/docs/design/production_data_migration_conventions.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/visual-references/visual-reference-manifest.json`
+- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/ui-ux-spec.md`
+- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/user-decision-record.md`
+- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/visual-references/visual-reference-manifest.json`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` (`CRR-009` / `CR-FIND-011`)
+- `origin/personal@773bce779` implementations of `workspaceHistoryNestedTeamStatus.ts`, `NestedTeamAggregateStatusDot.vue`, and `WorkspaceTeamExecutionTree.vue` (inspected with `git show`; continuity evidence only)
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md`
 
 ## Universal Invariants Used By Every Walkthrough
@@ -63,6 +68,7 @@ Inputs:
 | Exact Org focus reuses accepted workspaces | Direct Agent uses Agent surface; Team/Team Agent uses Team surface; no custom Org runtime dashboard | Pass |
 | Browser Org state has one owner | One checkpointed AgentOrgExecutionContext owns view, AgentContexts, mounted-Team views, nullable focus and stream recovery | Pass |
 | Member presentation does not own root lifecycle | Org stop lives on active Org history root row; focused member and mounted Team have no root-stop action | Pass |
+| Mounted Team status is pure presentation | Exact configured/task descendant Agent statuses fold `running > initializing > error > idle > offline`; collapse does not alter input; historical live-only/missing values are offline; no status/lifecycle/API owner is added | Pass |
 
 ## Identity And Physical-Scope Truth Table
 
@@ -113,6 +119,9 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-020 | Accepted Agent interaction behavior; REQ-019 | Org send/context-file, interrupt and tool-decision parity | DS-017 | Pass |
 | VAL-021 | Existing strict stream/recovery and trace behavior; REQ-016/025 | Invalid Org event/sequence and restore hydration recover without raw fallback | DS-016, DS-018 | Pass |
 | VAL-022 | REQ-016/025; VIS-016-VIS-018; established Team history interaction | Org root termination placement and mounted-Team lifecycle boundary | DS-019 | Pass |
+| VAL-023 | SCN-012; REQ-028; AC-023; VIS-STATUS-001 | Active expanded mounted Team aggregates exact configured and task-scoped Agent statuses | DS-020, DS-021 | Pass |
+| VAL-024 | SCN-012; REQ-028; AC-023; VIS-STATUS-002 | Collapsed mounted Team retains reactive aggregate and exact branch isolation | DS-020, DS-021 | Pass |
+| VAL-025 | SCN-012; REQ-028; AC-023; VIS-STATUS-003 | Stopped/history Team aggregate loses live-only state and adds no lifecycle authority | DS-020 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -552,6 +561,82 @@ package-family rename. It does not infer logical topology from directory depth.
   and cannot be mistaken for a member/Team action.
 - **Result:** Pass.
 
+### VAL-023 — Active Expanded Mounted Team Status Includes Exact Task Descendants
+
+- **Trigger:** a user inspects an expanded direct configured Team while one
+  configured or task-scoped Agent in that exact branch changes status.
+- **Primary spine:** `strict Org snapshot/status event ->
+  CollaborationAgentPresentationAdapter -> AgentOrgExecutionContext exact
+  AgentContext -> configured Team node -> AgentOrgTeamBranchStatusProjector ->
+  shared five-state fold -> TeamAggregateStatusDot and unchanged Agent dots`.
+- **Bounded spine:** enumerate direct configured Agent members, task Agent
+  executions, task-Team Agent members, nested task-Team members and child task
+  executions below this Team node; ignore Team containers and every root/sibling
+  branch.
+- **Owners:** AgentContext owns exact live Agent status; the Org tree owns branch
+  identity; AgentOrg Team-branch projector owns traversal/source admission; the
+  shared fold/dot owns only normalization, precedence and accessible rendering.
+- **Concrete check:** Team A has configured `idle`, configured `error`, and a
+  task Agent `running`; its aggregate is `running`. A direct Org Agent or Team B
+  Agent cannot affect Team A. If Team A task Agent becomes `idle` while one Team
+  A Agent is `error`, Team A becomes `error`.
+- **Boundary/dependency check:** projector receives the exact Team node and an
+  injected `agentRunId -> status` function. It does not query context stores,
+  sockets, GraphQL, definitions, persistence or lifecycle services.
+- **Rejected shortcut:** scan canonical address prefixes, fold all Org statuses,
+  fold visible rows only, copy the precedence into the component, or persist a
+  Team status.
+- **Outcome:** expanded Team and exact Agent status signals coexist and react to
+  the same current truth.
+- **Result:** Pass.
+
+### VAL-024 — Collapsed Team Retains Aggregate Without Hidden-Row Authority
+
+- **Trigger:** the user collapses a direct mounted Team and a hidden descendant
+  Agent later changes between `idle`, `initializing`, `running`, or `error`.
+- **Primary spine:** `AgentOrg history render -> complete strict Team node + live
+  AgentOrgExecutionContext -> branch projection/fold -> Team row dot -> collapse
+  filter hides only descendant rows`; later status events follow DS-021 and
+  recompute the same dot.
+- **Owners:** expansion state owns visibility only; it does not own topology or
+  status membership. The branch projector reads the immutable full Team node
+  before visible-row construction.
+- **Boundary check:** no hidden Vue row must exist for its Agent status to
+  contribute. Collapse neither selects a recipient nor changes Team/coordinator
+  focus, root readiness or commands.
+- **Accessibility check:** the retained dot has role/title/name `Team status:
+  <State>` and the Team tree item remains keyboard/disclosure compatible; color
+  is not the only communication.
+- **Rejected shortcut:** compute from `rowsFor` after expansion filtering or
+  issue a polling request when children are hidden.
+- **Outcome:** collapsed presentation is truthful, reactive and branch-local.
+- **Result:** Pass.
+
+### VAL-025 — Stopped/Historical Team Status Uses Terminal Authority Only
+
+- **Trigger:** the AgentOrg root stops or the user opens an inactive historical
+  run after earlier descendants were running/initializing.
+- **Primary spine:** `Org root lifecycle/history refresh -> run is_active=false
+  and live context authority is absent -> strict stored Org topology + existing
+  terminal/history Agent projections -> historical normalization -> branch fold
+  -> non-live TeamAggregateStatusDot`.
+- **Owners:** AgentOrg lifecycle remains the only stop/restore/archive authority;
+  the history projection supplies any existing terminal Agent truth. The fold
+  accepts `error`, `idle`, `offline`, demotes `running`/`initializing` without
+  live authority to `offline`, and maps missing/unknown/empty to `offline`.
+- **Current production truth:** stopped Org history does not persist a per-Agent
+  status field. Therefore a branch with no separate terminal projection is
+  truthfully `offline`; illustrative Product error/idle mixtures do not authorize
+  new persistence or transport.
+- **Lifecycle/non-effect check:** no mounted-Team Stop/restore/archive appears;
+  no Team status cache, poll, endpoint, sidecar or root registration exists.
+- **Rejected shortcut:** retain a stale pulsing live dot from a disconnected
+  context, infer Team health from root `is_active`, or add a historical status
+  field solely for the visual fixture.
+- **Outcome:** history never fabricates live activity and does not move root
+  lifecycle ownership.
+- **Result:** Pass.
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -575,6 +660,8 @@ package-family rename. It does not infer logical topology from directory depth.
 | Agent/Team workspace surface | ActiveAgentWorkspaceTarget and explicit action/view ports | subject store, GraphQL client, socket or raw event | Pass |
 | Mounted Team presentation adapter | TeamWorkspaceContextView | Team lifecycle/persistence/registration/termination | Pass |
 | AgentOrgRunHistoryPanel | Org lifecycle store/service | focused member surface or mounted-Team stop | Pass |
+| AgentOrg hierarchy row builder | AgentOrgTeamBranchStatusProjector + AgentOrgExecutionContext public selectors | visible-row scan, WebSocket/GraphQL, Team root store, definition lookup | Pass |
+| AgentOrg/Team hierarchy adapters | shared fold + TeamAggregateStatusDot | duplicated precedence/localization, topology-generic status owner, TeamActivityDot substitution | Pass |
 
 ## Dependency-Direction Audit
 
@@ -601,6 +688,9 @@ Shared execution -X-> concrete Team/Org root/tree/store/event types
 Agent presentation details -X-> Team/Org root identity, sequence or runtime
 AgentOrg surface -X-> raw events / socket / standalone Team stores
 Mounted Team view -X-> Team lifecycle, root store or Team registration
+AgentOrg Team branch adapter -> strict Org Team node + public AgentContext status selector -> pure Team status fold -> TeamAggregateStatusDot
+Team status fold/dot -X-> subject store, topology traversal, polling, transport, persistence or lifecycle
+Collapse/visible rows -X-> aggregate membership authority
 ```
 
 No upward bypass is needed in any validated use case. The active-root directory
@@ -625,6 +715,8 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Org member projection/hydration fails | Org hydration service/context store | keep prior context/history state and visible recovery error; do not guess from Team/current definition | No false conversation authority | Pass |
 | Org command acknowledgement fails or target is stale | Active target/Org stream handler | preserve draft/tool decision state as appropriate and surface typed error; execute no fallback target | No wrong Agent command | Pass |
 | Org root termination fails | Org lifecycle service + history row | clear pending into root-row error; focused surface remains non-authoritative | No mounted Team stopped independently | Pass |
+| Live Agent status is missing/unknown or context loses live authority | AgentOrg branch status source + shared fold | normalize to offline; historical running/initializing cannot pulse | No invented Team state or request | Pass |
+| Team branch traversal encounters empty/no Agent descendants | AgentOrg Team-branch projector | return offline through shared fold | No outside branch fallback | Pass |
 
 ## Removal And Forbidden-Shortcut Audit
 
@@ -649,13 +741,16 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Parallel Org raw event array / duplicate focus authority | Yes | one AgentOrgExecutionContext; mixed root store delegates |
 | Mounted Team registered as standalone for UI reuse | Rejected | read-only TeamWorkspaceContextView backed by Org context |
 | Member-header Stop Org / mounted-Team stop | Yes / Rejected | root history-row action owned by AgentOrg lifecycle |
+| Copied AgentOrg Team-status precedence or visible-row fold | Rejected | one shared pure fold plus exact Org branch adapter |
+| `NestedTeamAggregateStatusDot` / nesting-specific helper names retained through aliases | No; clean-cut rename | neutral TeamAggregateStatusDot and Team-history adapter, all imports/tests/locales updated |
+| Team aggregate persisted/polled/transported or mapped from TeamActivityDot | Rejected | pure projection over existing exact Agent status truth |
 
 ## Design-Principle Self-Check
 
 | Principle | Evidence In Revised Design | Result |
 | --- | --- | --- |
 | Approved behavior first | Every case cites REQ/AC/SCN/Product or established runtime contract; no new product behavior | Pass |
-| Supported-scenario gate | 22 concrete supported cases; real browser prompt/focus/interaction/recovery/stop are included; contrived global lookup/tampering/deep conversion remain rejected | Pass |
+| Supported-scenario gate | 25 concrete supported cases; active expanded/collapsed and stopped/history Team aggregates join the real browser prompt/focus/interaction/recovery/stop cases; contrived global lookup/tampering/deep conversion remain rejected | Pass |
 | Spine span sufficiency | Each primary case spans initiating caller through owner/durability/provider to result/event | Pass |
 | Multiple primary spines | Definition, Team launch, Org launch, message, task, persistence, migration, mixed read, focus, process lifecycle are distinct | Pass |
 | Ownership clarity | Root aggregates own lifecycle/state; lower capabilities own local mechanics; adapters own translation | Pass |
@@ -669,6 +764,8 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Accepted production reuse | Direct Org Agent and Team focus terminate in extracted accepted surfaces; Org view is only an adapter | Pass |
 | Strict presentation boundary | Raw callbacks are admitted once, subject-enveloped strictly, reduced into AgentContext and never formatted as protocol JSON | Pass |
 | Lifecycle/action ownership | Org stop is a root history action; focused Agent and mounted Team surfaces expose no root lifecycle capability | Pass |
+| Projection proportionality | Existing Agent status/context/tree truth plus one pure fold/dot satisfies REQ-028; no backend, durable, polling or transport machinery is introduced | Pass |
+| Collapse-independent hierarchy truth | Full strict Team node is traversed before display filtering; hidden task Agents remain inputs and outside branches cannot leak | Pass |
 
 ## Questions / Open Decisions
 
@@ -680,25 +777,26 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 - Implementation evidence still required: all tests and rendered/API/E2E checks
   named in `design-spec.md`, especially Team-wire compatibility, strict Org
   presentation/command parsing, checkpointed member hydration, structural
-  workspace reuse and the real imported-package prompt/browser comparison. The
+  workspace reuse, pure Team fold/branch matrices, expanded/collapsed/stopped
+  AgentOrg status rendering and the real imported-package prompt/browser comparison. The
   downstream implementation/test changes and evidence are not validated or
   claimed by this artifact.
 
 ## Self-Validation Conclusion
 
 `AD-REV-005` continues to resolve `IDI-001`; `AD-REV-006` resolves real-browser
-`ADI-007` at the architecture boundary. All supported
-walkthroughs have a complete production spine, one authoritative root owner,
-strict durable identity, explicit failure/restore/shutdown behavior, and a
-one-directional dependency path. No walkthrough requires a synthetic Team root,
-standalone mounted Team, standalone direct Org Agent, Team sidecar reinterpretation,
-public generic root, raw Org dashboard, opaque/JSON event fallback, component-
-owned Org socket, or boundary bypass.
+`ADI-007`; and AD-REV-007 resolves `API-FIND-007` / `CR-FIND-011` at the
+architecture boundary under approved RER-021. All 25 supported walkthroughs have
+a complete production spine, one authoritative owner, explicit status/lifecycle
+truth and a one-directional dependency path. No walkthrough requires a synthetic
+Team root, standalone mounted Team, standalone direct Org Agent, Team sidecar
+reinterpretation, public generic root, raw Org dashboard, opaque/JSON event
+fallback, component-owned Org socket, visible-row aggregate authority, status
+polling/persistence, or boundary bypass.
 
-The self-validation therefore passes. Because the correction materially changes
-shared Agent execution/tool context, Team local runtime extraction, tasks,
-messages, memory, sidecars, global routing, process lifecycle, shared presentation
-contracts, Org stream/member projection, browser context ownership and accepted
-workspace component boundaries, classification remains `Large / High` and
-independent Architecture Review is mandatory before implementation or API/E2E
-resumes.
+The self-validation therefore passes. The focused AD-REV-007 correction alone is
+a bounded `Medium / Low` frontend projection/refactor. The cumulative package
+still contains the previously reviewed structural runtime/persistence/contract
+work and remains classified `Large / High`; independent Architecture Review is
+mandatory before Implementation reconciles REQ-028 or API/E2E resumes that
+finding.

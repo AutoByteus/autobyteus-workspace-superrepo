@@ -14,6 +14,7 @@ does not revise intended behavior.
 | AD-REV-004 | User identification of the canonical server migration convention / architecture-impact correction round | `ADI-006` | `Architecture Revision — Forward-Only Convention-Compliant Migration Mechanics` | `Architecture Design Complete`; migration mechanics corrected without requirements/Product change; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-005 | Implementation Engineer `IR-001` / `IDI-001` after `ARCH-REV-002` Pass / implementation-impact recovery round | `IDI-001` | `Architecture Revision — Root-Neutral Configured Execution And AgentOrg Production Composition` | `Architecture Design Complete`; production extraction/composition boundary and self-validation added; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-006 | API/E2E Engineer real imported-package/browser validation after `IR-003` and `CRR-003` Pass / downstream design-impact recovery round | `ADI-007` | `Architecture Revision — Accepted Agent/Team Workspace Reuse And Strict AgentOrg Presentation` | `Architecture Design Complete`; raw Org runtime dashboard path removed by design; self-validation expanded to 22 cases; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-007 | API/E2E `API-FIND-007`, Code Review `CRR-009` / `CR-FIND-011`, and Requirements Engineer approved `RER-021` with focused Product `AORG-FLAT-TEAM-STATUS-001` / Product-baseline-impact recovery round | `API-FIND-007`, `CR-FIND-011` | `Architecture Revision — Mounted-Team Aggregate Status Projection` | `Architecture Design Complete`; focused Product gap mapped to an exact presentation-only Team-branch projection; self-validation expanded to 25 cases; focused delta `Medium/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -398,3 +399,89 @@ does not revise intended behavior.
   commands, accepted component extraction, contextual tools and root lifecycle
   placement. The real-browser defect is retained as failing evidence and is not
   claimed fixed by this architecture-only revision.
+
+### AD-REV-007 — Mounted-Team Aggregate Status Projection
+
+- Triggering role, report path, and round: API/E2E Engineer `API-FIND-007` and
+  the user's original-personal Team-tree evidence identified the missing Team-
+  level status signal on direct Teams mounted inside an AgentOrg. Code Review
+  `CRR-009` / `CR-FIND-011` correctly classified the omission as a Requirement/
+  Product baseline impact rather than a defect against the pre-RER-020 approved
+  prototype. Requirements Engineer then returned the completed, approved
+  `RER-021@ed236a63e8905432a6bb45e826c82856e620e7dc` package with the explicitly
+  user-approved Product supplement
+  `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/ui-ux-spec.md`
+  and normative `VIS-STATUS-001`-`VIS-STATUS-003`. This is the focused Product-
+  baseline-impact architecture recovery round.
+- Triggering finding IDs: `API-FIND-007` and `CR-FIND-011`. The approved behavior
+  is `BEH-011` / `REQ-028` / `AC-023` / `SCN-012`, with supporting
+  `ORG-CASE-056`-`ORG-CASE-058`.
+- Prior authoritative design result: `AD-REV-006`, Architecture Design Complete,
+  at commit `0d71c76ca52c1dab907b81b41702fa4e88fb7538`; independent Architecture
+  Review `ARCH-REV-004` passed it at
+  `2ae61a11f90cdf5e90786a6ff313af082a21cce8`. Current pre-gap Implementation
+  `IR-009@d43042ce9` intentionally excludes REQ-028 while this upstream gate is
+  open.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as `AD-REV-007` and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Why this revision is recorded: direct inspection of the original-personal
+  implementation at `origin/personal@773bce779` confirms the user's assessment:
+  the accepted Team hierarchy already has a
+  five-state descendant-Agent aggregate and accessible Team status dot, while
+  the AgentOrg Team row omits that aggregate and its Agent dots do not all
+  reflect exact context status. AD-REV-007 extracts one pure shared normalizer/
+  precedence fold, cleanly neutralizes the reusable Team aggregate dot, and
+  adds a subject-shaped AgentOrg Team-branch adapter over the strict Org
+  topology plus exact `AgentOrgExecutionContext` Agent status truth. The full
+  configured and task-scoped Agent branch is folded before display/collapse
+  filtering, so the Team signal remains reactive and visible while collapsed.
+  Historical or terminal projection cannot retain `running` or `initializing`
+  without live authority; missing, unknown, and empty inputs resolve to
+  `offline`. This remains presentation-only and adds no Team root, status
+  authority, persistence, transport, polling, lifecycle, stop, restore, focus,
+  routing, readiness, command, or recipient-fallback behavior.
+- Approved behavior or requirement IDs affected: `BEH-006`, `BEH-011`;
+  `REQ-028`; `AC-023`; `SCN-012`; and `ORG-CASE-056`-`ORG-CASE-058`. The focused
+  supplement supersedes only the previous mounted-Team status omission;
+  RER-021 preserves every prior definition, durable, runtime, migration,
+  handoff, launch/focus, and Product behavior.
+- Design-spec sections updated: document status, chronology, classification,
+  evidence, AD-REV-007 impact decision, behavior/Product mapping, scenario
+  inventory, `DS-020`/`DS-021` spines, ownership and lifecycle boundaries,
+  dependency and interface rules, shared projection structures, concrete file
+  responsibilities, clean-cut renames/removals, sequencing, tradeoffs, risks,
+  implementation guidance, and validation expectations.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` was updated from AD-REV-006 to
+  AD-REV-007. It retains the prior 22 supported cases and adds `VAL-023`-
+  `VAL-025` for active expanded Team aggregation including task descendants,
+  collapsed branch-independent reactivity, and stopped/history terminal-state
+  authority with no mounted-Team lifecycle. Requirements, Product, review,
+  implementation, and API/E2E artifacts remain read-only.
+- Downstream and architecture-review impact: the focused AD-REV-007 source
+  correction alone is a bounded `Medium / Low` frontend projection/refactor,
+  but the cumulative ticket remains `Large / High` because its previously
+  reviewed domain, persistence, migration, lifecycle, API/stream, execution,
+  and workspace boundaries remain part of the package. Independent Architecture
+  Review is therefore mandatory before Implementation reconciles REQ-028 or
+  API/E2E resumes API-FIND-007. Review must verify exact Team-branch membership,
+  task-Agent inclusion, branch isolation, one shared precedence/a11y policy,
+  collapse-independent derivation, truthful live-versus-history authority,
+  exact Agent-signal coexistence, and absence of new backend/durable/transport/
+  lifecycle ownership.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of the
+  cumulative `RER-021` / `RV-012` / focused Product status supplement /
+  `AD-REV-007` package. Implementation and API/E2E must not claim
+  API-FIND-007 resolved until that route passes and the reviewed design is
+  reconciled in source.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, or material open
+  architecture decision remains after the 25-case self-validation. Focused
+  residual risks are accidental visible-row-only folding, sibling/direct-Agent
+  leakage, historical pulsing without live authority, duplicated precedence or
+  localization, misuse of binary `TeamActivityDot`, and accidental mounted-Team
+  lifecycle/transport expansion. The design contains explicit ownership,
+  dependency, test, and forbidden-shortcut controls for each; no implementation
+  or browser-fix claim is made by this architecture-only revision.
