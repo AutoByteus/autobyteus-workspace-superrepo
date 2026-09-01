@@ -11,6 +11,7 @@ does not revise intended behavior.
 | AD-REV-001 | Requirements Engineer handoff, approved package `AORG-FLAT-TEAM-001` / initial architecture round | N/A | `Initial Architecture Baseline` | `Architecture Design Complete`; `task_size=Large`; `architectural_risk=High`; Architecture Review selected |
 | AD-REV-002 | Requirements Engineer re-entry, approved `RER-016` plus Product `RV-012` / Product-and-durable-impact architecture round | `RIF-AORG-001`, `RIF-AORG-002`, `ADI-001`-`ADI-005`, prior `Requirement Gap` on superseded RER-014 V3 | `Architecture Revision — Product, Launch, Handoff, And Split-Run-Family Impact` | `Architecture Design Complete`; `task_size=Large`; `architectural_risk=High`; Architecture Review selected |
 | AD-REV-003 | Architecture Reviewer `ARCH-REV-001` plus Requirements Engineer approved `RER-018` / architecture-review recovery round | `AR-FIND-001`, `AR-FIND-002` | `Architecture Revision — Target Definition Admission, External Ownership, And Handoff Order` | `Architecture Design Complete`; both findings resolved; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-004 | User identification of the canonical server migration convention / architecture-impact correction round | `ADI-006` | `Architecture Revision — Forward-Only Convention-Compliant Migration Mechanics` | `Architecture Design Complete`; migration mechanics corrected without requirements/Product change; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -176,3 +177,66 @@ does not revise intended behavior.
   family promotion, handoff order drift, task lineage, mixed projection family
   mismatch, configuration/focus parity, and exact RV-012 reproduction. The
   design specifies controls; independent review remains open.
+
+### AD-REV-004 — Canonical Forward-Only Production Migration Correction
+
+- Triggering role, report path, and round: the user directly identified the
+  repository's canonical data-migration convention after the AD-REV-003 review
+  handoff. Architecture Designer inspected
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/docs/design/production_data_migration_conventions.md`,
+  its server README link, the existing app-data migration runner/registry/types,
+  startup scheduling, and representative file migrations. This is an
+  architecture-owned impact correction before the next review completes.
+- Triggering finding IDs: `ADI-006`. No Requirement Gap or Product UI gap: the
+  target Team Definition V2 / Org Definition V1 and Team Run V2 / Org Run V1
+  contracts remain exactly as approved in RER-018; only rollout/recovery
+  mechanics change.
+- Prior authoritative design result: `AD-REV-003`, Architecture Design Complete,
+  at commit `36e92c1e4ac3c09d3490a6dcab0b9720bd24b2d9`. The Architecture Designer
+  asked the active reviewer not to finalize that package after discovering the
+  convention mismatch.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as `AD-REV-004`.
+- Why this revision is recorded: AD-REV-003 incorrectly introduced a custom
+  migration plan/journal, backup/staging promotion, restoration state machine,
+  blanket readiness gate, and exhaustive crash-boundary matrix. AD-REV-004 uses
+  the existing registered `STARTUP_ONLY` runner, forward-only current codecs,
+  migration-owned legacy decoders, atomic current-file replacement, one direct
+  same-filesystem package rename, strict rereads/cleanup, bounded dispositions,
+  capability-scoped exclusion, and ordinary restart/idempotence instead. No
+  migration-specific ledger, runner API, manual retry, restore command, or
+  warning-residue exception is added.
+- Approved behavior or requirement IDs affected: rollout mechanics for
+  `BEH-005`, `BEH-007`, and `BEH-010`; `REQ-012`, `REQ-013`, and `REQ-027`;
+  `AC-008` and `AC-022`; `SCN-004` and `SCN-011`; and `PRE-001`-`PRE-005`.
+  No intended behavior, Product UI state, schema version, logical file name,
+  path, root discriminator, or external-project boundary changes.
+- Design-spec sections updated: document status/current-state and evidence;
+  AD-REV-004 impact decision; behavior and supplemental-artifact maps;
+  persisted-data decision/convention application/migration plan/dispositions;
+  supported operational scenarios; DS-007/DS-010 spines and readiness;
+  ownership/dependency/file/folder mappings; clean-cut rejection; sequencing;
+  migration tradeoffs/risks; and implementation guidance/tests.
+- Architecture supplements updated, added, or removed: none. Requirements-owned
+  `AORG-CONTRACT-001`, Product-owned `RV-012`, and the external repositories
+  remain unchanged/read-only. The canonical migration convention is referenced
+  as repository architecture authority, not copied into a competing artifact.
+- Downstream and architecture-review impact: classification remains `Large` /
+  `High`, so independent Architecture Review remains mandatory. Re-review must
+  verify the original AR-FIND-001/002 resolutions plus forward-only current
+  source, migration-only legacy knowledge, exact runner scheduling/recovery
+  action, atomic direct rename/idempotent retry, narrow failure classification,
+  bounded summary/log evidence, flat-Team zero-write behavior, and absence of
+  custom migration journal/staging/backup/restoration machinery.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is another independent Architecture Review of
+  cumulative `RER-018` / `RV-012` / `AD-REV-004`; do not route to implementation
+  while `ARCH-REV-001` Fail remains the latest completed review result.
+- Remaining gaps or risks: no Requirement Gap or Product UI gap. High structural
+  risk remains because the release still changes definition/runtime families,
+  history/stream/API/frontend boundaries, and server-memory ownership. The
+  migration-specific residual risk is bounded to deterministic source
+  classification, destination collision, cleanup, strict current catalog
+  exclusion, and correct startup restart guidance; implementation must return a
+  Design Impact rather than recreate custom recovery machinery.
