@@ -12,6 +12,7 @@ concise chronological architecture-review history.
 | ARCH-REV-003 | Round 3 / re-review after implementation `IR-001` returned composition impact `IDI-001` and `AD-REV-005` defined the production runtime extraction | `AD-REV-005` | Pass | Pass | `IDI-001` |
 | ARCH-REV-004 | Round 4 / re-review after API/E2E real-browser execution exposed raw Org presentation impact `ADI-007` and `AD-REV-006` defined strict accepted-workspace reuse | `AD-REV-006` | Pass | Pass | `ADI-007` |
 | ARCH-REV-005 | Round 5 / re-review after `API-FIND-007` / `CR-FIND-011`, approved `RER-021` and focused Product status authority, and `AD-REV-007` defined the mounted-Team projection | `AD-REV-007` | Pass | Pass | `API-FIND-007`, `CR-FIND-011` |
+| ARCH-REV-006 | Round 6 / re-review after exact `API-FIND-008` correlation and `AD-REV-008` defined non-blocking settlement and interrupt-before-drain shutdown | `AD-REV-008` | Pass | Blocked — Unclear | `AR-FIND-003`, `API-FIND-008`, `CR-CAND-020` |
 
 ## Revision Entries
 
@@ -131,3 +132,30 @@ None.
 - Material classification changes: The authoritative result remains `Pass`; the focused correction is `Medium / Low`, while the cumulative package remains `Large / High` and requires the normal reviewed implementation/source/API route. No Requirement Gap or Product UI gap remains.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must compute from the complete strict Team branch rather than visible rows, include recursive task Agents without sibling/root leakage, preserve exact Agent dots and retained Team history behavior, gate live authority on the exact active context, demote stale live-only historical states, use one shared fold/a11y dot, and introduce no backend status field, polling, mounted-Team lifecycle, or configured recursion. Source review and real browser/API/E2E validation remain required; these are controlled implementation risks, not open architecture decisions.
+
+### ARCH-REV-006 — Terminal-settlement production-reachability hold
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 6; `AD-REV-008` reclassified `API-FIND-008` / `CR-CAND-020` from the prior no-impact disposition and introduced a shared short mutation FIFO, task-keyed settlement coordinator, passive/committed cleanup tokens, terminal admission fencing, and interrupt-before-drain Team/Org shutdown.
+- Triggering role, report path, and finding IDs: Architecture Designer, based on `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008-settlement/settlement-correlation-observed-boundaries.md`; review finding `AR-FIND-003` over `API-FIND-008` / `CR-CAND-020`.
+- Relevant architecture design revision IDs: `AD-REV-008`
+- Prior authoritative decision: `Pass` (`ARCH-REV-005` for `AD-REV-007`)
+- Current authoritative decision: `Blocked — Unclear`
+- What changed in the review result or what baseline was established: Current source confirms that settlement preparation/local teardown can occupy the root task FIFO head and that current Team/Org shutdown drains task work before later provider interruption. The exact two-task probe correlates that mechanism precisely. However, its provider wait was intentionally created by an unsupported verifier self-review call left awaiting approval; the evidence artifact says that invalid prompt does not establish Design Impact, and VAL-026 repeats the unsupported trigger. AD-REV-008 does not yet identify a separate supported user/system action that reaches a terminal approval-blocked execution. The review therefore cannot approve the new Medium/High coordinator/token/fail-stop/shutdown machinery until Architecture establishes that production path or removes/narrows the dependent scope.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001` | Resolved in `ARCH-REV-002` | Remains resolved | `RER-018`, `AD-REV-003`-`AD-REV-008` | Target-only Team V2/Org V1 admission, server-owned conversion, and external read-only ownership are unchanged. |
+| `AR-FIND-002` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-003`-`AD-REV-008` | Org/root-owned handoffs still precede stable Team-local lists; task settlement changes do not alter order. |
+| `ADI-006` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-004`-`AD-REV-008` | Canonical migration runner/direct-rename/relaunch behavior and native flat-Team zero-write are unchanged. |
+| `IDI-001` | Resolved in `ARCH-REV-003` | Remains resolved | `AD-REV-005`-`AD-REV-008` | Root-neutral execution, exact task hosts, and no mounted-Team root/package remain intact. |
+| `ADI-007` | Resolved in `ARCH-REV-004` | Remains resolved | `AD-REV-006`-`AD-REV-008` | Strict Org presentation/context and accepted workspace reuse are unchanged. |
+| `API-FIND-007` / `CR-FIND-011` | Resolved in `ARCH-REV-005` | Remains resolved | `RER-021`, `AD-REV-007`, `AD-REV-008` | Exact mounted-Team status projection remains presentation-only and unchanged. |
+| `API-FIND-008` / `CR-CAND-020` | Architecture-held investigation; AD-REV-008 claims Design Impact resolved | Unclear at architecture-review boundary | `AD-REV-008`; `AR-PREM-004`, `AR-PREM-005`; `AR-FIND-003` | Clean supported control succeeds. Exact blocking correlation depends on unsupported self-review; no independent supported terminal approval-wait trigger/path is documented. |
+
+- New or remaining finding IDs: `AR-FIND-003`
+- Material classification changes: The cumulative classification remains `Large / High`, and the focused delta remains `Medium / High`. The authoritative review changes from `Pass` for AD-REV-007 to `Blocked / Unclear` for AD-REV-008. No Requirement Gap or Product UI gap is identified.
+- Recommended recipient: `/software_engineering_team/architecture_designer`
+- Remaining risks or uncertainty: Architecture must establish an independent supported terminal-provider-wait and derived shutdown path or remove/narrow DS-022, VAL-026-029, and the new coordinator/token/dependency/root-ordering scope. No speculative timeout, replay, force-kill, persisted settling state, or self-review support is authorized. Implementation and API/E2E remain held on the impacted path.
