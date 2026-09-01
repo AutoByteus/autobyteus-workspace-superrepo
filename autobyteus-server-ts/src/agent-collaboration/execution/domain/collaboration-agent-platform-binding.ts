@@ -8,6 +8,11 @@ export type CollaborationAgentPlatformBinding = Readonly<{
   platformAgentRunId: string;
 }>;
 
+export type CollaborationAgentNoConversationBindingReplacement = Readonly<{
+  binding: CollaborationAgentPlatformBinding;
+  expectedPreviousPlatformAgentRunId: string;
+}>;
+
 export const createCollaborationAgentPlatformBinding = (input: {
   execution: CollaborationMemberExecutionIdentity;
   platformAgentRunId: string;
@@ -17,5 +22,22 @@ export const createCollaborationAgentPlatformBinding = (input: {
   return Object.freeze({
     execution: cloneCollaborationMemberExecutionIdentity(input.execution),
     platformAgentRunId,
+  });
+};
+
+export const createCollaborationAgentNoConversationBindingReplacement = (input: {
+  binding: CollaborationAgentPlatformBinding;
+  expectedPreviousPlatformAgentRunId: string;
+}): CollaborationAgentNoConversationBindingReplacement => {
+  const expectedPreviousPlatformAgentRunId = input.expectedPreviousPlatformAgentRunId?.trim();
+  if (!expectedPreviousPlatformAgentRunId) {
+    throw new Error("expectedPreviousPlatformAgentRunId is required.");
+  }
+  if (expectedPreviousPlatformAgentRunId === input.binding.platformAgentRunId) {
+    throw new Error("A no-conversation binding replacement must change the provider identity.");
+  }
+  return Object.freeze({
+    binding: createCollaborationAgentPlatformBinding(input.binding),
+    expectedPreviousPlatformAgentRunId,
   });
 };

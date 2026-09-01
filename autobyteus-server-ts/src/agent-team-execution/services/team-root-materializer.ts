@@ -17,7 +17,10 @@ import type { TaskDelegationRecordsV1Store } from "../task-delegation/records/ta
 import type { TaskExecutionIdentityCapabilities } from "../task-delegation/task-execution-identity-capabilities.js";
 import type { MemberExecutionContextBuilder } from "./member-team-context-builder.js";
 import { createTeamFlatExecutionCallbacks } from "./team-flat-execution-callbacks.js";
-import { adoptAgentPlatformBindingInTree } from "./team-run-execution-tree-mutator.js";
+import {
+  adoptAgentPlatformBindingInTree,
+  replaceAgentPlatformBindingWithoutConversationInTree,
+} from "./team-run-execution-tree-mutator.js";
 import { TeamRunEventPublisher } from "./team-run-event-publisher.js";
 import { TeamRunPersistenceCoordinator } from "./team-run-persistence-coordinator.js";
 
@@ -96,12 +99,22 @@ export const materializeTeamRoot = async (
     callbacks,
     prepareConfiguredAgents: true,
   });
+  const replacementTree = prepared.stagedNoConversationBindingReplacements.reduce(
+    (current, replacement) => replaceAgentPlatformBindingWithoutConversationInTree({
+      tree: current,
+      replacement: {
+        binding: createTeamAgentPlatformBinding(replacement.binding),
+        expectedPreviousPlatformAgentRunId: replacement.expectedPreviousPlatformAgentRunId,
+      },
+    }),
+    input.tree,
+  );
   const tree = prepared.stagedPlatformBindings.reduce(
     (current, binding) => adoptAgentPlatformBindingInTree({
       tree: current,
       binding: createTeamAgentPlatformBinding(binding),
     }).tree,
-    input.tree,
+    replacementTree,
   );
   try {
     if (input.persistInitialPackage) {

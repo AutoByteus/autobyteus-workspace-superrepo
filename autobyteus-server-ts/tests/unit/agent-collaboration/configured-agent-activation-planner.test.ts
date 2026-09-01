@@ -70,7 +70,13 @@ describe("ConfiguredAgentActivationPlanner external restore", () => {
     expect(fixture.prepareNewAgentRun).toHaveBeenCalledWith({ runId: "agent-run", config });
     expect(fixture.prepareRestoreAgentRunFromPlatformState).not.toHaveBeenCalled();
     expect(prepared.candidate).toBe(fixture.freshCandidate);
-    expect(prepared.binding?.platformAgentRunId).toBe("new-thread-id");
+    expect(prepared.bindingChange).toMatchObject({
+      kind: "replace_without_conversation",
+      replacement: {
+        expectedPreviousPlatformAgentRunId: "existing-thread-id",
+        binding: { platformAgentRunId: "new-thread-id" },
+      },
+    });
   });
 
   it("restores the exact provider conversation when durable user or assistant activity exists", async () => {
@@ -85,7 +91,10 @@ describe("ConfiguredAgentActivationPlanner external restore", () => {
     });
     expect(fixture.prepareNewAgentRun).not.toHaveBeenCalled();
     expect(prepared.candidate).toBe(fixture.restoredCandidate);
-    expect(prepared.binding?.platformAgentRunId).toBe("existing-thread-id");
+    expect(prepared.bindingChange).toMatchObject({
+      kind: "adopt_or_retain",
+      binding: { platformAgentRunId: "existing-thread-id" },
+    });
   });
 
   it("fails closed when real conversation activity has no provider binding", async () => {

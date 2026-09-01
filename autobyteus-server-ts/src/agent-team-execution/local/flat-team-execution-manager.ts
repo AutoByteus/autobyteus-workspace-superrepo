@@ -75,6 +75,7 @@ export class FlatTeamExecutionManager {
 
   async prepareConfiguredActivation(): Promise<Readonly<{
     stagedPlatformBindings: readonly import("../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js").CollaborationAgentPlatformBinding[];
+    stagedNoConversationBindingReplacements: readonly import("../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js").CollaborationAgentNoConversationBindingReplacement[];
     commitAfterDurability(): void;
     abort(): Promise<void>;
   }>> {
@@ -92,6 +93,9 @@ export class FlatTeamExecutionManager {
     let state: "prepared" | "committed" | "aborted" = "prepared";
     return Object.freeze({
       stagedPlatformBindings: Object.freeze(prepared.flatMap((activation) => activation.stagedPlatformBindings)),
+      stagedNoConversationBindingReplacements: Object.freeze(
+        prepared.flatMap((activation) => activation.stagedNoConversationBindingReplacements),
+      ),
       commitAfterDurability: () => {
         if (state !== "prepared") throw new Error(`TeamRun '${this.context.teamRunId}' configured activation is not publishable.`);
         for (const activation of prepared) activation.commitAfterDurability();

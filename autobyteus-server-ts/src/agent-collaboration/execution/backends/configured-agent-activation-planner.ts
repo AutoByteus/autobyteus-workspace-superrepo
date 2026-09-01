@@ -13,7 +13,9 @@ import {
   type ConfiguredAgentActivationMode,
 } from "../domain/configured-agent-execution.js";
 import {
+  createCollaborationAgentNoConversationBindingReplacement,
   createCollaborationAgentPlatformBinding,
+  type CollaborationAgentNoConversationBindingReplacement,
   type CollaborationAgentPlatformBinding,
 } from "../domain/collaboration-agent-platform-binding.js";
 import type { CollaborationMemberExecutionIdentity } from "../domain/root-execution-identity.js";
@@ -29,11 +31,26 @@ export class ConfiguredAgentActivationPlanner {
 
   async prepare(config: AgentRunConfig): Promise<Readonly<{
     candidate: AgentRunActivationCandidate;
-    binding: CollaborationAgentPlatformBinding | null;
+    bindingChange:
+      | Readonly<{ kind: "adopt_or_retain"; binding: CollaborationAgentPlatformBinding }>
+      | Readonly<{ kind: "replace_without_conversation"; replacement: CollaborationAgentNoConversationBindingReplacement }>
+      | null;
   }>> {
     const plan = this.resolvePlan(config);
     const candidate = await this.prepareCandidate(plan, config);
-    return Object.freeze({ candidate, binding: this.createExternalBinding(candidate) });
+    const binding = this.createExternalBinding(candidate);
+    const bindingChange = plan.kind === "replace_external_without_conversation"
+      ? Object.freeze({
+          kind: "replace_without_conversation" as const,
+          replacement: createCollaborationAgentNoConversationBindingReplacement({
+            binding: binding ?? this.missingReplacementBinding(),
+            expectedPreviousPlatformAgentRunId: plan.expectedPreviousPlatformAgentRunId,
+          }),
+        })
+      : binding
+        ? Object.freeze({ kind: "adopt_or_retain" as const, binding })
+        : null;
+    return Object.freeze({ candidate, bindingChange });
   }
 
   isRetrySafe(error: unknown): boolean {
@@ -49,7 +66,12 @@ export class ConfiguredAgentActivationPlanner {
     }
     if (external) {
       const activity = this.inspectConversationActivity(config);
-      if (activity.kind === "none") return Object.freeze({ kind: "new" });
+      if (activity.kind === "none") {
+        const previous = this.input.platformAgentRunId?.trim() || null;
+        return previous
+          ? Object.freeze({ kind: "replace_external_without_conversation", expectedPreviousPlatformAgentRunId: previous })
+          : Object.freeze({ kind: "new" });
+      }
       if (activity.kind === "indeterminate") {
         throw new CollaborationAgentActivationError(
           "COLLABORATION_AGENT_CONTINUATION_STATE_UNREADABLE",
@@ -75,7 +97,9 @@ export class ConfiguredAgentActivationPlanner {
   }
 
   private prepareCandidate(plan: ActivationPlan, config: AgentRunConfig): Promise<AgentRunActivationCandidate> {
-    if (plan.kind === "new") return this.manager.prepareNewAgentRun({ runId: this.input.identity.agentRunId, config });
+    if (plan.kind === "new" || plan.kind === "replace_external_without_conversation") {
+      return this.manager.prepareNewAgentRun({ runId: this.input.identity.agentRunId, config });
+    }
     if (plan.kind === "restore_external") {
       return this.manager.prepareRestoreAgentRunFromPlatformState({
         runId: this.input.identity.agentRunId,
@@ -138,10 +162,18 @@ export class ConfiguredAgentActivationPlanner {
     });
   }
 
+  private missingReplacementBinding(): never {
+    throw new AgentRunActivationError(
+      "PLATFORM_AGENT_RUN_BINDING_INVALID",
+      "The replacement external runtime did not provide a valid provider conversation identity.",
+    );
+  }
+
   private get manager(): AgentRunManager { return this.input.manager ?? AgentRunManager.getInstance(); }
 }
 
 type ActivationPlan =
   | Readonly<{ kind: "new" }>
+  | Readonly<{ kind: "replace_external_without_conversation"; expectedPreviousPlatformAgentRunId: string }>
   | Readonly<{ kind: "restore_native" }>
   | Readonly<{ kind: "restore_external"; platformAgentRunId: string }>;

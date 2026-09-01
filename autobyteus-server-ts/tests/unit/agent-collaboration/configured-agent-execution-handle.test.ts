@@ -97,6 +97,7 @@ describe("ConfiguredAgentExecutionHandle", () => {
       const fixture = build(kind);
       const prepared = await fixture.handle.prepareConfiguredActivation();
       expect(prepared.stagedPlatformBindings).toEqual([]);
+      expect(prepared.stagedNoConversationBindingReplacements).toEqual([]);
       expect(fixture.handle.isActive()).toBe(false);
       const preparedInput = fixture.prepareNewAgentRun.mock.calls[0]![0];
       expect(preparedInput.runId).toBe("agent-run");

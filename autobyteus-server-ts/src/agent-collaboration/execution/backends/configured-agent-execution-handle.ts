@@ -30,7 +30,10 @@ import type {
   ConfiguredAgentExecutionSpec,
 } from "../domain/configured-agent-execution.js";
 import { CollaborationAgentActivationError } from "../domain/configured-agent-execution.js";
-import type { CollaborationAgentPlatformBinding } from "../domain/collaboration-agent-platform-binding.js";
+import type {
+  CollaborationAgentNoConversationBindingReplacement,
+  CollaborationAgentPlatformBinding,
+} from "../domain/collaboration-agent-platform-binding.js";
 import type {
   CollaborationAgentStatusSnapshot,
 } from "../domain/collaboration-agent-execution-event.js";
@@ -40,6 +43,7 @@ import { ConfiguredAgentStatusOverlay } from "./configured-agent-status-overlay.
 
 export type PreparedConfiguredAgentActivation = Readonly<{
   stagedPlatformBindings: readonly CollaborationAgentPlatformBinding[];
+  stagedNoConversationBindingReplacements: readonly CollaborationAgentNoConversationBindingReplacement[];
   commitAfterDurability(): void;
   abort(): Promise<void>;
 }>;
@@ -148,10 +152,20 @@ export class ConfiguredAgentExecutionHandle {
     const prepared = await this.planner.prepare(await this.buildAgentRunConfig());
     let state: "prepared" | "published" | "aborted" = "prepared";
     return Object.freeze({
-      stagedPlatformBindings: Object.freeze(prepared.binding ? [prepared.binding] : []),
+      stagedPlatformBindings: Object.freeze(
+        prepared.bindingChange?.kind === "adopt_or_retain" ? [prepared.bindingChange.binding] : [],
+      ),
+      stagedNoConversationBindingReplacements: Object.freeze(
+        prepared.bindingChange?.kind === "replace_without_conversation"
+          ? [prepared.bindingChange.replacement]
+          : [],
+      ),
       commitAfterDurability: () => {
         if (state !== "prepared") throw new Error(`AgentRun '${prepared.candidate.runId}' is not publishable.`);
-        if (prepared.binding) this.platformAgentRunId = prepared.binding.platformAgentRunId;
+        const binding = prepared.bindingChange?.kind === "replace_without_conversation"
+          ? prepared.bindingChange.replacement.binding
+          : prepared.bindingChange?.binding;
+        if (binding) this.platformAgentRunId = binding.platformAgentRunId;
         const run = prepared.candidate.commitPublication();
         this.bindEvents(run);
         this.agentRun = run;
@@ -218,9 +232,12 @@ export class ConfiguredAgentExecutionHandle {
     let prepared: Awaited<ReturnType<ConfiguredAgentActivationPlanner["prepare"]>> | null = null;
     try {
       prepared = await this.planner.prepare(await this.buildAgentRunConfig());
-      if (prepared.binding) {
-        await this.options.callbacks.acceptPlatformBinding(this.identity, prepared.binding);
-        this.platformAgentRunId = prepared.binding.platformAgentRunId;
+      const binding = prepared.bindingChange?.kind === "replace_without_conversation"
+        ? prepared.bindingChange.replacement.binding
+        : prepared.bindingChange?.binding;
+      if (binding) {
+        await this.options.callbacks.acceptPlatformBinding(this.identity, binding);
+        this.platformAgentRunId = binding.platformAgentRunId;
       }
       const run = prepared.candidate.commitPublication();
       this.bindEvents(run);

@@ -21,7 +21,14 @@ import { validateAgentOrgStatePackage } from "./agent-org-state-package-validato
 import { AgentOrgRootAgentExecutionRegistry, type PreparedAgentOrgConfiguredAgent } from "./agent-org-root-agent-execution-registry.js";
 import { AgentOrgTeamExecutionDirectory } from "./agent-org-team-execution-directory.js";
 import { projectAgentOrgConfiguredAgentNode, projectAgentOrgConfiguredTeamNode } from "./agent-org-runtime-config-projector.js";
-import { adoptAgentOrgPlatformBinding } from "./agent-org-run-execution-tree-mutator.js";
+import type {
+  CollaborationAgentNoConversationBindingReplacement,
+  CollaborationAgentPlatformBinding,
+} from "../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js";
+import {
+  adoptAgentOrgPlatformBinding,
+  replaceAgentOrgPlatformBindingWithoutConversation,
+} from "./agent-org-run-execution-tree-mutator.js";
 import type { AgentOrgRunPersistenceCoordinator } from "./agent-org-run-persistence-coordinator.js";
 
 /** Builds one complete Org scope before publication; no synthetic Team root exists. */
@@ -104,7 +111,8 @@ export class AgentOrgExecutionScopeBuilder {
     });
     const teams = new AgentOrgTeamExecutionDirectory(this.dependencies.flatTeamExecutionFactory);
     const plans: Array<Readonly<{
-      stagedPlatformBindings: readonly import("../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js").CollaborationAgentPlatformBinding[];
+      stagedPlatformBindings: readonly CollaborationAgentPlatformBinding[];
+      stagedNoConversationBindingReplacements: readonly CollaborationAgentNoConversationBindingReplacement[];
       commitAfterDurability(): void;
       abort(): Promise<void>;
     }>> = [];
@@ -124,12 +132,16 @@ export class AgentOrgExecutionScopeBuilder {
           });
           plans.push(Object.freeze({
             stagedPlatformBindings: prepared.prepared.stagedPlatformBindings,
+            stagedNoConversationBindingReplacements: prepared.prepared.stagedNoConversationBindingReplacements,
             commitAfterDurability: prepared.commitAfterDurability,
             abort: prepared.abort,
           }));
         }
       }
       let tree = input.state.executionTree;
+      for (const replacement of plans.flatMap((plan) => plan.stagedNoConversationBindingReplacements)) {
+        tree = replaceAgentOrgPlatformBindingWithoutConversation({ tree, replacement });
+      }
       for (const binding of plans.flatMap((plan) => plan.stagedPlatformBindings)) {
         tree = adoptAgentOrgPlatformBinding({ tree, binding }).tree;
       }
@@ -177,6 +189,7 @@ export class AgentOrgExecutionScopeBuilder {
   private agentPlan(prepared: PreparedAgentOrgConfiguredAgent) {
     return Object.freeze({
       stagedPlatformBindings: prepared.activation.stagedPlatformBindings,
+      stagedNoConversationBindingReplacements: prepared.activation.stagedNoConversationBindingReplacements,
       commitAfterDurability: prepared.commitAfterDurability,
       abort: prepared.abort,
     });

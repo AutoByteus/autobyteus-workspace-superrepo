@@ -17,6 +17,7 @@ import type { FlatTeamExecutionCallbacks } from "./flat-team-execution-callbacks
 export type PreparedFlatTeamExecution = Readonly<{
   teamRun: TeamRun;
   stagedPlatformBindings: readonly import("../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js").CollaborationAgentPlatformBinding[];
+  stagedNoConversationBindingReplacements: readonly import("../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js").CollaborationAgentNoConversationBindingReplacement[];
   commitAfterDurability(): void;
   abort(): Promise<void>;
 }>;
@@ -98,6 +99,8 @@ export class FlatTeamExecutionFactory {
     return Object.freeze({
       teamRun,
       stagedPlatformBindings: activation?.stagedPlatformBindings ?? Object.freeze([]),
+      stagedNoConversationBindingReplacements:
+        activation?.stagedNoConversationBindingReplacements ?? Object.freeze([]),
       commitAfterDurability: () => {
         if (state !== "prepared") throw new Error(`Flat Team '${teamRun.teamRunId}' is not publishable.`);
         activation?.commitAfterDurability();

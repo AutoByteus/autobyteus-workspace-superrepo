@@ -50,6 +50,7 @@ describe("FlatTeamExecutionFactory", () => {
     expect(prepared.teamRun.context.runtimeContext?.memberContexts.map((item) => item.address))
       .toEqual(teamNode.children.map((item) => item.address));
     expect(prepared.stagedPlatformBindings).toEqual([]);
+    expect(prepared.stagedNoConversationBindingReplacements).toEqual([]);
     prepared.commitAfterDurability();
     expect(prepared.teamRun.isActive()).toBe(true);
   });

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { createCollaborationMemberExecutionIdentity, createTeamRootExecutionIdentity } from "../../../src/agent-collaboration/execution/domain/root-execution-identity.js";
-import { addTaskExecutionToTree, adoptAgentPlatformBindingInTree } from "../../../src/agent-team-execution/services/team-run-execution-tree-mutator.js";
+import {
+  addTaskExecutionToTree,
+  adoptAgentPlatformBindingInTree,
+  replaceAgentPlatformBindingWithoutConversationInTree,
+} from "../../../src/agent-team-execution/services/team-run-execution-tree-mutator.js";
 import { projectTaskAgentExecution, projectTaskTeamExecution } from "../../../src/agent-team-execution/task-delegation/task-execution-tree-projection.js";
 import { RuntimeKind } from "../../../src/runtime-management/runtime-kind-enum.js";
 import {
@@ -141,5 +145,30 @@ describe("adoptAgentPlatformBindingInTree", () => {
       tree: adopted,
       binding: binding("/coordinator", "run-coordinator", "thread-2"),
     })).toThrow("already has a different provider binding");
+  });
+
+  it("replaces only the exact expected no-conversation provider binding", () => {
+    const prior = adoptAgentPlatformBindingInTree({
+      tree: baseTree(),
+      binding: binding("/coordinator", "run-coordinator", "thread-old"),
+    }).tree;
+    const replacementBinding = binding("/coordinator", "run-coordinator", "thread-new");
+
+    const replaced = replaceAgentPlatformBindingWithoutConversationInTree({
+      tree: prior,
+      replacement: {
+        binding: replacementBinding,
+        expectedPreviousPlatformAgentRunId: "thread-old",
+      },
+    });
+
+    expect(replaced.rootTeam.members[0]).toMatchObject({ platformAgentRunId: "thread-new" });
+    expect(() => replaceAgentPlatformBindingWithoutConversationInTree({
+      tree: prior,
+      replacement: {
+        binding: replacementBinding,
+        expectedPreviousPlatformAgentRunId: "thread-other",
+      },
+    })).toThrow("does not match the persisted provider binding");
   });
 });

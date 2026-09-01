@@ -1,4 +1,7 @@
-import type { CollaborationAgentPlatformBinding } from "../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js";
+import type {
+  CollaborationAgentNoConversationBindingReplacement,
+  CollaborationAgentPlatformBinding,
+} from "../../agent-collaboration/execution/domain/collaboration-agent-platform-binding.js";
 import type { TaskExecutionHostIdentity } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
 import type {
   ConfiguredAgentExecutionNode,
@@ -157,4 +160,48 @@ export const adoptAgentOrgPlatformBinding = (input: {
     outcome: "adopted",
     tree: validateAgentOrgRunExecutionTreePayload(next, input.tree.rootOrg.orgRunId),
   });
+};
+
+export const replaceAgentOrgPlatformBindingWithoutConversation = (input: {
+  tree: AgentOrgRunExecutionTreeSnapshot;
+  replacement: CollaborationAgentNoConversationBindingReplacement;
+}): AgentOrgRunExecutionTreeSnapshot => {
+  const identity = input.replacement.binding.execution;
+  if (identity.root.rootSubjectKind !== "agent_org" || identity.root.rootRunId !== input.tree.rootOrg.orgRunId) {
+    throw new Error("Platform binding replacement belongs to a different AgentOrg root.");
+  }
+  let matches = 0;
+  const agent = <T extends AgentNode>(value: T): T => {
+    if (value.agentRunId !== identity.agentRunId || value.address !== identity.memberAddress) return value;
+    matches += 1;
+    if (value.platformAgentRunId !== input.replacement.expectedPreviousPlatformAgentRunId) {
+      throw new Error("AgentOrg no-conversation binding replacement does not match the persisted provider binding.");
+    }
+    return { ...value, platformAgentRunId: input.replacement.binding.platformAgentRunId };
+  };
+  const taskMember = (value: TaskTeamMemberExecution): TaskTeamMemberExecution => "agentRunId" in value ? agent(value) : {
+    ...value,
+    members: value.members.map(taskMember),
+    taskExecutions: value.taskExecutions.map(task),
+  };
+  const task = (value: TaskExecution): TaskExecution => "agentRunId" in value ? agent(value) : {
+    ...value,
+    members: value.members.map(taskMember),
+    taskExecutions: value.taskExecutions.map(task),
+  };
+  const configured = (value: ConfiguredExecutionNode): ConfiguredExecutionNode => "agentRunId" in value ? agent(value) : {
+    ...value,
+    members: value.members.map(agent),
+    taskExecutions: value.taskExecutions.map(task),
+  };
+  const next = {
+    ...input.tree,
+    rootOrg: {
+      ...input.tree.rootOrg,
+      members: input.tree.rootOrg.members.map(configured),
+      taskExecutions: input.tree.rootOrg.taskExecutions.map(task),
+    },
+  };
+  if (matches !== 1) throw new Error("Platform binding replacement target was not found exactly once in AgentOrg tree.");
+  return validateAgentOrgRunExecutionTreePayload(next, input.tree.rootOrg.orgRunId);
 };

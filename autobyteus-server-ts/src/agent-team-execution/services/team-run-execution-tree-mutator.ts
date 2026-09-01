@@ -190,3 +190,57 @@ export const adoptAgentPlatformBindingInTree = (input: {
     tree: validateTeamRunExecutionTreePayload(next, input.tree.rootTeam.teamRunId),
   };
 };
+
+export const replaceAgentPlatformBindingWithoutConversationInTree = (input: {
+  tree: TeamRunExecutionTreeSnapshot;
+  replacement: Readonly<{
+    binding: TeamAgentPlatformBinding;
+    expectedPreviousPlatformAgentRunId: string;
+  }>;
+}): TeamRunExecutionTreeSnapshot => {
+  const identity = input.replacement.binding.execution;
+  if (identity.root.rootSubjectKind !== "agent_team" || identity.root.rootRunId !== input.tree.rootTeam.teamRunId) {
+    throw new TeamAgentPlatformBindingError(
+      "TEAM_AGENT_PLATFORM_BINDING_CONFLICT",
+      "The platform binding replacement belongs to a different root TeamRun.",
+    );
+  }
+  let matches = 0;
+  const mapAgent = <T extends AgentExecutionNode>(agent: T): T => {
+    if (agent.address !== identity.memberAddress || agent.agentRunId !== identity.agentRunId) return agent;
+    matches += 1;
+    if (agent.platformAgentRunId !== input.replacement.expectedPreviousPlatformAgentRunId) {
+      throw new TeamAgentPlatformBindingError(
+        "TEAM_AGENT_PLATFORM_BINDING_CONFLICT",
+        "The no-conversation binding replacement does not match the persisted provider binding.",
+      );
+    }
+    return { ...agent, platformAgentRunId: input.replacement.binding.platformAgentRunId };
+  };
+  const mapTaskMember = (member: TaskTeamMemberExecution): TaskTeamMemberExecution =>
+    "agentRunId" in member ? mapAgent(member) : {
+      ...member,
+      members: member.members.map(mapTaskMember),
+      taskExecutions: member.taskExecutions.map(mapTask),
+    };
+  const mapTask = (task: TaskExecution): TaskExecution => "agentRunId" in task ? mapAgent(task) : {
+    ...task,
+    members: task.members.map(mapTaskMember),
+    taskExecutions: task.taskExecutions.map(mapTask),
+  } as TaskTeamExecution;
+  const next = {
+    ...input.tree,
+    rootTeam: {
+      ...input.tree.rootTeam,
+      members: input.tree.rootTeam.members.map(mapAgent),
+      taskExecutions: input.tree.rootTeam.taskExecutions.map(mapTask),
+    },
+  };
+  if (matches !== 1) {
+    throw new TeamAgentPlatformBindingError(
+      "TEAM_AGENT_PLATFORM_BINDING_CONFLICT",
+      "The platform binding replacement target was not found in the execution tree.",
+    );
+  }
+  return validateTeamRunExecutionTreePayload(next, input.tree.rootTeam.teamRunId);
+};
