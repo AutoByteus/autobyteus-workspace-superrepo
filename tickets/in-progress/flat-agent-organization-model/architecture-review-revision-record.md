@@ -10,6 +10,7 @@ concise chronological architecture-review history.
 | ARCH-REV-001 | Round 1 / independent review requested after approved `RER-016`, Product `RV-012`, and completed `AD-REV-002` | `AD-REV-001`, `AD-REV-002` | N/A | Fail — Design Impact | `AR-FIND-001`, `AR-FIND-002` |
 | ARCH-REV-002 | Round 2 / cumulative re-review after approved `RER-018`, `AD-REV-003` finding recovery, and `AD-REV-004` migration-convention correction | `AD-REV-003`, `AD-REV-004` | Fail — Design Impact | Pass | `AR-FIND-001`, `AR-FIND-002`, `ADI-006` |
 | ARCH-REV-003 | Round 3 / re-review after implementation `IR-001` returned composition impact `IDI-001` and `AD-REV-005` defined the production runtime extraction | `AD-REV-005` | Pass | Pass | `IDI-001` |
+| ARCH-REV-004 | Round 4 / re-review after API/E2E real-browser execution exposed raw Org presentation impact `ADI-007` and `AD-REV-006` defined strict accepted-workspace reuse | `AD-REV-006` | Pass | Pass | `ADI-007` |
 
 ## Revision Entries
 
@@ -78,3 +79,28 @@ None.
 - Material classification changes: The authoritative result remains `Pass`; task size remains `Large`, architectural risk remains `High`, and no Requirement Gap or Product UI gap exists. The result validates architecture only and does not validate the partial implementation draft.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must reconcile the partial draft with the AD-REV-005 boundary, prove import/registration/package negatives, retain Team V2 and migration guarantees, and validate full Org activation/task/message/binding/restore/fail-stop/memory/routing/shutdown plus Product parity. These are controlled High implementation risks, not open design decisions.
+
+### ARCH-REV-004 — Strict AgentOrg presentation and accepted-workspace reuse pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 4; API/E2E real imported-package/Codex/browser execution after `IR-003` and `CRR-003` proved full Org launch and exact member focus, then exposed `ADI-007`: raw protocol envelopes rendered as JSON cards through a bespoke Org header/composer with member-header `Stop Org`. `AD-REV-006` supplied the transport, browser-state, component-reuse, contextual-query, command, and lifecycle-action correction and requested independent re-review.
+- Triggering role, report path, and finding IDs: API/E2E Engineer evidence at `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-001/screenshots/03-org-live-raw-events-defect.png`; architecture impact `ADI-007` is recorded in the Architecture Designer's revision record.
+- Relevant architecture design revision IDs: `AD-REV-006`
+- Prior authoritative decision: `Pass` (`ARCH-REV-003`)
+- Current authoritative decision: `Pass`
+- What changed in the review result or what baseline was established: Independently confirmed the supported browser defect and the existing accepted Agent/Team production capabilities. The revised design now places one closed root-neutral Agent presentation contract/admission adapter below compatible Team and strict Org envelopes; gives one checkpointed AgentOrgExecutionContext authority over strict topology, AgentContexts, mounted-Team views, nullable focus, and recovery; routes four exact active-Agent target branches through subject interaction/browse ports into extracted accepted Agent/Team surfaces; requires Org-tagged member trace/token/tool queries; and places whole-Org stop on the active Org history root row. Raw/opaque events, JSON rendering, duplicate Org composer/header/store authority, direct send-only component paths, standalone mounted-Team registration, and member/mounted-Team lifecycle actions are explicit removals.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001` | Resolved in `ARCH-REV-002` | Remains resolved | `RER-018`, `AD-REV-003`-`AD-REV-006` | Target-only Team V2/Org V1 definition admission, server-owned conversion, and external read-only ownership are unchanged by the presentation correction. |
+| `AR-FIND-002` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-003`-`AD-REV-006` | Org/root-owned saved order still precedes stable Team-local lists; the new presentation/context paths consume projections without regrouping or deduplicating rules. |
+| `ADI-006` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-004`-`AD-REV-006` | Canonical startup runner/direct-rename/relaunch behavior and the native flat-Team zero-write cohort are unchanged. |
+| `IDI-001` | Resolved at design boundary in `ARCH-REV-003` | Remains resolved | `AD-REV-005`, `AD-REV-006`; self-validation VAL-001-VAL-017 | Strict two-family root-neutral execution composition remains the foundation; AD-REV-006 introduces no synthetic Team root, mounted Team package, or public/durable root union. |
+| `ADI-007` | Open architecture-owned presentation impact from API/E2E | Resolved at design boundary | `AD-REV-006`; self-validation VAL-018-VAL-022; real-browser defect screenshot | Exact schemas, adapter/serializer ownership, Org hydration and stream state machine, active target/interaction/browse ports, shared accepted surfaces, Org-tagged contextual queries, explicit removals, root-stop placement, files, and validation order make the correction actionable while preserving Team wire and root authority. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: The authoritative result remains `Pass`; task size remains `Large`, architectural risk remains `High`, and no Requirement Gap or Product UI gap exists. The result validates architecture only and does not claim the impacted implementation or API/E2E path is fixed.
+- Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+- Remaining risks or uncertainty: Implementation must reconcile `IR-003` with AD-REV-006, preserve every Team-only outer message and standalone Agent/Team workspace behavior, eliminate all opaque Org/event/dashboard/direct-socket paths, prove exact Org member hydration/command/contextual-query correlation and recovery, keep mounted Teams outside Team root stores/registries/lifecycle, and re-run source review plus real browser/API/E2E evidence. These are controlled High implementation risks, not open design decisions.

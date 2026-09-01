@@ -2,34 +2,34 @@
 
 ## Review Round Meta
 
-- Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` (`RER-018`, approved commit `e1f26fbe128a33ef863a3735607b1b3857f161e6`)
+- Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` (`RER-019`, approved commit `f3035a2d5ba90e64c51113fcd957524a3afd9cf9`; behavior authority remains cumulative `RER-018`)
 - Upstream Investigation Notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - Upstream Requirements Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`
-- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` (`AD-REV-005`, architecture commit `9718fb36b68e0ffee554b9eb443c9e0bb9735aa1`)
-- Supplemental Task Artifacts Reviewed: approved `AORG-CONTRACT-001`; approved Product `RV-012`, `ui-ux-spec.md`, `user-decision-record.md`, `visual-reference-manifest.json`, and representative `VIS-*` images; repository `production_data_migration_conventions.md`; `architecture-design-self-validation.md`; implementation-owned `implementation-handoff.md` / `implementation-revision-record.md` (`IR-001`, `IDI-001`); current hierarchy/runtime/package evidence inventoried in `investigation-notes.md`
+- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` (`AD-REV-006`, architecture commit `0d71c76ca52c1dab907b81b41702fa4e88fb7538`)
+- Supplemental Task Artifacts Reviewed: approved `AORG-CONTRACT-001`; approved Product `RV-012`, `ui-ux-spec.md`, `user-decision-record.md`, `visual-reference-manifest.json`, and `VIS-001`-`VIS-020`; supplemental Product `BASELINE-PROMOTION-001`; repository `production_data_migration_conventions.md`; `architecture-design-self-validation.md`; implementation `IR-002`/`IR-003`, source review `CRR-003`, and API/E2E investigation plus `03-org-live-raw-events-defect.png`; current committed Agent/Team presentation, stream, context, history-action, and AgentOrg defect source
 - Architecture Design Revision Record Reviewed: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`
-- Relevant Architecture Design Revision IDs: `AD-REV-001`, `AD-REV-002`, `AD-REV-003`, `AD-REV-004`, `AD-REV-005`
+- Relevant Architecture Design Revision IDs: `AD-REV-001`-`AD-REV-006`
 - Architecture Review Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
-- Current Architecture Review Revision ID: `ARCH-REV-003`
-- Current Review Round: `3`
-- Trigger: Implementation `IR-001` returned architecture-owned `IDI-001` after `ARCH-REV-002` passed. The current Team runtime proved that the prior lower-level reuse direction was not constructible without false Team-root ownership. `AD-REV-005` replaces that direction with explicit root-neutral configured-Agent/task/message capabilities, rootless flat-Team local execution, private Team/Org adapters, strict Org sidecars, compound live routing, and complete Org/process lifecycle composition.
-- Prior Review Round Reviewed: `ARCH-REV-002 / Pass`
-- Latest Authoritative Round: `ARCH-REV-003 / Round 3`
-- Current-State Evidence Basis: the cumulative `ARCH-REV-002` evidence remains valid. This round additionally independently inspected the committed `MixedTeamRunBackendFactory`, `MixedAgentMemberHandle`, `MemberTaskRootResolver`, `AgentTeamRunManager.materializeRoot`, task persistence/reopen flow, `GlobalAgentRunMessageRouter`, AgentRun `memberTeamContext` consumers, atomic Team file writer/fail-stop coordinator, and `GeneralProcessRunSupervisor`; these confirm `IDI-001`'s Team-root coupling and the lifecycle seams that `AD-REV-005` must replace. The partial uncommitted implementation draft was read only as triggering evidence and is not treated as implementation validation.
+- Current Architecture Review Revision ID: `ARCH-REV-004`
+- Current Review Round: `4`
+- Trigger: API/E2E real imported-package/Codex/browser execution after `IR-003` and `CRR-003` proved full Org activation and exact `/concierge` focus, then exposed architecture impact `ADI-007`: the focused Org view rendered raw protocol envelopes with `JSON.stringify`, a bespoke composer/header, and member-header `Stop Org`. `AD-REV-006` replaces that parallel dashboard with strict root-neutral Agent presentation, one checkpointed Org browser context, accepted Agent/Team surface reuse, exact interaction/browse ports, Org-tagged contextual queries, and root-owned stop placement.
+- Prior Review Round Reviewed: `ARCH-REV-003 / Pass`
+- Latest Authoritative Round: `ARCH-REV-004 / Round 4`
+- Current-State Evidence Basis: the cumulative `ARCH-REV-003` evidence remains valid. This round independently inspected the real-browser defect screenshot; the committed `RootExecutionEventDto.event: unknown`, send-only Org client command, raw `rootExecutionViewStore`, and `AgentOrgWorkspaceView.vue` event casts/`JSON.stringify`/custom composer/Stop control; the accepted `AgentWorkspaceView`, `TeamWorkspaceView`, `AgentTeamEventMonitor`, `AgentEventMonitor`, `useActiveContextStore`, Team event adapter/projector, member projection, and active history-row stop patterns. These establish both the supported defect path and the concrete production capabilities that `AD-REV-006` extracts or extends. Dirty downstream test/report files were treated as read-only evidence and are not implementation validation.
 
 ## Routing Classification Review
 
 - Task size (`Small`/`Medium`/`Large`): `Large`
 - Architectural risk (`Low`/`High`): `High`
-- Classification rationale reviewed: `Confirmed`. In addition to the previously reviewed cross-subsystem changes, `AD-REV-005` changes shared AgentRun/tool context, configured-Agent activation, Team-local execution, task/message/event adapters, memory/location lookup, Org sidecars, active-root routing, restore/fail-stop, and process construction/shutdown. Payload counts are evidence, not the size driver.
+- Classification rationale reviewed: `Confirmed`. The earlier two-family execution/persistence/migration scope remains Large/High. `AD-REV-006` additionally changes shared Agent presentation admission/contracts, Team and Org subject serialization, Org member projection and checkpointed browser hydration, active-context command/browse ports, accepted Agent/Team component extraction, contextual tools, and root lifecycle-action placement. The route is driven by ownership and cross-subsystem blast radius, not payload counts.
 - Independent Architecture Review required by the classification: `Yes`
 - Classification evidence or correction required: None. The selected gate remains correct.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
 - Overall Basis Status (`Confirmed`/`Contradicted`/`Blocked`): `Confirmed`
-- Approved requirements / intended behavior understood: `Yes`. `RER-018` preserves `RER-016` runtime families and Product `RV-012`, excludes external-repository writes, and approves exact target definition admission plus per-definition availability.
-- Relevant existing behavior and evidence confirmed: `Yes`. The prior definition, handoff, Team V2, migration, and Product evidence remains confirmed. Current runtime code also binds Agent execution, task tools, memory, same-root routing, events, and local Team construction to `RootTeamRun`/Team-specific contexts exactly as `IDI-001` reports.
+- Approved requirements / intended behavior understood: `Yes`. Cumulative `RER-018` preserves the two runtime families, exact admission/external ownership, and Product `RV-012`; `RER-019` only promotes that accepted experience to the default Product baseline. REQ-004/016/019/025 and VIS-016-VIS-018 already require exact focus and the accepted Agent/Team workspace rather than a custom Org dashboard.
+- Relevant existing behavior and evidence confirmed: `Yes`. The prior definition, handoff, Team V2, migration, and root-neutral runtime evidence remains confirmed. The real browser path and committed source prove `ADI-007`; accepted Agent/Team contexts, event admission/projectors, presentation handlers, component stack, and history stop actions provide the existing behavior/capability basis for the target extraction.
 - Scope guardrail confirmed (`In-Scope Use Cases` / `Out of Scope` / `Preserved Behavior Boundary` / `Review Authority`): `Yes`
 - Approved change, preserved behavior, and outside scope understood: `Yes`
 - Every prospective blocking `Design Impact` finding is traceable to an approved requirement, acceptance criterion, or preserved-behavior ID (`Yes`/`No`): `Yes — no blocking finding remains`
@@ -40,9 +40,9 @@
 | BEH-001 | Contract | Pass | Pass | Pass | Confirmed | None. Exact Team Definition V2 and Org Definition V1 replace recursive normal admission. |
 | BEH-002 | System | Pass | Pass | Pass | Confirmed | None. Peer Team/Org services own distinct launch/restore paths; Org scope assembly prepares and registers the complete direct-Agent/mounted-Team scope without a synthetic Team root. |
 | BEH-003 | Contract | Pass | Pass | Pass | Confirmed | None. Org/root-owned handoffs precede stable Team-local lists and every `rules[]` order is preserved. |
-| BEH-004 | User / contract | Pass | Pass | Pass | Confirmed | None. Full Org activation completes before a nullable client focus; exact Team focus still resolves through its stored coordinator. |
-| BEH-005 | System | Pass | Pass | Pass | Confirmed | None. Strict subject stores/sidecars, tagged memory/root identity, and subject adapters preserve runtime truth and whole-root fail-stop. |
-| BEH-006 | User | Pass | Pass | Pass | Confirmed | None. Available Team/Org new-work surfaces and snapshot-backed history are separated truthfully. |
+| BEH-004 | User / contract | Pass | Pass | Pass | Confirmed | None. Full Org activation completes before nullable exact focus; direct Agent focus yields the accepted Agent surface and Team/Team-Agent focus yields the accepted Team surface through its exact coordinator/member. |
+| BEH-005 | System | Pass | Pass | Pass | Confirmed | None. Strict subject stores/sidecars and root-neutral execution remain intact; strict Org presentation envelopes, checkpointed context recovery, and root-history termination preserve live/history truth without member-owned lifecycle. |
+| BEH-006 | User | Pass | Pass | Pass | Confirmed | None. Available Team/Org surfaces remain truthful; the bespoke raw Org dashboard is removed in favor of structurally shared accepted workspaces and Org-tagged contextual tools. |
 | BEH-007 | Operational | Pass | Pass | Pass | Confirmed | None. Server-owned definitions and every server-memory package are classified independently of external source ownership. |
 | BEH-008 | Durable contract | Pass | Pass | Pass | Confirmed | None. Exact native Team V2 remains unchanged; AgentOrg V1 adds strict Org task/message sidecars without a generic root/store or mounted Team package. |
 | BEH-009 | System | Pass | Pass | Pass | Confirmed | None. Bound root-neutral task commands resolve a truthful Org-root or exact Team host while configured flatness remains separate from recursive task lineage. |
@@ -52,13 +52,16 @@
 
 | Artifact | Purpose And Scope Are Clear? (`Pass`/`Fail`) | Linked To Relevant Core Artifacts? (`Pass`/`Fail`) | Internally Complete? (`Pass`/`Fail`) | Consistent With Related Core Artifacts? (`Pass`/`Fail`) | Status And Approval Applicability Are Clear? (`Pass`/`Fail`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| `agent-org-contract.md` (`AORG-CONTRACT-001@RER-018`) | Pass | Pass | Pass | Pass | Pass | None. Exact definition admission and runtime families agree with the design. |
+| `investigation-notes.md` supplement inventory plus the design spec's later-stage supplement map | Pass | Pass | Pass | Pass | Pass | None. The Requirements-owned inventory is current through RER-019; the AD-REV-006 design map explicitly adds the later implementation/review/API trigger artifacts without rewriting upstream authority. |
+| `agent-org-contract.md` (`AORG-CONTRACT-001@RER-019`) | Pass | Pass | Pass | Pass | Pass | None. Exact definition admission and runtime families agree with the design; RER-019 changes only Product activation/provenance. |
 | `production_data_migration_conventions.md` | Pass | Pass | Pass | Pass | Pass | None. `AD-REV-004` applies its forward-only, runner-owned, proportionate recovery boundary rather than copying a competing convention. |
 | `ui-ux-spec.md` (`RV-012`) | Pass | Pass | Pass | Pass | Pass | None; mocked prototype services remain non-authoritative. |
 | `visual-reference-manifest.json` and `VIS-001`–`VIS-020` | Pass | Pass | Pass | Pass | Pass | None. State, viewport, fixture, and hash provenance remain explicit. |
 | `user-decision-record.md` / `prototype-ticket.md` | Pass | Pass | Pass | Pass | Pass | None. |
-| `architecture-design-self-validation.md` (`AD-REV-005`) | Pass | Pass | Pass | Pass | Pass | None. Its 17 walkthroughs are design evidence only and agree with the canonical design/requirements. |
-| `implementation-handoff.md` / `implementation-revision-record.md` (`IR-001`, `IDI-001`) | Pass | Pass | Pass | Pass | Pass | None. They establish the current composition gap and partial-draft status; they make no implementation-complete or test claim. |
+| `BASELINE-PROMOTION-001` | Pass | Pass | Pass | Pass | Pass | None. It promotes the already-approved experience to clean normal routes and explicitly changes no behavior or production architecture. |
+| `architecture-design-self-validation.md` (`AD-REV-006`) | Pass | Pass | Pass | Pass | Pass | None. Its 22 walkthroughs are design evidence only; VAL-018-VAL-022 completely trace the newly affected conversation, mounted-Team reuse, command parity, recovery, and root-stop paths. |
+| `implementation-handoff.md` / `implementation-revision-record.md` (`IR-001`-`IR-003`, `IDI-001`) and `code-review-report.md` / revision record (`CRR-003`) | Pass | Pass | Pass | Pass | Pass | None. They establish the implementation baseline and prior review state; AD-REV-006 does not claim the impacted source is already reconciled. |
+| `api-e2e-coverage-investigation.md` and `03-org-live-raw-events-defect.png` | Pass | Pass | Pass | Pass | Pass | None. They are explicitly downstream trigger evidence, not a completed API/E2E result; architecture records the observed supported browser path and keeps validation stopped. |
 | Current hierarchy/runtime/package evidence | Pass | Pass | Pass | Pass | Pass | Evidence only; no external write authority or unsupported topology is inferred. |
 
 ## Task Design Health Assessment Verdict
@@ -66,9 +69,9 @@
 | Assessment Area | Result (`Pass`/`Fail`) | Evidence | Required Action |
 | --- | --- | --- | --- |
 | Assessment is present for the current task posture | Pass | The design classifies the work as a larger requirement plus refactor. | None. |
-| Root-cause classification is explicit and evidence-backed | Pass | Boundary/ownership, duplicated coordination, and shared-structure looseness are tied both to recursive Team behavior and to the concrete `IDI-001` Team-root coupling across AgentRun, tools, memory, tasks, messages, events, and process composition. | None. |
+| Root-cause classification is explicit and evidence-backed | Pass | The prior Team-root coupling remains resolved. ADI-007 adds a distinct boundary witness: opaque Org transport, duplicate browser authority, and component-owned protocol formatting/input/lifecycle bypassed accepted Agent presentation and created a second runtime surface. | None. |
 | Refactor needed now / no refactor needed / deferred decision is explicit | Pass | Refactor now is explicit; dynamic membership, cross-run routing, shared instances, new task semantics, and external-project updates are deferred/out of scope. | None. |
-| Refactor decision is supported by the concrete design sections or residual-risk rationale | Pass | Separate subject owners plus tagged internal identities, configured-Agent/local-Team extraction, private task/message adapters, Org state package ownership, active-root directory, location facade, exact lifecycle sequence, removals, files, and tests make the refactor actionable. | None. |
+| Refactor decision is supported by the concrete design sections or residual-risk rationale | Pass | The prior subject/runtime extraction remains concrete. AD-REV-006 adds exact presentation schemas/admission, subject serializers, Org member projection/checkpoint hydration, one context/state machine, four tagged active targets, store-neutral surfaces, contextual query identities, command parity, removals, file mapping, and an ordered validation sequence. | None. |
 
 ## Spine Inventory Verdict
 
@@ -84,6 +87,10 @@
 | DS-008 | Tagged mixed projection/event/history | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 | DS-014 | Root-neutral configured execution, durability, and publication | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 | DS-015 | General/application process construction and shutdown | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-016 | Strict Org Agent presentation event path | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-017 | Exact focused Agent/Team interaction through accepted surfaces | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-018 | Org member hydration, checkpoint recovery, and atomic context publication | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-019 | Org root termination from active history | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 
 ## Boundary Encapsulation Verdict
 
@@ -100,7 +107,11 @@
 | ActiveCollaborationRootDirectory / CollaborationExecutionLocationService | Pass | Pass | Pass | Pass | Compound identity and narrow capabilities prevent bare-ID/family inference and lifecycle bypass. |
 | GeneralProcessRunSupervisor | Pass | Pass | Pass | Pass | It calls subject managers, not embedded Teams/handles, and owns construction/Org→Team→Agent teardown ordering. |
 | Team V2 / Org V1 stores | Pass | Pass | Pass | Pass | One strict current family per store; no try-both reader. |
-| RootExecutionProjectionService / web RootExecutionView | Pass | Pass | Pass | Pass | Explicit compound identity and tagged branch control mixed reads/focus. |
+| RootExecutionProjectionService / web RootExecutionView | Pass | Pass | Pass | Pass | Explicit compound identity controls mixed reads; the web facade delegates active Org state and retains no raw-event/tree/focus authority. |
+| CollaborationAgentPresentationAdapter / subject serializers | Pass | Pass | Pass | Pass | Raw Agent events cross one strict root-neutral admission boundary; Team and Org add only their own envelope/identity semantics. |
+| AgentOrgExecutionContext / hydration / streaming | Pass | Pass | Pass | Pass | One correlated candidate owns Org topology, AgentContexts, mounted-Team views, nullable focus, sequence state, and atomic recovery. |
+| ActiveAgentWorkspaceTarget / shared Agent and Team surfaces | Pass | Pass | Pass | Pass | Components use exact presentation/action/interaction/browse ports and cannot reach subject stores, sockets, raw events, or root lifecycle. |
+| AgentOrg history root lifecycle action | Pass | Pass | Pass | Pass | Exact root ID, pending/error, and whole-root termination stay outside focused Agent and mounted-Team presentation. |
 
 ## Dependency Direction / Forbidden Shortcut Verdict
 
@@ -113,6 +124,9 @@
 | Persistence/history/readiness | Pass | Pass | Pass | Pass | Strict stores own payloads; readiness and mixed catalogs remain derived/current-only. |
 | Migration/current runtime | Pass | Pass | Pass | Pass | Legacy imports are migration-only; normal code never tries old files or paths. |
 | Web authoring/runtime | Pass | Pass | Pass | Pass | Separate subject drafts and root-kind selectors prevent mixed ownership. |
+| Agent presentation transport | Pass | Pass | Pass | Pass | Root-neutral detail contracts sit below subject envelopes; raw domain events and Team/Org root identities cannot flow into shared presentation bodies. |
+| Org browser workspace | Pass | Pass | Pass | Pass | Route/history -> Org context -> active target -> shared surface; no component-to-store/socket shortcut, parallel Org state, or standalone mounted-Team registration is permitted. |
+| Contextual tools and lifecycle | Pass | Pass | Pass | Pass | Org member trace/token/file/activity queries carry compound Org/member/run identity; root stop remains an Org service/store action. |
 
 ## Interface Boundary Verdict
 
@@ -132,6 +146,11 @@
 | RootRunPackageReadinessIndex | Pass | Pass | Pass | Medium | Pass |
 | RootExecutionProjectionService / mixed stream | Pass | Pass | Pass | Medium | Pass |
 | App-data migration definition | Pass | Pass | Pass | Medium | Pass |
+| CollaborationAgentPresentationAdapter / AgentPresentationMessage | Pass | Pass | Pass | High | Pass |
+| AgentOrgStreamingService / AgentOrgExecutionContext | Pass | Pass | Pass | High | Pass |
+| AgentOrg member projection/checkpoint queries | Pass | Pass | Pass | Medium | Pass |
+| ActiveAgentWorkspaceTarget / AgentInteractionPort / TeamWorkspaceContextView | Pass | Pass | Pass | High | Pass |
+| AgentOrgRunStore.terminate / history root action | Pass | Pass | Pass | Medium | Pass |
 
 ## Existing Capability / Subsystem Reuse Verdict
 
@@ -143,7 +162,10 @@
 | Configured Agent and local Team execution | Pass | Pass | Pass | Pass | Extract provider/local mechanics and one rootless Agent-only Team plane; do not reuse RootTeamRun or duplicate Org activation. |
 | Task/message lifecycle | Pass | Pass | Pass | Pass | Extract common FIFO/record/reservation policy behind private Team/Org adapters; keep subject trees, stores, events, and fail-stop separate. |
 | Live routing and mixed physical location | Pass | Pass | Pass | Pass | Compound active-root directory and strict location facade are the narrow additions required by supported exact-Agent and memory paths. |
-| History/stream/workspace | Pass | Pass | Pass | Pass | Tagged mixed facade is justified; Team-only surfaces may remain. |
+| History/stream/root projection | Pass | Pass | Pass | Pass | Tagged mixed facade remains justified; Team-only outer wire stays compatible and Org obtains a strict specialized branch. |
+| Agent event presentation | Pass | Pass | Pass | Pass | Existing Team admission/projector and AgentContext handlers are extracted beneath subject envelopes rather than copied into an Org formatter. |
+| Accepted Agent/Team workspace | Pass | Pass | Pass | Pass | Existing Agent/Team views, event monitors, composer, active context, trace/right-tool, and history action patterns are reused through prop/port surfaces and subject adapters. |
+| Org member hydration/context | Pass | Pass | Pass | Pass | New Org-specific projection/checkpoint/context pieces are justified because mounted executions cannot truthfully use Team-root locations or stores. |
 | Production migration | Pass | Pass | N/A | Pass | Existing runner, status/log/restart actions, atomic writer, and startup sequence are extended rather than replaced. |
 | Definition package save | Pass | Pass | Pass | Pass | Normal multi-file authoring transaction is distinct from the app-data migration. |
 
@@ -158,7 +180,10 @@
 | AgentOrg / AgentTeam Execution | Pass | Pass | Pass | Pass | Peer roots own subject lifecycle, adapters, stores, and events; Team-local execution is rootless and explicitly consumable by both. |
 | Run History / Current Readiness | Pass | Pass | Pass | Pass | Two strict authorities plus current-only readiness and derived mixed catalogs. |
 | App Data Migration | Pass | Pass | Pass | Pass | One registered legacy boundary; no custom runner or recovery subsystem. |
-| GraphQL / streams / web | Pass | Pass | Pass | Pass | Subject-specific writes and explicit mixed reads. |
+| Agent Presentation Contracts / Stream Contracts | Pass | Pass | Pass | Pass | Root-neutral strict message bodies are separate from Team/Org envelopes; Team wire is preserved while Org eliminates opaque payloads. |
+| Web AgentOrg Execution Context | Pass | Pass | Pass | Pass | Owns strict Org snapshot/AgentContexts/focus/stream recovery and mounted-Team presentation under one browser authority. |
+| Web Shared Agent/Team Workspace | Pass | Pass | Pass | Pass | Store-neutral surfaces and the active-target facade preserve accepted presentation while subject adapters own commands and browsing. |
+| GraphQL / root history / web facade | Pass | Pass | Pass | Pass | Subject-specific writes/lifecycle and explicit mixed reads; Org root stop is history-owned and the facade duplicates no Org state. |
 
 ## Reusable Owned Structures Verdict
 
@@ -173,21 +198,29 @@
 | Root task/message engines | Pass | Pass | Pass | Pass | Common policy is shared through one private adapter port; subject trees/sidecars/events remain specialized. |
 | Definition package transaction | Pass | Pass | Pass | Pass | Normal persistence primitive does not absorb domain or migration policy. |
 | Handoff/config UI primitives | Pass | Pass | Pass | Pass | Owner supplies catalogs and commands. |
+| Agent presentation message details/admission | Pass | Pass | Pass | Pass | One closed root-neutral type and adapter replace duplicated Team/Org raw-event parsing without introducing a generic root envelope. |
+| AgentOrgExecutionContext | Pass | Pass | Pass | Pass | Org topology, AgentContexts, mounted-Team projections, focus, and synchronization must swap together; raw event journals and durable focus are excluded. |
+| ActiveAgentWorkspaceTarget / interaction / browse ports | Pass | Pass | Pass | Pass | Four exact branches share one component boundary while retaining subject-specific commands and identity. |
+| TeamWorkspaceContextView | Pass | Pass | Pass | Pass | Read-only Team presentation is shared without lifecycle, persistence, registry, or writable mounted-root capabilities. |
 
 ## Shared Structure / Data Model Tightness Verdict
 
 | Shared Structure / Type / Schema | One Clear Meaning Per Field? (`Pass`/`Fail`) | Redundant Attributes Removed? (`Pass`/`Fail`) | Overlapping Representation Risk Is Controlled? (`Pass`/`Fail`) | Shared Core Vs Specialized Variant / Composition Decision Is Sound? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| DefinitionSourceDescriptor / DefinitionAdmissionResult | Pass | Pass | Pass | Pass | Availability data cannot become a fallback definition or write authority. |
-| AgentOrgDefinition | Pass | Pass | Pass | Pass | No coordinator or inherited Team root fields. |
-| AgentTeamDefinition | Pass | Pass | Pass | Pass | Agent-only exact V2 member shape is explicit. |
-| Shared persisted records | Pass | Pass | Pass | Pass | Existing exact child/task keys are reused without root fields. |
-| Team V2 / Org V1 roots | Pass | Pass | Pass | Pass | Separate exact roots compose shared records. |
-| RootExecutionTreeProjection | Pass | Pass | Pass | Pass | Explicit discriminator selects a specialized branch. |
-| RootExecutionIdentity / CollaborationMemberExecutionIdentity | Pass | Pass | Pass | Pass | Both root kind and ID are mandatory; no duplicate `rootTeamRunId` or bare-ID comparison. |
-| RootExecutionPhysicalScope / TaskExecutionHostIdentity | Pass | Pass | Pass | Pass | Physical Team ancestry and logical host identity are separate, exact concepts. |
-| MemberExecutionContext / bound task commands | Pass | Pass | Pass | Pass | Sender/root selection is closed over and revalidated; no manager/root resolver is exposed. |
-| Org task/message sidecar envelopes | Pass | Pass | Pass | Pass | Mandatory `subjectKind/orgRunId` specializes the unchanged record bodies and prevents Team-envelope reinterpretation. |
+| DefinitionSourceDescriptor / DefinitionAdmissionResult | Pass | Pass | Pass | Pass | Pass | Availability data cannot become a fallback definition or write authority. |
+| AgentOrgDefinition | Pass | Pass | Pass | Pass | Pass | No coordinator or inherited Team root fields. |
+| AgentTeamDefinition | Pass | Pass | Pass | Pass | Pass | Agent-only exact V2 member shape is explicit. |
+| Shared persisted records | Pass | Pass | Pass | Pass | Pass | Existing exact child/task keys are reused without root fields. |
+| Team V2 / Org V1 roots | Pass | Pass | Pass | Pass | Pass | Separate exact roots compose shared records. |
+| RootExecutionTreeProjection | Pass | Pass | Pass | Pass | Pass | Explicit discriminator selects a specialized branch. |
+| RootExecutionIdentity / CollaborationMemberExecutionIdentity | Pass | Pass | Pass | Pass | Pass | Both root kind and ID are mandatory; no duplicate `rootTeamRunId` or bare-ID comparison. |
+| RootExecutionPhysicalScope / TaskExecutionHostIdentity | Pass | Pass | Pass | Pass | Pass | Physical Team ancestry and logical host identity are separate, exact concepts. |
+| MemberExecutionContext / bound task commands | Pass | Pass | Pass | Pass | Pass | Sender/root selection is closed over and revalidated; no manager/root resolver is exposed. |
+| Org task/message sidecar envelopes | Pass | Pass | Pass | Pass | Pass | Mandatory `subjectKind/orgRunId` specializes the unchanged record bodies and prevents Team-envelope reinterpretation. |
+| AgentPresentationMessage | Pass | Pass | Pass | Pass | Pass | One event type/detail meaning; root, member, run, and sequence identity live in subject envelopes rather than optional shared fields. |
+| AgentOrgExecutionContext | Pass | Pass | Pass | Pass | Pass | One correlated Org view and AgentContext map replace overlapping raw-event/tree/focus representations. |
+| ActiveAgentWorkspaceTarget | Pass | Pass | Pass | Pass | Pass | Each branch carries exact context, interaction, browse, and optional Team view; no generic selector or inferred focus. |
+| TeamWorkspaceContextView | Pass | Pass | Pass | Pass | Pass | Presentation-only semantics are singular and cannot be mistaken for Team root authority. |
 
 ## File Responsibility Mapping Verdict
 
@@ -204,6 +237,10 @@
 | Root readiness / mixed projection files | Pass | Pass | Pass | Pass | Current manifest gating is separate from transformation and projection. |
 | Registered migration folder | Pass | Pass | Pass | Pass | Owns all retired decoding, deterministic transform, cleanup, and bounded dispositions only. |
 | Web subject stores/components | Pass | Pass | Pass | Pass | RV-012 mapping remains explicit. |
+| Agent presentation contract/adapter and Team/Org serializers | Pass | Pass | Pass | Pass | Strict detail admission, compatible Team projection, and strict Org envelopes are separate responsibilities. |
+| Org member projection/checkpoint, streaming, context, and context store | Pass | Pass | Pass | Pass | Durable-location reads, transport state, aggregate state, and registration are explicitly split without duplicate authority. |
+| Active-target/interaction/browse contracts and workspace surfaces | Pass | Pass | Pass | Pass | Ports are separated from rendering; standalone and Org wrappers adapt their own owners. |
+| AgentOrg history panel/action | Pass | Pass | Pass | Pass | Exact root termination presentation is isolated from member surfaces and mounted-Team views. |
 
 ## Subsystem / Folder / File Placement Verdict
 
@@ -217,6 +254,9 @@
 | `run-history/` subject stores/readiness/mixed services | Pass | Pass | Medium | Pass | Strict stores, readiness, and projection responsibilities are distinct. |
 | `app-data-migrations/.../agent-org-flat-team-families-v1/` | Pass | Pass | Low | Pass | Historical codecs and transform stay isolated under the registered migration. |
 | Web `agentOrgs` / `agentTeams` / `rootExecution` | Pass | Pass | Low | Pass | Writes are subject-specific; mixed read state is separate. |
+| `autobyteus-agent-presentation-contracts/` | Pass | Pass | Low | Pass | Tight root-neutral presentation schemas sit below both subject transports and contain no runtime/root owner. |
+| Web `services/agentOrgExecution/`, contexts, and stores | Pass | Pass | Medium | Pass | Hydration, strict stream, AgentContexts, mounted-Team views, focus, and atomic replacement belong to one Org browser capability area. |
+| Web shared Agent/Team surface and active-context files | Pass | Pass | Medium | Pass | Accepted visual/interaction primitives are store-neutral; standalone and Org adapters remain subject-specific. |
 
 ## Removal / Decommission Completeness Verdict
 
@@ -233,6 +273,10 @@
 | Nested Team UI/API inputs and fixtures | Pass | Pass | Pass | Pass | Org surfaces replace organization composition. |
 | Root-kind inference/try-both readers | Pass | Pass | Pass | Pass | Explicit family identity and strict dispatch replace them. |
 | AD-REV-003 bespoke migration recovery machinery | Pass | Pass | Pass | Pass | Existing runner/atomic operations/relaunch replace journal, backup, staging, restore command, and crash matrix. |
+| Raw/opaque AgentOrg events, `any`/`JSON.stringify`, and custom event cards | Pass | Pass | Pass | Pass | Closed presentation admission, strict Org transport, AgentContext handlers, and accepted event monitors replace the protocol dashboard. |
+| Bespoke Org member header/composer and direct send-only component path | Pass | Pass | Pass | Pass | Shared Agent/Team surfaces plus exact interaction ports replace duplicated input/action ownership. |
+| Duplicate Org tree/focus/event state in RootExecutionViewStore | Pass | Pass | Pass | Pass | One AgentOrgExecutionContext becomes authoritative; the mixed store is a route/history facade. |
+| Member-header `Stop Org`, mounted-Team termination, or standalone Team registration | Pass | Pass | Pass | Pass | Exact Org root history action and read-only mounted-Team view preserve lifecycle truth. |
 
 ## Legacy / Backward-Compatibility Verdict
 
@@ -243,6 +287,7 @@
 | Native flat Team V2 | No | Pass | Pass | Permanent current behavior, not compatibility. |
 | Migrated organization-like Team V2 | No | Pass | Pass | One registered forward transform; current readiness never decodes it. |
 | Team-only APIs/streams | No | Pass | Pass | Retained only where semantically valid for current Teams. |
+| AgentOrg live presentation | No | Pass | Pass | One strict current Org event/command contract; no raw/JSON fallback or parallel send-only client remains. |
 
 ## Persisted-Data Transition Verdict (When Applicable)
 
@@ -257,6 +302,8 @@
 
 The migration now follows the repository convention: current code is forward-only; the existing runner owns attempts, prerequisites, summary/log, stale status, and `RESTART_TO_RETRY`; results and examples are bounded; failures gate the narrow definition/root; and unsupported infrastructure premises add no machinery.
 
+`AD-REV-006` changes no durable schema, path, migration cohort, or transition decision. Org member hydration reads the already-approved strict Org package/location and presentation traces; it does not create another persisted authority.
+
 ## Change / Refactor Safety Verdict
 
 | Area | Sequence Is Realistic? (`Pass`/`Fail`) | Temporary Seams Are Explicit? (`Pass`/`Fail`) | Cleanup / Removal Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) |
@@ -270,6 +317,11 @@ The migration now follows the repository convention: current code is forward-onl
 | Team preservation then Org runtime | Pass | Pass | Pass | Pass |
 | Root-first handoff compiler cutover | Pass | Pass | Pass | Pass |
 | Mixed projections and Product web cut | Pass | Pass | Pass | Pass |
+| Freeze defect evidence, then extract strict presentation admission and preserve Team wire | Pass | Pass | Pass | Pass |
+| Complete Org projection/commands before browser context cutover | Pass | Pass | Pass | Pass |
+| Establish one checkpointed Org context before deleting duplicate root-store state | Pass | Pass | Pass | Pass |
+| Extract accepted store-neutral surfaces before replacing the Org dashboard | Pass | Pass | Pass | Pass |
+| Move root stop to history and revalidate Team/Org browser parity | Pass | Pass | Pass | Pass |
 
 ## Example Adequacy Verdict
 
@@ -281,7 +333,11 @@ The migration now follows the repository convention: current code is forward-onl
 | Cross-owner handoff order | Yes | Pass | Pass | Pass | `[O1,O2,B1,B2,A1]` example matches current root-first behavior. |
 | Configuration/focus/task host | Yes | Pass | Pass | Pass | Specificity, no-focus, coordinator ingress, Org-root host, mounted-Team host, and recursive task lineage are concrete. |
 | Root-neutral runtime composition | Yes | Pass | Pass | Pass | Exact tagged types, fresh/restore sequences, memory truth table, sidecars, global routing, and rejected synthetic-root shapes make `IDI-001`'s resolution actionable. |
-| Process lifecycle | Yes | Pass | Pass | Pass | Construction and shutdown arrows plus the 17-case self-validation show normal/failure cleanup and the Team-only application specialization. |
+| Process lifecycle | Yes | Pass | Pass | Pass | Construction and shutdown arrows plus the retained validation cases show normal/failure cleanup and the Team-only application specialization. |
+| Strict Agent presentation and Team-wire preservation | Yes | Pass | Pass | Pass | Root-neutral detail union, subject envelopes, token specialization, publish/filter/reject outcomes, and prohibited raw/unknown shapes are concrete. |
+| Org context hydration/recovery | Yes | Pass | Pass | Pass | Exact route-to-snapshot/projection/checkpoint/stream/atomic-swap sequence and `reopen_required` behavior are explicit. |
+| Accepted direct-Agent and mounted-Team workspace reuse | Yes | Pass | Pass | Pass | Four tagged target branches, shared surface mappings, read-only Team view, command parity, and forbidden standalone mounted-root shortcuts are illustrated. |
+| Org root stop placement | Yes | Pass | Pass | Pass | Active history-row pending/error/termination flow and prohibited member/mounted-Team actions are concrete. |
 
 ## Material Premise Validation (Only When Needed)
 
@@ -327,7 +383,7 @@ None.
 
 ## Review Decision
 
-`Pass` — the cumulative `RER-018` / `RV-012` / `AD-REV-005` architecture is behavior-grounded, actionable, convention-aligned, and ready for implementation to resume from `IR-001`.
+`Pass` — the cumulative `RER-019` / `RV-012` / `AD-REV-006` architecture is behavior-grounded, actionable, convention-aligned, and ready for Implementation to reconcile the `IR-003` baseline before API/E2E resumes.
 
 ## Findings
 
@@ -345,13 +401,16 @@ Informational pass notification after the primary handoff: `/software_engineerin
 
 ## Residual Risks
 
-- Classification remains `Large` / `High`; implementation must first reconcile the partial `IR-001` draft with the AD-REV-005 extraction, then preserve exact Team V2 zero-write behavior, source ownership, family/ID exclusivity, root-first handoff order, task hosts, mixed discriminator checks, configuration/focus parity, and RV-012 desktop/narrow fidelity.
+- Classification remains `Large` / `High`; Implementation must reconcile `IR-003` with AD-REV-006 before API/E2E resumes while preserving exact Team V2 zero-write behavior, source ownership, family/ID exclusivity, root-first handoff order, task hosts, mixed discriminator checks, configuration/focus parity, and RV-012 desktop/narrow fidelity.
 - Shared Agent/tool/task/message code must not regain `RootTeamRun`, `AgentOrgRun`, subject manager/store/index/event, Team envelope, bare root ID, or public/durable root-union dependencies. Mounted Teams must remain local Org-owned executions with no Team-family package or registry entry.
 - Org activation/restore must publish/register only a complete scope, use strict correlated Org tree/task/message authorities, and fail-stop the whole Org after indeterminate durability/live finalization; implementation evidence must cover exact memory paths, platform bindings, active-root routing, and Org→Team→Agent shutdown.
 - The registered migration must retain the existing runner/status/log/restart contract and one relaunch category; external repositories remain separate owner work and outside in-ticket write/release scope.
+- Presentation extraction must preserve every Team-only outer message and accepted standalone Agent/Team interaction while eliminating opaque Org payloads, parallel Org tree/event/focus state, component-owned protocol/socket access, and direct send-only behavior.
+- Org hydration and contextual browsing must correlate `{orgRunId, memberAddress, agentRunId}` and sequence checkpoints before atomic publication; malformed/unsupported messages enter visible recovery rather than a raw fallback.
+- Shared surfaces and contextual tools must depend only on exact active-target/action/interaction/browse ports. Mounted Teams must never enter standalone Team stores or Team-root trace/token/history/termination paths, and Org stop must remain on the root history row.
 
 ## Latest Authoritative Result
 
 - Review Decision: `Pass`
 - Material-Premise Gate (`Pass`/`Fail`/`Blocked`): `Pass`
-- Notes: `ARCH-REV-003` revalidates the earlier `ARCH-REV-002` Pass against `AD-REV-005`. `AR-FIND-001`, `AR-FIND-002`, and `ADI-006` remain resolved; `IDI-001` is resolved at the design boundary by the explicit root-neutral composition and lifecycle contract. No Requirement Gap, Product UI gap, or architecture-review finding blocks implementation. The partial draft remains implementation-owned and unvalidated.
+- Notes: `ARCH-REV-004` revalidates the cumulative prior Pass against `AD-REV-006`. `AR-FIND-001`, `AR-FIND-002`, `ADI-006`, and `IDI-001` remain resolved; `ADI-007` is resolved at the design boundary by strict root-neutral presentation, one correlated Org context, accepted surface reuse, exact interaction/browse ports, and root-owned stop placement. No Requirement Gap, Product UI gap, or architecture-review finding blocks implementation. The impacted implementation remains implementation-owned and requires reconciliation plus renewed source/API/E2E validation.
