@@ -238,7 +238,23 @@ const openRun = async (run: AgentOrgHistoryItem) => { if (!run.is_active) { togg
 const focusAgent = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
 const focusTeam = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; toggle(expandedTeams, teamKey(run.root_run_id, address)); orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
 const restore = async (run: AgentOrgHistoryItem) => { const runId = await store.restore(run.root_run_id); orgContexts.select(runId, null); orgContexts.connect(runId); await activateRoute({ ...run, root_run_id: runId, is_active: true }) }
-const stopOrg = async (run: AgentOrgHistoryItem) => { await store.terminate(run.root_run_id).catch(() => undefined); if (!store.terminationErrors[run.root_run_id]) orgContexts.disconnect(run.root_run_id) }
+const stopOrg = async (run: AgentOrgHistoryItem) => {
+  await store.terminate(run.root_run_id).catch(() => undefined)
+  if (store.terminationErrors[run.root_run_id]) return
+  orgContexts.disconnect(run.root_run_id)
+  if (route.query.rootSubjectKind === 'agent_org'
+    && route.query.mode === 'active'
+    && String(route.query.orgRunId || '') === run.root_run_id) {
+    await router.replace({
+      path: '/workspace',
+      query: {
+        rootSubjectKind: 'agent_org',
+        definitionId: treeFor(run).rootOrg.orgDefinitionId,
+        mode: 'configuration',
+      },
+    })
+  }
+}
 const refresh = () => store.fetchHistory().catch(() => undefined)
 const expandActivePath = () => {
   const activeRunId = String(route.query.orgRunId || '')

@@ -85,12 +85,16 @@ const store = reactive<any>({
 const disconnect = vi.fn()
 const connect = vi.fn()
 const select = vi.fn()
-const route = reactive({ query: { orgRunId: 'org-run' } })
+const route = reactive<any>({ query: {
+  rootSubjectKind: 'agent_org', definitionId: 'org-def', orgRunId: 'org-run', mode: 'active',
+} })
+const routerPush = vi.fn()
+const routerReplace = vi.fn()
 const contextState = vi.hoisted(() => ({ current: null as any }))
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: routerPush, replace: routerReplace }),
 }))
 vi.mock('~/stores/agentOrgRunStore', () => ({ useAgentOrgRunStore: () => store }))
 vi.mock('~/stores/agentOrgContextsStore', () => ({
@@ -137,6 +141,9 @@ describe('AgentOrgRunHistoryPanel', () => {
     vi.clearAllMocks()
     contextState.current = null
     route.query.orgRunId = 'org-run'
+    route.query.rootSubjectKind = 'agent_org'
+    route.query.definitionId = 'org-def'
+    route.query.mode = 'active'
     store.history = [{
       root_subject_kind: 'agent_org', root_run_id: 'org-run', created_at: '2026-09-01T00:00:00.000Z',
       archived_at: null, is_active: true, summary: 'Active Org', org: tree,
@@ -153,6 +160,28 @@ describe('AgentOrgRunHistoryPanel', () => {
     await flushPromises()
     expect(store.terminate).toHaveBeenCalledWith('org-run')
     expect(disconnect).toHaveBeenCalledWith('org-run')
+    expect(routerReplace).toHaveBeenCalledWith({
+      path: '/workspace',
+      query: { rootSubjectKind: 'agent_org', definitionId: 'org-def', mode: 'configuration' },
+    })
+  })
+
+  it('does not clear a different active Org route or navigate after failed termination', async () => {
+    const wrapper = mountSubject()
+    await flushPromises()
+    route.query.orgRunId = 'another-org-run'
+    await wrapper.get('button[aria-label="Stop Agent Org"]').trigger('click')
+    await flushPromises()
+    expect(disconnect).toHaveBeenCalledWith('org-run')
+    expect(routerReplace).not.toHaveBeenCalled()
+
+    vi.clearAllMocks()
+    route.query.orgRunId = 'org-run'
+    store.terminationErrors['org-run'] = 'termination failed'
+    await wrapper.get('button[aria-label="Stop Agent Org"]').trigger('click')
+    await flushPromises()
+    expect(disconnect).not.toHaveBeenCalled()
+    expect(routerReplace).not.toHaveBeenCalled()
   })
 
   it('expands a newly launched active Org after history and route update without remounting', async () => {

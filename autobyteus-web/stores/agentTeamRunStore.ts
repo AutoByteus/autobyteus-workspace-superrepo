@@ -230,6 +230,7 @@ export const useAgentTeamRunStore = defineStore('agentTeamRun', {
       let rootTeamRunId: string | null = team?.view.getRootTeamRunId() ?? null;
       let targetAgentRunId = team?.view.getFocusedAgentRunId() ?? null;
       let localSubmission: LocalUserSubmissionHandle | null = null;
+      let retryAttachments = contextAttachments.map(cloneContextAttachment);
       let draftOwnerId = draft?.draftId ?? rootTeamRunId;
       try {
         if (draft) {
@@ -266,6 +267,7 @@ export const useAgentTeamRunStore = defineStore('agentTeamRun', {
           attachments: contextAttachments,
         });
         const plan = planContextAttachmentSubmission(finalized);
+        retryAttachments = plan.retainedMessageAttachments.map(cloneContextAttachment);
         const messageId = buildClientMessageId();
         const dedupeKey = inputDedupeKey(rootTeamRunId, targetAgentRunId, messageId);
         localSubmission.message.messageId = messageId;
@@ -274,9 +276,15 @@ export const useAgentTeamRunStore = defineStore('agentTeamRun', {
         useRunHistoryStore().markTeamAsActive(rootTeamRunId);
         void useRunHistoryStore().refreshTreeQuietly();
         const service = await this.ensureTeamStreamConnected(rootTeamRunId);
-        service.sendMessage(text, targetAgentRunId, plan.executable.contextFilePaths, plan.executable.imageUrls, { messageId, dedupeKey });
+        await service.sendMessage(text, targetAgentRunId, plan.executable.contextFilePaths, plan.executable.imageUrls, { messageId, dedupeKey });
       } catch (error) {
-        if (localSubmission) { failLocalSubmission(localSubmission, error); applyOfflineOrTerminalCleanup(localSubmission.context, AgentStatus.Error); return; }
+        if (localSubmission) {
+          failLocalSubmission(localSubmission, error);
+          localSubmission.context.requirement = text;
+          localSubmission.context.contextFilePaths = retryAttachments;
+          applyOfflineOrTerminalCleanup(localSubmission.context, AgentStatus.Error);
+          return;
+        }
         throw error;
       }
     },

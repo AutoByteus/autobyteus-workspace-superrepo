@@ -629,6 +629,56 @@ describe('agentTeamRunStore current rooted execution contract', () => {
     )
   })
 
+  it('keeps the lazy-restore submission pending until exact Team admission is confirmed', async () => {
+    const stale = twoMemberTeam({ teamRunId: 'team-admission', focusedMemberAddress: '/worker', isActive: false })
+    const hydrated = twoMemberTeam({ teamRunId: 'team-admission', focusedMemberAddress: '/worker', isActive: true })
+    setActiveTeam(stale)
+    mockMutate.mockResolvedValue({
+      data: { restoreAgentTeamRun: { success: true, teamRunId: 'team-admission' } }, errors: [],
+    })
+    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    let admit!: () => void
+    mockSendMessage.mockReturnValueOnce(new Promise<void>((resolve) => { admit = resolve }))
+
+    let completed = false
+    const sending = useAgentTeamRunStore().sendMessageToFocusedMember('exact lazy prompt', [])
+      .then(() => { completed = true })
+    await vi.waitFor(() => expect(mockSendMessage).toHaveBeenCalledOnce())
+    expect(completed).toBe(false)
+    expect(hydrated.view.getAgentContext('team-admission-worker-run')?.submissionPending).toBe(true)
+
+    admit()
+    await sending
+    expect(completed).toBe(true)
+  })
+
+  it('retains the exact lazy-restore prompt and attachments for retry after admission failure', async () => {
+    const stale = twoMemberTeam({ teamRunId: 'team-retry', focusedMemberAddress: '/worker', isActive: false })
+    const hydrated = twoMemberTeam({ teamRunId: 'team-retry', focusedMemberAddress: '/worker', isActive: true })
+    const attachment: ContextAttachment = {
+      kind: 'workspace_path', id: 'retry-file', locator: '/tmp/retry.txt',
+      displayName: 'retry.txt', type: 'Text',
+    }
+    setActiveTeam(stale)
+    mockMutate.mockResolvedValue({
+      data: { restoreAgentTeamRun: { success: true, teamRunId: 'team-retry' } }, errors: [],
+    })
+    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    mockSendMessage.mockRejectedValueOnce(new Error('runtime is stopping'))
+
+    await useAgentTeamRunStore().sendMessageToFocusedMember('retry this exact prompt', [attachment])
+
+    const worker = hydrated.view.getAgentContext('team-retry-worker-run')!
+    expect(worker.requirement).toBe('retry this exact prompt')
+    expect(worker.contextFilePaths).toEqual([attachment])
+    expect(worker.submissionPending).toBe(false)
+    expect(worker.state.currentStatus).toBe(AgentStatus.Error)
+    expect(worker.state.conversation.messages).toEqual([
+      expect.objectContaining({ type: 'user', text: 'retry this exact prompt' }),
+      expect.objectContaining({ type: 'ai', text: 'Error Occurred' }),
+    ])
+  })
+
   it('launches a flat mixed-runtime draft with exact direct memberAddress inputs and focus', async () => {
     const { configStore } = configureSelectedFlatLaunchDraft()
     configStore.setPendingInput('/review_lead', {
