@@ -12,6 +12,7 @@ does not revise intended behavior.
 | AD-REV-002 | Requirements Engineer re-entry, approved `RER-016` plus Product `RV-012` / Product-and-durable-impact architecture round | `RIF-AORG-001`, `RIF-AORG-002`, `ADI-001`-`ADI-005`, prior `Requirement Gap` on superseded RER-014 V3 | `Architecture Revision — Product, Launch, Handoff, And Split-Run-Family Impact` | `Architecture Design Complete`; `task_size=Large`; `architectural_risk=High`; Architecture Review selected |
 | AD-REV-003 | Architecture Reviewer `ARCH-REV-001` plus Requirements Engineer approved `RER-018` / architecture-review recovery round | `AR-FIND-001`, `AR-FIND-002` | `Architecture Revision — Target Definition Admission, External Ownership, And Handoff Order` | `Architecture Design Complete`; both findings resolved; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-004 | User identification of the canonical server migration convention / architecture-impact correction round | `ADI-006` | `Architecture Revision — Forward-Only Convention-Compliant Migration Mechanics` | `Architecture Design Complete`; migration mechanics corrected without requirements/Product change; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-005 | Implementation Engineer `IR-001` / `IDI-001` after `ARCH-REV-002` Pass / implementation-impact recovery round | `IDI-001` | `Architecture Revision — Root-Neutral Configured Execution And AgentOrg Production Composition` | `Architecture Design Complete`; production extraction/composition boundary and self-validation added; `task_size=Large`; `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -240,3 +241,78 @@ does not revise intended behavior.
   classification, destination collision, cleanup, strict current catalog
   exclusion, and correct startup restart guidance; implementation must return a
   Design Impact rather than recreate custom recovery machinery.
+
+### AD-REV-005 — Root-Neutral Configured Execution And AgentOrg Production Composition
+
+- Triggering role, report path, and round: Implementation Engineer initial
+  implementation `IR-001`, recorded in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
+  and
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`,
+  after Architecture Review `ARCH-REV-002@614f705ffee5ff40614a61bf56a58da12115b536`
+  passed AD-REV-003/004. This is the first implementation-impact architecture
+  recovery round.
+- Triggering finding IDs: `IDI-001`. Implementation proved that the design's
+  prior phrase “reuse lower-level Agent/Team runtime factories” did not name a
+  constructible boundary: the candidate handle, member context, task resolver,
+  memory locations, callbacks, sidecars, global routing, and process lifecycle
+  were all statically Team-root-owned.
+- Prior authoritative design result: `AD-REV-004`, Architecture Design Complete,
+  at commit `05a41d1c32be4686065a68e29023ae508e393dae`; independent review
+  `ARCH-REV-002` passed at
+  `614f705ffee5ff40614a61bf56a58da12115b536` and routed to Implementation.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as `AD-REV-005` and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Why this revision is recorded: it replaces an underspecified injected Org
+  activator/lower-level-reuse direction with an explicit internal production
+  composition. The revised design extracts tagged root-neutral configured-Agent
+  execution and a rootless flat-Team local runtime; binds Agent tools to narrow
+  task commands instead of a `RootTeamRun` resolver; keeps task/message engines
+  behind private Team/Org adapters; gives Org exact root task hosts, physical
+  memory, sidecars, binding/event/fail-stop ownership, and compound active-root
+  routing; and defines complete launch, restore, termination, construction, and
+  shutdown order. Public Team V2 and Org V1 roots remain separate and exact.
+- Approved behavior or requirement IDs affected: `BEH-002`, `BEH-004`,
+  `BEH-005`, `BEH-008`, and `BEH-009`; `REQ-004`, `REQ-005`, `REQ-014`-`REQ-016`,
+  and `REQ-024`; `AC-002`, `AC-009`, `AC-010`, `AC-019`, and `AC-020`;
+  `SCN-002`, `SCN-004`, `SCN-006`, `SCN-009`, and `SCN-010`. No intended
+  behavior, Product UI decision, or approved public/durable root-family contract
+  changes.
+- Design-spec sections updated: document/current-state/evidence/classification;
+  AD-REV-005 impact decision; internal runtime composition; Org sidecars and
+  memory placement; construction/activation/restore/fail-stop/termination;
+  process/application composition; scenarios and DS-014/DS-015 spines;
+  ownership, interfaces, dependencies, file/folder mapping, clean-cut removals,
+  sequence, tradeoffs, risks, and implementation guidance.
+- Architecture supplements updated, added, or removed: added
+  `architecture-design-self-validation.md` at the canonical task path. It walks
+  17 supported definition, Team, Org, task, message, binding, persistence,
+  restore, shutdown, mixed-projection, migration, focus, authoring, and
+  application cases through their data-flow spines, owners, boundaries,
+  dependencies, persistence truth, failures, and forbidden shortcuts. It is
+  design evidence, not executable-test evidence. Requirements/Product artifacts
+  remain read-only and unchanged.
+- Downstream and architecture-review impact: classification remains `Large` /
+  `High`; another independent Architecture Review is mandatory before
+  implementation resumes. Review must verify that the shared plane has no Team
+  root/store/index/event imports, mounted Teams create no Team-family root,
+  direct Org Agents/tasks have truthful Org hosts/paths, Org sidecars correlate
+  strictly, initial publication/restore/fail-stop order prevents partial live
+  roots, global routing uses compound identity, and shutdown preserves root
+  ownership. The uncommitted IR-001 draft remains partial evidence and must be
+  reconciled by Implementation only after a review Pass.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of the
+  cumulative `RER-018` / `RV-012` / `AD-REV-005` package; Implementation and
+  Code Review must not treat the partial draft as ready while this revised design
+  is unreviewed.
+- Remaining gaps or risks: no Requirement Gap or Product UI gap and no material
+  architecture question remains open after self-validation. Structural risk
+  remains high because the clean extraction changes AgentRun/tool context,
+  Team-local runtime, tasks/messages/events, memory/location, root sidecars,
+  process composition, restore, and shutdown. Implementation must return a new
+  Design Impact rather than introduce a synthetic root, standalone mounted Team
+  or Org Agent, Team-envelope reinterpretation, public generic root, bare-ID
+  inference, or boundary bypass.
