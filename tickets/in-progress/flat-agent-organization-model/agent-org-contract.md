@@ -4,9 +4,9 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-017`
-- Status: `Ready for Approval — External Definition Scope Requirement Impact`
-- Approval reference: Behavior/Product UI and the Team V2 / AgentOrg V1 runtime contract through `RER-016` remain approved. The user explicitly clarified that the public/private external definition repositories are separate projects maintained by other owners and are not implementation/migration scope for this ticket. The exact target definition versions, normal admission behavior, and proposed per-definition availability boundary below require approval.
+- Requirements revision: `RER-018`
+- Status: `Approved`
+- Approval reference: Behavior/Product UI and the Team V2 / AgentOrg V1 runtime contract through `RER-016` remain approved. The user explicitly clarified that the public/private external definition repositories are separate owner projects outside this ticket and explicitly approved the exact `RER-017` target definition versions, target-only normal admission, and non-blocking per-definition availability policy on 2026-09-01. `RER-018` records approval closure.
 - Owner/date: Requirements Engineer / 2026-09-01
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
@@ -173,7 +173,7 @@ defaults still seed the definition's standalone launch journey.
 | --- | --- | --- | --- |
 | ORG-CASE-031 | User adds a previously tested standalone AgentTeam definition to AgentOrg and authors Org-scoped handoffs | Org references the same Team definition identity and preserves its coordinator, Agent members, Team-local handoffs, independent launchability, and prior run history | No copy, fork, Org-specific Team subtype, or Team-within-Team placement is required. |
 
-## Normative Definition Package And Admission Contract — Proposed In RER-017
+## Normative Definition Package And Admission Contract — Approved In RER-018
 
 Definition config versions are independent of execution-tree versions. The
 normal server definition codecs accept only the following target config files;
@@ -261,7 +261,7 @@ target validation fails. It reports package root, definition identity/path,
 expected family/version, and reason, and does not mutate the source. A rejected
 external definition, plus an Org that depends on its unavailable Team, is
 excluded from new-run catalog/launch/authoring until its owner publishes the
-target version. Under the proposed rollout policy, this per-definition
+target version. Under the approved rollout policy, this per-definition
 unavailability does not block server startup, compatible definitions, server
 memory migration, or history/inspection of existing durable run snapshots.
 
@@ -605,7 +605,7 @@ identity.
 | ORG-VERIFY-007 | ORG-CASE-032–042 | Explicit From/To/When detail and authoring; eligible endpoint projection; coordinator indication; address visibility; CRUD/order/validation/cancel/atomic save; Org-versus-Team ownership separation. |
 | ORG-VERIFY-008 | ORG-CASE-043–048 | Direct-to-Org configuration, Org → Team → Agent effective-setting precedence, referenced-definition immutability, complete launch validation, full-scope activation, and no initial focus. |
 | ORG-VERIFY-009 | Mixed-root projection contract | Mandatory `root_subject_kind`, correct Team V2/AgentOrg V1 union branch, Team-only compatibility, package/payload/projection agreement, and failure-closed mismatch handling. |
-| ORG-VERIFY-010 | ORG-CASE-049–055 | Exact Team Definition V2 / Org Definition V1 codecs, source ownership, migration-only legacy decoding, target-only normal admission, external dependency diagnostics, runtime independence, and proposed per-definition availability. |
+| ORG-VERIFY-010 | ORG-CASE-049–055 | Exact Team Definition V2 / Org Definition V1 codecs, source ownership, migration-only legacy decoding, target-only normal admission, external dependency diagnostics, runtime independence, and approved per-definition availability. |
 
 ## Contract Non-Goals
 
@@ -658,11 +658,12 @@ interaction solution.
 
 The external source ownership correction is explicit: this ticket does not
 write `/home/autobyteus/workspace/autobyteus-agents` or
-`/home/autobyteus/workspace/autobyteus-private-agents`. `RER-017` proposes the
-remaining approval boundary: exact Team Definition Config V2 / AgentOrg
-Definition Config V1 normal admission, no legacy fallback, and temporary
-unavailability limited to incompatible external definitions and their dependent
-Orgs without globally blocking server readiness or existing run history.
+`/home/autobyteus/workspace/autobyteus-private-agents`. The user explicitly
+approved the exact `RER-017` boundary on 2026-09-01; `RER-018` records approval:
+Team Definition Config V2 / AgentOrg Definition Config V1 normal admission, no
+legacy fallback, and temporary unavailability limited to incompatible external
+definitions and their dependent Orgs without globally blocking server readiness
+or existing run history.
 
 The launch/configuration/focus behavior defined by `ORG-CASE-008`–`ORG-CASE-011`
 and `ORG-CASE-043`–`ORG-CASE-048` was approved in `RER-013` from the user's
