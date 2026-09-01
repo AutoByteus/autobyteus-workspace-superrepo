@@ -166,6 +166,7 @@ import { useAgentTeamDefinitionStore, type AgentTeamDefinition } from '~/stores/
 import {
   useAgentOrgDefinitionStore,
   type AgentOrgDefinition,
+  type AgentOrgDefinitionDraft,
   type AgentOrgMember,
 } from '~/stores/agentOrgDefinitionStore'
 import {
@@ -304,13 +305,25 @@ const saveOrg = async (): Promise<void> => {
   if (!formName.value.trim()) { saveError.value = 'Enter an Agent Org name before saving.'; return }
   if (!orgHandoffManager.value?.validateAll()) { saveError.value = 'Resolve the highlighted handoffs before saving this Agent Org.'; return }
   saving.value = true; saved.value = false; saveError.value = ''
-  const input = { name: formName.value.trim(), description: formDescription.value.trim(), instructions: '', category: null, avatarUrl: null, members: formMembers.value.map((member) => ({ ...member })), handoffs: toDefinitionHandoffs(formOrgHandoffs.value), defaultLaunchConfig: null }
+  const visibleInput = {
+    name: formName.value.trim(),
+    description: formDescription.value.trim(),
+    members: formMembers.value.map((member) => ({ ...member })),
+    handoffs: toDefinitionHandoffs(formOrgHandoffs.value),
+  }
   try {
     if (view.value === 'org-create') {
-      const created = await orgStore.create(input)
+      const createInput: AgentOrgDefinitionDraft = {
+        ...visibleInput,
+        instructions: '',
+        category: null,
+        avatarUrl: null,
+        defaultLaunchConfig: null,
+      }
+      const created = await orgStore.create(createInput)
       await go('org-edit', created.id)
     } else {
-      await orgStore.update(selectedOrg.value.id, selectedOrg.value.revision, input)
+      await orgStore.update(selectedOrg.value.id, selectedOrg.value.revision, visibleInput)
     }
     await nextTick(); orgHandoffManager.value?.clearStatus(); saved.value = true
   } catch (error) { saveError.value = error instanceof Error ? error.message : String(error) } finally { saving.value = false }

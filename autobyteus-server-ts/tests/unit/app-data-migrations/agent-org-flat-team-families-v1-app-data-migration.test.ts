@@ -14,6 +14,10 @@ import { getAgentOrgTaskDelegationRecordsV1Path } from "../../../src/agent-org-e
 import { getAgentOrgCommunicationMessagesV1Path } from "../../../src/agent-org-execution/persistence/agent-org-communication-messages-v1-store.js";
 import { AgentOrgRunHistoryIndexStore } from "../../../src/run-history/store/agent-org-run-history-index-store.js";
 import { TeamRunHistoryIndexStore } from "../../../src/run-history/store/team-run-history-index-store.js";
+import {
+  AtomicRunPackageFileCommitWriter,
+  type RunPackageFileWriteResult,
+} from "../../../src/run-history/store/atomic-run-package-file-commit-writer.js";
 import { testAgentNode, testExecutionTree } from "../../fixtures/current-team-run-fixtures.js";
 
 const tempDirs: string[] = [];
@@ -27,7 +31,15 @@ const createEnvironment = async () => {
   const orgDefinitions = path.join(root, "definitions", "agent-orgs");
   await Promise.all([fs.mkdir(memoryDir, { recursive: true }), fs.mkdir(teamDefinitions, { recursive: true }), fs.mkdir(orgDefinitions, { recursive: true })]);
   const config = { getAgentTeamsDir: () => teamDefinitions, getAgentOrgsDir: () => orgDefinitions } as AppConfig;
-  return { root, memoryDir, teamDefinitions, orgDefinitions, layout: new AgentMemoryLayout(memoryDir), migration: () => new AgentOrgFlatTeamFamiliesV1AppDataMigration(memoryDir, config) };
+  return {
+    root,
+    memoryDir,
+    teamDefinitions,
+    orgDefinitions,
+    layout: new AgentMemoryLayout(memoryDir),
+    migration: (writer?: AtomicRunPackageFileCommitWriter) =>
+      new AgentOrgFlatTeamFamiliesV1AppDataMigration(memoryDir, config, writer),
+  };
 };
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
@@ -69,10 +81,141 @@ const orgLikeTree = (runId: string) => {
     },
   };
 };
+type LegacyDefinitionMember = Readonly<{
+  memberName: string;
+  ref: string;
+  refType: "agent" | "agent_team";
+  refScope: "shared" | "team_local" | "application_owned";
+}>;
+const legacyDefinition = (members: readonly LegacyDefinitionMember[], coordinatorMemberName: string) => ({
+  coordinatorMemberName,
+  members,
+  handoffs: [],
+  avatarUrl: null,
+  defaultLaunchConfig: null,
+});
+const writeLegacyOrgDefinition = async (env: Awaited<ReturnType<typeof createEnvironment>>, invalidLaterChild = false) => {
+  const source = path.join(env.teamDefinitions, "software-org");
+  const root = legacyDefinition([
+    { memberName: "director", ref: "director-agent", refType: "agent", refScope: "shared" },
+    { memberName: "delivery", ref: "delivery", refType: "agent_team", refScope: "team_local" },
+    ...(invalidLaterChild
+      ? [{ memberName: "quality", ref: "quality", refType: "agent_team" as const, refScope: "team_local" as const }]
+      : []),
+  ], "director");
+  const childAgent: LegacyDefinitionMember = {
+    memberName: "lead",
+    ref: "lead-agent",
+    refType: "agent",
+    refScope: "shared",
+  };
+  const delivery = legacyDefinition([childAgent], "lead");
+  const quality = legacyDefinition([
+    childAgent,
+    { memberName: "deeper", ref: "deeper-team", refType: "agent_team", refScope: "team_local" },
+  ], "lead");
+  await fs.mkdir(path.join(source, "agent-teams", "delivery"), { recursive: true });
+  await fs.writeFile(path.join(source, "team-config.json"), json(root));
+  await fs.writeFile(path.join(source, "team.md"), "# Software Org\n\nCoordinate delivery.\n");
+  await fs.writeFile(path.join(source, "agent-teams", "delivery", "team-config.json"), json(delivery));
+  if (invalidLaterChild) {
+    await fs.mkdir(path.join(source, "agent-teams", "quality"), { recursive: true });
+    await fs.writeFile(path.join(source, "agent-teams", "quality", "team-config.json"), json(quality));
+  }
+  return source;
+};
 const detailCount = (result: Awaited<ReturnType<AgentOrgFlatTeamFamiliesV1AppDataMigration["execute"]>>, id: string) =>
   Number(result.summary.details.find((detail) => detail.itemId === id)?.message.match(/Count: (\d+)/)?.[1] ?? 0);
 
 describe("AgentOrg flat-Team family startup migration", () => {
+  it("preflights every owned Team before writing and reports the exact deeper-member invariant", async () => {
+    const env = await createEnvironment();
+    const source = await writeLegacyOrgDefinition(env, true);
+    const filePaths = [
+      path.join(source, "team-config.json"),
+      path.join(source, "team.md"),
+      path.join(source, "agent-teams", "delivery", "team-config.json"),
+      path.join(source, "agent-teams", "quality", "team-config.json"),
+    ];
+    const before = await Promise.all(filePaths.map(async (filePath) => [filePath, await fs.readFile(filePath)] as const));
+
+    const result = await env.migration().execute();
+
+    expect(result.status).toBe("FAILED");
+    const failure = result.summary.details.find((detail) => detail.itemId === "FAILED_DEFINITION");
+    expect(failure?.message).toContain("agent-teams/quality/team-config.json");
+    expect(failure?.message).toContain("member 'deeper' references a Team");
+    for (const [filePath, bytes] of before) expect(await fs.readFile(filePath)).toEqual(bytes);
+    await expect(fs.access(path.join(source, "org-config.json"))).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(fs.access(path.join(source, "org.md"))).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(fs.access(path.join(env.orgDefinitions, "software-org"))).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("resumes a valid one-level definition after interruption commits an owned Team V2 file", async () => {
+    const env = await createEnvironment();
+    const source = await writeLegacyOrgDefinition(env);
+    const committedWriter = new AtomicRunPackageFileCommitWriter();
+    let interrupted = false;
+    const interruptionWriter = {
+      async write(input: { file: string; filePath: string; payload: unknown }): Promise<RunPackageFileWriteResult> {
+        const result = await committedWriter.write(input);
+        if (!interrupted && result.outcome === "committed" && input.filePath.includes(`${path.sep}agent-teams${path.sep}`)) {
+          interrupted = true;
+          throw new Error("simulated process interruption after owned Team commit");
+        }
+        return result;
+      },
+    } as unknown as AtomicRunPackageFileCommitWriter;
+
+    const interruptedResult = await env.migration(interruptionWriter).execute();
+    expect(interruptedResult.status).toBe("FAILED");
+    expect(JSON.parse(await fs.readFile(path.join(source, "agent-teams", "delivery", "team-config.json"), "utf8")))
+      .toMatchObject({ schemaVersion: 2 });
+    expect(JSON.parse(await fs.readFile(path.join(source, "team-config.json"), "utf8"))).not.toHaveProperty("schemaVersion");
+
+    const retry = await env.migration().execute();
+    const target = path.join(env.orgDefinitions, "software-org");
+    expect(retry.status).toBe("SUCCEEDED");
+    expect(detailCount(retry, "MIGRATED_ORG_DEFINITION")).toBe(1);
+    await expect(fs.access(source)).rejects.toMatchObject({ code: "ENOENT" });
+    expect(JSON.parse(await fs.readFile(path.join(target, "org-config.json"), "utf8")))
+      .toMatchObject({ schemaVersion: 1 });
+    expect(JSON.parse(await fs.readFile(path.join(target, "agent-teams", "delivery", "team-config.json"), "utf8")))
+      .toMatchObject({ schemaVersion: 2 });
+    await expect(fs.access(path.join(target, "team-config.json"))).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(fs.access(path.join(target, "team.md"))).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("resumes an exact prospective Org config written before interruption", async () => {
+    const env = await createEnvironment();
+    const source = await writeLegacyOrgDefinition(env);
+    const committedWriter = new AtomicRunPackageFileCommitWriter();
+    let interrupted = false;
+    const interruptionWriter = {
+      async write(input: { file: string; filePath: string; payload: unknown }): Promise<RunPackageFileWriteResult> {
+        const result = await committedWriter.write(input);
+        if (!interrupted && result.outcome === "committed" && input.filePath.endsWith(`${path.sep}org-config.json`)) {
+          interrupted = true;
+          throw new Error("simulated process interruption after Org config commit");
+        }
+        return result;
+      },
+    } as unknown as AtomicRunPackageFileCommitWriter;
+
+    expect((await env.migration(interruptionWriter).execute()).status).toBe("FAILED");
+    expect(JSON.parse(await fs.readFile(path.join(source, "agent-teams", "delivery", "team-config.json"), "utf8")))
+      .toMatchObject({ schemaVersion: 2 });
+    expect(JSON.parse(await fs.readFile(path.join(source, "org-config.json"), "utf8")))
+      .toMatchObject({ schemaVersion: 1 });
+    await expect(fs.access(path.join(source, "org.md"))).rejects.toMatchObject({ code: "ENOENT" });
+
+    const retry = await env.migration().execute();
+    const target = path.join(env.orgDefinitions, "software-org");
+    expect(retry.status).toBe("SUCCEEDED");
+    expect(await fs.readFile(path.join(target, "org.md"), "utf8")).toBe("# Software Org\n\nCoordinate delivery.\n");
+    await expect(fs.access(source)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
   it("keeps a native flat Team V2 package a strict zero-write cohort", async () => {
     const env = await createEnvironment(); const runId = "flat-run"; const directory = env.layout.getTeamDirPath({ rootTeamRunId: runId, ancestorTeamRunIds: [] });
     await writeTeamPackage(directory, runId, flatTree(runId));

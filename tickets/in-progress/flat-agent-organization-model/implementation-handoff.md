@@ -16,6 +16,9 @@
 - Architecture review: `ARCH-REV-003 / Pass` at `ae61ecd38`
 - Design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
 - Architecture review revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
+- Code review trigger: `CRR-001` and reconsideration `CRR-002`, both `Fail — Local Fix`, with `CR-FIND-001`–`CR-FIND-003` assigned to Implementation.
+- Code review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Code review revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-revision-record.md`
 - Product authority: approved `RV-012`; `ui-ux-spec.md` and `VIS-001`–`VIS-020` are normative.
 - Product artifacts:
   - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/prototype-ticket.md`
@@ -29,11 +32,12 @@
 
 The implementation is complete for the approved production scope. It reconciles the partial `IR-001` draft with `AD-REV-005`, removes the recursive configured-Team/current-runtime model, adds the separate fixed-depth AgentOrg family, implements the root-neutral configured execution boundary, preserves exact standalone Team V2 persistence, adds exact Org V1 persistence, registers the required startup migration, exposes distinct Team/Org API and product surfaces, and implements the approved configuration-first/no-initial-focus AgentOrg journey.
 
-- Implementation cycle: `Rework after Design Impact recovery`
-- Current implementation revision ID: `IR-002`
+- Implementation cycle: `Code Review Local Fix rework`
+- Current implementation revision ID: `IR-003`
 - Related architecture revisions: `AD-REV-005`, `ARCH-REV-003`
-- Related code-review, API/E2E, and delivery revisions: `N/A — pending downstream work`
-- Triggering finding: `IDI-001 — resolved in architecture and implemented`
+- Related code-review revisions: `CRR-001`, `CRR-002`
+- Related API/E2E and delivery revisions: `N/A — pending downstream work`
+- Triggering findings: `CR-FIND-001`, `CR-FIND-002`, `CR-FIND-003 — corrected in IR-003`; `IDI-001 — previously resolved`
 - New Design Impact, Requirement Gap, Product UI gap, or implementation blocker: `None`
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
 
@@ -49,6 +53,16 @@ The implementation is complete for the approved production scope. It reconciles 
 8. Org promotion validates current targets in memory and through current codecs, atomically writes/rereads Org state in the source package, directly atomically renames the package family, rereads, and completes retired-file cleanup. Current-only readiness excludes only invalid/conflicting definitions or roots.
 9. GraphQL/catalog/detail/config/history/stream surfaces distinguish AgentOrg from AgentTeam and enforce atomic parent-definition saves with revision evidence.
 10. Production UI matches RV-012 desktop/narrow behavior: Team authoring offers Agents only; Org authoring offers direct Agents and reusable Teams; handoffs expose `From`, `To`, ordered `When`; Org `Run` opens configuration; launch has no entry selector or initial focus; exact Agent selection focuses that Agent and Team selection focuses its coordinator.
+
+### CRR-002 Local Fix Resolution
+
+| Finding | Correction | Regression evidence | Status for re-review |
+| --- | --- | --- | --- |
+| `CR-FIND-001` | Org definition migration now preflights the legacy root, every direct owned Team, exact target Org config, destination, and markdown in memory before its first write. Unexpected deeper membership leaves every source file byte-faithful and the bounded disposition includes the exact child path and invariant reason. | Focused valid-earlier/invalid-later definition test; reviewer migration probe now reports the earlier child remains legacy (`schemaVersion: null`, `refType` retained). | Corrected |
+| `CR-FIND-002` | Migration-only planning recognizes exact current Team V2 children and matching prospective Org V1 config/markdown beside a legacy root, completes remaining writes, directly renames, rereads, and cleans retired authorities through ordinary rerun. No journal, backup, runtime fallback, or recovery subsystem was added. | Focused child-commit and Org-config-commit interruption/relaunch tests; reviewer subprocess exits `77`, then ordinary retry returns `SUCCEEDED`, removes source, and creates target. | Corrected |
+| `CR-FIND-003` | AgentOrg create still supplies explicit defaults, while edit sends only fields exposed by the edit form. Omitted instructions/category/avatar/default-launch fields therefore retain backend partial-update semantics instead of being cleared. | Component fixture now carries nonempty hidden fields and default launch config; a visible edit asserts the update payload omits all four fields and preserves ordered handoffs. | Corrected |
+
+Classification remains `Large` / `High`; these corrections stay within the approved migration and Org-experience owners and introduce no design change.
 
 ## Routing Classification
 
@@ -126,7 +140,11 @@ All `AC-001`–`AC-022` have implementation paths. Independent executable covera
 
 ### Server
 
-- `pnpm build`: passed after final production extraction; TypeScript build, managed assets, built-in Agent bootstrap smoke, and sanitized built-module smoke all passed. Log: `/tmp/aorg-server-build-final.log`.
+- IR-003 `pnpm build`: passed; TypeScript build, managed assets, built-in Agent bootstrap smoke, and sanitized built-module smoke passed. Log: `/tmp/aorg-ir003-server-build.log`.
+- IR-003 prepared server TypeScript `--noEmit` check: passed after the repository-required shared SDK preparation. Log: `/tmp/aorg-ir003-server-typecheck.log`.
+- IR-003 focused migration/startup-gate/GraphQL migration checks: `19/19` passed, including 10 migration cases. Logs: `/tmp/aorg-ir003-server-focused.log`, `/tmp/aorg-ir003-migration-tests.log`.
+- Exact reviewer probes rerun against the production build: invalid later child caused zero earlier-child mutation; process exit `77` after child commit resumed with `SUCCEEDED`, source removed, target present. Logs: `/tmp/aorg-ir003-review-migration-probe.log`, `/tmp/aorg-ir003-review-interruption-probe.log`.
+- IR-002 baseline `pnpm build`: passed after final production extraction; log `/tmp/aorg-server-build-final.log`.
 - Focused current architecture/runtime/migration/admission/persistence/stream checks: combined final result `95 passed`. The first combined invocation passed 94 and exposed one outdated architecture-source witness after the intentional Team materializer extraction; the witness was updated and its isolated suite rerun passed `14/14`. Log: `/tmp/aorg-server-focused-final.log` plus final rerun output.
 - Additional post-extraction lifecycle/physical-scope/supervisor tests: `14/14` passed.
 - New `@autobyteus/collaboration-stream-contracts` package build/test: `2/2` passed.
@@ -134,7 +152,9 @@ All `AC-001`–`AC-022` have implementation paths. Independent executable covera
 
 ### Web
 
-- Production `pnpm build`: passed; Nuxt prerendered all 16 routes including `/agent-orgs` and `/agent-teams`. Log: `/tmp/aorg-web-build-final.log`.
+- IR-003 production `pnpm build`: passed; Nuxt prerendered all 16 routes including `/agent-orgs` and `/agent-teams`. Log: `/tmp/aorg-ir003-web-build.log`.
+- IR-003 focused `AgentOrgExperience` component checks: `4/4` passed with nonempty hidden durable fields and partial-update preservation. Log: `/tmp/aorg-ir003-org-experience-tests.log`.
+- IR-002 production build baseline: passed; log `/tmp/aorg-web-build-final.log`.
 - Full Nuxt test run excluding the known unrelated fixed-px audit: `433` files passed, `2` skipped; `2392` tests passed, `2` skipped. Log: `/tmp/aorg-web-full-excluding-baseline.log`.
 - The ordinary full run leaves only the unrelated `app-font-size-fixed-px-audit.integration.test.ts` baseline, which reports 14 pre-existing settings/token-usage files not modified by this ticket.
 - Full repository Nuxt typecheck still has a broad pre-existing baseline; the affected Org/root/Team paths produced no errors in the captured check. No repository-wide typecheck pass is claimed. Log: `/tmp/aorg-web-typecheck.log`.
@@ -143,7 +163,7 @@ These are implementation-scoped checks, not independent API/E2E validation.
 
 ## Frontend Rendered-Result Check
 
-Production browser validation used the real Nuxt renderer and production components/stores with an isolated local server-data root. No desktop-only shell behavior was required for the equivalent web journeys.
+Production browser validation for IR-002 used the real Nuxt renderer and production components/stores with an isolated local server-data root. IR-003 changes only migration sequencing/diagnostics and the nonvisual edit mutation payload; the affected component test and production build were rerun, so no visual layout rerender was required. No desktop-only shell behavior was required for the equivalent web journeys.
 
 - Desktop `1440x900`: Org catalog, detail, edit/handoffs, config, placement overrides; Team catalog/detail/edit.
 - Narrow `390x844`: Org create picker/config; Team create.

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { isDeepStrictEqual } from "node:util";
 import type { AppConfig } from "../../../config/app-config.js";
 import { appConfigProvider } from "../../../config/app-config-provider.js";
 import { AgentMemoryLayout } from "../../../agent-memory/store/agent-memory-layout.js";
@@ -33,9 +34,20 @@ type Disposition =
   | "MIGRATED_FLAT_TEAM_DEFINITION" | "MIGRATED_ORG_DEFINITION" | "SKIPPED_CURRENT_DEFINITION"
   | "SKIPPED_FLAT_TEAM_RUN_ZERO_WRITE" | "MIGRATED_ORG_RUN" | "CLEANED_CURRENT_ORG"
   | "MIGRATED_ORG_HISTORY" | "FAILED_DEFINITION" | "FAILED_RUNTIME" | "FAILED_HISTORY" | "FAILED_FAMILY_CONFLICT";
-type Count = { count: number; examples: string[] };
+type Count = { count: number; examples: string[]; reasons: string[] };
 type LegacyMember = { memberName: string; ref: string; refType: "agent" | "agent_team"; refScope: "shared" | "team_local" | "application_owned" };
 type LegacyTeamConfig = { coordinatorMemberName: string; members: LegacyMember[]; handoffs: unknown[]; avatarUrl: string | null; defaultLaunchConfig: unknown };
+type OwnedTeamDefinitionPlan = Readonly<{ configPath: string; target: unknown; writeRequired: boolean }>;
+type OrgDefinitionPlan = Readonly<{
+  destination: string;
+  ownedTeams: readonly OwnedTeamDefinitionPlan[];
+  orgConfigPath: string;
+  orgTarget: unknown;
+  writeOrgConfig: boolean;
+  orgMarkdownPath: string;
+  orgMarkdown: string;
+  writeOrgMarkdown: boolean;
+}>;
 
 const record = (value: unknown, label: string): Record<string, unknown> => {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${label} must be an object.`);
@@ -89,6 +101,11 @@ const orgTarget = (legacy: LegacyTeamConfig, legacyRootDefinitionId: string): un
   handoffs: legacy.handoffs, avatarUrl: legacy.avatarUrl, defaultLaunchConfig: legacy.defaultLaunchConfig,
 });
 const exists = (target: string): Promise<boolean> => fs.access(target).then(() => true).catch(() => false);
+const errorReason = (error: unknown): string => error instanceof Error ? error.message : String(error);
+const readJson = async (filePath: string): Promise<unknown> => {
+  try { return JSON.parse(await fs.readFile(filePath, "utf8")); }
+  catch (error) { throw new Error(`Cannot read '${filePath}': ${errorReason(error)}`); }
+};
 const atomicText = async (target: string, content: string): Promise<void> => {
   await fs.mkdir(path.dirname(target), { recursive: true });
   const temp = `${target}.${process.pid}.${randomUUID()}.tmp`;
@@ -143,8 +160,8 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       const source = path.join(teamRoot, entry.name);
       const configPath = path.join(source, "team-config.json");
       let raw: unknown;
-      try { raw = JSON.parse(await fs.readFile(configPath, "utf8")); }
-      catch { this.add("FAILED_DEFINITION", configPath); continue; }
+      try { raw = await readJson(configPath); }
+      catch (error) { this.add("FAILED_DEFINITION", configPath, errorReason(error)); continue; }
       try { parseAgentTeamDefinitionConfigV2(raw); this.add("SKIPPED_CURRENT_DEFINITION", configPath); continue; }
       catch { /* isolated released decoder follows */ }
       try {
@@ -156,23 +173,76 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
           this.add("MIGRATED_FLAT_TEAM_DEFINITION", configPath); continue;
         }
         const destination = path.join(orgRoot, entry.name);
-        if (await exists(destination)) { this.add("FAILED_FAMILY_CONFLICT", destination); continue; }
-        for (const member of legacy.members.filter((item) => item.refType === "agent_team" && item.refScope === "team_local")) {
-          const childPath = path.join(source, "agent-teams", member.ref, "team-config.json");
-          const child = legacyConfig(JSON.parse(await fs.readFile(childPath, "utf8")));
-          if (child.members.some((item) => item.refType !== "agent")) throw new Error("owned Team is not flat.");
-          const target = teamTarget(child); parseAgentTeamDefinitionConfigV2(target); await this.writeJson(childPath, target);
+        if (await exists(destination)) {
+          this.add("FAILED_FAMILY_CONFLICT", destination, "AgentOrg definition destination already exists.");
+          continue;
         }
-        const target = orgTarget(legacy, entry.name); parseAgentOrgDefinitionConfigV1(target);
-        await this.writeJson(path.join(source, "org-config.json"), target);
-        await atomicText(path.join(source, "org.md"), await fs.readFile(path.join(source, "team.md"), "utf8"));
-        await fs.rename(source, destination);
+        const plan = await this.planOrgDefinition(source, destination, entry.name, legacy);
+        for (const child of plan.ownedTeams) {
+          if (child.writeRequired) await this.writeJson(child.configPath, child.target);
+          parseAgentTeamDefinitionConfigV2(await readJson(child.configPath));
+        }
+        if (plan.writeOrgConfig) await this.writeJson(plan.orgConfigPath, plan.orgTarget);
+        if (plan.writeOrgMarkdown) await atomicText(plan.orgMarkdownPath, plan.orgMarkdown);
+        parseAgentOrgDefinitionConfigV1(await readJson(plan.orgConfigPath));
+        if (await fs.readFile(plan.orgMarkdownPath, "utf8") !== plan.orgMarkdown) {
+          throw new Error(`Prospective Org markdown '${plan.orgMarkdownPath}' does not match its released source.`);
+        }
+        await fs.rename(source, plan.destination);
         await fs.rm(path.join(destination, "team-config.json"), { force: true });
         await fs.rm(path.join(destination, "team.md"), { force: true });
-        parseAgentOrgDefinitionConfigV1(JSON.parse(await fs.readFile(path.join(destination, "org-config.json"), "utf8")));
+        parseAgentOrgDefinitionConfigV1(await readJson(path.join(destination, "org-config.json")));
         this.add("MIGRATED_ORG_DEFINITION", destination);
-      } catch { this.add("FAILED_DEFINITION", configPath); }
+      } catch (error) { this.add("FAILED_DEFINITION", configPath, errorReason(error)); }
     }
+  }
+  private async planOrgDefinition(
+    source: string,
+    destination: string,
+    rootDefinitionId: string,
+    legacy: LegacyTeamConfig,
+  ): Promise<OrgDefinitionPlan> {
+    const ownedTeams: OwnedTeamDefinitionPlan[] = [];
+    for (const member of legacy.members.filter((item) => item.refType === "agent_team" && item.refScope === "team_local")) {
+      const configPath = path.join(source, "agent-teams", member.ref, "team-config.json");
+      const raw = await readJson(configPath);
+      try {
+        parseAgentTeamDefinitionConfigV2(raw);
+        ownedTeams.push({ configPath, target: raw, writeRequired: false });
+        continue;
+      } catch { /* exact current prospective output or released input only */ }
+      let child: LegacyTeamConfig;
+      try { child = legacyConfig(raw); }
+      catch (error) { throw new Error(`Owned Team definition '${configPath}' is neither released nor exact V2: ${errorReason(error)}`); }
+      const nested = child.members.find((item) => item.refType !== "agent");
+      if (nested) {
+        throw new Error(`Owned Team definition '${configPath}' is not flat: member '${nested.memberName}' references a Team.`);
+      }
+      const target = teamTarget(child);
+      parseAgentTeamDefinitionConfigV2(target);
+      ownedTeams.push({ configPath, target, writeRequired: true });
+    }
+    const orgTargetPayload = orgTarget(legacy, rootDefinitionId);
+    parseAgentOrgDefinitionConfigV1(orgTargetPayload);
+    const orgConfigPath = path.join(source, "org-config.json");
+    const writeOrgConfig = !(await exists(orgConfigPath));
+    if (!writeOrgConfig) {
+      const prospective = await readJson(orgConfigPath);
+      parseAgentOrgDefinitionConfigV1(prospective);
+      if (!isDeepStrictEqual(prospective, orgTargetPayload)) {
+        throw new Error(`Prospective Org config '${orgConfigPath}' does not match the exact target.`);
+      }
+    }
+    const orgMarkdown = await fs.readFile(path.join(source, "team.md"), "utf8");
+    const orgMarkdownPath = path.join(source, "org.md");
+    const writeOrgMarkdown = !(await exists(orgMarkdownPath));
+    if (!writeOrgMarkdown && await fs.readFile(orgMarkdownPath, "utf8") !== orgMarkdown) {
+      throw new Error(`Prospective Org markdown '${orgMarkdownPath}' does not match its released source.`);
+    }
+    return {
+      destination, ownedTeams, orgConfigPath, orgTarget: orgTargetPayload, writeOrgConfig,
+      orgMarkdownPath, orgMarkdown, writeOrgMarkdown,
+    };
   }
   private async migrateRuntimeRoots(): Promise<void> {
     const sourceRoot = this.layout.getTeamRootDirPath();
@@ -185,7 +255,7 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       const filePath = getTeamRunExecutionTreePath(source);
       let raw: unknown;
       try { raw = JSON.parse(await fs.readFile(filePath, "utf8")); }
-      catch { this.add("FAILED_RUNTIME", filePath); continue; }
+      catch (error) { this.add("FAILED_RUNTIME", filePath, errorReason(error)); continue; }
       try {
         validateTeamRunExecutionTreePayload(raw, entry.name);
         this.add("SKIPPED_FLAT_TEAM_RUN_ZERO_WRITE", filePath);
@@ -195,7 +265,10 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
         const released = validateReleasedTeamRunV2(raw, entry.name);
         if (released.teamCount < 1) throw new Error("non-flat root is not organization-like.");
         const targetDir = path.join(targetRoot, entry.name);
-        if (await exists(targetDir)) { this.add("FAILED_FAMILY_CONFLICT", targetDir); continue; }
+        if (await exists(targetDir)) {
+          this.add("FAILED_FAMILY_CONFLICT", targetDir, "AgentOrg run destination already exists.");
+          continue;
+        }
         const teamTasks = validateTaskDelegationRecordsV1Payload(
           JSON.parse(await fs.readFile(getTaskDelegationRecordsV1Path(source), "utf8")),
           entry.name,
@@ -237,7 +310,7 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
         }
         await this.validateCompleteOrgRunPackage(targetDir, entry.name);
         this.add("MIGRATED_ORG_RUN", targetDir);
-      } catch { this.add("FAILED_RUNTIME", filePath); }
+      } catch (error) { this.add("FAILED_RUNTIME", filePath, errorReason(error)); }
     }
   }
   private async cleanupDefinitionTargets(): Promise<void> {
@@ -257,7 +330,7 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
         await fs.rm(retiredMarkdown, { force: true });
         if (await exists(retiredConfig) || await exists(retiredMarkdown)) throw new Error("retired definition cleanup failed.");
         this.add("CLEANED_CURRENT_ORG", dir);
-      } catch { this.add("FAILED_DEFINITION", dir); }
+      } catch (error) { this.add("FAILED_DEFINITION", dir, errorReason(error)); }
     }
   }
   private async cleanupOrgTargets(): Promise<void> {
@@ -279,7 +352,7 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
         if ((await Promise.all(retired.map(exists))).some(Boolean)) throw new Error("retired Team run authorities cleanup failed.");
         await this.validateCompleteOrgRunPackage(dir, entry.name);
         this.add("CLEANED_CURRENT_ORG", dir);
-      } catch { this.add("FAILED_RUNTIME", dir); }
+      } catch (error) { this.add("FAILED_RUNTIME", dir, errorReason(error)); }
     }
   }
   private async migrateHistoryIndexes(): Promise<void> {
@@ -328,7 +401,7 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       const convertedCount = teamSnapshot.rows.length - nextTeamRows.length;
       if (convertedCount > 0) this.add("MIGRATED_ORG_HISTORY", teamSnapshot.sourcePath);
     } catch (error) {
-      this.add("FAILED_HISTORY", error instanceof Error ? error.message : String(error));
+      this.add("FAILED_HISTORY", this.memoryDir, errorReason(error));
     }
   }
   private async validateCompleteOrgRunPackage(dir: string, orgRunId: string): Promise<void> {
@@ -351,11 +424,14 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       throw new Error(`Atomic write did not finalize for '${filePath}' (${outcome.outcome}:${outcome.stage}).`);
     }
   }
-  private add(disposition: Disposition, example: string): void {
-    const current = this.counts.get(disposition) ?? { count: 0, examples: [] };
+  private add(disposition: Disposition, example: string, reason?: string): void {
+    const current = this.counts.get(disposition) ?? { count: 0, examples: [], reasons: [] };
     current.count += 1;
     current.examples.push(path.relative(this.memoryDir, example).split(path.sep).join("/"));
-    current.examples.sort(); current.examples.splice(5); this.counts.set(disposition, current);
+    if (reason) current.reasons.push(reason);
+    current.examples.sort(); current.examples.splice(5);
+    current.reasons.sort(); current.reasons.splice(5);
+    this.counts.set(disposition, current);
   }
   private result(): AppDataMigrationExecutionResult {
     let migratedCount = 0, skippedCount = 0, failedCount = 0;
@@ -364,7 +440,11 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       const failed = name.startsWith("FAILED_");
       const skipped = name.startsWith("SKIPPED_");
       if (failed) failedCount += value.count; else if (skipped) skippedCount += value.count; else migratedCount += value.count;
-      details.push({ itemId: name, status: failed ? "FAILED" : skipped ? "SKIPPED" : "MIGRATED", message: `Count: ${value.count}.${value.examples.length ? ` Examples: ${value.examples.join(", ")}.` : ""}` });
+      details.push({
+        itemId: name,
+        status: failed ? "FAILED" : skipped ? "SKIPPED" : "MIGRATED",
+        message: `Count: ${value.count}.${value.examples.length ? ` Examples: ${value.examples.join(", ")}.` : ""}${value.reasons.length ? ` Reasons: ${value.reasons.join(" | ")}.` : ""}`,
+      });
     }
     return { status: failedCount ? "FAILED" : "SUCCEEDED", summary: { scannedCount: this.scanned, migratedCount, skippedCount, failedCount, details }, errorMessage: failedCount ? `${failedCount} flat-Team/AgentOrg family item(s) require correction and restart.` : null };
   }

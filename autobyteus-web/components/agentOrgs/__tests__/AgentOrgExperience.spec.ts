@@ -18,7 +18,15 @@ const { route, push, org, orgStore, agentStore, teamStore } = vi.hoisted(() => {
   }
   const org = {
     id: 'software-org', name: 'Software Development Department', description: 'One complete delivery organization.',
-    instructions: '', revision: 'org-rev-7', category: null, avatarUrl: null, defaultLaunchConfig: null,
+    instructions: 'Coordinate the complete approved delivery lifecycle.',
+    revision: 'org-rev-7',
+    category: 'software-delivery',
+    avatarUrl: 'https://example.test/software-org.png',
+    defaultLaunchConfig: {
+      llmModelIdentifier: 'gpt-5.4',
+      runtimeKind: 'autobyteus',
+      llmConfig: { reasoning_effort: 'high' },
+    },
     members: [
       { memberName: 'requirements_engineer', ref: 'requirements-agent', refType: 'AGENT', refScope: 'SHARED' },
       { memberName: 'software_engineering', ref: 'software-team', refType: 'AGENT_TEAM', refScope: 'SHARED' },
@@ -97,8 +105,9 @@ describe('AgentOrgExperience', () => {
     expect(wrapper.text()).not.toContain('Handoff 1')
   })
 
-  it('saves the complete Org atomically with the expected revision and preserved rule order', async () => {
+  it('saves a visible edit while preserving hidden durable fields and rule order by omission', async () => {
     const wrapper = await mountExperience('org-edit', org.id)
+    await wrapper.get('textarea').setValue('Updated visible description.')
     await wrapper.get('form').trigger('submit.prevent')
     await flushPromises()
 
@@ -106,10 +115,26 @@ describe('AgentOrgExperience', () => {
       org.id,
       'org-rev-7',
       expect.objectContaining({
+        description: 'Updated visible description.',
         members: org.members,
         handoffs: [{ from: '/requirements_engineer', to: '/software_engineering', rules: ['Requirements are approved.', 'Architecture may begin.'] }],
       }),
     )
+    const update = orgStore.update.mock.calls[0]?.[2]
+    expect(update).not.toHaveProperty('instructions')
+    expect(update).not.toHaveProperty('category')
+    expect(update).not.toHaveProperty('avatarUrl')
+    expect(update).not.toHaveProperty('defaultLaunchConfig')
+    expect(org).toMatchObject({
+      instructions: 'Coordinate the complete approved delivery lifecycle.',
+      category: 'software-delivery',
+      avatarUrl: 'https://example.test/software-org.png',
+      defaultLaunchConfig: {
+        llmModelIdentifier: 'gpt-5.4',
+        runtimeKind: 'autobyteus',
+        llmConfig: { reasoning_effort: 'high' },
+      },
+    })
     expect(wrapper.text()).toContain('Agent Org saved.')
   })
 })
