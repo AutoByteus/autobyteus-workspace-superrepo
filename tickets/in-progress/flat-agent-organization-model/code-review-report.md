@@ -2,179 +2,223 @@
 
 ## Review Round Meta
 
-- Review Entry Point: `API/E2E Failure-Origin Review`
-- Requirements Doc Reviewed As Context: `requirements-doc.md` (`RER-020`; prior runtime behavior remains cumulative `RER-018`, Product baseline provenance `RER-019`)
-- Investigation Notes Reviewed As Context: `investigation-notes.md`
-- Requirements Revision Record Reviewed As Context: `requirements-revision-record.md` through `RER-020`
-- Design Spec Reviewed As Context: `design-spec.md` (`AD-REV-006`) only where an API failure depended on an existing lifecycle or identity contract
-- Supplemental Task Artifacts Reviewed As Context: `agent-org-contract.md`; approved Product `RV-012` / `VIS-001`–`VIS-020`; `BASELINE-PROMOTION-001`; corrected task-fixture audit and user/current Team-status screenshots
-- Architecture Design Revision Record Reviewed As Context: `architecture-design-revision-record.md`
-- Relevant Architecture Design Revision IDs: `AD-REV-006`; `API-FIND-007` is later than this design
-- Design Review Report Reviewed As Context: `design-review-report.md`
-- Architecture Review Revision Record Reviewed As Context: `architecture-review-revision-record.md`
-- Relevant Architecture Review Revision IDs: `ARCH-REV-004 / Pass`; no review yet covers `RER-020`
-- Implementation Handoff Reviewed As Context: `implementation-handoff.md`
-- Implementation Revision Record Reviewed As Context: `implementation-revision-record.md`
-- Relevant Implementation Revision IDs: `IR-008` cumulative implementation
-- Code Review Revision Record: `code-review-revision-record.md`
-- Current Code Review Revision ID: `CRR-009`
-- Current Review Round: `9`
-- Trigger: corrected `API-REV-001 / Fail / 81.3%` after `CRR-008 / Pass`
-- Prior Review Round Reviewed: `CRR-008 / Pass — ready for API/E2E`
-- Latest Authoritative Round: `CRR-009`
-- Coverage Investigation Reviewed: `api-e2e-coverage-investigation.md`
-- Execution Coverage Report Reviewed: `api-e2e-execution-coverage-report.md`
-- API/E2E Revision Record Reviewed: `api-e2e-revision-record.md`
-- Relevant API/E2E Revision IDs: `API-REV-001`
-- Delivery Revision Record / IDs: `N/A — pending`
-- Failing Scenario IDs: `APP-001`, `APP-002`, `ORG-010`, `RST-002`, `RST-005`–`RST-007`, `UI-001`; `TEAM-004/005` and `ORG-005`–`ORG-007` are corrected to `Not Tested`
-- Exact Failing Commands / Execution Mode: cumulative server Vitest execution (`99 files / 584 passed, 2 files / 2 failed`); real `pnpm build` / `autobyteus-app pack` in `applications/brief-studio`; built isolated backend and production Nuxt bundle with real Codex App Server, graceful shutdown/same-data restart, history/reconnect/restore, and production Chromium
-- Failure Evidence Paths: `api-e2e-evidence/API-REV-001/resumed-crr008/repository/server-cumulative-changed.log`; `repository/brief-studio-build.log`; `live/restart-failure-excerpts.log`; `live/browser-journey-transcript.md`; `api/post-run-task-tool-fixture-audit.md`; screenshots `RST-002-org-fail-closed.png`, `RST-007-org-restore-provider-failure.png`, and `ORG-005-direct-agent-conversation.png`; user screenshot `ctx_8cd213e66142__image.png`
+- Review Entry Point: `Implementation Review — skill-reloaded full cumulative re-review`
+- Requirements Doc Reviewed As Context: `requirements-doc.md` through approved `RER-021`
+- Investigation / Requirements Revision Context: `investigation-notes.md`; `requirements-revision-record.md`
+- Design Spec Reviewed As Context: `design-spec.md` through cumulative `AD-REV-011`, including the accepted `AD-REV-009/010` lifecycle mechanism
+- Supplemental Artifacts: `agent-org-contract.md`; Product `RV-012 / VIS-001–020`; approved mounted-Team-status supplement `VIS-STATUS-001–003`; `production_data_migration_conventions.md`; the user-confirmed automatic-recovery/terminal-history correction recorded in `IR-015`
+- Architecture Review: `ARCH-REV-009 / Pass`
+- Implementation Handoff / Revision Record: reviewed through `IR-016`
+- Current Source Revision: `IR-016@394fc27f896dac4121ef166cc0972b60e8b89ce4`
+- Current Implementation Artifact: `b19c41e68c119f9a9590c5b04839454dae5f64b8`
+- Code Review Revision ID: `CRR-017`
+- Current Review Round: `17`
+- Trigger: IR-016 Local Fix for `CR-FIND-017/018`; the user's standing instruction to repeat a fresh whole-ticket review after multiple local-fix rounds
+- Prior Authoritative Result: `CRR-016 / Fail — Local Fix`
+- Relevant API/E2E Result: `API-REV-003 / Fail / 92.9%`, executed against IR-012; its implementation findings were corrected in IR-014 and accepted in CRR-016
+- Delivery Revisions: `N/A — pending`
 
 ## Routing Classification Review
 
 - Task size: `Large`
 - Architectural risk: `High`
-- Selected route: `API/E2E Failure-Origin Review`
-- Independent source review required by the classification: `Failure-origin exception after reviewed source`
-- Classification evidence or correction required: The Large/High classification remains correct. This round is intentionally focused: it classifies the seven reported API findings without repeating the `CRR-008` full source audit or scorecard.
+- Selected route: `Implementation Review`
+- Independent source review required: `Yes`
+- Classification correction required: `None`. The cumulative ticket still spans definition, migration, runtime, task, shutdown, persistence, history, GraphQL/stream, and responsive web boundaries.
 
 ## Review Scope
 
-- Changed implementation and behavior reviewed: only the smallest production/test/evidence paths needed to classify `API-FIND-001`–`API-FIND-007`.
-- Files / areas reviewed:
-  - standalone application-package validation and bundle-backed Agent/Team definition providers;
-  - Agent Tools MCP owner identity, production activation callers, and the failing Brief Studio integration harness;
-  - retained task fixture, automatic collaboration-tool exposure, task traces, and the post-run fixture audit;
-  - process shutdown, active-only Org checkpoint recovery, history refresh, and explicit Org restore paths;
-  - Codex thread create/restore behavior plus the persisted idle-member tree/trace;
-  - AgentOrg launch, history expansion, focus, and Team-row rendering;
-  - current `RER-020` / `REQ-028` / `AC-023` status requirement and both visual witnesses.
-- Explicit exclusions: no full implementation scorecard, changed-source size audit, legacy audit, or successful-test-code review is repeated. API/E2E remains failed, so its two durable test edits are not proportionally reviewed here. No implementation or test fix was made by Code Review.
+- Changed implementation and behavior reviewed: the full cumulative implementation from pre-implementation authority `f3035a2d5ba90e64c51113fcd957524a3afd9cf9` through `b19c41e68`, not only IR-016; all prior findings; strict Team V2/Org V1 definitions and packages; startup migration; execution identity; communication/tasks; shutdown; persistence/history/restore; stream/context/focus; accepted Agent/Team surfaces; mounted-Team status; automatic recovery and terminal-history UX.
+- Files / areas reviewed: `621` cumulative changed paths, including the previously established `367` production implementation-source paths; all `63` changed production-source files over `220` effective non-empty lines; `0` over the `500` hard limit. IR-016 modifies three production files and one focused test file, reducing rather than expanding the public surface.
+- Explicit exclusions: API/E2E-owned dirty integration edits and retained evidence are review inputs rather than IR-016 source; generated SDK `dist/` outputs are not implementation source; external Agent repositories remain outside this ticket's edit/release scope; Code Review authored no production fix.
+- Method: reloaded the Code Reviewer skill, shared design principles, Example 9, report template, upstream authority, and current implementation artifacts; rebuilt the cumulative path/size/legacy inventory; traced every material candidate from an approved scenario or engineering contract through the production path before deciding or scoring it.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
-- Approved requirements basis understood: Yes. `AC-002`, `AC-009`–`AC-011`, and `AC-021`–`AC-022` govern the relevant launch/focus, restore, task, and packaged-definition behavior. `RER-020` now separately approves the Team-row aggregate semantics as `REQ-028` / `AC-023`, while holding Product/architecture re-entry.
-- Design-spec behavior map verified against the relevant implementation paths: Yes for the pre-`RER-020` identity, restore, shutdown, hydration, focus, and history contracts. No design artifact yet covers `RER-020`.
-- Design review report and round confirmed: `ARCH-REV-004 / Pass` for `AD-REV-006` only.
-- Behavior-basis status: `Confirmed`, with one later approved requirement impact pending its Product/architecture route.
-- Changed or newly discovered behavior: `BEH-011` / `REQ-028` / `AC-023` were added by Requirements Engineering in `RER-020` after the user's `API-FIND-007` clarification.
-- Remaining material ambiguity: None for the seven origin classifications. Product visual authority and architecture impact for `RER-020` remain deliberately pending rather than being invented in this review.
+- Approved requirements basis understood: `Yes`
+- Design-spec behavior map verified against implementation: `Yes`
+- Architecture review round confirmed: `ARCH-REV-009 / Pass`
+- Behavior-basis status: `Confirmed`
+- Changed or newly discovered behavior: `None`
+- Remaining material ambiguity: `None`
 
-| Behavior / Contract ID | Current Status | Current Implementation Path And Lifecycle Evidence | Contradicting Or Newly Discovered Supported Behavior Evidence |
+| Behavior ID | Current Status | Current Implementation Path And Lifecycle Evidence | Contradicting Or New Evidence |
 | --- | --- | --- | --- |
-| `AC-021/022` packaged definition admission | `Contradicted` | The real Brief Studio pack enters `validateStandaloneApplicationPackage`, whose read-only config lacks the Org directory method now required by the Agent/Team providers. | Real application build fails before packaging. |
-| exact collaboration-member MCP identity (`AC-003/010`, current session contract) | `Confirmed` | Production Codex/Claude activation callers pass `collaborationIdentity`; the session service correctly rejects an absent/mismatched identity. | The failing integration passes obsolete `teamIdentity`; this contradicts the test harness, not production behavior. |
-| `AC-010` formal task lifecycle | `Unclear — Not Tested by API-REV-001` | Fresh task runs were created, but the imported Agents had no configured submission/review tools. | Corrected fixture audit proves the original implementation attribution was invalid. |
-| `AC-009` persist/restore | `Contradicted in explicit restore; not contradicted by stale Reconnect` | Controlled shutdown makes the old root inactive. The supported path is refreshed history followed by explicit Restore; the live Restore path then fails for an idle Codex member. | No approved behavior requires a stale pre-shutdown active-context `Reconnect` action to reactivate an inactive root. |
-| `AC-002/011` post-launch exact focus | `Contradicted` | Launch refreshes history and routes active, but the already-mounted history panel initializes expansion only once on mount. | Two real launches required manual workspace → Org → run expansion before exact focus was exposed. |
-| `REQ-028` / `AC-023` mounted-Team aggregate status | `Newly approved in RER-020; implementation pending` | Current Team rows render chevron/icon/name without an aggregate status; Agent rows retain dots. | User original-tree screenshot plus current production screenshot established the omission; `RER-020` now owns the semantic correction and Product gate. |
+| `BEH-001`–`BEH-004`, `BEH-007/008/010/011` | `Confirmed` | Target-only definition admission, fixed-depth Org composition, root-first handoffs, startup-only migration, exact Team V2/Org V1 packages, accepted focus/surfaces, and mounted-Team status remain intact. | None. |
+| `BEH-005/006/009`; `CR-FIND-015/016` | `Confirmed` | IR-014 retains exact task-event retirement during committed local teardown and complete-generation atomic/awaited root-package readiness. | Independent server `15 files / 110 tests` and the retained production-shaped IR-014 regressions pass. |
+| `DS-017/018/019`; automatic recovery | `Confirmed` | Valid server `ERROR` throws into current-generation fail-close, then the single bounded recovery scheduler. Only the five-attempt exhaustion boundary publishes a visible error; a later verified snapshot clears it. | Exact stream `13/13`; focused web `75/75`; source trace at `agentOrgStreamingService.ts:207-210,267-273,304-348`. |
+| IR-015 terminal-history behavior | `Confirmed` | Inactive Org roots open as history without a stream or manual lifecycle action; historical member selection uses the existing exact-root restore and exact focus path. | Focused workspace/history tests and retained desktop/narrow rendered evidence. |
 
-## Supported Product Scenario And Reachability Gate (Mandatory)
+## Supported Product Scenario And Reachability Gate
 
-| Scenario ID | Related Behavior / Contract IDs | Kind | Actor / Initiator | Coherent Goal Or Governing Event | Supported Entry Surface / Event | Scenario Shape | Forward Production Path / Lifecycle | Expected Outcome / Consequence | Independent Evidence | Scenario Validity | Review Use |
+| Scenario ID | Related Behavior / Contract IDs | Kind | Actor / Initiator | Coherent Goal Or Governing Event | Supported Entry Surface / Event | Shape | Forward Production Path / Lifecycle | Expected Outcome / Consequence | Independent Evidence | Validity | Review Use |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-SCN-013` | `AC-021/022`; application package contract | `Operational` | Application author/release build | Validate and pack shipped Brief Studio against current definition providers | `pnpm build` / `autobyteus-app pack` | `Normal` | pack → standalone validator → bundle-backed providers → package artifact | Build completes or reports a real package defect, not an incomplete host double | application package/scripts, requirements, real build log | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-014` | `AC-003/010`; Agent Tools MCP identity contract | `Contract` | Collaboration member runtime | Expose tools only under the exact owning root/member/run identity | production backend bootstrap | `Normal` | member context → session activation → strict identity check → tool capability | exact identity admitted; mismatch rejected | current session service and Codex/Claude callers | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-015` | `REQ-015`; `AC-010` | `User` | Configured task delegator/assignee | Complete formal task submission and review with configured lifecycle tools | `delegate_task`, `submit_task_result`, `review_task_result` | `Normal` | configured tools → fresh run → submit → review/settle | formal durable transitions occur | approved task behavior and tool contracts | `Supported Normal Scenario` | `Investigate` — API fixture did not reach it |
-| `CR-SCN-016A` | `REQ-014`; `AC-009`; `DS-015/018/019` | `Operational` / `User` | Graceful process restart, then user | Reopen persisted work after the prior active root has been stopped | server stop/restart; history Refresh; inactive-row Restore | `Normal` | shutdown stops roots → restart reads history inactive → explicit Restore → hydrate active context | persisted Org restores or returns an exact restore failure | requirements, design lifecycle, current history/restore surfaces | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-016B` | none beyond a callable button | `User` | User on stale pre-shutdown route | Make `Reconnect` silently reactivate a root stopped by process shutdown | old active workspace's stream recovery action | `Explicit Edge` claimed by API report | stale context → active-only checkpoint query | proposed automatic reactivation | only the downstream button/error and failed query; no independent requirement | `Technically Possible but Unsupported/Contrived` | `Reject` |
-| `CR-SCN-017` | `REQ-014`; `AC-009`; `SCN-002` | `User` | User of a cleanly stopped Org | Restore the entire persisted full-scope Org, including a member never messaged | inactive Org history `Restore` | `Normal` | GraphQL restore → Org manager/materialization → Agent backend restore → Codex thread restore | every member restores atomically with identities/content; no partial root | requirements, explicit Restore UI, real provider evidence | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-018` | `REQ-004`; `AC-002/011`; approved workspace UI | `User` | User who just launched an Org | Select an exact member immediately from the active sidebar | configuration `Run Agent Org` | `Normal` | launch → history refresh → active route → visible expanded run tree → exact focus | active hierarchy is discoverable without unrelated manual expansion | requirements/Product and two real browser launches | `Supported Normal Scenario` | `Use` |
-| `CR-SCN-019` | `REQ-028`; `AC-023`; `SCN-012` | `User` | User inspecting mounted Team state | See Team aggregate status while retaining exact Agent statuses | active/stopped Org hierarchy, expanded or collapsed Team | `Normal` | exact Agent status projection → presentation-only Team fold → accessible Team-row indicator | truthful five-state aggregate without Team-root lifecycle | `RER-020`, user/current screenshots | `Supported Normal Scenario` | `Use` — upstream recovery only |
+| `CR-SCN-027` | `BEH-009`, `REQ-015`, `AC-010`, `SCN-005/006` | `User/System` | Org delegator/reviewer and mounted-Team task Agent | Complete a delegated task and settle its execution without losing root authority | Collaboration task tools and normal terminal settlement | `Normal` | task tools -> root FIFO -> durable terminal record -> exact teardown -> unregister | durable settlement and usable Org | approved requirements/design and real API-FIND-012 evidence | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-028` | `BEH-005/006/008`, `AC-009/011/020`, `SCN-006/010` | `User/System` | user after same-data application restart | Reopen retained standalone Team and Org history | normal history/workspace surfaces | `Normal` | generic history -> shared readiness -> subject catalog -> Team row/Restore | every valid retained package is visible/restorable | requirements and real API-FIND-013 retained data | `Supported Normal Scenario` | `Use` |
+| `CR-SCN-031` | `DS-017/018/019`, `AC-009`; automatic-recovery contract | `Operational/System` | supported AgentOrg stream/restart lifecycle | Transparently recover an active/reopening Org connection and report failure only after bounded attempts actually exhaust | production WebSocket close or valid server `ERROR` | `Explicit Edge` | connect -> strict frame handling -> fail-close -> bounded reconnect/checkpoint -> verified candidate or terminal notice | no false exhaustion notice; exact context/focus remains authoritative | reviewed design, IR-015/016 artifacts, production server/client paths, focused regression | `Supported Explicit Edge Scenario` | `Use` |
+| `CR-SCN-032` | IR-015 terminal history; `AC-009/011`; `VIS-STATUS-003` | `User` | user inspecting a stopped Org | Inspect history and continue by selecting an exact historical member | Org history root/member rows | `Normal` | inactive root -> history/no stream -> member selection -> exact restore/focus -> accepted surface | truthful offline history and exact continuation | approved history/restore requirements and user-confirmed simplification | `Supported Normal Scenario` | `Use` |
+| `CR-CONTRACT-004` | shared removal/cleanup contract; IR-015 removal scope | `Contract` | engineering ownership contract | Remove superseded manual recovery entry points when automatic recovery becomes sole authority | changed service/store API boundary | `Normal` | removed UI action -> service/store usage audit | no dead public manual-reopen chain | shared design principles and repository usage graph | `Supported Normal Scenario` | `Use` |
 
 ### Candidate Finding And Mechanism Gate
 
 | Candidate ID | Observation Or Mechanism | Scenario / Contract ID | Independent Trigger | Forward Path / Lifecycle / Consequence | Evidence | Disposition | Reason / Proportionate Response |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-CAND-011` | The validator's `AppConfig` double omits `getAgentOrgsDir` after shared definition providers began scanning Org roots. | `CR-SCN-013` | ordinary shipped application pack | validator creates incomplete host config → provider call throws → no package | validator `:14-18`, Agent provider `:101-103`, Team provider `:60-68`, real build log | `Promote` | Bounded production packaging defect; complete the current provider composition and cover the real pack path. |
-| `CR-CAND-012` | Strict MCP owner identity is broken in production. | `CR-SCN-014` | production collaboration-member bootstrap | production callers pass exact `collaborationIdentity`; only the integration supplies obsolete `teamIdentity` | session service `:81-108`, Codex bootstrapper `:307-314`, failing test `:334-350` | `Reject` | Production is correct and fail-closed. Correct the stale test harness; do not weaken identity admission. |
-| `CR-CAND-013` | Missing formal task submission proves a runtime task-tool defect. | `CR-SCN-015` | intended configured task lifecycle | fixture lacks `agent-config.json` / lifecycle tools, so intended path never begins | post-run fixture audit and retained package | `Reject` | Correct the fixture and rerun; implementation behavior remains `Not Tested`. |
-| `CR-CAND-014` | An inactive Org must be reactivated by the stale workspace `Reconnect` action after process restart. | `CR-SCN-016B` | old active route after controlled shutdown | active-only checkpoint correctly reports root absent; later history refresh reports inactive | requirements/design, transcript, restart log | `Reject` | No independent contract supports this reactivation shortcut. API/E2E must use Refresh → inactive-row Restore and correct the report. |
-| `CR-CAND-015` | Explicit Org Restore cannot restore an idle never-messaged Codex member. | `CR-SCN-017` | ordinary history Restore | stored non-null thread ID → unconditional `thread/resume` → Codex `no rollout found` → whole Org remains inactive | persisted tree/trace, restore log, service/manager and Codex thread manager | `Promote` | Critical supported restore failure. Fix within existing provider/Agent restore ownership without broad error fallback or weakened atomicity. |
-| `CR-CAND-016` | A newly launched Org remains hidden in collapsed history because expansion is initialized only on panel mount. | `CR-SCN-018` | normal config → launch transition | launch refreshes history and routes active; mounted panel has no route/history expansion watch; user must manually expand three levels | config panel `:88`, run store `:32-40`, history panel `:82-117`, browser transcript | `Promote` | Bounded reactive UI lifecycle correction and transition regression. |
-| `CR-CAND-017` | Mounted Team row has no aggregate status. | `CR-SCN-019` | ordinary hierarchy inspection | Team row renders no status while Agent rows do; source cannot satisfy newly approved fold/accessibility semantics | history panel `:57-64`, screenshots, `RER-020` | `Promote` | This was an upstream Product/requirement omission at API time. `RER-020` now defines behavior, but Product evidence and architecture impact must complete before source work. |
+| `CR-CAND-034` | IR-014 retirement could weaken strict live-event admission. | `CR-SCN-027` | normal committed task settlement | exact lease begins only after durable write, suppresses only the exact committed teardown status during awaited local teardown, then releases | current source and focused regressions | `Reject` | Resolved/acceptable: lifecycle-bounded and identity-exact; no broader suppression or second authority. |
+| `CR-CAND-035` | IR-014 readiness could expose a partial generation. | `CR-SCN-028` | first mixed history query after restart | candidate builds off-state, retries admission revision changes, swaps complete Team/Org/diagnostics together, and Team history awaits it | readiness/catalog source and focused regression | `Reject` | Resolved/acceptable without request serialization or a second cache. |
+| `CR-CAND-036` | A valid server `ERROR` might still publish an exhaustion notice on its first frame. | `CR-SCN-031` | production server error | IR-016 now routes `ERROR` -> throw -> `failClosed` -> single scheduler; `reportError` exists only at exhausted attempt count | source trace; exact `13/13`; `rg` finds one caller at the exhaustion branch | `Reject` | `CR-FIND-017` is resolved. Preserve strict fail-close and the sole visible exhaustion exit. |
+| `CR-CAND-037` | Removed UI actions might leave a public manual-reopen chain. | `CR-CONTRACT-004` | automatic-only recovery contract | usage graph now contains only private `reopenOwned`; public service/store/active-context reopen methods are deleted | IR-016 diff and repository-wide `rg` | `Reject` | `CR-FIND-018` is resolved; no manual fallback or duplicate recovery owner remains. |
+| `CR-CAND-038` | Repeatedly invoke actions during retry and require global user-action serialization. | `CR-SCN-031` | no independent supported contradictory multi-action goal | artificial timing would add coordination unrelated to the observed contract | Example 9; no Product/operational contract | `Reject` | Technically possible but unsupported/contrived; do not add machinery. |
+| `CR-CAND-039` | Treat all server errors as permissive/recoverable or weaken schema/root/sequence/ACK admission. | `CR-SCN-031` | none | would blur command/protocol identity and current-generation strictness | DS-017/018 and current strict handlers | `Reject` | IR-016 changes visibility timing only; strict admission remains required. |
+| `CR-CAND-040` | Unchanged unused locale/type-generation strings and product docs still describe the older nested-Team model. | delivery docs/generated-artifact sync | no current production caller; files are unchanged from the implementation baseline | current Team UI/operations/server schema are Agent-only; repository usage search finds no production caller for the old locale/type declarations | baseline diff and `rg` usage audit | `Reject` | Not a reachable current product behavior or changed-source defect, so it cannot drive a finding or score deduction. Record product-document/generated-artifact sync for Delivery instead. |
 
-## Focused Failure-Origin Analysis
+## Structural / Design Checks
 
-| API Finding | Confirmed Origin | Source / Execution Evidence | Prior-Review Accountability | Classification / Owner |
-| --- | --- | --- | --- | --- |
-| `API-FIND-001` | Production implementation/packaging defect | `createReadOnlyDefinitionConfig` has Agents/Teams/additional roots only, while ticket-changed Agent/Team providers call `getAgentOrgsDir`; the real Brief Studio pack fails exactly there. | `CRR-008` should have caught the shared-provider caller contract and application pack path. This is a source-review readiness gap. | `CR-FIND-008`; `Local Fix` → Implementation Engineer |
-| `API-FIND-002` | Invalid/stale integration test, not production source | Test passes `owner.teamIdentity`; current owner contract and production Codex/Claude callers use `collaborationIdentity`. Strict rejection is correct. | The stale line was introduced in the cumulative implementation (`37d05c7f7`) and should have been caught by the source review's test-readiness check. Do not weaken source behavior. | API/E2E test `Local Fix` → API/E2E Engineer |
-| `API-FIND-003` | API/E2E fixture validity issue | Imported Agents had no `agent-config.json`/`toolNames`; automatic exposure omits submit/review tools. Fresh task creation passed, but formal lifecycle was unreachable. | Corrected promptly after the user's question; no implementation or source-review defect can be inferred from this trace. | Fixture/report `Local Fix`; formal lifecycle `Not Tested` → API/E2E Engineer |
-| `API-FIND-004` | API/E2E expected-path/execution issue | Graceful shutdown intentionally stops roots. The clicked `Reconnect` path queries an active-only checkpoint and correctly reports the root absent. Approved recovery is refreshed inactive history plus explicit Restore. | `CRR-008` did not promise automatic stale-context reactivation. This finding must not create unsupported lifecycle machinery. | Execution/report `Local Fix`; supported restore still unproven/failing under `API-FIND-005` → API/E2E Engineer |
-| `API-FIND-005` | Production runtime/provider restore defect | Explicit Restore reaches a persisted idle member whose Codex thread ID has no rollout; `CodexThreadManager.restoreThread` unconditionally resumes every non-null ID and the Org atomically remains inactive. | The provider's “thread ID exists but no rollout exists before first turn” behavior required a real Codex lifecycle and was not reasonably detectable from static source alone. API/E2E correctly found it. | `CR-FIND-009`; `Local Fix` → Implementation Engineer |
-| `API-FIND-006` | Production frontend lifecycle defect | Launch refreshes history before routing, but the already-mounted history panel expands the active path only in `onMounted`; it never reacts to the new route/run. | `CRR-008` validated active target states but missed the live configuration-to-launch transition through the persistent sidebar. This is a source-review gap. | `CR-FIND-010`; `Local Fix` → Implementation Engineer |
-| `API-FIND-007` | Requirement/Product baseline omission at API execution; upstream recovery now active | Original Team tree has a Team-row status signal; current Org tree and source omit it. `RER-020` now approves exact semantics and sets `Product Design Requested`; `AD-REV-006`/`ARCH-REV-004` predate it. | Not a defect against the pre-`RER-020` approved prototype. Do not implement from the screenshot alone. | `CR-FIND-011`; `Requirement Gap` now in `RER-020` Product/architecture recovery → Architecture Designer after Product/Requirements re-entry |
+| Check | Result | Evidence | Required Action |
+| --- | --- | --- | --- |
+| Task design health assessment is present, evidence-backed, and preserved | `Pass` | Large/High assessment, AD-REV-011, ARCH-REV-009, and cumulative implementation validation are present. | None. |
+| Implementation matches approved behavior-defining supplemental artifacts | `Pass` | Exact Team/Org, Product RV-012/status, automatic recovery, and terminal-history behavior align. | None. |
+| Data-flow spine inventory clarity and preservation | `Pass` | Definition, migration, launch, task, persistence, history, presentation, recovery, and shutdown spines have explicit owners. | None. |
+| Ownership boundary preservation and clarity | `Pass` | One AgentOrg stream service owns generation/recovery; existing Org/readiness/lifecycle owners retain their responsibilities. | None. |
+| Off-spine concern clarity | `Pass` | Snapshot hydration, projection, persistence, notices, and catalogs remain subordinate to explicit roots. | None. |
+| Existing capability/subsystem reuse check | `Pass` | IR-014–016 extend existing settlement, readiness, checkpoint, store, and accepted-surface owners. | None. |
+| Reusable owned structures check | `Pass` | Shared notice, five-state fold, exact identities, and strict package models are reused. | None. |
+| Shared-structure/data-model tightness check | `Pass` | Team V2 and Org V1 are specialized, exact, and non-overlapping. | None. |
+| Repeated coordination ownership check | `Pass` | One readiness generation and one stream recovery service own their coordination. | None. |
+| Empty indirection check | `Pass` | Remaining adapters translate real identity, persistence, or presentation boundaries. | None. |
+| Scope-appropriate separation of concerns and file responsibility clarity | `Pass` | No bespoke Org dashboard, parallel context, second recovery subsystem, or mixed persistence authority remains. | None. |
+| Ownership-driven dependency check | `Pass` | No forbidden shortcut or unjustified cycle was found. | None. |
+| Authoritative Boundary Rule check | `Pass` | Callers use subject services/stores rather than coupling outer owners to internal managers/repositories. | None. |
+| File placement check | `Pass` | Recovery, history, readiness, task, and lifecycle code reside in their owning subsystems. | None. |
+| Flat-vs-over-split layout judgment | `Pass` | Layout is proportionate; the shared notice is a real reusable concern. | None. |
+| Interface/API/query/command/service boundary clarity | `Pass` | Exact identity shapes remain explicit; IR-016 removed the obsolete public manual-reopen chain. | None. |
+| Naming quality and responsibility alignment | `Pass` | Current types/methods accurately name recovery, retirement, readiness, and history roles. | None. |
+| No unjustified duplication / repeated structures | `Pass` | No parallel recovery, readiness, topology, or persistence shape was introduced. | None. |
+| Patch-on-patch complexity control | `Pass` | Fresh cumulative audit confirms IR-016 collapses duplicate visible-error/manual entry paths rather than layering another patch. | None. |
+| Dead/obsolete code cleanup completeness | `Pass` | Public `reopenAgentOrg -> reopen -> reopen` chain is absent; private `reopenOwned` is called only by the automatic owner. | None. |
+| Relevant test scenarios and assertions are requirement-aligned | `Pass` | Deterministic tests cover first ERROR privacy, five retries, one exhausted notice, later verified publication/error clear, release/generation, focus, and strict correlation. | None. |
+| Test fixtures/helpers are reasonably reusable | `Pass` | Context/socket/root builders remain coherent and reused. | None. |
+| No stale/duplicated/compatibility-only tests retained | `Pass` | No tests were removed to obtain the result; no compatibility-only runtime path was added. | None. |
+| API/E2E readiness | `Pass` | Focused server/web cohorts and both production builds pass; prior real-system defects have production-shaped regressions. | Resume cumulative API/E2E. |
+
+## Source File Size And Structure Audit
+
+`621` cumulative changed paths retain the established `367` production-source inventory. All `63` files over the `>220` review signal were reassessed; none exceeds `500` effective non-empty lines. Current IR-014–016 high-signal production files:
+
+| Source File | Effective Non-Empty Lines | `>500` | `>220` | SoC / Ownership | Placement | Classification | Required Action |
+| --- | ---: | --- | --- | --- | --- | --- | --- |
+| `agent-org-run.ts` | 444 | Pass | Signal assessed | Cohesive Org aggregate; retirement remains exact/private | Pass | Accept | None. |
+| `agent-org-task-lifecycle-adapter.ts` | 256 | Pass | Signal assessed | Persistence/settlement adapter is coherent | Pass | Accept | None. |
+| `root-run-package-readiness-index.ts` | 308 | Pass | Signal assessed | One shared atomic readiness generation | Pass | Accept | None. |
+| `team-run-history-catalog-service.ts` | 269 | Pass | Signal assessed | Team history/cache owner | Pass | Accept | None. |
+| `WorkspaceAdaptiveLayout.vue` | 280 | Pass | Signal assessed | Existing layout owner | Pass | Accept | None. |
+| `AgentWorkspaceSurface.vue` | 87 | Pass | Pass | Accepted Agent surface | Pass | Accept | None. |
+| `WorkspaceRecoveryNotice.vue` | 8 | Pass | Pass | Shared message-only notice | Pass | Accept | None. |
+| `AgentOrgRunHistoryPanel.vue` | 297 | Pass | Signal assessed | History/focus/lifecycle presentation | Pass | Accept | None. |
+| `AgentOrgWorkspaceView.vue` | 99 | Pass | Pass | Org route/context composition | Pass | Accept | None. |
+| `TeamWorkspaceSurface.vue` | 87 | Pass | Pass | Accepted Team-member surface | Pass | Accept | None. |
+| `en/workspace.ts` / `zh-CN/workspace.ts` | 338 / 337 | Pass | Signal assessed | Localization catalogs | Pass | Accept | None. |
+| `agentOrgStreamingService.ts` | 392 | Pass | Signal assessed | Sole strict transport/recovery owner; one visible exhaustion exit | Pass | Accept | None. |
+| `activeContextStore.ts` | 254 | Pass | Signal assessed | Workspace target/context owner; manual reopen removed | Pass | Accept | None. |
+| `agentOrgContextsStore.ts` | 54 | Pass | Pass | Minimal Org service/context/error registry | Pass | Accept | None. |
+
+## Legacy / Backward-Compatibility Verdict
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| No backward-compatibility mechanisms in changed scope | `Pass` | Normal runtime is strict Team V2/Org V1. |
+| No legacy old-behavior retention in changed scope | `Pass` | No nested configured-Team runtime, bespoke Org dashboard, raw envelope, or visible/manual Reconnect behavior remains. |
+| Dead/obsolete code cleanup completeness | `Pass` | The changed public manual-reopen chain is removed. |
+| Approved persisted-data transition decision followed | `Pass` | Required migration remains startup-only and isolated; IR-016 does not affect persisted data. |
+| No version-specific dual reads/writes or request-time old-shape fallback | `Pass` | None found. |
+| Transition mechanics match reviewed design | `Pass` | Migration remains preflighted, rerunnable under its approved interruption cases, and isolated from runtime. |
+
+## Dead / Obsolete / Legacy Items Requiring Removal
+
+`None in changed implementation source.` The former public manual-reopen chain is removed. Unchanged no-caller generated/localization remnants are not a production finding under `CR-CAND-040`; product documentation/generated-artifact synchronization is recorded for Delivery.
+
+## Docs-Impact Verdict
+
+- Docs impact: `Yes — delivery-stage synchronization`
+- Why: ticket implementation/revision artifacts are current through IR-016. Existing product documentation such as `autobyteus-web/docs/agent_teams.md` and related README/generated descriptions still contain older nested-Team language and should be reconciled with the strict Agent-only Team V2 / fixed-depth Org V1 model during Delivery. This does not change runtime behavior or block the source Pass.
+- Files or areas likely affected: Agent Teams/Agent Org product documentation, README references, and generated GraphQL/localization cleanup if the Delivery regeneration/audit confirms they remain obsolete.
+
+## Additional Material Premise Validation
+
+- Upstream `AR-PREM-004`–`AR-PREM-006`: `Confirmed`; IR-014 preserves the approved supported settlement/shutdown/readiness paths.
+- New or reclassified premise outside the scenario/candidate tables: `None`.
+
+## Independent Validation Evidence
+
+- Exact AgentOrg stream service: `1 file / 13 tests passed` — `/tmp/aorg-crr017-stream-focused.log`.
+- Current focused web cohort: `8 files / 75 tests passed` — `/tmp/aorg-crr017-web-focused.log`.
+- Cumulative high-signal server cohort: `15 files / 110 tests passed` — `/tmp/aorg-crr017-server-cumulative-focused.log`.
+- Current web production build and `16`-route prerender: `passed` — `/tmp/aorg-crr017-web-build.log`.
+- Server production build and sanitized built-in-agent bootstrap: `passed`; server source is unchanged from the independently built CRR-016 state — `/tmp/aorg-crr016-server-build.log`.
+- Implementation web/localization guards and exact IR-016 evidence: passed in `/tmp/aorg-ir016-web-guards.log`, `/tmp/aorg-ir016-stream-focused.log`, and `/tmp/aorg-ir016-web-focused.log`.
+- Repository-wide dead-chain audit: no `reopenAgentOrg`, store public `reopen`, or service public `reopen`; only private `reopenOwned` remains.
+- Cumulative `git diff --check`: `passed`; production-source size audit: `0 >500`.
+- No full web-suite pass is claimed from an accidentally started watch-mode run; only the exact completed commands above are evidence.
+
+## Review Scorecard
+
+- Overall score: `9.2/10`
+- Overall score: `91.6/100`
+- Decision note: every category meets the `>=9.0` clean-pass target; the average does not replace the finding/behavior gates.
+
+| Priority | Category | Score | Why | Weakness / Holding It Down | Improvement |
+| --- | --- | ---: | --- | --- | --- |
+| 1 | Data-Flow Spine Inventory and Clarity | 9.2 | Definition, migration, execution, task, history, presentation, recovery, and shutdown spines are explicit and independently traced. | The legitimately broad lifecycle still requires cross-subsystem evidence. | Preserve production-shaped end-to-end regressions. |
+| 2 | Ownership Clarity and Boundary Encapsulation | 9.2 | One owner exists for recovery, readiness, root lifecycle, and persistence publication. | Breadth makes owner drift a continuing review risk, not a current defect. | Keep new behavior inside these owners. |
+| 3 | API / Interface / Query / Command Clarity | 9.1 | Exact root/member/run identities and strict family/version boundaries are clear; dead manual API is gone. | Identity-rich interfaces remain necessarily detailed. | Preserve exact discriminants and avoid compatibility facades. |
+| 4 | Separation of Concerns and File Placement | 9.2 | Runtime, persistence, history, projection, store, and presentation responsibilities are well placed. | Several cohesive files remain above the review signal due domain breadth. | Continue extracting only when a distinct owner emerges. |
+| 5 | Shared-Structure / Data-Model Tightness | 9.2 | Team V2 and Org V1 remain tight specializations with reusable exact identities. | No material current gap. | Preserve strict package families. |
+| 6 | Naming Quality and Local Readability | 9.1 | Recovery, readiness, retirement, generation, and focus names reflect responsibility. | Complex lifecycle sequencing still demands careful local reading. | Keep ordering invariants explicit in tests and handoffs. |
+| 7 | API/E2E Readiness | 9.1 | Focused cohorts/builds pass and every prior real-system defect has a production-shaped correction. | Renewed cumulative real-system execution has not yet run against IR-016. | Resume API/E2E with the listed supported scenarios. |
+| 8 | Runtime Correctness And Behavioral Fidelity | 9.2 | Server errors are now silent during bounded recovery, terminal only at exhaustion, and cleared by verified publication; prior task/history fixes remain intact. | Final confidence still depends on downstream cumulative execution. | Retain strict error/identity/restart coverage. |
+| 9 | No Backward-Compatibility / No Legacy Retention | 9.2 | Current runtime is strict; historical knowledge remains migration-only. | Approved migration remains a necessarily sensitive operational path. | Keep it startup-only and fail according to the established convention. |
+| 10 | Cleanup Completeness | 9.1 | The changed manual-reopen chain and retired UI/runtime paths are removed. | Delivery still must synchronize unchanged documentation/generated descriptions. | Complete docs/generated-artifact audit during Delivery. |
 
 ## Findings
 
-### `CR-FIND-008` — Brief Studio package validation omits the current AgentOrg definition root dependency
+### Current Findings
 
-- Severity: `High`
-- Affected supported scenario: `CR-SCN-013`; `APP-001`; `AC-021/022`
-- Promoted candidate: `CR-CAND-011`
-- Evidence: `autobyteus-server-ts/src/application-platform/launch-configuration/application-standalone-package-validator.ts:14-18,76-87`; `file-agent-definition-provider.ts:101-103`; `file-agent-team-definition-provider.ts:60-68`; real `brief-studio-build.log`.
-- Consequence: a shipped application cannot complete its normal package build even though the server build passes.
-- Required action: make the validator/application composition supply the complete current read-only definition-root contract and add a focused real package-validation/build regression. Keep external roots read-only and do not introduce a legacy parser.
+`None.`
 
-### `CR-FIND-009` — A valid Org containing an idle Codex member cannot be restored
+### Prior Finding Resolution
 
-- Severity: `Critical`
-- Affected supported scenario: `CR-SCN-017`; `ORG-010`; `RST-005`–`RST-007`; `AC-009`
-- Promoted candidate: `CR-CAND-015`
-- Evidence: `agent-org-run.ts:137-144`; `agent-org-run-service.ts:126-134`; `codex-agent-run-backend-factory.ts:52-68`; `codex-thread-manager.ts:54-62,103-162,189-212`; persisted `/verifier` tree/trace; `restart-failure-excerpts.log:237-245`.
-- Consequence: the explicit whole-Org Restore action fails for an otherwise valid full-scope run merely because one member never received a first turn; the root correctly avoids partial activation but `AC-009` is unmet.
-- Required action: resolve the provider-specific never-started persisted-thread state inside the existing Agent/Codex restore ownership, preserving exact identities/content for real conversations, atomic Org activation, and strict failure for unrelated resume errors. Do not add a blanket “any resume error starts fresh” fallback.
-
-### `CR-FIND-010` — Post-launch history expansion does not expose the exact focus surface
-
-- Severity: `Medium`
-- Affected supported scenario: `CR-SCN-018`; `ORG-001/002`; `UI-001`; `AC-002/011`
-- Promoted candidate: `CR-CAND-016`
-- Evidence: `AgentOrgRunConfigPanel.vue:88`; `agentOrgRunStore.ts:32-40`; `AgentOrgRunHistoryPanel.vue:82-117`; two-launch browser transcript.
-- Consequence: the workspace instructs the user to choose a member, but the newly launched active Org remains behind three collapsed levels until manual expansion.
-- Required action: update the existing history-panel expansion owner to react to the supported launch/route/history transition and add a focused transition regression. Do not add a second navigation or context-state authority.
-
-### `CR-FIND-011` — Mounted-Team aggregate status lacked upstream authority; `RER-020` recovery is not yet implementation-ready
-
-- Severity: `Blocking upstream gate`, not a pre-`RER-020` source defect
-- Affected supported scenario: `CR-SCN-019`; `REQ-028`; `AC-023`; `SCN-012`
-- Promoted candidate: `CR-CAND-017`
-- Evidence: user original-tree screenshot; current `ORG-005` screenshot; `AgentOrgRunHistoryPanel.vue:57-64`; `RER-020`.
-- Consequence: current source lacks the now-approved presentation aggregate, but the Product supplement/user approval and architecture impact revision are still pending.
-- Required action: complete the `RER-020` Product/Requirements/Architecture route before implementation. Preserve its negative boundary: presentation-only fold over exact descendant Agent status, no Team-root persistence, polling, lifecycle, or Stop/restore authority.
+- `CR-FIND-001`–`CR-FIND-014`: remain `Resolved` after the fresh cumulative behavior/source/legacy/size review and preserved evidence.
+- `CR-FIND-015`: remains `Resolved` by IR-014 exact committed teardown-event retirement; cumulative server evidence passes.
+- `CR-FIND-016`: remains `Resolved` by IR-014 complete-generation readiness and awaited Team-history filtering; cumulative server evidence passes.
+- `CR-FIND-017`: `Resolved` by IR-016. Valid server `ERROR` is a strict current-generation failure; only exhausted bounded recovery publishes the visible error, and verified later publication clears it.
+- `CR-FIND-018`: `Resolved` by IR-016. The zero-caller public reopen chain is removed; private `reopenOwned` remains the sole checkpointed automatic recovery operation.
 
 ## Classification
 
-- Overall: `Fail — mixed-origin API/E2E failure`
-- `Local Fix / implementation`: `CR-FIND-008`, `CR-FIND-009`, `CR-FIND-010`
-- `Local Fix / API/E2E`: `API-FIND-002` stale test, `API-FIND-003` invalid fixture/report, `API-FIND-004` unsupported expected action/report
-- `Requirement Gap / upstream recovery`: `CR-FIND-011` was missing at API execution; `RER-020` now defines it and holds the package at `Product Design Requested` before architecture/source work
-- Rejected production attributions: `API-FIND-002`, `API-FIND-003`, and the automatic-reactivation interpretation of `API-FIND-004` must not weaken strict identity, auto-expose unconfigured lifecycle tools, or add stale-context restore machinery.
+- Review outcome: `Pass`
+- Failure classification: `N/A`
+- Design Impact: `None`
+- Requirement Gap: `None`
+- Product UI gap: `None`
+- API/E2E readiness: `Yes — resume cumulative validation`
+- Delivery readiness: `No — API/E2E has not yet passed and delivery docs sync remains pending`
 
 ## Recommended Recipient
 
-- Implementation Engineer: correct only `CR-FIND-008`–`CR-FIND-010` within existing owners, subject to the active `RER-020` upstream gate and architecture sequencing; return through source review and API/E2E.
-- API/E2E Engineer: correct the stale MCP test, task fixture/report, and restart expectation; do not rerun the cumulative pass attempt until implementation source re-review passes and the `RER-020` Product/architecture path permits validation.
-- Architecture Designer: retain `CR-FIND-011` as the already-recorded `RER-020` Requirement Gap recovery; do not treat the old screenshot as direct implementation authority or bypass the focused Product gate.
-- Exact recipients and order remain governed by `get_handoff_rules`.
+- Apply the exact dynamic handoff rule for a passed Large/High implementation source review; expected primary next stage is `/software_engineering_team/api_e2e_engineer`.
 
 ## Residual Risks
 
-- Formal standalone-Team and AgentOrg task submission/revision/acceptance remain `Not Tested` until a corrected, re-imported fixture explicitly supplies task lifecycle tools.
-- Successful Org restore remains unproven for both idle and previously conversed members after `CR-FIND-009` correction.
-- The correct post-restart Refresh → Restore browser journey remains unproven because the valid Restore currently fails downstream.
-- Product-owned visual/accessibility evidence and the architecture impact for `REQ-028` / `AC-023` remain pending under `RER-020`.
-- Other API-REV-001 stopped cohorts remain exactly as recorded; none are inferred to pass.
+- API/E2E should repeat the real mounted-Team settlement, first mixed post-restart Team history, valid server-error automatic recovery/exhaustion/error clearing, stopped/history member continuation, strict identity negatives, migration/startup, shutdown, Codex, standalone Team, and responsive focus paths.
+- Preserve IR-013's one-FIFO/null-deferral/root-fence guarantees, IR-014's exact retirement/atomic readiness guarantees, and IR-015/016's automatic-only recovery ownership.
+- No API/E2E, delivery, release, deployment, or external-repository completion is claimed.
 
 ## Latest Authoritative Result
 
-- Review Decision: `Fail`
-- Review Entry Point: `API/E2E Failure-Origin Review`
-- Supported Product Scenario Gate: `Pass` — every attribution was either promoted from an approved normal scenario/contract or explicitly rejected as unsupported/unreached
+- Review Decision: `Pass`
+- Review Entry Point: `Implementation Review — skill-reloaded full cumulative re-review`
+- Supported Product Scenario Gate: `Pass`
 - Material-Premise Gate: `Pass`
-- Score Summary: `N/A — failure-origin-only round; CRR-008's score is historical and is not reused as the current decision`
-- Failure Origin: three implementation defects (`API-FIND-001/005/006`), three API/E2E test/fixture/execution corrections (`API-FIND-002/003/004`), and one upstream Requirement/Product gap now governed by `RER-020` (`API-FIND-007`)
-- Recommended Recipient: Implementation Engineer, API/E2E Engineer, and Architecture Designer according to the exact dynamic handoff rules
-- Notes: `CRR-008 / Pass` remains the historical pre-API source result, but `CRR-009 / Fail` is the latest authoritative review. No API/E2E pass or delivery readiness is claimed.
+- Score Summary: `9.2/10 (91.6/100)`; every category is at least `9.0`
+- Open Findings: `None`
+- Recommended Recipient: dynamic pass handoff, expected `/software_engineering_team/api_e2e_engineer`
+- Notes: This is a fresh cumulative whole-ticket review, not a delta-only review. The automatic recovery behavior is confirmed: users do not click Reconnect; only private bounded recovery remains, and a visible notice appears only after all five automatic attempts fail.

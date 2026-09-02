@@ -119,6 +119,7 @@ const createFactory = (input: {
         return result;
       }),
       freezeForRootTermination: () => ({
+        fenceAgentRunsForRootShutdown: vi.fn(async () => ({ accepted: true })),
         interruptActiveTurns: vi.fn(async () => ({ accepted: true })),
         prepareMemberRuns: vi.fn(async () => undefined),
         finish: vi.fn(async () => backend.terminate()),
@@ -129,6 +130,7 @@ const createFactory = (input: {
     return Object.freeze({
       teamRun: new TeamRun(context, backend as never),
       stagedPlatformBindings: Object.freeze([]),
+      stagedNoConversationBindingReplacements: Object.freeze([]),
       commitAfterDurability: vi.fn(),
       abort: vi.fn(async () => undefined),
     });

@@ -339,7 +339,7 @@ describe("Brief Studio production application Agent Tool through MCP", () => {
       const activation = sessionService.activateForRun({
         owner: {
           runId: row.agentRunId,
-          teamIdentity: memberExecutionContext.identity,
+          collaborationIdentity: memberExecutionContext.identity,
         },
         sender: buildAgentRunMessageSenderContext({
           senderRunId: row.agentRunId,
@@ -442,12 +442,18 @@ describe("Brief Studio production application Agent Tool through MCP", () => {
       },
     });
     expect(requireLiveTeamMember).toHaveBeenNthCalledWith(1, {
-      rootTeamRunId: "team-alpha",
+      root: {
+        rootSubjectKind: "agent_team",
+        rootRunId: "team-alpha",
+      },
       memberAddress: "/researcher",
       agentRunId: "run-alpha",
     });
     expect(requireLiveTeamMember).toHaveBeenNthCalledWith(2, {
-      rootTeamRunId: "team-beta",
+      root: {
+        rootSubjectKind: "agent_team",
+        rootRunId: "team-beta",
+      },
       memberAddress: "/writer",
       agentRunId: "run-beta",
     });
