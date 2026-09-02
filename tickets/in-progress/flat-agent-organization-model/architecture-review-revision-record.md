@@ -15,6 +15,7 @@ concise chronological architecture-review history.
 | ARCH-REV-006 | Round 6 / re-review after exact `API-FIND-008` correlation and `AD-REV-008` defined non-blocking settlement and interrupt-before-drain shutdown | `AD-REV-008` | Pass | Blocked — Unclear | `AR-FIND-003`, `API-FIND-008`, `CR-CAND-020` |
 | ARCH-REV-007 | Round 7 / `AD-REV-009` supported-reachability recovery and proportionate settlement/shutdown redesign | `AD-REV-009` | Blocked — Unclear | Fail — Design Impact | `AR-FIND-003`, `AR-FIND-004`, `API-FIND-008`, `CR-CAND-020` |
 | ARCH-REV-008 | Round 8 / `AD-REV-010` AgentRun root-shutdown fence recovery and cumulative coherence re-review | `AD-REV-010` | Fail — Design Impact | Fail — Design Impact | `AR-FIND-004`, `AR-FIND-005` |
+| ARCH-REV-009 | Round 9 / `AD-REV-011` one-FIFO validation-coherence correction | `AD-REV-011` | Fail — Design Impact | Pass | `AR-FIND-005` |
 
 ## Revision Entries
 
@@ -218,3 +219,29 @@ None.
 - Material classification changes: The cumulative package remains `Large / High`; the focused AD-REV-010 correction remains `Medium / High`. AR-FIND-004 is resolved, but the authoritative decision remains `Fail / Design Impact` because one Architecture-owned validation spine still gives an incompatible settlement owner/order. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: `/software_engineering_team/architecture_designer`
 - Remaining risks or uncertainty: Correct VAL-006 to the existing deepest-first sweep, one FIFO, nullable quiescence attempt, existing prepared settlement, and no independent job/concurrency path; confirm remaining AD-REV-008 references are historical or negative only. Then re-request independent review. Implementation and API/E2E remain held.
+
+### ARCH-REV-009 — One-FIFO recursive settlement coherence pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 9; `AD-REV-011` responded to `ARCH-REV-008 / AR-FIND-005` by correcting VAL-006's sole stale affirmative AD-REV-008 cleanup-job/concurrent-outside-FIFO statement and requested independent re-review.
+- Triggering role, report path, and finding IDs: Architecture Designer; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; `AR-FIND-005`.
+- Relevant architecture design revision IDs: `AD-REV-011` with unchanged accepted mechanism from `AD-REV-009`, `AD-REV-010`
+- Prior authoritative decision: `Fail — Design Impact` (`ARCH-REV-008`)
+- Current authoritative decision: `Pass`
+- What changed in the review result or what baseline was established: Independently verified that VAL-006 now uses the same current contract as DS-022 and VAL-026/029: the existing deepest-first terminal sweep selects one eligible leaf through `RootTaskLifecycleCommandQueue`; `tryPrepareTerminationIfQuiescent()` returns `null` and releases the FIFO for established idle/offline retry, or a quiescent leaf uses the existing prepared settlement, `settledAt` durability, and finish/unregister through the serialized path; a parent becomes eligible only after children are durably settled. No independent cleanup job, concurrent task-mutation path, second lane, coordinator, token, or dependency graph remains. All other AD-REV-008 references in current Architecture artifacts are historical or explicit withdrawals/rejections. The focused correction changes no source, public/durable contract, Product behavior, migration, ownership, interface, file responsibility, root fence, or root phase order.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001` | Resolved in `ARCH-REV-002` | Remains resolved | `RER-018`, `AD-REV-003`-`AD-REV-011` | Definition admission/source ownership, handoff order, and migration boundaries are unchanged. |
+| `AR-FIND-002` | Resolved in `ARCH-REV-002` | Remains resolved | `AD-REV-003`-`AD-REV-011` | Root-owned-before-Team-local order remains exact. |
+| `AR-FIND-003` | Resolved in `ARCH-REV-007` | Remains resolved | `AD-REV-009`-`AD-REV-011`; `AR-PREM-004`, `AR-PREM-005` | Supported submit/accept and approval-wait shutdown paths still justify the narrow prepared-or-null and fence-before-drain design; unsupported self-review remains excluded. |
+| `AR-FIND-004` | Resolved in `ARCH-REV-008` | Remains resolved | `AD-REV-010`, `AD-REV-011`; `AR-PREM-006`; VAL-027 | AD-REV-011 changes no AgentRun fence, exact input-state disposition, recursive scope, or root shutdown order. |
+| `AR-FIND-005` | Open — Design Impact | Resolved | `AD-REV-011`; VAL-006, VAL-026, VAL-029, DS-022 | VAL-006 now names the singular existing FIFO/deepest-first/prepared-or-null path; every remaining AD-REV-008 reference is historical or an explicit withdrawal/rejection. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020` | Resolved in prior rounds | Remain resolved at the design boundary | `AD-REV-004`-`AD-REV-011` | AD-REV-011 is documentation-only and changes none of the previously accepted source-family, runtime-composition, presentation, status, or lifecycle mechanisms. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: The authoritative review changes from `Fail / Design Impact` to `Pass`. AD-REV-011 is `Small / Low` in isolation; the cumulative package remains `Large / High` and follows the reviewed implementation/source-review/API-E2E route. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+- Remaining risks or uncertainty: Implementation must reconcile the reviewed AD-REV-009/010 mechanism and prove one-FIFO non-waiting deferral/idle retry, exact lifecycle-fact uniqueness, complete frozen-scope enumeration, no post-fence provider start, prepared-cancel non-reopen, recursive deepest-first settlement, ordinary AgentRun FIFO-drain regression, and both Team/Org shutdown orders. These are controlled High implementation/validation risks, not open design decisions.
