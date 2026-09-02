@@ -15,8 +15,7 @@ import type {
 } from '~/types/agent/TeamRunConfig'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
 import {
-  hasMeaningfulLaunchOverride,
-  hasMeaningfulMemberOverride,
+  resolvedTeamRunLaunchConfigsEqual,
   resolveOverrideLlmConfig,
   resolveOverrideLlmModelIdentifier,
   resolveOverrideRuntimeKind,
@@ -68,14 +67,17 @@ const resolveConfig = (
   inherited: Readonly<ResolvedTeamRunLaunchConfig>,
   override: Readonly<AgentConfigOverride | TeamScopeConfigOverride> | null | undefined,
 ): Readonly<ResolvedTeamRunLaunchConfig> => {
-  const workspace = override && 'workspace' in override && override.workspace !== undefined
-    ? override.workspace
-    : { workspaceId: inherited.workspaceId, workspaceMetadata: inherited.workspaceMetadata }
+  const workspaceOverride = override && 'workspace' in override ? override.workspace : undefined
+  const hasWorkspaceOverride = workspaceOverride !== undefined
+  const workspace = workspaceOverride
+    ?? { workspaceId: inherited.workspaceId, workspaceMetadata: inherited.workspaceMetadata }
   return Object.freeze({
     runtimeKind: resolveOverrideRuntimeKind(override, inherited.runtimeKind),
     workspaceId: workspace.workspaceId,
     workspaceMetadata: workspace.workspaceMetadata ? Object.freeze({ ...workspace.workspaceMetadata }) : null,
-    workspaceRootPath: workspace.workspaceMetadata?.workspaceRootPath?.trim() || null,
+    workspaceRootPath: hasWorkspaceOverride
+      ? workspace.workspaceMetadata?.workspaceRootPath?.trim() || null
+      : inherited.workspaceRootPath,
     llmModelIdentifier: resolveOverrideLlmModelIdentifier(override, inherited.llmModelIdentifier),
     llmConfig: resolveOverrideLlmConfig(override, inherited.llmConfig),
     autoExecuteTools: override?.autoExecuteTools ?? inherited.autoExecuteTools,
@@ -124,7 +126,7 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
         address: inputNode.address,
         displayName: inputNode.displayName,
         isCoordinator: inputNode.isCoordinator,
-        isCustomized: hasMeaningfulMemberOverride(override),
+        isCustomized: !resolvedTeamRunLaunchConfigsEqual(effectiveConfig, inputNode.baseline),
         override,
         baselineConfig: inputNode.baseline,
         effectiveConfig,
@@ -160,7 +162,16 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
         )
       }
       const teamOverride = input.teamOverrides[address]
-      const effectiveConfig = resolveConfig(input.rootConfig, teamOverride)
+      const resolvedConfig = resolveConfig(input.rootConfig, teamOverride)
+      const workspaceSelection = input.workspaceSelectionFor(address, resolvedConfig)
+      const effectiveConfig = workspaceSelection.mode === 'new' && workspaceSelection.newWorkspacePath.trim()
+        ? Object.freeze({
+            ...resolvedConfig,
+            workspaceId: null,
+            workspaceMetadata: null,
+            workspaceRootPath: workspaceSelection.newWorkspacePath.trim(),
+          })
+        : resolvedConfig
       const children = definition.nodes.map((node) => {
         const agentAddress = placementAddress(node.memberName, address)
         claim(agentAddress, 'Agent')
@@ -176,10 +187,10 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
         address,
         displayName: definition.name,
         effectiveConfig,
-        isCustomized: hasMeaningfulLaunchOverride(teamOverride),
+        isCustomized: !resolvedTeamRunLaunchConfigsEqual(effectiveConfig, input.rootConfig),
         inheritedConfig: input.rootConfig,
         override: teamOverride ?? null,
-        workspaceSelection: input.workspaceSelectionFor(address, effectiveConfig),
+        workspaceSelection,
         workspaceOperation: input.workspaceOperationFor(address),
         runtimeCatalogState: input.runtimeCatalogStateFor(effectiveConfig.runtimeKind),
       })

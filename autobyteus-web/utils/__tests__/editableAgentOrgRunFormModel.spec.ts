@@ -112,6 +112,51 @@ describe('projectEditableAgentOrgRunFormModel', () => {
     }))
   })
 
+  it('preserves an inherited new root workspace and labels only value-changing patches as customized', () => {
+    const newWorkspaceRoot = {
+      ...rootConfig,
+      workspaceId: null,
+      workspaceMetadata: null,
+      workspaceRootPath: '/workspace/new-root',
+    }
+    const model = readyModel({
+      rootConfig: newWorkspaceRoot,
+      teamOverrides: { '/software': { autoExecuteTools: false } },
+      agentOverrides: { '/software/implementation_engineer': { autoExecuteTools: false } },
+    })
+
+    expect(model.mountedTeams[1]!.scope).toEqual(expect.objectContaining({
+      isCustomized: false,
+      effectiveConfig: expect.objectContaining({ workspaceRootPath: '/workspace/new-root' }),
+      workspaceSelection: expect.objectContaining({ newWorkspacePath: '/workspace/new-root' }),
+    }))
+    expect(model.mountedTeams[1]!.children[1]).toEqual(expect.objectContaining({
+      isCustomized: false,
+      effectiveConfig: expect.objectContaining({ workspaceRootPath: '/workspace/new-root' }),
+    }))
+  })
+
+  it('projects a pending new Team workspace as the exact customized Team and Agent baseline', () => {
+    const model = readyModel({
+      teamOverrides: { '/software': { workspace: { workspaceId: null, workspaceMetadata: null } } },
+      workspaceSelectionFor: (address, effective) => address === '/software'
+        ? { mode: 'new', existingWorkspaceId: null, newWorkspacePath: '/workspace/software' }
+        : {
+            mode: effective.workspaceId ? 'existing' : 'new',
+            existingWorkspaceId: effective.workspaceId,
+            newWorkspacePath: effective.workspaceRootPath ?? '',
+          },
+    })
+
+    expect(model.mountedTeams[1]!.scope).toEqual(expect.objectContaining({
+      isCustomized: true,
+      effectiveConfig: expect.objectContaining({ workspaceRootPath: '/workspace/software' }),
+    }))
+    expect(model.mountedTeams[1]!.children[0]).toEqual(expect.objectContaining({
+      baselineConfig: expect.objectContaining({ workspaceRootPath: '/workspace/software' }),
+    }))
+  })
+
   it.each([
     ['missing Team', { getTeamDefinitionById: () => null }, 'MISSING_TEAM_DEFINITION', "cannot resolve Team '/product'"],
     ['duplicate Org address', { orgDefinition: { ...org, members: [...org.members, { ...org.members[0] }] } }, 'DUPLICATE_ADDRESS', "duplicate Agent address '/requirements_engineer'"],
