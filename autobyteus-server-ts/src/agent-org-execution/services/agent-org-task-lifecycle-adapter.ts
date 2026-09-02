@@ -1,6 +1,6 @@
 import type { RootTaskLifecycleAdapter, RootTaskActivationPreparation, PreparedRootTaskActivation } from "../../agent-collaboration/execution/task/root-task-lifecycle-adapter.js";
 import type { RootTaskLifecycleEvent } from "../../agent-collaboration/execution/task/root-task-lifecycle-event.js";
-import type { TaskDelegationRecordV1 } from "../../agent-collaboration/execution/task/task-delegation-record-v1.js";
+import type { TaskDelegationRecordV1, TaskExecutionReference } from "../../agent-collaboration/execution/task/task-delegation-record-v1.js";
 import { projectTaskAgentExecution, projectTaskTeamExecution } from "../../agent-collaboration/execution/task/task-execution-tree-projection.js";
 import type { CollaborationMemberExecutionIdentity, RootExecutionIdentity } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
 import { createRootExecutionPhysicalScope } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
@@ -44,6 +44,7 @@ export class AgentOrgTaskLifecycleAdapter implements RootTaskLifecycleAdapter<Re
     getIndex(): AgentOrgExecutionIndex;
     isOpen(): boolean;
     authorize(identity: CollaborationMemberExecutionIdentity): void;
+    beginTaskExecutionEventRetirement(reference: TaskExecutionReference): () => void;
     replaceState(tree: AgentOrgRunExecutionTreeSnapshot, tasks: AgentOrgTaskDelegationRecordsFileV1): void;
     publish(event: RootTaskLifecycleEvent): void;
     deliverSystemMessage(agentRunId: string, message: AgentInputUserMessage): Promise<AgentOperationResult>;
@@ -172,6 +173,7 @@ export class AgentOrgTaskLifecycleAdapter implements RootTaskLifecycleAdapter<Re
     }
     const runId = "agentRunId" in input.task.taskExecution ? input.task.taskExecution.agentRunId : input.task.taskExecution.teamRunId;
     let committed: ReturnType<PreparedTaskSettlement["commitAfterDurability"]> | null = null;
+    let finishEventRetirement = (): void => undefined;
     await this.options.persistence.commitTreeMutation({
       prepareAgainstCurrent: () => {
         const nextTree = settleAgentOrgTaskExecution({ tree: this.options.getTree(), taskExecutionRunId: runId, settledAt: input.settledAt });
@@ -179,6 +181,7 @@ export class AgentOrgTaskLifecycleAdapter implements RootTaskLifecycleAdapter<Re
           nextTree,
           cancelBeforeDurability: () => prepared!.cancelBeforeDurability(),
           commitAfterDurability: () => {
+            finishEventRetirement = this.options.beginTaskExecutionEventRetirement(input.task.taskExecution);
             committed = prepared!.commitAfterDurability();
             this.options.replaceState(nextTree, this.tasksEnvelope(input.currentRecords));
             this.options.publish(input.event);
@@ -192,6 +195,8 @@ export class AgentOrgTaskLifecycleAdapter implements RootTaskLifecycleAdapter<Re
     } catch (error) {
       this.options.enterLifecycleFailStop();
       throw error;
+    } finally {
+      finishEventRetirement();
     }
     return true;
   }

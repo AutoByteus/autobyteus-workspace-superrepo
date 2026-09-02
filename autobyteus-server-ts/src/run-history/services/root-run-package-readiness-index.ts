@@ -28,11 +28,15 @@ export type RootRunPackageReadinessDiagnostic = Readonly<{
   reason: string;
 }>;
 
-type ReadinessState = {
-  initialized: boolean;
+type ReadinessSnapshot = {
   admittedTeams: Set<string>;
   admittedOrgs: Set<string>;
   diagnostics: RootRunPackageReadinessDiagnostic[];
+};
+type ReadinessState = ReadinessSnapshot & {
+  initialized: boolean;
+  rebuildPromise: Promise<void> | null;
+  mutationRevision: number;
 };
 
 const states = new Map<string, ReadinessState>();
@@ -46,6 +50,8 @@ const stateFor = (memoryDir: string): ReadinessState => {
     admittedTeams: new Set(),
     admittedOrgs: new Set(),
     diagnostics: [],
+    rebuildPromise: null,
+    mutationRevision: 0,
   };
   states.set(key, created);
   return created;
@@ -109,6 +115,10 @@ export class RootRunPackageReadinessIndex {
   }
 
   isInitialized(): boolean { return this.state.initialized; }
+  awaitReady(): Promise<void> {
+    if (this.state.rebuildPromise) return this.state.rebuildPromise;
+    return this.state.initialized ? Promise.resolve() : this.rebuild();
+  }
 
   isAdmitted(rootSubjectKind: RootRunPackageFamily, rootRunId: string): boolean {
     const id = rootRunId.trim();
@@ -139,6 +149,7 @@ export class RootRunPackageReadinessIndex {
     own.add(id);
     this.state.diagnostics = this.state.diagnostics.filter((item) =>
       item.rootSubjectKind !== rootSubjectKind || item.rootRunId !== id);
+    this.state.mutationRevision += 1;
   }
 
   excludeCurrent(
@@ -154,14 +165,39 @@ export class RootRunPackageReadinessIndex {
     const packagePath = rootSubjectKind === "agent_team"
       ? this.layout.getTeamDirPath({ rootTeamRunId: id, ancestorTeamRunIds: [] })
       : this.layout.getOrgDirPath(id);
-    this.record(rootSubjectKind, id, packagePath, "ROOT_RUN_PACKAGE_CURRENT_VALIDATION_FAILED", reason);
+    this.record(this.state, rootSubjectKind, id, packagePath, "ROOT_RUN_PACKAGE_CURRENT_VALIDATION_FAILED", reason);
+    this.state.mutationRevision += 1;
   }
 
-  async rebuild(): Promise<void> {
-    this.state.initialized = true;
-    this.state.admittedTeams.clear();
-    this.state.admittedOrgs.clear();
-    this.state.diagnostics = [];
+  rebuild(): Promise<void> {
+    if (this.state.rebuildPromise) return this.state.rebuildPromise;
+    const attempt = this.rebuildUntilStable();
+    this.state.rebuildPromise = attempt;
+    void attempt.finally(() => {
+      if (this.state.rebuildPromise === attempt) this.state.rebuildPromise = null;
+    }).catch(() => undefined);
+    return attempt;
+  }
+
+  private async rebuildUntilStable(): Promise<void> {
+    while (true) {
+      const revision = this.state.mutationRevision;
+      const candidate = await this.buildSnapshot();
+      if (revision !== this.state.mutationRevision) continue;
+      this.state.admittedTeams = candidate.admittedTeams;
+      this.state.admittedOrgs = candidate.admittedOrgs;
+      this.state.diagnostics = candidate.diagnostics;
+      this.state.initialized = true;
+      return;
+    }
+  }
+
+  private async buildSnapshot(): Promise<ReadinessSnapshot> {
+    const candidate: ReadinessSnapshot = {
+      admittedTeams: new Set(),
+      admittedOrgs: new Set(),
+      diagnostics: [],
+    };
 
     const [teamEntries, orgEntries] = await Promise.all([
       this.listFamilyEntries(this.layout.getTeamRootDirPath()),
@@ -175,28 +211,30 @@ export class RootRunPackageReadinessIndex {
       const team = teamById.get(rootRunId);
       const org = orgById.get(rootRunId);
       if (team && org) {
-        this.record("agent_team", rootRunId, team.packagePath, "ROOT_RUN_FAMILY_CONFLICT",
+        this.record(candidate, "agent_team", rootRunId, team.packagePath, "ROOT_RUN_FAMILY_CONFLICT",
           `RootRun '${rootRunId}' exists in both agent_teams and agent_orgs; neither family is admitted.`);
-        this.record("agent_org", rootRunId, org.packagePath, "ROOT_RUN_FAMILY_CONFLICT",
+        this.record(candidate, "agent_org", rootRunId, org.packagePath, "ROOT_RUN_FAMILY_CONFLICT",
           `RootRun '${rootRunId}' exists in both agent_teams and agent_orgs; neither family is admitted.`);
         continue;
       }
-      if (team) await this.inspectTeam(rootRunId, team);
-      if (org) await this.inspectOrg(rootRunId, org);
+      if (team) await this.inspectTeam(candidate, rootRunId, team);
+      if (org) await this.inspectOrg(candidate, rootRunId, org);
     }
+    return candidate;
   }
 
   private async inspectTeam(
+    target: ReadinessSnapshot,
     rootRunId: string,
     entry: Readonly<{ packagePath: string; isDirectory: boolean }>,
   ): Promise<void> {
     if (!entry.isDirectory) {
-      this.record("agent_team", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_NOT_DIRECTORY", "Package root is not a directory.");
+      this.record(target, "agent_team", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_NOT_DIRECTORY", "Package root is not a directory.");
       return;
     }
     const manifestError = await this.validateManifest(entry.packagePath, requiredTeamFiles, retiredTeamFiles);
     if (manifestError) {
-      this.record("agent_team", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_MANIFEST_INVALID", manifestError);
+      this.record(target, "agent_team", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_MANIFEST_INVALID", manifestError);
       return;
     }
     try {
@@ -209,23 +247,24 @@ export class RootRunPackageReadinessIndex {
         throw new Error("Team Run V2 tree and both strict Team sidecars are required.");
       }
       validateTeamRunStatePackage({ executionTree, taskRecords, communicationMessages });
-      this.state.admittedTeams.add(rootRunId);
+      target.admittedTeams.add(rootRunId);
     } catch (error) {
-      this.record("agent_team", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_CURRENT_VALIDATION_FAILED", message(error));
+      this.record(target, "agent_team", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_CURRENT_VALIDATION_FAILED", message(error));
     }
   }
 
   private async inspectOrg(
+    target: ReadinessSnapshot,
     rootRunId: string,
     entry: Readonly<{ packagePath: string; isDirectory: boolean }>,
   ): Promise<void> {
     if (!entry.isDirectory) {
-      this.record("agent_org", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_NOT_DIRECTORY", "Package root is not a directory.");
+      this.record(target, "agent_org", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_NOT_DIRECTORY", "Package root is not a directory.");
       return;
     }
     const manifestError = await this.validateManifest(entry.packagePath, requiredOrgFiles, retiredOrgFiles);
     if (manifestError) {
-      this.record("agent_org", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_MANIFEST_INVALID", manifestError);
+      this.record(target, "agent_org", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_MANIFEST_INVALID", manifestError);
       return;
     }
     try {
@@ -238,9 +277,9 @@ export class RootRunPackageReadinessIndex {
         throw new Error("AgentOrg Run V1 tree and both strict Org sidecars are required.");
       }
       validateAgentOrgStatePackage({ executionTree, taskRecords, communicationMessages });
-      this.state.admittedOrgs.add(rootRunId);
+      target.admittedOrgs.add(rootRunId);
     } catch (error) {
-      this.record("agent_org", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_CURRENT_VALIDATION_FAILED", message(error));
+      this.record(target, "agent_org", rootRunId, entry.packagePath, "ROOT_RUN_PACKAGE_CURRENT_VALIDATION_FAILED", message(error));
     }
   }
 
@@ -277,13 +316,14 @@ export class RootRunPackageReadinessIndex {
   }
 
   private record(
+    target: ReadinessSnapshot,
     rootSubjectKind: RootRunPackageFamily,
     rootRunId: string,
     packagePath: string,
     code: RootRunPackageReadinessDiagnostic["code"],
     reason: string,
   ): void {
-    this.state.diagnostics.push(Object.freeze({ rootSubjectKind, rootRunId, packagePath, code, reason }));
+    target.diagnostics.push(Object.freeze({ rootSubjectKind, rootRunId, packagePath, code, reason }));
   }
 }
 

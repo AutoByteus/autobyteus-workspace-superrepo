@@ -31,6 +31,7 @@ import { CollaborationAgentPresentationEventAdapter } from "../../agent-collabor
 import type { FrozenTeamRunTerminationScope } from "../../agent-team-execution/domain/frozen-team-run-termination-scope.js";
 import type { ConfiguredAgentExecutionHandle } from "../../agent-collaboration/execution/backends/configured-agent-execution-handle.js";
 import { AgentOrgOperationGate } from "./agent-org-operation-gate.js";
+import type { TaskExecutionReference } from "../../agent-collaboration/execution/task/task-delegation-record-v1.js";
 
 export type AgentOrgRunPackageSnapshot = Readonly<{
   tree: AgentOrgRunExecutionTreeSnapshot;
@@ -55,6 +56,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   private readonly communication: RootCommunicationEngine;
   private readonly presentation: CollaborationAgentPresentationEventAdapter;
   private readonly operationGate: AgentOrgOperationGate;
+  private readonly retiringAgentEvents = new Map<string, CollaborationMemberExecutionIdentity>();
   private termination: Promise<AgentOperationResult> | null = null;
   private frozenTerminationScope: FrozenAgentOrgTerminationScope | null = null;
 
@@ -98,6 +100,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
       getIndex: () => this.index,
       isOpen: () => this.isAdmitting(),
       authorize: (identity) => this.authorizeCurrentIdentity(identity),
+      beginTaskExecutionEventRetirement: (reference) => this.beginTaskExecutionEventRetirement(reference),
       replaceState: (tree, tasks) => this.replaceTaskState(tree, tasks),
       publish: (event) => options.publisher.publish({ kind: "task", event }),
       deliverSystemMessage: (agentRunId, message) => this.postMessageToAgent(agentRunId, message),
@@ -240,6 +243,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
 
   onAgentExecutionEvent(identity: CollaborationMemberExecutionIdentity, event: CollaborationAgentExecutionEvent): void {
     if (!sameRootExecutionIdentity(identity.root, this.options.root)) throw new Error("AgentOrg event belongs to another root.");
+    if (this.isCommittedTeardownStatus(identity, event)) return;
     const adapted = this.presentation.adapt(identity, event);
     if (adapted.kind === "rejected") {
       this.enterFailStop();
@@ -360,6 +364,45 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     return agent.host.hostKind === "root"
       ? this.options.rootAgents.executeCommand(agentRunId, { kind: "post_message", message })
       : this.options.teams.require(agent.host.hostRunId).executeDirectAgentCommand(agentRunId, { kind: "post_message", message });
+  }
+
+  private beginTaskExecutionEventRetirement(reference: TaskExecutionReference): () => void {
+    const execution = this.index.getTaskExecution(reference);
+    if (!execution) throw new Error("Task execution event retirement target is not live in this AgentOrg.");
+    const agents = execution.kind === "agent"
+      ? [this.index.requireAgent(execution.agentRunId)]
+      : this.index.listAgents().filter((agent) => agent.host.hostKind === "team"
+        && this.index.listTeamAncestorsDeepestFirst(agent.host.hostRunId)
+          .some((team) => team.teamRunId === execution.teamRunId));
+    const retired = agents.map((agent) => this.identityFor(agent.agentRunId, agent.address));
+    for (const identity of retired) {
+      const current = this.retiringAgentEvents.get(identity.agentRunId);
+      if (current && !sameCollaborationMemberExecutionIdentity(current, identity)) {
+        throw new Error(`AgentRun '${identity.agentRunId}' already has a different event-retirement identity.`);
+      }
+      this.retiringAgentEvents.set(identity.agentRunId, identity);
+    }
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      for (const identity of retired) {
+        const current = this.retiringAgentEvents.get(identity.agentRunId);
+        if (current && sameCollaborationMemberExecutionIdentity(current, identity)) {
+          this.retiringAgentEvents.delete(identity.agentRunId);
+        }
+      }
+    };
+  }
+
+  private isCommittedTeardownStatus(
+    identity: CollaborationMemberExecutionIdentity,
+    event: CollaborationAgentExecutionEvent,
+  ): boolean {
+    const retired = this.retiringAgentEvents.get(identity.agentRunId);
+    return event.kind === "agent_run"
+      && event.event.eventType === "AGENT_STATUS"
+      && Boolean(retired && sameCollaborationMemberExecutionIdentity(retired, identity));
   }
 
   executeAgentCommand(agentRunId: string, command: TeamMemberExecutionCommand): Promise<AgentOperationResult> {

@@ -12,6 +12,7 @@ export class TeamRunPackageCatalog {
   }
 
   isInitialized(): boolean { return this.readiness.isInitialized(); }
+  awaitReady(): Promise<void> { return this.readiness.awaitReady(); }
   isAdmitted(rootTeamRunId: string): boolean {
     return this.readiness.isAdmitted("agent_team", rootTeamRunId);
   }

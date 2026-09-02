@@ -16,6 +16,7 @@ export class AgentOrgRunPackageCatalog {
   }
 
   isInitialized(): boolean { return this.readiness.isInitialized(); }
+  awaitReady(): Promise<void> { return this.readiness.awaitReady(); }
   isAdmitted(id: string): boolean { return this.readiness.isAdmitted("agent_org", id); }
   listAdmitted(): string[] { return [...this.readiness.listAdmitted("agent_org")]; }
   listDiagnostics(): readonly AgentOrgRunPackageDiagnostic[] {
