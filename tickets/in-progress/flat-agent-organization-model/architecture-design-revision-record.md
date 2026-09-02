@@ -17,6 +17,7 @@ does not revise intended behavior.
 | AD-REV-007 | API/E2E `API-FIND-007`, Code Review `CRR-009` / `CR-FIND-011`, and Requirements Engineer approved `RER-021` with focused Product `AORG-FLAT-TEAM-STATUS-001` / Product-baseline-impact recovery round | `API-FIND-007`, `CR-FIND-011` | `Architecture Revision — Mounted-Team Aggregate Status Projection` | `Architecture Design Complete`; focused Product gap mapped to an exact presentation-only Team-branch projection; self-validation expanded to 25 cases; focused delta `Medium/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-008 | Code Review `CRR-012/013` and API/E2E `API-FIND-008` exact correlated settlement probe / architecture-held Unclear recovery round | `API-FIND-008`, `CR-CAND-020` | `Architecture Revision — Non-Blocking Terminal Task Settlement And Interrupt-Before-Drain Shutdown` | `Architecture Design Complete`; exact liveness cycle classified and resolved at design boundary; self-validation expanded to 29 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-009 | Architecture Reviewer `ARCH-REV-006` / `AR-FIND-003` supported-reachability review of AD-REV-008 | `AR-FIND-003`, `AR-PREM-004`, `AR-PREM-005`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — Supported Quiescence Deferral And Interrupt-Before-Drain Shutdown` | `Architecture Design Complete`; AD-REV-008 coordinator/token machinery withdrawn; supported production reachability and proportional correction self-validated across 29 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-010 | Architecture Reviewer `ARCH-REV-007` / `AR-FIND-004` supported shutdown-race review of AD-REV-009 | `AR-FIND-004`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — AgentRun Root-Shutdown Admission And Provider-Start Fence` | `Architecture Design Complete`; supported pre-`TURN_STARTED` race receives one AgentRun-owned fence over stable recursive Team/Org scopes; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -666,3 +667,122 @@ does not revise intended behavior.
   are specified and self-validated but still require independent Architecture
   Review, implementation, source review and correlated executable validation;
   this architecture-only revision claims no runtime fix.
+
+### AD-REV-010 — AgentRun Root-Shutdown Admission And Provider-Start Fence
+
+- Triggering role, report path, and round: Architecture Reviewer
+  `ARCH-REV-007@6cec1ee1b` failed AD-REV-009 under `AR-FIND-004`. The reviewer
+  accepted AD-REV-009's supported normal submit/independent-accept overlap,
+  non-waiting prepared-or-null settlement, and interrupt-before-task-drain
+  direction, but identified a supported gap before canonical `TURN_STARTED`.
+  Canonical review inputs are
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+  and
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`.
+  This is the architecture-review recovery round for the Agent input/provider-
+  start shutdown race.
+- Triggering finding IDs: `AR-FIND-004`, with retained downstream identifiers
+  `API-FIND-008` / `CR-CAND-020`. `AR-FIND-003` is resolved. The finding
+  introduces no Requirement Gap, Product UI gap, migration, schema, API, task-
+  state, or provider-policy change.
+- Prior authoritative design result: `AD-REV-009`, Architecture Design
+  Complete, at commit `cd75bcdbfb97fd1707c5954db43dbbac65844da6`;
+  independent Architecture Review `ARCH-REV-007` is `Fail — Design Impact` only
+  for `AR-FIND-004`. `AD-REV-007` remains the latest fully passed cumulative
+  design baseline until this revision passes another independent review.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as `AD-REV-010` and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Supported reachability and current-state evidence: normal task activation
+  durably commits and asynchronously releases its initial input. Current
+  `AgentRun.postUserMessage()` claims input under its dispatch queue, then calls
+  provider dispatch after the queue closure; canonical `TURN_STARTED` can arrive
+  later. Application SIGTERM is an established supported operational input. The
+  current root wrapper can therefore call active-turn interruption in that
+  interval, receive `NO_ACTIVE_TURN`, treat the phase as complete, and permit
+  provider work to start afterward. Inspection of
+  `origin/personal@773bce779` shows the same latent claim/start versus active-turn
+  gap: prior tests covered already-active approval waits or mocked root
+  interruption, but did not place a shutdown barrier between provider dispatch
+  and `TURN_STARTED`. Its AgentRun FIFO-drain test also establishes that ordinary
+  non-root termination must continue draining admitted input rather than adopt
+  shutdown cancellation semantics.
+- Why this revision is recorded: AD-REV-010 adds exactly one irreversible,
+  idempotent, root-shutdown-only AgentRun boundary,
+  `fenceInputAndInterruptForRootShutdown()`. The AgentRun dispatch owner orders
+  input claim/provider-start registration and the fence. If the fence wins, a
+  never-admitted reservation is invalidated without a lifecycle fact and an
+  admitted but never-forwarded entry emits the existing
+  `AGENT_RUN_TERMINATED_BEFORE_INPUT_FORWARD` cancellation exactly once; no
+  backend call may follow. If provider start wins, AgentRun retains a tracked
+  dispatch slot, arms shutdown intent, and resolves only after the existing
+  canonical start/interrupt/failure/terminal path. Active turns and approval
+  waits join the same existing interrupt result. The method neither invents a
+  turn nor treats `NO_ACTIVE_TURN` as success while admitted/provider-start-
+  pending work exists.
+- Root composition and ownership decision: Team's existing operation/
+  materialization gate and frozen local scope stabilize configured, task,
+  prepared, and recursive task-Team handles. AgentOrg adds private equivalents
+  that compose direct configured/task/prepared Agent handles with every mounted
+  or root-task Team frozen scope without creating a generic root or mounted-Team
+  lifecycle. Each Team/Org root closes external admission, drains only already-
+  admitted handle/input-publication work needed for a stable scope, freezes that
+  exact scope, completes every per-Agent fence, and only then drains task
+  commands/settlement, persists interruption, performs existing deepest-first
+  prepared-or-null cleanup, drains persistence, and unregisters. The frozen
+  scopes own enumeration only; configured handles forward the capability;
+  AgentRun alone owns admission, provider-start, turn, interrupt, and lifecycle
+  facts.
+- Proportionality and compatibility decision: ordinary
+  `AgentRun.prepareTermination()` retains its FIFO-draining behavior, and
+  `tryPrepareTerminationIfQuiescent()` retains AD-REV-009's non-waiting
+  settlement behavior. A later prepared-settlement cancel cannot reopen a run
+  whose root-shutdown latch is set. No coordinator, token, job, second queue,
+  timeout, replay, force-kill, self-review support, persisted shutdown state,
+  new task record/status, provider contract, schema, sidecar, API, Product or
+  migration mechanism is introduced.
+- Approved behavior or requirement IDs affected: implementation/liveness path
+  for `BEH-009`, `REQ-015`, and `AC-010`, plus the established normal Team/Org
+  task lifecycle and graceful application-shutdown behavior. Intended behavior,
+  durable contracts, task tools/results, Product experience, and migration
+  remain unchanged.
+- Design-spec sections updated: document status and chronology; classification;
+  evidence; supported shutdown scenario; AD-REV-010 AgentRun fence; root phase
+  sequence; `DS-015` and `DS-022`; ownership, interface, dependency, file and
+  removal maps; change sequence; tradeoffs; risks; implementation guidance; and
+  deterministic validation expectations.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` was revised from AD-REV-009 to
+  AD-REV-010. It retains the same 29 supported cases and expands `VAL-027` into
+  two independent supported subcases: normal task activation with application
+  SIGTERM before `TURN_STARTED`, and an already-active legitimate approval wait.
+  It checks the exact Agent input-state dispositions, provider-start/fence
+  ordering, stable recursive Team/Org scope, cancellation versus canonical
+  terminal facts, no reopen, no post-fence provider call, and preservation of
+  ordinary FIFO-draining termination. Requirements, Product, review,
+  implementation, Code Review, and API/E2E artifacts remain read-only.
+- Downstream and architecture-review impact: the focused AD-REV-010 correction
+  is `Medium / High` because it is bounded to AgentRun admission/dispatch/
+  interrupt state, root-neutral configured handles, frozen Team/Org scope and
+  root shutdown phase ordering, while remaining material to concurrency,
+  fail-stop and shutdown. The cumulative ticket remains `Large / High`;
+  independent Architecture Review is mandatory. Review must verify that every
+  configured/task/prepared/recursive AgentRun is in the stable scope, the same
+  AgentRun owner serializes provider-start registration against the fence, each
+  input state produces only an existing valid fact, no provider work starts
+  after fence completion, task/settlement drain follows the fence, and ordinary
+  termination behavior is unchanged.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of the
+  cumulative `RER-021` / Product authorities / `AD-REV-010` package.
+  Implementation and API/E2E remain held on the impacted path until review
+  passes and the reviewed design is reconciled in source.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, schema, migration
+  or public-contract gap remains. Residual risk is concentrated in atomic
+  claim/provider-start/fence ordering, lifecycle-fact uniqueness, publication-
+  gate completeness, immutable recursive scope enumeration, root-fence versus
+  prepared-cancel interaction, and both Team/Org phase orderings. The design and
+  29-case self-validation specify controls and executable witnesses, but this
+  architecture-only revision claims no runtime fix, source validation, or
+  delivery readiness.

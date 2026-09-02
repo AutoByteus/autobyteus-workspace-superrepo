@@ -3,13 +3,13 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-009`
+- Architecture revision validated: `AD-REV-010`
 - Requirements authority: `RER-021` (approved BEH-011/REQ-028/AC-023/SCN-012 status supplement; prior runtime/durable behavior unchanged)
 - Product authority: `RV-012` / `VIS-001`-`VIS-020`; focused `AORG-FLAT-TEAM-STATUS-001` / `VIS-STATUS-001`-`VIS-STATUS-003`
-- Trigger: `ARCH-REV-006` / `AR-FIND-003` supported-reachability review of
-  `AD-REV-008`, while retaining the user-requested use-case/data-flow/ownership/
-  boundary/dependency self-validation discipline
-- Date: 2026-09-01
+- Trigger: `ARCH-REV-007` / `AR-FIND-004` supported pre-`TURN_STARTED`
+  Agent input/provider-start shutdown race, while retaining the user-requested
+  use-case/data-flow/ownership/boundary/dependency self-validation discipline
+- Date: 2026-09-02
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
 
@@ -37,7 +37,7 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-006` / `AR-FIND-003`)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-007` / `AR-FIND-004`; `AR-FIND-003` resolved)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -58,6 +58,10 @@ Inputs:
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-STATUS-001/visual-references/visual-reference-manifest.json`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` (`CRR-013`; retained `CRR-009` / `CR-FIND-011` history and `CR-CAND-020` hold)
 - `origin/personal@773bce779` implementations of `workspaceHistoryNestedTeamStatus.ts`, `NestedTeamAggregateStatusDot.vue`, and `WorkspaceTeamExecutionTree.vue` (inspected with `git show`; continuity evidence only)
+- `origin/personal@773bce779` implementations of `agent-run.ts`,
+  `agent-run-input-admission-state.ts`, Team frozen/root termination, and the
+  AgentRun FIFO-drain test; commits `1e7837929` / `f7d65ad75` (latent-shutdown-
+  gap and preserved ordinary-termination evidence)
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md`
 
 ## Universal Invariants Used By Every Walkthrough
@@ -81,7 +85,8 @@ Inputs:
 | Member presentation does not own root lifecycle | Org stop lives on active Org history root row; focused member and mounted Team have no root-stop action | Pass |
 | Mounted Team status is pure presentation | Exact configured/task descendant Agent statuses fold `running > initializing > error > idle > offline`; collapse does not alter input; historical live-only/missing values are offline; no status/lifecycle/API owner is added | Pass |
 | Settlement never waits for a non-quiescent execution | The existing one root FIFO and existing terminal sweep remain; exact handles offer non-waiting quiescence preparation, return deferred immediately while a turn/approval is live, and rely on the existing Agent idle/offline resweep | Pass |
-| Root shutdown interrupts before task drains | Team and Org close/freeze their complete scope and interrupt active provider turns before waiting for task command or settlement drains | Pass |
+| Root shutdown fences input/provider starts before task drains | Team and Org stabilize and freeze their complete direct/mounted/task/prepared scope, then every AgentRun closes admission, cancels pre-forward work or tracks and interrupts provider-started work through terminal state before task command/settlement drain | Pass |
+| AgentRun fence and ordinary termination stay distinct | Root shutdown is irreversible and may use the existing pre-forward cancellation fact; ordinary prepared termination still drains admitted FIFO input and a prepared cancel cannot reopen a root-fenced run | Pass |
 
 ## Identity And Physical-Scope Truth Table
 
@@ -136,7 +141,7 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-024 | SCN-012; REQ-028; AC-023; VIS-STATUS-002 | Collapsed mounted Team retains reactive aggregate and exact branch isolation | DS-020, DS-021 | Pass |
 | VAL-025 | SCN-012; REQ-028; AC-023; VIS-STATUS-003 | Stopped/history Team aggregate loses live-only state and adds no lifecycle authority | DS-020 | Pass |
 | VAL-026 | REQ-015; AC-010; supported submit plus independent authorized accept traces | Accepted task settlement overlaps its assignee's still-finishing normal provider turn while an unrelated supported task command arrives | DS-005, DS-022 | Pass |
-| VAL-027 | Existing Team/Org graceful-shutdown contract; supported approval-gated tool and application SIGTERM | Team and Org shutdown while a normal task Agent awaits tool approval | DS-015, DS-022 | Pass |
+| VAL-027 | Existing Team/Org graceful-shutdown contract; normal task activation; supported approval-gated tool and application SIGTERM | Team and Org shutdown across both pre-`TURN_STARTED` provider-start race and active approval wait | DS-015, DS-022 | Pass |
 | VAL-028 | Existing task mutation durability/fail-stop contract | Existing prepared settlement failure before versus after durability | DS-006T/O, DS-022 | Pass |
 | VAL-029 | PRE-005; REQ-015 | Recursive task-Team all-or-none quiescence preparation and deepest-first settlement | DS-005, DS-022 | Pass |
 
@@ -335,9 +340,10 @@ package-family rename. It does not infer logical topology from directory depth.
   admission`.
 - **Shutdown spine:** process visits `Org roots -> standalone Team roots ->
   residual AgentRuns`. Each root performs `close all external/materialization/
-  message admission -> freeze complete direct/mounted/task scope -> interrupt
-  every active provider turn -> drain short task mutations -> durably interrupt
-  open task records -> drain deepest-first settlement cleanup -> drain
+  message admission -> drain admitted publication operations only -> freeze
+  complete direct/mounted/task/prepared scope -> complete every AgentRun input/
+  provider-start/interrupt fence -> drain short task mutations -> durably
+  interrupt open task records -> drain deepest-first settlement cleanup -> drain
   persistence -> finish/unregister local execution`; then process releases
   services/directory/tool resources in reverse.
 - **Owners:** GeneralProcessRunSupervisor owns ordering; subject managers own
@@ -348,7 +354,7 @@ package-family rename. It does not infer logical topology from directory depth.
 - **Application specialization:** application scope constructs no Org manager and
   retains Team -> Agent shutdown while using the extracted factories.
 - **Rejected shortcut:** Team manager registers embedded Org Teams, root shutdown
-  drains commands/settlements before interrupting its provider turns, or process
+  drains commands/settlements before completing every Agent fence, or process
   stops residual AgentRuns before the roots that own them.
 - **Result:** Pass.
 
@@ -699,32 +705,63 @@ package-family rename. It does not infer logical topology from directory depth.
   and terminal record/tool semantics remain unchanged.
 - **Result:** Pass.
 
-### VAL-027 — Supported Approval Wait Is Interrupted Before Root Task Drain
+### VAL-027 — Root Shutdown Fences Pre-Turn Input And Active Approval Waits
 
-- **Trigger:** with normal auto-approval disabled, a supported task Agent invokes
-  an approval-gated tool and waits for the user; the application then receives
-  its supported SIGTERM/shutdown action.
-- **Production evidence:** the accepted Agent runtime integration test proves
-  that interrupting a pending tool approval produces a terminal tool lifecycle;
-  `server-runtime.ts` owns SIGTERM dispatch. This does not rely on PTY Ctrl-C,
-  SIGKILL, self-review, or the confounded API trace.
-- **Primary spine:** `application SIGTERM -> GeneralProcessRunSupervisor -> Team/
-  Org manager -> root closes external, message and task-materialization admission
-  -> freeze complete configured/mounted/task scope -> interrupt every active
-  AgentRun (including approval wait) -> drain existing task FIFO -> persist
-  active/awaiting_review task interruption -> existing deepest-first terminal
-  sweep -> persistence drain -> finish/unregister local handles -> manager
-  unregister`; process continues Org -> Team -> residual Agent.
+- **Supported trigger A — pre-turn window:** a normal member delegates a task.
+  Its durable activation commits and `releaseWork()` asynchronously posts the
+  initial task message. Independently, application SIGTERM arrives after the
+  exact AgentRun has admitted/claimed or registered provider start but before a
+  canonical `TURN_STARTED` is visible.
+- **Supported trigger B — active wait:** with normal auto-approval disabled, a
+  supported task Agent invokes an approval-gated tool and waits; application
+  SIGTERM then enters the same shutdown path.
+- **Production evidence:** task Agent/Team registries queue the normal initial
+  post after activation; AgentRun currently claims under its dispatch queue but
+  starts outside that closure; `server-runtime.ts` owns SIGTERM; the accepted
+  runtime test proves interrupt terminalizes pending tool approval. No PTY
+  Ctrl-C, SIGKILL, self-review, hidden mutation, or invalid task action is used.
+- **Primary spine:** `delegate_task -> root task engine -> durable activation ->
+  releaseWork -> AgentRun admission/provider-start slot`, concurrent with
+  `application SIGTERM -> GeneralProcessRunSupervisor -> Team/Org manager ->
+  root closes external admission -> drain admitted publication operations only
+  -> freeze exact direct/mounted/task/prepared scope -> recursively invoke
+  fenceInputAndInterruptForRootShutdown -> terminal Agent input/turn -> drain
+  task FIFO -> persist open-task interruption -> deepest-first settlement ->
+  persistence/local finish -> root unregister`; process continues Org -> Team ->
+  residual Agent.
+- **Bounded AgentRun spine:** `dispatch queue orders provider-start transition
+  versus root fence -> fence wins: reserved invalidation or exact pre-forward
+  cancelled fact and no backend call; provider start wins: tracked slot + armed
+  shutdown intent -> canonical TURN_STARTED -> existing interrupt -> canonical
+  interrupted/error terminal -> fence resolves`. Active approval wait enters the
+  same latter branch directly.
+- **State/fact check:** never-admitted reservation emits no lifecycle; admitted
+  pre-forward work emits exactly one existing
+  `AGENT_RUN_TERMINATED_BEFORE_INPUT_FORWARD` cancellation; provider-started work
+  is not mislabeled cancelled and finishes through existing forward/association/
+  interrupt/failure facts. No backend call can occur after fence completion.
+- **Stable-scope check:** Team's operation/materialization gate and Org's private
+  equivalent close before snapshot. Frozen scopes include active and prepared
+  direct/task handles plus every mounted/root-task/recursive task-Team scope. No
+  handle capable of later publication is omitted, and this short publication
+  drain is not terminal task settlement.
 - **Owners:** the process supervisor owns cross-root sequencing; each subject root
-  owns phase ordering; `AgentRun` owns approval interruption and terminal event
-  emission; the existing task engine/adapter owns settlement and durability.
-- **Boundary check:** the supervisor calls only subject managers. Each root walks
-  its already-owned execution scope and interrupts before invoking task drain;
-  neither supervisor nor task engine reaches into provider/MCP internals.
-- **Rejected shortcut:** drain before interrupt, add a shutdown timeout/force
-  kill, or treat process-group death as graceful completion.
-- **Outcome:** supported shutdown cannot wait on the approval that only its later
-  interrupt would release.
+  owns close/freeze/drain order; frozen scopes own immutable enumeration only;
+  `AgentRun` owns input/start/turn/interrupt decisions and exact facts; the task
+  engine/adapter owns record settlement and durability.
+- **Boundary check:** supervisor -> subject manager -> subject root -> frozen
+  scope -> configured handle -> AgentRun. No caller uses root plus AgentRun
+  internals; no task engine/provider/MCP bypass exists.
+- **Retry/cancellation check:** the Agent fence is idempotent and irreversible.
+  Root retry joins it. If a later prepared settlement cancels before durability,
+  it cannot reopen Agent input. Ordinary non-root prepared termination continues
+  draining admitted FIFO input exactly as origin/personal tests require.
+- **Rejected shortcut:** active-turn-only `NO_ACTIVE_TURN` success, task drain
+  before fence, timeout/replay/force kill, persisted shutdown/settling state,
+  coordinator/token/job graph, or treating process-group death as graceful.
+- **Outcome:** root shutdown cannot miss provider work in the pre-turn window,
+  cannot wait on an approval that only later interruption would release, and
+  does not change ordinary input or durable task semantics.
 - **Result:** Pass.
 
 ### VAL-028 — Existing Prepared Settlement Failure Boundary Remains Monotonic
@@ -789,6 +826,10 @@ package-family rename. It does not infer logical topology from directory depth.
 | Flat Team local factory | configured Agent factory + explicit root callbacks | root package/manager registration | Pass |
 | RootTaskLifecycleEngine / mutation FIFO | one subject adapter with nullable prepared settlement | subject tree/index/store/event imports or any wait on a non-quiescent execution | Pass |
 | AgentRun quiescence boundary | `tryPrepareTerminationIfQuiescent` under AgentRun input/turn authority | root task/tree/store knowledge or blocking provider wait | Pass |
+| Subject root shutdown | stable frozen Team/Org scope | AgentRun admission/dispatch internals or provider/MCP direct calls | Pass |
+| Frozen Team/Org scope | configured-handle `fenceForRootShutdown` | AgentRun state inspection, task persistence, root registration, or mounted-Team lifecycle | Pass |
+| Configured Agent root fence forwarding | `AgentRun.fenceInputAndInterruptForRootShutdown` | converting `NO_ACTIVE_TURN` to completion or duplicating admission policy | Pass |
+| AgentRun root-shutdown boundary | same dispatch/input/turn owner plus existing lifecycle facts | subject root/task/store identity, timeout/replay, second queue or persisted phase | Pass |
 | Global exact-Agent router | AgentRunManager + ActiveCollaborationRootDirectory | Team and Org managers together | Pass |
 | Mixed projection | explicit subject query boundaries | subject stores/files plus manager | Pass |
 | GeneralProcessRunSupervisor | subject managers/services | local Team/Agent handles | Pass |
@@ -834,8 +875,11 @@ Task mutation FIFO -> subject adapter -> local registry -> non-waiting AgentRun 
 Task mutation FIFO -X-> blocking provider/backend/MCP/local registry teardown
 AgentRun quiescence boundary -X-> Team/Org tree/store/index/manager
 Non-quiescent preparation -> null/deferred -> FIFO release -> existing idle/offline resweep
-Root shutdown -> freeze/interrupt full scope -> task command drain -> settlement drain
-Task command/settlement drain -X-> pre-interrupt root shutdown position
+Root shutdown -> close/drain publication gate -> freeze stable full scope -> frozen scope -> configured handle -> AgentRun root fence -> task command drain -> settlement drain
+AgentRun root fence -> same dispatch owner orders input claim/provider start/fence -> existing cancellation or canonical interrupt/terminal facts
+AgentRun root fence -X-> root/task/store identity, timeout/replay, persisted state
+Task command/settlement drain -X-> pre-fence root shutdown position
+Provider backend start -X-> after completed AgentRun fence
 ```
 
 No upward bypass is needed in any validated use case. The active-root directory
@@ -865,7 +909,11 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Prepared settlement write fails before durability | Subject task adapter + local prepared termination | cancel every prepared handle in reverse; retain tree/index/active handle; release FIFO and allow ordinary resweep | No durable or partial admission authority | Pass |
 | Terminal fence commits but prepared finish rejects | Subject adapter + subject root | report failure and enter whole-root fail-stop; never reopen/replay task | No terminal-task resurrection | Pass |
 | Terminal task execution is not quiescent while unrelated task command arrives | AgentRun quiescence boundary + mutation FIFO | preparation returns null without waiting; release FIFO; unrelated command commits; existing idle/offline event retries settlement | No global task-lane starvation | Pass |
-| Root shutdown begins with provider approval wait | Subject root + AgentRun | close/freeze and interrupt full scope before any task drain; then drain commands/settlements and finish | No interrupt-after-wait cycle | Pass |
+| Root shutdown begins with provider approval wait | Subject root + AgentRun | stabilize/freeze exact scope and complete every Agent fence before any task drain; active wait joins existing interrupt and terminal facts | No fence-after-wait cycle | Pass |
+| Root shutdown reaches AgentRun after admission/claim but before provider start | AgentRun | root fence wins dispatch serialization, invalidates/cancels exact pre-forward entry, and makes queued start a no-op | No provider call or invented turn | Pass |
+| Provider start wins serialization but `TURN_STARTED` has not arrived | AgentRun | retain tracked slot and shutdown intent; on canonical start reserve existing interrupt; resolve only after failure/non-forwarding or terminal turn | No false `NO_ACTIVE_TURN` success | Pass |
+| Prepared settlement cancel follows root fence | AgentRun + local registry | preserve root latch and closed admission; reverse local preparation without reopen; root retry joins fence | No post-shutdown input admission | Pass |
+| Admitted root operation can still publish a handle during freeze | Subject operation/materialization gate | close and drain that bounded publication operation before snapshot; include active+prepared handle | No omitted live execution | Pass |
 | Repeated settlement sweep sees the same non-quiescent terminal task | Existing terminal sweep + AgentRun quiescence boundary | each attempt either prepares atomically or defers without durable/local partial state; idle/offline resweep supplies progress | No duplicate job/token machinery | Pass |
 
 ## Removal And Forbidden-Shortcut Audit
@@ -886,7 +934,6 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Try-both reader/root-kind inference | Rejected | compound identity + strict family selection |
 | Migration-specific journal/backup/restore | Rejected | existing runner + atomic write/direct rename/restart retry |
 | Opaque AgentOrg event schema / `any` / JSON renderer | Yes | closed Agent presentation + Org event contracts and strict context reducer |
-| Bespoke AgentOrg runtime header/event cards/composer | Yes | thin Org focus adapter over shared Agent/Team workspace surfaces |
 | Direct Org send-only component/store socket path | Yes | ActiveAgentWorkspaceTarget + AgentInteractionPort + strict command union |
 | Parallel Org raw event array / duplicate focus authority | Yes | one AgentOrgExecutionContext; mixed root store delegates |
 | Mounted Team registered as standalone for UI reuse | Rejected | read-only TeamWorkspaceContextView backed by Org context |
@@ -895,7 +942,10 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | `NestedTeamAggregateStatusDot` / nesting-specific helper names retained through aliases | No; clean-cut rename | neutral TeamAggregateStatusDot and Team-history adapter, all imports/tests/locales updated |
 | Team aggregate persisted/polled/transported or mapped from TeamActivityDot | Rejected | pure projection over existing exact Agent status truth |
 | Provider/local teardown awaited indefinitely by root task mutation FIFO | Yes | nullable non-waiting quiescence preparation defers before any blocking teardown |
-| Drain-before-interrupt Team/Org root shutdown | Yes | close/freeze/interrupt complete scope precedes command and settlement drains |
+| Drain-before-fence Team/Org root shutdown | Yes | close bounded publication gate, stable freeze, and complete recursive Agent fences precede command and settlement drains |
+| Active-turn-only root wrapper accepts `NO_ACTIVE_TURN` while input may start | Yes | clean-cut `fenceInputAndInterruptForRootShutdown` and `fenceAgentRunsForRootShutdown` replacement |
+| Provider start after completed root fence | Rejected | claim/start transition and fence share AgentRun dispatch serialization; deterministic two-order test |
+| Root shutdown changes ordinary prepared termination into cancellation | Rejected | explicit separate fence; origin/personal FIFO-drain behavior retained |
 | AD-REV-008 task-keyed coordinator, passive/committed tokens and independent cleanup jobs | Withdrawn | ARCH-REV-006 supported-reachability review showed the extra machinery was disproportionate; existing FIFO/sweep/prepared settlement remain |
 | Duplicate settlement lanes or dependency graph beside the task tree | Rejected | existing serialized sweep and exact task hierarchy remain authoritative |
 | Team-domain shared settlement contract imported by Org | Yes | root-neutral nullable prepared-settlement adapter remains under collaboration execution task |
@@ -906,10 +956,10 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Principle | Evidence In Revised Design | Result |
 | --- | --- | --- |
 | Approved behavior first | Every case cites REQ/AC/SCN/Product or established runtime contract; no new product behavior | Pass |
-| Supported-scenario gate | 29 concrete supported cases; normal submit/independent-accept overlap and normal approval-gated shutdown prove the affected reachability. The self-review witness is classified `Unsupported/Contrived` and used only as technical coupling evidence; global lookup/tampering/deep conversion remain rejected | Pass |
+| Supported-scenario gate | 29 concrete supported cases; normal submit/independent-accept overlap, normal task activation plus SIGTERM before `TURN_STARTED`, and normal approval-gated shutdown prove the affected reachability. The self-review witness is `Unsupported/Contrived` and used only as technical coupling evidence; global lookup/tampering/deep conversion remain rejected | Pass |
 | Spine span sufficiency | Each primary case spans initiating caller through owner/durability/provider to result/event | Pass |
 | Multiple primary spines | Definition, Team launch, Org launch, message, task, persistence, migration, mixed read, focus, process lifecycle are distinct | Pass |
-| Ownership clarity | Root aggregates own lifecycle/state; lower capabilities own local mechanics; adapters own translation | Pass |
+| Ownership clarity | Root aggregates own subject lifecycle/order; frozen scopes own enumeration; AgentRun owns admission/provider-start/turn/interrupt; adapters own translation | Pass |
 | Authoritative boundary | Higher-level callers use one service/root boundary and do not hold internals beside it | Pass |
 | Off-spine concerns | Locations, active directory, physical writer, codecs, projectors serve explicit root/process owners | Pass |
 | Shared structure tightness | Tagged mandatory identities and record engines; no optional coordinator/root blob or tree union | Pass |
@@ -923,7 +973,7 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Projection proportionality | Existing Agent status/context/tree truth plus one pure fold/dot satisfies REQ-028; no backend, durable, polling or transport machinery is introduced | Pass |
 | Collapse-independent hierarchy truth | Full strict Team node is traversed before display filtering; hidden task Agents remain inputs and outside branches cannot leak | Pass |
 | Concurrency lane ownership | One existing serialized task lane remains; it probes quiescence without waiting and defers to the existing execution-state resweep | Pass |
-| Shutdown dependency order | Full owned scope is frozen/interrupted before command or settlement drain, breaking the evidenced wait cycle for both Team and Org | Pass |
+| Shutdown dependency order | Admitted publication closes, full owned scope is frozen, and each AgentRun fence reaches terminal before command/settlement drain; no provider may start after the phase | Pass |
 | Durable failure boundary | Existing prepared termination is reversible before durability; after durability, finish is monotonic and whole-root fail-stop on failure | Pass |
 
 ## Questions / Open Decisions
@@ -938,9 +988,12 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
   presentation/command parsing, checkpointed member hydration, structural
   workspace reuse, pure Team fold/branch matrices, expanded/collapsed/stopped
   AgentOrg status rendering, the real imported-package prompt/browser comparison,
-  and AD-REV-009's deterministic normal submit/accept overlap, non-waiting
+  and AD-REV-009/010's deterministic normal submit/accept overlap, non-waiting
   quiescence deferral, recursive all-or-none preparation, pre-/post-durable
-  failure and interrupt-before-drain Team/Org shutdown checks. The
+  failure, normal task activation barrier before `TURN_STARTED`, exact
+  cancellation/interrupt facts, no post-fence provider call, ordinary FIFO-
+  draining termination regression, and fence-before-drain Team/Org shutdown
+  checks. The
   downstream implementation/test changes and evidence are not validated or
   claimed by this artifact.
 
@@ -952,19 +1005,24 @@ architecture boundary under approved RER-021. `AD-REV-009` resolves
 `ARCH-REV-006` / `AR-FIND-003` by grounding the lifecycle concern in two
 independently supported production paths and proportionately replacing the
 blocked AD-REV-008 machinery with a nullable, non-waiting AgentRun quiescence
-boundary plus interrupt-before-drain root shutdown. All 29 supported walkthroughs
+boundary plus interrupt-before-drain root shutdown. `AD-REV-010` resolves
+`ARCH-REV-007 / AR-FIND-004` by adding the singular AgentRun-owned input/provider-
+start/interrupt fence and stable recursive Team/Org scope composition for the
+supported pre-`TURN_STARTED` SIGTERM window. All 29 supported walkthroughs
 have a complete production spine, one authoritative owner, explicit status/
 lifecycle/durability truth and a one-directional dependency path. No
 walkthrough requires a synthetic Team root, standalone mounted Team, standalone
 direct Org Agent, Team sidecar reinterpretation, public generic root, raw Org
 dashboard, opaque/JSON event fallback, component-owned Org socket, visible-row
 aggregate authority, status polling/persistence, blocking provider teardown in
-the task FIFO, a second settlement lane/coordinator/token protocol,
-drain-before-interrupt shutdown, timeout/replay machinery, or boundary bypass.
+the task FIFO, a second settlement lane/coordinator/token protocol, active-turn-
+only root success, provider dispatch after a completed fence, drain-before-fence
+shutdown, timeout/replay machinery, or boundary bypass.
 
-The self-validation therefore passes. The focused AD-REV-009 correction is
+The self-validation therefore passes. The focused AD-REV-009/010 recovery is
 `Medium / High`: bounded to the existing AgentRun quiescence boundary, shared
-task/local-execution adapters, and Team/Org shutdown sequencing, but material to
+task/local-execution adapters, AgentRun dispatch/input lifecycle, and Team/Org
+shutdown sequencing, but material to
 concurrency, fail-stop and shutdown. The cumulative
 package remains `Large / High`; independent Architecture Review is mandatory
 before Implementation changes this path or API/E2E resumes cumulative
