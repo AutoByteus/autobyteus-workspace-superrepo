@@ -115,7 +115,7 @@ These are implementation-scoped checks, not downstream API/E2E sign-off.
 - Final exact config/store/projector/disclosure check: `4` files / `17` tests passed. Evidence: `/tmp/aorg-ir018-config-final.log`.
 - Post-type-fix stream/projector/panel check: `3` files / `26` tests passed. Evidence: `/tmp/aorg-ir018-post-typefix.log`.
 - `guard:web-boundary`: passed. `guard:localization-boundary`: passed. Evidence: `/tmp/aorg-ir018-web-boundary.log`, `/tmp/aorg-ir018-localization-boundary.log`.
-- Workspace application-contract build and Nuxt production build/prerender: passed; `16` routes. Evidence: `/tmp/aorg-ir018-application-contract-build.log`, `/tmp/aorg-ir018-web-build-final.log`.
+- Workspace application-contract build and Nuxt production build/prerender: passed; `16` routes. Evidence: `/tmp/aorg-ir018-application-contract-build-final.log`, `/tmp/aorg-ir018-web-build-final2.log`.
 - Nuxt typecheck remains nonzero with `320` broad repository-baseline diagnostics after generated dependency output cleanup; the final filtered result contains zero IR-018 changed-path diagnostics. Evidence: `/tmp/aorg-ir018-typecheck-final3.log` and `.summary`.
 - Localization literal audit retains `15` existing `M-004/M-008` literals (including unchanged AgentOrg panel copy) and no new IR-018 literal. Evidence: `/tmp/aorg-ir018-localization-audit.log`.
 - Implementation-owned `git diff --check`, backend-change scan, obsolete-path scan, and source-size audit passed.
