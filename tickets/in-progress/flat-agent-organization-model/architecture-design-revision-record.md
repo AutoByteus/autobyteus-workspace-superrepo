@@ -19,6 +19,7 @@ does not revise intended behavior.
 | AD-REV-009 | Architecture Reviewer `ARCH-REV-006` / `AR-FIND-003` supported-reachability review of AD-REV-008 | `AR-FIND-003`, `AR-PREM-004`, `AR-PREM-005`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — Supported Quiescence Deferral And Interrupt-Before-Drain Shutdown` | `Architecture Design Complete`; AD-REV-008 coordinator/token machinery withdrawn; supported production reachability and proportional correction self-validated across 29 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-010 | Architecture Reviewer `ARCH-REV-007` / `AR-FIND-004` supported shutdown-race review of AD-REV-009 | `AR-FIND-004`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — AgentRun Root-Shutdown Admission And Provider-Start Fence` | `Architecture Design Complete`; supported pre-`TURN_STARTED` race receives one AgentRun-owned fence over stable recursive Team/Org scopes; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-011 | Architecture Reviewer `ARCH-REV-008` / `AR-FIND-005` cumulative coherence review of AD-REV-010 | `AR-FIND-005`; prior `AR-FIND-004` verified resolved | `Architecture Revision — One-FIFO Recursive Task-Team Validation Coherence` | `Architecture Design Complete`; stale withdrawn cleanup-job/concurrent-outside-FIFO language removed from VAL-006; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-012 | Code Review `CRR-021` / `CR-FIND-020` plus Requirements Engineer approved `RER-023` and focused Product `AORG-TEAM-OVERRIDES-001` | `CR-FIND-020`; separate `CR-FIND-019` retained as Implementation Local Fix | `Architecture Revision — Established AgentTeam Launch-Hierarchy Reuse For AgentOrg` | `Architecture Design Complete`; bespoke Org mounted-Team editor replaced at design boundary by strict Org projection into accepted Team presentation; self-validation expanded to 30 cases; focused delta `Medium/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -875,3 +876,105 @@ does not revise intended behavior.
   prepared-cancel non-reopen, recursive deepest-first settlement, and Team/Org
   shutdown phase order. This revision claims no implementation or validation
   completion.
+
+### AD-REV-012 — Established AgentTeam Launch-Hierarchy Reuse For AgentOrg
+
+- Triggering role, report path, and round: Code Reviewer `CRR-021` returned
+  `Fail — Product UI Baseline Impact / Design Impact` under `CR-FIND-020` after
+  the user's explicit direction not to reinvent the AgentOrg launch experience.
+  Requirements Engineering then completed approved Architecture-Ready
+  `RER-023@c4f39b02e6b4bceb8219811e27491e2a66666396` with the explicitly
+  user-approved focused Product package `AORG-TEAM-OVERRIDES-001` and
+  `VIS-OVR-001`-`VIS-OVR-006`. Canonical inputs are
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`,
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`, and
+  `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-TEAM-OVERRIDES-001/ui-ux-spec.md`.
+- Triggering finding IDs: `CR-FIND-020`. `CR-FIND-019` remains an independent
+  Implementation Local Fix and is carried into the later implementation/source-
+  review package without an architecture redesign. No prior architecture
+  finding is reopened.
+- Prior authoritative design result: cumulative `AD-REV-011` at
+  `31a19b592b27e9edb2ae9828a67ce7608a0b6314`, independently passed by
+  `ARCH-REV-009@f9b7fff0d1673a5416038efb3956252f53ea4809`.
+  Implementation was subsequently integrated through
+  `IR-017@b2c96d6b0`. The current Code Review failure is limited to the newly
+  approved launch-override presentation baseline.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as AD-REV-012 and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Current-state/root-cause evidence: production
+  `AgentOrgRunConfigPanel -> AgentOrgPlacementOverrideRow` substantially follows
+  superseded VIS-015: after opening the outer section it exposes every mounted
+  Team's Agent children, leaves inherited state implicit, and fabricates an
+  `EditableTeamFormAgentNode` even for a Team scope. The current
+  `TeamRunConfigForm -> TeamMemberConfigTree -> TeamScopeConfigEditor ->
+  MemberOverrideItem` files are byte-identical to `origin/personal@5fb16658e`
+  and already own the accepted disclosure, Team fields, exact Agent rows,
+  explicit state, coordinator-on-Agent identity, draft-preserving visibility,
+  a11y and narrow behavior. The server/GraphQL Org placement input already has
+  separate Team/Agent patches including Team `workspaceRootPath` and the server
+  already resolves root -> Team -> Agent authoritatively.
+- Why this revision is recorded: the correct solution is presentation reuse,
+  not a new AgentOrg Team editor and not a generic Team/Org configuration
+  system. AD-REV-012 keeps `agentOrgRunConfigStore` as the Org draft owner,
+  splits its exact Team and Agent sparse maps, and adds one pure
+  `projectEditableAgentOrgRunFormModel` that emits one real mounted-Team level
+  into the existing Team presentation view models. It extracts the compact
+  outer `MemberOverridesDisclosure` shell for both forms and routes Team/Agent
+  typed edit events back to exact Org store commands and the unchanged Org
+  GraphQL launch input. The old Team branch of
+  `AgentOrgPlacementOverrideRow` is removed; the compact direct Org Agent row
+  remains Agent-only.
+- Exact behavior/state boundary: outer and each Team disclosure start collapsed;
+  `N` counts exact configurable Agents only; Team `Inherited`/`Customized` and
+  mounted-Team Agent `Inherited`/`Overridden` states depend only on their own
+  patches while direct Org Agent behavior remains unchanged; Team reset retains
+  child Agent patches;
+  coordinator identity appears only on the exact Agent row; collapse changes
+  visibility, not draft state; Team workspace maps through existing
+  `workspaceRootPath`. Missing Team/member/coordinator/address correlation
+  yields one exact blocking diagnostic and disabled Run—never silent omission,
+  browser repair, or a launchable partial hierarchy.
+- Approved behavior or requirement IDs affected: `BEH-012`, `REQ-029`,
+  `AC-024`, `SCN-013`, `QR-009`, `DEC-016`, `ORG-CASE-059`-`ORG-CASE-061`,
+  and `ORG-VERIFY-012`. RER-023 changes no configuration precedence, launch,
+  focus, runtime, durable, handoff, status, migration, or lifecycle semantics.
+- Design-spec sections updated: status/current-state/evidence/classification;
+  AD-REV-012 reuse boundary and exact state rules; behavior/Product/scenario
+  map; DS-023 primary/return/local spines; ownership, dependency, interface,
+  reusable structure, file/folder, removal and compatibility maps; sequencing;
+  tradeoffs; risks; and implementation/validation guidance.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-012 and 30
+  supported cases. New VAL-030 walks the normal draft/edit/collapse/reopen/launch
+  path from route through Org store, strict projector, accepted Team components,
+  exact command adapter, existing GraphQL and server resolver; it also validates
+  reset/state/address/failure rules and forbidden cross-owner dependencies. No
+  new supplement is created.
+- Classification: focused AD-REV-012 is `Medium / Low` because it changes a
+  bounded set of existing frontend store, projection, presentation and tests,
+  while changing no server API/schema, stream, persistence, migration,
+  concurrency, lifecycle, definition, or runtime owner. The cumulative ticket
+  remains `task_size=Large` and `architectural_risk=High` because the full
+  reviewed two-family/runtime/migration/task/frontend package remains the
+  downstream implementation and validation scope. Independent Architecture
+  Review remains selected.
+- Downstream and architecture-review impact: review must verify that the reused
+  components are presentation-only, the AgentOrg draft and serializer remain
+  separate, the projector is complete-or-diagnostic, the superseded Team branch
+  is removed, standalone Team behavior is preserved, and no backend or Product
+  contract is invented. After review passes, Implementation may reconcile this
+  correction together with its separate CR-FIND-019 Local Fix and return for the
+  user-requested fresh full source review before cumulative API/E2E.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of
+  cumulative `RER-023`, all still-relevant Product authorities, AD-REV-012 and
+  the updated self-validation. Implementation and API/E2E remain held on
+  CR-FIND-020 until that review passes and source is reconciled.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, server contract,
+  durable, migration, or runtime architecture gap remains. Residual focused
+  risks are cross-store/payload leakage, silent projection omission, lost sparse
+  draft state on collapse/reset, workspace-field omission, and standalone Team
+  regression. The design names explicit controls/tests; this architecture-only
+  revision claims no implementation or executable validation completion.
