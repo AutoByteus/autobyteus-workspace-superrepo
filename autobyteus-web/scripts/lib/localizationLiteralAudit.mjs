@@ -29,7 +29,7 @@ const UI_PROPERTY_NAMES = new Set([
   'lastError',
   'error',
 ]);
-const UI_IDENTIFIER_PATTERN = /(?:label|message|detail|title|description|summary|placeholder|ariaLabel|buttonLabel|buttonText|helpText|emptyText|errorText|statusLabel|statusMessage|versionSummary|currentVersionLabel|lastCheckedLabel|pendingActionLabel|installPhaseLabel|installMessage|audioInputStatusMessage|settingsTestButtonLabel|settingsTestOutcomeLabel|settingsTestOutcomeDescription|extensionStatusMessage)$/i;
+const UI_IDENTIFIER_PATTERN = /(?:label|message|detail|title|description|summary|placeholder|ariaLabel|buttonLabel|buttonText|helpText|emptyText|errorText|statusLabel|statusMessage|versionSummary|currentVersionLabel|lastCheckedLabel|pendingActionLabel|installPhaseLabel|installMessage|audioInputStatusMessage|settingsTestButtonLabel|settingsTestOutcomeLabel|settingsTestOutcomeDescription|extensionStatusMessage|[A-Za-z0-9]*Error)$/i;
 const UI_FUNCTION_PATTERN = /(?:build.*Error|.*Label|.*Message|.*Title|.*Description|.*Summary)$/i;
 const ALLOWED_LITERAL_PATTERNS = [
   /^https?:\/\//,
@@ -144,14 +144,16 @@ function isUiIdentifierInitializer(node) {
   return false;
 }
 
-function isUiCallArgument(node, literalNode) {
+function isUiCallArgument(node, literalNode, options = {}) {
+  const { allowErrorConstruction = false } = options;
   if (!ts.isCallExpression(node) && !ts.isNewExpression(node)) return false;
   if (!node.arguments?.includes(literalNode)) return false;
 
   const calleeName = getNodeName(node.expression);
   if (!calleeName) return false;
 
-  return ['addToast', 'showToast', 'toast'].includes(calleeName);
+  if (['addToast', 'showToast', 'toast'].includes(calleeName)) return true;
+  return allowErrorConstruction && ts.isNewExpression(node) && calleeName === 'Error';
 }
 
 function getFunctionLikeOwnerName(node) {
@@ -188,6 +190,7 @@ function isRelevantScriptLiteralContext(node, options = {}) {
   const {
     allowUiIdentifierInitializers = false,
     allowUiNamedReturns = false,
+    allowErrorConstruction = false,
   } = options;
   let current = node.parent;
 
@@ -196,7 +199,7 @@ function isRelevantScriptLiteralContext(node, options = {}) {
       return false;
     }
 
-    if (isUiPropertyAssignment(current) || isUiCallArgument(current, node)) {
+    if (isUiPropertyAssignment(current) || isUiCallArgument(current, node, { allowErrorConstruction })) {
       return true;
     }
 
@@ -336,6 +339,7 @@ function collectVueFindings({ content, file, scopeId, findings, strictVueLiteral
         contextOptions: {
           allowUiIdentifierInitializers: true,
           allowUiNamedReturns: true,
+          allowErrorConstruction: true,
         },
       });
     }
@@ -392,6 +396,7 @@ export function auditLocalizationLiterals({ appRoot, scopes }) {
         contextOptions: {
           allowUiIdentifierInitializers: false,
           allowUiNamedReturns: false,
+          allowErrorConstruction: false,
         },
       });
     }

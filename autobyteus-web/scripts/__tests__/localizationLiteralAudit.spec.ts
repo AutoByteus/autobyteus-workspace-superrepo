@@ -155,7 +155,11 @@ function install() {
 </template>
 <script setup lang="ts">
 const catalogSections = computed(() => [{ title: 'Featured organizations' }]);
-const save = () => { errorMessage.value = 'Enter an Agent Org name before saving.'; };
+const saveError = ref('');
+const save = () => {
+  saveError.value = 'Enter an Agent Org name before saving.';
+  throw new Error('Agent Org save failed.');
+};
 </script>
 `,
     });
@@ -174,6 +178,7 @@ const save = () => { errorMessage.value = 'Enter an Agent Org name before saving
       'Add {{expr}}',
       'Featured organizations',
       'Enter an Agent Org name before saving.',
+      'Agent Org save failed.',
     ]));
   });
 
@@ -189,7 +194,11 @@ const save = () => { errorMessage.value = 'Enter an Agent Org name before saving
 </template>
 <script setup lang="ts">
 const catalogSections = computed(() => [{ title: t('agentOrgs.featured') }]);
-const save = () => { errorMessage.value = t('agentOrgs.nameRequired'); };
+const saveError = ref('');
+const save = () => {
+  saveError.value = t('agentOrgs.nameRequired');
+  throw new Error(t('agentOrgs.saveFailed'));
+};
 </script>
 `,
     });

@@ -149,14 +149,23 @@ describe('AgentOrgExperience', () => {
       const detail = await mountExperience('org-detail', org.id)
       expect(detail.text()).toContain('返回智能体组织')
       expect(detail.text()).toContain('协调员：Architecture Designer')
+      expect(detail.text()).toContain('交接规则')
+      expect(detail.text()).toContain('来源')
+      expect(detail.text()).toContain('目标')
+      expect(detail.text()).toContain('Requirements are approved.')
 
       const create = await mountExperience('org-create')
       expect(create.text()).toContain('创建智能体组织')
       expect(create.text()).toContain('添加成员')
+      expect(create.text()).toContain('添加交接规则')
+      expect(create.text()).toContain('尚无交接规则')
 
       const edit = await mountExperience('org-edit', org.id)
       expect(edit.text()).toContain('编辑 Software Development Department')
       expect(edit.text()).toContain('保存更改')
+      expect(edit.text()).toContain('交接规则')
+      expect(edit.text()).toContain('编辑')
+      expect(edit.text()).toContain('删除')
     } finally {
       await localizationRuntime.setPreference('en')
     }

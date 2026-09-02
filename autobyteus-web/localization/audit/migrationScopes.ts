@@ -102,10 +102,11 @@ export const localizationMigrationScopes: LocalizationMigrationScope[] = [
   {
     scopeId: 'M-014',
     status: 'closed',
-    description: 'Agent Org management, launch, history, and return navigation UI',
+    description: 'Agent Org management, handoff authoring, launch, history, and return navigation UI',
     include: [
       'pages/agent-orgs.vue',
       'components/agentOrgs/',
+      'components/collaboration/handoffs/HandoffManager.vue',
       'components/workspace/config/AgentOrgRunConfigPanel.vue',
       'components/workspace/history/AgentOrgRunHistoryPanel.vue',
       'components/workspace/org/AgentOrgWorkspaceView.vue',

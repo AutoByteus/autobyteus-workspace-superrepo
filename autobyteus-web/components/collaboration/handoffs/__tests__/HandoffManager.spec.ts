@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import HandoffManager from '../HandoffManager.vue'
+import { localizationRuntime } from '~/localization/runtime/localizationRuntime'
 import type { EditableHandoff, HandoffEndpointOption } from '~/types/collaboration/handoffs'
 
 const from: HandoffEndpointOption[] = [
@@ -52,5 +53,32 @@ describe('HandoffManager', () => {
     expect((wrapper.vm as unknown as { validateAll(): boolean }).validateAll()).toBe(false)
     await wrapper.vm.$nextTick()
     expect(wrapper.text()).toContain('Resolve 1 affected handoff before saving.')
+  })
+
+  it('localizes view, edit, and validation chrome in Simplified Chinese without translating user-authored rules', async () => {
+    await localizationRuntime.setPreference('zh-CN')
+    try {
+      const view = mount(HandoffManager, {
+        props: { modelValue: handoffs, fromOptions: from, toOptions: to, mode: 'view', scope: 'org' },
+      })
+      expect(view.text()).toContain('交接规则')
+      expect(view.text()).toContain('来源')
+      expect(view.text()).toContain('目标')
+      expect(view.text()).toContain('条件')
+      expect(view.text()).toContain('Requirements are approved.')
+      expect(view.text()).not.toContain('Edit')
+
+      const edit = mountManager()
+      expect(edit.text()).toContain('编辑')
+      expect(edit.text()).toContain('删除')
+      await edit.get('[data-test="edit-handoff-first"]').trigger('click')
+      expect(edit.text()).toContain('编辑交接规则')
+      await edit.get('[data-test="handoff-from"]').setValue('')
+      await edit.get('[data-test="apply-handoff-draft"]').trigger('click')
+      expect(edit.text()).toContain('请选择来源智能体。')
+      expect(edit.text()).toContain('Requirements are approved.')
+    } finally {
+      await localizationRuntime.setPreference('en')
+    }
   })
 })
