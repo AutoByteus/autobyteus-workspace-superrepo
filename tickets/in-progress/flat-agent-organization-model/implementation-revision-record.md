@@ -376,3 +376,28 @@
 - Persisted-data result: no schema, codec, family, sidecar, migration, retry journal, or stored data changed. Strict current Team V2 / Org V1 ownership and the migration zero-write cohort remain unchanged.
 - Next recipient or routing: apply dynamic handoff rules to the cumulative Large/High result; do not infer the exact recipient.
 - Remaining limitations or risks: independent cumulative source review must verify `IR-014/015`; API/E2E must then repeat real imported-package/Codex/browser recovery, stopped-history/reactivation, mounted-Team settlement, mixed-history Restore, migration, shutdown, and standalone Team regressions. Controlled render fixtures are not a real-system pass.
+
+### IR-016 — Exhaustion-only AgentOrg error publication and manual-reopen cleanup
+
+- Triggering role, report path, and round: Code Reviewer `CRR-016 / Fail — Local Fix`; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`; full cumulative review of `IR-014/015`.
+- Triggering finding IDs: `CR-FIND-017`, `CR-FIND-018`.
+- Classification: `Local Fix`; cumulative task size remains `Large`, architectural risk remains `High`.
+- Prior authoritative implementation result: `IR-015@42444895c`, artifact commit `40e728c49`. `CRR-016` accepted `IR-014` and the overall `IR-015` accepted-surface/history/single-owner direction but found premature visible server-error publication and a dead manual API chain.
+- Current authoritative implementation result: valid server `ERROR` frames now fail the exact current generation into the existing bounded automatic recovery owner without visible publication; only the five-attempt exhaustion boundary reports once, and later verified snapshot publication clears the error. The public manual reopen chain is deleted, leaving private `reopenOwned` as the sole checkpointed operation. No Design Impact, Requirement Gap, Product gap, or contract change was introduced.
+- Related requirements revision IDs: `RER-021` (cumulative behavior through `RER-018`).
+- Related architecture design revision IDs: `AD-REV-009`, `AD-REV-010`, `AD-REV-011`.
+- Related architecture-review revision IDs: `ARCH-REV-009 / Pass`.
+- Related code-review revision IDs: `CRR-016 / Fail — Local Fix`; renewed review pending.
+- Related API/E2E revision IDs: `API-REV-003`; renewed execution pending.
+- Related delivery revision IDs: `N/A — pending`.
+- Why this revision is recorded: the server's valid error envelope bypassed the new recovery exhaustion state machine by calling the visible store callback immediately, and removal of manual UI actions did not remove the now-zero-caller service/store facade.
+- Approved behavior or requirement IDs affected: `DS-017`, `DS-018`; user-confirmed automatic recovery direction; retained `VIS-016`–`VIS-018` and `VIS-STATUS-003`.
+- Implementation delta: `handleMessage(ERROR)` now throws the exact code/message into current-generation `failClosed`; the sole exhaustion branch remains the only `reportError` call; subsequent complete publication uses the existing store callback to clear error; removed service public `reopen`, store `reopen`, and active-context `reopenAgentOrg`.
+- Changed files or areas: AgentOrg streaming service and deterministic specification; AgentOrg contexts store; active context store. Source commit: `394fc27f8`.
+- Local validation and result: exact stream `13/13` (`/tmp/aorg-ir016-stream-focused.log`); cumulative focused web `8` files / `75` tests (`/tmp/aorg-ir016-web-focused.log`); web production build/prerender passed (`/tmp/aorg-ir016-web-build.log`); web/localization boundary guards passed (`/tmp/aorg-ir016-web-guards.log`); dead-chain search and `git diff --check` passed.
+- Deterministic recovery result: the first five automatic retries expose no error; the sixth failure (original plus five recovery attempts) publishes the exact server detail once; a subsequent selection/connect plus complete snapshot publishes the context and clears the visible error without an additional report.
+- Source-size assessment: all changed production sources remain below `500` effective non-empty lines (`392` maximum); no production delta crosses the `>220` split signal.
+- Frontend rendered-result assessment: no rendered layout/style/text change; only visibility timing and dead API surface changed. The deterministic test covers the timing, and `IR-015` desktop/narrow evidence remains current.
+- Persisted-data result: no schema, codec, family, sidecar, migration, retry journal, or stored data changed. Team V2 / Org V1 and startup migration boundaries remain unchanged.
+- Next recipient or routing: apply dynamic handoff rules to the cumulative Large/High result; do not infer the exact recipient.
+- Remaining limitations or risks: independent cumulative source review must verify `CR-FIND-017/018`; API/E2E must then repeat real server-error recovery/clearing and the cumulative settlement, mixed history, stopped history, migration, shutdown, Codex, and standalone Team paths. No API/E2E or delivery pass is claimed.

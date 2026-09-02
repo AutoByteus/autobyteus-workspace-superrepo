@@ -2,34 +2,34 @@
 
 ## Upstream Artifact Package
 
-- Upstream route: `Architecture Design -> Architecture Review -> Implementation -> Code Review -> API/E2E -> failure-origin review / architecture recovery -> Implementation`.
+- Upstream route: `Architecture Design -> Architecture Review -> Implementation -> Code Review -> API/E2E -> failure-origin review / architecture recovery -> Implementation Local Fix`.
 - Requirements authority: approved Architecture-Ready `RER-021@ed236a63e8905432a6bb45e826c82856e620e7dc` in `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`, with investigation and revision evidence beside it.
 - Architecture authority: cumulative `AD-REV-011@31a19b592b27e9edb2ae9828a67ce7608a0b6314`, including the approved `AD-REV-009/010` lifecycle mechanism, in `design-spec.md`, `architecture-design-revision-record.md`, and `architecture-design-self-validation.md`.
 - Independent architecture review: `ARCH-REV-009 / Pass@f9b7fff0d` in `design-review-report.md` and `architecture-review-revision-record.md`; no open architecture finding remains.
-- Prior implementation authority: cumulative `IR-014@c858b3eea7a96088fe32ad0bee46d7f694349065`, artifact commit `0ed8f2c80c19fd8e47a176800639d5ff60f4184b`.
-- Current frontend correction authority: the Architecture Designer's user-confirmed AgentOrg simplification message received on `2026-09-02`. The designer classified it as a bounded frontend implementation correction under the existing architecture, with no AD revision or backend, GraphQL, persistence, schema, or lifecycle-owner change.
+- Prior implementation authority: cumulative `IR-015@42444895c`, artifact commit `40e728c49`. `IR-014` exact teardown retirement and complete-generation readiness are accepted by `CRR-016`; `IR-015` accepted-surface, terminal-history, and single-owner automatic-recovery design is also accepted.
+- Triggering review: `CRR-016 / Fail — Local Fix` in `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` and `code-review-revision-record.md`; open findings were `CR-FIND-017` and `CR-FIND-018`.
 - Product authority: approved `RV-012` / `VIS-001`–`VIS-020`, particularly `VIS-016`–`VIS-018`; approved `AORG-FLAT-TEAM-STATUS-001`, particularly `VIS-STATUS-003`; `BASELINE-PROMOTION-001` remains clean-entry/provenance-only evidence.
 
 ## Current Implementation Summary
 
-`IR-015` preserves the cumulative `IR-014` backend corrections and aligns AgentOrg presentation with the established Agent/Team experience.
+`IR-016` corrects both bounded `CRR-016` findings while preserving cumulative `IR-014/015` behavior.
 
-1. AgentOrg streaming now performs bounded transparent recovery in its existing strict streaming owner. An established context reopens through the existing checkpoint-before/candidate-snapshot/checkpoint-after barrier; initial connection failure reconnects for a complete snapshot. The selected exact address is preserved and reselected. Only exhaustion of five bounded attempts publishes the shared localized recovery notice.
-2. The bespoke AgentOrg reconnect card, prominent `Reconnect` actions, and recovery-action API on accepted Agent/Team surfaces are removed. AgentOrg still renders the accepted Agent or Team workspace. The only visible failure affordance is one shared message-only recovery notice after transparent recovery cannot complete; raw envelopes are never rendered.
-3. Inactive AgentOrg root rows no longer expose inline `Restore`. Opening one routes to a terminal historical state, leaves every member offline, starts no live stream, and exposes no root or mounted-Team lifecycle action. Selecting a historical direct Agent or mounted Team invokes the existing exact-root restore capability, selects the exact member, and returns to the accepted live surface without introducing new restore terminology.
-4. Active AgentOrg launch/focus behavior is unchanged: initial launch is unfocused, direct Agent and mounted Team selection use the accepted surfaces, mounted Team focus remains coordinator-based, and only the Org root owns Stop.
-5. No server, GraphQL, WebSocket schema, persistence, migration, package-family, task, shutdown, readiness, or Product contract changed. `CR-FIND-015/016` remain implemented by `IR-014` and the accepted `IR-013` task/fence mechanism remains intact.
+1. A valid AgentOrg server `ERROR` frame is now a strict current-generation stream failure handled inside the existing automatic recovery owner. It retains the exact server code/message as the recovery detail, closes the affected generation, and schedules bounded recovery without publishing a visible error early.
+2. The existing exhaustion boundary remains the only `reportError` caller. Five automatic attempts run before one visible error is published. A later normal selection/connect starts a fresh bounded cycle; successful complete snapshot publication clears the store error through the existing publish callback.
+3. The obsolete manual recovery chain is removed end-to-end: `activeContextStore.reopenAgentOrg`, `agentOrgContextsStore.reopen`, and public `AgentOrgStreamingService.reopen` no longer exist. Private `reopenOwned` remains the sole checkpointed automatic recovery operation.
+4. Strict schema/root/sequence/ACK correlation, checkpoint-before/after verification, focus preservation, stale-generation retirement, explicit-release guards, accepted Agent/Team surfaces, stopped history, and root-only lifecycle remain unchanged.
+5. No server, GraphQL, WebSocket schema, persistence, migration, package-family, task, shutdown, readiness, or Product contract changed.
 
-- Implementation cycle: `Rework — bounded frontend implementation correction`.
+- Implementation cycle: `Rework — implementation-owned Local Fix`.
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`.
-- Current implementation revision ID: `IR-015`.
-- Current source commit: `42444895c` (`fix: align AgentOrg recovery and history UX`).
-- Related architecture design revision IDs: `AD-REV-009`, `AD-REV-010`, `AD-REV-011`; new revision `N/A — existing design already requires the accepted workspace/recovery behavior`.
-- Related architecture-review revision IDs: `ARCH-REV-009 / Pass`; new revision `N/A — not required by Architecture Designer`.
-- Related code-review revision IDs: `CRR-015 / Fail — Local Fix` remains the latest cumulative review; renewed review pending.
+- Current implementation revision ID: `IR-016`.
+- Current source commit: `394fc27f8` (`fix: publish AgentOrg errors after recovery exhaustion`).
+- Related architecture design revision IDs: `AD-REV-009`, `AD-REV-010`, `AD-REV-011`.
+- Related architecture-review revision IDs: `ARCH-REV-009 / Pass`.
+- Related code-review revision IDs: `CRR-016 / Fail — Local Fix`.
 - Related API/E2E revision IDs: `API-REV-003`; renewed execution pending.
 - Related delivery revision IDs: `N/A — pending`.
-- Triggering finding IDs: user-confirmed frontend divergence; formal new `CR-FIND-*` / `API-FIND-*`: `N/A`.
+- Triggering finding IDs: `CR-FIND-017`, `CR-FIND-018`.
 - Result: `Implementation Complete — ready for configured downstream review`.
 
 ## Routing Classification (Mandatory)
@@ -37,100 +37,90 @@
 - Task size: `Large` — confirmed.
 - Architectural risk: `High` — confirmed.
 - Requirements routing evidence: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` and `investigation-notes.md`.
-- Evidence: `IR-015` is frontend-bounded, but it changes recovery timing around strict checkpoint/sequence ownership and is part of a cumulative Large/High package with persistence, migration, task, shutdown, identity, and browser-state concerns. No risk downgrade is justified.
+- Evidence: this Local Fix is bounded, but recovery sequencing and strict generation ownership sit inside a cumulative Large/High persistence, migration, task, shutdown, identity, and browser-state package. No risk downgrade is justified.
 - Selected route: dynamic `get_handoff_rules`; implementation does not infer the recipient.
 - Lightweight implementation self-review: `Not Applicable — architecture-routed Large/High package`.
-- New Design Impact / Requirement Gap / Product gap: `None`. The implementation retains existing backend and strict stream contracts and uses the approved Agent/Team presentation surfaces.
+- New Design Impact / Requirement Gap / Product gap: `None`. Both findings fit the existing single AgentOrg streaming/store owners and require no public contract or lifecycle change.
 
 ## Reviewed Behavior Implementation Trace
 
-| Behavior / Design / Product evidence | Approved Outcome | Implemented Production Path | Result |
+| Behavior / Finding | Approved Outcome | Implemented Production Path | Result |
 | --- | --- | --- | --- |
-| `DS-017/018/019`; `VIS-016`–`VIS-018` | AgentOrg uses strict checkpoint/sequence recovery and accepted Agent/Team surfaces rather than a bespoke dashboard or raw event presentation. | `AgentOrgStreamingService` -> bounded automatic reconnect or checkpointed `reopenOwned()` -> complete candidate hydration/verification -> exact focus reselection -> `AgentOrgWorkspaceView` -> `AgentWorkspaceSurface` / `TeamWorkspaceSurface`. | Implemented. No raw envelope, duplicate composer/header, or prominent manual Reconnect path remains. |
-| User-confirmed recovery simplification | Transient transport failure is automatic; only a shared bounded error affordance remains if transparent recovery cannot finish. | Existing stream owner schedules immediate then `1s/2s/4s/8s` attempts, remains generation/release guarded, and reports one localized shared notice only after exhaustion. | Implemented. Current-generation schema/root/sequence/ACK mismatches still fail closed before recovery. |
-| `VIS-STATUS-003`; established Team history behavior | Inactive Org opens historical/terminal with offline members and no permanent Restore terminology. | `AgentOrgRunHistoryPanel` historical route -> `WorkspaceAdaptiveLayout` -> `AgentOrgWorkspaceView` stopped-history state; no streaming connection. Historical member selection uses the existing exact Org restore mutation and returns to exact Agent/Team focus. | Implemented. No mounted-Team Stop or new lifecycle owner was added. |
-| `BEH-004`–`BEH-006`, `BEH-008`; Org differences | Preserve Org label/root icon, coordinator-free root, nullable initial focus, direct Agents plus mounted Team hierarchy, and root-only lifecycle. | Existing Org launch/config/history/context owners plus accepted focus projections. | Preserved. |
-| `CR-FIND-015/016`; `DS-015/022`; Team V2 / Org V1 | Preserve cumulative settlement retirement, atomic readiness, one-FIFO/fence, persistence-family, migration, and external read-only boundaries. | Existing `IR-013/014` server owners and tests. | Preserved; no server delta in `IR-015`. |
+| `CR-FIND-017`; `DS-017/018` | A valid server error participates in automatic strict recovery; the recovery-exhausted notice appears only after all bounded attempts fail. | `handleMessage(ERROR)` throws exact code/message -> `processFrame` -> current-generation `failClosed` -> `scheduleTransparentRecovery` -> private `reopenOwned` or complete reconnect -> only exhausted `scheduleTransparentRecovery` calls `reportError`. | Implemented. No early visible notice; one notice after five attempts. |
+| `CR-FIND-017`; later reselection | A later successful verified candidate clears the exhausted notice. | Existing `connect()` resets the bounded counter -> complete `CONNECTED`/snapshot hydration -> candidate verification -> store `publish` clears exact Org error. | Implemented and deterministically covered. |
+| `CR-FIND-018` | Automatic recovery is the only advertised recovery owner; remove obsolete manual APIs. | Removed `activeContextStore.reopenAgentOrg`, `agentOrgContextsStore.reopen`, and `AgentOrgStreamingService.reopen`; retained private `reopenOwned`. | Implemented; repository search finds no remaining chain. |
+| `IR-015`; `VIS-016`–`VIS-018`; `VIS-STATUS-003` | Preserve accepted Agent/Team surfaces, automatic recovery, focus, and terminal history without manual Reconnect/Restore presentation. | Existing AgentOrg workspace/history/layout and shared notice paths. | Preserved. |
+| `IR-013/014`; Team V2 / Org V1 | Preserve one-FIFO/fence, exact settlement retirement, atomic readiness, migration, and persistence-family boundaries. | Existing server/runtime/persistence owners. | Preserved; no server delta. |
 
 ## Key Files Or Areas
 
-- Strict bounded recovery owner: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/services/agentOrgExecution/agentOrgStreamingService.ts`.
-- AgentOrg workspace/history routes: `autobyteus-web/components/workspace/org/AgentOrgWorkspaceView.vue`, `autobyteus-web/components/workspace/history/AgentOrgRunHistoryPanel.vue`, and `autobyteus-web/components/layout/WorkspaceAdaptiveLayout.vue`.
-- Shared bounded notice and accepted surfaces: `autobyteus-web/components/workspace/common/WorkspaceRecoveryNotice.vue`, `agent/AgentWorkspaceSurface.vue`, and `team/TeamWorkspaceSurface.vue`.
-- Localized strings: `autobyteus-web/localization/messages/en/workspace.ts` and `zh-CN/workspace.ts`.
-- Focused regressions are colocated under the affected component/service `__tests__` directories.
+- Strict automatic recovery: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/services/agentOrgExecution/agentOrgStreamingService.ts`.
+- Recovery callback ownership and removed manual surface: `autobyteus-web/stores/agentOrgContextsStore.ts` and `autobyteus-web/stores/activeContextStore.ts`.
+- Deterministic regression: `autobyteus-web/services/agentOrgExecution/__tests__/agentOrgStreamingService.spec.ts`.
+- Cumulative frontend presentation remains in `AgentOrgWorkspaceView.vue`, `AgentOrgRunHistoryPanel.vue`, and the accepted Agent/Team surfaces.
 
 ## Important Assumptions And Preserved Boundaries
 
-- The existing AgentOrg checkpoint query and strict snapshot/event schema remain the sole recovery authority. Automatic recovery does not infer identities, accept partial state, replay raw envelopes, or add a parallel context.
-- An explicit component/store release clears scheduled work and retains the existing generation/ownership guards; stale work cannot publish or reconnect after release.
-- Historical root selection itself is read-only. Exact-root reactivation occurs only when a member interaction requires a live context, using the existing restore mutation; it does not create mounted-Team root authority.
-- Every genuine Org difference remains: coordinator-free Org root, unfocused launch, direct/mounted hierarchy, exact focus, and root-only Stop.
+- A contract-valid `ERROR` is still a strict failure, not a permissively accepted presentation event. The exact error detail stays internal until the sole bounded-exhaustion boundary publishes it.
+- The original connection is followed by at most five automatic recovery attempts. Reselection/connect after exhaustion is a normal new user selection cycle, not a manual reopen API.
+- Complete snapshot publication remains the only operation that clears the visible store error and publishes a live context.
+- Explicit release and generation ownership still make pending hydration/checkpoint/frame work inert; no stale continuation can reconnect or republish.
 - External `autobyteus-agents` and `autobyteus-private-agents` remain read-only and were not edited, migrated, committed, released, or claimed complete.
 
 ## Task Design Health Assessment Implementation Check
 
-- Reviewed change posture: `Bug fix / bounded presentation correction`.
-- Root-cause classification: `Bespoke frontend transport/lifecycle presentation diverged from the approved accepted-workspace UX`.
-- Refactor decision: `Refactor Needed Now — narrow shared notice extraction and recovery ownership reconciliation only`.
+- Reviewed change posture: `Bug fix / Local Fix`.
+- Root-cause classification: `Premature visible-error publication plus obsolete public recovery surface`.
+- Refactor decision: `Refactor Needed Now — delete the dead public chain and route the existing valid server-error case through the sole recovery state machine`.
 - Implementation matched the reviewed assessment: `Yes`.
-- Design Impact route: `N/A — no backend/contract/owner change or constructibility gap emerged`.
-- Evidence: one AgentOrg streaming service still owns recovery; one active Org context still owns presentation truth; accepted Agent/Team workspaces remain the rendered content owners.
+- Design Impact route: `N/A — no constructibility or boundary conflict emerged`.
+- Evidence: one AgentOrg streaming service still owns all retry/checkpoint state, and one store publish callback still owns error clearing.
 
 ## Legacy / Compatibility Removal Check
 
 - Backward-compatibility mechanisms introduced: `None`.
-- Superseded paths removed: dedicated AgentOrg reconnect card, `Reconnect` actions, accepted-surface `recover` event/action-label API, and inline Org history `Restore` action.
+- Superseded/dead paths removed: the complete three-level public manual reopen chain.
 - Legacy fallback retained in scope: `No`.
-- Parallel recovery/dashboard authority introduced: `No`.
-- Changed source guardrails: all changed production sources are below `500` effective non-empty lines (`396` maximum). The largest production delta is below the `>220` split signal.
+- Parallel recovery authority introduced: `No`.
+- Repository search for `reopenAgentOrg`, public store `reopen`, or public `AgentOrgStreamingService.reopen`: no remaining production/test caller or declaration.
+- Changed production sources remain below `500` effective non-empty lines (`392` maximum), and no production delta crosses the `>220` split signal.
 
 ## Persisted Data Transition Check
 
-- Cumulative approved decision: `Migration Required` for the original Team/Org cutover; `IR-015` decision is `Not Affected`.
+- Cumulative approved decision: `Migration Required` for the original Team/Org cutover; `IR-016` decision is `Not Affected`.
 - No schema, codec, family, sidecar, migration registration/order, retry journal, or stored value changed.
 - Existing strict current Team V2 / Org V1 admission and zero-write migration guarantees remain unchanged.
 - Deviation: `None`.
 
 ## Environment Or Dependency Notes
 
-- Validation used the ticket worktree's existing pnpm/Nuxt environment and project-supported browser renderer.
-- Controlled rendered fixtures mocked GraphQL/WebSocket only to render the supported UI states. Expected console noise from omitted unrelated server-settings mocks and intentionally failing checkpoint fixtures is not claimed as real-system validation.
-- Previously generated untracked SDK `dist/` directories and all downstream-owned dirty integration tests, review files, and API/E2E artifacts were left unstaged and unmodified by the `IR-015` commit.
+- Validation used the ticket worktree's existing pnpm/Nuxt environment.
+- Previously generated untracked SDK `dist/` directories and all downstream-owned dirty integration tests, review files, and API/E2E artifacts were left unstaged and unclaimed.
 
 ## Local Implementation Checks Run
 
 These are implementation-scoped checks, not API/E2E sign-off.
 
-- Focused web cohort: `7` files / `67` tests passed, covering AgentOrg workspace, history, adaptive layout, strict stream recovery, accepted Agent view, accepted Team view, and Team focus/send workflow. Log: `/tmp/aorg-ir015-web-focused.log`.
-- Web production build/prerender: passed. Log: `/tmp/aorg-ir015-web-build.log`.
-- Web boundary guard: passed. Localization boundary guard: passed. Log: `/tmp/aorg-ir015-web-localization.log`.
-- Localization audit retains only the repository's known existing `M-004/M-008` literal baseline; the three new `IR-015` strings are localized in English and Chinese and add no audit entry.
+- Exact stream regression: `1` file / `13` tests passed. It includes valid server `ERROR` with no early notice, six failure cycles representing original plus five retries, one exhaustion notice, and successful later clearing. Log: `/tmp/aorg-ir016-stream-focused.log`.
+- Focused cumulative web cohort: `8` files / `75` tests passed, including AgentOrg workspace/history/layout/stream, active-context routing, accepted Agent/Team surfaces, and Team focus/send. Log: `/tmp/aorg-ir016-web-focused.log`.
+- Web production build/prerender: passed. Log: `/tmp/aorg-ir016-web-build.log`.
+- Web boundary and localization-boundary guards: passed. Log: `/tmp/aorg-ir016-web-guards.log`.
+- Localization audit retains only the known repository `M-004/M-008` baseline; `IR-016` adds no rendered literal.
 - `git diff --check`: passed before source commit.
-- Source-size audit: maximum effective non-empty changed production file is `396` lines; no changed production delta crosses `>220`.
+- Dead-chain repository search: no remaining `reopenAgentOrg`, store manual `reopen`, or service public `reopen` declaration/caller.
 
 ## Frontend Rendered-Result Check
 
-Implementation-rendered validation was completed through the project Nuxt development renderer with headless Chromium at desktop and narrow sizes.
-
-- Active unfocused AgentOrg retains the approved centered “Choose an Agent or Team” state on desktop and narrow layouts.
-- Direct Agent focus retains the accepted Agent header/conversation/composer workspace rather than an Org-specific dashboard.
-- Recovery exhaustion shows one compact shared amber notice above the accepted surface; no `Reconnect` button appears.
-- Stopped Org history shows the historical root/member tree with offline status, no `Restore`, no Stop action, and a restrained terminal center state. Narrow navigation remains usable without overflow.
-- Machine assertion for stopped history: `restoreText=0`, `stopButtons=0`, `agentStatus=offline`, `narrowRestoreText=0`.
-- Desktop evidence: `/tmp/aorg-ir015-unfocused-desktop.png`, `/tmp/aorg-ir015-focused-desktop.png`, `/tmp/aorg-ir015-bounded-recovery-desktop.png`, `/tmp/aorg-ir015-stopped-history-desktop.png`.
-- Narrow evidence: `/tmp/aorg-ir015-unfocused-narrow.png`, `/tmp/aorg-ir015-focused-narrow.png`, `/tmp/aorg-ir015-bounded-recovery-narrow.png`, `/tmp/aorg-ir015-stopped-history-narrow.png`, `/tmp/aorg-ir015-stopped-history-narrow-center.png`.
-- Interaction/machine evidence: `/tmp/aorg-ir015-rendered-validation.json`, `/tmp/aorg-ir015-rendered-validation-narrow.json`, `/tmp/aorg-ir015-stopped-history-render.json`.
-- This controlled render loop is implementation polish evidence only. Real imported-package/Codex/browser execution remains API/E2E-owned.
+`IR-016` changes only error-publication timing and deletes a zero-caller API chain; it changes no layout, style, label, responsive rule, or successfully rendered state. The direct deterministic stream test exercises the newly corrected interaction timing. `IR-015`'s Nuxt/Chromium desktop/narrow rendered evidence remains current at `/tmp/aorg-ir015-*.png` and `/tmp/aorg-ir015-*.json`, including no visible `Reconnect` or `Restore`, accepted Agent focus, bounded shared notice, and stopped-history presentation. This remains implementation evidence, not API/E2E sign-off.
 
 ## Downstream Coverage Hints / Remaining Risks
 
-1. Verify normal transient socket close and strict checkpoint-required recovery are transparent, preserve exact Agent/Team focus, never render raw envelopes, and expose the shared bounded notice only after retry exhaustion.
-2. Verify active-to-history route transitions release the live context, history opens offline without a stream or Restore/Stop action, and historical direct-Agent/mounted-Team selection invokes exactly one root restore then exact focus.
-3. Repeat `IR-014` real mounted-Team settlement/root-usability and first mixed-history/standalone-Team Restore journeys; `IR-015` does not claim them independently revalidated.
-4. Retain cumulative Team send admission, stopped-Org route truth, idle Codex restore, mounted-Team status, shutdown-fence, migration zero-write, current-family admission, and desktop/narrow Product journeys.
+1. Independently replay a contract-valid server `ERROR` followed by close and prove no visible notice during attempts, exactly one notice after five failed attempts, and clearing only after a complete later candidate publishes.
+2. Confirm the deleted manual reopen chain has no runtime or test caller and private `reopenOwned` remains the only checkpointed recovery operation.
+3. Repeat `IR-014` mounted-Team settlement/root-usability and first mixed-history/standalone-Team Restore journeys accepted by `CRR-016`.
+4. Retain cumulative strict correlation, focus, release/generation, Team send admission, stopped history, idle Codex restore, shutdown, migration, and standalone Team regressions.
 5. No browser API/E2E, delivery, release, deployment, or external-repository completion is claimed.
 
 ## API / E2E / Executable Coverage Investigation And Execution Still Required
 
-`Yes`. The cumulative Large/High package requires the route returned by `get_handoff_rules`, followed by renewed independent API/E2E validation after source review. `IR-015` claims implementation-scoped completion only.
+`Yes`. The cumulative Large/High package requires the route returned by `get_handoff_rules`, followed by renewed independent API/E2E validation after source review. `IR-016` claims implementation-scoped completion only.
