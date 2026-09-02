@@ -29,6 +29,7 @@
 | IR-023 | Code Reviewer / `CRR-027` / source-review Local Fix | `CR-FIND-023` | `Local Fix` | `RER-023`, `AD-REV-012`, `ARCH-REV-010`, `CRR-027`, `API-REV-006`, `DR-002` | Completed ticket-owned AgentOrg localization, closed the AgentOrg route and escaped/interpolated/script audit forms, and reproduced the guarded ARM64 package; cumulative package is ready for source review. |
 | IR-024 | Code Reviewer / `CRR-028` / source-review Local Fix | partial `CR-FIND-023` | `Local Fix` | `RER-023`, `AD-REV-012`, `ARCH-REV-010`, `CRR-028`, `API-REV-006`, `DR-002` | Localized the shared Handoff Manager, closed its M-014 and script-error audit escapes, and reproduced the guarded ARM64 package; cumulative package is ready for source review. |
 | IR-025 | Code Reviewer / `CRR-029` / source-review Local Fix | partial `CR-FIND-023` remainder | `Local Fix` | `RER-023`, `AD-REV-012`, `ARCH-REV-010`, `CRR-029`, `API-REV-006`, `DR-002` | Localized the Team handoff endpoint-group producers, protected the `group` presentation property in M-014, and reproduced the guarded ARM64 package; cumulative package is ready for source review. |
+| IR-026 | Code Reviewer / `CRR-031` / API/E2E failure-origin Local Fix | `CR-FIND-024`, `API-FIND-016` | `Local Fix` | `RER-023`, `AD-REV-012`, `ARCH-REV-010`, `CRR-030/031`, `API-REV-007`, `DR-002` | Corrected the browser WebSocket fail-close boundary, preserved automatic recovery scheduling, and made the focused double contract-faithful; cumulative package is ready for source review. |
 
 ## Revision Entries
 
@@ -626,3 +627,27 @@
 - Persisted-data result: `Not Affected`. No backend/API/schema/store/runtime/transport/recovery/definition/run package/migration/external source changed; cumulative Team V2/AgentOrg V1 boundaries remain intact.
 - Next recipient or routing: apply dynamic handoff rules to the completed Large/High Local Fix; do not infer the recipient.
 - Remaining limitations or risks: independent cumulative source review is required; API/E2E and Delivery remain downstream owners. The Nuxt development renderer emitted the established app-manifest warning, while the inspected surface and production ARM64 package passed.
+
+### IR-026 — Browser-safe AgentOrg fail-close recovery
+
+- Triggering role, report path, and round: Code Reviewer `CRR-031 / Fail — Local Fix`; focused origin review of `API-REV-007 / API-FIND-016`; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`.
+- Triggering finding IDs: `CR-FIND-024`, correlated `API-FIND-016` / `CR-SCN-044`.
+- Classification: `Local Fix`; cumulative task size remains `Large`, architectural risk remains `High`.
+- Prior authoritative result: `IR-025` passed cumulative source review at `CRR-030`, but API-REV-007 production Chromium proved that valid AgentOrg server ERROR handling cleared the active generation and then threw `InvalidAccessError` on client `close(1002)` before recovery scheduling, leaving the workspace indefinitely Connecting.
+- Current authoritative result: strict failure schedules existing transparent recovery after exact generation retirement and before browser-permitted application close code `4000`; the WebSocket double enforces/records the native client-code range; success and exhaustion paths pass; full packaging passes; the cumulative package is ready for source review.
+- Related requirements revision IDs: `RER-023`; no new requirement or behavior change.
+- Related architecture design revision IDs: `AD-REV-012`; no architecture revision required.
+- Related architecture-review revision IDs: `ARCH-REV-010 / Pass`; new review `N/A — not required`.
+- Related code-review revision IDs: `CRR-030 / Pass`, `CRR-031 / Fail — Local Fix`; renewed source review pending.
+- Related API/E2E revision IDs: `API-REV-007 / Fail / API-FIND-016`; renewed real-browser execution pending after source review.
+- Related delivery revision IDs: `DR-002 / Blocked — Local Fix`; Delivery has not resumed.
+- Why this revision is recorded: browser clients may send close code `1000` or application codes `3000`–`4999`, not reserved protocol code `1002`; the synchronous native exception was a blocking predecessor to approved automatic recovery.
+- Approved behavior or requirement IDs affected: `DS-016`, `DS-018`; no behavior expansion. Strict correlation, checkpoint/focus/release ownership, five-attempt exhaustion, and automatic-only presentation remain binding.
+- Implementation delta: added local application close code `4000`; moved existing recovery scheduling before retired-socket close; upgraded the existing test double to record/reject invalid close codes; added reserved-code, successful server-ERROR recovery, exact close-call, and exhaustion close-call assertions.
+- Changed files or areas: `services/agentOrgExecution/agentOrgStreamingService.ts` and its existing specification. Production source commit: `3199ba081ad450be72fba239fe86e76c0c697a33`.
+- Local validation and result: exact suite `1` file / `15` tests passed; related Org service/workspace cohort `5` files / `25` tests passed; native Chromium probe rejects `1002` and accepts `4000`; full guarded ARM64 Electron build passed and produced `AutoByteus_enterprise_linux-arm64-1.4.66.AppImage` (`523945963` bytes, SHA-256 `ea72201dee5b4c802141d0c1b05a5bf55e43acefd4b56bd167047df3eaf21133`). Logs: `/tmp/aorg-ir026-stream-focused.log`, `/tmp/aorg-ir026-web-focused.log`, `/tmp/aorg-ir026-browser-close-probe.log`, `/tmp/aorg-ir026-electron-linux-arm64-build.log`.
+- Rendered-result result: no template/style/copy/layout changed. Implementation exercised the recovery state machine and native browser close contract; production-browser lifecycle rendering remains the explicitly required API/E2E LIVE-005 rerun.
+- Source-size assessment: changed production source remains below `500` effective non-empty lines (`402`); production delta `+5/-1` is below the `>220` split signal; `git diff --check` passes.
+- Persisted-data result: `Not Affected`. No backend/API/schema/store/persistence/runtime owner/migration/external source changed; cumulative Team V2/AgentOrg V1 boundaries remain intact.
+- Next recipient or routing: apply dynamic handoff rules to the completed Large/High Local Fix; do not infer the recipient.
+- Remaining limitations or risks: independent source review is required; API/E2E must rerun real Chromium LIVE-005 and complete the stopped strict-address negative. Delivery remains downstream-owned.
