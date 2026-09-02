@@ -3,137 +3,137 @@
 ## Upstream Artifact Package
 
 - Upstream route: `Architecture Design`.
-- Requirements authority: approved Architecture-Ready `RER-023@c4f39b02e6b4bceb8219811e27491e2a66666396` in `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`, with investigation and revision history in the adjacent `investigation-notes.md` and `requirements-revision-record.md`.
+- Requirements authority: approved Architecture-Ready `RER-023@c4f39b02e6b4bceb8219811e27491e2a66666396` in `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`; investigation and revision history are in the adjacent `investigation-notes.md` and `requirements-revision-record.md`.
 - Architecture authority: cumulative `AD-REV-012@f8c1f463885d339d62bddb46ae9767391bf99617` in `design-spec.md`, `architecture-design-revision-record.md`, and `architecture-design-self-validation.md`.
 - Architecture review: `ARCH-REV-010 / Pass@3ddff04d7009b0db2414d43c896fc41e27822d45`; no open architecture finding remains.
-- Product authority: approved `RV-012` / `VIS-001`–`VIS-020`; approved mounted-Team-status supplement; user-approved `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`–`VIS-OVR-006`; `BASELINE-PROMOTION-001` remains clean-route/provenance-only evidence.
-- Integrated implementation baseline: `IR-017`, latest-base merge `9348e49a609c5e726f53e7c9e7b6975568be9c37`; cumulative frontend reconciliation `IR-018@d6d18cd8cd05c7efecaee969b42e1b040152e5d0`.
-- Triggering review: `CRR-024 / Fail — Local Fix`, partial `CR-FIND-022`; CRR-024 accepts the main pending/failure path from IR-020 and leaves only failure abandonment/retry correction. `CR-FIND-019/020/021` remain accepted resolved at the source-review boundary.
-- API/Delivery context: `API-REV-005 / Fail / 93.1%`; `DR-001 / Blocked — Local Fix`. Downstream-owned reports/evidence remain present, untouched, and unstaged.
+- Product authority: approved `RV-012` / `VIS-001`–`VIS-020`, the approved mounted-Team-status supplement, and user-approved `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`–`VIS-OVR-006`; `BASELINE-PROMOTION-001` remains clean-route/provenance-only evidence.
+- Accepted pre-fix chain: `IR-021` production source `ee6b793599d57cffed1ee0c900abbc07b552ac6b`, tested artifact `c969b480a2aaabf7ae68cd2b576110f2de513ad6`; `CRR-025 / Pass / 9.3`; `API-REV-006 / Pass / 97.9%` with REPO-001–005 and LIVE-001–014 passed; `CRR-026 / Not Applicable` because API-REV-006 changed no durable test or production source.
+- Triggering rework: Delivery `DR-002 / Blocked — Local Fix`; the mandatory ARM64 Electron build found 15 localization-literal audit findings in five ticket-owned Vue files. Canonical recovery context is `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/handoff-summary.md` and `delivery-revision-record.md`.
+- Delivery-owned docs, reports, release notes, and evidence remain present, untouched by Implementation, and unstaged.
 
 ## Current Implementation Summary
 
-`IR-021` completes CR-FIND-022's supported failure-correction path on top of IR-020's exact configured-Agent runtime admission lifecycle, without changing the server/API/schema/runtime boundary.
+`IR-022` closes DR-002's localization/package blocker without changing application behavior, ownership, APIs, persistence, runtime, or lifecycle boundaries.
 
-1. `MemberOverrideItem` continues to publish exact `loading` before a runtime catalog await, withholds the exact override on failure, and publishes exact `unavailable` to the existing AgentOrg readiness owner.
-2. The editor now retains the failed requested runtime as the visible select value while leaving the durable/parent override unchanged. Selecting the actual committed/default runtime therefore explicitly abandons the failed choice, clears the editor-owned failed operation, and lets the existing steady schema evaluator restore the exact address to `ready`.
-3. The existing accessible catalog-error presentation now reflects editor-owned failures as well as parent catalog failures. Its existing Retry action re-runs the retained failed selection through the same bounded `handleRuntimeChange` path; it publishes `loading`, reuses exact lookup/validation, and commits only after success.
-4. `AgentOrgRunConfigPanel` remains the sole whole-form admission owner: Run stays disabled while the exact address is unavailable and becomes enabled only after the abandoned choice returns to its real committed ready configuration. The launch payload contains no stale failed runtime override.
-5. Server-side authoritative launch validation, the approved Team-like AgentOrg hierarchy, exact sparse Team/Agent ownership, and every cumulative Team V2 / AgentOrg V1 boundary are unchanged. No polling, request coordinator, second store, generic Team/Org authority, fallback, or backend/API behavior was introduced.
+1. All 15 audit findings now resolve through the existing English/Simplified-Chinese localization runtime. The affected Team definition drop target, Agent library, active-unfocused AgentOrg workspace, Org history controls, and Org Run form labels/help/validation use catalog keys rather than product literals.
+2. The complete adjacent Agent library copy was localized together—title, search placeholder, section heading, badge, empty state, and flat-Team guidance—so that one visible surface does not mix translated and untranslated product text.
+3. English preserves the previously reviewed copy. Simplified Chinese uses the established product terms `智能体`, `智能体团队`, `智能体组织`, `运行`, and `工作区`.
+4. A durable catalog regression checks every new key in both locales. Existing production component tests plus the cumulative AgentOrg/config/workspace cohort remain green.
+5. Rendered validation found that the Chinese `智能体` library badge wrapped at narrow width; the existing badge gained only `flex-none whitespace-nowrap`, preserving the established component and fixing the localized narrow presentation.
+6. The repository-standard guarded ARM64 Electron build now completes and produces the requested AppImage. No audit bypass, disabled guard, custom packaging path, server/API change, or alternate localization owner was added.
 
 - Implementation cycle: `Rework`.
-- Current implementation revision ID: `IR-021`.
-- Current source commits: `06fb83e8cef2c592cbe6fa18c1c1f48283a485f1` (IR-020) and `ee6b793599d57cffed1ee0c900abbc07b552ac6b` (`fix(agent-org): recover abandoned member runtime choice`).
+- Current implementation revision ID: `IR-022`.
+- Current source commit: `b1bf0c73ca5282a70d31df06429e1e6d98af60c6` (`fix(localization): localize flat team and org surfaces`).
 - Related architecture design/review: `AD-REV-012`; `ARCH-REV-010 / Pass`.
-- Related code reviews: `CRR-020 / Fail`, `CRR-021 / upstream impact`, `CRR-022`–`CRR-024 / Fail — Local Fix`; renewed review pending.
-- Related API/E2E: `API-REV-005 / Fail / 93.1%`.
-- Related delivery: `DR-001 / Blocked — Local Fix`.
-- Triggering finding: partial `CR-FIND-022`; CR-FIND-019–021 remain resolved.
+- Related code review: `CRR-025 / Pass` is the accepted pre-DR-002 baseline; renewed review is pending for this source delta.
+- Related API/E2E: `API-REV-006 / Pass / 97.9%` is the accepted pre-DR-002 baseline; downstream determines the renewed scope after source review.
+- Related delivery: `DR-002 / Blocked — Local Fix`.
+- Triggering finding IDs: formal `CR-FIND-*` / `API-FIND-*` are `N/A`; Delivery reported 15 `audit:localization-literals` M-004/M-008 findings.
 - Result: `Implementation Complete — cumulative Large/High package ready for configured independent source review`.
 
 ## Routing Classification (Mandatory)
 
 - Task size: `Large` — confirmed.
 - Architectural risk: `High` — confirmed.
-- Requirements routing assessment: `requirements-doc.md`, RER-023 routing section.
-- Evidence: this correction is frontend-bounded but remains part of the cumulative high-risk runtime, persistence, migration, recovery, shutdown, and exact-scope configuration package. It changes launch admission across root/Team/Agent scopes and therefore does not justify a downgrade.
+- Requirements routing assessment: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`, RER-023 routing section.
+- Evidence: IR-022 is a bounded frontend localization/package Local Fix, but it remains part of the cumulative Large/High AgentOrg/flat-Team package. No evidence justifies downgrading the package classification.
 - Selected route: dynamic `get_handoff_rules`; Implementation does not infer the exact recipient.
 - Lightweight direct-route self-review: `Not Applicable — architecture-routed Large/High package`.
 - New Design Impact / Requirement Gap / Product gap: `None`.
 
 ## Reviewed Behavior Implementation Trace
 
-| Behavior / finding | Approved outcome | Implemented production path | Result |
+| Behavior / trigger | Approved or required outcome | Implemented production path | Result |
 | --- | --- | --- | --- |
-| `CR-FIND-022`; `CR-SCN-040`; `CR-CAND-060`; `REQ-024`, `AC-019`, `SCN-009/013`, `VAL-030` | After an uncommitted exact-Agent runtime lookup fails, choosing the real committed/default runtime abandons the failed choice and restores steady readiness; keeping it offers a bounded retry. No stale override launches. | `MemberOverrideItem.runtimeEditOperation` / `runtimeSelectionValue` / `handleRuntimeChange` / `retryRuntimeCatalog` -> exact-address `schema-state` -> existing Team/direct-Agent chain -> `agentOrgRunConfigStore` -> `AgentOrgRunConfigPanel.canRun`. | Implemented; real-editor failure/abandon/retry and parent no-stale-launch regressions pass. |
-| `CR-FIND-022`; `CR-SCN-039` | A new exact configured-Agent runtime selection becomes non-ready before catalog await; failure is unavailable and uncommitted; success publishes the exact resolved override before readiness returns. | Existing IR-020 `MemberOverrideItem.handleRuntimeChange` operation phases -> exact-address schema state -> Org admission owner. | Preserved; CRR-024 accepts the main IR-020 path. |
-| `CR-FIND-021`; `REQ-024`, `AC-019`, `QR-009`, `DS-023`, `VAL-030` | Loading, invalid, or unavailable model-schema state at root, mounted-Team, or exact-Agent scope yields an exact blocking diagnostic and disabled Run; ready restores admission. | `RuntimeModelConfigFields` / `MemberOverrideItem` -> `TeamScopeConfigEditor` / `TeamMemberConfigTree` / direct Agent row -> `AgentOrgRunConfigPanel` -> `agentOrgRunConfigStore`. | Preserved and accepted resolved. |
-| Exact draft and field-error preservation | Visible invalid advanced values remain visible/editable with exact error/a11y state and are not silently sanitized. | Existing UI schema validator and `ModelConfigSection.preserveInvalidDraft`. | Preserved. |
-| `CR-FIND-019` / `API-FIND-015` | Selected mounted-Team task presentation advances without refocus. | One shallow-reactive AgentOrg context identity remains published/stored/mutated through the strict stream owner. | Preserved and accepted resolved; real LIVE-004 rerun remains downstream-owned. |
-| `REQ-029`, `AC-024`, `DS-023` | User-approved collapsed Team override hierarchy and exact sparse Team/Agent patch ownership. | Existing `MemberOverridesDisclosure -> TeamMemberConfigTree -> TeamScopeConfigEditor -> MemberOverrideItem` chain and Org-owned projector/store. | Preserved; no Team-as-Agent or Team-store import reintroduced. |
-| Authoritative server validation | Client readiness cannot replace server validation. | Existing AgentOrg launch service/resolver and GraphQL fields are untouched. | Preserved. |
+| `DR-002` localization audit | No unresolved product literals in the five ticket surfaces; use the existing en/zh-CN runtime and do not bypass the audit. | Five Vue consumers -> `useLocalization` / `$t` -> manual en/zh-CN `agentTeams.ts` and `workspace.ts` catalogs. | Implemented; standalone audit reports zero findings. |
+| Flat Team authoring | Preserve the approved flat Team surface and make all adjacent library guidance locale-consistent. | `AgentTeamDefinitionForm.vue`; `AgentTeamLibraryPanel.vue`; `agentTeams` catalogs. | Implemented; Team semantics and interactions unchanged. |
+| AgentOrg workspace/history/config | Preserve the accepted Agent/Team-style workspace, terminal history, root-only lifecycle action, and exact configuration behavior while translating visible copy and accessible labels. | `AgentOrgWorkspaceView.vue`; `AgentOrgRunHistoryPanel.vue`; `AgentOrgRunConfigPanel.vue`; `workspace` catalogs. | Implemented; component and cumulative AgentOrg suites pass. |
+| Simplified-Chinese responsive presentation | Long translated labels remain readable at desktop/narrow sizes without horizontal overflow or broken badges. | Existing Tailwind layout; localized library badge uses `flex-none whitespace-nowrap`. | Implemented and visually inspected at `1440x900` and `390x844`. |
+| Mandatory package path | Unchanged documented ARM64 Electron command must pass every guard/audit and complete packaging. | `pnpm -C autobyteus-web build:electron:linux:arm64`. | Passed; ARM64 AppImage produced. |
+| Cumulative Team V2 / AgentOrg V1 behavior | Localization must not affect GraphQL, stream, persistence, migration, task, focus, restore, stop, or runtime ownership. | No server, contracts, generated API, store, transport, runtime, persistence, or migration source changed. | Preserved. |
 
 ## Key Files Or Areas
 
-- Exact schema-state contract: `autobyteus-web/types/agent/RuntimeModelConfigSchemaState.ts`.
-- Org draft/admission owner: `autobyteus-web/stores/agentOrgRunConfigStore.ts`.
-- Org form and exact diagnostic: `autobyteus-web/components/workspace/config/AgentOrgRunConfigPanel.vue`.
-- Exact direct-Agent forwarding: `AgentOrgDirectAgentOverrideRow.vue`.
-- Team/Agent schema propagation: `TeamMemberConfigTree.vue`, `TeamScopeConfigEditor.vue`, `MemberOverrideItem.vue`.
-- Root schema source and preserved invalid launch draft: `RuntimeModelConfigFields.vue`, `ModelConfigSection.vue`.
-- Exact catalog projection: `autobyteus-web/utils/editableAgentOrgRunFormModel.ts`.
-- Regressions: adjacent panel, member, model fields/section, and Org store specification files.
+- Team consumers: `autobyteus-web/components/agentTeams/AgentTeamDefinitionForm.vue`, `autobyteus-web/components/agentTeams/form/AgentTeamLibraryPanel.vue`.
+- AgentOrg consumers: `autobyteus-web/components/workspace/org/AgentOrgWorkspaceView.vue`, `workspace/history/AgentOrgRunHistoryPanel.vue`, `workspace/config/AgentOrgRunConfigPanel.vue`.
+- Catalog owners: `autobyteus-web/localization/messages/en/{agentTeams,workspace}.ts` and `zh-CN/{agentTeams,workspace}.ts`.
+- Durable regression: `autobyteus-web/localization/messages/__tests__/flatTeamAgentOrgCatalog.spec.ts`.
 
 ## Important Assumptions
 
-- The server remains the sole authoritative effective launch-resolution and validation owner.
-- Each projected current Org scope has one exact absolute address; the reviewed fixed-depth projector remains responsible for structural completeness before schema admission.
-- All effective editable scopes must report `ready`; absent/unknown state is intentionally treated as `loading`, never inferred ready.
+- English remains the exact fallback and preserves approved copy.
+- `zh-CN` is the only current non-English shipped catalog, and the existing localization runtime remains the single owner.
+- The standard Electron build and its mandatory guards are authoritative; the temporary Corepack shim changes only command availability, not repository behavior.
 
 ## Known Risks
 
-- Independent cumulative source review and renewed API/E2E remain required. `LIVE-004` must still run against the real server/browser without refocus, followed by the stopped cumulative scope.
-- Repository-wide Nuxt typecheck retains unrelated/pre-existing diagnostics documented below; no clean broad-baseline claim is made. No localization source changed in IR-021.
+- Independent cumulative source review remains required because the overall route is Large/High.
+- API/E2E owns any renewed executable-validation scope after source review; IR-022 does not claim to supersede or reproduce API-REV-006.
+- The broad Nuxt typecheck remains nonzero on established repository-wide diagnostics. With dependency preparation and an 8 GiB heap it reported no IR-022 changed-path diagnostic; the successful production Electron build compiled the actual changed templates/catalogs.
 
 ## Task Design Health Assessment Implementation Check
 
-- Change posture: `Local Fix`.
-- Root-cause classification: `Missing Invariant` in the existing exact-Agent edit lifecycle: a failed uncommitted choice remained the non-ready authority even after the user selected the real committed/default configuration.
-- Refactor decision: `No broader refactor`; complete the bounded editor-owned operation lifecycle for abandon/retry while reusing the exact schema-state chain and Org owner.
-- Implementation matched reviewed assessment: `Yes`.
-- Design Impact route challenged: `N/A — the existing AD-REV-012 owners and event chain were sufficient`.
-- Evidence: failure abandonment and retry remain inside `MemberOverrideItem`'s bounded operation lifecycle and travel through the existing `MemberOverrideItem -> exact address -> AgentOrg store` chain; no second owner, Team store import, API/schema change, permissive server path, polling, or fallback was needed.
+- Reviewed change posture: `Local Fix`.
+- Root-cause classification: product-owned literals were added in ticket surfaces but not connected to the mandatory localization owner, so the guarded delivery build correctly stopped.
+- Refactor decision: `No broader refactor`; replace literals with catalog keys and retain the existing runtime.
+- Implementation matched the reviewed assessment: `Yes`.
+- Design Impact route challenged: `N/A`; no design-owned boundary was implicated.
+- Evidence: all work stays inside existing Vue consumers/catalogs/tests; the unchanged standard audit and ARM64 package command pass.
 
 ## Legacy / Compatibility Removal Check
 
 - Backward-compatibility mechanisms introduced: `None`.
-- Legacy old behavior retained in scope: `No`; an abandoned failed runtime choice can no longer strand Run disabled, and the failed choice remains retryable without committing stale state.
-- Superseded paths added: `None`.
-- Shared structures remain tight: `Yes`; the existing schema-state contract stays limited to `status` and `message`, and the existing event chain remains authoritative.
+- Legacy old behavior retained in scope: `No`; the inline product literals were removed.
+- Dead/obsolete alternate localization path introduced: `None`.
+- Shared structures remain tight: `Yes`; no second locale runtime, feature-local translator, generic Team/Org authority, or duplicate product-copy cache was added.
 - Canonical design guidance reapplied: `Yes`.
-- Size guardrails: every changed production source is below `500` effective non-empty lines (`466` maximum); the IR-021 production delta is `+28/-8`, below the `>220` split signal.
+- Size guardrails: all changed production files remain below `500` effective non-empty lines (`455` maximum), and the production delta is `+49/-13`, below the `>220` split signal.
 
 ## Persisted Data Transition Check
 
-- Approved cumulative decision: original cutover is `Migration Required`; IR-021 is `Not Affected`.
-- No server, GraphQL schema/generated contract, durable definition/run file, sidecar, migration, external source, runtime lifecycle, or provider behavior changed.
-- Existing Team V2 / AgentOrg V1 ownership, native Team zero-write cohort, startup-only migration ordering, and external read-only dependency boundaries remain unchanged.
+- Approved cumulative decision: original ticket cutover is `Migration Required`; IR-022 is `Not Affected`.
+- No definition/run codec, file family, sidecar, database, startup migration, retry protocol, or external source changed.
+- Existing Team V2 / AgentOrg V1 migration, native Team zero-write cohort, and external read-only ownership remain unchanged.
 
 ## Environment Or Dependency Notes
 
 - Workspace/branch: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model` / `requirements/flat-agent-organization-model`.
-- Web production build requires the workspace `@autobyteus/application-sdk-contracts` package to be built first; the dependency build and final Nuxt production build passed. Generated dependency `dist` output was removed afterward.
+- The documented ARM64 build required Delivery's temporary Corepack shim at `/tmp/aorg-delivery-corepack-bin`; the repository command itself was unchanged.
+- Generated dependency `dist` directories were removed after validation. The ignored AppImage remains available for downstream Delivery at `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/electron-dist/AutoByteus_enterprise_linux-arm64-1.4.66.AppImage`.
+- AppImage SHA-256: `1358b860100ddd4390a4d73a2bf6aace76f1ba62b1f8286e552d9807775765c4`; size `523938028` bytes; `file` identifies ARM aarch64 ELF.
 - External `autobyteus-agents` and `autobyteus-private-agents` were not edited, migrated, committed, released, or claimed complete.
-- Downstream-owned review/API/delivery reports and evidence were preserved untouched and unstaged.
 
 ## Local Implementation Checks Run
 
 These are implementation-scoped checks, not downstream API/E2E sign-off.
 
-- Final exact failure-abandon/retry and parent admission cohort: `2` files / `20` tests passed. Evidence: `/tmp/aorg-ir021-runtime-cancel-focused-final.log`.
-- Final cumulative relevant AgentOrg/config/workspace cohort: `17` files / `119` tests passed. Evidence: `/tmp/aorg-ir021-web-cumulative-final.log`.
-- Web-boundary and localization-boundary guards: passed. No localization source changed. Evidence: `/tmp/aorg-ir021-web-boundary-final.log`, `/tmp/aorg-ir021-localization-boundary-final.log`.
-- Workspace application-contract build and final Nuxt production build/prerender: passed; `16` routes. Evidence: `/tmp/aorg-ir021-application-contract-build-final.log`, `/tmp/aorg-ir021-web-build-final.log`.
-- Nuxt typecheck remains nonzero with `293` broad repository-baseline diagnostics; filtered output contains zero IR-021 changed-path diagnostics. Evidence: `/tmp/aorg-ir021-typecheck-final-built.log`.
-- `git diff --check`, source-size, changed-delta, generated-output cleanup, and downstream-dirty-file isolation checks passed.
+- Final standalone localization audit: passed with zero unresolved findings. Evidence: `/tmp/aorg-ir022-localization-audit-final.log`.
+- Web/localization boundary guards: passed. Evidence: `/tmp/aorg-ir022-web-boundary-final.log`, `/tmp/aorg-ir022-localization-boundary-final.log`.
+- Cumulative relevant Team/AgentOrg/config/workspace cohort: `19` files / `125` tests passed. Evidence: `/tmp/aorg-ir022-web-cumulative.log`.
+- Final catalog regression after type correction: `1` file / `1` test passed. Evidence: `/tmp/aorg-ir022-catalog-focused-final.log`.
+- Full guarded ARM64 Electron build: passed through web/localization guards, zero-finding audit, server production build/bootstrap, mobile and Electron Nuxt generation, Electron TypeScript transpilation, native/Prisma ARM64 preparation, and `electron-builder`; AppImage produced. Evidence: `/tmp/aorg-ir022-electron-linux-arm64-build-final.log`.
+- Broad Nuxt typecheck: nonzero on repository-wide baseline diagnostics; zero IR-022 changed-path matches after the catalog-test type correction. Evidence: `/tmp/aorg-ir022-typecheck-prepared-final.log`, `/tmp/aorg-ir022-typecheck-changed-prepared-final.log`.
+- `git diff --check`, exact staging isolation, source-size/delta, generated-output cleanup, and downstream-dirty-file preservation checks passed.
 
 ## Frontend Rendered-Result Check
 
-- Affected journey: one mounted-Team exact Agent selects a runtime whose catalog fails, retains the explicit failed choice and error/retry affordance, then returns to the real committed global default and regains Run admission.
-- Normative references: cumulative RV-012, `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`–`VIS-OVR-006`, and reviewed `VAL-030` behavior.
-- Rendered surface: project Nuxt development renderer with the real `MemberOverrideItem` and production stores, exercised through a temporary non-committed fixture route in Chromium at `1440x900`; the fixture was removed afterward.
-- States inspected: failed Claude catalog with the requested Claude runtime still selected, exact accessible error plus Retry, disabled Run; then explicit return to Global default, exact `ready`, cleared error, and enabled Run.
-- Observed result: the correction reuses the approved Team-like hierarchy and established error/Run controls; hierarchy, spacing, typography, labels, and interaction remain consistent. Browser console/page errors were empty. No new visual component or responsive-layout change was introduced; prior IR-019/IR-018 desktop/narrow evidence remains applicable.
-- Evidence: `/tmp/aorg-ir021-render/evidence.json`, `/tmp/aorg-ir021-render/01-runtime-failed.png`, and `/tmp/aorg-ir021-render/02-returned-to-default.png`.
-- Limit: deterministic implementation fixture, not real-system/API/E2E sign-off.
+- Affected surfaces: flat-Team Agent library/drop guidance; AgentOrg active-unfocused prompt, history action/collection labels, and Run-form labels/help/validation.
+- References: cumulative RV-012, AORG-TEAM-OVERRIDES-001, adjacent origin/personal Team visual language, and the existing localization guide/catalog glossary.
+- Rendered surface: project Nuxt development renderer in Chromium using the actual `AgentTeamLibraryPanel`, actual `AgentOrgWorkspaceView`, actual localization runtime, and a temporary non-committed validation route for the config/history strings; the route was removed afterward.
+- States inspected: English and Simplified Chinese at `1440x900`; Simplified Chinese at `390x844`; locale switch interaction; localized Stop title/aria; active-unfocused prompt; library title/search/heading/badges/hint; Org config help and workspace diagnostic.
+- Issue found/corrected: the Chinese Agent badge wrapped at narrow width; `flex-none whitespace-nowrap` corrected it. Final layout has document/body width `390/390` with no horizontal overflow, readable wrapping, stable hierarchy, and unchanged Team/Org visual language.
+- Evidence: `/tmp/aorg-ir022-render/evidence.json`, `/tmp/aorg-ir022-render/01-en-desktop.png`, `02-zh-cn-desktop.png`, and `03-zh-cn-narrow.png`.
+- Limitation: the deterministic renderer fixture had no backend, so the surrounding app shell logged the expected failed Agent-definition GraphQL fetch; no product-layout exception occurred. This is implementation feedback-loop evidence, not API/E2E sign-off.
 
 ## Downstream Coverage Hints / Suggested Scenarios
 
-1. In the real AgentOrg Run form, fail one mounted-Team Agent runtime catalog lookup, verify the failed runtime remains visible with exact error and disabled Run, select Global default/current committed runtime, and verify ready/admitted state plus a launch payload with no stale override.
-2. Keep the failed runtime and activate Retry; verify loading is immediate, Run remains disabled, and only the successful resolved exact override is committed.
-3. Retain root, mounted-Team, and exact-Agent invalid advanced-field checks and `LIVE-004` without refocus.
-4. Preserve cumulative clean-route override visuals, Team V2/AgentOrg V1 migration, restore/stop/recovery/shutdown/history/package, standalone Team, and external-read-only scenarios.
+1. Re-run the mandatory localization audit and confirm all former DR-002 M-004/M-008 findings remain absent.
+2. Exercise Team definition/library and AgentOrg configuration/history/active-unfocused surfaces in both English and Simplified Chinese; verify accessible Stop/refresh labels and no mixed adjacent library copy.
+3. Confirm the `390px` Agent library badge remains one line and the Org copy wraps without horizontal overflow.
+4. Re-run the standard ARM64 Electron build or validate the supplied AppImage provenance/checksum as the selected stage requires.
+5. Preserve the already-passed API-REV-006 REPO-001–005/LIVE-001–014 behavioral scope; no server/runtime change is expected from IR-022.
 
 ## API / E2E / Executable Coverage Investigation And Execution Still Required
 
-`Yes`. The cumulative Large/High package must first follow the exact recipient returned by `get_handoff_rules`; renewed independent API/E2E is required after the applicable source review passes.
+`Yes, as selected by the configured post-source-review route.` API-REV-006 remains the authoritative pre-IR-022 passing baseline, but Implementation does not decide or claim the renewed executable-validation scope for this source change.
