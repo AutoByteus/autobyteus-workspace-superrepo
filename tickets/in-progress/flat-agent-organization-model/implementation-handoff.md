@@ -24,7 +24,7 @@
 - Implementation cycle: `Rework`.
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`.
 - Current implementation revision ID: `IR-018`.
-- Current source commit: `c193d67c5` (`feat(agent-org): reuse team override hierarchy`).
+- Current source commits: `c193d67c5` (`feat(agent-org): reuse team override hierarchy`) plus `6eb45771d` (`fix(agent-org): preserve inherited workspace projection`).
 - Related architecture design/review: `AD-REV-012`; `ARCH-REV-010 / Pass`.
 - Related code reviews: `CRR-019 / Pass`; `CRR-020 / Fail — Local Fix`; `CRR-021 / upstream Product/design impact`.
 - Related API/E2E: `API-REV-005 / Fail / 93.1%`.
@@ -90,7 +90,7 @@
 - Removed: Team branch/fabricated Team node/always-exposed child layout in `AgentOrgPlacementOverrideRow`; the remaining direct Agent behavior is renamed and Agent-only.
 - Shared structures remain tight: `Yes`; only the compact disclosure is extracted, while Org and Team draft/payload owners stay distinct.
 - Canonical design guidance reapplied: `Yes`.
-- Size guardrails: every changed production file remains below `500` effective non-empty lines (`398` maximum). The new projector is `207` effective lines. `AgentOrgRunConfigPanel` is `332` effective lines; its `+298/-44` raw delta triggered and received the required assessment: the prior source compressed most handlers onto single lines, while this round added the approved command mapping. Store state, strict projection, direct-Agent row, and disclosure were split into their reviewed owners, leaving the panel as the cohesive view/command adapter rather than creating empty indirection.
+- Size guardrails: every changed production file remains below `500` effective non-empty lines (`398` maximum). The new projector is `218` effective lines. `AgentOrgRunConfigPanel` is `332` effective lines; its `+298/-44` raw delta triggered and received the required assessment: the prior source compressed most handlers onto single lines, while this round added the approved command mapping. Store state, strict projection, direct-Agent row, and disclosure were split into their reviewed owners, leaving the panel as the cohesive view/command adapter rather than creating empty indirection.
 
 ## Persisted Data Transition Check
 
@@ -110,13 +110,13 @@
 
 These are implementation-scoped checks, not downstream API/E2E sign-off.
 
-- Cumulative AgentOrg/config/workspace unit cohort: `15` files / `83` tests passed. Evidence: `/tmp/aorg-ir018-web-cumulative.log`.
+- Cumulative AgentOrg/config/workspace unit cohort: `15` files / `85` tests passed. Evidence: `/tmp/aorg-ir018-web-cumulative-final.log`.
 - Standalone Team workspace/task navigation regression: `3` files / `20` tests passed. Evidence: `/tmp/aorg-ir018-team-workspace-regression.log`.
 - Final exact config/store/projector/disclosure check: `4` files / `17` tests passed. Evidence: `/tmp/aorg-ir018-config-final.log`.
 - Post-type-fix stream/projector/panel check: `3` files / `26` tests passed. Evidence: `/tmp/aorg-ir018-post-typefix.log`.
 - `guard:web-boundary`: passed. `guard:localization-boundary`: passed. Evidence: `/tmp/aorg-ir018-web-boundary.log`, `/tmp/aorg-ir018-localization-boundary.log`.
 - Workspace application-contract build and Nuxt production build/prerender: passed; `16` routes. Evidence: `/tmp/aorg-ir018-application-contract-build.log`, `/tmp/aorg-ir018-web-build-final.log`.
-- Nuxt typecheck remains nonzero with `295` broad repository-baseline diagnostics; the final filtered result contains zero IR-018 changed-path diagnostics. Evidence: `/tmp/aorg-ir018-typecheck-final2.log` and `.summary`.
+- Nuxt typecheck remains nonzero with `320` broad repository-baseline diagnostics after generated dependency output cleanup; the final filtered result contains zero IR-018 changed-path diagnostics. Evidence: `/tmp/aorg-ir018-typecheck-final3.log` and `.summary`.
 - Localization literal audit retains `15` existing `M-004/M-008` literals (including unchanged AgentOrg panel copy) and no new IR-018 literal. Evidence: `/tmp/aorg-ir018-localization-audit.log`.
 - Implementation-owned `git diff --check`, backend-change scan, obsolete-path scan, and source-size audit passed.
 
