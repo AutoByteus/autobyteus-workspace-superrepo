@@ -194,7 +194,7 @@
           <div
             class="mt-3 rounded-md border border-dashed p-6 text-center text-sm"
             :class="isCanvasDragOver ? 'border-blue-400 bg-blue-50 text-blue-700' : 'border-slate-300 bg-slate-50 text-slate-500'"
-          >Drop Agents here to add them to this Team</div>
+          >{{ $t('agentTeams.components.agentTeams.AgentTeamDefinitionForm.dropAgentsHere') }}</div>
 
           <p v-if="formErrors.nodes" class="mt-2 text-xs text-red-600">{{ formErrors.nodes }}</p>
         </section>

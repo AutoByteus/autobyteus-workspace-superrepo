@@ -38,6 +38,17 @@ const messages = {
   "workspace.agentOrg.stoppedHistory.title": "已停止的智能体组织",
   "workspace.agentOrg.stoppedHistory.description":
     "请从侧栏中的历史运行选择成员，以从其保存状态继续。",
+  "workspace.agentOrg.activeUnfocused.title": "选择智能体或团队",
+  "workspace.agentOrg.activeUnfocused.description":
+    "请从侧栏中的当前智能体组织选择成员。选择团队时会先聚焦其协调者。",
+  "workspace.agentOrg.history.refreshLabel": "刷新智能体组织历史记录",
+  "workspace.agentOrg.history.collectionLabel": "智能体组织",
+  "workspace.agentOrg.history.stopLabel": "停止智能体组织",
+  "workspace.agentOrg.runConfig.orgLabel": "智能体组织",
+  "workspace.agentOrg.runConfig.autoApprove": "自动批准工具",
+  "workspace.agentOrg.runConfig.autoApproveHelp":
+    "自动允许本次运行中的工具调用和访问请求。",
+  "workspace.agentOrg.runConfig.workspaceRequired": "运行智能体组织需要工作区。",
   "workspace.agentOrg.runConfig.memberOverrides": "成员覆盖",
   "workspace.agentOrg.runConfig.schemaLoading": "正在验证 {address} 的模型配置…",
   "workspace.agentOrg.runConfig.schemaBlocked": "{address} 的模型配置尚未就绪：{error}",

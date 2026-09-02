@@ -25,8 +25,8 @@
             <Icon icon="heroicons:building-office-2-20-solid" class="h-6 w-6" />
           </span>
           <div>
-            <h2 class="text-lg font-semibold text-gray-700">Choose an Agent or Team</h2>
-            <p class="mt-1">Select a member from the active Agent Org in the sidebar. Teams focus their coordinator first.</p>
+            <h2 class="text-lg font-semibold text-gray-700">{{ t('workspace.agentOrg.activeUnfocused.title') }}</h2>
+            <p class="mt-1">{{ t('workspace.agentOrg.activeUnfocused.description') }}</p>
           </div>
         </div>
       </div>

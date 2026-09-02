@@ -38,6 +38,17 @@ const messages = {
   "workspace.agentOrg.stoppedHistory.title": "Stopped Agent Org",
   "workspace.agentOrg.stoppedHistory.description":
     "Select a member from the historical run in the sidebar to continue from its saved state.",
+  "workspace.agentOrg.activeUnfocused.title": "Choose an Agent or Team",
+  "workspace.agentOrg.activeUnfocused.description":
+    "Select a member from the active Agent Org in the sidebar. Teams focus their coordinator first.",
+  "workspace.agentOrg.history.refreshLabel": "Refresh Agent Org history",
+  "workspace.agentOrg.history.collectionLabel": "Agent Orgs",
+  "workspace.agentOrg.history.stopLabel": "Stop Agent Org",
+  "workspace.agentOrg.runConfig.orgLabel": "Agent Org",
+  "workspace.agentOrg.runConfig.autoApprove": "Auto approve tools",
+  "workspace.agentOrg.runConfig.autoApproveHelp":
+    "Automatically allows tool calls and access requests for this run.",
+  "workspace.agentOrg.runConfig.workspaceRequired": "Workspace is required to run an Agent Org.",
   "workspace.agentOrg.runConfig.memberOverrides": "Member overrides",
   "workspace.agentOrg.runConfig.schemaLoading": "Validating model configuration for {address}…",
   "workspace.agentOrg.runConfig.schemaBlocked": "Model configuration for {address} is not ready: {error}",

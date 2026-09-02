@@ -2,7 +2,7 @@
   <div class="flex h-full flex-col bg-white" data-test="agent-org-run-history">
     <div class="flex items-center justify-between border-t border-gray-200 px-3 py-2">
       <h3 class="text-sm font-semibold text-gray-700">Workspaces</h3>
-      <button type="button" class="inline-flex h-6 w-6 items-center justify-center rounded-md text-gray-500 hover:bg-indigo-50 hover:text-indigo-600" aria-label="Refresh Agent Org history" @click="refresh">
+      <button type="button" class="inline-flex h-6 w-6 items-center justify-center rounded-md text-gray-500 hover:bg-indigo-50 hover:text-indigo-600" :aria-label="t('workspace.agentOrg.history.refreshLabel')" @click="refresh">
         <Icon icon="heroicons:arrow-path-20-solid" class="h-4 w-4" />
       </button>
     </div>
@@ -17,7 +17,7 @@
         </button>
 
         <div v-if="isWorkspaceExpanded(group.workspace)" class="ml-2 mt-0.5 space-y-1">
-          <div class="px-2 py-1 text-[0.6875rem] font-semibold uppercase tracking-wide text-gray-400">Agent Orgs</div>
+          <div class="px-2 py-1 text-[0.6875rem] font-semibold uppercase tracking-wide text-gray-400">{{ t('workspace.agentOrg.history.collectionLabel') }}</div>
           <div v-for="orgGroup in group.orgs" :key="orgGroup.definitionId" class="rounded-md">
             <button type="button" class="flex w-full items-center rounded-md px-2 py-1 text-left text-sm text-gray-700 hover:bg-gray-50" :aria-expanded="isOrgExpanded(orgGroup.definitionId)" @click="toggleOrg(orgGroup.definitionId)">
               <Icon icon="heroicons:chevron-down-20-solid" class="mr-1 h-3.5 w-3.5 text-gray-400 transition-transform" :class="isOrgExpanded(orgGroup.definitionId) ? '' : '-rotate-90'" />
@@ -38,8 +38,8 @@
                     v-if="run.is_active"
                     type="button"
                     class="ml-1 inline-flex h-5 w-5 items-center justify-center rounded text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-                    title="Stop Agent Org"
-                    aria-label="Stop Agent Org"
+                    :title="t('workspace.agentOrg.history.stopLabel')"
+                    :aria-label="t('workspace.agentOrg.history.stopLabel')"
                     :disabled="store.terminatingRunIds.has(run.root_run_id)"
                     @click.stop="stopOrg(run)"
                   >

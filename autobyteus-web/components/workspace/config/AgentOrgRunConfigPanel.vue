@@ -3,7 +3,7 @@
     <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4">
       <div v-if="org" class="mx-auto max-w-3xl space-y-4">
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700">Agent Org</label>
+          <label class="mb-1 block text-sm font-medium text-gray-700">{{ t('workspace.agentOrg.runConfig.orgLabel') }}</label>
           <div class="block w-full select-none rounded-md bg-slate-50 px-3 py-2 text-sm text-gray-500">{{ org.name }}</div>
         </div>
 
@@ -33,8 +33,8 @@
 
         <div class="flex items-center justify-between gap-4 py-2" data-test="org-auto-approve-row">
           <div class="min-w-0">
-            <label class="block text-base text-gray-900">Auto approve tools</label>
-            <p class="mt-1 text-xs text-gray-500">Automatically allows tool calls and access requests for this run.</p>
+            <label class="block text-base text-gray-900">{{ t('workspace.agentOrg.runConfig.autoApprove') }}</label>
+            <p class="mt-1 text-xs text-gray-500">{{ t('workspace.agentOrg.runConfig.autoApproveHelp') }}</p>
           </div>
           <button
             type="button"
@@ -44,7 +44,7 @@
             :class="autoExecuteTools ? 'bg-blue-600' : 'bg-gray-200'"
             @click="autoExecuteTools = !autoExecuteTools"
           >
-            <span class="sr-only">Auto approve tools</span>
+            <span class="sr-only">{{ t('workspace.agentOrg.runConfig.autoApprove') }}</span>
             <span class="inline-block h-5 w-5 rounded-full bg-white shadow transition" :class="autoExecuteTools ? 'translate-x-5' : 'translate-x-0'" />
           </button>
         </div>
@@ -112,7 +112,7 @@
       >
         {{ orgRunStore.launching ? 'Starting Agent Org…' : 'Run Agent Org' }}
       </button>
-      <p v-if="!workspaceReady" class="mt-2 text-xs text-amber-700">Workspace is required to run an Agent Org.</p>
+      <p v-if="!workspaceReady" class="mt-2 text-xs text-amber-700">{{ t('workspace.agentOrg.runConfig.workspaceRequired') }}</p>
     </div>
   </div>
 </template>
