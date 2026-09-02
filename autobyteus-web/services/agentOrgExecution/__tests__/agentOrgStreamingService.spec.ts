@@ -62,6 +62,10 @@ const connected = {
   type: 'CONNECTED',
   payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', session_id: 'session-1' },
 }
+const serverError = {
+  type: 'ERROR',
+  payload: { code: 'AGENT_ORG_STREAM_UNAVAILABLE', message: 'Agent Org is temporarily unavailable.' },
+}
 const snapshot = {
   type: 'ROOT_EXECUTION_VIEW_SNAPSHOT',
   payload: {
@@ -208,6 +212,62 @@ describe('AgentOrgStreamingService', () => {
       expect(reportError).toHaveBeenCalledTimes(1)
       expect(reportError).toHaveBeenCalledWith('checkpoint unavailable')
       expect(TestWebSocket.instances).toHaveLength(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('keeps a valid server ERROR private while transparent recovery is still available', async () => {
+    const reportError = vi.fn()
+    const service = new AgentOrgStreamingService({
+      orgRunId: 'org-run', publish: vi.fn(), reportError,
+    })
+
+    service.connect()
+    const failedSocket = TestWebSocket.instances[0]!
+    failedSocket.emit(serverError)
+
+    await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
+    expect(failedSocket.readyState).toBe(TestWebSocket.CLOSED)
+    expect(reportError).not.toHaveBeenCalled()
+  })
+
+  it('publishes one server ERROR only after recovery exhaustion and clears it on a later successful selection', async () => {
+    const recovered = candidate()
+    mocks.hydrate.mockResolvedValue(recovered)
+    let visibleError: string | null = null
+    const publish = vi.fn(() => { visibleError = null })
+    const reportError = vi.fn((message: string) => { visibleError = message })
+    const service = new AgentOrgStreamingService({ orgRunId: 'org-run', publish, reportError })
+
+    vi.useFakeTimers()
+    try {
+      service.connect()
+      for (let cycle = 0; cycle < 6; cycle += 1) {
+        const socket = TestWebSocket.instances[cycle]!
+        socket.emit(serverError)
+        await vi.runAllTimersAsync()
+        if (cycle < 5) {
+          expect(reportError).not.toHaveBeenCalled()
+          expect(TestWebSocket.instances).toHaveLength(cycle + 2)
+        }
+      }
+
+      expect(reportError).toHaveBeenCalledTimes(1)
+      expect(reportError).toHaveBeenCalledWith(
+        'AGENT_ORG_STREAM_UNAVAILABLE: Agent Org is temporarily unavailable.',
+      )
+      expect(visibleError).toContain('temporarily unavailable')
+
+      service.connect()
+      const recoveredSocket = TestWebSocket.instances[6]!
+      recoveredSocket.emit(connected)
+      recoveredSocket.emit(snapshot)
+      await vi.runAllTimersAsync()
+
+      expect(publish).toHaveBeenCalledWith(recovered)
+      expect(visibleError).toBeNull()
+      expect(reportError).toHaveBeenCalledTimes(1)
     } finally {
       vi.useRealTimers()
     }

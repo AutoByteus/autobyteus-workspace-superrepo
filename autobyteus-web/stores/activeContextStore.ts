@@ -132,7 +132,6 @@ export const useActiveContextStore = defineStore('activeContext', () => {
   });
 
   const connectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.connect(orgRunId);
-  const reopenAgentOrg = (orgRunId: string): Promise<void> => agentOrgContextsStore.reopen(orgRunId);
   const disconnectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.disconnect(orgRunId);
   const agentOrgContextFor = (orgRunId: string) => agentOrgContextsStore.contextFor(orgRunId);
   const agentOrgErrorFor = (orgRunId: string): string | null => agentOrgContextsStore.errorFor(orgRunId);
@@ -260,7 +259,6 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     currentContextPaths,
     activeConfig,
     connectAgentOrg,
-    reopenAgentOrg,
     disconnectAgentOrg,
     agentOrgContextFor,
     agentOrgErrorFor,

@@ -34,17 +34,6 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
     service.connect()
   }
 
-  const reopen = async (orgRunId: string): Promise<void> => {
-    try {
-      await services.get(orgRunId)?.reopen()
-    } catch (error) {
-      errors.value = {
-        ...errors.value,
-        [orgRunId]: error instanceof Error ? error.message : String(error),
-      }
-    }
-  }
-
   const disconnect = (orgRunId: string): void => {
     services.get(orgRunId)?.disconnect()
     services.delete(orgRunId)
@@ -68,5 +57,5 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
     contexts.value[orgRunId] ?? null
   const errorFor = (orgRunId: string): string | null => errors.value[orgRunId] ?? null
 
-  return { contexts, errors, connect, reopen, disconnect, select, contextFor, errorFor }
+  return { contexts, errors, connect, disconnect, select, contextFor, errorFor }
 })

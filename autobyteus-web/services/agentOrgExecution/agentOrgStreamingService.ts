@@ -112,10 +112,6 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     }
   }
 
-  async reopen(): Promise<void> {
-    await this.reopenOwned(this.activeGeneration)
-  }
-
   private async reopenOwned(generation: StreamGeneration | null): Promise<void> {
     if (!this.ownsOperation(generation)) return
     let checkpoint: ExecutionCheckpoint
@@ -211,8 +207,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   private async handleMessage(generation: StreamGeneration, raw: string): Promise<void> {
     const message = CollaborationStreamServerMessageSchema.parse(JSON.parse(raw))
     if (message.type === 'ERROR') {
-      this.options.reportError(`${message.payload.code}: ${message.payload.message}`)
-      return
+      throw new Error(`${message.payload.code}: ${message.payload.message}`)
     }
     if (message.payload.root_run_id !== this.options.orgRunId
       || message.payload.root_subject_kind !== 'agent_org') {
