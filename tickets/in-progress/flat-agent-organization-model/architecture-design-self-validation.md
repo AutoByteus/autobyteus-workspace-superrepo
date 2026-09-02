@@ -3,12 +3,13 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-010`
+- Architecture revision validated: `AD-REV-011`
 - Requirements authority: `RER-021` (approved BEH-011/REQ-028/AC-023/SCN-012 status supplement; prior runtime/durable behavior unchanged)
 - Product authority: `RV-012` / `VIS-001`-`VIS-020`; focused `AORG-FLAT-TEAM-STATUS-001` / `VIS-STATUS-001`-`VIS-STATUS-003`
-- Trigger: `ARCH-REV-007` / `AR-FIND-004` supported pre-`TURN_STARTED`
-  Agent input/provider-start shutdown race, while retaining the user-requested
-  use-case/data-flow/ownership/boundary/dependency self-validation discipline
+- Trigger: `ARCH-REV-008` / `AR-FIND-005` correction of stale withdrawn
+  independent cleanup-job/concurrent-outside-FIFO language in `VAL-006`, while
+  retaining the user-requested use-case/data-flow/ownership/boundary/dependency
+  self-validation discipline and the reviewed AD-REV-009/010 core design
 - Date: 2026-09-02
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
@@ -37,7 +38,7 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-007` / `AR-FIND-004`; `AR-FIND-003` resolved)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-008` / `AR-FIND-005`; `AR-FIND-004` resolved)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -273,9 +274,14 @@ package-family rename. It does not infer logical topology from directory depth.
   AgentOrg definition resolution.
 - **Dependency check:** recursive task Team uses FlatTeamExecutionFactory with
   appended physical ancestry; it creates no root package/manager entry.
-- **Terminal path:** a task-Team parent is eligible only after every owned child
-  cleanup job completes; independent terminal leaves may clean up concurrently
-  and never occupy the root mutation FIFO.
+- **Terminal path:** the existing deepest-first terminal sweep selects an
+  eligible leaf through the one root FIFO. Its exact local registry calls
+  `tryPrepareTerminationIfQuiescent`: `null` returns deferred and releases the
+  FIFO for an existing idle/offline-event retry; a quiescent leaf returns the
+  existing prepared settlement, commits `settledAt`, then finishes/unregisters
+  through that same serialized mutation path. A task-Team parent becomes
+  eligible only after its children are durably settled. No independent cleanup
+  job, second lane, or concurrent mutation path exists.
 - **Rejected shortcut:** delete task-Team recursion when configured Team recursion
   is removed.
 - **Result:** Pass.
@@ -988,7 +994,8 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
   presentation/command parsing, checkpointed member hydration, structural
   workspace reuse, pure Team fold/branch matrices, expanded/collapsed/stopped
   AgentOrg status rendering, the real imported-package prompt/browser comparison,
-  and AD-REV-009/010's deterministic normal submit/accept overlap, non-waiting
+  AD-REV-011's one-FIFO VAL-006 coherence, and AD-REV-009/010's deterministic
+  normal submit/accept overlap, non-waiting
   quiescence deferral, recursive all-or-none preparation, pre-/post-durable
   failure, normal task activation barrier before `TURN_STARTED`, exact
   cancellation/interrupt facts, no post-fence provider call, ordinary FIFO-
@@ -1008,7 +1015,12 @@ blocked AD-REV-008 machinery with a nullable, non-waiting AgentRun quiescence
 boundary plus interrupt-before-drain root shutdown. `AD-REV-010` resolves
 `ARCH-REV-007 / AR-FIND-004` by adding the singular AgentRun-owned input/provider-
 start/interrupt fence and stable recursive Team/Org scope composition for the
-supported pre-`TURN_STARTED` SIGTERM window. All 29 supported walkthroughs
+supported pre-`TURN_STARTED` SIGTERM window. `AD-REV-011` resolves
+`ARCH-REV-008 / AR-FIND-005` by restoring VAL-006 to that same one-FIFO,
+deepest-first, prepared-or-null settlement contract and removing its last
+affirmative independent-cleanup-job statement. All other AD-REV-008 references
+in this artifact are explicit withdrawal/rejection history only. All 29
+supported walkthroughs
 have a complete production spine, one authoritative owner, explicit status/
 lifecycle/durability truth and a one-directional dependency path. No
 walkthrough requires a synthetic Team root, standalone mounted Team, standalone
@@ -1019,7 +1031,10 @@ the task FIFO, a second settlement lane/coordinator/token protocol, active-turn-
 only root success, provider dispatch after a completed fence, drain-before-fence
 shutdown, timeout/replay machinery, or boundary bypass.
 
-The self-validation therefore passes. The focused AD-REV-009/010 recovery is
+The self-validation therefore passes. The focused AD-REV-011 correction is
+`Small / Low` in isolation because it changes only Architecture-owned
+documentation and introduces no production surface. The underlying focused
+AD-REV-009/010 recovery remains
 `Medium / High`: bounded to the existing AgentRun quiescence boundary, shared
 task/local-execution adapters, AgentRun dispatch/input lifecycle, and Team/Org
 shutdown sequencing, but material to

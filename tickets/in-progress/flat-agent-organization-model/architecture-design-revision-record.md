@@ -18,6 +18,7 @@ does not revise intended behavior.
 | AD-REV-008 | Code Review `CRR-012/013` and API/E2E `API-FIND-008` exact correlated settlement probe / architecture-held Unclear recovery round | `API-FIND-008`, `CR-CAND-020` | `Architecture Revision — Non-Blocking Terminal Task Settlement And Interrupt-Before-Drain Shutdown` | `Architecture Design Complete`; exact liveness cycle classified and resolved at design boundary; self-validation expanded to 29 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-009 | Architecture Reviewer `ARCH-REV-006` / `AR-FIND-003` supported-reachability review of AD-REV-008 | `AR-FIND-003`, `AR-PREM-004`, `AR-PREM-005`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — Supported Quiescence Deferral And Interrupt-Before-Drain Shutdown` | `Architecture Design Complete`; AD-REV-008 coordinator/token machinery withdrawn; supported production reachability and proportional correction self-validated across 29 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-010 | Architecture Reviewer `ARCH-REV-007` / `AR-FIND-004` supported shutdown-race review of AD-REV-009 | `AR-FIND-004`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — AgentRun Root-Shutdown Admission And Provider-Start Fence` | `Architecture Design Complete`; supported pre-`TURN_STARTED` race receives one AgentRun-owned fence over stable recursive Team/Org scopes; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-011 | Architecture Reviewer `ARCH-REV-008` / `AR-FIND-005` cumulative coherence review of AD-REV-010 | `AR-FIND-005`; prior `AR-FIND-004` verified resolved | `Architecture Revision — One-FIFO Recursive Task-Team Validation Coherence` | `Architecture Design Complete`; stale withdrawn cleanup-job/concurrent-outside-FIFO language removed from VAL-006; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -786,3 +787,91 @@ does not revise intended behavior.
   29-case self-validation specify controls and executable witnesses, but this
   architecture-only revision claims no runtime fix, source validation, or
   delivery readiness.
+
+### AD-REV-011 — One-FIFO Recursive Task-Team Validation Coherence
+
+- Triggering role, report path, and round: Architecture Reviewer
+  `ARCH-REV-008@a6f712265e57166469f68cce4d53083519d43dcf` reviewed cumulative
+  AD-REV-010 and returned `Fail — Design Impact` only for `AR-FIND-005`.
+  Canonical review inputs are
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+  and
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`.
+  This is a narrow Architecture-artifact coherence recovery round.
+- Triggering finding IDs: `AR-FIND-005`. The review independently verified
+  `AR-FIND-004` resolved by AD-REV-010 and found no Requirement Gap, Product UI
+  gap, or defect in the AD-REV-009/010 core design.
+- Prior authoritative design result: `AD-REV-010`, Architecture Design Complete,
+  at commit `820b6d02f13e96874f10bf78eda92b1e8327fa82`;
+  `ARCH-REV-008` is `Fail — Design Impact` because the supplemental
+  self-validation retained one contradictory sentence from withdrawn AD-REV-008.
+  `AD-REV-007` remains the latest fully passed cumulative design baseline until
+  this correction passes independent review.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as `AD-REV-011`; the corrected supplemental validation is
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Why this revision is recorded: VAL-006 previously said a recursive task-Team
+  parent waited for child cleanup jobs while independent terminal leaves cleaned
+  up concurrently outside the root mutation FIFO. That was AD-REV-008's
+  withdrawn coordinator/job direction and contradicted the authoritative
+  AD-REV-009/010 one-FIFO, prepared-or-null design, VAL-026, VAL-029, and DS-022.
+  The statement could have caused Implementation to recreate a forbidden second
+  settlement lane even though the core design rejected it.
+- Exact correction: VAL-006 now states that the existing deepest-first terminal
+  sweep selects an eligible leaf through the one
+  `RootTaskLifecycleCommandQueue`. The exact local registry invokes
+  `tryPrepareTerminationIfQuiescent()`. A `null` result returns deferred and
+  releases the FIFO for the existing idle/offline-event retry. A quiescent leaf
+  returns the existing prepared settlement, commits `settledAt`, and performs
+  existing finish/unregister through the same serialized mutation path. A task-
+  Team parent becomes eligible only after its children are durably settled. No
+  independent cleanup job, second lane, concurrent task mutation path, token, or
+  dependency graph exists.
+- AD-REV-008 reference audit: every remaining AD-REV-008 reference in the
+  current `design-spec.md` is historical or explicitly withdraws/rejects its
+  coordinator/token/job/dependency/outside-FIFO direction. Every remaining
+  reference in `architecture-design-self-validation.md` is an explicit
+  withdrawal/rejection or historical explanation. The AD-REV-008 revision-record
+  entry remains unchanged historical record as required; later AD-REV-009-011
+  entries explicitly supersede its mechanism.
+- Approved behavior or requirement IDs affected: architecture-description
+  coherence for `BEH-009`, `REQ-015`, and `AC-010`, especially recursive task-
+  Team lineage and deepest-first settlement. No intended behavior, lifecycle,
+  durability, API, Product, migration, source, or validation-execution contract
+  changes.
+- Design-spec sections updated: document revision/status, current-state review
+  chronology, classification delta, evidence/review table, cumulative artifact
+  status, escalation/routing statements, and implementation sequencing only.
+  AD-REV-009/010's mechanisms, ownership, interfaces, file responsibilities,
+  state tables, root ordering, removal plan, and validation requirements remain
+  unchanged.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-011, rewrites only
+  VAL-006's terminal path, records the negative AD-REV-008 reference audit, and
+  preserves all 29 supported cases. No new supplement is created.
+- Classification: focused AD-REV-011 is `Small / Low` because it changes only
+  Architecture-owned documentation and introduces no implementation surface.
+  The cumulative ticket remains `task_size=Large` and
+  `architectural_risk=High` because its reviewed definition, persistence,
+  migration, runtime, task, concurrency, API/stream, and frontend boundaries
+  remain the downstream implementation/review package. The selected route
+  remains independent Architecture Review.
+- Downstream and architecture-review impact: another independent review is
+  mandatory before Implementation reconciles the AD-REV-009/010 mechanism or
+  API/E2E resumes. Re-review should verify VAL-006 agrees with DS-022 and
+  VAL-026/029, all affirmative cleanup-job/concurrent-outside-FIFO language is
+  gone, and no core design or production contract changed.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is another independent Architecture Review of
+  cumulative `RER-021` / Product authorities / `AD-REV-011`. Implementation and
+  API/E2E remain held until review passes and the reviewed mechanism is
+  reconciled in source.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, schema, migration,
+  API, source-design, or public-contract gap remains. The focused documentation
+  contradiction is resolved. Existing implementation risks remain those already
+  stated by AD-REV-009/010: one-FIFO deferral/retry, exact lifecycle-fact
+  uniqueness, complete frozen-scope enumeration, no post-fence provider start,
+  prepared-cancel non-reopen, recursive deepest-first settlement, and Team/Org
+  shutdown phase order. This revision claims no implementation or validation
+  completion.
