@@ -22,13 +22,14 @@
       <Icon icon="heroicons:chevron-down-20-solid" class="h-4 w-4 flex-none text-slate-400 transition-transform" :class="expanded ? '' : '-rotate-90'" />
     </button>
 
-    <div v-if="expanded" :id="panelId" class="border-t border-slate-100 bg-slate-50 p-3">
+    <div v-show="expanded" :id="panelId" class="border-t border-slate-100 bg-slate-50 p-3">
       <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
         <MemberOverrideItem
           :node="node"
           :member-breadcrumb="node.address.split('/').filter(Boolean).join(' / ')"
           :disabled="false"
           @update:override="(_, value) => emit('update:override', value)"
+          @schema-state="forwardSchemaState"
         />
       </div>
     </div>
@@ -42,6 +43,7 @@ import MemberOverrideItem from './MemberOverrideItem.vue'
 import { useLocalization } from '~/composables/useLocalization'
 import type { EditableTeamFormAgentNode } from '~/types/agent/EditableTeamRunFormModel'
 import type { AgentConfigOverride } from '~/types/agent/TeamRunConfig'
+import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 
 const props = defineProps<{
   node: Readonly<EditableTeamFormAgentNode>
@@ -51,8 +53,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'toggle'): void
   (event: 'update:override', value: AgentConfigOverride | null): void
+  (event: 'schema-state', address: string, state: RuntimeModelConfigSchemaState): void
 }>()
 
 const { t } = useLocalization()
 const panelId = computed(() => `org-direct-agent-${props.node.address.slice(1).replaceAll('/', '-')}-panel`)
+const forwardSchemaState = (address: string, state: RuntimeModelConfigSchemaState) => {
+  if (address === props.node.address) emit('schema-state', address, state)
+}
 </script>

@@ -48,7 +48,7 @@ const provider = (runtime: string, models: ReturnType<typeof model>[]) => [{
 const codexSchema = {
   type: 'object',
   properties: {
-    temperature: { type: 'number', title: 'Temperature' },
+    temperature: { type: 'number', title: 'Temperature', minimum: 0, maximum: 2 },
     reasoning_effort: {
       type: 'string', title: 'Reasoning Effort',
       enum: ['low', 'medium', 'high', 'xhigh'], default: 'medium',
@@ -243,6 +243,41 @@ describe('MemberOverrideItem', () => {
     expect(toggle.attributes('aria-expanded')).toBe('true')
     expect(wrapper.emitted('update:override')?.at(-1)).toEqual([
       '/reviewer', { llmModelIdentifier: 'gpt-5.3-codex' },
+    ])
+  })
+
+  it('keeps an editable Agent field error visible and emits invalid-to-ready schema state', async () => {
+    const invalidNode = editableNode({
+      baseline: {
+        runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-5.4', llmConfig: { temperature: -1 },
+      },
+      effective: {
+        runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-5.4', llmConfig: { temperature: -1 },
+      },
+    })
+    const wrapper = mountItem(invalidNode)
+    await ready()
+
+    expect(wrapper.get('#config--reviewer-temperature').attributes('aria-invalid')).toBe('true')
+    expect(wrapper.text()).toContain('Value must be at least 0.')
+    expect(wrapper.emitted('schema-state')?.at(-1)).toEqual([
+      '/reviewer', { status: 'invalid', message: 'Value must be at least 0.' },
+    ])
+
+    await wrapper.setProps({
+      node: editableNode({
+        baseline: {
+          runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-5.4', llmConfig: { temperature: 0.5 },
+        },
+        effective: {
+          runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-5.4', llmConfig: { temperature: 0.5 },
+        },
+      }),
+    })
+    await ready()
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+    expect(wrapper.emitted('schema-state')?.at(-1)).toEqual([
+      '/reviewer', { status: 'ready', message: null },
     ])
   })
 

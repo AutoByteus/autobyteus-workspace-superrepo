@@ -57,6 +57,7 @@ import type { AgentConfigOverride, TeamScopeConfigOverride } from '~/types/agent
 import type { TeamLaunchConfigEdit } from '~/types/agent/TeamLaunchDraft'
 import type { TeamRunFormMemberNode, TeamRunFormModel } from '~/types/agent/TeamRunFormModel'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
+import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import TeamScopeConfigEditor from './TeamScopeConfigEditor.vue'
 import TeamMemberConfigTree from './TeamMemberConfigTree.vue'
 import MemberOverridesDisclosure from './MemberOverridesDisclosure.vue'
@@ -71,7 +72,7 @@ const emit = defineEmits<{
   (e: 'edit-config', edit: TeamLaunchConfigEdit): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
   (e: 'update-existing-model-config', address: string, config: Record<string, unknown> | null): void
-  (e: 'schema-state', address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void
+  (e: 'schema-state', address: string, state: RuntimeModelConfigSchemaState): void
 }>()
 const { t } = useLocalization()
 const model = computed(() => props.model)
@@ -115,7 +116,7 @@ const retryRuntimeCatalog = (runtimeKind: string) => {
 const forwardExistingModelConfig = (address: string, config: Record<string, unknown> | null) => {
   if (model.value.mode === 'existing' && !isFormReadOnly.value) emit('update-existing-model-config', address, config)
 }
-const forwardSchemaState = (address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }) => {
+const forwardSchemaState = (address: string, state: RuntimeModelConfigSchemaState) => {
   if (model.value.mode === 'existing') emit('schema-state', address, state)
 }
 </script>

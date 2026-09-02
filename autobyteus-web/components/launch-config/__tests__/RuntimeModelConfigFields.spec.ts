@@ -93,11 +93,30 @@ describe('RuntimeModelConfigFields stored historical values', () => {
     await flushPromises()
     await wrapper.vm.$nextTick()
 
-    expect(wrapper.get('input[type="number"]').exists()).toBe(true)
+    expect(wrapper.find('input[type="number"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Value must be at least 1.')
     expect(wrapper.emitted('schema-state')?.at(-1)).toEqual([{
       status: 'invalid',
       message: 'Value must be at least 1.',
+    }])
+  })
+
+  it('reports an unavailable selected launch model after its runtime catalog is ready', async () => {
+    const wrapper = mount(RuntimeModelConfigFields, {
+      props: {
+        runtimeKind: 'autobyteus',
+        llmModelIdentifier: 'removed-launch-model',
+        llmConfig: null,
+      },
+    })
+    await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.get('[data-test="selected-model-unavailable"]').text())
+      .toBe('The selected model is unavailable for the current runtime.')
+    expect(wrapper.emitted('schema-state')?.at(-1)).toEqual([{
+      status: 'unavailable',
+      message: 'The selected model is unavailable for the current runtime.',
     }])
   })
 

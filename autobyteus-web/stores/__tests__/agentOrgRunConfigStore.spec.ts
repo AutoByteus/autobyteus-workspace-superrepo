@@ -57,5 +57,42 @@ describe('agentOrgRunConfigStore', () => {
     expect(store.workspaceSelection).toEqual({ mode: 'new', existingWorkspaceId: null, newWorkspacePath: '' })
     expect(store.projectionError).toBeNull()
     expect(store.launchError).toBeNull()
+    expect(store.modelSchemaScopeAddresses).toEqual(['/'])
+    expect(store.firstModelSchemaBlock).toEqual({
+      address: '/', state: { status: 'loading', message: null },
+    })
+  })
+
+  it('retains exact schema readiness and prunes state outside the projected Org scope', () => {
+    const store = useAgentOrgRunConfigStore()
+    store.begin({ definitionId: 'org-1' })
+    store.reconcileModelSchemaScopes(['/', '/software', '/software/worker', '/direct'])
+
+    store.setModelSchemaState('/', { status: 'ready', message: null })
+    store.setModelSchemaState('/software', { status: 'invalid', message: 'Value must be at least 1.' })
+    store.setModelSchemaState('/software/worker', { status: 'ready', message: null })
+    store.setModelSchemaState('/direct', { status: 'unavailable', message: 'Model options could not be loaded.' })
+
+    expect(store.allModelSchemaScopesReady).toBe(false)
+    expect(store.firstModelSchemaBlock).toEqual({
+      address: '/software',
+      state: { status: 'invalid', message: 'Value must be at least 1.' },
+    })
+
+    store.setModelSchemaState('/software', { status: 'ready', message: null })
+    expect(store.firstModelSchemaBlock).toEqual({
+      address: '/direct',
+      state: { status: 'unavailable', message: 'Model options could not be loaded.' },
+    })
+    store.setModelSchemaState('/direct', { status: 'ready', message: null })
+    expect(store.allModelSchemaScopesReady).toBe(true)
+
+    store.reconcileModelSchemaScopes(['/', '/direct'])
+    expect(store.modelSchemaStateByAddress).toEqual({
+      '/': { status: 'ready', message: null },
+      '/direct': { status: 'ready', message: null },
+    })
+    store.setModelSchemaState('/software', { status: 'invalid', message: 'stale' })
+    expect(store.modelSchemaStateByAddress).not.toHaveProperty('/software')
   })
 })

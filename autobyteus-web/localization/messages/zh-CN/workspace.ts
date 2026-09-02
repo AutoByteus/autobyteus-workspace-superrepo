@@ -8,6 +8,7 @@ const messages = {
   "workspace.runModelConfig.verifying": "正在验证…",
   "workspace.runModelConfig.loadingModels": "正在加载模型选项…",
   "workspace.runModelConfig.catalogError": "无法加载模型选项。已保存的设置未更改。",
+  "workspace.runModelConfig.selectedModelUnavailable": "所选模型在当前运行时中不可用。",
   "workspace.runModelConfig.retry": "重试",
   "workspace.runModelConfig.refreshRequired": "编辑前必须刷新已保存的模型设置。",
   "workspace.runModelConfig.noAdjustableSettings": "此模型没有可调整的设置。",
@@ -38,6 +39,9 @@ const messages = {
   "workspace.agentOrg.stoppedHistory.description":
     "请从侧栏中的历史运行选择成员，以从其保存状态继续。",
   "workspace.agentOrg.runConfig.memberOverrides": "成员覆盖",
+  "workspace.agentOrg.runConfig.schemaLoading": "正在验证 {address} 的模型配置…",
+  "workspace.agentOrg.runConfig.schemaBlocked": "{address} 的模型配置尚未就绪：{error}",
+  "workspace.agentOrg.runConfig.schemaUnavailable": "有效模型配置不可用。",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "放大图表",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":

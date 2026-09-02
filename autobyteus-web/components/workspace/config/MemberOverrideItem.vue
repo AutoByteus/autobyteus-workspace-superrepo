@@ -129,6 +129,8 @@
       :historical="false"
       :historical-value-unavailable-message="historicalUnavailableMessage"
       :historical-model-config-title="t('workspace.components.workspace.config.TeamRunConfigForm.saved_model_configuration')"
+      :validation-errors="editableModelConfigErrors"
+      :preserve-invalid-draft="true"
       control-variant="quiet"
       @update:config="emitOverrideWithConfig"
     />
@@ -139,6 +141,7 @@
 import { computed, ref, watch } from 'vue'
 import type { AgentConfigOverride } from '~/types/agent/TeamRunConfig'
 import type { TeamFormAgentNode } from '~/types/agent/TeamRunFormModel'
+import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import type { ProviderWithModels } from '~/stores/llmProviderConfig'
 import SearchableGroupedSelect from '~/components/agentTeams/SearchableGroupedSelect.vue'
 import RuntimeModelConfigFields from '~/components/launch-config/RuntimeModelConfigFields.vue'
@@ -154,7 +157,12 @@ import {
   modelConfigsEqual,
   resolveEffectiveMemberRuntimeKind,
 } from '~/utils/teamRunConfigUtils'
-import { normalizeModelConfigSchema, type UiModelConfigSchema } from '~/utils/llmConfigSchema'
+import {
+  normalizeModelConfigSchema,
+  validateUiModelConfig,
+  type UiModelConfigSchema,
+  type UiModelConfigValidationIssue,
+} from '~/utils/llmConfigSchema'
 import { getThinkingControlState } from '~/utils/llmThinkingConfigAdapter'
 
 const props = defineProps<{
@@ -167,7 +175,7 @@ const emit = defineEmits<{
   (e: 'update:override', memberAddress: string, override: AgentConfigOverride | null): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
   (e: 'update-existing-model-config', memberAddress: string, config: Record<string, unknown> | null): void
-  (e: 'schema-state', address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void
+  (e: 'schema-state', address: string, state: RuntimeModelConfigSchemaState): void
 }>()
 const { t } = useLocalization()
 const editableNode = computed(() => props.node.mode === 'editable' ? props.node : null)
@@ -185,6 +193,8 @@ const {
   effectiveRuntimeKind,
   groupedModelOptions,
   hasModelIdentifier,
+  isLoadingModels,
+  modelLoadError,
   modelConfigSchemaByIdentifier,
   runtimeOptions,
   selectedRuntimeUnavailableReason,
@@ -215,6 +225,16 @@ const unresolvedInheritedModelMessage = computed(() => buildUnavailableInherited
 const effectiveModelIdentifier = computed(() => props.node.effectiveConfig.llmModelIdentifier || '')
 const selectedModelIdentifier = computed(() => existingNode.value ? effectiveModelIdentifier.value : explicitModelIdentifier.value)
 const modelConfigSchema = computed(() => modelConfigSchemaByIdentifier(effectiveModelIdentifier.value))
+const validationMessage = (issue: UiModelConfigValidationIssue): string => {
+  const key = `workspace.runModelConfig.validation.${issue.code}`
+  return t(key, issue.expected === undefined ? undefined : { expected: issue.expected })
+}
+const editableModelConfigIssues = computed(() => editableNode.value
+  ? validateUiModelConfig(modelConfigSchema.value, props.node.effectiveConfig.llmConfig)
+  : [])
+const editableModelConfigErrors = computed<Record<string, string>>(() => Object.fromEntries(
+  editableModelConfigIssues.value.map((issue) => [issue.key, validationMessage(issue)]),
+))
 const storedModelUnavailable = computed(() => Boolean(
   existingNode.value && selectedModelIdentifier.value && !hasModelIdentifier(selectedModelIdentifier.value),
 ))
@@ -223,6 +243,42 @@ const modelPlaceholder = computed(() => existingNode.value
   : isUnresolvedInheritedModel.value
     ? t('workspace.components.workspace.config.MemberOverrideItem.choose_compatible_member_model')
     : t('workspace.components.workspace.config.MemberOverrideItem.use_global_model_default'))
+
+watch(
+  [
+    editableNode,
+    isLoadingModels,
+    modelLoadError,
+    selectedRuntimeUnavailableReason,
+    isUnresolvedInheritedModel,
+    effectiveModelIdentifier,
+    modelConfigSchema,
+    editableModelConfigErrors,
+  ],
+  () => {
+    if (!editableNode.value) return
+    let state: RuntimeModelConfigSchemaState
+    if (isLoadingModels.value) {
+      state = { status: 'loading', message: null }
+    } else if (modelLoadError.value || selectedRuntimeUnavailableReason.value || isUnresolvedInheritedModel.value
+      || !effectiveModelIdentifier.value || !hasModelIdentifier(effectiveModelIdentifier.value)) {
+      state = {
+        status: 'unavailable',
+        message: modelLoadError.value
+          || selectedRuntimeUnavailableReason.value
+          || (isUnresolvedInheritedModel.value
+            ? unresolvedInheritedModelMessage.value
+            : t('workspace.runModelConfig.selectedModelUnavailable')),
+      }
+    } else if (Object.keys(editableModelConfigErrors.value).length) {
+      state = { status: 'invalid', message: Object.values(editableModelConfigErrors.value)[0] ?? null }
+    } else {
+      state = { status: 'ready', message: null }
+    }
+    emit('schema-state', props.node.address, state)
+  },
+  { immediate: true },
+)
 const autoExecuteStateLabel = computed(() => {
   if (existingNode.value) {
     return props.node.effectiveConfig.autoExecuteTools

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { TeamWorkspaceOperationState } from '~/types/agent/TeamLaunchDraft'
 import type { AgentConfigOverride, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
+import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
 
 export type AgentOrgRunConfigIntent = Readonly<{
@@ -19,6 +20,7 @@ export type AgentOrgRunConfigIntent = Readonly<{
 
 const emptyWorkspace = (): WorkspaceSelectionState => ({ mode: 'new', existingWorkspaceId: null, newWorkspacePath: '' })
 const idleWorkspaceOperation = (): TeamWorkspaceOperationState => ({ status: 'idle', error: null })
+const loadingSchemaState = (): RuntimeModelConfigSchemaState => ({ status: 'loading', message: null })
 const cloneTeamOverride = (override: TeamScopeConfigOverride): TeamScopeConfigOverride => ({
   ...override,
   ...(override.workspace ? {
@@ -42,6 +44,10 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
   const agentOverrides = ref<Record<AgentTeamAddress, AgentConfigOverride>>({})
   const teamWorkspaceSelections = ref<Record<AgentTeamAddress, WorkspaceSelectionState>>({})
   const teamWorkspaceOperations = ref<Record<AgentTeamAddress, TeamWorkspaceOperationState>>({})
+  const modelSchemaScopeAddresses = ref<readonly AgentTeamAddress[]>(['/'])
+  const modelSchemaStateByAddress = ref<Record<AgentTeamAddress, RuntimeModelConfigSchemaState>>({
+    '/': loadingSchemaState(),
+  })
   const projectionError = ref<string | null>(null)
   const launchError = ref<string | null>(null)
 
@@ -62,6 +68,8 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
     agentOverrides.value = {}
     teamWorkspaceSelections.value = {}
     teamWorkspaceOperations.value = {}
+    modelSchemaScopeAddresses.value = ['/']
+    modelSchemaStateByAddress.value = { '/': loadingSchemaState() }
     projectionError.value = null
     launchError.value = null
   }
@@ -107,6 +115,37 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
     teamWorkspaceSelections.value[address] ?? null
   const teamWorkspaceOperationFor = (address: AgentTeamAddress): TeamWorkspaceOperationState =>
     teamWorkspaceOperations.value[address] ?? idleWorkspaceOperation()
+  const reconcileModelSchemaScopes = (addresses: readonly AgentTeamAddress[]): void => {
+    const exactAddresses = [...new Set(addresses)]
+    if (exactAddresses.length === modelSchemaScopeAddresses.value.length
+      && exactAddresses.every((address, index) => modelSchemaScopeAddresses.value[index] === address)) return
+    modelSchemaScopeAddresses.value = Object.freeze(exactAddresses)
+    modelSchemaStateByAddress.value = Object.fromEntries(exactAddresses.map((address) => [
+      address,
+      modelSchemaStateByAddress.value[address] ?? loadingSchemaState(),
+    ]))
+  }
+  const setModelSchemaState = (address: AgentTeamAddress, state: RuntimeModelConfigSchemaState): void => {
+    if (!modelSchemaScopeAddresses.value.includes(address)) return
+    const current = modelSchemaStateByAddress.value[address]
+    if (current?.status === state.status && current.message === state.message) return
+    modelSchemaStateByAddress.value = {
+      ...modelSchemaStateByAddress.value,
+      [address]: { ...state },
+    }
+  }
+  const modelSchemaStateFor = (address: AgentTeamAddress): RuntimeModelConfigSchemaState =>
+    modelSchemaStateByAddress.value[address] ?? loadingSchemaState()
+  const firstModelSchemaBlock = computed(() => {
+    for (const address of modelSchemaScopeAddresses.value) {
+      const state = modelSchemaStateFor(address)
+      if (state.status !== 'ready') return Object.freeze({ address, state })
+    }
+    return null
+  })
+  const allModelSchemaScopesReady = computed(() => Boolean(
+    modelSchemaScopeAddresses.value.length && !firstModelSchemaBlock.value,
+  ))
   const setProjectionError = (error: string | null): void => {
     projectionError.value = error
   }
@@ -135,9 +174,11 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
   return {
     definitionId, runtimeKind, llmModelIdentifier, llmConfig, autoExecuteTools,
     workspaceSelection, teamOverrides, agentOverrides, teamWorkspaceSelections, teamWorkspaceOperations,
+    modelSchemaScopeAddresses, modelSchemaStateByAddress, firstModelSchemaBlock, allModelSchemaScopesReady,
     projectionError, launchError, intent,
     begin, setWorkspaceSelection, setTeamOverride, resetTeamOverride, setAgentOverride,
     setTeamWorkspaceSelection, setTeamWorkspaceOperation, teamWorkspaceSelectionFor, teamWorkspaceOperationFor,
+    reconcileModelSchemaScopes, setModelSchemaState, modelSchemaStateFor,
     setProjectionError, setLaunchError,
   }
 })

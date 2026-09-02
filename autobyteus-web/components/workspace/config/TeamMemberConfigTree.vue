@@ -53,6 +53,7 @@ import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { AgentConfigOverride, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
 import type { TeamRunFormMemberNode } from '~/types/agent/TeamRunFormModel'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
+import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import MemberOverrideItem from './MemberOverrideItem.vue'
 import TeamScopeConfigEditor from './TeamScopeConfigEditor.vue'
 
@@ -70,7 +71,7 @@ const emit = defineEmits<{
   (e: 'update:workspace-selection', address: AgentTeamAddress, selection: WorkspaceSelectionState): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
   (e: 'update-existing-model-config', address: string, config: Record<string, unknown> | null): void
-  (e: 'schema-state', address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void
+  (e: 'schema-state', address: string, state: RuntimeModelConfigSchemaState): void
 }>()
 const modelConfigFieldErrorsByAddress = computed(() => props.modelConfigFieldErrorsByAddress ?? {})
 
@@ -89,6 +90,6 @@ const forwardWorkspaceSelection = (address: AgentTeamAddress, selection: Workspa
 const forwardRetryRuntimeCatalog = (runtimeKind: string) => emit('retry-runtime-catalog', runtimeKind)
 const forwardExistingModelConfig = (address: string, config: Record<string, unknown> | null) =>
   emit('update-existing-model-config', address, config)
-const forwardSchemaState = (address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }) =>
+const forwardSchemaState = (address: string, state: RuntimeModelConfigSchemaState) =>
   emit('schema-state', address, state)
 </script>

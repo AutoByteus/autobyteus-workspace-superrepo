@@ -8,6 +8,7 @@ const messages = {
   "workspace.runModelConfig.verifying": "Verifying…",
   "workspace.runModelConfig.loadingModels": "Loading model options…",
   "workspace.runModelConfig.catalogError": "Model options could not be loaded. Saved settings were not changed.",
+  "workspace.runModelConfig.selectedModelUnavailable": "The selected model is unavailable for the current runtime.",
   "workspace.runModelConfig.retry": "Retry",
   "workspace.runModelConfig.refreshRequired": "Saved model settings must be refreshed before editing.",
   "workspace.runModelConfig.noAdjustableSettings": "This model has no adjustable settings.",
@@ -38,6 +39,9 @@ const messages = {
   "workspace.agentOrg.stoppedHistory.description":
     "Select a member from the historical run in the sidebar to continue from its saved state.",
   "workspace.agentOrg.runConfig.memberOverrides": "Member overrides",
+  "workspace.agentOrg.runConfig.schemaLoading": "Validating model configuration for {address}…",
+  "workspace.agentOrg.runConfig.schemaBlocked": "Model configuration for {address} is not ready: {error}",
+  "workspace.agentOrg.runConfig.schemaUnavailable": "The effective model configuration is unavailable.",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "Expand diagram",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":

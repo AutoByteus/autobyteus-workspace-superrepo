@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, nextTick, onMounted } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import AgentOrgRunConfigPanel from '../AgentOrgRunConfigPanel.vue'
@@ -22,7 +22,12 @@ vi.mock('vue-router', () => ({
 
 const PassiveField = defineComponent({
   name: 'RuntimeModelConfigFields',
-  template: '<div data-test="runtime-fields" />',
+  props: ['idPrefix'],
+  emits: ['schema-state'],
+  setup(_, { emit }) {
+    onMounted(() => emit('schema-state', { status: 'ready', message: null }))
+  },
+  template: '<div data-test="runtime-fields" :data-id-prefix="idPrefix" />',
 })
 const PassiveWorkspace = defineComponent({
   name: 'WorkspaceSelector',
@@ -33,7 +38,10 @@ const PassiveWorkspace = defineComponent({
 const AgentEditor = defineComponent({
   name: 'MemberOverrideItem',
   props: ['node'],
-  emits: ['update:override'],
+  emits: ['update:override', 'schema-state'],
+  setup(props, { emit }) {
+    onMounted(() => emit('schema-state', props.node.address, { status: 'ready', message: null }))
+  },
   template: '<div data-test="agent-editor" :data-address="node.address">{{ node.isCoordinator ? "Coordinator" : "Agent" }}</div>',
 })
 
@@ -67,6 +75,13 @@ const mountPanel = async () => {
   })
   await flushPromises()
   return wrapper
+}
+
+const prepareRunnableWorkspace = async () => {
+  useAgentOrgRunConfigStore().setWorkspaceSelection({
+    mode: 'new', existingWorkspaceId: null, newWorkspacePath: '/workspace/root',
+  })
+  await nextTick()
 }
 
 describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
@@ -180,5 +195,69 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     expect(wrapper.get('[data-test="org-config-projection-error"]').text()).toContain("cannot resolve Team '/software'")
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
     expect(wrapper.find('[data-test="org-member-overrides-toggle"]').exists()).toBe(false)
+  })
+
+  it('blocks the root invalid schema state with an exact accessible diagnostic until ready', async () => {
+    const wrapper = await mountPanel()
+    await prepareRunnableWorkspace()
+    const rootFields = wrapper.findAllComponents(PassiveField)
+      .find((field) => field.props('idPrefix') === 'org-run')!
+
+    rootFields.vm.$emit('schema-state', { status: 'invalid', message: 'Value must be at least 1.' })
+    await nextTick()
+
+    const diagnostic = wrapper.get('[data-test="org-config-schema-diagnostic"]')
+    expect(diagnostic.attributes('role')).toBe('alert')
+    expect(diagnostic.text()).toContain('/')
+    expect(diagnostic.text()).toContain('Value must be at least 1.')
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('aria-describedby')).toBe('org-model-schema-status')
+
+    rootFields.vm.$emit('schema-state', { status: 'ready', message: null })
+    await nextTick()
+    expect(wrapper.find('[data-test="org-config-schema-diagnostic"]').exists()).toBe(false)
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
+  })
+
+  it('blocks the exact mounted Team schema state until that Team becomes ready', async () => {
+    const wrapper = await mountPanel()
+    await prepareRunnableWorkspace()
+    const teamFields = wrapper.findAllComponents(PassiveField)
+      .find((field) => field.props('idPrefix') === 'team-scope-software')!
+
+    teamFields.vm.$emit('schema-state', { status: 'invalid', message: 'Value must be at most 10.' })
+    await nextTick()
+
+    expect(wrapper.get('[data-test="org-config-schema-diagnostic"]').text())
+      .toContain("Model configuration for /software is not ready: Value must be at most 10.")
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
+
+    teamFields.vm.$emit('schema-state', { status: 'ready', message: null })
+    await nextTick()
+    expect(wrapper.find('[data-test="org-config-schema-diagnostic"]').exists()).toBe(false)
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
+  })
+
+  it('forwards a direct Agent schema state and blocks only until the exact Agent is ready', async () => {
+    const wrapper = await mountPanel()
+    await prepareRunnableWorkspace()
+    const directAgent = wrapper.findAllComponents(AgentEditor)
+      .find((editor) => editor.props('node').address === '/requirements_engineer')!
+
+    directAgent.vm.$emit('schema-state', '/requirements_engineer', {
+      status: 'unavailable', message: 'Model options could not be loaded.',
+    })
+    await nextTick()
+
+    const diagnostic = wrapper.get('[data-test="org-config-schema-diagnostic"]')
+    expect(diagnostic.attributes('role')).toBe('alert')
+    expect(diagnostic.text()).toContain('/requirements_engineer')
+    expect(diagnostic.text()).toContain('Model options could not be loaded.')
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
+
+    directAgent.vm.$emit('schema-state', '/requirements_engineer', { status: 'ready', message: null })
+    await nextTick()
+    expect(wrapper.find('[data-test="org-config-schema-diagnostic"]').exists()).toBe(false)
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
   })
 })

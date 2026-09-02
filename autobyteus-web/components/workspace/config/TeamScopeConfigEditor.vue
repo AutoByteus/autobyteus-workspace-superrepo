@@ -244,6 +244,7 @@ import AutoApproveSwitch from './AutoApproveSwitch.vue'
 import WorkspaceSelector from './WorkspaceSelector.vue'
 import { useLocalization } from '~/composables/useLocalization'
 import type { TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
+import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import type { TeamScopeFormModel } from '~/types/agent/TeamRunFormModel'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
 import { hasMeaningfulLaunchOverride, modelConfigsEqual } from '~/utils/teamRunConfigUtils'
@@ -266,7 +267,7 @@ const emit = defineEmits<{
   (e: 'update:workspace-selection', address: string, selection: WorkspaceSelectionState): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
   (e: 'update-existing-model-config', address: string, config: Record<string, unknown> | null): void
-  (e: 'schema-state', address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void
+  (e: 'schema-state', address: string, state: RuntimeModelConfigSchemaState): void
 }>()
 const { t } = useLocalization()
 const editableScope = computed(() => props.scope.mode === 'editable' ? props.scope : null)

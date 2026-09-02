@@ -19,6 +19,7 @@
           @update:runtime-kind="runtimeKind = $event"
           @update:llm-model-identifier="llmModelIdentifier = $event"
           @update:llm-config="llmConfig = $event"
+          @schema-state="configStore.setModelSchemaState('/', $event)"
         />
 
         <div class="pt-4">
@@ -63,6 +64,7 @@
               :expanded="editingDirectAgent === agent.address"
               @toggle="toggleDirectAgent(agent.address)"
               @update:override="configStore.setAgentOverride(agent.address, $event)"
+              @schema-state="handleModelSchemaState"
             />
           </div>
           <TeamMemberConfigTree
@@ -74,6 +76,7 @@
             @reset-team="configStore.resetTeamOverride"
             @update-agent="configStore.setAgentOverride"
             @update:workspace-selection="handleTeamWorkspaceSelection"
+            @schema-state="handleModelSchemaState"
           />
         </MemberOverridesDisclosure>
 
@@ -82,6 +85,18 @@
         </p>
         <p v-if="launchError" role="alert" class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {{ launchError }}
+        </p>
+        <p
+          v-if="modelSchemaBlockingDiagnostic"
+          id="org-model-schema-status"
+          :role="modelSchemaBlockingDiagnostic.status === 'loading' ? 'status' : 'alert'"
+          class="rounded-md border p-3 text-sm"
+          :class="modelSchemaBlockingDiagnostic.status === 'loading'
+            ? 'border-blue-100 bg-blue-50 text-blue-700'
+            : 'border-red-200 bg-red-50 text-red-700'"
+          data-test="org-config-schema-diagnostic"
+        >
+          {{ modelSchemaBlockingDiagnostic.message }}
         </p>
       </div>
       <div v-else class="flex h-full items-center justify-center text-gray-500">Loading Agent Org…</div>
@@ -92,6 +107,7 @@
         data-test="run-agent-org"
         class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!canRun || orgRunStore.launching"
+        :aria-describedby="modelSchemaBlockingDiagnostic ? 'org-model-schema-status' : undefined"
         @click="runOrg"
       >
         {{ orgRunStore.launching ? 'Starting Agent Org…' : 'Run Agent Org' }}
@@ -120,6 +136,7 @@ import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
 import { useWorkspaceStore } from '~/stores/workspace'
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { AgentConfigOverride, ResolvedTeamRunLaunchConfig, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
+import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import type { WorkspaceMetadata } from '~/types/workspace/WorkspaceMetadata'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
 import { projectEditableAgentOrgRunFormModel } from '~/utils/editableAgentOrgRunFormModel'
@@ -138,6 +155,7 @@ const { t } = useLocalization()
 const {
   runtimeKind, llmModelIdentifier, llmConfig, autoExecuteTools, workspaceSelection,
   teamOverrides, agentOverrides, projectionError, launchError,
+  firstModelSchemaBlock, allModelSchemaScopesReady,
 } = storeToRefs(configStore)
 
 const definitionId = computed(() => String(route.query.definitionId || ''))
@@ -194,13 +212,33 @@ const projection = computed(() => {
       newWorkspacePath: effective.workspaceRootPath ?? '',
     },
     workspaceOperationFor: configStore.teamWorkspaceOperationFor,
-    runtimeCatalogStateFor: () => ({ status: 'idle', error: null }),
+    runtimeCatalogStateFor: (address) => configStore.modelSchemaStateFor(address).status === 'loading'
+      ? { status: 'loading', error: null }
+      : { status: 'ready', error: null },
   })
 })
 watch(projection, (result) => {
   configStore.setProjectionError(result?.status === 'blocked' ? result.diagnostic.message : null)
 }, { immediate: true })
 const formModel = computed(() => projection.value?.status === 'ready' ? projection.value.model : null)
+watch(formModel, (model) => {
+  configStore.reconcileModelSchemaScopes(model ? [
+    '/',
+    ...model.directAgents.map((agent) => agent.address),
+    ...model.mountedTeams.flatMap((team) => [team.address, ...team.children.map((agent) => agent.address)]),
+  ] : ['/'])
+}, { immediate: true })
+const modelSchemaBlockingDiagnostic = computed(() => {
+  const blocked = firstModelSchemaBlock.value
+  if (!blocked) return null
+  const message = blocked.state.status === 'loading'
+    ? t('workspace.agentOrg.runConfig.schemaLoading', { address: blocked.address })
+    : t('workspace.agentOrg.runConfig.schemaBlocked', {
+        address: blocked.address,
+        error: blocked.state.message || t('workspace.agentOrg.runConfig.schemaUnavailable'),
+      })
+  return Object.freeze({ status: blocked.state.status, message })
+})
 const workspaceReady = computed(() => Boolean(rootWorkspacePath.value))
 const teamWorkspacesReady = computed(() => Object.entries(configStore.teamWorkspaceSelections).every(
   ([address, selection]) => {
@@ -209,7 +247,8 @@ const teamWorkspacesReady = computed(() => Object.entries(configStore.teamWorksp
   },
 ))
 const canRun = computed(() => Boolean(
-  org.value && formModel.value && runtimeKind.value && llmModelIdentifier.value && workspaceReady.value && teamWorkspacesReady.value,
+  org.value && formModel.value && runtimeKind.value && llmModelIdentifier.value && workspaceReady.value
+    && teamWorkspacesReady.value && allModelSchemaScopesReady.value,
 ))
 
 const handleWorkspaceSelection = (selection: WorkspaceSelectionState) => {
@@ -219,6 +258,9 @@ const handleWorkspaceSelection = (selection: WorkspaceSelectionState) => {
 }
 const toggleDirectAgent = (address: AgentTeamAddress) => {
   editingDirectAgent.value = editingDirectAgent.value === address ? null : address
+}
+const handleModelSchemaState = (address: string, state: RuntimeModelConfigSchemaState) => {
+  configStore.setModelSchemaState(address as AgentTeamAddress, state)
 }
 const withoutWorkspace = (override: TeamScopeConfigOverride | undefined): TeamScopeConfigOverride | null => {
   const next = { ...(override ?? {}) }

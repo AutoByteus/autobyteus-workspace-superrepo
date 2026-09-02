@@ -97,7 +97,10 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
     effective: Readonly<ResolvedTeamRunLaunchConfig>,
   ) => Readonly<WorkspaceSelectionState>
   workspaceOperationFor: (address: AgentTeamAddress) => TeamWorkspaceOperationState
-  runtimeCatalogStateFor: (runtimeKind: string) => EditableRuntimeCatalogOperationState
+  runtimeCatalogStateFor: (
+    address: AgentTeamAddress,
+    runtimeKind: string,
+  ) => EditableRuntimeCatalogOperationState
 }>): EditableAgentOrgRunFormProjection => {
   try {
     const occupied = new Set<AgentTeamAddress>()
@@ -130,7 +133,7 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
         override,
         baselineConfig: inputNode.baseline,
         effectiveConfig,
-        runtimeCatalogState: input.runtimeCatalogStateFor(effectiveConfig.runtimeKind),
+        runtimeCatalogState: input.runtimeCatalogStateFor(inputNode.address, effectiveConfig.runtimeKind),
       })
     }
 
@@ -192,7 +195,7 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
         override: teamOverride ?? null,
         workspaceSelection,
         workspaceOperation: input.workspaceOperationFor(address),
-        runtimeCatalogState: input.runtimeCatalogStateFor(effectiveConfig.runtimeKind),
+        runtimeCatalogState: input.runtimeCatalogStateFor(address, effectiveConfig.runtimeKind),
       })
       mountedTeams.push(Object.freeze({
         mode: 'editable' as const,
