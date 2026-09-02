@@ -359,7 +359,7 @@ const handoffEndpoints = computed<HandoffEndpointOption[]>(() => formData.nodes.
   kind: 'agent',
   label: node.memberName,
   address: `/${node.memberName}`,
-  group: 'Team Agents',
+  group: t('handoffs.manager.groups.teamAgents'),
 })));
 const {
   addNodeFromLibrary,

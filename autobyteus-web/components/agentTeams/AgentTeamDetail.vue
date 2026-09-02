@@ -83,6 +83,7 @@ import HandoffManager from '~/components/collaboration/handoffs/HandoffManager.v
 import { useAgentTeamDefinitionStore, type AgentTeamDefinition } from '~/stores/agentTeamDefinitionStore'
 import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
 import { useRunActions } from '~/composables/useRunActions'
+import { useLocalization } from '~/composables/useLocalization'
 import { buildTeamLocalAgentDefinitionId } from '~/utils/teamLocalDefinitionId'
 import { toEditableHandoffs, type HandoffEndpointOption } from '~/types/collaboration/handoffs'
 
@@ -93,6 +94,7 @@ const router = useRouter()
 const teamStore = useAgentTeamDefinitionStore()
 const agentStore = useAgentDefinitionStore()
 const { prepareTeamRun } = useRunActions()
+const { t } = useLocalization()
 const loading = ref(false)
 const showDeleteConfirm = ref(false)
 const teamDef = computed(() => teamStore.getAgentTeamDefinitionById(teamDefinitionId.value))
@@ -103,7 +105,7 @@ const agentId = (node: TeamNode): string => node.refScope === 'TEAM_LOCAL' && te
   : node.ref
 const agentName = (node: TeamNode): string => agentStore.getAgentDefinitionById(agentId(node))?.name || node.ref
 const initials = (name: string): string => name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('') || 'AT'
-const handoffEndpoints = computed<HandoffEndpointOption[]>(() => (teamDef.value?.nodes ?? []).map((node) => ({ id: node.memberName, kind: 'agent', label: node.memberName, address: `/${node.memberName}`, group: 'Team Agents' })))
+const handoffEndpoints = computed<HandoffEndpointOption[]>(() => (teamDef.value?.nodes ?? []).map((node) => ({ id: node.memberName, kind: 'agent', label: node.memberName, address: `/${node.memberName}`, group: t('handoffs.manager.groups.teamAgents') })))
 const displayHandoffs = computed(() => toEditableHandoffs(teamDef.value?.handoffs))
 
 onMounted(async () => {

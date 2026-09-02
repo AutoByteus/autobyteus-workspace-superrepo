@@ -17,6 +17,7 @@ const messages = {
   'handoffs.manager.fields.selectDestination': 'Select destination',
   'handoffs.manager.fields.conditionLabel': 'When condition {{position}}',
   'handoffs.manager.fields.conditionPlaceholder': 'Describe when this handoff applies',
+  'handoffs.manager.groups.teamAgents': 'Team Agents',
   'handoffs.manager.aria.moveConditionUp': 'Move When condition {{position}} up',
   'handoffs.manager.aria.moveConditionDown': 'Move When condition {{position}} down',
   'handoffs.manager.aria.deleteCondition': 'Delete When condition {{position}}',

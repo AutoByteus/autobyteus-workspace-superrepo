@@ -69,12 +69,14 @@ describe('Agent Org ticket surface localization catalogs', () => {
     expect(enHandoffMessages).toMatchObject({
       'handoffs.manager.title': 'Handoffs',
       'handoffs.manager.actions.add': 'Add handoff',
+      'handoffs.manager.groups.teamAgents': 'Team Agents',
       'handoffs.manager.validation.chooseSource': 'Choose a source Agent.',
       'handoffs.manager.validation.resolveAffectedOne': 'Resolve {{count}} affected handoff before saving.',
     })
     expect(zhCnHandoffMessages).toMatchObject({
       'handoffs.manager.title': '交接规则',
       'handoffs.manager.actions.add': '添加交接规则',
+      'handoffs.manager.groups.teamAgents': '团队智能体',
       'handoffs.manager.validation.chooseSource': '请选择来源智能体。',
       'handoffs.manager.validation.resolveAffectedOne': '保存前，请解决 {{count}} 条受影响的交接规则。',
     })

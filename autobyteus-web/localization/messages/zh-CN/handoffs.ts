@@ -17,6 +17,7 @@ const messages = {
   'handoffs.manager.fields.selectDestination': '选择目标',
   'handoffs.manager.fields.conditionLabel': '交接条件 {{position}}',
   'handoffs.manager.fields.conditionPlaceholder': '描述此交接规则的适用条件',
+  'handoffs.manager.groups.teamAgents': '团队智能体',
   'handoffs.manager.aria.moveConditionUp': '将交接条件 {{position}} 上移',
   'handoffs.manager.aria.moveConditionDown': '将交接条件 {{position}} 下移',
   'handoffs.manager.aria.deleteCondition': '删除交接条件 {{position}}',

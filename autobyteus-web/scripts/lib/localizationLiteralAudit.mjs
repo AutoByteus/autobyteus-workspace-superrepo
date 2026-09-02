@@ -28,6 +28,7 @@ const UI_PROPERTY_NAMES = new Set([
   'confirmButtonText',
   'lastError',
   'error',
+  'group',
 ]);
 const UI_IDENTIFIER_PATTERN = /(?:label|message|detail|title|description|summary|placeholder|ariaLabel|buttonLabel|buttonText|helpText|emptyText|errorText|statusLabel|statusMessage|versionSummary|currentVersionLabel|lastCheckedLabel|pendingActionLabel|installPhaseLabel|installMessage|audioInputStatusMessage|settingsTestButtonLabel|settingsTestOutcomeLabel|settingsTestOutcomeDescription|extensionStatusMessage|[A-Za-z0-9]*Error)$/i;
 const UI_FUNCTION_PATTERN = /(?:build.*Error|.*Label|.*Message|.*Title|.*Description|.*Summary)$/i;

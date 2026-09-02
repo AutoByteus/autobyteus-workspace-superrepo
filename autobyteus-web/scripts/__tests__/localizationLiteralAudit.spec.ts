@@ -155,6 +155,7 @@ function install() {
 </template>
 <script setup lang="ts">
 const catalogSections = computed(() => [{ title: 'Featured organizations' }]);
+const endpoint = { group: 'Team Agents' };
 const saveError = ref('');
 const save = () => {
   saveError.value = 'Enter an Agent Org name before saving.';
@@ -177,6 +178,7 @@ const save = () => {
       '{{expr}} added',
       'Add {{expr}}',
       'Featured organizations',
+      'Team Agents',
       'Enter an Agent Org name before saving.',
       'Agent Org save failed.',
     ]));
@@ -194,6 +196,7 @@ const save = () => {
 </template>
 <script setup lang="ts">
 const catalogSections = computed(() => [{ title: t('agentOrgs.featured') }]);
+const endpoint = { group: t('handoffs.manager.groups.teamAgents') };
 const saveError = ref('');
 const save = () => {
   saveError.value = t('agentOrgs.nameRequired');
