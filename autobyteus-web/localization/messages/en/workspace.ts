@@ -37,6 +37,7 @@ const messages = {
   "workspace.agentOrg.stoppedHistory.title": "Stopped Agent Org",
   "workspace.agentOrg.stoppedHistory.description":
     "Select a member from the historical run in the sidebar to continue from its saved state.",
+  "workspace.agentOrg.runConfig.memberOverrides": "Member overrides",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "Expand diagram",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":
@@ -89,6 +90,7 @@ const messages = {
   "workspace.components.workspace.config.TeamScopeConfigEditor.runtime_help": "Runtime used by this Team scope.",
   "workspace.components.workspace.config.TeamScopeConfigEditor.team_default_model": "Default LLM Model",
   "workspace.components.workspace.config.TeamScopeConfigEditor.model_help": "Nested Teams and Agents inherit this value unless customized.",
+  "workspace.components.workspace.config.TeamScopeConfigEditor.flat_model_help": "Agents in this Team inherit this value unless customized.",
   "workspace.components.workspace.config.TeamScopeConfigEditor.auto_approve": "Auto approve tools",
   "workspace.components.workspace.config.TeamScopeConfigEditor.auto_help": "Inherited by descendant scopes without an override.",
   "workspace.components.workspace.config.TeamScopeConfigEditor.catalog_loading": "Loading models for {{address}}…",

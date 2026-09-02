@@ -100,14 +100,17 @@ const existingModel = () => {
     saving: false,
   })
 }
-const mountForm = (model: TeamRunFormModel = editableModel()) => shallowMount(TeamRunConfigForm, { props: { model } })
+const mountForm = (model: TeamRunFormModel = editableModel()) => shallowMount(TeamRunConfigForm, {
+  props: { model },
+  global: { stubs: { MemberOverridesDisclosure: false } },
+})
 
 describe('TeamRunConfigForm launch and existing-run presentation', () => {
   it('preserves the personal-baseline root order and projects inherited direct-Agent values', () => {
     const wrapper = mountForm()
     const root = wrapper.findComponent(TeamScopeConfigEditor)
     const tree = wrapper.findComponent(TeamMemberConfigTree)
-    const directChildren = Array.from(wrapper.element.children)
+    const directChildren = Array.from(wrapper.element.children) as HTMLElement[]
 
     expect(directChildren[0]?.querySelector('label')?.textContent).toContain('team_definition')
     expect(directChildren[1]?.tagName.toLowerCase()).toBe('team-scope-config-editor-stub')

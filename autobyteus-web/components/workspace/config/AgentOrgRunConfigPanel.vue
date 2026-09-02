@@ -8,42 +8,94 @@
         </div>
 
         <RuntimeModelConfigFields
-          :runtime-kind="runtimeKind" :llm-model-identifier="llmModelIdentifier" :llm-config="llmConfig"
+          :runtime-kind="runtimeKind"
+          :llm-model-identifier="llmModelIdentifier"
+          :llm-config="llmConfig"
           runtime-help-text="Selects the runtime used by this organization run."
-          model-label="Default LLM Model" model-help-text="Used across the organization unless a placement is customized."
-          id-prefix="org-run" control-variant="quiet"
-          @update:runtime-kind="runtimeKind = $event" @update:llm-model-identifier="llmModelIdentifier = $event" @update:llm-config="llmConfig = $event"
+          model-label="Default LLM Model"
+          model-help-text="Used across the organization unless a placement is customized."
+          id-prefix="org-run"
+          control-variant="quiet"
+          @update:runtime-kind="runtimeKind = $event"
+          @update:llm-model-identifier="llmModelIdentifier = $event"
+          @update:llm-config="llmConfig = $event"
         />
 
         <div class="pt-4">
           <WorkspaceSelector
             :model="{ mode: 'editable', selection: workspaceSelection, isLoading: workspaceLoading, error: workspaceError }"
-            control-variant="quiet" :auto-select-default="false"
+            control-variant="quiet"
+            :auto-select-default="false"
             @update:model-value="handleWorkspaceSelection"
           />
         </div>
 
         <div class="flex items-center justify-between gap-4 py-2" data-test="org-auto-approve-row">
-          <div class="min-w-0"><label class="block text-base text-gray-900">Auto approve tools</label><p class="mt-1 text-xs text-gray-500">Automatically allows tool calls and access requests for this run.</p></div>
-          <button type="button" role="switch" :aria-checked="autoExecuteTools" class="relative inline-flex h-6 w-11 flex-none rounded-full border-2 border-transparent transition-colors focus:ring-2 focus:ring-blue-500" :class="autoExecuteTools ? 'bg-blue-600' : 'bg-gray-200'" @click="autoExecuteTools = !autoExecuteTools"><span class="sr-only">Auto approve tools</span><span class="inline-block h-5 w-5 rounded-full bg-white shadow transition" :class="autoExecuteTools ? 'translate-x-5' : 'translate-x-0'" /></button>
+          <div class="min-w-0">
+            <label class="block text-base text-gray-900">Auto approve tools</label>
+            <p class="mt-1 text-xs text-gray-500">Automatically allows tool calls and access requests for this run.</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="autoExecuteTools"
+            class="relative inline-flex h-6 w-11 flex-none rounded-full border-2 border-transparent transition-colors focus:ring-2 focus:ring-blue-500"
+            :class="autoExecuteTools ? 'bg-blue-600' : 'bg-gray-200'"
+            @click="autoExecuteTools = !autoExecuteTools"
+          >
+            <span class="sr-only">Auto approve tools</span>
+            <span class="inline-block h-5 w-5 rounded-full bg-white shadow transition" :class="autoExecuteTools ? 'translate-x-5' : 'translate-x-0'" />
+          </button>
         </div>
 
-        <div>
-          <button type="button" data-test="org-member-overrides-toggle" class="flex w-full items-center justify-between rounded-md px-1 py-2 text-left text-sm font-medium text-gray-700 hover:text-gray-900" :aria-expanded="overridesExpanded" @click="overridesExpanded = !overridesExpanded"><span>Member overrides</span><Icon icon="heroicons:chevron-down-20-solid" class="h-4 w-4 transition-transform" :class="overridesExpanded ? '' : '-rotate-90'" /></button>
-          <div v-show="overridesExpanded" class="mt-3 overflow-hidden rounded-lg border border-slate-300 bg-white shadow-sm" data-test="org-member-overrides-panel">
-            <AgentOrgPlacementOverrideRow v-for="agent in directAgents" :key="agent.address" :placement-key="agent.address" kind="agent" :name="agent.name" :address="agent.address" :expanded="editingPlacement === agent.address" :override="memberOverrides[agent.address]" :global-runtime-kind="runtimeKind" :global-llm-model="llmModelIdentifier" :global-llm-config="llmConfig" :global-auto-execute-tools="autoExecuteTools" @toggle="togglePlacement(agent.address)" @update:override="setPlacementOverride(agent.address, $event)" />
-            <section v-for="team in teams" :key="team.address" class="border-t border-slate-200 bg-slate-50/60">
-              <AgentOrgPlacementOverrideRow :placement-key="team.address" kind="team" :name="team.name" :address="team.address" :detail="`Coordinator: ${team.coordinatorName}`" :expanded="editingPlacement === team.address" :override="memberOverrides[team.address]" :global-runtime-kind="runtimeKind" :global-llm-model="llmModelIdentifier" :global-llm-config="llmConfig" :global-auto-execute-tools="autoExecuteTools" @toggle="togglePlacement(team.address)" @update:override="setPlacementOverride(team.address, $event)" />
-              <div class="ml-6 border-l border-slate-200 bg-white"><AgentOrgPlacementOverrideRow v-for="agent in team.agents" :key="agent.address" :placement-key="agent.address" kind="agent" :name="agent.name" :address="agent.address" :expanded="editingPlacement === agent.address" :override="memberOverrides[agent.address]" :global-runtime-kind="runtimeKind" :global-llm-model="llmModelIdentifier" :global-llm-config="llmConfig" :global-auto-execute-tools="autoExecuteTools" @toggle="togglePlacement(agent.address)" @update:override="setPlacementOverride(agent.address, $event)" /></div>
-            </section>
+        <MemberOverridesDisclosure
+          v-if="formModel"
+          :key="org.id"
+          :label="t('workspace.agentOrg.runConfig.memberOverrides')"
+          :count="formModel.configurableAgentCount"
+          test-prefix="org-member-overrides"
+        >
+          <div v-if="formModel.directAgents.length" class="mb-3 overflow-hidden rounded-lg border border-slate-300 bg-white shadow-sm">
+            <AgentOrgDirectAgentOverrideRow
+              v-for="agent in formModel.directAgents"
+              :key="agent.address"
+              :node="agent"
+              :expanded="editingDirectAgent === agent.address"
+              @toggle="toggleDirectAgent(agent.address)"
+              @update:override="configStore.setAgentOverride(agent.address, $event)"
+            />
           </div>
-        </div>
-        <p v-if="launchError" class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ launchError }}</p>
+          <TeamMemberConfigTree
+            v-if="formModel.mountedTeams.length"
+            :member-nodes="formModel.mountedTeams"
+            :disabled="false"
+            :team-model-help-text="t('workspace.components.workspace.config.TeamScopeConfigEditor.flat_model_help')"
+            @update-team="configStore.setTeamOverride"
+            @reset-team="configStore.resetTeamOverride"
+            @update-agent="configStore.setAgentOverride"
+            @update:workspace-selection="handleTeamWorkspaceSelection"
+          />
+        </MemberOverridesDisclosure>
+
+        <p v-if="projectionError" role="alert" class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700" data-test="org-config-projection-error">
+          {{ projectionError }}
+        </p>
+        <p v-if="launchError" role="alert" class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {{ launchError }}
+        </p>
       </div>
       <div v-else class="flex h-full items-center justify-center text-gray-500">Loading Agent Org…</div>
     </div>
     <div class="border-t border-gray-200 bg-gray-50 px-4 py-3">
-      <button type="button" data-test="run-agent-org" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50" :disabled="!canRun || orgRunStore.launching" @click="runOrg">{{ orgRunStore.launching ? 'Starting Agent Org…' : 'Run Agent Org' }}</button>
+      <button
+        type="button"
+        data-test="run-agent-org"
+        class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        :disabled="!canRun || orgRunStore.launching"
+        @click="runOrg"
+      >
+        {{ orgRunStore.launching ? 'Starting Agent Org…' : 'Run Agent Org' }}
+      </button>
       <p v-if="!workspaceReady" class="mt-2 text-xs text-amber-700">Workspace is required to run an Agent Org.</p>
     </div>
   </div>
@@ -52,39 +104,241 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Icon } from '@iconify/vue'
 import { useRoute, useRouter } from 'vue-router'
 import RuntimeModelConfigFields from '~/components/launch-config/RuntimeModelConfigFields.vue'
-import WorkspaceSelector from '~/components/workspace/config/WorkspaceSelector.vue'
-import AgentOrgPlacementOverrideRow from '~/components/workspace/config/AgentOrgPlacementOverrideRow.vue'
-import { useAgentOrgDefinitionStore } from '~/stores/agentOrgDefinitionStore'
-import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
-import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
-import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
-import { useAgentOrgRunConfigStore } from '~/stores/agentOrgRunConfigStore'
-import { useWorkspaceStore } from '~/stores/workspace'
+import AgentOrgDirectAgentOverrideRow from './AgentOrgDirectAgentOverrideRow.vue'
+import MemberOverridesDisclosure from './MemberOverridesDisclosure.vue'
+import TeamMemberConfigTree from './TeamMemberConfigTree.vue'
+import WorkspaceSelector from './WorkspaceSelector.vue'
+import { useLocalization } from '~/composables/useLocalization'
 import { useRightSideTabs } from '~/composables/useRightSideTabs'
+import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
+import { useAgentOrgDefinitionStore } from '~/stores/agentOrgDefinitionStore'
+import { useAgentOrgRunConfigStore } from '~/stores/agentOrgRunConfigStore'
+import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
+import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
+import { useWorkspaceStore } from '~/stores/workspace'
+import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
+import type { AgentConfigOverride, ResolvedTeamRunLaunchConfig, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
+import type { WorkspaceMetadata } from '~/types/workspace/WorkspaceMetadata'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
-import type { AgentConfigOverride } from '~/types/agent/TeamRunConfig'
+import { projectEditableAgentOrgRunFormModel } from '~/utils/editableAgentOrgRunFormModel'
+import { hasMeaningfulLaunchOverride } from '~/utils/teamRunConfigUtils'
 
-type AgentPlacement = { name: string; address: string }
-type TeamPlacement = AgentPlacement & { coordinatorName: string; agents: AgentPlacement[] }
-const route = useRoute(); const router = useRouter()
-const orgStore = useAgentOrgDefinitionStore(); const agentStore = useAgentDefinitionStore(); const teamStore = useAgentTeamDefinitionStore(); const orgRunStore = useAgentOrgRunStore(); const configStore = useAgentOrgRunConfigStore(); const workspaceStore = useWorkspaceStore(); const { setActiveTab } = useRightSideTabs()
-const { runtimeKind, llmModelIdentifier, llmConfig, autoExecuteTools, workspaceSelection, memberOverrides } = storeToRefs(configStore)
+const route = useRoute()
+const router = useRouter()
+const orgStore = useAgentOrgDefinitionStore()
+const agentStore = useAgentDefinitionStore()
+const teamStore = useAgentTeamDefinitionStore()
+const orgRunStore = useAgentOrgRunStore()
+const configStore = useAgentOrgRunConfigStore()
+const workspaceStore = useWorkspaceStore()
+const { setActiveTab } = useRightSideTabs()
+const { t } = useLocalization()
+const {
+  runtimeKind, llmModelIdentifier, llmConfig, autoExecuteTools, workspaceSelection,
+  teamOverrides, agentOverrides, projectionError, launchError,
+} = storeToRefs(configStore)
+
 const definitionId = computed(() => String(route.query.definitionId || ''))
 const org = computed(() => orgStore.byId(definitionId.value))
-const workspaceLoading = ref(false); const workspaceError = ref<string | null>(null); const launchError = ref<string | null>(null)
-const overridesExpanded = ref(false); const editingPlacement = ref<string | null>(null)
-watch(org, (value) => { if (!value) return; configStore.begin({ definitionId: value.id, runtimeKind: value.defaultLaunchConfig?.runtimeKind, llmModelIdentifier: value.defaultLaunchConfig?.llmModelIdentifier, llmConfig: value.defaultLaunchConfig?.llmConfig ?? null }) }, { immediate: true })
-const directAgents = computed<AgentPlacement[]>(() => (org.value?.members ?? []).filter((member) => member.refType === 'AGENT').map((member) => ({ name: agentStore.getAgentDefinitionById(member.ref)?.name || member.memberName, address: `/${member.memberName}` })))
-const teams = computed<TeamPlacement[]>(() => (org.value?.members ?? []).filter((member) => member.refType === 'AGENT_TEAM').flatMap((member) => { const team = teamStore.getAgentTeamDefinitionById(member.ref); if (!team) return []; const address = `/${member.memberName}`; return [{ name: team.name, address, coordinatorName: team.nodes.find((node) => node.memberName === team.coordinatorMemberName)?.memberName || team.coordinatorMemberName, agents: team.nodes.map((node) => ({ name: agentStore.getAgentDefinitionById(node.ref)?.name || node.memberName, address: `${address}/${node.memberName}` })) }] }))
-const workspaceReady = computed(() => workspaceSelection.value.mode === 'existing' ? Boolean(workspaceSelection.value.existingWorkspaceId) : Boolean(workspaceSelection.value.newWorkspacePath.trim()))
-const canRun = computed(() => Boolean(org.value && runtimeKind.value && llmModelIdentifier.value && workspaceReady.value))
-const handleWorkspaceSelection = (selection: WorkspaceSelectionState) => { configStore.setWorkspaceSelection(selection); workspaceError.value = null; if (selection.mode === 'existing' && selection.existingWorkspaceId) setActiveTab('files') }
-const togglePlacement = (address: string) => { editingPlacement.value = editingPlacement.value === address ? null : address }
-const setPlacementOverride = (address: string, override: AgentConfigOverride | null) => configStore.setPlacementOverride(address, override)
-const resolveWorkspacePath = async (): Promise<string> => { const selection = workspaceSelection.value; if (selection.mode === 'new') { const path = selection.newWorkspacePath.trim(); if (!path) throw new Error('Workspace path is required.'); workspaceLoading.value = true; try { await workspaceStore.createWorkspace({ root_path: path }); setActiveTab('files'); return path } finally { workspaceLoading.value = false } } const workspace = selection.existingWorkspaceId ? workspaceStore.workspaces[selection.existingWorkspaceId] : null; const path = workspace?.workspaceRootPath || workspace?.absolutePath || workspace?.workspaceConfig?.root_path || workspace?.workspaceConfig?.rootPath || ''; if (!path) throw new Error('Selected workspace has no usable root path.'); return path }
-const runOrg = async () => { if (!org.value || !canRun.value) return; launchError.value = null; try { const workspaceRootPath = await resolveWorkspacePath(); const configuration = (override: AgentConfigOverride) => ({ ...(override.runtimeKind ? { runtimeKind: override.runtimeKind } : {}), ...(override.llmModelIdentifier ? { llmModelIdentifier: override.llmModelIdentifier } : {}), ...(Object.prototype.hasOwnProperty.call(override, 'llmConfig') ? { llmConfig: override.llmConfig ?? null } : {}), ...(override.autoExecuteTools === undefined ? {} : { autoExecuteTools: override.autoExecuteTools }) }); const teamAddresses = new Set(teams.value.map((team) => team.address)); const overrides = Object.entries(memberOverrides.value).filter(([, value]) => Object.keys(configuration(value)).length).map(([address, value]) => ({ address, configuration: configuration(value) })); const orgRunId = await orgRunStore.launch({ agentOrgDefinitionId: org.value.id, rootConfiguration: { runtimeKind: runtimeKind.value, llmModelIdentifier: llmModelIdentifier.value, llmConfig: llmConfig.value, autoExecuteTools: autoExecuteTools.value, skillAccessMode: 'PRELOADED_ONLY', workspaceRootPath }, teamOverrides: overrides.filter((item) => teamAddresses.has(item.address)), agentOverrides: overrides.filter((item) => !teamAddresses.has(item.address)) }); await router.replace({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId: org.value.id, orgRunId, mode: 'active' } }) } catch (cause) { launchError.value = cause instanceof Error ? cause.message : String(cause) } }
-onMounted(() => Promise.all([orgStore.fetchAll(), agentStore.fetchAllAgentDefinitions(), teamStore.fetchAllAgentTeamDefinitions(), workspaceStore.fetchAllWorkspaces()]))
+const workspaceLoading = ref(false)
+const workspaceError = ref<string | null>(null)
+const editingDirectAgent = ref<AgentTeamAddress | null>(null)
+
+watch(org, (value) => {
+  if (!value) return
+  editingDirectAgent.value = null
+  configStore.begin({
+    definitionId: value.id,
+    runtimeKind: value.defaultLaunchConfig?.runtimeKind,
+    llmModelIdentifier: value.defaultLaunchConfig?.llmModelIdentifier,
+    llmConfig: value.defaultLaunchConfig?.llmConfig ?? null,
+  })
+}, { immediate: true })
+
+const workspaceMetadata = (workspaceId: string | null): WorkspaceMetadata | null => {
+  if (!workspaceId) return null
+  const workspace = workspaceStore.workspaces[workspaceId]
+  return workspaceStore.workspaceMetadataById[workspaceId]
+    ?? (workspace ? workspaceStore.registerWorkspaceInfoMetadata(workspace) : null)
+    ?? null
+}
+const rootWorkspacePath = computed(() => {
+  if (workspaceSelection.value.mode === 'new') return workspaceSelection.value.newWorkspacePath.trim() || null
+  const metadata = workspaceMetadata(workspaceSelection.value.existingWorkspaceId)
+  return metadata?.workspaceRootPath?.trim() || null
+})
+const rootConfig = computed<Readonly<ResolvedTeamRunLaunchConfig>>(() => Object.freeze({
+  runtimeKind: runtimeKind.value,
+  workspaceId: workspaceSelection.value.mode === 'existing' ? workspaceSelection.value.existingWorkspaceId : null,
+  workspaceMetadata: workspaceSelection.value.mode === 'existing' ? workspaceMetadata(workspaceSelection.value.existingWorkspaceId) : null,
+  workspaceRootPath: rootWorkspacePath.value,
+  llmModelIdentifier: llmModelIdentifier.value,
+  llmConfig: llmConfig.value,
+  autoExecuteTools: autoExecuteTools.value,
+  skillAccessMode: 'PRELOADED_ONLY',
+}))
+const projection = computed(() => {
+  if (!org.value) return null
+  return projectEditableAgentOrgRunFormModel({
+    orgDefinition: org.value,
+    rootConfig: rootConfig.value,
+    teamOverrides: teamOverrides.value,
+    agentOverrides: agentOverrides.value,
+    getTeamDefinitionById: teamStore.getAgentTeamDefinitionById,
+    getAgentDisplayNameById: (id) => agentStore.getAgentDefinitionById(id)?.name ?? null,
+    workspaceSelectionFor: (address, effective) => configStore.teamWorkspaceSelectionFor(address) ?? {
+      mode: effective.workspaceId ? 'existing' : 'new',
+      existingWorkspaceId: effective.workspaceId,
+      newWorkspacePath: effective.workspaceRootPath ?? '',
+    },
+    workspaceOperationFor: configStore.teamWorkspaceOperationFor,
+    runtimeCatalogStateFor: () => ({ status: 'idle', error: null }),
+  })
+})
+watch(projection, (result) => {
+  configStore.setProjectionError(result?.status === 'blocked' ? result.diagnostic.message : null)
+}, { immediate: true })
+const formModel = computed(() => projection.value?.status === 'ready' ? projection.value.model : null)
+const workspaceReady = computed(() => Boolean(rootWorkspacePath.value))
+const teamWorkspacesReady = computed(() => Object.entries(configStore.teamWorkspaceSelections).every(
+  ([address, selection]) => {
+    if (configStore.teamWorkspaceOperationFor(address).status === 'error') return false
+    return selection.mode === 'existing' ? Boolean(selection.existingWorkspaceId) : Boolean(selection.newWorkspacePath.trim())
+  },
+))
+const canRun = computed(() => Boolean(
+  org.value && formModel.value && runtimeKind.value && llmModelIdentifier.value && workspaceReady.value && teamWorkspacesReady.value,
+))
+
+const handleWorkspaceSelection = (selection: WorkspaceSelectionState) => {
+  configStore.setWorkspaceSelection(selection)
+  workspaceError.value = null
+  if (selection.mode === 'existing' && selection.existingWorkspaceId) setActiveTab('files')
+}
+const toggleDirectAgent = (address: AgentTeamAddress) => {
+  editingDirectAgent.value = editingDirectAgent.value === address ? null : address
+}
+const withoutWorkspace = (override: TeamScopeConfigOverride | undefined): TeamScopeConfigOverride | null => {
+  const next = { ...(override ?? {}) }
+  delete next.workspace
+  return hasMeaningfulLaunchOverride(next) ? next : null
+}
+const handleTeamWorkspaceSelection = (address: AgentTeamAddress, selection: WorkspaceSelectionState) => {
+  configStore.setTeamWorkspaceSelection(address, selection)
+  const current = teamOverrides.value[address]
+  if (selection.mode === 'existing' && selection.existingWorkspaceId) {
+    const metadata = workspaceMetadata(selection.existingWorkspaceId)
+    if (!metadata) {
+      configStore.setTeamWorkspaceOperation(address, { status: 'error', error: `Workspace '${selection.existingWorkspaceId}' is unavailable.` })
+      return
+    }
+    const matchesRoot = rootConfig.value.workspaceId === selection.existingWorkspaceId
+      && rootConfig.value.workspaceRootPath === metadata.workspaceRootPath
+    configStore.setTeamOverride(address, matchesRoot ? withoutWorkspace(current) : {
+      ...(current ?? {}), workspace: { workspaceId: selection.existingWorkspaceId, workspaceMetadata: metadata },
+    })
+    setActiveTab('files')
+    return
+  }
+  const path = selection.newWorkspacePath.trim()
+  configStore.setTeamOverride(address, path && path !== rootConfig.value.workspaceRootPath ? {
+    ...(withoutWorkspace(current) ?? {}),
+    workspace: { workspaceId: null, workspaceMetadata: null },
+  } : withoutWorkspace(current))
+}
+const resolveRootWorkspacePath = async (): Promise<string> => {
+  if (workspaceSelection.value.mode === 'new') {
+    const path = workspaceSelection.value.newWorkspacePath.trim()
+    if (!path) throw new Error('Workspace path is required.')
+    workspaceLoading.value = true
+    try {
+      await workspaceStore.createWorkspace({ root_path: path })
+      setActiveTab('files')
+      return path
+    } finally {
+      workspaceLoading.value = false
+    }
+  }
+  const path = rootWorkspacePath.value
+  if (!path) throw new Error('Selected workspace has no usable root path.')
+  return path
+}
+const prepareTeamWorkspacePaths = async (): Promise<Record<AgentTeamAddress, string>> => {
+  const paths: Record<AgentTeamAddress, string> = {}
+  const created = new Map<string, Promise<string>>()
+  for (const [address, override] of Object.entries(teamOverrides.value)) {
+    const selection = configStore.teamWorkspaceSelectionFor(address)
+    const path = selection?.mode === 'new'
+      ? selection.newWorkspacePath.trim()
+      : override.workspace?.workspaceMetadata?.workspaceRootPath?.trim() || ''
+    if (!path) continue
+    if (selection?.mode === 'new') {
+      configStore.setTeamWorkspaceOperation(address, { status: 'loading', error: null })
+      try {
+        const request = created.get(path) ?? workspaceStore.createWorkspace({ root_path: path }).then(() => path)
+        created.set(path, request)
+        paths[address] = await request
+        configStore.setTeamWorkspaceOperation(address, { status: 'idle', error: null })
+      } catch (cause) {
+        const detail = cause instanceof Error ? cause.message : String(cause)
+        configStore.setTeamWorkspaceOperation(address, { status: 'error', error: detail })
+        throw cause
+      }
+    } else paths[address] = path
+  }
+  return paths
+}
+const serializeOverride = (override: AgentConfigOverride | TeamScopeConfigOverride) => ({
+  ...(override.runtimeKind ? { runtimeKind: override.runtimeKind } : {}),
+  ...(override.llmModelIdentifier ? { llmModelIdentifier: override.llmModelIdentifier } : {}),
+  ...(Object.prototype.hasOwnProperty.call(override, 'llmConfig') ? { llmConfig: override.llmConfig ?? null } : {}),
+  ...(override.autoExecuteTools === undefined ? {} : { autoExecuteTools: override.autoExecuteTools }),
+})
+const runOrg = async () => {
+  if (!org.value || !formModel.value || !canRun.value) return
+  configStore.setLaunchError(null)
+  try {
+    const workspaceRootPath = await resolveRootWorkspacePath()
+    const teamWorkspacePaths = await prepareTeamWorkspacePaths()
+    const serializedTeams = Object.entries(teamOverrides.value).map(([address, override]) => ({
+      address,
+      configuration: {
+        ...serializeOverride(override),
+        ...(teamWorkspacePaths[address] ? { workspaceRootPath: teamWorkspacePaths[address] } : {}),
+      },
+    })).filter((item) => Object.keys(item.configuration).length)
+    const serializedAgents = Object.entries(agentOverrides.value).map(([address, override]) => ({
+      address,
+      configuration: serializeOverride(override),
+    })).filter((item) => Object.keys(item.configuration).length)
+    const orgRunId = await orgRunStore.launch({
+      agentOrgDefinitionId: org.value.id,
+      rootConfiguration: {
+        runtimeKind: runtimeKind.value,
+        llmModelIdentifier: llmModelIdentifier.value,
+        llmConfig: llmConfig.value,
+        autoExecuteTools: autoExecuteTools.value,
+        skillAccessMode: 'PRELOADED_ONLY',
+        workspaceRootPath,
+      },
+      teamOverrides: serializedTeams,
+      agentOverrides: serializedAgents,
+    })
+    await router.replace({
+      path: '/workspace',
+      query: { rootSubjectKind: 'agent_org', definitionId: org.value.id, orgRunId, mode: 'active' },
+    })
+  } catch (cause) {
+    configStore.setLaunchError(cause instanceof Error ? cause.message : String(cause))
+  }
+}
+
+onMounted(() => Promise.all([
+  orgStore.fetchAll(),
+  agentStore.fetchAllAgentDefinitions(),
+  teamStore.fetchAllAgentTeamDefinitions(),
+  workspaceStore.fetchAllWorkspaces(),
+]))
 </script>

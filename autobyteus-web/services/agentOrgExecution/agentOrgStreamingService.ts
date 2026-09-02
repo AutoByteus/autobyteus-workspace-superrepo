@@ -3,6 +3,7 @@ import {
   type CollaborationStreamClientMessage,
   type CollaborationStreamServerMessage,
 } from '@autobyteus/collaboration-stream-contracts'
+import { shallowReactive } from 'vue'
 import type { ContextFilePath } from '~/types/conversation'
 import type { AgentInteractionPort } from '~/types/workspace/activeAgentWorkspaceTarget'
 import { useWindowNodeContextStore } from '~/stores/windowNodeContextStore'
@@ -233,14 +234,19 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
         throw new Error('AgentOrg stream supplied a non-Org snapshot.')
       }
       const previousFocus = this.recoveryFocus ?? this.context?.selectedAddress ?? null
-      const candidate = await hydrateAgentOrgExecutionContext({
+      const hydratedCandidate = await hydrateAgentOrgExecutionContext({
         orgRunId: this.options.orgRunId,
         view: message.payload.root_org,
         transport: this,
       })
       if (!this.isCurrent(generation)) return
-      if (!await this.verifyRecoveryCandidate(candidate, generation)) return
+      if (!await this.verifyRecoveryCandidate(hydratedCandidate, generation)) return
       if (!this.isCurrent(generation)) return
+      // The stream and every Vue observer must retain the same observable
+      // identity. Mutating a raw class instance after publishing its Vue proxy
+      // leaves top-level task-record replacements invisible until another UI
+      // action happens to invalidate the consumer.
+      const candidate = shallowReactive(hydratedCandidate)
       if (previousFocus) candidate.select(previousFocus)
       this.context = candidate
       this.recoveryCheckpoint = null

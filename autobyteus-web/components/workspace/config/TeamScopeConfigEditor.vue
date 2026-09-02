@@ -179,7 +179,7 @@
         :historical-model-config="scope.mode === 'existing'"
         :runtime-help-text="scope.mode === 'existing' ? t('workspace.runModelConfig.fixedIdentity') : t('workspace.components.workspace.config.TeamScopeConfigEditor.runtime_help')"
         :model-label="t('workspace.components.workspace.config.TeamScopeConfigEditor.team_default_model')"
-        :model-help-text="scope.mode === 'existing' ? t('workspace.runModelConfig.fixedIdentity') : t('workspace.components.workspace.config.TeamScopeConfigEditor.model_help')"
+        :model-help-text="scope.mode === 'existing' ? t('workspace.runModelConfig.fixedIdentity') : teamModelHelpText || t('workspace.components.workspace.config.TeamScopeConfigEditor.model_help')"
         :id-prefix="inputIdPrefix"
         :advanced-initially-expanded="scope.mode === 'existing'"
         :historical-value-unavailable-message="historicalUnavailableMessage"
@@ -252,10 +252,12 @@ const props = withDefaults(defineProps<{
   scope: Readonly<TeamScopeFormModel>
   isRoot?: boolean
   disabled?: boolean
+  teamModelHelpText?: string | null
   modelConfigFieldErrors?: Readonly<Record<string, string>>
 }>(), {
   isRoot: false,
   disabled: false,
+  teamModelHelpText: null,
 })
 const emit = defineEmits<{
   (e: 'update-root', field: 'runtime' | 'model' | 'llmConfig' | 'auto', value: unknown): void

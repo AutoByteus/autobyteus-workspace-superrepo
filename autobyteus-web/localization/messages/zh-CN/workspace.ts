@@ -37,6 +37,7 @@ const messages = {
   "workspace.agentOrg.stoppedHistory.title": "已停止的智能体组织",
   "workspace.agentOrg.stoppedHistory.description":
     "请从侧栏中的历史运行选择成员，以从其保存状态继续。",
+  "workspace.agentOrg.runConfig.memberOverrides": "成员覆盖",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "放大图表",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":
@@ -89,6 +90,7 @@ const messages = {
   "workspace.components.workspace.config.TeamScopeConfigEditor.runtime_help": "此团队范围使用的运行时。",
   "workspace.components.workspace.config.TeamScopeConfigEditor.team_default_model": "默认 LLM 模型",
   "workspace.components.workspace.config.TeamScopeConfigEditor.model_help": "嵌套团队和智能体会继承此值，除非另行自定义。",
+  "workspace.components.workspace.config.TeamScopeConfigEditor.flat_model_help": "此团队中的智能体会继承该值，除非另行自定义。",
   "workspace.components.workspace.config.TeamScopeConfigEditor.auto_approve": "自动批准工具",
   "workspace.components.workspace.config.TeamScopeConfigEditor.auto_help": "未覆盖的后代范围会继承此设置。",
   "workspace.components.workspace.config.TeamScopeConfigEditor.catalog_loading": "正在为 {{address}} 加载模型…",

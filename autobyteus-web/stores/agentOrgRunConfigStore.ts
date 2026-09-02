@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { AgentConfigOverride } from '~/types/agent/TeamRunConfig'
+import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
+import type { TeamWorkspaceOperationState } from '~/types/agent/TeamLaunchDraft'
+import type { AgentConfigOverride, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
 
 export type AgentOrgRunConfigIntent = Readonly<{
@@ -10,10 +12,24 @@ export type AgentOrgRunConfigIntent = Readonly<{
   llmConfig: Record<string, unknown> | null
   autoExecuteTools: boolean
   workspaceSelection: WorkspaceSelectionState
-  memberOverrides: Readonly<Record<string, AgentConfigOverride>>
+  teamOverrides: Readonly<Record<AgentTeamAddress, TeamScopeConfigOverride>>
+  agentOverrides: Readonly<Record<AgentTeamAddress, AgentConfigOverride>>
+  teamWorkspaceSelections: Readonly<Record<AgentTeamAddress, WorkspaceSelectionState>>
 }>
 
 const emptyWorkspace = (): WorkspaceSelectionState => ({ mode: 'new', existingWorkspaceId: null, newWorkspacePath: '' })
+const idleWorkspaceOperation = (): TeamWorkspaceOperationState => ({ status: 'idle', error: null })
+const cloneTeamOverride = (override: TeamScopeConfigOverride): TeamScopeConfigOverride => ({
+  ...override,
+  ...(override.workspace ? {
+    workspace: {
+      workspaceId: override.workspace.workspaceId,
+      workspaceMetadata: override.workspace.workspaceMetadata
+        ? { ...override.workspace.workspaceMetadata }
+        : null,
+    },
+  } : {}),
+})
 
 export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => {
   const definitionId = ref('')
@@ -22,7 +38,12 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
   const llmConfig = ref<Record<string, unknown> | null>(null)
   const autoExecuteTools = ref(false)
   const workspaceSelection = ref<WorkspaceSelectionState>(emptyWorkspace())
-  const memberOverrides = ref<Record<string, AgentConfigOverride>>({})
+  const teamOverrides = ref<Record<AgentTeamAddress, TeamScopeConfigOverride>>({})
+  const agentOverrides = ref<Record<AgentTeamAddress, AgentConfigOverride>>({})
+  const teamWorkspaceSelections = ref<Record<AgentTeamAddress, WorkspaceSelectionState>>({})
+  const teamWorkspaceOperations = ref<Record<AgentTeamAddress, TeamWorkspaceOperationState>>({})
+  const projectionError = ref<string | null>(null)
+  const launchError = ref<string | null>(null)
 
   const begin = (input: {
     definitionId: string
@@ -37,18 +58,62 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
     llmConfig.value = input.llmConfig ?? null
     autoExecuteTools.value = false
     workspaceSelection.value = emptyWorkspace()
-    memberOverrides.value = {}
+    teamOverrides.value = {}
+    agentOverrides.value = {}
+    teamWorkspaceSelections.value = {}
+    teamWorkspaceOperations.value = {}
+    projectionError.value = null
+    launchError.value = null
   }
 
   const setWorkspaceSelection = (selection: WorkspaceSelectionState): void => {
     workspaceSelection.value = { ...selection }
   }
-  const setPlacementOverride = (address: string, override: AgentConfigOverride | null): void => {
-    const next = { ...memberOverrides.value }
+  const setTeamOverride = (address: AgentTeamAddress, override: TeamScopeConfigOverride | null): void => {
+    const next = { ...teamOverrides.value }
+    if (override) next[address] = cloneTeamOverride(override)
+    else delete next[address]
+    teamOverrides.value = next
+  }
+  const resetTeamOverride = (address: AgentTeamAddress): void => {
+    setTeamOverride(address, null)
+    const selections = { ...teamWorkspaceSelections.value }
+    const operations = { ...teamWorkspaceOperations.value }
+    delete selections[address]
+    delete operations[address]
+    teamWorkspaceSelections.value = selections
+    teamWorkspaceOperations.value = operations
+  }
+  const setAgentOverride = (address: AgentTeamAddress, override: AgentConfigOverride | null): void => {
+    const next = { ...agentOverrides.value }
     if (override) next[address] = { ...override }
     else delete next[address]
-    memberOverrides.value = next
+    agentOverrides.value = next
   }
+  const setTeamWorkspaceSelection = (address: AgentTeamAddress, selection: WorkspaceSelectionState): void => {
+    teamWorkspaceSelections.value = {
+      ...teamWorkspaceSelections.value,
+      [address]: { ...selection },
+    }
+    setTeamWorkspaceOperation(address, idleWorkspaceOperation())
+  }
+  const setTeamWorkspaceOperation = (address: AgentTeamAddress, operation: TeamWorkspaceOperationState): void => {
+    teamWorkspaceOperations.value = {
+      ...teamWorkspaceOperations.value,
+      [address]: { ...operation },
+    }
+  }
+  const teamWorkspaceSelectionFor = (address: AgentTeamAddress): WorkspaceSelectionState | null =>
+    teamWorkspaceSelections.value[address] ?? null
+  const teamWorkspaceOperationFor = (address: AgentTeamAddress): TeamWorkspaceOperationState =>
+    teamWorkspaceOperations.value[address] ?? idleWorkspaceOperation()
+  const setProjectionError = (error: string | null): void => {
+    projectionError.value = error
+  }
+  const setLaunchError = (error: string | null): void => {
+    launchError.value = error
+  }
+
   const intent = computed<AgentOrgRunConfigIntent>(() => Object.freeze({
     definitionId: definitionId.value,
     runtimeKind: runtimeKind.value,
@@ -56,11 +121,23 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
     llmConfig: llmConfig.value,
     autoExecuteTools: autoExecuteTools.value,
     workspaceSelection: { ...workspaceSelection.value },
-    memberOverrides: Object.freeze({ ...memberOverrides.value }),
+    teamOverrides: Object.freeze(Object.fromEntries(
+      Object.entries(teamOverrides.value).map(([address, override]) => [address, cloneTeamOverride(override)]),
+    )),
+    agentOverrides: Object.freeze(Object.fromEntries(
+      Object.entries(agentOverrides.value).map(([address, override]) => [address, { ...override }]),
+    )),
+    teamWorkspaceSelections: Object.freeze(Object.fromEntries(
+      Object.entries(teamWorkspaceSelections.value).map(([address, selection]) => [address, { ...selection }]),
+    )),
   }))
+
   return {
     definitionId, runtimeKind, llmModelIdentifier, llmConfig, autoExecuteTools,
-    workspaceSelection, memberOverrides, intent,
-    begin, setWorkspaceSelection, setPlacementOverride,
+    workspaceSelection, teamOverrides, agentOverrides, teamWorkspaceSelections, teamWorkspaceOperations,
+    projectionError, launchError, intent,
+    begin, setWorkspaceSelection, setTeamOverride, resetTeamOverride, setAgentOverride,
+    setTeamWorkspaceSelection, setTeamWorkspaceOperation, teamWorkspaceSelectionFor, teamWorkspaceOperationFor,
+    setProjectionError, setLaunchError,
   }
 })

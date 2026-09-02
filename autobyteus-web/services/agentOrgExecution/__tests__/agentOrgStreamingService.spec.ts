@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { computed } from 'vue'
+import { createPinia, setActivePinia } from 'pinia'
 import type { AgentOrgExecutionContext } from '../agentOrgExecutionContext'
+import { projectAgentOrgTeamTasks } from '../agentOrgTeamPresentation'
+import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
 
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
@@ -55,8 +59,8 @@ class TestWebSocket {
 }
 
 const launch = {
-  runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-5.6-sol', llmConfig: null,
-  autoExecuteTools: false, skillAccessMode: 'PRELOADED_ONLY', workspaceRootPath: null,
+  runtimeKind: 'codex_app_server' as const, llmModelIdentifier: 'gpt-5.6-sol', llmConfig: null,
+  autoExecuteTools: false, skillAccessMode: 'PRELOADED_ONLY' as const, workspaceRootPath: null,
 }
 const connected = {
   type: 'CONNECTED',
@@ -106,6 +110,7 @@ describe('AgentOrgStreamingService', () => {
     mocks.hydrate.mockReset()
     TestWebSocket.instances = []
     vi.stubGlobal('WebSocket', TestWebSocket)
+    setActivePinia(createPinia())
   })
 
   it('keeps the committed context until a checkpointed candidate is complete, then restores focus atomically', async () => {
@@ -316,6 +321,117 @@ describe('AgentOrgStreamingService', () => {
     expect(first.requireReopen).not.toHaveBeenCalled()
     expect(reportError).not.toHaveBeenCalled()
     expect(mocks.query).toHaveBeenCalledTimes(2)
+  })
+
+  it('publishes one store-observable context identity so the mounted-Team task panel advances without refocus', async () => {
+    const team = {
+      address: '/team', teamDefinitionId: 'team-def', role: null, description: null,
+      teamRunId: 'team-run', coordinatorAddress: '/team/coordinator',
+      defaultLaunchConfiguration: launch, taskExecutions: [],
+      members: [{
+        address: '/team/coordinator', agentDefinitionId: 'coordinator-def', role: null,
+        description: null, agentRunId: 'agent-coordinator', platformAgentRunId: null,
+        launchConfiguration: launch,
+      }, {
+        address: '/team/worker', agentDefinitionId: 'worker-def', role: null,
+        description: null, agentRunId: 'agent-worker', platformAgentRunId: null,
+        launchConfiguration: launch,
+      }],
+    }
+    const baseTask = {
+      taskId: 'task-live', delegatorAgentRunId: 'agent-coordinator', recipientAddress: '/team/worker',
+      taskExecution: { agentRunId: 'task-agent-run' }, description: 'Verify the live result.',
+      referenceFiles: [], status: 'active', updates: [], createdAt: '2026-09-01T00:00:01.000Z',
+    }
+    const context = {
+      phase: 'live', changeSequence: 4, selectedAddress: '/team',
+      view: {
+        ...snapshot.payload.root_org,
+        execution_tree: {
+          ...snapshot.payload.root_org.execution_tree,
+          rootOrg: { ...snapshot.payload.root_org.execution_tree.rootOrg, members: [team] },
+        },
+        task_records: {
+          ...snapshot.payload.root_org.task_records,
+          records: [baseTask],
+        },
+      },
+      select: vi.fn(), setActive: vi.fn(), requireReopen: vi.fn(),
+      applyEvent(this: any, changeSequence: number, event: any) {
+        const records = this.view.task_records.records.map((record: any) =>
+          record.taskId === event.event.task.taskId ? event.event.task : record)
+        this.view = { ...this.view, task_records: { ...this.view.task_records, records } }
+        this.changeSequence = changeSequence
+        return 'applied' as const
+      },
+    } as unknown as AgentOrgExecutionContext
+    mocks.hydrate.mockResolvedValue(context)
+    const contextsStore = useAgentOrgContextsStore()
+    const observed = computed(() => contextsStore.contextFor('org-run'))
+    const panelStatus = computed(() => {
+      const value = observed.value as any
+      if (!value) return null
+      return projectAgentOrgTeamTasks({
+        orgRunId: 'org-run', view: value.view, team, focusedAgentRunId: 'agent-coordinator',
+      })[0]?.displayStatus ?? null
+    })
+    const submission = {
+      submissionId: 'submission-1', message: 'Initial result.', referenceFiles: [],
+      createdAt: '2026-09-01T00:00:02.000Z',
+    }
+    const revision = {
+      reviewId: 'review-1', reviewedSubmissionId: 'submission-1', decision: 'request_revision',
+      comment: 'Revise it.', referenceFiles: [], createdAt: '2026-09-01T00:00:03.000Z',
+    }
+    const acceptance = {
+      reviewId: 'review-2', reviewedSubmissionId: 'submission-1', decision: 'accept',
+      comment: null, referenceFiles: [], createdAt: '2026-09-01T00:00:04.000Z',
+    }
+
+    contextsStore.connect('org-run')
+    const socket = TestWebSocket.instances[0]!
+    socket.emit(connected)
+    socket.emit(snapshot)
+    await vi.waitFor(() => expect(observed.value).not.toBeNull())
+    expect(panelStatus.value).toBe('in_progress')
+
+    socket.emit({
+      type: 'ROOT_EXECUTION_EVENT',
+      payload: {
+        root_subject_kind: 'agent_org', root_run_id: 'org-run', change_sequence: 5,
+        event: { kind: 'task', event: {
+          kind: 'submitted', submission,
+          task: { ...baseTask, status: 'awaiting_review', updates: [submission] },
+        } },
+      },
+    })
+    await vi.waitFor(() => expect(panelStatus.value).toBe('awaiting_review'))
+
+    socket.emit({
+      type: 'ROOT_EXECUTION_EVENT',
+      payload: {
+        root_subject_kind: 'agent_org', root_run_id: 'org-run', change_sequence: 6,
+        event: { kind: 'task', event: {
+          kind: 'reviewed', review: revision,
+          task: { ...baseTask, status: 'active', updates: [submission, revision] },
+        } },
+      },
+    })
+    await vi.waitFor(() => expect(panelStatus.value).toBe('revision_requested'))
+
+    socket.emit({
+      type: 'ROOT_EXECUTION_EVENT',
+      payload: {
+        root_subject_kind: 'agent_org', root_run_id: 'org-run', change_sequence: 7,
+        event: { kind: 'task', event: {
+          kind: 'settled', settledAt: '2026-09-01T00:00:05.000Z',
+          task: { ...baseTask, status: 'accepted', updates: [submission, acceptance] },
+        } },
+      },
+    })
+    await vi.waitFor(() => expect(panelStatus.value).toBe('accepted'))
+    expect(context.select).not.toHaveBeenCalled()
+    contextsStore.disconnect('org-run')
   })
 
   it('completes a command only from an ACK with the exact command type and target', async () => {

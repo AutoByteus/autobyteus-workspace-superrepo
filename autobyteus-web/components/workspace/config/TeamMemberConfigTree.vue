@@ -5,6 +5,7 @@
         v-if="node.kind === 'agent_team'"
         :scope="node.scope"
         :disabled="disabled"
+        :team-model-help-text="teamModelHelpText"
         :model-config-field-errors="modelConfigFieldErrorsByAddress[node.address]"
         @update-override="emit('update-team', node.address, $event)"
         @reset="emit('reset-team', node.address)"
@@ -18,6 +19,7 @@
             :member-nodes="node.children"
             :disabled="disabled"
             :nested="true"
+            :team-model-help-text="teamModelHelpText"
             :model-config-field-errors-by-address="modelConfigFieldErrorsByAddress"
             @update-team="forwardTeamUpdate"
             @reset-team="forwardTeamReset"
@@ -58,8 +60,9 @@ const props = withDefaults(defineProps<{
   memberNodes: readonly TeamRunFormMemberNode[]
   disabled: boolean
   nested?: boolean
+  teamModelHelpText?: string | null
   modelConfigFieldErrorsByAddress?: Readonly<Record<string, Readonly<Record<string, string>>>>
-}>(), { nested: false })
+}>(), { nested: false, teamModelHelpText: null })
 const emit = defineEmits<{
   (e: 'update-team', address: AgentTeamAddress, override: TeamScopeConfigOverride | null): void
   (e: 'reset-team', address: AgentTeamAddress): void

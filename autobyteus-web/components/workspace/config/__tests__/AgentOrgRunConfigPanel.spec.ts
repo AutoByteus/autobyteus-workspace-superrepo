@@ -1,0 +1,184 @@
+import { createPinia, setActivePinia } from 'pinia'
+import { defineComponent, nextTick } from 'vue'
+import { flushPromises, mount } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import AgentOrgRunConfigPanel from '../AgentOrgRunConfigPanel.vue'
+import TeamScopeConfigEditor from '../TeamScopeConfigEditor.vue'
+import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
+import { useAgentOrgDefinitionStore } from '~/stores/agentOrgDefinitionStore'
+import { useAgentOrgRunConfigStore } from '~/stores/agentOrgRunConfigStore'
+import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
+import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
+import { useWorkspaceStore } from '~/stores/workspace'
+
+const { route, replace } = vi.hoisted(() => ({
+  route: { query: { definitionId: 'delivery-org' } as Record<string, string> },
+  replace: vi.fn().mockResolvedValue(undefined),
+}))
+vi.mock('vue-router', () => ({
+  useRoute: () => route,
+  useRouter: () => ({ replace }),
+}))
+
+const PassiveField = defineComponent({
+  name: 'RuntimeModelConfigFields',
+  template: '<div data-test="runtime-fields" />',
+})
+const PassiveWorkspace = defineComponent({
+  name: 'WorkspaceSelector',
+  props: ['model'],
+  emits: ['update:modelValue'],
+  template: '<div data-test="workspace-selector" />',
+})
+const AgentEditor = defineComponent({
+  name: 'MemberOverrideItem',
+  props: ['node'],
+  emits: ['update:override'],
+  template: '<div data-test="agent-editor" :data-address="node.address">{{ node.isCoordinator ? "Coordinator" : "Agent" }}</div>',
+})
+
+const org = {
+  id: 'delivery-org', name: 'Delivery Org', description: '', instructions: '', revision: '1', handoffs: [],
+  defaultLaunchConfig: { runtimeKind: 'autobyteus', llmModelIdentifier: 'gpt-root', llmConfig: null },
+  members: [
+    { memberName: 'requirements_engineer', ref: 'requirements-agent', refType: 'AGENT' as const, refScope: 'SHARED' as const },
+    { memberName: 'product', ref: 'product-team', refType: 'AGENT_TEAM' as const, refScope: 'SHARED' as const },
+    { memberName: 'software', ref: 'software-team', refType: 'AGENT_TEAM' as const, refScope: 'SHARED' as const },
+  ],
+}
+const teams = [{
+  id: 'product-team', name: 'Product Design', description: '', instructions: '', coordinatorMemberName: 'designer',
+  nodes: [{ memberName: 'designer', ref: 'designer-agent' }, { memberName: 'prototyper', ref: 'prototyper-agent' }],
+}, {
+  id: 'software-team', name: 'Software Engineering', description: '', instructions: '', coordinatorMemberName: 'architect',
+  nodes: [{ memberName: 'architect', ref: 'architect-agent' }, { memberName: 'implementer', ref: 'implementer-agent' }],
+}]
+
+const mountPanel = async () => {
+  const wrapper = mount(AgentOrgRunConfigPanel, {
+    global: {
+      stubs: {
+        RuntimeModelConfigFields: PassiveField,
+        WorkspaceSelector: PassiveWorkspace,
+        MemberOverrideItem: AgentEditor,
+        Icon: true,
+      },
+    },
+  })
+  await flushPromises()
+  return wrapper
+}
+
+describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    setActivePinia(createPinia())
+    const orgStore = useAgentOrgDefinitionStore()
+    orgStore.definitions = [org]
+    const teamStore = useAgentTeamDefinitionStore()
+    teamStore.agentTeamDefinitions = teams
+    const agentStore = useAgentDefinitionStore()
+    agentStore.agentDefinitions = [{
+      id: 'requirements-agent', name: 'Requirements Engineer', description: '', instructions: '',
+      toolNames: [], inputProcessorNames: [], llmResponseProcessorNames: [],
+      toolExecutionResultProcessorNames: [], toolInvocationPreprocessorNames: [], lifecycleProcessorNames: [], skillNames: [],
+    }]
+    useWorkspaceStore().workspacesFetched = true
+  })
+
+  it('starts with the exact Agent count collapsed, then keeps each mounted Team independently collapsed', async () => {
+    const wrapper = await mountPanel()
+    const outer = wrapper.get('[data-test="org-member-overrides-toggle"]')
+    expect(outer.text()).toContain('Member overrides (5)')
+    expect(outer.attributes('aria-expanded')).toBe('false')
+    expect(wrapper.get('#org-member-overrides-panel').attributes('style')).toContain('display: none')
+
+    await outer.trigger('click')
+    const scopes = wrapper.findAllComponents(TeamScopeConfigEditor)
+    expect(scopes.map((scope) => scope.props('scope').address)).toEqual(['/product', '/software'])
+    expect(scopes.map((scope) => scope.get('button[aria-expanded]').attributes('aria-expanded'))).toEqual(['false', 'false'])
+    expect(scopes[1]!.props('teamModelHelpText')).toBe('Agents in this Team inherit this value unless customized.')
+    expect(wrapper.text()).toContain('Requirements Engineer')
+
+    await scopes[1]!.get('button[aria-expanded]').trigger('click')
+    expect(scopes[1]!.get('button[aria-expanded]').attributes('aria-expanded')).toBe('true')
+    expect(scopes[0]!.get('button[aria-expanded]').attributes('aria-expanded')).toBe('false')
+    expect(scopes[1]!.findAll('[data-test="agent-editor"]').map((node) => node.attributes('data-address')))
+      .toEqual(['/software/architect', '/software/implementer'])
+    expect(scopes[1]!.text()).toContain('Coordinator')
+  })
+
+  it('keeps Team and Agent patches independent and preserves them across collapse/reopen', async () => {
+    const wrapper = await mountPanel()
+    await wrapper.get('[data-test="org-member-overrides-toggle"]').trigger('click')
+    let software = wrapper.findAllComponents(TeamScopeConfigEditor)[1]!
+    await software.get('button[aria-expanded]').trigger('click')
+    software.vm.$emit('update-override', { runtimeKind: 'codex_app_server' })
+    await nextTick()
+
+    software = wrapper.findAllComponents(TeamScopeConfigEditor)[1]!
+    expect(software.props('scope')).toEqual(expect.objectContaining({ isCustomized: true }))
+    await software.get('button[aria-expanded]').trigger('click')
+    await software.get('button[aria-expanded]').trigger('click')
+    expect(wrapper.findAllComponents(TeamScopeConfigEditor)[1]!.props('scope')).toEqual(expect.objectContaining({
+      isCustomized: true,
+      override: expect.objectContaining({ runtimeKind: 'codex_app_server' }),
+    }))
+
+    const configStore = useAgentOrgRunConfigStore()
+    configStore.setAgentOverride('/software/implementer', { llmModelIdentifier: 'gpt-member' })
+    configStore.setAgentOverride('/requirements_engineer', { autoExecuteTools: true })
+    configStore.resetTeamOverride('/software')
+    await nextTick()
+    software = wrapper.findAllComponents(TeamScopeConfigEditor)[1]!
+    expect(software.props('scope')).toEqual(expect.objectContaining({ isCustomized: false, override: null }))
+    expect(configStore.agentOverrides['/software/implementer']).toEqual({ llmModelIdentifier: 'gpt-member' })
+    expect(wrapper.get('[data-test="org-placement-/requirements_engineer"]').text()).toContain('Overridden')
+  })
+
+  it('maps exact sparse Team and Agent patches to the unchanged AgentOrg launch command', async () => {
+    const wrapper = await mountPanel()
+    const configStore = useAgentOrgRunConfigStore()
+    configStore.setWorkspaceSelection({ mode: 'new', existingWorkspaceId: null, newWorkspacePath: '/workspace/root' })
+    configStore.setTeamOverride('/software', { runtimeKind: 'codex_app_server', autoExecuteTools: true })
+    configStore.setAgentOverride('/software/implementer', { llmModelIdentifier: 'gpt-member' })
+    await wrapper.get('[data-test="org-member-overrides-toggle"]').trigger('click')
+    wrapper.findAllComponents(TeamScopeConfigEditor)[1]!.vm.$emit(
+      'update:workspace-selection', '/software',
+      { mode: 'new', existingWorkspaceId: null, newWorkspacePath: '/workspace/software' },
+    )
+    const workspaceStore = useWorkspaceStore()
+    vi.spyOn(workspaceStore, 'createWorkspace').mockResolvedValue('workspace-root')
+    const runStore = useAgentOrgRunStore()
+    vi.spyOn(runStore, 'launch').mockResolvedValue('org-run-1')
+    await nextTick()
+
+    await wrapper.get('[data-test="run-agent-org"]').trigger('click')
+    await flushPromises()
+
+    expect(runStore.launch).toHaveBeenCalledWith(expect.objectContaining({
+      agentOrgDefinitionId: 'delivery-org',
+      rootConfiguration: expect.objectContaining({ workspaceRootPath: '/workspace/root' }),
+      teamOverrides: [{
+        address: '/software',
+        configuration: {
+          runtimeKind: 'codex_app_server', autoExecuteTools: true,
+          workspaceRootPath: '/workspace/software',
+        },
+      }],
+      agentOverrides: [{ address: '/software/implementer', configuration: { llmModelIdentifier: 'gpt-member' } }],
+    }))
+    expect(workspaceStore.createWorkspace).toHaveBeenCalledWith({ root_path: '/workspace/software' })
+    expect(replace).toHaveBeenCalledWith(expect.objectContaining({
+      query: expect.objectContaining({ orgRunId: 'org-run-1', rootSubjectKind: 'agent_org' }),
+    }))
+  })
+
+  it('fails closed and disables Run when a referenced Team is unavailable', async () => {
+    useAgentTeamDefinitionStore().agentTeamDefinitions = teams.filter((team) => team.id !== 'software-team')
+    const wrapper = await mountPanel()
+    expect(wrapper.get('[data-test="org-config-projection-error"]').text()).toContain("cannot resolve Team '/software'")
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('[data-test="org-member-overrides-toggle"]').exists()).toBe(false)
+  })
+})
