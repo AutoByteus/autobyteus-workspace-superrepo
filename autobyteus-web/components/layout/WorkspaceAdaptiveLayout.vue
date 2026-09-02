@@ -183,7 +183,9 @@ onBeforeUnmount(() => {
 const isAgentSelected = computed(() => selectionStore.selectedType === 'agent');
 const isTeamSelected = computed(() => selectionStore.selectedType === 'team');
 const showAgentOrgRunConfig = computed(() => route.query?.rootSubjectKind === 'agent_org' && route.query.mode === 'configuration');
-const showAgentOrgActive = computed(() => route.query?.rootSubjectKind === 'agent_org' && route.query.mode === 'active' && Boolean(route.query.orgRunId));
+const showAgentOrgActive = computed(() => route.query?.rootSubjectKind === 'agent_org'
+  && (route.query.mode === 'active' || route.query.mode === 'history')
+  && Boolean(route.query.orgRunId));
 const showSelectedRunConfig = computed(() =>
   Boolean(selectionStore.selectedRunId) && workspaceCenterViewStore.isConfigMode,
 );

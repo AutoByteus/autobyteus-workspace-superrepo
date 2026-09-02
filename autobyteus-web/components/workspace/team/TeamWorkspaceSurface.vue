@@ -21,12 +21,10 @@
         @edit-config="$emit('edit-config')"
       />
     </div>
-    <div v-if="recoveryNotice" role="alert" class="mx-3 mt-3 flex items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 sm:mx-4">
-      <span>{{ recoveryNotice }}</span>
-      <button v-if="recoveryActionLabel" type="button" class="shrink-0 rounded-md bg-amber-900 px-3 py-1.5 font-semibold text-white" @click="$emit('recover')">
-        {{ recoveryActionLabel }}
-      </button>
-    </div>
+    <WorkspaceRecoveryNotice
+      v-if="recoveryNotice"
+      :message="recoveryNotice"
+    />
     <div class="min-h-0 flex-1">
       <AgentEventMonitor
         :conversation="target.context.state.conversation"
@@ -52,6 +50,7 @@ import type { ActiveAgentWorkspaceTarget } from '~/types/workspace/activeAgentWo
 import AgentEventMonitor from '~/components/workspace/agent/AgentEventMonitor.vue'
 import AgentStatusDisplay from '~/components/workspace/agent/AgentStatusDisplay.vue'
 import WorkspaceHeaderActions from '~/components/workspace/common/WorkspaceHeaderActions.vue'
+import WorkspaceRecoveryNotice from '~/components/workspace/common/WorkspaceRecoveryNotice.vue'
 import SkillImprovementComposerCta from '~/components/workspace/skill-improvement/SkillImprovementComposerCta.vue'
 import type { SkillImprovementComposerCtaTarget } from '~/components/workspace/skill-improvement/skillImprovementComposerCtaTarget'
 import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
@@ -62,9 +61,8 @@ const props = withDefaults(defineProps<{
   target: TeamTarget
   showHeaderActions?: boolean
   recoveryNotice?: string | null
-  recoveryActionLabel?: string | null
-}>(), { showHeaderActions: false, recoveryNotice: null, recoveryActionLabel: null })
-defineEmits<{ (event: 'new-team'): void; (event: 'edit-config'): void; (event: 'recover'): void }>()
+}>(), { showHeaderActions: false, recoveryNotice: null })
+defineEmits<{ (event: 'new-team'): void; (event: 'edit-config'): void }>()
 
 const definitions = useAgentDefinitionStore()
 const avatarFailed = ref(false)

@@ -201,6 +201,21 @@ describe('WorkspaceAdaptiveLayout', () => {
     expect(wrapper.find('[data-test="workspace-empty-state-runs"]').exists()).toBe(true);
   });
 
+  it('renders the AgentOrg workspace surface for an inactive historical root route', async () => {
+    routeMock.query = {
+      rootSubjectKind: 'agent_org', definitionId: 'org-def', orgRunId: 'org-run', mode: 'history',
+    };
+    const wrapper = await mountComponent({
+      agentSelection: { subject: null },
+      workspaceCenterView: { mode: 'chat' },
+      agentRunConfig: { config: null },
+      teamRunConfig: { config: null },
+    });
+
+    expect(wrapper.find('.org-workspace-view').exists()).toBe(true);
+    expect(wrapper.find('[data-test="workspace-empty-state"]').exists()).toBe(false);
+  });
+
   it('keeps the adaptive root and center/right split shrink-safe', async () => {
     const wrapper = await mountComponent({
       agentSelection: { subject: { kind: 'team_run', rootTeamRunId: '456' } },

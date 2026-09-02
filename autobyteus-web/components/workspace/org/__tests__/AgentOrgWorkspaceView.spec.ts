@@ -10,13 +10,13 @@ const state = reactive({
 })
 const connect = vi.fn()
 const disconnect = vi.fn()
-const reopen = vi.fn().mockResolvedValue(undefined)
 const push = vi.fn().mockResolvedValue(undefined)
+const route = reactive({ query: {
+  rootSubjectKind: 'agent_org', definitionId: 'org-def', orgRunId: 'org-run', mode: 'active',
+} })
 
 vi.mock('vue-router', () => ({
-  useRoute: () => reactive({ query: {
-    rootSubjectKind: 'agent_org', definitionId: 'org-def', orgRunId: 'org-run', mode: 'active',
-  } }),
+  useRoute: () => route,
   useRouter: () => ({ push }),
 }))
 vi.mock('~/stores/activeContextStore', () => ({
@@ -24,7 +24,6 @@ vi.mock('~/stores/activeContextStore', () => ({
     get activeWorkspaceTarget() { return state.target },
     connectAgentOrg: connect,
     disconnectAgentOrg: disconnect,
-    reopenAgentOrg: reopen,
     agentOrgContextFor: () => state.context,
     agentOrgErrorFor: () => state.error,
   }),
@@ -41,12 +40,12 @@ const mountSubject = () => mount(AgentOrgWorkspaceView, {
   global: { stubs: {
     Icon: true,
     AgentWorkspaceSurface: {
-      props: ['target', 'showHeaderActions', 'recoveryNotice', 'recoveryActionLabel'],
-      emits: ['new-agent', 'edit-config', 'recover'],
-      template: '<div data-test="shared-agent-surface" :data-recovery="recoveryNotice || \'\'" :data-actions="String(showHeaderActions)"><button data-test="org-edit" @click="$emit(\'edit-config\')" /><button data-test="org-recover" @click="$emit(\'recover\')" /></div>',
+      props: ['target', 'showHeaderActions', 'recoveryNotice'],
+      emits: ['new-agent', 'edit-config'],
+      template: '<div data-test="shared-agent-surface" :data-recovery="recoveryNotice || \'\'" :data-actions="String(showHeaderActions)"><button data-test="org-edit" @click="$emit(\'edit-config\')" /></div>',
     },
     TeamWorkspaceSurface: {
-      props: ['target', 'showHeaderActions', 'recoveryNotice', 'recoveryActionLabel'],
+      props: ['target', 'showHeaderActions', 'recoveryNotice'],
       template: '<div data-test="shared-team-surface" />',
     },
   } },
@@ -58,6 +57,7 @@ describe('AgentOrgWorkspaceView', () => {
     state.context = context()
     state.error = null
     state.target = directTarget
+    route.query.mode = 'active'
   })
 
   it('renders the accepted shared Agent surface and routes header actions through the Org journey', async () => {
@@ -75,14 +75,23 @@ describe('AgentOrgWorkspaceView', () => {
     expect(disconnect).toHaveBeenCalledWith('org-run')
   })
 
-  it('keeps the committed shared surface visible with an explicit recovery action', async () => {
+  it('keeps the committed shared surface visible while bounded recovery remains transport-owned', () => {
     state.context = context('reopen_required')
     state.error = 'Sequence gap'
     const wrapper = mountSubject()
     expect(wrapper.find('[data-test="shared-agent-surface"]').exists()).toBe(true)
-    expect(wrapper.get('[data-test="shared-agent-surface"]').attributes('data-recovery')).toContain('out of sync')
-    await wrapper.get('[data-test="org-recover"]').trigger('click')
-    expect(reopen).toHaveBeenCalledWith('org-run')
+    expect(wrapper.get('[data-test="shared-agent-surface"]').attributes('data-recovery')).toContain('recover automatically')
+    expect(wrapper.text()).not.toContain('Reconnect')
+  })
+
+  it('uses the shared bounded recovery notice when no committed context is available', () => {
+    state.context = null
+    state.target = null
+    state.error = 'Automatic recovery exhausted'
+    const wrapper = mountSubject()
+    expect(wrapper.get('[role="alert"]').text()).toContain('recover automatically')
+    expect(wrapper.text()).not.toContain('Agent Org stream needs to reconnect')
+    expect(wrapper.find('button').exists()).toBe(false)
   })
 
   it('starts with the approved nullable-focus prompt instead of inventing a member fallback', () => {
@@ -90,5 +99,17 @@ describe('AgentOrgWorkspaceView', () => {
     const wrapper = mountSubject()
     expect(wrapper.get('[data-test="agent-org-active-unfocused"]').text()).toContain('Choose an Agent or Team')
     expect(wrapper.find('[data-test="shared-agent-surface"]').exists()).toBe(false)
+  })
+
+  it('opens an inactive root as terminal history without starting a live stream', () => {
+    route.query.mode = 'history'
+    state.context = null
+    state.target = null
+    const wrapper = mountSubject()
+
+    expect(wrapper.get('[data-test="agent-org-stopped-history"]').text()).toContain('Stopped Agent Org')
+    expect(wrapper.get('[data-test="agent-org-stopped-history"]').text()).toContain('saved state')
+    expect(connect).not.toHaveBeenCalled()
+    expect(wrapper.text()).not.toContain('Restore')
   })
 })

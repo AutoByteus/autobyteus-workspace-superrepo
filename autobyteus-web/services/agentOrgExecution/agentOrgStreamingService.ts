@@ -36,6 +36,10 @@ type StreamGeneration = Readonly<{
 type AgentOrgStreamPhase = 'disconnected' | 'awaiting_connected_root' | 'awaiting_snapshot' | 'ready'
 
 const attachmentLocator = (attachment: ContextFilePath): string => attachment.locator
+const MAX_TRANSPARENT_RECOVERY_ATTEMPTS = 5
+const recoveryDelay = (attempt: number): number => attempt === 0
+  ? 0
+  : Math.min(1_000 * (2 ** (attempt - 1)), 30_000)
 
 export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   private socket: WebSocket | null = null
@@ -49,6 +53,10 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   private recoveryCheckpoint: ExecutionCheckpoint | null = null
   private recoveryFocus: string | null = null
   private streamPhase: AgentOrgStreamPhase = 'disconnected'
+  private transparentRecoveryAttempts = 0
+  private transparentRecoveryScheduled = false
+  private transparentRecoveryInFlight = false
+  private transparentRecoveryTimer: ReturnType<typeof setTimeout> | null = null
 
   constructor(private readonly options: Readonly<{
     orgRunId: string
@@ -57,6 +65,21 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   }>) {}
 
   connect(): void {
+    if (this.released) return
+    if (this.socket?.readyState === WebSocket.OPEN || this.socket?.readyState === WebSocket.CONNECTING) return
+    this.resetTransparentRecovery()
+    if (this.context?.phase === 'reopen_required') {
+      this.scheduleTransparentRecovery(this.context.error ?? 'AgentOrg stream recovery is required.')
+      return
+    }
+    try {
+      this.openSocket()
+    } catch (cause) {
+      this.scheduleTransparentRecovery(this.detail(cause))
+    }
+  }
+
+  private openSocket(): void {
     if (this.released) return
     if (this.socket?.readyState === WebSocket.OPEN || this.socket?.readyState === WebSocket.CONNECTING) return
     const endpoint = `${useWindowNodeContextStore().getBoundEndpoints().orgWs}/${encodeURIComponent(this.options.orgRunId)}`
@@ -73,19 +96,19 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
       this.processing = this.processing
         .then(() => this.processFrame(generation, String(raw.data)))
     }
-    socket.onerror = () => {
-      if (this.isCurrent(generation)) this.options.reportError('AgentOrg stream connection failed.')
-    }
+    socket.onerror = () => undefined
     socket.onclose = () => {
       if (!this.isCurrent(generation)) return
+      const shouldRecover = !this.intentionalClose
       this.socket = null
       this.activeGeneration = null
       this.streamPhase = 'disconnected'
-      if (!this.intentionalClose && this.context?.phase === 'live') {
-        this.context.requireReopen('AgentOrg stream closed; reopen is required.')
-        this.options.reportError(this.context.error!)
+      const detail = 'AgentOrg stream closed before a complete synchronized view was available.'
+      if (shouldRecover && this.context) {
+        this.context.requireReopen(detail)
       }
       this.rejectPending('AgentOrg stream closed before command acknowledgement.')
+      if (shouldRecover) this.scheduleTransparentRecovery(detail)
     }
   }
 
@@ -107,11 +130,12 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     this.recoveryFocus = this.context?.selectedAddress ?? null
     this.closeSocket('AgentOrg checkpointed recovery')
     if (this.released) return
-    this.connect()
+    this.openSocket()
   }
 
   disconnect(): void {
     this.released = true
+    this.clearTransparentRecovery()
     this.closeSocket('AgentOrg context released')
     this.context?.setActive(false)
     this.context = null
@@ -227,6 +251,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
       this.recoveryCheckpoint = null
       this.recoveryFocus = null
       this.streamPhase = 'ready'
+      this.resetTransparentRecovery()
       this.options.publish(candidate)
       return
     }
@@ -283,15 +308,63 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
 
   private failClosed(cause: unknown, generation: StreamGeneration): void {
     if (!this.isCurrent(generation)) return
-    const detail = cause instanceof Error ? cause.message : String(cause)
+    const detail = this.detail(cause)
     this.context?.requireReopen(detail)
-    this.options.reportError(detail)
     this.intentionalClose = true
     this.streamPhase = 'disconnected'
     this.socket = null
     this.activeGeneration = null
     this.rejectPending(detail)
     generation.socket.close(1002, 'Invalid AgentOrg stream')
+    this.scheduleTransparentRecovery(detail)
+  }
+
+  private scheduleTransparentRecovery(detail: string): void {
+    if (this.released || this.transparentRecoveryScheduled || this.transparentRecoveryInFlight || this.socket) return
+    if (this.transparentRecoveryAttempts >= MAX_TRANSPARENT_RECOVERY_ATTEMPTS) {
+      this.options.reportError(detail)
+      return
+    }
+    const delay = recoveryDelay(this.transparentRecoveryAttempts)
+    this.transparentRecoveryAttempts += 1
+    this.transparentRecoveryScheduled = true
+    const run = () => {
+      this.transparentRecoveryScheduled = false
+      this.transparentRecoveryTimer = null
+      void this.attemptTransparentRecovery(detail)
+    }
+    if (delay === 0) queueMicrotask(run)
+    else this.transparentRecoveryTimer = setTimeout(run, delay)
+  }
+
+  private async attemptTransparentRecovery(previousDetail: string): Promise<void> {
+    if (this.released || this.socket || this.transparentRecoveryInFlight) return
+    this.transparentRecoveryInFlight = true
+    let failure: unknown = null
+    try {
+      if (this.context) await this.reopenOwned(null)
+      else this.openSocket()
+    } catch (cause) {
+      failure = cause
+    } finally {
+      this.transparentRecoveryInFlight = false
+    }
+    if (failure) this.scheduleTransparentRecovery(this.detail(failure) || previousDetail)
+  }
+
+  private resetTransparentRecovery(): void {
+    this.clearTransparentRecovery()
+    this.transparentRecoveryAttempts = 0
+  }
+
+  private clearTransparentRecovery(): void {
+    if (this.transparentRecoveryTimer) clearTimeout(this.transparentRecoveryTimer)
+    this.transparentRecoveryTimer = null
+    this.transparentRecoveryScheduled = false
+  }
+
+  private detail(cause: unknown): string {
+    return cause instanceof Error ? cause.message : String(cause)
   }
 
   private closeSocket(reason: string): void {

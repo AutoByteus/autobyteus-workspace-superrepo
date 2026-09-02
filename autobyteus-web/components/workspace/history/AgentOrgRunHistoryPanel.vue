@@ -34,9 +34,8 @@
                     <span class="mr-1.5 h-2 w-2 flex-none rounded-full" :class="run.is_active ? 'bg-emerald-500' : 'bg-gray-300'" :aria-label="run.is_active ? 'Running' : 'Stopped'" />
                     <span class="truncate font-medium">{{ run.summary || `New - ${orgGroup.name}` }}</span>
                   </button>
-                  <button v-if="!run.is_active" type="button" class="ml-1 rounded px-1.5 py-0.5 text-[0.6875rem] font-semibold text-indigo-600 hover:bg-indigo-50" :disabled="store.restoring" @click.stop="restore(run)">Restore</button>
                   <button
-                    v-else
+                    v-if="run.is_active"
                     type="button"
                     class="ml-1 inline-flex h-5 w-5 items-center justify-center rounded text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                     title="Stop Agent Org"
@@ -57,8 +56,9 @@
                     <button
                       v-if="display.row.kind === 'agent'"
                       type="button"
-                      class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm"
+                      class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm disabled:cursor-wait disabled:opacity-60"
                       :class="isSelected(run.root_run_id, display.row.address) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'"
+                      :disabled="!run.is_active && store.restoring"
                       :style="rowStyle(display.row.depth)"
                       :aria-label="agentRowLabel(display.row)"
                       :aria-level="display.row.depth + 1"
@@ -76,8 +76,9 @@
                     <button
                       v-else-if="display.row.kind === 'team'"
                       type="button"
-                      class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm"
+                      class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm disabled:cursor-wait disabled:opacity-60"
                       :class="isSelected(run.root_run_id, display.row.address) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'"
+                      :disabled="!run.is_active && store.restoring"
                       :style="rowStyle(display.row.depth)"
                       :aria-expanded="isTeamExpanded(run.root_run_id, display.row.address)"
                       :aria-label="teamRowLabel(display.row)"
@@ -234,10 +235,35 @@ const rowsFor = (run: AgentOrgHistoryItem): DisplayRow[] => {
 const rowStyle = (depth: number) => ({ paddingLeft: `calc((${depth} + 1) * 0.875rem)` })
 const isSelected = (runId: string, address: string) => String(route.query.orgRunId || '') === runId && orgContexts.contextFor(runId)?.selectedAddress === address
 const activateRoute = (run: AgentOrgHistoryItem) => router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId: treeFor(run).rootOrg.orgDefinitionId, orgRunId: run.root_run_id, mode: 'active' } })
-const openRun = async (run: AgentOrgHistoryItem) => { if (!run.is_active) { toggle(expandedRuns, run.root_run_id); return } if (!isRunExpanded(run.root_run_id)) toggle(expandedRuns, run.root_run_id); orgContexts.connect(run.root_run_id); await activateRoute(run) }
-const focusAgent = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
-const focusTeam = async (run: AgentOrgHistoryItem, address: string) => { if (!run.is_active) return; toggle(expandedTeams, teamKey(run.root_run_id, address)); orgContexts.connect(run.root_run_id); orgContexts.select(run.root_run_id, address); await activateRoute(run) }
-const restore = async (run: AgentOrgHistoryItem) => { const runId = await store.restore(run.root_run_id); orgContexts.select(runId, null); orgContexts.connect(runId); await activateRoute({ ...run, root_run_id: runId, is_active: true }) }
+const historicalRoute = (run: AgentOrgHistoryItem) => router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId: treeFor(run).rootOrg.orgDefinitionId, orgRunId: run.root_run_id, mode: 'history' } })
+const openRun = async (run: AgentOrgHistoryItem) => {
+  if (!run.is_active) {
+    toggle(expandedRuns, run.root_run_id)
+    await historicalRoute(run)
+    return
+  }
+  if (!isRunExpanded(run.root_run_id)) toggle(expandedRuns, run.root_run_id)
+  orgContexts.connect(run.root_run_id)
+  await activateRoute(run)
+}
+const ensureActive = async (run: AgentOrgHistoryItem): Promise<AgentOrgHistoryItem> => {
+  if (run.is_active) return run
+  const runId = await store.restore(run.root_run_id)
+  return { ...run, root_run_id: runId, is_active: true }
+}
+const focusAgent = async (run: AgentOrgHistoryItem, address: string) => {
+  const activeRun = await ensureActive(run)
+  orgContexts.select(activeRun.root_run_id, address)
+  orgContexts.connect(activeRun.root_run_id)
+  await activateRoute(activeRun)
+}
+const focusTeam = async (run: AgentOrgHistoryItem, address: string) => {
+  toggle(expandedTeams, teamKey(run.root_run_id, address))
+  const activeRun = await ensureActive(run)
+  orgContexts.select(activeRun.root_run_id, address)
+  orgContexts.connect(activeRun.root_run_id)
+  await activateRoute(activeRun)
+}
 const stopOrg = async (run: AgentOrgHistoryItem) => {
   await store.terminate(run.root_run_id).catch(() => undefined)
   if (store.terminationErrors[run.root_run_id]) return

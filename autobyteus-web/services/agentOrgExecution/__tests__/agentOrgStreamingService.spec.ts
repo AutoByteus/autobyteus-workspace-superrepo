@@ -43,6 +43,11 @@ class TestWebSocket {
     this.readyState = TestWebSocket.CLOSED
     this.onclose?.()
   }
+  emitClose() {
+    if (this.readyState === TestWebSocket.CLOSED) return
+    this.readyState = TestWebSocket.CLOSED
+    this.onclose?.()
+  }
   emit(message: unknown) {
     this.onmessage?.({ data: JSON.stringify(message) } as MessageEvent)
   }
@@ -93,6 +98,8 @@ const candidate = (selectedAddress: string | null = null, changeSequence = 4) =>
 describe('AgentOrgStreamingService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mocks.query.mockReset()
+    mocks.hydrate.mockReset()
     TestWebSocket.instances = []
     vi.stubGlobal('WebSocket', TestWebSocket)
   })
@@ -122,7 +129,7 @@ describe('AgentOrgStreamingService', () => {
     await vi.waitFor(() => expect(first.requireReopen).toHaveBeenCalled())
     expect(publish).toHaveBeenCalledTimes(1)
 
-    await service.reopen()
+    await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
     const recoverySocket = TestWebSocket.instances[1]!
     recoverySocket.emit(connected)
     recoverySocket.emit(snapshot)
@@ -134,19 +141,76 @@ describe('AgentOrgStreamingService', () => {
     expect(second.select).toHaveBeenCalledWith('/direct')
     expect(publish).toHaveBeenLastCalledWith(second)
     expect(mocks.query).toHaveBeenCalledTimes(2)
+    expect(reportError).not.toHaveBeenCalled()
   })
 
-  it('fails closed when a strict snapshot arrives before CONNECTED', async () => {
+  it('recovers transparently when a strict snapshot arrives before CONNECTED', async () => {
     const reportError = vi.fn()
     const service = new AgentOrgStreamingService({
       orgRunId: 'org-run', publish: vi.fn(), reportError,
     })
     service.connect()
     TestWebSocket.instances[0]!.emit(snapshot)
-    await vi.waitFor(() => expect(reportError).toHaveBeenCalledWith(
-      expect.stringContaining('snapshot arrived before CONNECTED'),
-    ))
+    await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
+    expect(reportError).not.toHaveBeenCalled()
     expect(mocks.hydrate).not.toHaveBeenCalled()
+  })
+
+  it('uses checkpointed transparent recovery after an established stream closes and preserves focus', async () => {
+    const first = candidate('/direct')
+    const second = candidate()
+    mocks.hydrate.mockResolvedValueOnce(first).mockResolvedValueOnce(second)
+    mocks.query.mockResolvedValue({ data: { getAgentOrgExecutionCheckpoint: {
+      orgRunId: 'org-run', changeSequence: 4, hasOpenExecutionWork: false,
+    } } })
+    const publish = vi.fn()
+    const reportError = vi.fn()
+    const service = new AgentOrgStreamingService({ orgRunId: 'org-run', publish, reportError })
+
+    service.connect()
+    const initialSocket = TestWebSocket.instances[0]!
+    initialSocket.emit(connected)
+    initialSocket.emit(snapshot)
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+
+    initialSocket.emitClose()
+    await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
+    const replacement = TestWebSocket.instances[1]!
+    replacement.emit(connected)
+    replacement.emit(snapshot)
+
+    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second))
+    expect(first.requireReopen).toHaveBeenCalled()
+    expect(second.select).toHaveBeenCalledWith('/direct')
+    expect(mocks.query).toHaveBeenCalledTimes(2)
+    expect(reportError).not.toHaveBeenCalled()
+  })
+
+  it('shows the bounded error only after checkpointed transparent recovery is exhausted', async () => {
+    const first = candidate('/direct')
+    mocks.hydrate.mockResolvedValue(first)
+    const publish = vi.fn()
+    const reportError = vi.fn()
+    const service = new AgentOrgStreamingService({ orgRunId: 'org-run', publish, reportError })
+
+    service.connect()
+    const initialSocket = TestWebSocket.instances[0]!
+    initialSocket.emit(connected)
+    initialSocket.emit(snapshot)
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+    mocks.query.mockRejectedValue(new Error('checkpoint unavailable'))
+
+    vi.useFakeTimers()
+    try {
+      initialSocket.emitClose()
+      await vi.runAllTimersAsync()
+      expect(mocks.query).toHaveBeenCalledTimes(5)
+      expect(reportError).toHaveBeenCalledTimes(1)
+      expect(reportError).toHaveBeenCalledWith('checkpoint unavailable')
+      expect(TestWebSocket.instances).toHaveLength(1)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('checkpoint-hydrates a fresh task activation instead of publishing a partial context', async () => {
@@ -197,6 +261,9 @@ describe('AgentOrgStreamingService', () => {
   it('completes a command only from an ACK with the exact command type and target', async () => {
     const context = candidate()
     mocks.hydrate.mockResolvedValue(context)
+    mocks.query.mockResolvedValue({ data: { getAgentOrgExecutionCheckpoint: {
+      orgRunId: 'org-run', changeSequence: 4, hasOpenExecutionWork: false,
+    } } })
     const reportError = vi.fn()
     const service = new AgentOrgStreamingService({
       orgRunId: 'org-run', publish: vi.fn(), reportError,
@@ -235,6 +302,9 @@ describe('AgentOrgStreamingService', () => {
   ) => {
     const context = candidate()
     mocks.hydrate.mockResolvedValue(context)
+    mocks.query.mockResolvedValue({ data: { getAgentOrgExecutionCheckpoint: {
+      orgRunId: 'org-run', changeSequence: 4, hasOpenExecutionWork: false,
+    } } })
     const reportError = vi.fn()
     const service = new AgentOrgStreamingService({
       orgRunId: 'org-run', publish: vi.fn(), reportError,
@@ -259,9 +329,8 @@ describe('AgentOrgStreamingService', () => {
     })
 
     await expect(rejected).rejects.toThrow(/identity mismatch/)
-    await vi.waitFor(() => expect(reportError).toHaveBeenCalledWith(
-      expect.stringContaining('identity mismatch'),
-    ))
+    await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
+    expect(reportError).not.toHaveBeenCalled()
     expect(context.requireReopen).toHaveBeenCalledWith(expect.stringContaining('identity mismatch'))
   })
 

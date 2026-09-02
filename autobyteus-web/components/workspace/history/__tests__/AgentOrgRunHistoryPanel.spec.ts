@@ -136,6 +136,19 @@ const setStatusHistory = () => {
   }]
 }
 
+const expandStoppedRun = async (wrapper: ReturnType<typeof mountSubject>) => {
+  await wrapper.get('section > button').trigger('click')
+  await flushPromises()
+  const orgButton = wrapper.findAll('button').find((button) => button.text().includes('Agent Org'))
+  if (!orgButton) throw new Error('Agent Org definition row was not rendered.')
+  await orgButton.trigger('click')
+  await flushPromises()
+  const runButton = wrapper.findAll('button').find((button) => button.text().includes('Stopped Org'))
+  if (!runButton) throw new Error('Stopped Agent Org history row was not rendered.')
+  await runButton.trigger('click')
+  await flushPromises()
+}
+
 describe('AgentOrgRunHistoryPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -148,6 +161,9 @@ describe('AgentOrgRunHistoryPanel', () => {
       root_subject_kind: 'agent_org', root_run_id: 'org-run', created_at: '2026-09-01T00:00:00.000Z',
       archived_at: null, is_active: true, summary: 'Active Org', org: tree,
     }]
+    store.restoring = false
+    store.restore.mockResolvedValue('org-run')
+    store.terminationErrors = {}
   })
 
   it('owns whole-Org stop on the active root row and exposes no member stop action', async () => {
@@ -205,6 +221,67 @@ describe('AgentOrgRunHistoryPanel', () => {
     expect(wrapper.get('button[aria-expanded="true"] span.font-medium').text()).toBe('Agent Org')
     expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(1)
     expect(wrapper.get('[role="treeitem"]').text()).toContain('lead')
+  })
+
+  it('opens an inactive Org as terminal history without exposing a Restore action', async () => {
+    store.history = [{
+      root_subject_kind: 'agent_org', root_run_id: 'org-run', created_at: '2026-09-01T00:00:00.000Z',
+      archived_at: null, is_active: false, summary: 'Stopped Org', org: tree,
+    }]
+    route.query.orgRunId = ''
+    route.query.mode = 'configuration'
+    const wrapper = mountSubject()
+    await flushPromises()
+    await expandStoppedRun(wrapper)
+
+    expect(store.restore).not.toHaveBeenCalled()
+    expect(routerPush).toHaveBeenCalledWith({
+      path: '/workspace',
+      query: { rootSubjectKind: 'agent_org', definitionId: 'org-def', orgRunId: 'org-run', mode: 'history' },
+    })
+    expect(wrapper.text()).not.toContain('Restore')
+    expect(wrapper.find('button[aria-label="Stop Agent Org"]').exists()).toBe(false)
+    expect(wrapper.get('[data-test="agent-org-agent-row-direct-org-agent"]').attributes('data-status'))
+      .toBe(AgentStatus.Offline)
+  })
+
+  it('reactivates the exact inactive Org only when a historical Agent is selected', async () => {
+    store.history = [{
+      root_subject_kind: 'agent_org', root_run_id: 'org-run', created_at: '2026-09-01T00:00:00.000Z',
+      archived_at: null, is_active: false, summary: 'Stopped Org', org: tree,
+    }]
+    route.query.orgRunId = ''
+    const wrapper = mountSubject()
+    await flushPromises()
+    await expandStoppedRun(wrapper)
+    await wrapper.get('[data-test="agent-org-agent-row-direct-org-agent"]').trigger('click')
+    await flushPromises()
+
+    expect(store.restore).toHaveBeenCalledWith('org-run')
+    expect(select).toHaveBeenCalledWith('org-run', '/lead')
+    expect(connect).toHaveBeenCalledWith('org-run')
+    expect(routerPush).toHaveBeenCalledWith({
+      path: '/workspace',
+      query: { rootSubjectKind: 'agent_org', definitionId: 'org-def', orgRunId: 'org-run', mode: 'active' },
+    })
+  })
+
+  it('reactivates the exact inactive Org through mounted Team selection without a Team lifecycle action', async () => {
+    store.history = [{
+      root_subject_kind: 'agent_org', root_run_id: 'org-run', created_at: '2026-09-01T00:00:00.000Z',
+      archived_at: null, is_active: false, summary: 'Stopped Org', org: statusTree,
+    }]
+    route.query.orgRunId = ''
+    const wrapper = mountSubject()
+    await flushPromises()
+    await expandStoppedRun(wrapper)
+    await wrapper.get('[data-test="agent-org-team-row-design-team-run"]').trigger('click')
+    await flushPromises()
+
+    expect(store.restore).toHaveBeenCalledWith('org-run')
+    expect(select).toHaveBeenCalledWith('org-run', '/design')
+    expect(connect).toHaveBeenCalledWith('org-run')
+    expect(wrapper.findAll('[data-test^="agent-org-team-row-"] button[aria-label*="Stop"]')).toHaveLength(0)
   })
 
   it('folds the complete mounted Team branch before collapse and keeps exact Agent signals reactive', async () => {

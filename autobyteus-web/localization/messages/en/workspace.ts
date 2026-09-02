@@ -32,6 +32,11 @@ const messages = {
     "This Team is still working. Wait for it to finish, then select this Team member again.",
   "workspace.components.workspace.history.WorkspaceAgentRunsTreePanel.stream_recovery_retry":
     "Team activity changed while the conversation was being reloaded. Select this Team member again to retry.",
+  "workspace.agentOrg.recovery.exhausted":
+    "Live updates could not recover automatically. Select this Agent Org again to reload a verified complete conversation.",
+  "workspace.agentOrg.stoppedHistory.title": "Stopped Agent Org",
+  "workspace.agentOrg.stoppedHistory.description":
+    "Select a member from the historical run in the sidebar to continue from its saved state.",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "Expand diagram",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":

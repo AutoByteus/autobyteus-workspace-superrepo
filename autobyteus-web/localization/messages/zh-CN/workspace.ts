@@ -32,6 +32,11 @@ const messages = {
     "该团队仍在工作。请等待其完成，然后再次选择此团队成员。",
   "workspace.components.workspace.history.WorkspaceAgentRunsTreePanel.stream_recovery_retry":
     "重新加载对话时团队活动发生了变化。请再次选择此团队成员以重试。",
+  "workspace.agentOrg.recovery.exhausted":
+    "实时更新无法自动恢复。请重新选择此智能体组织，以重新加载经过验证的完整对话。",
+  "workspace.agentOrg.stoppedHistory.title": "已停止的智能体组织",
+  "workspace.agentOrg.stoppedHistory.description":
+    "请从侧栏中的历史运行选择成员，以从其保存状态继续。",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "放大图表",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":
