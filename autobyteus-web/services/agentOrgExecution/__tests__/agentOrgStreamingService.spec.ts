@@ -39,10 +39,18 @@ class TestWebSocket {
   onerror: (() => void) | null = null
   onclose: (() => void) | null = null
   sent: string[] = []
+  closeCalls: Array<Readonly<{ code: number | undefined, reason: string | undefined }>> = []
 
   constructor(readonly url: string) { TestWebSocket.instances.push(this) }
   send(value: string) { this.sent.push(value) }
-  close() {
+  close(code?: number, reason?: string) {
+    this.closeCalls.push(Object.freeze({ code, reason }))
+    if (code !== undefined && code !== 1000 && (code < 3000 || code > 4999)) {
+      throw new DOMException(
+        'The close code must be either 1000, or between 3000 and 4999.',
+        'InvalidAccessError',
+      )
+    }
     if (this.readyState === TestWebSocket.CLOSED) return
     this.readyState = TestWebSocket.CLOSED
     this.onclose?.()
@@ -111,6 +119,16 @@ describe('AgentOrgStreamingService', () => {
     TestWebSocket.instances = []
     vi.stubGlobal('WebSocket', TestWebSocket)
     setActivePinia(createPinia())
+  })
+
+  it('rejects and records browser-reserved client close codes in the WebSocket double', () => {
+    const socket = new TestWebSocket('ws://example.test/contract')
+
+    expect(() => socket.close(1002, 'Protocol error')).toThrowError(
+      expect.objectContaining({ name: 'InvalidAccessError' }),
+    )
+    expect(socket.closeCalls).toEqual([{ code: 1002, reason: 'Protocol error' }])
+    expect(socket.readyState).toBe(TestWebSocket.OPEN)
   })
 
   it('keeps the committed context until a checkpointed candidate is complete, then restores focus atomically', async () => {
@@ -222,10 +240,13 @@ describe('AgentOrgStreamingService', () => {
     }
   })
 
-  it('keeps a valid server ERROR private while transparent recovery is still available', async () => {
+  it('retires a valid server ERROR with a browser-permitted close and publishes recovered context', async () => {
+    const recovered = candidate()
+    mocks.hydrate.mockResolvedValue(recovered)
+    const publish = vi.fn()
     const reportError = vi.fn()
     const service = new AgentOrgStreamingService({
-      orgRunId: 'org-run', publish: vi.fn(), reportError,
+      orgRunId: 'org-run', publish, reportError,
     })
 
     service.connect()
@@ -234,6 +255,18 @@ describe('AgentOrgStreamingService', () => {
 
     await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
     expect(failedSocket.readyState).toBe(TestWebSocket.CLOSED)
+    expect(failedSocket.closeCalls).toEqual([{
+      code: 4000,
+      reason: 'Invalid AgentOrg stream',
+    }])
+    expect(reportError).not.toHaveBeenCalled()
+
+    const recoverySocket = TestWebSocket.instances[1]!
+    recoverySocket.emit(connected)
+    recoverySocket.emit(snapshot)
+
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(recovered))
+    expect(recoverySocket.readyState).toBe(TestWebSocket.OPEN)
     expect(reportError).not.toHaveBeenCalled()
   })
 
@@ -263,6 +296,12 @@ describe('AgentOrgStreamingService', () => {
         'AGENT_ORG_STREAM_UNAVAILABLE: Agent Org is temporarily unavailable.',
       )
       expect(visibleError).toContain('temporarily unavailable')
+      expect(TestWebSocket.instances.slice(0, 6).map((socket) => socket.closeCalls)).toEqual(
+        Array.from({ length: 6 }, () => [{
+          code: 4000,
+          reason: 'Invalid AgentOrg stream',
+        }]),
+      )
 
       service.connect()
       const recoveredSocket = TestWebSocket.instances[6]!

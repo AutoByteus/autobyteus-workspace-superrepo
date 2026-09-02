@@ -38,6 +38,7 @@ type AgentOrgStreamPhase = 'disconnected' | 'awaiting_connected_root' | 'awaitin
 
 const attachmentLocator = (attachment: ContextFilePath): string => attachment.locator
 const MAX_TRANSPARENT_RECOVERY_ATTEMPTS = 5
+const INVALID_STREAM_CLOSE_CODE = 4000
 const recoveryDelay = (attempt: number): number => attempt === 0
   ? 0
   : Math.min(1_000 * (2 ** (attempt - 1)), 30_000)
@@ -316,8 +317,11 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     this.socket = null
     this.activeGeneration = null
     this.rejectPending(detail)
-    generation.socket.close(1002, 'Invalid AgentOrg stream')
+    // Recovery owns the retired generation from this point forward. Schedule it
+    // before asking the browser to close so a transport-level close failure can
+    // never strand the workspace after strict admission has failed.
     this.scheduleTransparentRecovery(detail)
+    generation.socket.close(INVALID_STREAM_CLOSE_CODE, 'Invalid AgentOrg stream')
   }
 
   private scheduleTransparentRecovery(detail: string): void {
