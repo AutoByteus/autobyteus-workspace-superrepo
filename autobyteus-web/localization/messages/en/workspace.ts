@@ -35,6 +35,7 @@ const messages = {
     "Team activity changed while the conversation was being reloaded. Select this Team member again to retry.",
   "workspace.agentOrg.recovery.exhausted":
     "Live updates could not recover automatically. Select this Agent Org again to reload a verified complete conversation.",
+  "workspace.agentOrg.connecting": "Connecting to Agent Org…",
   "workspace.agentOrg.stoppedHistory.title": "Stopped Agent Org",
   "workspace.agentOrg.stoppedHistory.description":
     "Select a member from the historical run in the sidebar to continue from its saved state.",
@@ -44,7 +45,25 @@ const messages = {
   "workspace.agentOrg.history.refreshLabel": "Refresh Agent Org history",
   "workspace.agentOrg.history.collectionLabel": "Agent Orgs",
   "workspace.agentOrg.history.stopLabel": "Stop Agent Org",
+  "workspace.agentOrg.history.workspaces": "Workspaces",
+  "workspace.agentOrg.history.running": "Running",
+  "workspace.agentOrg.history.stopped": "Stopped",
+  "workspace.agentOrg.history.newRun": "New - {{name}}",
+  "workspace.agentOrg.history.executionHierarchy": "{{name}} execution hierarchy",
+  "workspace.agentOrg.history.taskLabel": "Task: {{name}}",
+  "workspace.agentOrg.history.empty": "No Agent Org run history yet.",
+  "workspace.agentOrg.history.noWorkspace": "No workspace",
+  "workspace.agentOrg.history.relativeNow": "now",
+  "workspace.agentOrg.history.relativeMinutes": "{{count}}m",
+  "workspace.agentOrg.history.relativeHours": "{{count}}h",
+  "workspace.agentOrg.history.relativeDays": "{{count}}d",
   "workspace.agentOrg.runConfig.orgLabel": "Agent Org",
+  "workspace.agentOrg.runConfig.runtimeHelp": "Selects the runtime used by this organization run.",
+  "workspace.agentOrg.runConfig.modelLabel": "Default LLM Model",
+  "workspace.agentOrg.runConfig.modelHelp": "Used across the organization unless a placement is customized.",
+  "workspace.agentOrg.runConfig.loading": "Loading Agent Org…",
+  "workspace.agentOrg.runConfig.starting": "Starting Agent Org…",
+  "workspace.agentOrg.runConfig.run": "Run Agent Org",
   "workspace.agentOrg.runConfig.autoApprove": "Auto approve tools",
   "workspace.agentOrg.runConfig.autoApproveHelp":
     "Automatically allows tool calls and access requests for this run.",
@@ -53,6 +72,9 @@ const messages = {
   "workspace.agentOrg.runConfig.schemaLoading": "Validating model configuration for {address}…",
   "workspace.agentOrg.runConfig.schemaBlocked": "Model configuration for {address} is not ready: {error}",
   "workspace.agentOrg.runConfig.schemaUnavailable": "The effective model configuration is unavailable.",
+  "workspace.agentOrg.runConfig.workspaceUnavailable": "Workspace '{{workspaceId}}' is unavailable.",
+  "workspace.agentOrg.runConfig.workspacePathRequired": "Workspace path is required.",
+  "workspace.agentOrg.runConfig.workspacePathUnavailable": "Selected workspace has no usable root path.",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "Expand diagram",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":

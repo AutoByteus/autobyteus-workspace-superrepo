@@ -46,6 +46,7 @@ vi.mock('vue-router', () => ({ useRouter: () => ({ push }) }))
 
 const translations: Record<string, string> = {
   'agentTeams.components.agentTeams.AgentTeamDetail.back_to_agent_teams': 'Back to Agent Teams',
+  'agentTeams.components.agentTeams.AgentTeamDetail.backToAgentOrgs': 'Back to Agent Orgs',
   'agentTeams.components.agentTeams.AgentTeamDetail.loading_agent_team_details': 'Loading',
   'agentTeams.components.agentTeams.AgentTeamDetail.agent_team_not_found': 'Agent Team not found',
   'agentTeams.components.agentTeams.AgentTeamDetail.uncategorized': 'Uncategorized',
@@ -115,6 +116,7 @@ describe('AgentTeamDetail flat Team experience', () => {
 
   it('returns to the owning Agent Org detail without inferring a parent Team', async () => {
     const wrapper = await mountDetail('org-1')
+    expect(wrapper.findAll('button')[0].text()).toContain('Back to Agent Orgs')
     await wrapper.findAll('button')[0].trigger('click')
 
     expect(wrapper.emitted('navigate')?.at(-1)?.[0]).toEqual({ target: 'agent-orgs', view: 'org-detail', id: 'org-1' })

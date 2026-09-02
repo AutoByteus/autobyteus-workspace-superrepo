@@ -12,7 +12,7 @@
       </div>
     </div>
     <div v-else-if="!context && !streamError" class="flex h-full items-center justify-center text-slate-500">
-      Connecting to Agent Org…
+      {{ t('workspace.agentOrg.connecting') }}
     </div>
     <div v-else-if="!context" class="flex min-h-0 flex-1 items-start justify-center px-3 pt-3 sm:px-4">
       <WorkspaceRecoveryNotice class="w-full max-w-xl" :message="recoveryNotice || ''" />

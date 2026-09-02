@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full flex-col bg-white" data-test="agent-org-run-history">
     <div class="flex items-center justify-between border-t border-gray-200 px-3 py-2">
-      <h3 class="text-sm font-semibold text-gray-700">Workspaces</h3>
+      <h3 class="text-sm font-semibold text-gray-700">{{ t('workspace.agentOrg.history.workspaces') }}</h3>
       <button type="button" class="inline-flex h-6 w-6 items-center justify-center rounded-md text-gray-500 hover:bg-indigo-50 hover:text-indigo-600" :aria-label="t('workspace.agentOrg.history.refreshLabel')" @click="refresh">
         <Icon icon="heroicons:arrow-path-20-solid" class="h-4 w-4" />
       </button>
@@ -31,8 +31,8 @@
                 <div class="group flex items-center justify-between rounded-md px-2 py-1 text-sm text-gray-700 hover:bg-gray-50">
                   <button type="button" class="flex min-w-0 flex-1 items-center text-left" :aria-expanded="isRunExpanded(run.root_run_id)" @click="openRun(run)">
                     <Icon icon="heroicons:chevron-down-20-solid" class="mr-1 h-3.5 w-3.5 text-gray-400 transition-transform" :class="isRunExpanded(run.root_run_id) ? '' : '-rotate-90'" />
-                    <span class="mr-1.5 h-2 w-2 flex-none rounded-full" :class="run.is_active ? 'bg-emerald-500' : 'bg-gray-300'" :aria-label="run.is_active ? 'Running' : 'Stopped'" />
-                    <span class="truncate font-medium">{{ run.summary || `New - ${orgGroup.name}` }}</span>
+                    <span class="mr-1.5 h-2 w-2 flex-none rounded-full" :class="run.is_active ? 'bg-emerald-500' : 'bg-gray-300'" :aria-label="run.is_active ? t('workspace.agentOrg.history.running') : t('workspace.agentOrg.history.stopped')" />
+                    <span class="truncate font-medium">{{ run.summary || t('workspace.agentOrg.history.newRun', { name: orgGroup.name }) }}</span>
                   </button>
                   <button
                     v-if="run.is_active"
@@ -51,7 +51,7 @@
                   {{ store.terminationErrors[run.root_run_id] }}
                 </p>
 
-                <div v-if="isRunExpanded(run.root_run_id)" class="team-execution-tree ml-3 space-y-0.5" role="tree" :aria-label="`${orgGroup.name} execution hierarchy`">
+                <div v-if="isRunExpanded(run.root_run_id)" class="team-execution-tree ml-3 space-y-0.5" role="tree" :aria-label="t('workspace.agentOrg.history.executionHierarchy', { name: orgGroup.name })">
                   <template v-for="display in rowsFor(run)" :key="display.row.key">
                     <button
                       v-if="display.row.kind === 'agent'"
@@ -108,13 +108,13 @@
                       <span class="ml-2 mr-1 h-3.5 w-3.5 flex-none" aria-hidden="true" />
                       <StatusDot class="mr-1.5" :status="display.row.status" :variant="display.row.taskKind === 'direct' ? 'transient' : 'solid'" />
                       <span v-if="display.row.taskKind === 'team_member'" class="mr-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-gray-200 text-[0.5625rem] font-semibold text-gray-600">{{ initials(display.row.address) }}</span>
-                      <span class="truncate">{{ display.row.taskKind === 'direct' ? `Task: ${label(display.row.address)}` : label(display.row.address) }}</span>
+                      <span class="truncate">{{ display.row.taskKind === 'direct' ? taskLabel(display.row.address) : label(display.row.address) }}</span>
                     </div>
                     <div v-else class="org-execution-row relative flex min-h-7 w-full items-center rounded-md bg-indigo-50/70 text-sm text-indigo-900" :style="rowStyle(display.row.depth)" :aria-level="display.row.depth + 1" :data-test="`agent-org-task-team-row-${display.row.teamRunId}`" role="treeitem">
                       <WorkspaceHierarchyBranches :depth="display.row.depth" :continuing-ancestor-depths="display.continuingAncestorDepths" :has-following-sibling="display.hasFollowingSibling" />
                       <span class="ml-2 mr-1 h-3.5 w-3.5" aria-hidden="true" />
                       <Icon icon="heroicons:user-group-20-solid" class="mr-1.5 h-3.5 w-3.5 text-indigo-600" />
-                      <span class="truncate">Task: {{ label(display.row.address) }}</span>
+                      <span class="truncate">{{ taskLabel(display.row.address) }}</span>
                     </div>
                   </template>
                 </div>
@@ -123,7 +123,7 @@
           </div>
         </div>
       </section>
-      <p v-if="!groups.length && !store.historyError" class="px-3 py-4 text-xs text-gray-500">No Agent Org run history yet.</p>
+      <p v-if="!groups.length && !store.historyError" class="px-3 py-4 text-xs text-gray-500">{{ t('workspace.agentOrg.history.empty') }}</p>
     </div>
   </div>
 </template>
@@ -164,9 +164,10 @@ type StatusSource = Readonly<{
 }>
 
 const store = useAgentOrgRunStore(); const orgContexts = useAgentOrgContextsStore(); const route = useRoute(); const router = useRouter(); const { t } = useLocalization()
+const NO_WORKSPACE_KEY = '__agent_org_no_workspace__'
 const expandedWorkspaces = ref(new Set<string>()); const expandedOrgs = ref(new Set<string>()); const expandedRuns = ref(new Set<string>()); const expandedTeams = ref(new Set<string>())
 const treeFor = (run: AgentOrgHistoryItem): AgentOrgExecutionTree => orgContexts.contextFor(run.root_run_id)?.executionTree ?? parseAgentOrgExecutionTree(run.org)
-const workspaceFor = (run: AgentOrgHistoryItem) => String(treeFor(run).rootOrg.defaultLaunchConfiguration.workspaceRootPath || 'No workspace')
+const workspaceFor = (run: AgentOrgHistoryItem) => String(treeFor(run).rootOrg.defaultLaunchConfiguration.workspaceRootPath || NO_WORKSPACE_KEY)
 const groups = computed(() => { const workspaces = new Map<string, Map<string, { definitionId: string; name: string; runs: AgentOrgHistoryItem[] }>>(); for (const run of store.history) { const tree = treeFor(run); const workspace = workspaceFor(run); const byOrg = workspaces.get(workspace) ?? new Map<string, { definitionId: string; name: string; runs: AgentOrgHistoryItem[] }>(); const definitionId = tree.rootOrg.orgDefinitionId; const group = byOrg.get(definitionId) ?? { definitionId, name: tree.rootOrg.orgDefinitionName, runs: [] as AgentOrgHistoryItem[] }; group.runs.push(run); byOrg.set(definitionId, group); workspaces.set(workspace, byOrg) } return [...workspaces].map(([workspace, orgs]) => ({ workspace, orgs: [...orgs.values()] })) })
 const toggle = (state: typeof expandedWorkspaces, key: string) => { const next = new Set(state.value); next.has(key) ? next.delete(key) : next.add(key); state.value = next }
 const isWorkspaceExpanded = (key: string) => expandedWorkspaces.value.has(key); const toggleWorkspace = (key: string) => toggle(expandedWorkspaces, key)
@@ -175,8 +176,15 @@ const isRunExpanded = (key: string) => expandedRuns.value.has(key)
 const teamKey = (runId: string, address: string) => `${runId}:${address}`; const isTeamExpanded = (runId: string, address: string) => expandedTeams.value.has(teamKey(runId, address))
 const label = (address: string) => address.split('/').filter(Boolean).at(-1)?.replace(/[_-]+/g, ' ') || address
 const initials = (address: string) => label(address).split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('')
-const workspaceLabel = (workspace: string) => workspace === 'No workspace' ? workspace : workspace.split(/[\\/]/).filter(Boolean).at(-1) || workspace
-const relative = (createdAt: string) => { const seconds = Math.max(0, Math.floor((Date.now() - Date.parse(createdAt)) / 1000)); if (seconds < 60) return 'now'; if (seconds < 3600) return `${Math.floor(seconds / 60)}m`; if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`; return `${Math.floor(seconds / 86400)}d` }
+const workspaceLabel = (workspace: string) => workspace === NO_WORKSPACE_KEY ? t('workspace.agentOrg.history.noWorkspace') : workspace.split(/[\\/]/).filter(Boolean).at(-1) || workspace
+const relative = (createdAt: string) => {
+  const seconds = Math.max(0, Math.floor((Date.now() - Date.parse(createdAt)) / 1000))
+  if (seconds < 60) return t('workspace.agentOrg.history.relativeNow')
+  if (seconds < 3600) return t('workspace.agentOrg.history.relativeMinutes', { count: Math.floor(seconds / 60) })
+  if (seconds < 86400) return t('workspace.agentOrg.history.relativeHours', { count: Math.floor(seconds / 3600) })
+  return t('workspace.agentOrg.history.relativeDays', { count: Math.floor(seconds / 86400) })
+}
+const taskLabel = (address: string) => t('workspace.agentOrg.history.taskLabel', { name: label(address) })
 const statusLabelKey = (status: AgentStatus) => `workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_${status}`
 const agentStatusLabelKey = (status: AgentStatus) => `workspace.history.hierarchy.status.${status}`
 const agentRowLabel = (row: AgentRow | TaskAgentRow) => `${label(row.address)}, ${t(agentStatusLabelKey(row.status))}`

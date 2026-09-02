@@ -3,6 +3,7 @@ import { reactive } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AgentStatus } from '~/types/agent/AgentStatus'
 import AgentOrgRunHistoryPanel from '../AgentOrgRunHistoryPanel.vue'
+import { localizationRuntime } from '~/localization/runtime/localizationRuntime'
 
 const launch = {
   runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-5.6-sol', llmConfig: null,
@@ -382,5 +383,20 @@ describe('AgentOrgRunHistoryPanel', () => {
     expect(designDot().attributes('data-status')).toBe(AgentStatus.Offline)
     expect(wrapper.find('button[aria-label="Stop Agent Org"]').exists()).toBe(false)
     expect(wrapper.findAll('[data-test^="agent-org-team-row-"] button[aria-label*="Stop"]')).toHaveLength(0)
+  })
+
+  it('renders history chrome and lifecycle status through the Simplified Chinese catalog', async () => {
+    await localizationRuntime.setPreference('zh-CN')
+    try {
+      const wrapper = mountSubject()
+      await flushPromises()
+
+      expect(wrapper.text()).toContain('工作区')
+      expect(wrapper.find('[aria-label="运行中"]').exists()).toBe(true)
+      expect(wrapper.get('button[aria-label="刷新智能体组织历史记录"]').exists()).toBe(true)
+      expect(wrapper.get('button[aria-label="停止智能体组织"]').exists()).toBe(true)
+    } finally {
+      await localizationRuntime.setPreference('en')
+    }
   })
 })

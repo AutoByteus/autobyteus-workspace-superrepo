@@ -2,7 +2,7 @@
   <div class="h-full flex-1 overflow-auto bg-slate-50">
     <div class="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
       <button type="button" class="mb-5 inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" @click="goBack">
-        <span aria-hidden="true" class="mr-2">←</span>{{ returnToOrgId ? 'Back to Agent Orgs' : $t('agentTeams.components.agentTeams.AgentTeamDetail.back_to_agent_teams') }}
+        <span aria-hidden="true" class="mr-2">←</span>{{ returnToOrgId ? $t('agentTeams.components.agentTeams.AgentTeamDetail.backToAgentOrgs') : $t('agentTeams.components.agentTeams.AgentTeamDetail.back_to_agent_teams') }}
       </button>
 
       <div v-if="loading" class="rounded-xl border border-slate-200 bg-white py-20 text-center shadow-sm">

@@ -11,9 +11,9 @@
           :runtime-kind="runtimeKind"
           :llm-model-identifier="llmModelIdentifier"
           :llm-config="llmConfig"
-          runtime-help-text="Selects the runtime used by this organization run."
-          model-label="Default LLM Model"
-          model-help-text="Used across the organization unless a placement is customized."
+          :runtime-help-text="t('workspace.agentOrg.runConfig.runtimeHelp')"
+          :model-label="t('workspace.agentOrg.runConfig.modelLabel')"
+          :model-help-text="t('workspace.agentOrg.runConfig.modelHelp')"
           id-prefix="org-run"
           control-variant="quiet"
           @update:runtime-kind="runtimeKind = $event"
@@ -99,7 +99,7 @@
           {{ modelSchemaBlockingDiagnostic.message }}
         </p>
       </div>
-      <div v-else class="flex h-full items-center justify-center text-gray-500">Loading Agent Org…</div>
+      <div v-else class="flex h-full items-center justify-center text-gray-500">{{ t('workspace.agentOrg.runConfig.loading') }}</div>
     </div>
     <div class="border-t border-gray-200 bg-gray-50 px-4 py-3">
       <button
@@ -110,7 +110,7 @@
         :aria-describedby="modelSchemaBlockingDiagnostic ? 'org-model-schema-status' : undefined"
         @click="runOrg"
       >
-        {{ orgRunStore.launching ? 'Starting Agent Org…' : 'Run Agent Org' }}
+        {{ orgRunStore.launching ? t('workspace.agentOrg.runConfig.starting') : t('workspace.agentOrg.runConfig.run') }}
       </button>
       <p v-if="!workspaceReady" class="mt-2 text-xs text-amber-700">{{ t('workspace.agentOrg.runConfig.workspaceRequired') }}</p>
     </div>
@@ -273,7 +273,10 @@ const handleTeamWorkspaceSelection = (address: AgentTeamAddress, selection: Work
   if (selection.mode === 'existing' && selection.existingWorkspaceId) {
     const metadata = workspaceMetadata(selection.existingWorkspaceId)
     if (!metadata) {
-      configStore.setTeamWorkspaceOperation(address, { status: 'error', error: `Workspace '${selection.existingWorkspaceId}' is unavailable.` })
+      configStore.setTeamWorkspaceOperation(address, {
+        status: 'error',
+        error: t('workspace.agentOrg.runConfig.workspaceUnavailable', { workspaceId: selection.existingWorkspaceId }),
+      })
       return
     }
     const matchesRoot = rootConfig.value.workspaceId === selection.existingWorkspaceId
@@ -293,7 +296,7 @@ const handleTeamWorkspaceSelection = (address: AgentTeamAddress, selection: Work
 const resolveRootWorkspacePath = async (): Promise<string> => {
   if (workspaceSelection.value.mode === 'new') {
     const path = workspaceSelection.value.newWorkspacePath.trim()
-    if (!path) throw new Error('Workspace path is required.')
+    if (!path) throw new Error(t('workspace.agentOrg.runConfig.workspacePathRequired'))
     workspaceLoading.value = true
     try {
       await workspaceStore.createWorkspace({ root_path: path })
@@ -304,7 +307,7 @@ const resolveRootWorkspacePath = async (): Promise<string> => {
     }
   }
   const path = rootWorkspacePath.value
-  if (!path) throw new Error('Selected workspace has no usable root path.')
+  if (!path) throw new Error(t('workspace.agentOrg.runConfig.workspacePathUnavailable'))
   return path
 }
 const prepareTeamWorkspacePaths = async (): Promise<Record<AgentTeamAddress, string>> => {

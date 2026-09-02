@@ -35,6 +35,7 @@ const messages = {
     "重新加载对话时团队活动发生了变化。请再次选择此团队成员以重试。",
   "workspace.agentOrg.recovery.exhausted":
     "实时更新无法自动恢复。请重新选择此智能体组织，以重新加载经过验证的完整对话。",
+  "workspace.agentOrg.connecting": "正在连接智能体组织…",
   "workspace.agentOrg.stoppedHistory.title": "已停止的智能体组织",
   "workspace.agentOrg.stoppedHistory.description":
     "请从侧栏中的历史运行选择成员，以从其保存状态继续。",
@@ -44,7 +45,25 @@ const messages = {
   "workspace.agentOrg.history.refreshLabel": "刷新智能体组织历史记录",
   "workspace.agentOrg.history.collectionLabel": "智能体组织",
   "workspace.agentOrg.history.stopLabel": "停止智能体组织",
+  "workspace.agentOrg.history.workspaces": "工作区",
+  "workspace.agentOrg.history.running": "运行中",
+  "workspace.agentOrg.history.stopped": "已停止",
+  "workspace.agentOrg.history.newRun": "新建 - {{name}}",
+  "workspace.agentOrg.history.executionHierarchy": "{{name}} 执行层级",
+  "workspace.agentOrg.history.taskLabel": "任务：{{name}}",
+  "workspace.agentOrg.history.empty": "暂无智能体组织运行历史记录。",
+  "workspace.agentOrg.history.noWorkspace": "无工作区",
+  "workspace.agentOrg.history.relativeNow": "刚刚",
+  "workspace.agentOrg.history.relativeMinutes": "{{count}} 分钟",
+  "workspace.agentOrg.history.relativeHours": "{{count}} 小时",
+  "workspace.agentOrg.history.relativeDays": "{{count}} 天",
   "workspace.agentOrg.runConfig.orgLabel": "智能体组织",
+  "workspace.agentOrg.runConfig.runtimeHelp": "选择此组织运行所使用的运行时。",
+  "workspace.agentOrg.runConfig.modelLabel": "默认大语言模型",
+  "workspace.agentOrg.runConfig.modelHelp": "应用于整个组织，除非某个位置已自定义。",
+  "workspace.agentOrg.runConfig.loading": "正在加载智能体组织…",
+  "workspace.agentOrg.runConfig.starting": "正在启动智能体组织…",
+  "workspace.agentOrg.runConfig.run": "运行智能体组织",
   "workspace.agentOrg.runConfig.autoApprove": "自动批准工具",
   "workspace.agentOrg.runConfig.autoApproveHelp":
     "自动允许本次运行中的工具调用和访问请求。",
@@ -53,6 +72,9 @@ const messages = {
   "workspace.agentOrg.runConfig.schemaLoading": "正在验证 {address} 的模型配置…",
   "workspace.agentOrg.runConfig.schemaBlocked": "{address} 的模型配置尚未就绪：{error}",
   "workspace.agentOrg.runConfig.schemaUnavailable": "有效模型配置不可用。",
+  "workspace.agentOrg.runConfig.workspaceUnavailable": "工作区“{{workspaceId}}”不可用。",
+  "workspace.agentOrg.runConfig.workspacePathRequired": "必须提供工作区路径。",
+  "workspace.agentOrg.runConfig.workspacePathUnavailable": "所选工作区没有可用的根路径。",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.expand_diagram":
     "放大图表",
   "workspace.components.conversation.segments.renderer.MermaidDiagram.viewer":

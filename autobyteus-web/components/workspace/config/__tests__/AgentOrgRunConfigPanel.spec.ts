@@ -10,6 +10,7 @@ import { useAgentOrgRunConfigStore } from '~/stores/agentOrgRunConfigStore'
 import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
 import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
 import { useWorkspaceStore } from '~/stores/workspace'
+import { localizationRuntime } from '~/localization/runtime/localizationRuntime'
 
 const { route, replace } = vi.hoisted(() => ({
   route: { query: { definitionId: 'delivery-org' } as Record<string, string> },
@@ -22,7 +23,7 @@ vi.mock('vue-router', () => ({
 
 const PassiveField = defineComponent({
   name: 'RuntimeModelConfigFields',
-  props: ['idPrefix'],
+  props: ['idPrefix', 'runtimeHelpText', 'modelLabel', 'modelHelpText'],
   emits: ['schema-state'],
   setup(_, { emit }) {
     onMounted(() => emit('schema-state', { status: 'ready', message: null }))
@@ -296,5 +297,23 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     expect(launch).toHaveBeenCalledWith(expect.objectContaining({
       agentOverrides: [],
     }))
+  })
+
+  it('renders the Agent Org launch controls through the Simplified Chinese catalog', async () => {
+    await localizationRuntime.setPreference('zh-CN')
+    try {
+      const wrapper = await mountPanel()
+      const rootFields = wrapper.findAllComponents(PassiveField)
+        .find((field) => field.props('idPrefix') === 'org-run')!
+
+      expect(rootFields.props()).toMatchObject({
+        runtimeHelpText: '选择此组织运行所使用的运行时。',
+        modelLabel: '默认大语言模型',
+        modelHelpText: '应用于整个组织，除非某个位置已自定义。',
+      })
+      expect(wrapper.get('[data-test="run-agent-org"]').text()).toBe('运行智能体组织')
+    } finally {
+      await localizationRuntime.setPreference('en')
+    }
   })
 })

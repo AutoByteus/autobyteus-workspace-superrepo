@@ -3,11 +3,11 @@
     <div class="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
       <template v-if="view === 'org-list'">
         <header class="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center">
-          <h1 class="sr-only">Agent Orgs</h1>
+          <h1 class="sr-only">{{ t('agentOrgs.experience.catalog.title') }}</h1>
           <label class="relative min-w-0 flex-1 rounded-lg border border-slate-200 bg-white shadow-sm">
-            <span class="sr-only">Search Agent Orgs</span>
+            <span class="sr-only">{{ t('agentOrgs.experience.catalog.searchLabel') }}</span>
             <Icon icon="heroicons:magnifying-glass-20-solid" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input v-model="search" class="block w-full rounded-lg border-transparent bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Search organizations by name">
+            <input v-model="search" class="block w-full rounded-lg border-transparent bg-white py-2.5 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20" :placeholder="t('agentOrgs.experience.catalog.searchPlaceholder')">
           </label>
           <div class="flex items-center justify-end gap-2">
             <button
@@ -18,10 +18,10 @@
               @click="reloadOrgs"
             >
               <Icon icon="heroicons:arrow-path-20-solid" class="mr-2 h-4 w-4" :class="{ 'animate-spin': reloading }" />
-              {{ reloading ? 'Reloading…' : 'Reload' }}
+              {{ reloading ? t('agentOrgs.experience.catalog.reloading') : t('agentOrgs.experience.catalog.reload') }}
             </button>
             <button type="button" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" data-test="create-org" @click="go('org-create')">
-              Create Agent Org
+              {{ t('agentOrgs.experience.catalog.create') }}
             </button>
           </div>
         </header>
@@ -40,13 +40,13 @@
                     <p class="mt-1 line-clamp-2 text-sm text-slate-600">{{ org.description }}</p>
                   </div>
                   <div class="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
-                    <button type="button" class="inline-flex min-w-[104px] justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" @click="openLaunch(org.id)">Run</button>
-                    <button type="button" class="inline-flex items-center text-sm font-medium text-slate-500 transition-colors hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" @click="go('org-detail', org.id)">View Details <span class="ml-1" aria-hidden="true">→</span></button>
+                    <button type="button" class="inline-flex min-w-[104px] justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" @click="openLaunch(org.id)">{{ t('agentOrgs.experience.actions.run') }}</button>
+                    <button type="button" class="inline-flex items-center text-sm font-medium text-slate-500 transition-colors hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" @click="go('org-detail', org.id)">{{ t('agentOrgs.experience.actions.viewDetails') }} <span class="ml-1" aria-hidden="true">→</span></button>
                   </div>
                 </div>
 
                 <div class="mt-4 flex flex-wrap items-center gap-2">
-                  <span v-for="member in org.members" :key="`${member.kind}-${member.ref}`" :data-test="`org-member-${member.kind}-${member.ref}`" class="inline-flex max-w-[14rem] items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium" :class="member.kind === 'team' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-slate-50 text-slate-700'" :aria-label="`${member.kind === 'team' ? 'Team' : 'Agent'} ${member.kind === 'team' ? teamById(member.ref).name : agentById(member.ref).name}`">
+                  <span v-for="member in org.members" :key="`${member.kind}-${member.ref}`" :data-test="`org-member-${member.kind}-${member.ref}`" class="inline-flex max-w-[14rem] items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium" :class="member.kind === 'team' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-slate-50 text-slate-700'" :aria-label="memberAriaLabel(member)">
                     <Icon :icon="member.kind === 'team' ? 'heroicons:user-group-20-solid' : 'heroicons:user-20-solid'" class="h-4 w-4 flex-none" />
                     <span class="truncate">{{ member.kind === 'team' ? teamById(member.ref).name : agentById(member.ref).name }}</span>
                   </span>
@@ -57,13 +57,13 @@
           </section>
         </div>
         <div v-else class="rounded-lg border border-slate-200 bg-white py-16 text-center shadow-sm">
-          <p class="text-lg font-medium text-slate-500">No organizations found</p>
-          <p class="mt-2 text-sm text-slate-400">No organizations matched “{{ search.trim() }}”</p>
+          <p class="text-lg font-medium text-slate-500">{{ t('agentOrgs.experience.catalog.empty') }}</p>
+          <p class="mt-2 text-sm text-slate-400">{{ t('agentOrgs.experience.catalog.emptyFiltered', { query: search.trim() }) }}</p>
         </div>
       </template>
 
       <template v-else-if="view === 'org-detail'">
-        <button type="button" class="mb-5 inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')"><Icon icon="heroicons:arrow-left-20-solid" class="mr-2 h-4 w-4" /> Back to Agent Orgs</button>
+        <button type="button" class="mb-5 inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')"><Icon icon="heroicons:arrow-left-20-solid" class="mr-2 h-4 w-4" /> {{ t('agentOrgs.experience.detail.back') }}</button>
         <header class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex min-w-0 items-start gap-4">
@@ -71,28 +71,28 @@
               <div class="min-w-0"><h1 class="text-3xl font-bold tracking-tight text-slate-950">{{ selectedOrg.name }}</h1></div>
             </div>
             <div class="flex shrink-0 gap-2">
-              <button type="button" class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" data-test="run-organization" @click="openLaunch(selectedOrg.id)">Run</button>
-              <button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-edit', selectedOrg.id)">Edit</button>
+              <button type="button" class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" data-test="run-organization" @click="openLaunch(selectedOrg.id)">{{ t('agentOrgs.experience.actions.run') }}</button>
+              <button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-edit', selectedOrg.id)">{{ t('agentOrgs.experience.actions.edit') }}</button>
             </div>
           </div>
         </header>
 
         <div class="mt-4 space-y-4">
           <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 class="text-xl font-semibold text-slate-900">Description</h2>
+            <h2 class="text-xl font-semibold text-slate-900">{{ t('agentOrgs.experience.detail.description') }}</h2>
             <p class="mt-2 text-sm leading-6 text-slate-600">{{ selectedOrg.description }}</p>
           </section>
 
           <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-            <div class="border-b border-slate-200 px-5 py-4"><h2 class="text-xl font-semibold text-slate-900">Members</h2></div>
+            <div class="border-b border-slate-200 px-5 py-4"><h2 class="text-xl font-semibold text-slate-900">{{ t('agentOrgs.experience.detail.members') }}</h2></div>
             <div class="grid divide-y divide-slate-100 lg:grid-cols-2 lg:divide-x lg:divide-y-0">
               <div class="p-5">
-                <div class="mb-4 flex items-center gap-2"><Icon icon="heroicons:user-20-solid" class="h-5 w-5 text-slate-500" /><h3 class="font-semibold text-slate-900">Agents ({{ directAgents.length }})</h3></div>
+                <div class="mb-4 flex items-center gap-2"><Icon icon="heroicons:user-20-solid" class="h-5 w-5 text-slate-500" /><h3 class="font-semibold text-slate-900">{{ t('agentOrgs.experience.detail.agentsCount', { count: directAgents.length }) }}</h3></div>
                 <ul class="space-y-3"><li v-for="agent in directAgents" :key="agent.id" class="flex items-center gap-3 rounded-lg border border-slate-200 p-3"><span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">{{ agent.initials }}</span><p class="min-w-0 truncate text-sm font-semibold text-slate-900">{{ agent.name }}</p></li></ul>
               </div>
               <div class="p-5">
-                <div class="mb-4 flex items-center gap-2"><Icon icon="heroicons:user-group-20-solid" class="h-5 w-5 text-blue-600" /><h3 class="font-semibold text-slate-900">Teams ({{ referencedTeams.length }})</h3></div>
-                <ul class="space-y-3"><li v-for="team in referencedTeams" :key="team.id" class="rounded-lg border border-blue-200 bg-blue-50/50 p-3"><div class="flex items-center gap-3"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-blue-700"><Icon icon="heroicons:user-group-20-solid" class="h-5 w-5" /></span><div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-900">{{ team.name }}</p><p class="truncate text-xs text-slate-500">Coordinator: {{ agentById(team.coordinatorId).name }}</p></div><button type="button" class="text-xs font-semibold text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="openTeam(team.id)">View ↗</button></div></li></ul>
+                <div class="mb-4 flex items-center gap-2"><Icon icon="heroicons:user-group-20-solid" class="h-5 w-5 text-blue-600" /><h3 class="font-semibold text-slate-900">{{ t('agentOrgs.experience.detail.teamsCount', { count: referencedTeams.length }) }}</h3></div>
+                <ul class="space-y-3"><li v-for="team in referencedTeams" :key="team.id" class="rounded-lg border border-blue-200 bg-blue-50/50 p-3"><div class="flex items-center gap-3"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white text-blue-700"><Icon icon="heroicons:user-group-20-solid" class="h-5 w-5" /></span><div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-900">{{ team.name }}</p><p class="truncate text-xs text-slate-500">{{ t('agentOrgs.experience.member.coordinator', { name: agentById(team.coordinatorId).name }) }}</p></div><button type="button" class="text-xs font-semibold text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="openTeam(team.id)">{{ t('agentOrgs.experience.actions.view') }}</button></div></li></ul>
               </div>
             </div>
           </section>
@@ -102,53 +102,53 @@
       </template>
 
       <template v-else>
-        <button type="button" class="mb-5 inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')"><Icon icon="heroicons:arrow-left-20-solid" class="mr-2 h-4 w-4" /> Back to Agent Orgs</button>
-        <header class="mb-6"><h1 class="text-3xl font-bold tracking-tight text-slate-950">{{ view === 'org-create' ? 'Create Agent Org' : 'Edit ' + selectedOrg.name }}</h1><p class="mt-2 max-w-3xl text-base text-slate-600">Add Agents and Teams, then configure handoffs.</p></header>
+        <button type="button" class="mb-5 inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')"><Icon icon="heroicons:arrow-left-20-solid" class="mr-2 h-4 w-4" /> {{ t('agentOrgs.experience.detail.back') }}</button>
+        <header class="mb-6"><h1 class="text-3xl font-bold tracking-tight text-slate-950">{{ view === 'org-create' ? t('agentOrgs.experience.catalog.create') : t('agentOrgs.experience.form.editTitle', { name: selectedOrg.name }) }}</h1><p class="mt-2 max-w-3xl text-base text-slate-600">{{ t('agentOrgs.experience.form.description') }}</p></header>
         <form class="space-y-4" @submit.prevent="saveOrg">
-          <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h2 class="font-semibold text-slate-900">Basics</h2><div class="mt-4 space-y-4"><label class="block"><span class="text-sm font-medium text-slate-700">Name</span><input v-model="formName" required class="mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"></label><label class="block"><span class="text-sm font-medium text-slate-700">Description</span><textarea v-model="formDescription" rows="3" class="mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"></textarea></label></div></section>
+          <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h2 class="font-semibold text-slate-900">{{ t('agentOrgs.experience.form.basics') }}</h2><div class="mt-4 space-y-4"><label class="block"><span class="text-sm font-medium text-slate-700">{{ t('agentOrgs.experience.form.name') }}</span><input v-model="formName" required class="mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"></label><label class="block"><span class="text-sm font-medium text-slate-700">{{ t('agentOrgs.experience.detail.description') }}</span><textarea v-model="formDescription" rows="3" class="mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"></textarea></label></div></section>
 
           <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div class="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
-              <h2 class="text-xl font-semibold text-slate-900">Members</h2>
+              <h2 class="text-xl font-semibold text-slate-900">{{ t('agentOrgs.experience.detail.members') }}</h2>
               <button type="button" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" data-test="open-member-picker" @click="memberPickerOpen ? closeMemberPicker() : openMemberPicker()">
-                <Icon :icon="memberPickerOpen ? 'heroicons:x-mark-20-solid' : 'heroicons:plus-20-solid'" class="h-4 w-4" /> {{ memberPickerOpen ? 'Close' : 'Add member' }}
+                <Icon :icon="memberPickerOpen ? 'heroicons:x-mark-20-solid' : 'heroicons:plus-20-solid'" class="h-4 w-4" /> {{ memberPickerOpen ? t('agentOrgs.experience.form.close') : t('agentOrgs.experience.form.addMember') }}
               </button>
             </div>
             <section v-if="memberPickerOpen" class="border-b border-slate-200 bg-slate-50 px-5 py-5" data-test="org-member-picker" aria-labelledby="member-picker-title">
-              <div class="flex items-start justify-between gap-4"><div><h3 id="member-picker-title" class="font-semibold text-slate-900">Choose members</h3><p class="mt-1 text-sm text-slate-600">Add a direct Agent or an existing Team.</p></div></div>
-              <label class="relative mt-4 block"><span class="sr-only">Search members</span><Icon icon="heroicons:magnifying-glass-20-solid" class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" /><input v-model="memberSearch" type="search" class="block w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="Search members"></label>
-              <div class="mt-4 flex gap-1 border-b border-slate-200" role="tablist" aria-label="Member type">
-                <button type="button" role="tab" class="border-b-2 px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="memberPickerTab === 'agents' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'" :aria-selected="memberPickerTab === 'agents'" @click="memberPickerTab = 'agents'">Agents</button>
-                <button type="button" role="tab" class="border-b-2 px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="memberPickerTab === 'teams' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'" :aria-selected="memberPickerTab === 'teams'" @click="memberPickerTab = 'teams'">Teams</button>
+              <div class="flex items-start justify-between gap-4"><div><h3 id="member-picker-title" class="font-semibold text-slate-900">{{ t('agentOrgs.experience.form.chooseMembers') }}</h3><p class="mt-1 text-sm text-slate-600">{{ t('agentOrgs.experience.form.chooseMembersHelp') }}</p></div></div>
+              <label class="relative mt-4 block"><span class="sr-only">{{ t('agentOrgs.experience.form.searchMembers') }}</span><Icon icon="heroicons:magnifying-glass-20-solid" class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" /><input v-model="memberSearch" type="search" class="block w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" :placeholder="t('agentOrgs.experience.form.searchMembers')"></label>
+              <div class="mt-4 flex gap-1 border-b border-slate-200" role="tablist" :aria-label="t('agentOrgs.experience.form.memberType')">
+                <button type="button" role="tab" class="border-b-2 px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="memberPickerTab === 'agents' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'" :aria-selected="memberPickerTab === 'agents'" @click="memberPickerTab = 'agents'">{{ t('agentOrgs.experience.form.agents') }}</button>
+                <button type="button" role="tab" class="border-b-2 px-4 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="memberPickerTab === 'teams' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'" :aria-selected="memberPickerTab === 'teams'" @click="memberPickerTab = 'teams'">{{ t('agentOrgs.experience.form.teams') }}</button>
               </div>
               <ul v-if="memberPickerTab === 'agents'" class="mt-4 grid gap-2 lg:grid-cols-2" data-test="member-picker-agents">
                 <li v-for="agent in filteredMemberAgents" :key="agent.id" class="flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5">
                   <span class="inline-flex h-9 w-9 flex-none items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">{{ agent.initials }}</span>
                   <div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-900">{{ agent.name }}</p><p class="truncate text-xs text-slate-500">{{ agent.description }}</p></div>
-                  <button type="button" class="rounded-lg px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="formAgentIds.includes(agent.id) ? 'cursor-default bg-slate-100 text-slate-500' : 'border border-blue-200 bg-white text-blue-700 hover:bg-blue-50'" :disabled="formAgentIds.includes(agent.id)" :aria-label="formAgentIds.includes(agent.id) ? `${agent.name} added` : `Add ${agent.name}`" @click="addOrgAgent(agent.id)">{{ formAgentIds.includes(agent.id) ? 'Added' : 'Add' }}</button>
+                  <button type="button" class="rounded-lg px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="formAgentIds.includes(agent.id) ? 'cursor-default bg-slate-100 text-slate-500' : 'border border-blue-200 bg-white text-blue-700 hover:bg-blue-50'" :disabled="formAgentIds.includes(agent.id)" :aria-label="formAgentIds.includes(agent.id) ? t('agentOrgs.experience.form.memberAddedLabel', { name: agent.name }) : t('agentOrgs.experience.form.addMemberLabel', { name: agent.name })" @click="addOrgAgent(agent.id)">{{ formAgentIds.includes(agent.id) ? t('agentOrgs.experience.actions.added') : t('agentOrgs.experience.actions.add') }}</button>
                 </li>
-                <li v-if="filteredMemberAgents.length === 0" class="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No Agents match your search.</li>
+                <li v-if="filteredMemberAgents.length === 0" class="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">{{ t('agentOrgs.experience.form.noAgentMatches') }}</li>
               </ul>
               <ul v-else class="mt-4 grid gap-2 lg:grid-cols-2" data-test="member-picker-teams">
                 <li v-for="team in filteredMemberTeams" :key="team.id" class="flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5">
                   <span class="inline-flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-blue-50 text-blue-700"><Icon icon="heroicons:user-group-20-solid" class="h-5 w-5" /></span>
-                  <div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-900">{{ team.name }}</p><p class="truncate text-xs text-slate-500">Coordinator: {{ agentById(team.coordinatorId).name }}</p></div>
-                  <button type="button" class="rounded-lg px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="formTeamIds.includes(team.id) ? 'cursor-default bg-slate-100 text-slate-500' : 'border border-blue-200 bg-white text-blue-700 hover:bg-blue-50'" :disabled="formTeamIds.includes(team.id)" :aria-label="formTeamIds.includes(team.id) ? `${team.name} added` : `Add ${team.name}`" @click="addOrgTeam(team.id)">{{ formTeamIds.includes(team.id) ? 'Added' : 'Add' }}</button>
+                  <div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-900">{{ team.name }}</p><p class="truncate text-xs text-slate-500">{{ t('agentOrgs.experience.member.coordinator', { name: agentById(team.coordinatorId).name }) }}</p></div>
+                  <button type="button" class="rounded-lg px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :class="formTeamIds.includes(team.id) ? 'cursor-default bg-slate-100 text-slate-500' : 'border border-blue-200 bg-white text-blue-700 hover:bg-blue-50'" :disabled="formTeamIds.includes(team.id)" :aria-label="formTeamIds.includes(team.id) ? t('agentOrgs.experience.form.memberAddedLabel', { name: team.name }) : t('agentOrgs.experience.form.addMemberLabel', { name: team.name })" @click="addOrgTeam(team.id)">{{ formTeamIds.includes(team.id) ? t('agentOrgs.experience.actions.added') : t('agentOrgs.experience.actions.add') }}</button>
                 </li>
-                <li v-if="filteredMemberTeams.length === 0" class="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No Teams match your search.</li>
+                <li v-if="filteredMemberTeams.length === 0" class="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">{{ t('agentOrgs.experience.form.noTeamMatches') }}</li>
               </ul>
-              <div class="mt-4 flex justify-end"><button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="closeMemberPicker">Done</button></div>
+              <div class="mt-4 flex justify-end"><button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="closeMemberPicker">{{ t('agentOrgs.experience.actions.done') }}</button></div>
             </section>
             <div class="grid lg:grid-cols-2 lg:divide-x lg:divide-slate-100">
-              <div class="p-5"><h3 class="font-semibold text-slate-900">Agents</h3><ul v-if="formAgentIds.length" class="mt-4 space-y-2"><li v-for="agentId in formAgentIds" :key="agentId" class="flex items-center gap-3 rounded-lg border border-slate-200 p-3"><span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">{{ agentById(agentId).initials }}</span><p class="min-w-0 flex-1 truncate text-sm font-semibold text-slate-900">{{ agentById(agentId).name }}</p><button type="button" class="rounded text-slate-400 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :aria-label="`Remove ${agentById(agentId).name}`" @click="removeOrgAgent(agentId)"><Icon icon="heroicons:x-mark-20-solid" class="h-4 w-4" /></button></li></ul><p v-else class="mt-4 text-sm text-slate-500">No Agents added.</p></div>
-              <div class="p-5"><h3 class="font-semibold text-slate-900">Teams</h3><ul v-if="formTeamIds.length" class="mt-4 space-y-2"><li v-for="teamId in formTeamIds" :key="teamId" class="rounded-lg border border-blue-200 bg-blue-50/50 p-3"><div class="flex items-center gap-3"><span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-blue-700"><Icon icon="heroicons:user-group-20-solid" class="h-4 w-4" /></span><div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-900">{{ teamById(teamId).name }}</p><p class="truncate text-xs text-slate-500">Coordinator: {{ agentById(teamById(teamId).coordinatorId).name }}</p></div><button type="button" class="rounded text-slate-400 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :aria-label="`Remove ${teamById(teamId).name}`" @click="removeOrgTeam(teamId)"><Icon icon="heroicons:x-mark-20-solid" class="h-4 w-4" /></button></div></li></ul><p v-else class="mt-4 text-sm text-slate-500">No Teams added.</p></div>
+              <div class="p-5"><h3 class="font-semibold text-slate-900">{{ t('agentOrgs.experience.form.agents') }}</h3><ul v-if="formAgentIds.length" class="mt-4 space-y-2"><li v-for="agentId in formAgentIds" :key="agentId" class="flex items-center gap-3 rounded-lg border border-slate-200 p-3"><span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">{{ agentById(agentId).initials }}</span><p class="min-w-0 flex-1 truncate text-sm font-semibold text-slate-900">{{ agentById(agentId).name }}</p><button type="button" class="rounded text-slate-400 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :aria-label="t('agentOrgs.experience.form.removeMemberLabel', { name: agentById(agentId).name })" @click="removeOrgAgent(agentId)"><Icon icon="heroicons:x-mark-20-solid" class="h-4 w-4" /></button></li></ul><p v-else class="mt-4 text-sm text-slate-500">{{ t('agentOrgs.experience.form.noAgents') }}</p></div>
+              <div class="p-5"><h3 class="font-semibold text-slate-900">{{ t('agentOrgs.experience.form.teams') }}</h3><ul v-if="formTeamIds.length" class="mt-4 space-y-2"><li v-for="teamId in formTeamIds" :key="teamId" class="rounded-lg border border-blue-200 bg-blue-50/50 p-3"><div class="flex items-center gap-3"><span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-blue-700"><Icon icon="heroicons:user-group-20-solid" class="h-4 w-4" /></span><div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-900">{{ teamById(teamId).name }}</p><p class="truncate text-xs text-slate-500">{{ t('agentOrgs.experience.member.coordinator', { name: agentById(teamById(teamId).coordinatorId).name }) }}</p></div><button type="button" class="rounded text-slate-400 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" :aria-label="t('agentOrgs.experience.form.removeMemberLabel', { name: teamById(teamId).name })" @click="removeOrgTeam(teamId)"><Icon icon="heroicons:x-mark-20-solid" class="h-4 w-4" /></button></div></li></ul><p v-else class="mt-4 text-sm text-slate-500">{{ t('agentOrgs.experience.form.noTeams') }}</p></div>
             </div>
           </section>
 
           <HandoffManager ref="orgHandoffManager" v-model="formOrgHandoffs" :from-options="formOrgHandoffOptions.from" :to-options="formOrgHandoffOptions.to" mode="edit" scope="org" />
           <section v-if="saveError" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700" role="alert">{{ saveError }}</section>
-          <section v-if="saved" class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800" role="status">Agent Org saved.</section>
-          <div class="flex justify-end gap-3"><button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')">Cancel</button><button type="submit" class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">{{ view === 'org-create' ? 'Create Org' : 'Save changes' }}</button></div>
+          <section v-if="saved" class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800" role="status">{{ t('agentOrgs.experience.form.saved') }}</section>
+          <div class="flex justify-end gap-3"><button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')">{{ t('agentOrgs.experience.actions.cancel') }}</button><button type="submit" class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">{{ view === 'org-create' ? t('agentOrgs.experience.actions.createOrg') : t('agentOrgs.experience.actions.saveChanges') }}</button></div>
         </form>
       </template>
     </div>
@@ -161,6 +161,7 @@ import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRoute, useRouter } from 'vue-router'
 import HandoffManager from '~/components/collaboration/handoffs/HandoffManager.vue'
+import { useLocalization } from '~/composables/useLocalization'
 import { useAgentDefinitionStore, type AgentDefinition } from '~/stores/agentDefinitionStore'
 import { useAgentTeamDefinitionStore, type AgentTeamDefinition } from '~/stores/agentTeamDefinitionStore'
 import {
@@ -185,6 +186,7 @@ type CatalogOrg = Omit<AgentOrgDefinition, 'members'> & { members: CatalogMember
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useLocalization()
 const orgStore = useAgentOrgDefinitionStore()
 const agentStore = useAgentDefinitionStore()
 const teamStore = useAgentTeamDefinitionStore()
@@ -222,6 +224,9 @@ const teamById = (id: string): TeamView => {
   const coordinator = team.nodes.find((member) => member.memberName === team.coordinatorMemberName)
   return { id: team.id, name: team.name, description: team.description, coordinatorId: coordinator?.ref || team.coordinatorMemberName }
 }
+const memberAriaLabel = (member: CatalogMember): string => member.kind === 'team'
+  ? t('agentOrgs.experience.member.teamLabel', { name: teamById(member.ref).name })
+  : t('agentOrgs.experience.member.agentLabel', { name: agentById(member.ref).name })
 const toCatalogOrg = (org: AgentOrgDefinition): CatalogOrg => ({
   ...org,
   members: org.members.map((member) => ({ kind: member.refType === 'AGENT_TEAM' ? 'team' : 'agent', ref: member.ref })),
@@ -233,7 +238,7 @@ const filteredOrgs = computed(() => {
 })
 const catalogSections = computed(() => {
   if (search.value.trim()) return filteredOrgs.value.length ? [{ id: 'search', title: '', orgs: filteredOrgs.value }] : []
-  return catalogOrgs.value.length ? [{ id: 'featured', title: 'Featured organizations', orgs: catalogOrgs.value }] : []
+  return catalogOrgs.value.length ? [{ id: 'featured', title: t('agentOrgs.experience.catalog.featured'), orgs: catalogOrgs.value }] : []
 })
 const directAgents = computed(() => selectedOrg.value.members.filter((member) => member.refType === 'AGENT').map((member) => agentById(member.ref)))
 const referencedTeams = computed(() => selectedOrg.value.members.filter((member) => member.refType === 'AGENT_TEAM').map((member) => teamById(member.ref)))
@@ -256,16 +261,16 @@ const buildHandoffOptions = (members: readonly AgentOrgMember[]) => {
   const to: HandoffEndpointOption[] = []
   for (const member of members) {
     if (member.refType === 'AGENT') {
-      const option = { id: member.memberName, kind: 'agent' as const, label: agentById(member.ref).name, address: `/${member.memberName}`, group: 'Direct Agents' }
+      const option = { id: member.memberName, kind: 'agent' as const, label: agentById(member.ref).name, address: `/${member.memberName}`, group: t('agentOrgs.experience.form.directAgentsGroup') }
       from.push(option); to.push(option); continue
     }
     const team = teamStore.getAgentTeamDefinitionById(member.ref)
     if (!team) continue
     const teamAddress = `/${member.memberName}`
-    const teamOption = { id: member.memberName, kind: 'team' as const, label: team.name, address: teamAddress, group: 'Teams', coordinatorAddress: `${teamAddress}/${team.coordinatorMemberName}` }
+    const teamOption = { id: member.memberName, kind: 'team' as const, label: team.name, address: teamAddress, group: t('agentOrgs.experience.form.teamsGroup'), coordinatorAddress: `${teamAddress}/${team.coordinatorMemberName}` }
     to.push(teamOption)
     for (const agent of team.nodes) {
-      const option = { id: `${member.memberName}/${agent.memberName}`, kind: 'agent' as const, label: `${team.name} / ${agent.memberName}`, address: `${teamAddress}/${agent.memberName}`, group: `Team · ${team.name}` }
+      const option = { id: `${member.memberName}/${agent.memberName}`, kind: 'agent' as const, label: `${team.name} / ${agent.memberName}`, address: `${teamAddress}/${agent.memberName}`, group: t('agentOrgs.experience.form.teamGroup', { name: team.name }) }
       from.push(option); to.push(option)
     }
   }
@@ -302,8 +307,8 @@ const removeOrgAgent = (id: string) => removeMember(id, 'AGENT')
 const removeOrgTeam = (id: string) => removeMember(id, 'AGENT_TEAM')
 const saveOrg = async (): Promise<void> => {
   if (saving.value) return
-  if (!formName.value.trim()) { saveError.value = 'Enter an Agent Org name before saving.'; return }
-  if (!orgHandoffManager.value?.validateAll()) { saveError.value = 'Resolve the highlighted handoffs before saving this Agent Org.'; return }
+  if (!formName.value.trim()) { saveError.value = t('agentOrgs.experience.form.nameRequired'); return }
+  if (!orgHandoffManager.value?.validateAll()) { saveError.value = t('agentOrgs.experience.form.handoffsInvalid'); return }
   saving.value = true; saved.value = false; saveError.value = ''
   const visibleInput = {
     name: formName.value.trim(),

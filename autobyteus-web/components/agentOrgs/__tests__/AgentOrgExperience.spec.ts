@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import AgentOrgExperience from '../AgentOrgExperience.vue'
+import { localizationRuntime } from '~/localization/runtime/localizationRuntime'
 
 const { route, push, org, orgStore, agentStore, teamStore } = vi.hoisted(() => {
   const agents = [
@@ -136,5 +137,28 @@ describe('AgentOrgExperience', () => {
       },
     })
     expect(wrapper.text()).toContain('Agent Org saved.')
+  })
+
+  it('renders list, detail, create, and edit presentation through the Simplified Chinese catalog', async () => {
+    await localizationRuntime.setPreference('zh-CN')
+    try {
+      const list = await mountExperience('org-list')
+      expect(list.text()).toContain('精选智能体组织')
+      expect(list.text()).toContain('运行')
+
+      const detail = await mountExperience('org-detail', org.id)
+      expect(detail.text()).toContain('返回智能体组织')
+      expect(detail.text()).toContain('协调员：Architecture Designer')
+
+      const create = await mountExperience('org-create')
+      expect(create.text()).toContain('创建智能体组织')
+      expect(create.text()).toContain('添加成员')
+
+      const edit = await mountExperience('org-edit', org.id)
+      expect(edit.text()).toContain('编辑 Software Development Department')
+      expect(edit.text()).toContain('保存更改')
+    } finally {
+      await localizationRuntime.setPreference('en')
+    }
   })
 })

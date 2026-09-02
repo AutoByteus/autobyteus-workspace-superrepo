@@ -47,6 +47,7 @@ const messages = {
   'agentTeams.components.agentTeams.AgentTeamDetail.viewSharedAgentLabel': 'Open agent details for {{name}}',
   'agentTeams.components.agentTeams.AgentTeamDetail.viewTeamAction': 'View ↗',
   'agentTeams.components.agentTeams.AgentTeamDetail.backToParentTeam': 'Back to Parent Team',
+  'agentTeams.components.agentTeams.AgentTeamDetail.backToAgentOrgs': 'Back to Agent Orgs',
   'agentTeams.components.agentTeams.AgentTeamDetail.viewNestedTeamLabel': 'Open team details for {{name}}',
   'agentTeams.components.agentTeams.AgentTeamDetail.teamLocalDefinitionMissing': 'Team-local agent definition could not be loaded for {{id}}.',
   'agentTeams.components.agentTeams.TeamLocalAgentMemberDetails.memberContext': 'Team member: {{member}}',
