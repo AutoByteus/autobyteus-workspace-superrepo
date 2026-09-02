@@ -54,18 +54,18 @@
       </select>
       <p v-if="selectedRuntimeUnavailableReason" class="mt-1 text-xs text-amber-600">{{ selectedRuntimeUnavailableReason }}</p>
       <p
-        v-if="editableNode?.runtimeCatalogState.status === 'loading'"
+        v-if="runtimeCatalogPresentationState.status === 'loading'"
         role="status"
         class="mt-2 rounded border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-700"
         data-test="agent-runtime-catalog-loading"
       >{{ t('workspace.components.workspace.config.TeamScopeConfigEditor.catalog_loading', { address: node.address }) }}</p>
       <div
-        v-else-if="editableNode?.runtimeCatalogState.status === 'error'"
+        v-else-if="runtimeCatalogPresentationState.status === 'error'"
         role="alert"
         class="mt-2 flex items-start justify-between gap-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
         data-test="agent-runtime-catalog-error"
       >
-        <span>{{ t('workspace.components.workspace.config.TeamScopeConfigEditor.catalog_error', { address: node.address, error: editableNode.runtimeCatalogState.error || '' }) }}</span>
+        <span>{{ t('workspace.components.workspace.config.TeamScopeConfigEditor.catalog_error', { address: node.address, error: runtimeCatalogPresentationState.error || '' }) }}</span>
         <button type="button" class="font-semibold underline disabled:opacity-50" :disabled="isInteractionDisabled" @click="retryRuntimeCatalog">
           {{ t('workspace.components.workspace.config.TeamScopeConfigEditor.retry') }}
         </button>
@@ -211,9 +211,20 @@ const {
     : props.node.effectiveConfig.runtimeKind),
 })
 
-const runtimeSelectionValue = computed(() => editableNode.value
-  ? editableNode.value.override?.runtimeKind || ''
-  : props.node.effectiveConfig.runtimeKind)
+const runtimeSelectionValue = computed(() => {
+  if (!editableNode.value) return props.node.effectiveConfig.runtimeKind
+  const pendingRuntimeKind = runtimeEditOperation.value?.requestedOverrideRuntimeKind
+  if (runtimeEditOperation.value) return pendingRuntimeKind || ''
+  return editableNode.value.override?.runtimeKind || ''
+})
+const runtimeCatalogPresentationState = computed(() => {
+  const operation = runtimeEditOperation.value
+  if (operation?.schemaState.status === 'unavailable') {
+    return { status: 'error' as const, error: operation.schemaState.message }
+  }
+  if (operation) return { status: 'loading' as const, error: null }
+  return editableNode.value?.runtimeCatalogState ?? { status: 'idle' as const, error: null }
+})
 const explicitModelIdentifier = computed(() => editableOverride.value?.llmModelIdentifier || '')
 const hasExplicitModelOverride = computed(() => hasExplicitMemberLlmModelOverride(editableOverride.value))
 const globalModelIdentifier = computed(() => baselineConfig.value.llmModelIdentifier || '')
@@ -378,7 +389,10 @@ const handleRuntimeChange = async (value: string) => {
   if (!editable || isInteractionDisabled.value) return
   const nextRuntimeKind = value || undefined
   const runtimeChanged = nextRuntimeKind !== (editable.override?.runtimeKind || undefined)
-  if (!runtimeChanged) return
+  if (!runtimeChanged) {
+    if (runtimeEditOperation.value?.phase === 'failed') runtimeEditOperation.value = null
+    return
+  }
   const nextEffectiveRuntimeKind = nextRuntimeKind || editable.baselineConfig.runtimeKind
   runtimeEditOperation.value = {
     phase: 'catalog',
@@ -457,6 +471,12 @@ const handleAutoExecuteChange = () => {
   }))
 }
 const retryRuntimeCatalog = () => {
-  if (!isInteractionDisabled.value && editableNode.value) emit('retry-runtime-catalog', effectiveRuntimeKind.value ?? '')
+  if (isInteractionDisabled.value || !editableNode.value) return
+  const failedOperation = runtimeEditOperation.value?.phase === 'failed' ? runtimeEditOperation.value : null
+  if (failedOperation) {
+    void handleRuntimeChange(failedOperation.requestedOverrideRuntimeKind ?? '')
+    return
+  }
+  emit('retry-runtime-catalog', effectiveRuntimeKind.value ?? '')
 }
 </script>

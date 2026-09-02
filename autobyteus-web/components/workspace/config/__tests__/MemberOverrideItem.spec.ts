@@ -244,6 +244,36 @@ describe('MemberOverrideItem', () => {
       '/reviewer', { status: 'unavailable', message: 'Claude catalog is offline.' },
     ])
     expect(wrapper.emitted('update:override')).toBeUndefined()
+    expect(wrapper.get('[data-test="agent-runtime-catalog-error"]').text())
+      .toContain('Claude catalog is offline.')
+
+    await wrapper.get('[data-test="agent-runtime-catalog-error"] button').trigger('click')
+    await ready()
+    expect(wrapper.emitted('update:override')?.at(-1)).toEqual([
+      '/reviewer', { runtimeKind: 'claude_agent_sdk' },
+    ])
+  })
+
+  it('returns from a failed uncommitted runtime choice to the committed default and becomes ready', async () => {
+    const wrapper = mountItem(editableNode())
+    await ready()
+    llmStore.fetchProvidersWithModels.mockRejectedValueOnce(new Error('Claude catalog is offline.'))
+
+    void wrapper.get('#override-runtime--reviewer').setValue('claude_agent_sdk')
+    await ready()
+    expect(wrapper.emitted('schema-state')?.at(-1)?.[1]).toEqual({
+      status: 'unavailable', message: 'Claude catalog is offline.',
+    })
+    expect((wrapper.get('#override-runtime--reviewer').element as HTMLSelectElement).value)
+      .toBe('claude_agent_sdk')
+
+    await wrapper.get('#override-runtime--reviewer').setValue('')
+    await ready()
+    expect(wrapper.emitted('schema-state')?.at(-1)).toEqual([
+      '/reviewer', { status: 'ready', message: null },
+    ])
+    expect(wrapper.emitted('update:override')).toBeUndefined()
+    expect(wrapper.find('[data-test="agent-runtime-catalog-error"]').exists()).toBe(false)
   })
 
   it('returns to a null override when explicit runtime/model/config all return to inherited values', async () => {

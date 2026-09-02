@@ -261,7 +261,7 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
   })
 
-  it('cannot launch a stale Agent override while its exact runtime catalog is pending', async () => {
+  it('cannot launch stale Agent state and admits the committed default after a failed choice is abandoned', async () => {
     const wrapper = await mountPanel()
     await prepareRunnableWorkspace()
     const runStore = useAgentOrgRunStore()
@@ -281,7 +281,12 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     expect(launch).not.toHaveBeenCalled()
     expect(useAgentOrgRunConfigStore().agentOverrides['/software/implementer']).toBeUndefined()
 
-    member.vm.$emit('update:override', '/software/implementer', { runtimeKind: 'claude_agent_sdk' })
+    member.vm.$emit('schema-state', '/software/implementer', {
+      status: 'unavailable', message: 'Claude catalog is offline.',
+    })
+    await nextTick()
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
+
     member.vm.$emit('schema-state', '/software/implementer', { status: 'ready', message: null })
     await nextTick()
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
@@ -289,10 +294,7 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     await wrapper.get('[data-test="run-agent-org"]').trigger('click')
     await flushPromises()
     expect(launch).toHaveBeenCalledWith(expect.objectContaining({
-      agentOverrides: [{
-        address: '/software/implementer',
-        configuration: { runtimeKind: 'claude_agent_sdk' },
-      }],
+      agentOverrides: [],
     }))
   })
 })
