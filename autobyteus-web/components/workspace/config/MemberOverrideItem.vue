@@ -185,6 +185,13 @@ const isFixedFieldDisabled = computed(() => props.disabled || props.node.mode ==
 const historicalUnavailableMessage = computed(() => t('workspace.components.workspace.config.TeamRunConfigForm.historical_value_unavailable'))
 const modelConfigFieldErrors = computed(() => props.modelConfigFieldErrors ?? {})
 const memberAdvancedExplicitlyExpanded = ref(false)
+type RuntimeEditOperation = Readonly<{
+  phase: 'catalog' | 'commit' | 'failed'
+  requestedOverrideRuntimeKind: string | undefined
+  effectiveRuntimeKind: string
+  schemaState: RuntimeModelConfigSchemaState
+}>
+const runtimeEditOperation = ref<RuntimeEditOperation | null>(null)
 const inputIdSuffix = computed(() => props.node.address.replace(/[^a-zA-Z0-9_-]+/g, '-'))
 const editableOverride = computed(() => editableNode.value?.override)
 const baselineConfig = computed(() => editableNode.value?.baselineConfig ?? props.node.effectiveConfig)
@@ -245,8 +252,16 @@ const modelPlaceholder = computed(() => existingNode.value
     : t('workspace.components.workspace.config.MemberOverrideItem.use_global_model_default'))
 
 watch(
+  runtimeEditOperation,
+  (operation) => {
+    if (editableNode.value && operation) emit('schema-state', props.node.address, operation.schemaState)
+  },
+  { flush: 'sync' },
+)
+watch(
   [
     editableNode,
+    runtimeEditOperation,
     isLoadingModels,
     modelLoadError,
     selectedRuntimeUnavailableReason,
@@ -257,6 +272,7 @@ watch(
   ],
   () => {
     if (!editableNode.value) return
+    if (runtimeEditOperation.value) return
     let state: RuntimeModelConfigSchemaState
     if (isLoadingModels.value) {
       state = { status: 'loading', message: null }
@@ -278,6 +294,18 @@ watch(
     emit('schema-state', props.node.address, state)
   },
   { immediate: true },
+)
+watch(
+  [runtimeEditOperation, editableNode],
+  () => {
+    const operation = runtimeEditOperation.value
+    const editable = editableNode.value
+    if (!operation || operation.phase !== 'commit' || !editable) return
+    if ((editable.override?.runtimeKind || undefined) !== operation.requestedOverrideRuntimeKind) return
+    if (editable.effectiveConfig.runtimeKind !== operation.effectiveRuntimeKind) return
+    runtimeEditOperation.value = null
+  },
+  { flush: 'post' },
 )
 const autoExecuteStateLabel = computed(() => {
   if (existingNode.value) {
@@ -350,7 +378,29 @@ const handleRuntimeChange = async (value: string) => {
   if (!editable || isInteractionDisabled.value) return
   const nextRuntimeKind = value || undefined
   const runtimeChanged = nextRuntimeKind !== (editable.override?.runtimeKind || undefined)
-  const nextRows = await loadRuntimeProviderGroupsForSelection(nextRuntimeKind || editable.baselineConfig.runtimeKind)
+  if (!runtimeChanged) return
+  const nextEffectiveRuntimeKind = nextRuntimeKind || editable.baselineConfig.runtimeKind
+  runtimeEditOperation.value = {
+    phase: 'catalog',
+    requestedOverrideRuntimeKind: nextRuntimeKind,
+    effectiveRuntimeKind: nextEffectiveRuntimeKind,
+    schemaState: { status: 'loading', message: null },
+  }
+  let nextRows: ProviderWithModels[]
+  try {
+    nextRows = await loadRuntimeProviderGroupsForSelection(nextEffectiveRuntimeKind)
+  } catch (cause) {
+    runtimeEditOperation.value = {
+      phase: 'failed',
+      requestedOverrideRuntimeKind: nextRuntimeKind,
+      effectiveRuntimeKind: nextEffectiveRuntimeKind,
+      schemaState: {
+        status: 'unavailable',
+        message: cause instanceof Error ? cause.message : String(cause),
+      },
+    }
+    return
+  }
   const identifiers = nextRows.flatMap((row) => row.models.map((model) => model.modelIdentifier))
   const retainedModel = explicitModelIdentifier.value && identifiers.includes(explicitModelIdentifier.value)
     ? explicitModelIdentifier.value
@@ -365,7 +415,13 @@ const handleRuntimeChange = async (value: string) => {
     autoExecuteTools: editable.override?.autoExecuteTools,
     llmConfig: retainedConfig,
   }))
-  if (runtimeChanged) maybeOpenAdvanced(modelConfigSchemaFromRows(nextRows, effectiveModel), retainedConfig ?? editable.baselineConfig.llmConfig)
+  runtimeEditOperation.value = {
+    phase: 'commit',
+    requestedOverrideRuntimeKind: nextRuntimeKind,
+    effectiveRuntimeKind: nextEffectiveRuntimeKind,
+    schemaState: { status: 'loading', message: null },
+  }
+  maybeOpenAdvanced(modelConfigSchemaFromRows(nextRows, effectiveModel), retainedConfig ?? editable.baselineConfig.llmConfig)
 }
 const emitOverrideWithConfig = (config: Record<string, unknown> | null | undefined) => {
   const editable = editableNode.value

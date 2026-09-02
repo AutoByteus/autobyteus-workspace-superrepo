@@ -209,6 +209,43 @@ describe('MemberOverrideItem', () => {
     ])
   })
 
+  it('reports the exact Agent non-ready before awaiting a runtime catalog and commits afterward', async () => {
+    const wrapper = mountItem(editableNode())
+    await ready()
+    let resolveCatalog!: () => void
+    llmStore.fetchProvidersWithModels.mockImplementationOnce(() => new Promise((resolve) => {
+      resolveCatalog = () => resolve(runtimeProviders.claude_agent_sdk)
+    }))
+
+    void wrapper.get('#override-runtime--reviewer').setValue('claude_agent_sdk')
+    await nextTick()
+
+    expect(wrapper.emitted('schema-state')?.at(-1)).toEqual([
+      '/reviewer', { status: 'loading', message: null },
+    ])
+    expect(wrapper.emitted('update:override')).toBeUndefined()
+
+    resolveCatalog()
+    await ready()
+    expect(wrapper.emitted('update:override')?.at(-1)).toEqual([
+      '/reviewer', { runtimeKind: 'claude_agent_sdk' },
+    ])
+  })
+
+  it('reports an unavailable exact Agent and does not commit when runtime catalog loading fails', async () => {
+    const wrapper = mountItem(editableNode())
+    await ready()
+    llmStore.fetchProvidersWithModels.mockRejectedValueOnce(new Error('Claude catalog is offline.'))
+
+    void wrapper.get('#override-runtime--reviewer').setValue('claude_agent_sdk')
+    await ready()
+
+    expect(wrapper.emitted('schema-state')?.at(-1)).toEqual([
+      '/reviewer', { status: 'unavailable', message: 'Claude catalog is offline.' },
+    ])
+    expect(wrapper.emitted('update:override')).toBeUndefined()
+  })
+
   it('returns to a null override when explicit runtime/model/config all return to inherited values', async () => {
     const wrapper = mountItem(editableNode({
       override: {

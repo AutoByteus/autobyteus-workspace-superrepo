@@ -260,4 +260,39 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     expect(wrapper.find('[data-test="org-config-schema-diagnostic"]').exists()).toBe(false)
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
   })
+
+  it('cannot launch a stale Agent override while its exact runtime catalog is pending', async () => {
+    const wrapper = await mountPanel()
+    await prepareRunnableWorkspace()
+    const runStore = useAgentOrgRunStore()
+    const launch = vi.spyOn(runStore, 'launch').mockResolvedValue('org-run-runtime')
+    vi.spyOn(useWorkspaceStore(), 'createWorkspace').mockResolvedValue('workspace-root')
+    const member = wrapper.findAllComponents(AgentEditor)
+      .find((editor) => editor.props('node').address === '/software/implementer')!
+
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
+    member.vm.$emit('schema-state', '/software/implementer', { status: 'loading', message: null })
+    await nextTick()
+
+    expect(wrapper.get('[data-test="org-config-schema-diagnostic"]').text())
+      .toContain('Validating model configuration for /software/implementer')
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
+    await wrapper.get('[data-test="run-agent-org"]').trigger('click')
+    expect(launch).not.toHaveBeenCalled()
+    expect(useAgentOrgRunConfigStore().agentOverrides['/software/implementer']).toBeUndefined()
+
+    member.vm.$emit('update:override', '/software/implementer', { runtimeKind: 'claude_agent_sdk' })
+    member.vm.$emit('schema-state', '/software/implementer', { status: 'ready', message: null })
+    await nextTick()
+    expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
+
+    await wrapper.get('[data-test="run-agent-org"]').trigger('click')
+    await flushPromises()
+    expect(launch).toHaveBeenCalledWith(expect.objectContaining({
+      agentOverrides: [{
+        address: '/software/implementer',
+        configuration: { runtimeKind: 'claude_agent_sdk' },
+      }],
+    }))
+  })
 })
