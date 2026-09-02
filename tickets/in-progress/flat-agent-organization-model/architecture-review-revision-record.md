@@ -16,6 +16,7 @@ concise chronological architecture-review history.
 | ARCH-REV-007 | Round 7 / `AD-REV-009` supported-reachability recovery and proportionate settlement/shutdown redesign | `AD-REV-009` | Blocked — Unclear | Fail — Design Impact | `AR-FIND-003`, `AR-FIND-004`, `API-FIND-008`, `CR-CAND-020` |
 | ARCH-REV-008 | Round 8 / `AD-REV-010` AgentRun root-shutdown fence recovery and cumulative coherence re-review | `AD-REV-010` | Fail — Design Impact | Fail — Design Impact | `AR-FIND-004`, `AR-FIND-005` |
 | ARCH-REV-009 | Round 9 / `AD-REV-011` one-FIFO validation-coherence correction | `AD-REV-011` | Fail — Design Impact | Pass | `AR-FIND-005` |
+| ARCH-REV-010 | Round 10 / `AD-REV-012` response to `CRR-021 / CR-FIND-020` and approved `RER-023` | `AD-REV-012` | Pass | Pass | `CR-FIND-020` |
 
 ## Revision Entries
 
@@ -245,3 +246,27 @@ None.
 - Material classification changes: The authoritative review changes from `Fail / Design Impact` to `Pass`. AD-REV-011 is `Small / Low` in isolation; the cumulative package remains `Large / High` and follows the reviewed implementation/source-review/API-E2E route. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must reconcile the reviewed AD-REV-009/010 mechanism and prove one-FIFO non-waiting deferral/idle retry, exact lifecycle-fact uniqueness, complete frozen-scope enumeration, no post-fence provider start, prepared-cancel non-reopen, recursive deepest-first settlement, ordinary AgentRun FIFO-drain regression, and both Team/Org shutdown orders. These are controlled High implementation/validation risks, not open design decisions.
+
+### ARCH-REV-010 — AgentOrg launch-hierarchy reuse pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 10; `AD-REV-012` responded to `CRR-021 / CR-FIND-020` and approved `RER-023` plus the user-approved `AORG-TEAM-OVERRIDES-001` Product supplement by replacing the bespoke AgentOrg mounted-Team override hierarchy with a pure Org projection into the accepted AgentTeam launch presentation.
+- Triggering role, report path, and finding IDs: Architecture Designer, based on Code Review evidence in `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-revision-record.md`; `CR-FIND-020`.
+- Relevant architecture design revision IDs: `AD-REV-012`, cumulative with unchanged accepted `AD-REV-001`-`AD-REV-011`
+- Prior authoritative decision: `Pass` (`ARCH-REV-009`)
+- Current authoritative decision: `Pass`
+- What changed in the review result or what baseline was established: Independently confirmed the current Org hierarchy defect, the accepted Team presentation chain, the approved focused Product states, and the existing Org GraphQL/service/resolver capabilities. The revised design keeps the Org draft, exact Team/Agent sparse maps, payload, domain, and lifecycle separately owned; adds one pure complete-or-diagnostic fixed-depth form projector and Org command adapter; extracts only the disclosure shell; reuses the accepted Team tree/scope/Agent presentation; removes the fabricated Team-as-Agent and always-exposed path; and requires exact-address fail-closed correlation. Existing Org `workspaceRootPath` input and root -> Team -> Agent resolution are sufficient, so no backend, API, schema, durable, migration, runtime, Team-store, Team-payload, or mounted-Team-root expansion is authorized.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001`-`AR-FIND-005` | Resolved in prior architecture-review rounds | Remain resolved | `AD-REV-003`-`AD-REV-012`; `ARCH-REV-002`-`ARCH-REV-009` | AD-REV-012 is a bounded frontend draft/projection/presentation correction and changes none of the accepted definition, ordering, migration, runtime-composition, settlement, or shutdown mechanisms. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020` | Resolved in prior rounds | Remain resolved at the design boundary | `AD-REV-004`-`AD-REV-012` | The focused delta does not alter source-family ownership, root-neutral execution, accepted workspace transport, mounted-Team status, or one-FIFO/fence lifecycle behavior. |
+| `CR-FIND-020` | Open architecture-owned Design Impact from `CRR-021` | Resolved at the design boundary | `RER-023`; `AD-REV-012`; DS-023; VAL-030; `AORG-TEAM-OVERRIDES-001` | The normal supported AgentOrg configuration path has one Org-owned draft/projector/command boundary, exact Team/Agent correlation, accepted Team presentation reuse, explicit obsolete-path removal, exact Product states, and unchanged authoritative Org launch resolution. |
+| `CR-FIND-019` | Open Implementation Local Fix | Remains implementation-owned; not an architecture finding | `CRR-021`; `AD-REV-012` scope guardrail | The architecture correction neither depends on nor absorbs this separate source-level fix; it must be reconciled by Implementation and carried to the next source review. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: The authoritative architecture-review decision remains `Pass`. AD-REV-012 is `Medium / Low` in isolation; the cumulative package remains `Large / High` and follows the reviewed Implementation reconciliation, source-review, and API/E2E route. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+- Remaining risks or uncertainty: Implementation must preserve the exact AgentOrg count/disclosure/a11y states and standalone Team presentation, map Team workspace edits into the Org-owned exact Team patch without Team-store/payload imports, fail closed on unavailable or mismatched projection, preserve collapse/reset/direct-Agent behavior, and reconcile the distinct `CR-FIND-019` Local Fix. These are controlled implementation/validation risks, not open architecture decisions.
