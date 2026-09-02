@@ -54,6 +54,7 @@ export class ConfiguredAgentExecutionHandle {
   readonly physicalScope: RootExecutionPhysicalScope;
   private agentRun: AgentRun | null = null;
   private readinessAttempt: Promise<AgentRun> | null = null;
+  private rootShutdownFenced = false;
   private unsubscribe: (() => void) | null = null;
   private platformAgentRunId: string | null;
   private readonly overlay: ConfiguredAgentStatusOverlay;
@@ -138,14 +139,18 @@ export class ConfiguredAgentExecutionHandle {
   async interrupt(): Promise<AgentOperationResult> {
     return this.agentRun ? this.agentRun.interrupt() : { accepted: true };
   }
-  async interruptForRootTermination(): Promise<AgentOperationResult> {
+  async fenceForRootShutdown(): Promise<AgentOperationResult> {
+    this.rootShutdownFenced = true;
     if (this.readinessAttempt) await this.readinessAttempt.catch(() => null);
-    if (!this.agentRun) return { accepted: true };
-    const result = await this.agentRun.interrupt();
-    return !result.accepted && result.code === "NO_ACTIVE_TURN" ? { accepted: true } : result;
+    return this.agentRun
+      ? this.agentRun.fenceInputAndInterruptForRootShutdown()
+      : { accepted: true };
   }
 
   async prepareConfiguredActivation(): Promise<PreparedConfiguredAgentActivation> {
+    if (this.rootShutdownFenced) {
+      throw new Error(`AgentRun '${this.identity.agentRunId}' is fenced for root shutdown.`);
+    }
     if (this.agentRun || this.readinessAttempt) {
       throw new Error(`AgentRun '${this.identity.agentRunId}' already entered live readiness.`);
     }
@@ -183,23 +188,15 @@ export class ConfiguredAgentExecutionHandle {
   async prepareTermination(): Promise<PreparedLocalExecutionTermination> {
     if (this.readinessAttempt) await this.readinessAttempt.catch(() => null);
     const prepared = this.agentRun ? await this.manager.prepareAgentRunTermination(this.agentRun) : null;
-    let state: "prepared" | "cancelled" | "committed" = "prepared";
-    let committed: ReturnType<PreparedLocalExecutionTermination["commit"]> | null = null;
-    return Object.freeze({
-      cancel: () => { if (state === "prepared") { state = "cancelled"; prepared?.cancel(); } },
-      commit: () => {
-        if (state === "cancelled") throw new Error(`AgentRun '${this.identity.agentRunId}' termination was cancelled.`);
-        if (committed) return committed;
-        state = "committed";
-        const local = prepared?.commit() ?? null;
-        committed = Object.freeze({ finish: async () => {
-          const result = local ? await local.finish() : { accepted: true as const };
-          if (result.accepted) this.dispose();
-          return result;
-        } });
-        return committed;
-      },
-    });
+    return prepared ? this.wrapPreparedTermination(prepared) : completedLocalTermination(() => this.dispose());
+  }
+
+  async tryPrepareTerminationIfQuiescent(): Promise<PreparedLocalExecutionTermination | null> {
+    if (this.readinessAttempt) return null;
+    if (!this.agentRun) return completedLocalTermination(() => this.dispose());
+    const prepared = await this.manager.tryPrepareAgentRunTerminationIfQuiescent(this.agentRun);
+    if (!prepared) return null;
+    return this.wrapPreparedTermination(prepared);
   }
 
   async terminate(): Promise<AgentOperationResult> {
@@ -214,6 +211,9 @@ export class ConfiguredAgentExecutionHandle {
   }
 
   private ensureReady(): Promise<AgentRun> {
+    if (this.rootShutdownFenced) {
+      return Promise.reject(new Error(`AgentRun '${this.identity.agentRunId}' is fenced for root shutdown.`));
+    }
     if (this.agentRun?.isActive()) return Promise.resolve(this.agentRun);
     if (this.readinessAttempt) return this.readinessAttempt;
     let retrySafe = false;
@@ -308,6 +308,32 @@ export class ConfiguredAgentExecutionHandle {
     this.overlay.set(status, this.getStatusSnapshot().details.status, errorMessage);
   }
   private get manager(): AgentRunManager { return this.options.agentRunManager ?? AgentRunManager.getInstance(); }
+
+  private wrapPreparedTermination(
+    prepared: import("../../../agent-execution/domain/prepared-agent-run-termination.js").PreparedAgentRunTermination,
+  ): PreparedLocalExecutionTermination {
+    let state: "prepared" | "cancelled" | "committed" = "prepared";
+    let committed: ReturnType<PreparedLocalExecutionTermination["commit"]> | null = null;
+    return Object.freeze({
+      cancel: () => {
+        if (state !== "prepared") return;
+        state = "cancelled";
+        prepared.cancel();
+      },
+      commit: () => {
+        if (state === "cancelled") throw new Error(`AgentRun '${this.identity.agentRunId}' termination was cancelled.`);
+        if (committed) return committed;
+        state = "committed";
+        const local = prepared.commit();
+        committed = Object.freeze({ finish: async () => {
+          const result = await local.finish();
+          if (result.accepted) this.dispose();
+          return result;
+        } });
+        return committed;
+      },
+    });
+  }
   private get displayName(): string { return this.identity.memberAddress.split("/").at(-1) ?? this.identity.agentRunId; }
   private readinessFailureCode(error: unknown): string {
     return error instanceof CollaborationAgentActivationError || error instanceof Error && "code" in error
@@ -322,3 +348,13 @@ export class ConfiguredAgentExecutionHandle {
     );
   }
 }
+
+const completedLocalTermination = (
+  finish: () => void,
+): PreparedLocalExecutionTermination => Object.freeze({
+  cancel: () => undefined,
+  commit: () => Object.freeze({ finish: async () => {
+    finish();
+    return { accepted: true as const };
+  } }),
+});

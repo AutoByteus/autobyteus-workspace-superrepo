@@ -35,6 +35,7 @@ export class TeamRun {
     return this.backend.prepareDirectTaskSettlement(taskId, binding);
   }
   prepareTermination() { return this.backend.prepareTermination(); }
+  tryPrepareTerminationIfQuiescent() { return this.backend.tryPrepareTerminationIfQuiescent(); }
   freezeForRootTermination() { return this.backend.freezeForRootTermination(); }
   terminate() { return this.backend.terminate(); }
 }

@@ -28,12 +28,20 @@ import type { FlatTeamExecutionCallbacks } from "../../agent-team-execution/loca
 import type { RootSnapshotConnection } from "../../agent-collaboration/execution/services/root-event-publisher.js";
 import type { CollaborationAgentStatusSnapshot } from "../../agent-collaboration/execution/domain/collaboration-agent-execution-event.js";
 import { CollaborationAgentPresentationEventAdapter } from "../../agent-collaboration/execution/events/collaboration-agent-presentation-event-adapter.js";
+import type { FrozenTeamRunTerminationScope } from "../../agent-team-execution/domain/frozen-team-run-termination-scope.js";
+import type { ConfiguredAgentExecutionHandle } from "../../agent-collaboration/execution/backends/configured-agent-execution-handle.js";
+import { AgentOrgOperationGate } from "./agent-org-operation-gate.js";
 
 export type AgentOrgRunPackageSnapshot = Readonly<{
   tree: AgentOrgRunExecutionTreeSnapshot;
   tasks: AgentOrgTaskDelegationRecordsFileV1;
   messages: AgentOrgCommunicationMessagesFileV1;
   statuses: readonly CollaborationAgentStatusSnapshot[];
+}>;
+
+type FrozenAgentOrgTerminationScope = Readonly<{
+  fenceAgentRunsForRootShutdown(): Promise<AgentOperationResult>;
+  finish(): Promise<AgentOperationResult>;
 }>;
 
 /** Native coordinator-free AgentOrg aggregate and sole live owner of its scope. */
@@ -46,7 +54,9 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   private readonly taskEngine: RootTaskLifecycleEngine<ResolvedAgentOrgRecipient>;
   private readonly communication: RootCommunicationEngine;
   private readonly presentation: CollaborationAgentPresentationEventAdapter;
+  private readonly operationGate: AgentOrgOperationGate;
   private termination: Promise<AgentOperationResult> | null = null;
+  private frozenTerminationScope: FrozenAgentOrgTerminationScope | null = null;
 
   constructor(private readonly options: Readonly<{
     root: RootExecutionIdentity;
@@ -66,6 +76,10 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     this.messages = options.messages;
     this.index = new AgentOrgExecutionIndex(this.tree);
     this.assertCorrelation();
+    this.operationGate = new AgentOrgOperationGate({
+      orgRunId: this.orgRunId,
+      canEnter: () => this.isAdmitting(),
+    });
     this.presentation = new CollaborationAgentPresentationEventAdapter((agentRunId) => {
       const agent = this.index.getAgent(agentRunId);
       return agent && this.index.isLiveAgent(agentRunId)
@@ -83,7 +97,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
       getTree: () => this.tree,
       getIndex: () => this.index,
       isOpen: () => this.isAdmitting(),
-      authorize: (identity) => this.authorizeIdentity(identity),
+      authorize: (identity) => this.authorizeCurrentIdentity(identity),
       replaceState: (tree, tasks) => this.replaceTaskState(tree, tasks),
       publish: (event) => options.publisher.publish({ kind: "task", event }),
       deliverSystemMessage: (agentRunId, message) => this.postMessageToAgent(agentRunId, message),
@@ -146,48 +160,57 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
 
   authorizeIdentity(identity: CollaborationMemberExecutionIdentity): void {
     this.assertAdmitting();
+    this.authorizeCurrentIdentity(identity);
+  }
+  private authorizeCurrentIdentity(identity: CollaborationMemberExecutionIdentity): void {
     if (!this.isCurrentAgent(identity)) throw new Error(`AgentRun '${identity.agentRunId}' is not a live execution at '${identity.memberAddress}' in AgentOrg '${this.orgRunId}'.`);
   }
 
   async deliverLogicalMessage(sender: CollaborationMemberExecutionIdentity, input: MemberLogicalMessageInput): Promise<AgentOperationResult> {
-    this.authorizeIdentity(sender);
-    const recipient = this.resolveRecipient(input.recipientAddress);
-    const receiver = this.resolveRecipientIdentity(recipient);
-    return this.communication.deliver({
-      senderIdentity: sender,
-      senderDisplayName: getAgentTeamAddressBasename(sender.memberAddress) ?? sender.agentRunId,
-      receiverIdentity: receiver,
-      receiverDisplayName: getAgentTeamAddressBasename(receiver.memberAddress) ?? receiver.agentRunId,
-      content: input.content,
-      messageType: input.messageType,
-      referenceFiles: input.referenceFiles,
+    return this.operationGate.run(async () => {
+      this.authorizeIdentity(sender);
+      const recipient = this.resolveRecipient(input.recipientAddress);
+      const receiver = this.resolveRecipientIdentity(recipient);
+      return this.communication.deliver({
+        senderIdentity: sender,
+        senderDisplayName: getAgentTeamAddressBasename(sender.memberAddress) ?? sender.agentRunId,
+        receiverIdentity: receiver,
+        receiverDisplayName: getAgentTeamAddressBasename(receiver.memberAddress) ?? receiver.agentRunId,
+        content: input.content,
+        messageType: input.messageType,
+        referenceFiles: input.referenceFiles,
+      });
     });
   }
 
   deliverExactAgentMessage(input: ExactAgentMessageInput): Promise<AgentOperationResult> {
-    this.authorizeIdentity(input.sender.identity);
-    const receiver = this.index.getAgent(input.targetAgentRunId);
-    if (!receiver || !this.index.isLiveAgent(receiver.agentRunId)) {
-      return Promise.resolve({ accepted: false, code: "TARGET_AGENT_RUN_NOT_ACTIVE", message: `AgentRun '${input.targetAgentRunId}' is not live in this AgentOrg.` });
-    }
-    return this.communication.deliver({
-      senderIdentity: input.sender.identity,
-      senderDisplayName: input.sender.displayName,
-      receiverIdentity: this.identityFor(receiver.agentRunId, receiver.address),
-      receiverDisplayName: getAgentTeamAddressBasename(receiver.address) ?? receiver.agentRunId,
-      content: input.content,
-      messageType: input.messageType,
-      referenceFiles: input.referenceFiles,
+    return this.operationGate.run(async () => {
+      this.authorizeIdentity(input.sender.identity);
+      const receiver = this.index.getAgent(input.targetAgentRunId);
+      if (!receiver || !this.index.isLiveAgent(receiver.agentRunId)) {
+        return { accepted: false, code: "TARGET_AGENT_RUN_NOT_ACTIVE", message: `AgentRun '${input.targetAgentRunId}' is not live in this AgentOrg.` };
+      }
+      return this.communication.deliver({
+        senderIdentity: input.sender.identity,
+        senderDisplayName: input.sender.displayName,
+        receiverIdentity: this.identityFor(receiver.agentRunId, receiver.address),
+        receiverDisplayName: getAgentTeamAddressBasename(receiver.address) ?? receiver.agentRunId,
+        content: input.content,
+        messageType: input.messageType,
+        referenceFiles: input.referenceFiles,
+      });
     });
   }
 
   delegateTask(context: TaskDelegationContext, input: DelegateTaskInput): Promise<DelegateTaskResult> {
-    this.authorizeIdentity(context.identity);
-    const placement = this.resolveRecipient(input.recipient_address);
-    if (placement.kind === "agent" && placement.address === context.identity.memberAddress) {
-      throw new Error("An Agent cannot delegate a task to its own logical placement.");
-    }
-    return this.taskEngine.delegateTask(context, input, placement);
+    return this.operationGate.run(async () => {
+      this.authorizeIdentity(context.identity);
+      const placement = this.resolveRecipient(input.recipient_address);
+      if (placement.kind === "agent" && placement.address === context.identity.memberAddress) {
+        throw new Error("An Agent cannot delegate a task to its own logical placement.");
+      }
+      return this.taskEngine.delegateTask(context, input, placement);
+    });
   }
   submitTaskResult(context: TaskDelegationContext, input: SubmitTaskResultInput): Promise<SubmitTaskResultResult> {
     return this.taskEngine.submitTaskResult(context, input);
@@ -197,8 +220,9 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   }
 
   async adoptAgentPlatformBinding(binding: CollaborationAgentPlatformBinding): Promise<void> {
-    this.assertAdmitting();
-    await this.options.persistence.commitTreeMutation({
+    return this.operationGate.run(async () => {
+      this.assertAdmitting();
+      await this.options.persistence.commitTreeMutation({
       prepareAgainstCurrent: () => {
         const mutation = adoptAgentOrgPlatformBinding({ tree: this.tree, binding });
         return {
@@ -210,6 +234,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
           },
         };
       },
+      });
     });
   }
 
@@ -253,6 +278,7 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     this.lifecycle = "terminating";
     this.communication.closeAdmission();
     this.taskEngine.closeExternalAdmission();
+    void this.operationGate.closeAndDrain();
     const attempt = this.terminateOnce(wasFailStopped);
     this.termination = attempt;
     return attempt;
@@ -260,15 +286,20 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
 
   private async terminateOnce(failStopped: boolean): Promise<AgentOperationResult> {
     const errors: string[] = [];
+    await this.operationGate.closeAndDrain();
+    this.frozenTerminationScope ??= this.createFrozenTerminationScope(
+      this.options.rootAgents.freezeForRootTermination(),
+      this.options.teams.freezeForRootTermination(),
+    );
+    const fenced = await this.frozenTerminationScope.fenceAgentRunsForRootShutdown();
+    if (!fenced.accepted) return fenced;
     try {
       if (!failStopped) await this.taskEngine.shutdownAndSettle("AgentOrg root is terminating.");
       else await this.taskEngine.drain();
     } catch (error) { errors.push(error instanceof Error ? error.message : String(error)); }
-    const teams = await this.options.teams.terminateAll();
-    if (!teams.accepted) errors.push(teams.message ?? teams.code ?? "AgentOrg Team termination failed");
-    const agents = await this.options.rootAgents.terminateAll();
-    if (!agents.accepted) errors.push(agents.message ?? agents.code ?? "AgentOrg Agent termination failed");
     await this.options.persistence.drain();
+    const local = await this.frozenTerminationScope.finish();
+    if (!local.accepted) errors.push(local.message ?? local.code ?? "AgentOrg local termination failed");
     this.lifecycle = "terminated";
     this.options.publisher.publish({ kind: "lifecycle", isActive: false });
     this.options.publisher.clear();
@@ -276,6 +307,39 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     return errors.length
       ? { accepted: false, code: "AGENT_ORG_TERMINATION_FAILED", message: errors.join("; ") }
       : { accepted: true };
+  }
+
+  private createFrozenTerminationScope(
+    agentHandles: readonly ConfiguredAgentExecutionHandle[],
+    teamScopes: readonly FrozenTeamRunTerminationScope[],
+  ): FrozenAgentOrgTerminationScope {
+    let fencing: Promise<AgentOperationResult> | null = null;
+    let finishing: Promise<AgentOperationResult> | null = null;
+    return Object.freeze({
+      fenceAgentRunsForRootShutdown: () => {
+        if (fencing) return fencing;
+        fencing = Promise.all([
+          ...agentHandles.map((handle) => handle.fenceForRootShutdown()),
+          ...teamScopes.map((scope) => scope.fenceAgentRunsForRootShutdown()),
+        ]).then((results) => results.find((result) => !result.accepted) ?? { accepted: true });
+        return fencing;
+      },
+      finish: () => {
+        if (finishing) return finishing;
+        finishing = (async () => {
+          for (const scope of teamScopes) {
+            const result = await scope.finish();
+            if (!result.accepted) return result;
+          }
+          for (const handle of [...agentHandles].reverse()) {
+            const result = await handle.terminate();
+            if (!result.accepted) return result;
+          }
+          return { accepted: true };
+        })();
+        return finishing;
+      },
+    });
   }
 
   private reserveAgentInput(agentRunId: string, message: AgentInputUserMessage, options: AgentRunInputOptions = {}): Promise<AgentRunInputReservationResult> {
@@ -299,12 +363,14 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   }
 
   executeAgentCommand(agentRunId: string, command: TeamMemberExecutionCommand): Promise<AgentOperationResult> {
-    this.assertAdmitting();
-    const agent = this.index.getAgent(agentRunId);
-    if (!agent || !this.index.isLiveAgent(agentRunId)) return Promise.resolve({ accepted: false, code: "RUN_NOT_FOUND", message: `AgentRun '${agentRunId}' is not live in AgentOrg '${this.orgRunId}'.` });
-    return agent.host.hostKind === "root"
-      ? this.options.rootAgents.executeCommand(agentRunId, command)
-      : this.options.teams.require(agent.host.hostRunId).executeDirectAgentCommand(agentRunId, command);
+    return this.operationGate.run(async () => {
+      this.assertAdmitting();
+      const agent = this.index.getAgent(agentRunId);
+      if (!agent || !this.index.isLiveAgent(agentRunId)) return { accepted: false, code: "RUN_NOT_FOUND", message: `AgentRun '${agentRunId}' is not live in AgentOrg '${this.orgRunId}'.` };
+      return agent.host.hostKind === "root"
+        ? this.options.rootAgents.executeCommand(agentRunId, command)
+        : this.options.teams.require(agent.host.hostRunId).executeDirectAgentCommand(agentRunId, command);
+    });
   }
 
   private resolveRecipientIdentity(recipient: ResolvedAgentOrgRecipient): CollaborationMemberExecutionIdentity {

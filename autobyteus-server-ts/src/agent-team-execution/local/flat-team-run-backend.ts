@@ -37,6 +37,7 @@ export class FlatTeamRunBackend implements TeamRunBackend {
     return this.manager.prepareDirectTaskSettlement(taskId, binding);
   }
   prepareTermination() { return this.manager.prepareTermination(); }
+  tryPrepareTerminationIfQuiescent() { return this.manager.tryPrepareTerminationIfQuiescent(); }
   freezeForRootTermination() { return this.manager.freezeForRootTermination(); }
   terminate() { return this.manager.terminate(); }
 }

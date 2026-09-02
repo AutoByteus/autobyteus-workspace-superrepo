@@ -31,6 +31,7 @@ export interface TeamRunBackend {
     binding: { agentRunId: string } | { teamRunId: string },
   ): Promise<PreparedTaskSettlement | null>;
   prepareTermination(): Promise<PreparedLocalExecutionTermination>;
+  tryPrepareTerminationIfQuiescent(): Promise<PreparedLocalExecutionTermination | null>;
   freezeForRootTermination(): FrozenTeamRunTerminationScope;
   terminate(): Promise<AgentOperationResult>;
 }

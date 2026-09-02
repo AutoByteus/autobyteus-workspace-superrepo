@@ -318,7 +318,7 @@ export class RootTaskLifecycleEngine<TPlacement> {
     queueMicrotask(() => {
       this.settlementSweepScheduled = false;
       if (this.rootFailStopped) return;
-      for (const task of this.records) {
+      for (const task of this.orderTasksDeepestFirst()) {
         if (task.status !== "accepted" && task.status !== "interrupted") continue;
         void this.settle(task.taskId).catch((error) => console.error(`Task '${task.taskId}' settlement failed:`, error));
       }

@@ -43,6 +43,10 @@ export class AgentOrgRootAgentExecutionRegistry {
   }>) {}
 
   listHandles(): readonly ConfiguredAgentExecutionHandle[] { return Object.freeze([...this.active.values()]); }
+  freezeForRootTermination(): readonly ConfiguredAgentExecutionHandle[] {
+    this.materializationOpen = false;
+    return Object.freeze([...new Set([...this.active.values(), ...this.prepared.values()])]);
+  }
   get(agentRunId: string): ConfiguredAgentExecutionHandle | null { return this.active.get(agentRunId) ?? null; }
   isActive(agentRunId: string): boolean { return this.active.get(agentRunId)?.isActive() ?? false; }
   freezeMaterialization(): void { this.materializationOpen = false; }
@@ -145,9 +149,13 @@ export class AgentOrgRootAgentExecutionRegistry {
     if (!handle || this.settling.has(agentRunId)) return null;
     this.settling.add(agentRunId);
     let local;
-    try { local = await handle.prepareTermination(); }
+    try { local = await handle.tryPrepareTerminationIfQuiescent(); }
     catch (error) { this.settling.delete(agentRunId); throw error; }
-    if (this.active.get(agentRunId) !== handle || handle.hasOpenExecutionWork()) {
+    if (!local) {
+      this.settling.delete(agentRunId);
+      return null;
+    }
+    if (this.active.get(agentRunId) !== handle) {
       local.cancel();
       this.settling.delete(agentRunId);
       return null;
@@ -171,19 +179,6 @@ export class AgentOrgRootAgentExecutionRegistry {
         return Object.freeze({ finishLocalTeardown: () => committed.finish() });
       },
     });
-  }
-
-  async terminateAll(): Promise<AgentOperationResult> {
-    this.materializationOpen = false;
-    const errors: string[] = [];
-    for (const handle of [...this.active.values()].reverse()) {
-      const result = await handle.terminate();
-      if (!result.accepted) errors.push(result.message ?? result.code ?? "Agent termination rejected");
-    }
-    for (const handle of this.prepared.values()) handle.dispose();
-    this.active.clear();
-    this.prepared.clear();
-    return errors.length ? { accepted: false, code: "AGENT_ORG_AGENT_TERMINATION_FAILED", message: errors.join("; ") } : { accepted: true };
   }
 
   private async createHandle(

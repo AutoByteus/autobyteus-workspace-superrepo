@@ -18,11 +18,13 @@ const createHarness = (input: {
   records?: readonly TaskDelegationRecordV1[];
   schemaError?: Error;
   activationError?: Error;
+  settlementReady?: (task: TaskDelegationRecordV1) => boolean;
 } = {}) => {
   let records = input.records ?? [];
   const settled = new Set<string>();
   const events: string[] = [];
   const settlementOrder: string[] = [];
+  const settlementAttempts: string[] = [];
   const abort = vi.fn(async () => undefined);
   const adapter: RootTaskLifecycleAdapter<Placement> = {
     initialRecords: records,
@@ -55,7 +57,9 @@ const createHarness = (input: {
     taskOwnsAgent: (task, agentRunId) => task.taskId === "parent" && agentRunId === "agent-child",
     isTaskExecutionSettled: (task) => settled.has(task.taskId),
     settleTaskExecution: async (command) => {
+      settlementAttempts.push(command.task.taskId);
       if (command.remainsBlockedByOpenChild()) return false;
+      if (input.settlementReady && !input.settlementReady(command.task)) return false;
       settlementOrder.push(command.task.taskId);
       settled.add(command.task.taskId);
       events.push(command.event.kind);
@@ -65,7 +69,7 @@ const createHarness = (input: {
     deliverSystemMessage: async () => ({ accepted: true }),
   };
   const engine = new RootTaskLifecycleEngine(adapter);
-  return { engine, abort, events, settlementOrder, records: () => records };
+  return { engine, abort, events, settlementAttempts, settlementOrder, records: () => records };
 };
 
 const terminal = (input: {
@@ -116,6 +120,43 @@ describe("root-neutral current task lifecycle invariants", () => {
     await harness.engine.shutdownAndSettle("root stopping");
     expect(harness.settlementOrder).toEqual(["child", "parent"]);
     expect(harness.records().find((task) => task.taskId === "child")?.status).toBe("interrupted");
+  });
+
+  it("releases the one FIFO when terminal settlement is not quiescent and retries on idle", async () => {
+    let ready = false;
+    const active = terminal({ taskId: "accepted-later", agentRunId: "agent-active" });
+    const harness = createHarness({
+      records: [active],
+      settlementReady: () => ready,
+    });
+    const assignee = createCollaborationMemberExecutionIdentity({
+      root,
+      memberAddress: "/researcher",
+      agentRunId: "agent-active",
+    });
+
+    await expect(harness.engine.submitTaskResult(
+      { identity: assignee },
+      { message: "independent supported result" },
+    )).resolves.toMatchObject({ status: "awaiting_review" });
+    await expect(harness.engine.reviewTaskResult(
+      { identity: delegator },
+      { task_id: "accepted-later", decision: "accept" },
+    )).resolves.toMatchObject({ status: "accepted" });
+    await vi.waitFor(() => expect(harness.settlementAttempts).toEqual(["accepted-later"]));
+
+    expect(harness.settlementOrder).toEqual([]);
+    await expect(harness.engine.delegateTask(
+      { identity: delegator },
+      { recipient_address: "/researcher", description: "unrelated supported command" },
+      { address: "/researcher" },
+    )).resolves.toMatchObject({ status: "active" });
+    expect(harness.records()).toHaveLength(2);
+
+    ready = true;
+    harness.engine.onExecutionBecameIdle();
+    await vi.waitFor(() => expect(harness.settlementOrder).toEqual(["accepted-later"]));
+    expect(harness.settlementAttempts).toEqual(["accepted-later", "accepted-later"]);
   });
 
   it("does not abort prepared work after persistence finalization becomes indeterminate", async () => {

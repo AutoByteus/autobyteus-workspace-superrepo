@@ -203,6 +203,44 @@ export class FlatTeamExecutionManager {
     return preparation;
   }
 
+  async tryPrepareTerminationIfQuiescent(): Promise<PreparedLocalExecutionTermination | null> {
+    if (this.preparedTermination) return this.preparedTermination;
+    if (this.preparingTermination || this.lifecycle !== "active") return null;
+    this.lifecycle = "quiescing";
+    const locals: PreparedLocalExecutionTermination[] = [];
+    try {
+      for (const handle of this.taskAgents.listHandles()) {
+        const local = await handle.tryPrepareTerminationIfQuiescent();
+        if (!local) return this.cancelDeferredPreparation(locals);
+        locals.push(local);
+      }
+      for (const handle of this.taskAgents.listPreparedHandles()) {
+        const local = await handle.tryPrepareTerminationIfQuiescent();
+        if (!local) return this.cancelDeferredPreparation(locals);
+        locals.push(local);
+      }
+      for (const run of this.taskTeams.listTeamRuns()) {
+        const local = await run.tryPrepareTerminationIfQuiescent();
+        if (!local) return this.cancelDeferredPreparation(locals);
+        locals.push(local);
+      }
+      for (const run of this.taskTeams.listPreparedTeamRuns()) {
+        const local = await run.tryPrepareTerminationIfQuiescent();
+        if (!local) return this.cancelDeferredPreparation(locals);
+        locals.push(local);
+      }
+      for (const handle of [...this.configured.listHandles()].reverse()) {
+        const local = await handle.tryPrepareTerminationIfQuiescent();
+        if (!local) return this.cancelDeferredPreparation(locals);
+        locals.push(local);
+      }
+      return this.createPreparedTermination(locals);
+    } catch (error) {
+      this.cancelDeferredPreparation(locals);
+      throw error;
+    }
+  }
+
   freezeForRootTermination(): FrozenTeamRunTerminationScope {
     if (this.frozenTerminationScope) return this.frozenTerminationScope;
     this.configured.freezeMaterialization();
@@ -260,6 +298,12 @@ export class FlatTeamExecutionManager {
       throw error;
     }
 
+    return this.createPreparedTermination(locals);
+  }
+
+  private createPreparedTermination(
+    locals: readonly PreparedLocalExecutionTermination[],
+  ): PreparedLocalExecutionTermination {
     let state: "prepared" | "cancelled" | "committed" = "prepared";
     let committed: ReturnType<PreparedLocalExecutionTermination["commit"]> | null = null;
     const prepared: PreparedLocalExecutionTermination = Object.freeze({
@@ -282,6 +326,14 @@ export class FlatTeamExecutionManager {
     });
     this.preparedTermination = prepared;
     return prepared;
+  }
+
+  private cancelDeferredPreparation(
+    locals: readonly PreparedLocalExecutionTermination[],
+  ): null {
+    [...locals].reverse().forEach((local) => local.cancel());
+    this.lifecycle = "active";
+    return null;
   }
 
   private finishCommittedTermination(
@@ -323,34 +375,24 @@ export class FlatTeamExecutionManager {
     agentHandles: readonly FlatTeamAgentExecutionHandle[],
     childScopes: readonly FrozenTeamRunTerminationScope[],
   ): FrozenTeamRunTerminationScope {
-    let prepared: readonly PreparedLocalExecutionTermination[] | null = null;
-    let preparing: Promise<void> | null = null;
+    let fencing: Promise<AgentOperationResult> | null = null;
     let finishing: Promise<AgentOperationResult> | null = null;
 
-    const prepareMemberRuns = (): Promise<void> => {
-      if (prepared) return Promise.resolve();
-      if (preparing) return preparing;
-      const attempt = Promise.all([
-        ...agentHandles.map((handle) => handle.prepareTermination()),
-        ...childScopes.map(async (scope) => { await scope.prepareMemberRuns(); return null; }),
-      ]).then((results) => {
-        prepared = Object.freeze(results.filter((item): item is PreparedLocalExecutionTermination => item !== null));
-      });
-      preparing = attempt;
-      void attempt.finally(() => {
-        if (preparing === attempt) preparing = null;
-      }).catch(() => undefined);
-      return attempt;
+    const fenceOnce = async (): Promise<AgentOperationResult> => {
+      const results = await Promise.all([
+        ...agentHandles.map((handle) => handle.fenceForRootShutdown()),
+        ...childScopes.map((scope) => scope.fenceAgentRunsForRootShutdown()),
+      ]);
+      return results.find((result) => !result.accepted) ?? { accepted: true };
     };
 
     const finishOnce = async (): Promise<AgentOperationResult> => {
-      await prepareMemberRuns();
       for (const scope of childScopes) {
         const result = await scope.finish();
         if (!result.accepted) return result;
       }
-      for (const local of prepared ?? []) {
-        const result = await local.commit().finish();
+      for (const handle of [...agentHandles].reverse()) {
+        const result = await handle.terminate();
         if (!result.accepted) return result;
       }
       this.completeFrozenTermination();
@@ -358,14 +400,12 @@ export class FlatTeamExecutionManager {
     };
 
     return Object.freeze({
-      interruptActiveTurns: async () => {
-        const results = await Promise.all([
-          ...agentHandles.map((handle) => handle.interruptForRootTermination()),
-          ...childScopes.map((scope) => scope.interruptActiveTurns()),
-        ]);
-        return results.find((result) => !result.accepted) ?? { accepted: true };
+      fenceAgentRunsForRootShutdown: () => {
+        if (fencing) return fencing;
+        const attempt = fenceOnce();
+        fencing = attempt;
+        return attempt;
       },
-      prepareMemberRuns,
       finish: () => {
         if (this.lifecycle === "terminated") return Promise.resolve({ accepted: true });
         if (finishing) return finishing;

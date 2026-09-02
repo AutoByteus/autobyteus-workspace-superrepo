@@ -130,12 +130,16 @@ export class TaskAgentExecutionRegistry {
     this.settling.add(agentRunId);
     let local;
     try {
-      local = await handle.prepareTermination();
+      local = await handle.tryPrepareTerminationIfQuiescent();
     } catch (error) {
       this.settling.delete(agentRunId);
       throw error;
     }
-    if (this.active.get(agentRunId) !== handle || handle.hasOpenExecutionWork()) {
+    if (!local) {
+      this.settling.delete(agentRunId);
+      return null;
+    }
+    if (this.active.get(agentRunId) !== handle) {
       local.cancel();
       this.settling.delete(agentRunId);
       return null;

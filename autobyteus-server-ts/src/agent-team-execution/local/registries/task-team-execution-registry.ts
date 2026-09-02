@@ -103,12 +103,16 @@ export class TaskTeamExecutionRegistry {
     this.settling.add(teamRunId);
     let local;
     try {
-      local = await run.prepareTermination();
+      local = await run.tryPrepareTerminationIfQuiescent();
     } catch (error) {
       this.settling.delete(teamRunId);
       throw error;
     }
-    if (this.active.get(teamRunId) !== run || run.hasOpenExecutionWork()) {
+    if (!local) {
+      this.settling.delete(teamRunId);
+      return null;
+    }
+    if (this.active.get(teamRunId) !== run) {
       local.cancel();
       this.settling.delete(teamRunId);
       return null;

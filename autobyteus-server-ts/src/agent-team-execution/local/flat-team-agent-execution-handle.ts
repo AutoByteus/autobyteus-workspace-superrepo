@@ -27,6 +27,7 @@ export class FlatTeamAgentExecutionHandle {
   readonly context: FlatAgentExecutionContext;
   private handle: ConfiguredAgentExecutionHandle | null = null;
   private construction: Promise<ConfiguredAgentExecutionHandle> | null = null;
+  private rootShutdownFenced = false;
 
   constructor(private readonly options: {
     teamContext: TeamRunContext<FlatTeamExecutionContext>;
@@ -61,9 +62,11 @@ export class FlatTeamAgentExecutionHandle {
     return (await this.getHandle()).approveToolInvocation(invocationId, approved, reason);
   }
   async interrupt() { return this.handle ? this.handle.interrupt() : { accepted: true as const }; }
-  async interruptForRootTermination() {
-    if (this.construction) await this.construction.catch(() => null);
-    return this.handle ? this.handle.interruptForRootTermination() : { accepted: true as const };
+  async fenceForRootShutdown() {
+    this.rootShutdownFenced = true;
+    const construction = this.construction;
+    if (construction) await construction.catch(() => null);
+    return this.handle ? this.handle.fenceForRootShutdown() : { accepted: true as const };
   }
   async prepareConfiguredActivation(): Promise<PreparedConfiguredAgentActivation> {
     return (await this.getHandle()).prepareConfiguredActivation();
@@ -76,10 +79,17 @@ export class FlatTeamAgentExecutionHandle {
       commit: () => Object.freeze({ finish: async () => ({ accepted: true as const }) }),
     });
   }
+  async tryPrepareTerminationIfQuiescent(): Promise<PreparedLocalExecutionTermination | null> {
+    if (this.construction) return null;
+    return this.handle ? this.handle.tryPrepareTerminationIfQuiescent() : completedTermination();
+  }
   async terminate() { return this.handle ? this.handle.terminate() : { accepted: true as const }; }
   dispose(): void { this.handle?.dispose(); this.handle = null; }
 
   private getHandle(): Promise<ConfiguredAgentExecutionHandle> {
+    if (this.rootShutdownFenced) {
+      return Promise.reject(new Error(`AgentRun '${this.context.agentRunId}' is fenced for root shutdown.`));
+    }
     if (this.handle) return Promise.resolve(this.handle);
     if (this.construction) return this.construction;
     const attempt = this.createHandle();
@@ -140,3 +150,8 @@ export class FlatTeamAgentExecutionHandle {
     });
   }
 }
+
+const completedTermination = (): PreparedLocalExecutionTermination => Object.freeze({
+  cancel: () => undefined,
+  commit: () => Object.freeze({ finish: async () => ({ accepted: true as const }) }),
+});

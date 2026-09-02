@@ -115,7 +115,7 @@ export class RootTeamRun {
       getTree: () => this.tree,
       getIndex: () => this.index,
       isRootOpen: () => this.isAdmitting(),
-      authorize: (identity) => this.authorizeIdentity(identity),
+      authorize: (identity) => this.authorizeCurrentIdentity(identity),
       requireTeamRun: (teamRunId) => this.requireTeamRun(teamRunId),
       teamRunResolver: this.teamRunResolver,
       commitTaskMutation: (command) => options.persistence.commitTaskMutation(command),
@@ -259,6 +259,10 @@ export class RootTeamRun {
 
   authorizeIdentity(identity: CollaborationMemberExecutionIdentity): void {
     this.assertAdmitting();
+    this.authorizeCurrentIdentity(identity);
+  }
+
+  private authorizeCurrentIdentity(identity: CollaborationMemberExecutionIdentity): void {
     if (!this.isCurrentAgent(identity)) {
       throw new CollaborationContractError(
         "COLLABORATION_CONTEXT_REQUIRED",
@@ -282,11 +286,11 @@ export class RootTeamRun {
   }
 
   submitTaskResult(context: TaskDelegationContext, input: SubmitTaskResultInput): Promise<SubmitTaskResultResult> {
-    return this.materializationGate.run(() => this.taskDelegation.submitTaskResult(context, input));
+    return this.taskDelegation.submitTaskResult(context, input);
   }
 
   reviewTaskResult(context: TaskDelegationContext, input: ReviewTaskResultInput): Promise<ReviewTaskResultResult> {
-    return this.materializationGate.run(() => this.taskDelegation.reviewTaskResult(context, input));
+    return this.taskDelegation.reviewTaskResult(context, input);
   }
 
   async deliverInterAgentMessage(intent: InterAgentMessageDeliveryIntent): Promise<AgentOperationResult> {
@@ -409,20 +413,18 @@ export class RootTeamRun {
 
   private async runTermination(): Promise<AgentOperationResult> {
     await this.materializationGate.closeAndDrain();
-    await this.taskDelegation.drain();
-    await this.options.persistence.drain();
     this.teamRunResolver.closeRegistration();
     this.frozenTerminationScope ??= this.options.rootRun.freezeForRootTermination();
-    const interrupted = await this.frozenTerminationScope.interruptActiveTurns();
-    if (!interrupted.accepted) return interrupted;
-    await this.frozenTerminationScope.prepareMemberRuns();
+    const fenced = await this.frozenTerminationScope.fenceAgentRunsForRootShutdown();
+    if (!fenced.accepted) return fenced;
     if (!this.failStopped) {
       try {
         await this.taskDelegation.shutdownAndSettle("Root TeamRun terminated.");
       } catch (error) {
         if (!this.failStopped) throw error;
       }
-    }
+    } else await this.taskDelegation.drain();
+    await this.options.persistence.drain();
     const result = await this.frozenTerminationScope.finish();
     if (!result.accepted) return result;
     this.teamRunResolver.clear();

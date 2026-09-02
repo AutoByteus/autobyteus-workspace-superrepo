@@ -1,4 +1,3 @@
-import type { AgentOperationResult } from "../../agent-execution/domain/agent-operation-result.js";
 import type { RootExecutionPhysicalScope } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
 import type { CollaborationAgentExecutionEvent } from "../../agent-collaboration/execution/domain/collaboration-agent-execution-event.js";
 import type { FlatTeamExecutionCallbacks } from "../../agent-team-execution/local/flat-team-execution-callbacks.js";
@@ -9,6 +8,7 @@ import type { PrepareTaskTeamInput } from "../../agent-team-execution/domain/tas
 import type { PreparedTaskExecution } from "../../agent-team-execution/domain/prepared-task-execution.js";
 import type { PreparedTaskSettlement } from "../../agent-team-execution/domain/prepared-task-settlement.js";
 import type { ConfiguredMemberActivationMode } from "../../agent-team-execution/local/flat-team-execution-context.js";
+import type { FrozenTeamRunTerminationScope } from "../../agent-team-execution/domain/frozen-team-run-termination-scope.js";
 
 export type AgentOrgTeamRegistrationReservation = Readonly<{
   commit(): void;
@@ -24,6 +24,13 @@ export class AgentOrgTeamExecutionDirectory {
   constructor(private readonly factory: FlatTeamExecutionFactory) {}
 
   list(): readonly TeamRun[] { return Object.freeze([...this.active.values()]); }
+  freezeForRootTermination(): readonly FrozenTeamRunTerminationScope[] {
+    this.materializationOpen = false;
+    if (this.reserved.size) {
+      throw new Error("AgentOrg Team publication was still reserved at root-scope freeze.");
+    }
+    return Object.freeze([...this.active.values()].map((run) => run.freezeForRootTermination()));
+  }
   get(teamRunId: string): TeamRun | null { return this.active.get(teamRunId) ?? null; }
   require(teamRunId: string): TeamRun {
     const run = this.get(teamRunId);
@@ -145,8 +152,9 @@ export class AgentOrgTeamExecutionDirectory {
   async prepareSettlement(taskId: string, teamRunId: string): Promise<PreparedTaskSettlement | null> {
     const run = this.active.get(teamRunId);
     if (!run) return null;
-    const local = await run.prepareTermination();
-    if (this.active.get(teamRunId) !== run || run.hasOpenExecutionWork()) {
+    const local = await run.tryPrepareTerminationIfQuiescent();
+    if (!local) return null;
+    if (this.active.get(teamRunId) !== run) {
       local.cancel();
       return null;
     }
@@ -173,18 +181,6 @@ export class AgentOrgTeamExecutionDirectory {
         return Object.freeze({ finishLocalTeardown: () => commit.finish() });
       },
     });
-  }
-
-  async terminateAll(): Promise<AgentOperationResult> {
-    this.materializationOpen = false;
-    const errors: string[] = [];
-    for (const run of [...this.active.values()].reverse()) {
-      const result = await run.terminate();
-      if (!result.accepted) errors.push(result.message ?? result.code ?? "Team termination rejected");
-    }
-    this.active.clear();
-    this.reserved.clear();
-    return errors.length ? { accepted: false, code: "AGENT_ORG_TEAM_TERMINATION_FAILED", message: errors.join("; ") } : { accepted: true };
   }
 
   private reserveIds(ids: readonly string[]): void {

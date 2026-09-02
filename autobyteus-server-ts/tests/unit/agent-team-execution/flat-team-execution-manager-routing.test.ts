@@ -155,4 +155,102 @@ describe("FlatTeamExecutionManager exact direct AgentRun routing", () => {
     expect(runs.get(taskAgentRunId)?.interrupt).toHaveBeenCalledOnce();
     expect(runs.has(codeReviewerRunId)).toBe(false);
   });
+
+  it("cancels recursive task-Team descendants all-or-none when one remains busy", async () => {
+    const { manager } = createMixedManager();
+    const cancelOrder: string[] = [];
+    const prepared = (name: string) => Object.freeze({
+      cancel: vi.fn(() => cancelOrder.push(name)),
+      commit: vi.fn(() => Object.freeze({
+        finish: vi.fn(async () => ({ accepted: true as const })),
+      })),
+    });
+    const firstAttempt = prepared("first-attempt");
+    const first = {
+      tryPrepareTerminationIfQuiescent: vi.fn()
+        .mockResolvedValueOnce(firstAttempt)
+        .mockResolvedValueOnce(prepared("first-retry")),
+    };
+    const second = {
+      tryPrepareTerminationIfQuiescent: vi.fn()
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(prepared("second-retry")),
+    };
+    const taskAgents = (manager as never as {
+      taskAgents: { listHandles(): readonly unknown[]; listPreparedHandles(): readonly unknown[] };
+    }).taskAgents;
+    vi.spyOn(taskAgents, "listHandles").mockReturnValue([first, second]);
+    vi.spyOn(taskAgents, "listPreparedHandles").mockReturnValue([]);
+
+    await expect(manager.tryPrepareTerminationIfQuiescent()).resolves.toBeNull();
+    expect(firstAttempt.cancel).toHaveBeenCalledOnce();
+    expect(cancelOrder).toEqual(["first-attempt"]);
+
+    const retry = await manager.tryPrepareTerminationIfQuiescent();
+    expect(retry).not.toBeNull();
+    retry?.cancel();
+    expect(cancelOrder).toEqual(["first-attempt", "second-retry", "first-retry"]);
+  });
+
+  it("freezes the complete active, prepared, and recursive task scope once", async () => {
+    const { manager } = createMixedManager();
+    const fenced: string[] = [];
+    const finished: string[] = [];
+    const handle = (name: string) => ({
+      fenceForRootShutdown: vi.fn(async () => {
+        fenced.push(name);
+        return { accepted: true as const };
+      }),
+      terminate: vi.fn(async () => {
+        finished.push(name);
+        return { accepted: true as const };
+      }),
+    });
+    const childScope = (name: string) => ({
+      fenceAgentRunsForRootShutdown: vi.fn(async () => {
+        fenced.push(name);
+        return { accepted: true as const };
+      }),
+      finish: vi.fn(async () => {
+        finished.push(name);
+        return { accepted: true as const };
+      }),
+    });
+    const activeAgent = handle("active-agent");
+    const preparedAgent = handle("prepared-agent");
+    const activeChild = childScope("active-child");
+    const preparedChild = childScope("prepared-child");
+    const internals = manager as never as {
+      configured: { listHandles(): readonly unknown[] };
+      taskAgents: { listHandles(): readonly unknown[]; listPreparedHandles(): readonly unknown[] };
+      taskTeams: { listTeamRuns(): readonly unknown[]; listPreparedTeamRuns(): readonly unknown[] };
+    };
+    vi.spyOn(internals.configured, "listHandles").mockReturnValue([]);
+    vi.spyOn(internals.taskAgents, "listHandles").mockReturnValue([activeAgent]);
+    vi.spyOn(internals.taskAgents, "listPreparedHandles").mockReturnValue([preparedAgent]);
+    vi.spyOn(internals.taskTeams, "listTeamRuns").mockReturnValue([{
+      freezeForRootTermination: () => activeChild,
+    }]);
+    vi.spyOn(internals.taskTeams, "listPreparedTeamRuns").mockReturnValue([{
+      freezeForRootTermination: () => preparedChild,
+    }]);
+
+    const scope = manager.freezeForRootTermination();
+    expect(manager.freezeForRootTermination()).toBe(scope);
+    await expect(scope.fenceAgentRunsForRootShutdown()).resolves.toEqual({ accepted: true });
+    await expect(scope.finish()).resolves.toEqual({ accepted: true });
+
+    expect(fenced).toEqual([
+      "active-agent",
+      "prepared-agent",
+      "active-child",
+      "prepared-child",
+    ]);
+    expect(finished).toEqual([
+      "active-child",
+      "prepared-child",
+      "prepared-agent",
+      "active-agent",
+    ]);
+  });
 });
