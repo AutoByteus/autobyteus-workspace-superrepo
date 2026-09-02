@@ -22,6 +22,7 @@ import type { AgentTeamContext } from '~/types/agent/AgentTeamContext';
 import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress';
 import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective';
 import { deriveDelegatedTaskEntries } from '~/utils/teamDelegatedTaskEntries';
+import { isTeamMemberProjectionAuthoritative } from '~/services/runHydration/teamMemberProjectionHydrationService';
 
 /**
  * @store useActiveContextStore
@@ -51,6 +52,9 @@ export const useActiveContextStore = defineStore('activeContext', () => {
       coordinatorAddress: parseAgentTeamAddress(tree.root_team.coordinator_address),
       focusedMemberAddress: view.getFocusedMemberAddress(),
       focusedAgentRunId: view.getFocusedAgentRunId(), focusedAgentContext: focusedContext,
+      focusedTaskPresentation: () => view.getFocusedNavigationRow()?.task ?? null,
+      isFocusedProjectionAuthoritative: () =>
+        isTeamMemberProjectionAuthoritative(team, view.getFocusedAgentRunId()),
       listMembers: () => Object.freeze(entries.map((entry) => Object.freeze({
         address: entry.memberAddress, agentRunId: entry.agentRunId,
         context: entry.agentContext, coordinator: entry.memberAddress === tree.root_team.coordinator_address,

@@ -5,6 +5,7 @@ import type { ToolApprovalTarget } from '~/types/segments'
 import type { EventMonitorActiveTraceBrowseSubject } from '~/services/eventMonitor/eventMonitorActiveTracePageService'
 import type { TeamCommunicationPerspectiveMessage } from '~/stores/teamCommunicationTypes'
 import type { DelegatedTaskEntry } from '~/utils/teamDelegatedTaskEntries'
+import type { TeamExecutionTaskPresentation } from '~/services/teamExecution/taskDelegationPresentation'
 
 export interface AgentInteractionPort {
   send(content: string, contextPaths: readonly ContextFilePath[]): Promise<void>
@@ -27,6 +28,8 @@ export interface TeamWorkspaceContextView {
   readonly focusedMemberAddress: AgentTeamAddress
   readonly focusedAgentRunId: string
   readonly focusedAgentContext: AgentContext
+  focusedTaskPresentation(): TeamExecutionTaskPresentation | null
+  isFocusedProjectionAuthoritative(): boolean
   listMembers(): readonly Readonly<{
     address: AgentTeamAddress
     agentRunId: string

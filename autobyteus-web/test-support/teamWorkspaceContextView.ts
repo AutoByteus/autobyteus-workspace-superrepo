@@ -3,6 +3,7 @@ import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget'
 import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective'
 import { deriveDelegatedTaskEntries } from '~/utils/teamDelegatedTaskEntries'
+import { isTeamMemberProjectionAuthoritative } from '~/services/runHydration/teamMemberProjectionHydrationService'
 
 export const testTeamWorkspaceContextView = (
   team: AgentTeamContext,
@@ -24,6 +25,9 @@ export const testTeamWorkspaceContextView = (
     focusedMemberAddress: memberAddress,
     focusedAgentRunId,
     focusedAgentContext: context,
+    focusedTaskPresentation: () => view.getFocusedNavigationRow()?.task ?? null,
+    isFocusedProjectionAuthoritative: () =>
+      isTeamMemberProjectionAuthoritative(team, focusedAgentRunId),
     listMembers: () => entries.map((entry) => ({
       address: entry.memberAddress,
       agentRunId: entry.agentRunId,

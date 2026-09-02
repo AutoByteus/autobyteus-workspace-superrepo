@@ -14,12 +14,56 @@ import type { WorkspaceManager } from "../../../workspaces/workspace-manager.js"
 import type { FlatTeamExecutionCallbacks } from "../flat-team-execution-callbacks.js";
 
 type PreparedState = "preparing" | "sealed" | "committed" | "aborted";
+type TaskAgentDurabilityEventGateState = "prepared" | "releasing" | "live" | "aborted";
+type TaskAgentEventPublisher = FlatTeamExecutionCallbacks["publishAgentEvent"];
+type TaskAgentDurabilityEvent = Readonly<{
+  identity: Parameters<TaskAgentEventPublisher>[0];
+  event: Parameters<TaskAgentEventPublisher>[1];
+}>;
+
+/** Keeps task-Agent events private until the durable activation is externally visible. */
+export class TaskAgentDurabilityEventGate {
+  private state: TaskAgentDurabilityEventGateState = "prepared";
+  private readonly retainedEvents: TaskAgentDurabilityEvent[] = [];
+
+  constructor(private readonly forward: TaskAgentEventPublisher) {}
+
+  readonly publish: TaskAgentEventPublisher = (identity, event): void => {
+    if (this.state === "aborted") return;
+    if (this.state === "live") {
+      this.forward(identity, event);
+      return;
+    }
+    this.retainedEvents.push(Object.freeze({ identity, event }));
+  };
+
+  releaseToLive(): boolean {
+    if (this.state !== "prepared") return this.state === "live";
+    this.state = "releasing";
+    while (this.state === "releasing") {
+      const retained = this.retainedEvents.shift();
+      if (!retained) {
+        this.state = "live";
+        return true;
+      }
+      this.forward(retained.identity, retained.event);
+    }
+    return false;
+  }
+
+  abort(): void {
+    if (this.state === "aborted") return;
+    this.state = "aborted";
+    this.retainedEvents.length = 0;
+  }
+}
 
 /** Direct task-Agent mechanics for one TeamRun; task policy remains root-owned. */
 export class TaskAgentExecutionRegistry {
   private readonly active = new Map<string, FlatTeamAgentExecutionHandle>();
   private readonly reserved = new Set<string>();
   private readonly preparedHandles = new Map<string, FlatTeamAgentExecutionHandle>();
+  private readonly eventGates = new Map<string, TaskAgentDurabilityEventGate>();
   private readonly settling = new Set<string>();
   private materializationOpen = true;
 
@@ -47,6 +91,7 @@ export class TaskAgentExecutionRegistry {
       throw new Error(`Task AgentRun '${runId}' is already active or reserved.`);
     }
     this.reserved.add(runId);
+    const eventGate = new TaskAgentDurabilityEventGate(this.options.callbacks.publishAgentEvent);
     const handle = new FlatTeamAgentExecutionHandle({
       teamContext: this.options.teamContext,
       context: new FlatAgentExecutionContext({
@@ -61,16 +106,22 @@ export class TaskAgentExecutionRegistry {
       memoryLocator: this.options.memoryLocator,
       activityInspector: this.options.activityInspector,
       workspaceManager: this.options.workspaceManager,
-      callbacks: this.options.callbacks,
+      callbacks: Object.freeze({
+        ...this.options.callbacks,
+        publishAgentEvent: eventGate.publish,
+      }),
     });
     this.preparedHandles.set(runId, handle);
+    this.eventGates.set(runId, eventGate);
     let state: PreparedState = "preparing";
     let activation!: Awaited<ReturnType<FlatTeamAgentExecutionHandle["prepareConfiguredActivation"]>>;
     try {
       activation = await handle.prepareConfiguredActivation();
     } catch (error) {
+      eventGate.abort();
       this.reserved.delete(runId);
       this.preparedHandles.delete(runId);
+      this.eventGates.delete(runId);
       handle.dispose();
       throw error;
     }
@@ -93,6 +144,8 @@ export class TaskAgentExecutionRegistry {
           releaseWork: () => {
             if (released) return;
             released = true;
+            if (!eventGate.releaseToLive()) return;
+            this.eventGates.delete(runId);
             queueMicrotask(() => { void handle.postMessage(input.message); });
           },
         });
@@ -100,8 +153,10 @@ export class TaskAgentExecutionRegistry {
       abort: async () => {
         if (state === "committed" || state === "aborted") return;
         state = "aborted";
+        eventGate.abort();
         this.reserved.delete(runId);
         this.preparedHandles.delete(runId);
+        this.eventGates.delete(runId);
         try { await activation.abort(); } finally { handle.dispose(); }
       },
     };
@@ -172,11 +227,13 @@ export class TaskAgentExecutionRegistry {
   }
 
   dispose(): void {
+    this.eventGates.forEach((gate) => gate.abort());
     this.active.forEach((handle) => handle.dispose());
     this.preparedHandles.forEach((handle) => handle.dispose());
     this.active.clear();
     this.reserved.clear();
     this.preparedHandles.clear();
+    this.eventGates.clear();
     this.settling.clear();
   }
 }

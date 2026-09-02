@@ -9,7 +9,7 @@ import { initializeRuntimeStatusState } from '~/services/runStatus/agentRuntimeS
 import { buildConversationFromProjection } from '~/services/runHydration/runProjectionConversation'
 import type { RunProjectionConversationEntry } from '~/services/runHydration/runProjectionConversation'
 import {
-  hydrateActivitiesFromProjection,
+  buildActivitiesFromProjection,
   type RunProjectionActivityEntry,
 } from '~/services/runHydration/runProjectionActivityHydration'
 import {
@@ -19,6 +19,7 @@ import {
 import { GetAgentOrgMemberRunProjection } from '~/graphql/queries/runHistoryQueries'
 import { getApolloClient } from '~/utils/apolloClient'
 import { useRunHistoryStore } from '~/stores/runHistoryStore'
+import { useAgentActivityStore } from '~/stores/agentActivityStore'
 import {
   AgentOrgExecutionContext,
   type AgentOrgCommandTransport,
@@ -187,8 +188,18 @@ const fetchProjection = async (
   }
 }
 
-const applyProjection = (context: AgentContext, seed: AgentSeed, projection: Projection | null): void => {
-  if (!projection) return
+type PendingActivityReplacement = Readonly<{
+  runId: string
+  expectedRevision: number
+  activities: ReturnType<typeof buildActivitiesFromProjection>
+}>
+
+const applyProjection = (
+  context: AgentContext,
+  seed: AgentSeed,
+  projection: Projection | null,
+): PendingActivityReplacement | null => {
+  if (!projection) return null
   resetRecentEventMonitorBaseline(context)
   context.state.conversation = buildConversationFromProjection(
     seed.agentRunId,
@@ -200,8 +211,13 @@ const applyProjection = (context: AgentContext, seed: AgentSeed, projection: Pro
     },
   )
   context.state.hasEarlierActiveTraceEvents = projection.hasEarlierActiveTraceEvents === true
-  hydrateActivitiesFromProjection(seed.agentRunId, projection.activities)
   primeRecentEventMonitorBaseline(context)
+  const activities = useAgentActivityStore()
+  return Object.freeze({
+    runId: seed.agentRunId,
+    expectedRevision: activities.getActivityContentRevision(seed.agentRunId),
+    activities: buildActivitiesFromProjection(projection.activities),
+  })
 }
 
 export const hydrateAgentOrgExecutionContext = async (input: Readonly<{
@@ -216,15 +232,36 @@ export const hydrateAgentOrgExecutionContext = async (input: Readonly<{
   }
   const seeds = collectAgentSeeds(input.view)
   const workspaces = await resolveWorkspaces(seeds, input.view.is_active)
-  const entries: AgentOrgContextEntry[] = await Promise.all(seeds.map(async (seed) => {
+  const hydrated = await Promise.all(seeds.map(async (seed) => {
     const rootPath = seed.launch.workspaceRootPath
     const context = createAgentContext(
       seed,
       input.view.execution_tree.createdAt,
       rootPath ? workspaces.get(rootPath) ?? null : null,
     )
-    applyProjection(context, seed, await fetchProjection(input.orgRunId, seed))
-    return Object.freeze({ agentRunId: seed.agentRunId, memberAddress: seed.address, context })
+    const activityReplacement = applyProjection(
+      context,
+      seed,
+      await fetchProjection(input.orgRunId, seed),
+    )
+    return Object.freeze({
+      entry: Object.freeze({
+        agentRunId: seed.agentRunId,
+        memberAddress: seed.address,
+        context,
+      }) satisfies AgentOrgContextEntry,
+      activityReplacement,
+    })
   }))
-  return new AgentOrgExecutionContext({ ...input, entries })
+  const context = new AgentOrgExecutionContext({
+    ...input,
+    entries: hydrated.map((item) => item.entry),
+  })
+  const replacements = hydrated.flatMap((item) =>
+    item.activityReplacement ? [item.activityReplacement] : [])
+  if (replacements.length > 0
+    && useAgentActivityStore().replaceProjectionActivitiesIfRevisions(replacements) === 'conflict') {
+    throw new Error(`AgentOrg activity changed before '${input.orgRunId}' hydration could commit.`)
+  }
+  return context
 }

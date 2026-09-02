@@ -401,6 +401,8 @@ export class AgentOrgExecutionContext {
       teamRunId: team.teamRunId, teamAddress: team.address,
       teamDefinitionName: nameAt(team.address), coordinatorAddress: team.coordinatorAddress,
       focusedMemberAddress, focusedAgentRunId, focusedAgentContext,
+      focusedTaskPresentation: () => null,
+      isFocusedProjectionAuthoritative: () => true,
       listMembers: () => Object.freeze(members),
       senderNameByAgentRunId: () => Object.freeze(Object.fromEntries(
         members.map((member) => [member.agentRunId, nameAt(member.address)]),

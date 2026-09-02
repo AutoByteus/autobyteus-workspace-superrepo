@@ -12,8 +12,26 @@
           />
           <span v-else>{{ initials }}</span>
         </div>
-        <h4 class="truncate text-base font-medium text-gray-800" :title="memberName">{{ memberName }}</h4>
-        <AgentStatusDisplay :status="target.context.state.currentStatus" />
+        <div class="min-w-0 flex-1">
+          <div class="flex min-w-0 items-center gap-2">
+            <h4 class="truncate text-base font-medium text-gray-800" :title="memberName">{{ memberName }}</h4>
+            <span
+              v-if="focusedTask"
+              class="shrink-0 rounded-full bg-indigo-100 px-2 py-0.5 text-[0.6875rem] font-semibold text-indigo-700"
+            >{{ t('workspace.task_monitor.task') }}</span>
+            <AgentStatusDisplay :status="target.context.state.currentStatus" />
+          </div>
+          <p
+            v-if="focusedTask"
+            class="truncate text-xs text-slate-500"
+            :title="focusedTask.description"
+          >{{ focusedTask.description }}</p>
+          <p
+            v-if="focusedTaskStatus"
+            class="text-xs font-medium text-slate-600"
+            data-test="team-workspace-task-status"
+          >{{ focusedTaskStatus }}</p>
+        </div>
       </div>
       <WorkspaceHeaderActions
         v-if="showHeaderActions"
@@ -25,7 +43,7 @@
       v-if="recoveryNotice"
       :message="recoveryNotice"
     />
-    <div class="min-h-0 flex-1">
+    <div class="relative min-h-0 flex-1">
       <AgentEventMonitor
         :conversation="target.context.state.conversation"
         :run-id="target.context.state.runId"
@@ -40,6 +58,12 @@
           <SkillImprovementComposerCta :target="skillTarget" />
         </template>
       </AgentEventMonitor>
+      <div
+        v-if="showAuthoritativeTaskEmpty"
+        class="pointer-events-none absolute inset-x-4 top-1/2 z-10 -translate-y-1/2 rounded-lg border border-dashed border-slate-300 bg-white/95 px-4 py-5 text-center text-sm text-slate-600 shadow-sm"
+        role="status"
+        data-test="team-task-authoritative-empty"
+      >{{ t('workspace.task_monitor.empty') }}</div>
     </div>
   </div>
 </template>
@@ -54,6 +78,8 @@ import WorkspaceRecoveryNotice from '~/components/workspace/common/WorkspaceReco
 import SkillImprovementComposerCta from '~/components/workspace/skill-improvement/SkillImprovementComposerCta.vue'
 import type { SkillImprovementComposerCtaTarget } from '~/components/workspace/skill-improvement/skillImprovementComposerCtaTarget'
 import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
+import { useAgentActivityStore } from '~/stores/agentActivityStore'
+import { useLocalization } from '~/composables/useLocalization'
 
 type TeamTarget = Extract<ActiveAgentWorkspaceTarget,
   { kind: 'standalone_team_member' | 'agent_org_team_member' }>
@@ -65,6 +91,8 @@ const props = withDefaults(defineProps<{
 defineEmits<{ (event: 'new-team'): void; (event: 'edit-config'): void }>()
 
 const definitions = useAgentDefinitionStore()
+const activityStore = useAgentActivityStore()
+const { t } = useLocalization()
 const avatarFailed = ref(false)
 const memberName = computed(() => props.target.context.config.agentDefinitionName
   || props.target.team.focusedMemberAddress.split('/').at(-1)?.replace(/[_-]+/g, ' ')
@@ -75,6 +103,20 @@ const avatarUrl = computed(() => props.target.context.config.agentAvatarUrl?.tri
   || definitions.getAgentDefinitionById(props.target.context.config.agentDefinitionId)?.avatarUrl?.trim()
   || '')
 const showAvatar = computed(() => Boolean(avatarUrl.value) && !avatarFailed.value)
+const focusedTask = computed(() => props.target.team.focusedTaskPresentation())
+const focusedTaskStatus = computed(() => focusedTask.value
+  ? t('workspace.task_monitor.combined_status', {
+      lifecycle: t(`workspace.task_monitor.lifecycle.${focusedTask.value.displayStatus}`),
+      execution: t(`workspace.task_monitor.execution.${props.target.context.state.currentStatus}`),
+    })
+  : '')
+const showAuthoritativeTaskEmpty = computed(() => Boolean(
+  focusedTask.value
+  && props.target.team.isFocusedProjectionAuthoritative()
+  && props.target.context.state.conversation.messages.length === 0
+  && props.target.context.state.hasEarlierActiveTraceEvents !== true
+  && activityStore.getActivities(props.target.context.state.runId).length === 0,
+))
 const skillTarget = computed<SkillImprovementComposerCtaTarget | null>(() =>
   props.target.kind === 'standalone_team_member'
     ? {

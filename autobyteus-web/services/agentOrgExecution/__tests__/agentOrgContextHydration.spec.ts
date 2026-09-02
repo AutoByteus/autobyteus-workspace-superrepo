@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AgentOrgExecutionViewDto } from '@autobyteus/collaboration-stream-contracts'
+import { createPinia, setActivePinia } from 'pinia'
+import { useAgentActivityStore } from '~/stores/agentActivityStore'
 
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
@@ -145,6 +147,7 @@ const taskBearingView = (): AgentOrgExecutionViewDto => ({
 
 describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
   beforeEach(() => {
+    setActivePinia(createPinia())
     vi.clearAllMocks()
     mocks.query.mockResolvedValue({ data: { getAgentOrgMemberRunProjection: null } })
   })
@@ -179,5 +182,32 @@ describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
         orgRunId: 'org-run', memberAddress: '/worker', agentRunId: 'agent-worker-task',
       },
     }))
+  })
+
+  it('commits projection activities through the current atomic activity replacement owner', async () => {
+    mocks.query.mockImplementation(async ({ variables }: { variables: { agentRunId: string } }) => ({
+      data: { getAgentOrgMemberRunProjection: variables.agentRunId === 'agent-director'
+        ? {
+            agentRunId: 'agent-director', memberAddress: '/director', conversation: [],
+            hasEarlierActiveTraceEvents: false,
+            activities: [{
+              kind: 'tool', invocationId: 'tool-1', toolName: 'read_file',
+              status: 'success', result: 'done', ts: 1,
+            }],
+          }
+        : null },
+    }))
+
+    await hydrateAgentOrgExecutionContext({
+      orgRunId: 'org-run',
+      view: taskBearingView(),
+      transport: { interactionFor: () => ({
+        send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn(),
+      }) },
+    })
+
+    expect(useAgentActivityStore().getActivities('agent-director')).toEqual([
+      expect.objectContaining({ kind: 'tool', invocationId: 'tool-1', status: 'success' }),
+    ])
   })
 })

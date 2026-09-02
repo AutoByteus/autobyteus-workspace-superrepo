@@ -34,6 +34,7 @@ const {
   mockInterruptGeneration,
   mockMutate,
   mockClearActivities,
+  mockReplaceProjectionActivitiesIfRevisions,
   mockHydrateLiveTeamRunContext,
   teamContextsStoreMock,
   runHistoryStoreMock,
@@ -55,6 +56,7 @@ const {
   mockInterruptGeneration: vi.fn(),
   mockMutate: vi.fn(),
   mockClearActivities: vi.fn(),
+  mockReplaceProjectionActivitiesIfRevisions: vi.fn(() => 'replaced' as const),
   mockHydrateLiveTeamRunContext: vi.fn(),
   teamContextsStoreMock: {
     activeTeamContext: null as AgentTeamContext | null,
@@ -118,6 +120,7 @@ vi.mock('~/stores/agentActivityStore', () => ({
   useAgentActivityStore: () => ({
     clearActivities: mockClearActivities,
     getCompactionActivities: vi.fn(() => []),
+    replaceProjectionActivitiesIfRevisions: mockReplaceProjectionActivitiesIfRevisions,
   }),
 }))
 
@@ -164,6 +167,19 @@ const setActiveTeam = (team: AgentTeamContext): void => {
   teamContextsStoreMock.activeTeamContext = team
   teamContextsStoreMock.getTeamContextById.mockImplementation((rootTeamRunId: string) =>
     rootTeamRunId === team.view.getRootTeamRunId() ? team : undefined)
+}
+
+const teamHydrationCandidate = (hydratedContext: AgentTeamContext): any => {
+  const teamRunId = hydratedContext.view.getRootTeamRunId()
+  const focusedAgentRunId = hydratedContext.view.getFocusedAgentRunId()
+  return {
+    teamRunId,
+    focusedAgentRunId,
+    resumeConfig: { teamRunId, isActive: hydratedContext.view.isRootTeamActive(), metadata: {} },
+    hydratedContext,
+    projectionByAgentRunId: new Map([[focusedAgentRunId, { agentRunId: focusedAgentRunId }]]),
+    activityReplacements: [],
+  }
 }
 
 const twoMemberTeam = (input: {
@@ -610,7 +626,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
       data: { restoreAgentTeamRun: { success: true, teamRunId: 'team-restore' } },
       errors: [],
     })
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(hydrated))
 
     await useAgentTeamRunStore().sendMessageToFocusedMember('restore then send', [])
 
@@ -619,7 +635,8 @@ describe('agentTeamRunStore current rooted execution contract', () => {
       teamRunId: 'team-restore',
       agentRunId: 'team-restore-worker-run',
     }))
-    expect(teamContextsStoreMock.addTeamContext).toHaveBeenCalledWith(hydrated)
+    expect(teamContextsStoreMock.replaceTeamContext).toHaveBeenCalledWith('team-restore', stale, hydrated)
+    expect(teamContextsStoreMock.addTeamContext).not.toHaveBeenCalled()
     expect(mockSendMessage).toHaveBeenCalledWith(
       'restore then send',
       'team-restore-worker-run',
@@ -636,7 +653,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
     mockMutate.mockResolvedValue({
       data: { restoreAgentTeamRun: { success: true, teamRunId: 'team-admission' } }, errors: [],
     })
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(hydrated))
     let admit!: () => void
     mockSendMessage.mockReturnValueOnce(new Promise<void>((resolve) => { admit = resolve }))
 
@@ -663,7 +680,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
     mockMutate.mockResolvedValue({
       data: { restoreAgentTeamRun: { success: true, teamRunId: 'team-retry' } }, errors: [],
     })
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(hydrated))
     mockSendMessage.mockRejectedValueOnce(new Error('runtime is stopping'))
 
     await useAgentTeamRunStore().sendMessageToFocusedMember('retry this exact prompt', [attachment])
@@ -691,7 +708,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
       data: { createAgentTeamRun: { success: true, teamRunId: 'team-flat-live' } },
       errors: [],
     })
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(hydrated))
 
     const result = await useAgentTeamRunStore().launchDraft(draft)
 
@@ -754,7 +771,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
     mockMutate.mockResolvedValue({
       data: { createAgentTeamRun: { success: true, teamRunId: 'team-flat-live' } }, errors: [],
     })
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: flatHydratedTeam() })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(flatHydratedTeam()))
 
     await useAgentTeamRunStore().launchDraft(configStore.selectedDraft!)
 
@@ -854,7 +871,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
     const hydrated = flatHydratedTeam()
     let resolveAllocation!: (value: unknown) => void
     mockMutate.mockReturnValue(new Promise((resolve) => { resolveAllocation = resolve }))
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(hydrated))
     const runStore = useAgentTeamRunStore()
 
     const launch = runStore.launchDraft(draft)
@@ -905,7 +922,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
       data: { createAgentTeamRun: { success: true, teamRunId: 'team-flat-live' } },
       errors: [],
     })
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: flatHydratedTeam() })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(flatHydratedTeam()))
     await expect(useAgentTeamRunStore().launchDraft(retryDraft)).resolves.toMatchObject({
       rootTeamRunId: 'team-flat-live',
     })
@@ -921,7 +938,7 @@ describe('agentTeamRunStore current rooted execution contract', () => {
       data: { createAgentTeamRun: { success: true, teamRunId: 'team-flat-live' } },
       errors: [],
     })
-    mockHydrateLiveTeamRunContext.mockResolvedValue({ hydratedContext: hydrated })
+    mockHydrateLiveTeamRunContext.mockResolvedValue(teamHydrationCandidate(hydrated))
     teamContextsStoreMock.addTeamContext.mockImplementation((team: AgentTeamContext) => setActiveTeam(team))
 
     await useAgentTeamRunStore().sendMessageToFocusedMember('FIRST_SEND_EXACT', [])

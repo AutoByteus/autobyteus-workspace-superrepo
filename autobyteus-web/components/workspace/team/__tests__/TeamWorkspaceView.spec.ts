@@ -2,8 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import TeamWorkspaceView from '../TeamWorkspaceView.vue';
 import { AgentStatus } from '~/types/agent/AgentStatus';
-import { buildTestTeamContext, testAgentNode, testSubTeamNode } from '~/test-support/currentTeamTestFixtures';
+import {
+  buildTestTeamContext,
+  testAgentNode,
+  testSubTeamNode,
+  testTaskRecord,
+} from '~/test-support/currentTeamTestFixtures';
 import { createPinia, setActivePinia } from 'pinia';
+import { markTeamMemberProjectionAuthoritative } from '~/services/runHydration/teamMemberProjectionHydrationService';
 
 const { state, teamContextsStoreMock, agentDefinitionStoreMock, teamRunConfigStoreMock,
   agentRunConfigStoreMock, selectionStoreMock, workspaceCenterViewStoreMock, agentTeamRunStoreMock } = vi.hoisted(() => {
@@ -95,6 +101,29 @@ describe('TeamWorkspaceView current aggregate', () => {
     const wrapper = mountComponent();
     expect(wrapper.find('h4').text()).toBe('Student');
     expect(wrapper.get('[data-test="header-status"]').text()).toBe(AgentStatus.Initializing);
+  });
+
+  it('renders focused task lifecycle and execution status over an authoritative empty projection', () => {
+    state.activeTeamContext = buildTestTeamContext({
+      teamRunId: 'team-1', teamDefinitionName: 'Class Room Simulation', teamDefinitionId: 'team-def-1',
+      rootChildren: [buildAgent('/Student', 'Student', 'student-run', 'agent-student-def')],
+      coordinatorAddress: '/Student', focusedAgentRunId: 'task-student-run',
+      tasks: [testTaskRecord({
+        taskId: 'task-1', delegatorAgentRunId: 'student-run', recipientAddress: '/Student',
+        target: { agentRunId: 'task-student-run' }, description: 'Solve the retained task exactly',
+      })],
+    });
+    state.activeTeamContext.view.getAgentContext('task-student-run').state.currentStatus = AgentStatus.Idle;
+    markTeamMemberProjectionAuthoritative(state.activeTeamContext, 'task-student-run');
+
+    const wrapper = mountComponent();
+
+    expect(wrapper.text()).toContain('Task');
+    expect(wrapper.text()).toContain('Solve the retained task exactly');
+    expect(wrapper.get('[data-test="team-workspace-task-status"]').text()).toBe('In progress · Idle');
+    expect(wrapper.get('[data-test="header-status"]').text()).toBe(AgentStatus.Idle);
+    expect(wrapper.get('[data-test="team-task-authoritative-empty"]').text())
+      .toBe('No activity recorded for this task yet.');
   });
 
   it('renders persistent actionable guidance while the selected Team stream requires recovery', () => {
