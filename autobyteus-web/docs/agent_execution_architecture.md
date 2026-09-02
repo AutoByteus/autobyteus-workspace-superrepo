@@ -88,8 +88,8 @@ The Pinia stores act as the primary interface for the UI components to interact 
     view to an exact attachment location (`containingTeamRunId` plus rooted
     `memberAddress`) before local admission. Draft attachment ownership remains
     launch/root scoped, while the `team_member_final` owner uses that containing
-    TeamRun; a configured or task-Team Agent nested below the root must not
-    substitute the root TeamRun id. It then begins one local submission,
+    TeamRun; a task-Team Agent below the flat configured root must not substitute the
+    root TeamRun id. It then begins one local submission,
     finalizes attachments, and emits `SEND_MESSAGE` with `execution_address`,
     required `message_id`, and required `dedupe_key`. Missing execution location
     and invalid, stale, non-Agent, or cross-root identity fail closed; there is
@@ -104,6 +104,26 @@ The Pinia stores act as the primary interface for the UI components to interact 
     from current focus or invocation-id/display aliases.
   - `terminateTeamRun()`: calls backend termination before local teardown for a
     persisted TeamRun and preserves the active local state on failure.
+
+### `agentOrgRunStore.ts`, `agentOrgContextsStore.ts`, And `agentOrgRunConfigStore.ts`
+
+- **Role**: Keep AgentOrg definition/configuration, root lifecycle/history, and
+  live execution context separate from the standalone Team store.
+- `agentOrgRunConfigStore` owns the root choices, sparse mounted-Team and exact-
+  Agent overrides, workspace operations, and exact schema-readiness states. The
+  Run action is admitted only when every registered root/Team/Agent scope is
+  ready; unavailable or invalid scope state remains address-specific.
+- `agentOrgRunStore.launch()` sends one complete projected payload and records
+  only the returned `agentOrgRunId`. `restore()`, `terminate()`, and
+  `fetchHistory()` use the AgentOrg GraphQL operations and the
+  `root_subject_kind: "agent_org"` history projection.
+- `agentOrgContextsStore` owns one `AgentOrgStreamingService` per active Org.
+  Launch establishes the full coordinator-free scope without focus; `select()`
+  later focuses an exact Agent or mounted Team. A mounted Team selection resolves
+  to its direct coordinator but does not create a standalone Team lifecycle.
+- These stores never import the Team draft/config store as configuration
+  authority, synthesize an Org coordinator, or convert AgentOrg persistence into
+  Team V2 state.
 
 ### Stopped-Run Follow-Up Recovery
 
@@ -225,24 +245,22 @@ definition field. Representative ordering, leaf-agent status, socket
 subscription, and Stop/pending state must not influence either the exact-run
 cue or the group projection.
 
-Stable configured nested-Team rows inside one concrete TeamRun may also render a
-presentation-only five-state summary in the Workspaces history tree. The
-summary folds the exact Agent statuses already present in that Team's flattened
-`executionRows` descendant scope with the precedence `running > initializing >
-error > idle > offline`. Configured descendants, task Agents, and task-Team
-children inside the nested Team contribute; the parent container itself,
-ancestors, adjacent siblings, and rows after the nested subtree do not. Unknown,
-missing, or empty status input normalizes to `offline`. The dot remains visible
-when the nested Team is collapsed and reacts to the existing execution-row
-projection, so it performs no request or polling of its own.
+A direct mounted-Team row inside one AgentOrg may render a presentation-only
+five-state summary in `AgentOrgRunHistoryPanel`. The summary folds exact Agent
+statuses in that mounted Team branch with precedence `running > initializing >
+error > idle > offline`. Direct Team Agents plus task Agents and task-Team
+Agents beneath that mounted placement contribute; the Team container itself,
+direct Org Agents, sibling Teams, and other branches do not. Missing or empty
+input normalizes to `offline`. The dot remains visible when the Team is
+collapsed and reacts to the existing Org execution context without requesting
+or polling.
 
-This nested-row summary does not change status authority. It is neither a Team
-status model nor a replacement for exact leaf `AGENT_STATUS` or binary root
-`TEAM_RUN_LIFECYCLE`. It is not persisted or transported and must not influence
-TeamRun liveness, focus, readiness, command admission, interrupt/Stop, archive,
-delete, or lifecycle decisions. Root TeamRun rows and definition groups retain
-the binary activity cues described above; transient task-Team rows do not gain
-the aggregate dot.
+This mounted-Team summary does not change status authority. It is neither a
+Team-root lifecycle nor a replacement for exact leaf `AGENT_STATUS` or the
+AgentOrg root lifecycle. It is not persisted or transported and cannot affect
+focus, readiness, command admission, interrupt/Stop, archive, delete, or
+lifecycle decisions. Standalone TeamRun rows retain their binary activity cue;
+task-Team rows do not gain the configured mounted-Team aggregate.
 
 Delegated task executions are task-scoped execution projections rather than
 structural topology. Every Team Agent event carries one `agent_execution`
@@ -251,7 +269,7 @@ that execution owns an Agent runtime. A task-Agent address keeps the rooted
 logical member and sets `taskAgentRunId`; a task-Team child appends the concrete
 child TeamRun id to ordered `taskTeamRunIds` and carries the rooted child Agent
 address. The strict contract contains no task instance ids, execution-kind
-aliases, member/source path or route-key fallbacks, represented-subteam fields,
+aliases, member/source path or route-key fallbacks, represented-Team compatibility fields,
 or generated-run-id inference. Complete task snapshots and live events reconcile
 through the same execution model and exact serialized address.
 
@@ -260,9 +278,8 @@ global Workspaces/run-history tree owns live execution identity and hierarchy:
 it composes stable history rows with pure renderer-only transient display rows
 from the V2 execution view in `AgentTeamContext.view`, keeps durable members
 visually solid, and renders task-agent, task-team root, and task-team child
-executions inline with explicit transient row kinds. Stable configured Team
-rows use an unboxed filled user-group icon and semibold name, while stable Agent
-rows retain their circular avatar. A transient task-Team row uses one dashed
+executions inline with explicit transient row kinds. AgentOrg mounted-Team rows use an unboxed filled user-group icon and semibold
+name, while configured Agent rows retain their circular avatar. A transient task-Team row uses one dashed
 indigo row treatment plus a bordered bolt icon; a transient task-Agent keeps the
 eight-dot `StatusDot` variant so its exact status color remains visible. Neither
 role adds visible `Temp` / `Temporary` copy to the row body.
@@ -704,49 +721,35 @@ current expansion state.
   standalone chevron size, shape, and gray color. The row button remains the
   single interaction boundary, and team-run rows expose `aria-expanded` so
   visual, keyboard, and assistive-technology state stay in sync.
-- Manual workspace, agent-group, team-definition-group, team-run, and nested
-  team-member/subteam expansion choices are kept in component-local tree state
-  and are not reset by quiet history refreshes while the history panel remains
-  mounted.
+- Manual workspace, definition-group, root-run, mounted-Team, and task-execution
+  expansion choices are kept in component-local tree state and are not reset by
+  quiet history refreshes while the relevant history panel remains mounted.
 - Newly added workspaces are explicitly opened after creation so the add flow
   still lands the user in the workspace they just created.
 
-When an existing run or team run is selected before its history ancestry is
-visible, `useWorkspaceHistoryTreeState(...)` performs a one-shot selected-path
-reveal. The reveal expands only the selected run/team's workspace and containing
-agent or team-definition group, and for selected team runs opens the matching
-team-run row. After the selected path has been revealed for the stable selection
-key, later quiet refreshes must not reopen the same path if the user manually
-collapses it. When a user opens/selects a team run that has a focused nested
-member, or selects a nested member row directly,
-`useWorkspaceHistorySelectionActions(...)` asks
-`useWorkspaceHistoryTreeState(...)` to expand only the subteam ancestors
-needed to keep that nested focus visible.
+When an existing standalone run or TeamRun is selected before its history
+ancestry is visible, `useWorkspaceHistoryTreeState(...)` performs a one-shot
+selected-path reveal. It expands only the selected root's workspace, containing
+definition group, root row, and task ancestors needed for an exact task Agent.
+After the stable selection key has been revealed, quiet refreshes do not reopen
+branches that the user manually collapsed.
 
-For Team execution rows, selection state derives from the same exact
+Standalone Team execution-row selection derives from the same exact
 `TeamExecutionViewState` focus used by the workspace and command surfaces; there
-is no separate roster/history visual-focus authority. The current-row predicate
-is scoped to the authoritative selected TeamRun plus the view's focused exact
-AgentRun. Clearing the Team selection or having no valid target leaves no member
-row current. The cached run-history projection mirrors that focus only after
-successful exact inspection. The Workspace history tree renders recursive
-`team.rootTeam.members` structure from the V2 history projection. Nested
-configured-Team member rows appear as
-semibold subteam rows with an unboxed filled user-group icon and their own
-disclosure control; they are collapsed by default and expand children through
-the continuous-rail/right-elbow printed-tree grammar described above.
-Disclosure-bearing configured subteam row-body activation toggles children and
-selects only when that structural row has a concrete Agent run. The explicit
-disclosure control remains visible and toggles children without selecting the
-row or bubbling into the row-body handler. Leaf member rows without children
-remain select-only. Clicking a member or subteam row whose canonical address
-exists in the Team's V2 tree requests inspection of its exact AgentRun and keeps
-the previous row current until required projection authority succeeds. An
-offline AgentRun may still be focused when its retained projection is
-authoritative; a structural row without an executable AgentRun cannot become the
-workspace focus. Live/hydrated Team-context merges must preserve the persisted
-history row's workspace grouping while deriving selected-row highlighting from
-the execution view.
+is no separate roster/history visual-focus authority. Team V2 projects a flat
+configured-Agent roster plus task-scoped execution rows. Direct Agent rows are
+select-only; task-Team disclosure rows expand their runtime children but do not
+become configured focus targets. Exact Agent selection waits for authoritative
+projection before changing the current-row state, and an offline Agent may be
+focused when retained projection is authoritative.
+
+`AgentOrgRunHistoryPanel` owns the parallel AgentOrg hierarchy. It renders the
+coordinator-free Org root, direct Agents, and direct mounted Teams from the Org
+V1 projection. Mounted Teams start collapsed and disclose their direct Agents
+and task rows. Selecting a mounted Team focuses its exact direct coordinator
+through the active Org context; it does not create or replace a standalone
+TeamRun. The panel preserves independent workspace/Org/run/Team disclosure
+state while reactive live context mutations update rows without refocus.
 
 Topology operations build and index the complete run-history navigation
 projection once, retaining equal workspace/team branches by reference. The
@@ -945,16 +948,21 @@ switch follows workspace selection, and no hierarchy wrapper, root `/`,
 inheritance badge, or effective-value summary is inserted around the root
 controls.
 
-The **Team Members Override** disclosure defaults collapsed and keeps a visible
-chevron and member count. When opened, Agent rows and nested Team groups render
-recursively as the existing connected, indented hierarchy. Nested Team editors
-also default collapsed; their headers retain Team identity and canonical
-placement address while adding only **Inherited**/**Customized**, a disclosure
-chevron, and conditional **Reset**. Expanding a nested Team shows its real
-effective runtime/model/configuration/workspace/auto-approve controls without a
-duplicate summary. Disclosures expose `aria-expanded`/`aria-controls`, Reset has
-a Team-specific accessible name, scoped loading/error Retry stays associated
-with its Team, and narrow layouts may wrap header content without overlap.
+A standalone Team's **Team Members Override** disclosure defaults collapsed and
+shows its direct-Agent count. Expanding it displays only direct Agent override
+rows because AgentTeam Definition V2 is flat; configured Team groups are not a
+valid Team member shape.
+
+The AgentOrg form uses **Member overrides (N)**, where `N` is the exact
+configurable-Agent count across direct Org Agents and mounted Teams. The outer
+disclosure and every mounted-Team row start independently collapsed. Each Team
+header shows Team identity, exact placement address,
+**Inherited**/**Customized**, an accessible disclosure, and conditional
+**Reset**. Only an expanded Team shows its Team-scope controls and direct Agent
+rows; only the exact coordinator Agent carries coordinator identity. Direct Org
+Agents remain direct rows. Drafts survive collapse, sibling Teams remain closed,
+and narrow layouts wrap without overlap. Loading/error/Retry and model-schema
+state stay bound to the exact root, Team, or Agent address.
 
 Explicit Team- or Agent-local runtime/model selections that resolve to an
 effective-ON model can open only that scope's **Advanced** controls. Display-only
@@ -1168,7 +1176,7 @@ Incoming events are routed based on their `type`:
 | `ARTIFACT_PERSISTED`      | inline no-op compatibility                         | Ignored by the current client; published artifacts are not displayed in the current web UI. |
 | `FILE_CHANGE`             | `fileChangeHandler.handleFileChange`        | Syncs touched files and generated outputs into the run-scoped Agent Artifact store. |
 | `EXTERNAL_USER_MESSAGE`   | `externalUserMessageHandler.handleExternalUserMessage` | Inserts or updates a user/input row for true external-channel ingress by backend `message_id` / `dedupe_key`. It remains external-channel-specific; repeated rows with no identity remain separate. |
-| `MEMBER_INPUT_MESSAGE`    | `memberInputMessageHandler.handleMemberInputMessage` | Inserts or updates an accepted team/member input row by backend `message_id` / `dedupe_key`, including local team sends and parent-to-subteam delivery prompts in the target leaf transcript before assistant output. Deduped local submissions preserve existing non-empty `contextFilePaths` when a lower-fidelity echo omits attachments, while incoming non-empty context-file locators update the row. |
+| `MEMBER_INPUT_MESSAGE`    | `memberInputMessageHandler.handleMemberInputMessage` | Inserts or updates an accepted team/member input row by backend `message_id` / `dedupe_key`, including local team sends and parent-to-task-Team delivery prompts in the target leaf transcript before assistant output. Deduped local submissions preserve existing non-empty `contextFilePaths` when a lower-fidelity echo omits attachments, while incoming non-empty context-file locators update the row. |
 | `SYSTEM_TASK_NOTIFICATION` | `systemTaskNotificationHandler.handleSystemTaskNotification` | Appends backend-provided system-task notification content as a `system_task_notification` AI message segment without rewriting the display text. |
 | `INTER_AGENT_MESSAGE`      | `teamHandler.handleInterAgentMessage`       | Preserves existing conversation rendering only. |
 | `TEAM_COMMUNICATION_MESSAGE`| `teamHandler.handleTeamCommunicationMessage` | Upserts normalized Team Communication messages and child reference files into the Team Communication store. |

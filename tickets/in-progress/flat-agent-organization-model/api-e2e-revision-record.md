@@ -11,6 +11,10 @@ The latest `api-e2e-coverage-investigation.md` and
 | API-REV-002 | Code Reviewer `CRR-011` Pass / cumulative real-system rerun | `RER-021`; `AD-REV-007`; `ARCH-REV-005`; `IR-011`; `CRR-011` | `Fail / 81.3%` | `Fail / 92.3%` |
 | API-REV-003 | Code Reviewer CRR-013/014 / cumulative real-system rerun | RER-021; AD-REV-007 / ARCH-REV-005 at execution gate; IR-012; CRR-013/014 | Fail / 92.3% | Fail / 92.9% |
 | API-REV-004 | Code Reviewer CRR-017 / cumulative real-system rerun | RER-021; AD-REV-011; ARCH-REV-009; IR-016; CRR-017 | Fail / 92.9% | Pass / 98.1% |
+| API-REV-005 | Code Reviewer CRR-019 / integrated cumulative renewal | RER-021; AD-REV-011; ARCH-REV-009; IR-017; CRR-019; DR-001 integration recovery | Pass / 98.1% | Fail / 93.1% |
+| API-REV-006 | Code Reviewer CRR-025 / cumulative IR-021 renewal | RER-023; AD-REV-012; ARCH-REV-010; IR-021; CRR-025 | Fail / 93.1% | Pass / 97.9% |
+| API-REV-007 | Code Reviewer CRR-030 / localized cumulative IR-025 renewal | RER-023; AD-REV-012; ARCH-REV-010; IR-025; CRR-030 | Pass / 97.9% | Fail / 86.9% |
+| API-REV-008 | Code Reviewer CRR-032 / browser-safe recovery and cumulative IR-026 renewal | RER-023; AD-REV-012; ARCH-REV-010; IR-026; CRR-032 | Fail / 86.9% | Pass / 98.4% |
 
 ## Revision Entries
 
@@ -424,3 +428,296 @@ history root.
   unchanged Electron shell, and destructive corrupt-live-copy injection. Strict
   durable negatives, target admission, production renderer and actual lifecycle
   boundaries are current; these do not block the Pass.
+
+
+### API-REV-005 — Integrated task-monitor renewal finds mounted-Team live projection failure
+
+- Triggering role, report path, and round: Code Reviewer `CRR-019` cumulative
+  integrated-source Pass; API/E2E round 6 at
+  `api-e2e-execution-coverage-report.md`.
+- Triggering scenario IDs: current artifact renewal `REPO-001`–`REPO-004` and
+  `LIVE-001`–`LIVE-013`; latest-base task-monitor path; new `API-FIND-015`.
+- Related revisions: `RER-021`; `AD-REV-011` with AD-REV-009/010 mechanism;
+  `ARCH-REV-009 Pass`; `IR-017`; `CRR-019`; prior delivery conflict record
+  `DR-001`; tested integrated artifact
+  `b2c96d6b0eed5ffb3a0eaa503eb7f1cf353e9c9e`.
+- Why recorded: API-REV-004 passed the pre-integration artifact. IR-017 merged
+  latest-base task-Agent durability and monitor behavior into the flat AgentOrg
+  package, so repository and real-system proof had to be renewed rather than
+  inherited. The real mounted-Team task panel failed even though the same
+  standalone Team path passed.
+- Coverage decisions / durable paths changed: no repository-resident test or
+  production path was changed by API/E2E in this round. Existing current tests
+  remain valid but are insufficient to prove mounted-Team live task-panel
+  convergence; a durable mounted scenario is a likely post-fix need, subject to
+  focused origin review.
+- Scenarios rechecked:
+  - current server task/event/lifecycle/API/persistence/migration/negative/
+    shutdown/MCP cohort: 31 files / 168 tests Pass;
+  - current renderer task monitor/focus/hydration/activity and Team/Org cohort:
+    41 files / 379 tests Pass;
+  - production server build/bootstrap, web guards, 16-route Nuxt build and
+    project-supported Chromium task probe 2/2 Pass;
+  - real UI package import, standalone Team first prompt, exact selected task
+    hydration/live updates, revision/resubmission/acceptance and settlement
+    fallback Pass;
+  - fresh mixed Org routing and durable mounted task lifecycle succeeded, but
+    live selected Team task-panel convergence failed.
+- Environment delta: isolated built backend on 8467, production renderer on
+  3467, AutoByteus `open_tab`, UI-imported four-Agent/two-Team/two-Org package,
+  real Codex App Server `gpt-5.6-sol` low, GraphQL/WebSocket/MCP/SQLite/files,
+  provider traces, screenshots and direct SIGTERM cleanup.
+
+#### Prior Failure Resolution
+
+No unresolved API-REV-004 failure existed. Its `Pass / 98.1%` remains valid only
+for the pre-integration artifact and is superseded as the current package result
+by API-REV-005. Historical `API-FIND-008` remains Not Reproduced / invalidly
+confounded with No Architecture Impact and was not reused as a failure basis.
+
+- New finding: `API-FIND-015` — while a mounted research Team remained selected
+  under an active AgentOrg, its task panel stayed `In progress` after the exact
+  task durably submitted V1, received a revision and durably resubmitted V2.
+  Focus-away/back hydrated the correct Awaiting review state. After durable
+  acceptance and task-row settlement, the panel again remained Awaiting review
+  until refocus. The standalone Team control advanced continuously in the same
+  runtime.
+- Preliminary classification: `Local Fix`, likely implementation-owned mounted
+  event/projection application. Task lifecycle, provider/MCP, messages,
+  persistence, notifications, task status and settlement succeeded; no design,
+  LLM, policy, persistence or shutdown defect is inferred before focused review.
+- Cumulative stop: `LIVE-005`–`LIVE-012` are Not Tested on the current artifact;
+  `LIVE-013` completed only cleanup/immutability. No pass is inferred from
+  API-REV-004 for those renewals.
+- Cleanup: direct backend SIGTERM exited in 200 ms with `Server closed cleanly`
+  and no AggregateError; web/backend stopped, owned ports closed, browser tabs
+  were `[]`, fixture hashes passed 18/18, generated setup outputs were removed,
+  and `git diff --check` passed.
+- Canonical artifacts updated:
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-revision-record.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-005/live/test-case-ledger.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-005/`
+- Prior result/confidence: `Pass / 98.1%`.
+- Current result/confidence: `Fail / 93.1%`.
+- New or remaining failure IDs: `API-FIND-015`.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for focused
+  failure-origin review.
+- Remaining untested current-artifact scope: active two-family snapshot, exact
+  390x844 focus, planned active-root shutdown state, same-data restart/first
+  history, Team continuation, Org restore/provider identity/continuation,
+  explicit Stop Org, and live recovery/strict negatives. External definition
+  publication and unchanged Electron-shell-only behavior remain bounded scope.
+
+
+### API-REV-006 — Cumulative real package, Team, AgentOrg and lifecycle validation passes
+
+- Triggering role, report path, and round: Code Reviewer `CRR-025` cumulative
+  source Pass; API/E2E round 7 at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`.
+- Triggering scenarios: REPO-001–005 and LIVE-001–014; mandatory recheck of
+  `API-FIND-015`; IR-021 exact-Agent runtime failure/Retry/default abandonment;
+  all previously stopped current-artifact lifecycle scopes.
+- Related revisions: `RER-023`; `AD-REV-012`; `ARCH-REV-010 Pass`; cumulative
+  `IR-001–021`; `CRR-025 Pass`; tested source
+  `ee6b793599d57cffed1ee0c900abbc07b552ac6b`; tested artifact
+  `c969b480a2aaabf7ae68cd2b576110f2de513ad6`.
+- Why recorded: API-REV-005 failed the integrated artifact at mounted-Team live
+  task projection and stopped later current-artifact journeys. CR-FIND-022 and
+  prior implementation findings were resolved and source-reviewed, requiring a
+  full cumulative repository and real-system renewal rather than a delta probe.
+- Coverage decisions / durable paths changed: none. Existing current coverage
+  remained valid; API/E2E changed no repository test or production source.
+- Repository execution: exact runtime/config/hierarchy 17 files / 119 tests;
+  cumulative server 31 files / 168 tests; cumulative web 52 files / 467 tests;
+  server/web production builds, Brief Studio pack/validate, two guards, Nuxt
+  prerender of 16 routes, and the project Chromium task-monitor probe all Pass.
+- Real execution: exact package import; desktop/narrow override UI; runtime
+  failure/Retry/default/no-stale launch; root/Team/Agent admission; standalone
+  Team and mounted-Team message/task revision/acceptance; two-family API;
+  390x844 focus/status; clean active SIGTERM/restart; stopped Team continuation;
+  whole-Org Restore with provider identity policy and byte-identical task
+  sidecar; terminal Stop Org; strict identity negatives; recovery/migration;
+  final immutability and cleanup all Pass.
+- Environment: isolated built backend on 8487, production renderer on 3487,
+  AutoByteus persistent Chromium `open_tab`, UI-imported 18-file four-Agent/
+  two-Team/two-Org package, real Codex App Server `gpt-5.6-sol`, GraphQL,
+  WebSocket, MCP, SQLite, filesystem and direct process lifecycle.
+
+#### Prior Failure Resolution
+
+| Prior finding | Previous classification | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-015` | implementation-owned mounted-Team selected-panel convergence failure | Resolved/not reproduced. With `/research-team` continuously selected, the same task panel advanced 0 -> V1 -> revision/V2 -> accepted Result 2 without focus-away/back; the durable sidecar and settlement fallback were exact. | `API-REV-006/live/mounted-team-observations.json`; `LIVE-007-mounted-team-v1-no-refocus.png`; `LIVE-007-mounted-team-v2-no-refocus.png`; `LIVE-007-mounted-team-accepted-no-refocus.png` |
+| API-REV-005 stopped LIVE-005–012 scope | Not Tested on prior artifact | Fully executed in LIVE-005–013: admission, two families, responsive focus, shutdown/restart, Team continuation, Org Restore/identity/task/message, terminal Stop, recovery, strict negatives and migration all Pass. | `API-REV-006/live/test-case-ledger.md`; case-specific observation JSON/API/process evidence |
+
+- Canonical artifacts updated:
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-revision-record.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-006/live/test-case-ledger.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-006/`
+- Prior result/confidence: `Fail / 93.1%`.
+- Current result/confidence: `Pass / 97.9%`.
+- New or remaining failure IDs: `None`.
+- Recommended recipient: `/software_engineering_team/code_reviewer` under the
+  reviewed Large/High route; proportional test-code review is not applicable
+  because this round changed no durable test code.
+- Remaining bounded scope: separately owned external definition publication
+  and unchanged Electron IPC/preload/window behavior. Both are outside the
+  changed ticket boundary and do not block the Pass.
+
+### API-REV-007 — Localized current artifact passes presentation/runtime but fails real-browser valid-ERROR recovery
+
+- Triggering role/result: Code Reviewer `CRR-030` cumulative source Pass,
+  93.4/100; renewed API/E2E required for IR-025.
+- Authority: `RER-023`; `AD-REV-012`; `ARCH-REV-010 Pass`; cumulative
+  `IR-001–025`; source `5300fd7ac3c6061dfd6e88feb69edd9931ef326e`;
+  artifact `5bfc54c11ef82e4fec217c84dc66887965cf98ac`.
+- Classification: `Large / High / reviewed`.
+- Prior result: `API-REV-006 / Pass / 97.9%` on pre-localization IR-021.
+- Why recorded: current normal locale presentation could not be inferred from
+  the prior artifact. User-required real Team/Org/Codex/task/restart validation
+  also renewed the cumulative critical path and exposed a production browser
+  defect missed by durable fake-WebSocket coverage.
+- Durable coverage/source changes by API/E2E: none.
+
+#### Executed coverage
+
+- REPO-001–004:
+  - exact artifact/source/fixture/resource preflight Pass;
+  - localization and audit cohort 17 files / 60 tests Pass;
+  - both guards and zero-finding localization audit Pass;
+  - production Nuxt build/prerender 16 routes Pass;
+  - reviewed AppImage size/SHA exact;
+  - retained server 15 files / 61 tests and web 20 files / 202 tests Pass.
+- LIVE-001–003:
+  - exact 18-entry package imported through Settings;
+  - normal Simplified Chinese/English switching;
+  - real Agent Team Create/Edit with both native selector groups exactly
+    `团队智能体` / `Team Agents`;
+  - real AgentOrg shared handoff source/destination groups including exact Team
+    root destination;
+  - exact user-authored names, canonical addresses and mixed-language When prose
+    preserved by GraphQL;
+  - desktop and 390x844 geometry/accessibility Pass.
+- LIVE-004:
+  - real Codex App Server / `gpt-5.6-sol` standalone Team first prompt;
+  - whole Org direct-Agent and mounted-Team prompts;
+  - mounted Team delegate -> task Agent `submit_task_result` -> coordinator
+    `review_task_result` acceptance; exact durable task sidecar and settlement.
+- LIVE-005 passing substeps:
+  - active SIGTERM exited cleanly;
+  - first same-data post-restart API history returned Team and Org inactive;
+  - same-ID Org rematerialized with exact real-conversation identity/content;
+  - system-only provider was correctly renewed;
+  - accepted task sidecar remained byte-identical;
+  - continued conversation returned exact marker;
+  - normal Stop Org terminal configuration appeared.
+- LIVE-006: fixture/source immutability and all owned process/tab/port cleanup Pass.
+
+#### New finding
+
+`API-FIND-016` — valid AgentOrg server ERROR cannot enter approved browser
+recovery:
+
+- A production Chromium reload of an inactive exact Org active URL received the
+  correlated server frame `ERROR / AGENT_ORG_NOT_ACTIVE`.
+- `AgentOrgStreamingService.failClosed` called
+  `generation.socket.close(1002, 'Invalid AgentOrg stream')`.
+- Chromium threw `InvalidAccessError` because a browser caller may locally close
+  only with 1000 or 3000–4999; reserved protocol code 1002 is rejected.
+- The call precedes `scheduleTransparentRecovery(detail)`, so no bounded retry
+  or exhaustion notice ran and the page remained `Connecting to Agent Org…`.
+- Reproduced twice; correlated frame/exception/close and screenshot retained.
+- Preliminary classification: implementation-owned frontend Local Fix. No
+  Requirement Gap, Design Impact, server/provider/fixture/persistence/migration
+  origin, or speculative recovery redesign is inferred.
+- Remaining live strict-address negative renewal: Not Tested after the critical
+  failure; retained current repository coverage passed.
+
+#### Artifacts / result
+
+- Canonical artifacts:
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-test-case-ledger.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-revision-record.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-007/`
+- Finding evidence:
+  - `API-REV-007/live/API-FIND-016-valid-error-recovery-failure.md`
+  - `API-REV-007/live/LIVE-005-stopped-root-correlated-reload-cdp.jsonl`
+  - `API-REV-007/live/screenshots/LIVE-005-correlated-error-stuck-connecting.png`
+- Prior result/confidence: `Pass / 97.9%`.
+- Current result/confidence: **Fail / 86.9%**.
+- New/remaining finding: `API-FIND-016`.
+- Broader validation: Required and executed.
+- Cleanup: complete; ports 8587/3587 closed, tabs `[]`, fixture 18/18, HEAD
+  unchanged, `git diff --check` Pass.
+- Recommended recipient: dynamic failure rule, expected
+  `/software_engineering_team/code_reviewer` for focused failure-origin review.
+- Delivery readiness: not claimed.
+
+
+### API-REV-008 — Browser-safe recovery and cumulative real-system Pass
+
+- Triggering role, report path, and round: Code Reviewer `CRR-032 / Pass`;
+  API/E2E round 9 at `api-e2e-execution-coverage-report.md`.
+- Triggering finding/scenario IDs: prior `API-FIND-016`; `REPO-001–003` and
+  `LIVE-001–006`.
+- Related revisions: `RER-023`; `AD-REV-012`; `ARCH-REV-010 / Pass`; cumulative
+  `IR-001–026`; `CRR-032`; source
+  `3199ba081ad450be72fba239fe86e76c0c697a33`; artifact
+  `06a918c71fc192e0b4ed9c3ef6b4df7163aef530`.
+- Why recorded: API-REV-007 directly found that production Chromium rejected
+  client close code `1002` before automatic recovery could schedule. IR-026 and
+  CRR-032 corrected and reviewed the exact ordering/code boundary. The Large/High
+  cumulative package then required renewed real execution rather than inheriting
+  the preceding artifact's material passes.
+- Durable test/source paths changed by API/E2E: none. The implementation's
+  reviewed service/spec pair was rerun; an evidence-only CDP observer was retained
+  at `api-e2e-evidence/API-REV-008/live/LIVE-004-recovery-cdp-probe.mjs`.
+- Coverage delta:
+  - exact current recovery 5 files / 25 tests, native Chromium close-code probe,
+    both web guards and zero-finding localization audit;
+  - retained server 15 files / 61 tests and web 37 files / 263 tests;
+  - production renderer build/prerender 16 routes and exact AppImage provenance;
+  - actual `open_tab` package import, new Team and mixed Org creation, zh-CN/en
+    handoff authoring and exact Unicode GraphQL persistence;
+  - real Codex `gpt-5.6-sol` standalone Team and Org conversations, mounted-Team
+    delegate/submit/review/accept task, live Team status and monitor fallback;
+  - application SIGTERM, same-data restart, mixed history, Restore, provider
+    identity semantics, task durability, three continuations and terminal Stop;
+  - production-Chromium valid ERROR correlation and bounded exhaustion;
+  - exact wrong-address/wrong-AgentRun negatives followed by valid context use,
+    migration reconciliation and complete cleanup.
+- Setup delta: a missing generated SDK prerequisite was built and the unchanged
+  server cohort rerun. Short-lived processes reaped before product mutation were
+  replaced by foreground owned PTYs. Both setup corrections and original logs
+  are retained rather than hidden.
+
+#### Prior Failure Resolution
+
+| Prior failure | Previous classification | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-016` / LIVE-005 | implementation/frontend Local Fix; valid ERROR called reserved `close(1002)` before recovery scheduling, causing `InvalidAccessError` and permanent Connecting | **Resolved.** Real production Chromium saw six valid ERROR generations; every client close was legal code `4000`; no browser/runtime error or permanent Connecting occurred; exactly one notice remained after bounded exhaustion and there was no Reconnect control. Current direct success coverage proves complete verified replacement publication and notice clear. | `API-REV-008/live/LIVE-004-stopped-root-recovery-cdp.jsonl`; `LIVE-004-stopped-root-recovery-summary.json`; screenshot; `repository/web-recovery-focused.log`; `repository/browser-close-contract.log` |
+| API-REV-007 strict current-address negative left Not Tested | execution stopped after the critical recovery failure | **Resolved / Pass.** Wrong address and wrong AgentRun each failed closed; immediately following exact projection and checkpoint succeeded. | `API-REV-008/live/LIVE-005-negative-and-migration-observations.json`; request/responses |
+
+- Canonical artifacts updated:
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-test-case-ledger.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-revision-record.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-008/`
+- Prior result/confidence: `Fail / 86.9%`.
+- Current result/confidence: **Pass / 98.4%**.
+- Broader validation: `Required and completed`.
+- New or remaining finding IDs: `None`; `API-FIND-016` resolved.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for
+  proportional test-code review. No durable test changed, so the changed-test
+  review is expected to be recorded `Not Applicable`.
+- Remaining bounded risk: the unchanged actual Electron shell was not launched;
+  its exact AppImage provenance was verified. The live ERROR run selected bounded
+  exhaustion, while direct current durable coverage proved the alternate complete
+  snapshot publication branch. Neither is a material acceptance gap.
