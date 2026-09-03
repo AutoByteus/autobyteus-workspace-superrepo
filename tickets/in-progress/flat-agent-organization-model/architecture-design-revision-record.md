@@ -20,6 +20,7 @@ does not revise intended behavior.
 | AD-REV-010 | Architecture Reviewer `ARCH-REV-007` / `AR-FIND-004` supported shutdown-race review of AD-REV-009 | `AR-FIND-004`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — AgentRun Root-Shutdown Admission And Provider-Start Fence` | `Architecture Design Complete`; supported pre-`TURN_STARTED` race receives one AgentRun-owned fence over stable recursive Team/Org scopes; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-011 | Architecture Reviewer `ARCH-REV-008` / `AR-FIND-005` cumulative coherence review of AD-REV-010 | `AR-FIND-005`; prior `AR-FIND-004` verified resolved | `Architecture Revision — One-FIFO Recursive Task-Team Validation Coherence` | `Architecture Design Complete`; stale withdrawn cleanup-job/concurrent-outside-FIFO language removed from VAL-006; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-012 | Code Review `CRR-021` / `CR-FIND-020` plus Requirements Engineer approved `RER-023` and focused Product `AORG-TEAM-OVERRIDES-001` | `CR-FIND-020`; separate `CR-FIND-019` retained as Implementation Local Fix | `Architecture Revision — Established AgentTeam Launch-Hierarchy Reuse For AgentOrg` | `Architecture Design Complete`; bespoke Org mounted-Team editor replaced at design boundary by strict Org projection into accepted Team presentation; self-validation expanded to 30 cases; focused delta `Medium/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-013 | User Electron production-path findings plus Requirements Engineer approved `RER-024` | `BEH-013`-`BEH-015`; `REQ-030`-`REQ-032`; `AC-025`-`AC-027`; `SCN-014`-`SCN-016` | `Architecture Revision — Effective Launch Equality, Unified Workspace History, And Root Workspace Default` | `Architecture Design Complete`; one canonical Org patch, one route-stable Workspace/history owner and established root default/inheritance; self-validation expanded to 33 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -977,4 +978,118 @@ does not revise intended behavior.
   risks are cross-store/payload leakage, silent projection omission, lost sparse
   draft state on collapse/reset, workspace-field omission, and standalone Team
   regression. The design names explicit controls/tests; this architecture-only
+  revision claims no implementation or executable validation completion.
+
+### AD-REV-013 — Effective Launch Equality, Unified Workspace History, And Root Workspace Default
+
+- Triggering role, report path, and round: the user exercised the delivered
+  Electron build after `ARCH-REV-010` passed AD-REV-012 and supplied five
+  screenshots showing runtime/model launch failure, route-induced left-panel
+  replacement, and an empty fresh root/inherited Team Workspace. Requirements
+  Engineering recorded the behavior-level clarification as approved
+  `RER-024@d881d815a995af166074728c0e6a6431829ad52f`. Canonical inputs are
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`
+  and
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`.
+- Triggering finding IDs: `BEH-013`-`BEH-015`, `UC-015`-`UC-017`,
+  `REQ-030`-`REQ-032`, `AC-025`-`AC-027`, `SCN-014`-`SCN-016`, `QR-010`, and
+  `DEC-017`-`DEC-019`. This is Architecture-owned Design Impact, not a new
+  Product gate. The already implemented `CR-FIND-019` behavior remains a
+  separate regression obligation rather than part of this architecture delta.
+- Prior authoritative design result: cumulative `AD-REV-012` at
+  `f8c1f463885d339d62bddb46ae9767391bf99617`, independently passed by
+  `ARCH-REV-010@3ddff04d7009b0db2414d43c896fc41e27822d45`.
+- Downstream baseline inspected: current source
+  `IR-026@3199ba081ad450be72fba239fe86e76c0c697a33` passed `CRR-032` and
+  `API-REV-008`; `CRR-033` found no durable test-code change. `DR-003` had
+  entered explicit Electron user verification when this new Design Impact was
+  observed.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as AD-REV-013 and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Current-state/root-cause evidence: frontend `resolveOverrideLlmConfig` clears
+  model config when runtime/model is explicitly changed, while
+  `MemberOverrideItem` plus `AgentOrgRunConfigPanel.serializeOverride` can omit
+  that clear; server `CollaborationLaunchConfigurationResolver` correctly treats
+  omission as inherit and explicit null as clear. `AppLeftPanel` selects
+  `AgentOrgRunHistoryPanel` by route and otherwise selects the established
+  `WorkspaceAgentRunsTreePanel`, creating two history/navigation owners. The
+  Team root passes `auto-select-default=true` to the shared Workspace selector
+  while AgentOrg root explicitly passes false; mounted Team correctly has no
+  independent default and therefore inherits the empty root.
+- Why this revision is recorded: the earlier design specified presentation reuse
+  but did not self-validate semantic equality across client patch/request/server
+  resolution/snapshot, stable shell ownership across routes, or root workspace
+  default parity. Requirements cannot and should not prescribe object-spread,
+  component mounting, or default-selector internals; Architecture must make the
+  production ownership and data-flow invariants explicit.
+- Exact design correction: add one pure idempotent
+  `canonicalizeAgentOrgPlacementLaunchPatch` and retain only canonical Team/
+  Agent maps. Owned runtime/model plus absent config materializes
+  `llmConfig:null`; ordinary absent fields still inherit. Complete root
+  runtime/model/config edits go through Org-store root commands and always
+  serialize owned config/null. Preview and existing GraphQL serialization
+  consume those same root/placement states and the unchanged server resolver
+  independently validates them. Always mount one `WorkspaceAgentRunsTreePanel`;
+  combine the existing Workspace Agent/Team query with only the strictly parsed
+  AgentOrg branch of the existing collaboration-root history query; group tagged
+  Org roots under `Agent Orgs` directly below `Teams`; move Org hierarchy/status/
+  root-action presentation into the unified workspace section; remove the Org
+  command store's parallel history cache and delete the route-selected Org-only
+  panel. Reuse the existing catalog-backed Team root workspace-default policy at
+  the fresh AgentOrg root; one explicit new-launch draft epoch (not definition-ID
+  inequality) owns untouched/defaulted/explicit selection provenance;
+  descendants inherit root or exact supported Team override and never default
+  independently.
+- Ownership and boundary result: `agentOrgRunConfigStore` owns canonical Org
+  draft intent; server resolver owns effective runtime authority; mixed
+  workspace-history projector owns read grouping; panel owns UI state; subject
+  stores retain exact lifecycle; workspace catalog owns available records; Org
+  store owns selection; focus remains independent/null. No new generic Team/Org
+  config, history runtime, or lifecycle owner is created.
+- Persisted-data decision: `Not Affected`. Existing Team V2/Org V1 run packages,
+  sidecars, history schemas, indexes, and migration remain directly usable.
+  The launch patch is pre-create state and the history projection is derived.
+  Removing `AgentOrgRunHistoryPanel` is a source clean cut, not data migration.
+- Approved behavior or requirement IDs affected: `BEH-002`, `BEH-005`,
+  `BEH-006`, `BEH-012`-`BEH-015`, `REQ-024`, `REQ-029`-`REQ-032`,
+  `AC-019`, `AC-024`-`AC-027`, and `SCN-013`-`SCN-016`. AgentOrg remains
+  coordinator-free, AgentTeam remains flat/coordinator-led, and launch remains
+  full-scope/unfocused.
+- Design-spec sections updated: document authority/current-state/evidence;
+  classification/design health; AD-REV-013 solution and failure tables;
+  behavior/Product/scenario maps; DS-024-026 primary/return/local spines;
+  ownership, dependency, interface, subsystem, file/folder/removal maps;
+  persisted-state decision; sequence, tradeoffs, risks and implementation/
+  validation guidance.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-013 and 33
+  supported cases. VAL-031 proves client/request/server/snapshot configuration
+  equality; VAL-032 proves one route-stable history owner and category/action
+  truth; VAL-033 proves actual available-default selection, inheritance,
+  explicit override, absent-default failure and no-focus. No new supplement is
+  created.
+- Classification: focused AD-REV-013 is `Medium / High`. Source scope is bounded
+  to frontend configuration/history/navigation and tests, with no API or
+  persistence change. High reflects one cross-layer effective-launch invariant
+  and consolidation of the shell-wide history ownership boundary. The cumulative
+  ticket remains `task_size=Large` and `architectural_risk=High`; independent
+  Architecture Review remains selected.
+- Downstream and architecture-review impact: review must verify one canonical
+  patch/no raw duality, unchanged server semantics, exact category order and
+  subject action ownership, route-stable panel/state, clean deletion of the
+  alternate panel, actual root-only default selection, exact inheritance, and no
+  API/persistence/focus/lifecycle expansion. After review passes, Implementation
+  reconciles AD-REV-013, preserves/revalidates the separate CR-FIND-019
+  behavior, and returns through the configured full-source/API route.
+- Next recipient or routing: dynamic handoff rules determine the exact recipient.
+  Selected next action is independent Architecture Review of cumulative
+  `RER-024`, still-relevant Product authorities, AD-REV-013, and the updated
+  self-validation. Implementation/API-E2E remain held until review passes.
+- Remaining gaps or risks: no Requirement Gap or Product UI gap remains. Focused
+  risks are omission/null drift, a parallel raw patch, history-state loss during
+  extraction, wrong category/root action dispatch, Org runtime-state duplication,
+  synthesized/default-overwriting workspace selection, and standalone Team
+  regression. The design names exact controls and tests; this architecture-only
   revision claims no implementation or executable validation completion.
