@@ -20,7 +20,8 @@ does not revise intended behavior.
 | AD-REV-010 | Architecture Reviewer `ARCH-REV-007` / `AR-FIND-004` supported shutdown-race review of AD-REV-009 | `AR-FIND-004`, retained `API-FIND-008` / `CR-CAND-020` | `Architecture Revision — AgentRun Root-Shutdown Admission And Provider-Start Fence` | `Architecture Design Complete`; supported pre-`TURN_STARTED` race receives one AgentRun-owned fence over stable recursive Team/Org scopes; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-011 | Architecture Reviewer `ARCH-REV-008` / `AR-FIND-005` cumulative coherence review of AD-REV-010 | `AR-FIND-005`; prior `AR-FIND-004` verified resolved | `Architecture Revision — One-FIFO Recursive Task-Team Validation Coherence` | `Architecture Design Complete`; stale withdrawn cleanup-job/concurrent-outside-FIFO language removed from VAL-006; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-012 | Code Review `CRR-021` / `CR-FIND-020` plus Requirements Engineer approved `RER-023` and focused Product `AORG-TEAM-OVERRIDES-001` | `CR-FIND-020`; separate `CR-FIND-019` retained as Implementation Local Fix | `Architecture Revision — Established AgentTeam Launch-Hierarchy Reuse For AgentOrg` | `Architecture Design Complete`; bespoke Org mounted-Team editor replaced at design boundary by strict Org projection into accepted Team presentation; self-validation expanded to 30 cases; focused delta `Medium/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
-| AD-REV-013 | User Electron production-path findings plus Requirements Engineer approved `RER-024` | `BEH-013`-`BEH-015`; `REQ-030`-`REQ-032`; `AC-025`-`AC-027`; `SCN-014`-`SCN-016` | `Architecture Revision — Effective Launch Equality, Unified Workspace History, And Root Workspace Default` | `Architecture Design Complete`; one canonical Org patch, one route-stable Workspace/history owner and established root default/inheritance; self-validation expanded to 33 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-013 | User Electron production-path findings plus Requirements Engineer approved `RER-024` | `BEH-013`-`BEH-015`; `REQ-030`-`REQ-032`; `AC-025`-`AC-027`; `SCN-014`-`SCN-016` | `Architecture Revision — Effective Launch Equality, Unified Workspace History, And Root Workspace Default` | `Architecture Design Complete`; one canonical Org patch, one route-stable Workspace/history surface with distinct read/presentation owners, and established root default/inheritance; self-validation expanded to 33 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-014 | Architecture Reviewer `ARCH-REV-011` / ownership-coherence recovery round | `AR-FIND-006` | `Architecture Revision — Unified History Data Versus Presentation-State Ownership` | `Architecture Design Complete`; DS-025 assigns history data/grouping/order to the mixed read owner and expansion/reveal/highlight/scroll continuity to one always-mounted panel/tree-state owner; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -1043,11 +1044,13 @@ does not revise intended behavior.
   descendants inherit root or exact supported Team override and never default
   independently.
 - Ownership and boundary result: `agentOrgRunConfigStore` owns canonical Org
-  draft intent; server resolver owns effective runtime authority; mixed
-  workspace-history projector owns read grouping; panel owns UI state; subject
-  stores retain exact lifecycle; workspace catalog owns available records; Org
-  store owns selection; focus remains independent/null. No new generic Team/Org
-  config, history runtime, or lifecycle owner is created.
+  draft intent; server resolver owns effective runtime authority; the mixed
+  workspace-history read owner owns loading/strict projection/grouping/order;
+  the always-mounted panel plus its one tree-state composable owns
+  expansion/reveal/highlight/scroll continuity; subject stores retain exact
+  lifecycle; workspace catalog owns available records; Org config store owns
+  workspace selection; communication focus remains independent/null. No new
+  generic Team/Org config, history runtime, or lifecycle owner is created.
 - Persisted-data decision: `Not Affected`. Existing Team V2/Org V1 run packages,
   sidecars, history schemas, indexes, and migration remain directly usable.
   The launch patch is pre-create state and the history projection is derived.
@@ -1066,8 +1069,9 @@ does not revise intended behavior.
 - Architecture supplements updated, added, or removed:
   `architecture-design-self-validation.md` advances to AD-REV-013 and 33
   supported cases. VAL-031 proves client/request/server/snapshot configuration
-  equality; VAL-032 proves one route-stable history owner and category/action
-  truth; VAL-033 proves actual available-default selection, inheritance,
+  equality; VAL-032 proves one route-stable history surface with separate read
+  and presentation-state owners plus category/action truth; VAL-033 proves
+  actual available-default selection, inheritance,
   explicit override, absent-default failure and no-focus. No new supplement is
   created.
 - Classification: focused AD-REV-013 is `Medium / High`. Source scope is bounded
@@ -1093,3 +1097,76 @@ does not revise intended behavior.
   synthesized/default-overwriting workspace selection, and standalone Team
   regression. The design names exact controls and tests; this architecture-only
   revision claims no implementation or executable validation completion.
+
+### AD-REV-014 — Unified History Data Versus Presentation-State Ownership
+
+- Triggering role, report path, and round: Architecture Reviewer
+  `ARCH-REV-011@be0e2ea08210238eb6f618007392c5b4ca9d9830` reviewed cumulative
+  AD-REV-013 and returned the sole `AR-FIND-006` Design Impact. The canonical
+  report is
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Triggering finding IDs: `AR-FIND-006`, protecting `BEH-014`, `REQ-031`,
+  `AC-026`, and `SCN-015`.
+- Prior authoritative design result: AD-REV-013 at
+  `7cfeecc277516cbe2355b4b1a97fb2bcf9fe0f08`; its independent review passed
+  DS-024 effective launch equality and DS-026 Workspace default/inheritance but
+  failed on contradictory DS-025 presentation-state ownership wording.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as AD-REV-014 and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Current-state/root-cause evidence: the actual panel already instantiates
+  `useWorkspaceHistoryTreeState`, which owns expansion and ancestor-reveal
+  state, while `runHistoryStore` supplies history rows/selection signals. The
+  canonical DS-025 paragraph and terminology incorrectly said the mixed read
+  model also owned expansion, selected-row presentation, and scroll; later
+  ownership/validation sections correctly assigned those concerns to the
+  mounted presentation boundary.
+- Why this revision is recorded: grouping/order and presentation continuity are
+  different state categories. Leaving both under a vague “unified history
+  owner” would let implementation put route-stable UI state in the refreshed
+  read store or create another controller, undermining the exact continuity
+  required by REQ-031.
+- Exact design correction: the mixed history read owner now owns only the two
+  existing query loads, strict subject decoding, family-scoped result/error
+  slices, stable row keys, Workspace grouping, and category/row order. The
+  always-mounted `WorkspaceAgentRunsTreePanel` creates exactly one
+  `useWorkspaceHistoryTreeState` instance, which owns expansion, ancestor
+  reveal, and selected-row highlight continuity; the persistent panel scroll
+  container owns scroll position. The existing selection store remains the
+  authority for selected subject identity and is injected as a signal. Neither
+  owner acquires subject runtime or lifecycle authority.
+- Design-spec sections updated: AD-REV-014 current-state/classification note;
+  canonical DS-025 narrative; terminology; spine and owner maps; boundary and
+  dependency rules; focused file/folder responsibility tables; risk control;
+  implementation guidance; and current evidence references.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-014 without
+  inventing a new use case. VAL-032 and its ownership/dependency audits now
+  explicitly validate the same data-owner versus presentation-state-owner
+  split across the existing 33 supported walkthroughs. No supplement is added
+  or removed.
+- Persisted-data and interface impact: `Not Affected`. No source mechanism,
+  query, API, schema, migration, stream, runtime, lifecycle, focus, action set,
+  or Product behavior changes. DS-024, DS-026, the exact two-query merge,
+  category order, partial-family failure behavior, typed actions, Org cache/panel
+  removal, and root-only default selection remain unchanged.
+- Classification: focused AD-REV-014 is `Small / Low` because it is an
+  Architecture-document-only ownership correction. The cumulative ticket
+  remains `task_size=Large` and `architectural_risk=High`, so another independent
+  Architecture Review remains selected.
+- Downstream and architecture-review impact: review must verify that every
+  current DS-025 statement assigns loading/projection/grouping/order only to the
+  read owner and expansion/reveal/highlight/scroll only to the one mounted
+  panel/tree-state owner. Implementation and API/E2E remain held until that
+  review passes.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of
+  cumulative RER-024 / AD-REV-014 and the updated self-validation.
+- Remaining gaps or risks: no Requirement Gap or Product UI gap remains. The
+  focused ambiguity is resolved. Residual implementation risk is accidentally
+  storing presentation state in the refreshing read model, instantiating a
+  route-specific second tree controller, or changing selected subject identity
+  while trying to preserve its row highlight. The design prohibits all three;
+  this architecture-only revision claims no implementation or executable
+  validation completion.
