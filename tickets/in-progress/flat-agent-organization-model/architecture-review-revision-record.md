@@ -17,6 +17,7 @@ concise chronological architecture-review history.
 | ARCH-REV-008 | Round 8 / `AD-REV-010` AgentRun root-shutdown fence recovery and cumulative coherence re-review | `AD-REV-010` | Fail — Design Impact | Fail — Design Impact | `AR-FIND-004`, `AR-FIND-005` |
 | ARCH-REV-009 | Round 9 / `AD-REV-011` one-FIFO validation-coherence correction | `AD-REV-011` | Fail — Design Impact | Pass | `AR-FIND-005` |
 | ARCH-REV-010 | Round 10 / `AD-REV-012` response to `CRR-021 / CR-FIND-020` and approved `RER-023` | `AD-REV-012` | Pass | Pass | `CR-FIND-020` |
+| ARCH-REV-011 | Round 11 / `AD-REV-013` response to approved `RER-024` and DR-003 Electron findings | `AD-REV-013` | Pass | Fail — Design Impact | `AR-FIND-006` |
 
 ## Revision Entries
 
@@ -270,3 +271,27 @@ None.
 - Material classification changes: The authoritative architecture-review decision remains `Pass`. AD-REV-012 is `Medium / Low` in isolation; the cumulative package remains `Large / High` and follows the reviewed Implementation reconciliation, source-review, and API/E2E route. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must preserve the exact AgentOrg count/disclosure/a11y states and standalone Team presentation, map Team workspace edits into the Org-owned exact Team patch without Team-store/payload imports, fail closed on unavailable or mismatched projection, preserve collapse/reset/direct-Agent behavior, and reconcile the distinct `CR-FIND-019` Local Fix. These are controlled implementation/validation risks, not open architecture decisions.
+
+### ARCH-REV-011 — Effective launch and Workspace recovery with history-state ownership correction
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 11; user Electron verification during DR-003 exposed effective AgentOrg launch drift, route-selected history replacement, and an empty fresh root Workspace. Requirements Engineering approved `RER-024`, and `AD-REV-013` defined the architecture recovery.
+- Triggering role, report path, and finding IDs: Architecture Designer, based on approved RER-024 and downstream DR-003 evidence; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; new `AR-FIND-006`.
+- Relevant architecture design revision IDs: `AD-REV-013`, cumulative with unchanged accepted `AD-REV-001`-`AD-REV-012`
+- Prior authoritative decision: `Pass` (`ARCH-REV-010`)
+- Current authoritative decision: `Fail — Design Impact`
+- What changed in the review result or what baseline was established: Independently confirmed the three supported current defects and that the existing GraphQL/service/resolver and Workspace catalog capabilities are sufficient. DS-024's canonical Org placement patch and DS-026's root-only catalog default are coherent and proportionate. DS-025 correctly selects one always-mounted panel, strict two-query composition, explicit category order, typed subject actions, subject-scoped partial-read behavior, and clean removal of the route-selected Org panel/cache. One Architecture-owned contradiction remains: DS-025 and the terminology assign expansion, selection, and scroll continuity to the unified history read model, while the focused revision's ownership map and VAL-032 assign that presentation state to the always-mounted panel. This ambiguity is material to the exact state-authority consolidation required by REQ-031.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001`-`AR-FIND-005` | Resolved in prior architecture-review rounds | Remain resolved | `AD-REV-003`-`AD-REV-013`; `ARCH-REV-002`-`ARCH-REV-009` | AD-REV-013 changes no accepted definition transition, handoff order, migration, runtime composition, settlement, or shutdown mechanism. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020` | Resolved in prior rounds | Remain resolved at the design boundary | `AD-REV-004`-`AD-REV-013` | The focused delta introduces no durable family, root/runtime owner, transport, status API, task, or lifecycle change. |
+| `CR-FIND-020` | Resolved by AD-REV-012 / ARCH-REV-010 | Remains resolved | `RER-023`, `AD-REV-012`-`AD-REV-013`; DS-023 | The accepted Team launch-hierarchy reuse and exact Org-owned Team/Agent sparse maps remain intact. |
+| `CR-FIND-019` | Previously implementation-owned Local Fix | Implemented; retained as regression obligation | `IR-026`, `CRR-032`, `AD-REV-013` | AD-REV-013 neither absorbs nor reverses the source correction. |
+
+- New or remaining finding IDs: `AR-FIND-006`
+- Material classification changes: The authoritative review changes from `Pass` to `Fail / Design Impact`. AD-REV-013 remains `Medium / High` in isolation and the cumulative package remains `Large / High`. The required recovery is expected to be `Small / Low` if it only corrects Architecture-owned ownership wording and maps. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: `/software_engineering_team/architecture_designer`
+- Remaining risks or uncertainty: Reconcile DS-025, terminology, ownership/file mapping, revision rationale, and VAL-032 to one presentation-state owner without adding new state or behavior. After re-review, Implementation must still prove cross-layer configuration equality, route-stable history state/category/actions, actual Workspace default selection/inheritance, standalone Team regression safety, and absence of new API/persistence/runtime/lifecycle machinery.
