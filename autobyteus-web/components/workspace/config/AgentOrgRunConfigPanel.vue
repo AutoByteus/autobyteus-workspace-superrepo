@@ -16,9 +16,9 @@
           :model-help-text="t('workspace.agentOrg.runConfig.modelHelp')"
           id-prefix="org-run"
           control-variant="quiet"
-          @update:runtime-kind="runtimeKind = $event"
-          @update:llm-model-identifier="llmModelIdentifier = $event"
-          @update:llm-config="llmConfig = $event"
+          @update:runtime-kind="configStore.setRootRuntimeKind"
+          @update:llm-model-identifier="configStore.setRootLlmModelIdentifier"
+          @update:llm-config="configStore.setRootLlmConfig"
           @schema-state="configStore.setModelSchemaState('/', $event)"
         />
 
@@ -42,7 +42,7 @@
             :aria-checked="autoExecuteTools"
             class="relative inline-flex h-6 w-11 flex-none rounded-full border-2 border-transparent transition-colors focus:ring-2 focus:ring-blue-500"
             :class="autoExecuteTools ? 'bg-blue-600' : 'bg-gray-200'"
-            @click="autoExecuteTools = !autoExecuteTools"
+            @click="configStore.setRootAutoExecuteTools(!autoExecuteTools)"
           >
             <span class="sr-only">{{ t('workspace.agentOrg.runConfig.autoApprove') }}</span>
             <span class="inline-block h-5 w-5 rounded-full bg-white shadow transition" :class="autoExecuteTools ? 'translate-x-5' : 'translate-x-0'" />
@@ -134,13 +134,15 @@ import { useAgentOrgRunConfigStore } from '~/stores/agentOrgRunConfigStore'
 import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
 import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
 import { useWorkspaceStore } from '~/stores/workspace'
+import { useRunHistoryStore } from '~/stores/runHistoryStore'
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
-import type { AgentConfigOverride, ResolvedTeamRunLaunchConfig, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
+import type { ResolvedTeamRunLaunchConfig, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
 import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import type { WorkspaceMetadata } from '~/types/workspace/WorkspaceMetadata'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
 import { projectEditableAgentOrgRunFormModel } from '~/utils/editableAgentOrgRunFormModel'
 import { hasMeaningfulLaunchOverride } from '~/utils/teamRunConfigUtils'
+import { toAgentOrgPlacementLaunchConfiguration } from '~/utils/agentOrgLaunchPatch'
 
 const route = useRoute()
 const router = useRouter()
@@ -148,6 +150,7 @@ const orgStore = useAgentOrgDefinitionStore()
 const agentStore = useAgentDefinitionStore()
 const teamStore = useAgentTeamDefinitionStore()
 const orgRunStore = useAgentOrgRunStore()
+const runHistoryStore = useRunHistoryStore()
 const configStore = useAgentOrgRunConfigStore()
 const workspaceStore = useWorkspaceStore()
 const { setActiveTab } = useRightSideTabs()
@@ -163,9 +166,11 @@ const org = computed(() => orgStore.byId(definitionId.value))
 const workspaceLoading = ref(false)
 const workspaceError = ref<string | null>(null)
 const editingDirectAgent = ref<AgentTeamAddress | null>(null)
+const initializedDefinitionId = ref<string | null>(null)
 
 watch(org, (value) => {
-  if (!value) return
+  if (!value || initializedDefinitionId.value === value.id) return
+  initializedDefinitionId.value = value.id
   editingDirectAgent.value = null
   configStore.begin({
     definitionId: value.id,
@@ -252,7 +257,7 @@ const canRun = computed(() => Boolean(
 ))
 
 const handleWorkspaceSelection = (selection: WorkspaceSelectionState) => {
-  configStore.setWorkspaceSelection(selection)
+  configStore.setWorkspaceSelection(selection, 'explicit')
   workspaceError.value = null
   if (selection.mode === 'existing' && selection.existingWorkspaceId) setActiveTab('files')
 }
@@ -335,12 +340,6 @@ const prepareTeamWorkspacePaths = async (): Promise<Record<AgentTeamAddress, str
   }
   return paths
 }
-const serializeOverride = (override: AgentConfigOverride | TeamScopeConfigOverride) => ({
-  ...(override.runtimeKind ? { runtimeKind: override.runtimeKind } : {}),
-  ...(override.llmModelIdentifier ? { llmModelIdentifier: override.llmModelIdentifier } : {}),
-  ...(Object.prototype.hasOwnProperty.call(override, 'llmConfig') ? { llmConfig: override.llmConfig ?? null } : {}),
-  ...(override.autoExecuteTools === undefined ? {} : { autoExecuteTools: override.autoExecuteTools }),
-})
 const runOrg = async () => {
   if (!org.value || !formModel.value || !canRun.value) return
   configStore.setLaunchError(null)
@@ -349,14 +348,11 @@ const runOrg = async () => {
     const teamWorkspacePaths = await prepareTeamWorkspacePaths()
     const serializedTeams = Object.entries(teamOverrides.value).map(([address, override]) => ({
       address,
-      configuration: {
-        ...serializeOverride(override),
-        ...(teamWorkspacePaths[address] ? { workspaceRootPath: teamWorkspacePaths[address] } : {}),
-      },
+      configuration: toAgentOrgPlacementLaunchConfiguration(override, teamWorkspacePaths[address]),
     })).filter((item) => Object.keys(item.configuration).length)
     const serializedAgents = Object.entries(agentOverrides.value).map(([address, override]) => ({
       address,
-      configuration: serializeOverride(override),
+      configuration: toAgentOrgPlacementLaunchConfiguration(override),
     })).filter((item) => Object.keys(item.configuration).length)
     const orgRunId = await orgRunStore.launch({
       agentOrgDefinitionId: org.value.id,
@@ -371,6 +367,7 @@ const runOrg = async () => {
       teamOverrides: serializedTeams,
       agentOverrides: serializedAgents,
     })
+    void runHistoryStore.refreshTreeQuietly()
     await router.replace({
       path: '/workspace',
       query: { rootSubjectKind: 'agent_org', definitionId: org.value.id, orgRunId, mode: 'active' },
@@ -380,10 +377,19 @@ const runOrg = async () => {
   }
 }
 
-onMounted(() => Promise.all([
-  orgStore.fetchAll(),
-  agentStore.fetchAllAgentDefinitions(),
-  teamStore.fetchAllAgentTeamDefinitions(),
-  workspaceStore.fetchAllWorkspaces(),
-]))
+const applyAvailableRootDefault = (): void => {
+  configStore.selectDefaultRootWorkspace(workspaceStore.tempWorkspaceId)
+}
+
+watch(() => workspaceStore.tempWorkspaceId, applyAvailableRootDefault)
+
+onMounted(async () => {
+  await Promise.all([
+    orgStore.fetchAll(),
+    agentStore.fetchAllAgentDefinitions(),
+    teamStore.fetchAllAgentTeamDefinitions(),
+    workspaceStore.fetchAllWorkspaces(),
+  ])
+  applyAvailableRootDefault()
+})
 </script>

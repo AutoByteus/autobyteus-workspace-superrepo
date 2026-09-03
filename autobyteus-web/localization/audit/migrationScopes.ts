@@ -109,7 +109,7 @@ export const localizationMigrationScopes: LocalizationMigrationScope[] = [
       'components/collaboration/handoffs/HandoffManager.vue',
       'components/agentTeams/AgentTeamDefinitionForm.vue',
       'components/workspace/config/AgentOrgRunConfigPanel.vue',
-      'components/workspace/history/AgentOrgRunHistoryPanel.vue',
+      'components/workspace/history/WorkspaceAgentOrgHistoryCollection.vue',
       'components/workspace/org/AgentOrgWorkspaceView.vue',
       'components/agentTeams/AgentTeamDetail.vue',
     ],

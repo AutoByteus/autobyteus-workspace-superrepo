@@ -127,6 +127,57 @@ const buildTeamResumeMetadata = (input: {
   handoffs: [],
 });
 
+const buildAgentOrgHistoryRow = (input: {
+  rootRunId: string;
+  workspaceRootPath?: string | null;
+  definitionId?: string;
+  definitionName?: string;
+  summary?: string;
+  treeRootRunId?: string;
+}): Record<string, unknown> => {
+  const launchConfiguration = {
+    runtimeKind: 'codex_app_server',
+    llmModelIdentifier: 'gpt-5.6-sol',
+    llmConfig: null,
+    autoExecuteTools: false,
+    skillAccessMode: 'PRELOADED_ONLY',
+    workspaceRootPath: input.workspaceRootPath ?? null,
+  };
+  return {
+    root_subject_kind: 'agent_org',
+    root_run_id: input.rootRunId,
+    created_at: '2026-09-03T00:00:00.000Z',
+    archived_at: null,
+    is_active: false,
+    summary: input.summary ?? 'Agent Org run',
+    org: {
+      schemaVersion: 1,
+      subjectKind: 'agent_org',
+      createdAt: '2026-09-03T00:00:00.000Z',
+      archivedAt: null,
+      applicationBinding: null,
+      handoffs: [],
+      rootOrg: {
+        address: '/',
+        orgDefinitionId: input.definitionId ?? 'org-definition',
+        orgDefinitionName: input.definitionName ?? 'Delivery Org',
+        orgRunId: input.treeRootRunId ?? input.rootRunId,
+        defaultLaunchConfiguration: launchConfiguration,
+        taskExecutions: [],
+        members: [{
+          address: '/writer',
+          agentDefinitionId: 'writer-definition',
+          role: null,
+          description: null,
+          agentRunId: `writer-${input.rootRunId}`,
+          platformAgentRunId: null,
+          launchConfiguration,
+        }],
+      },
+    },
+  };
+};
+
 const {
   queryMock,
   mutateMock,
@@ -308,6 +359,10 @@ vi.mock('~/graphql/queries/runHistoryQueries', () => ({
   GetTeamRunResumeConfig: 'GetTeamRunResumeConfig',
   GetTeamMemberRunProjection: 'GetTeamMemberRunProjection',
   GetTeamCommunicationMessages: 'GetTeamCommunicationMessages',
+}));
+
+vi.mock('~/graphql/queries/collaborationRootHistoryQueries', () => ({
+  ListCollaborationRootHistory: 'ListCollaborationRootHistory',
 }));
 
 vi.mock('~/stores/windowNodeContextStore', () => ({
@@ -573,6 +628,136 @@ describe('runHistoryStore', () => {
     expect(flattenWorkspaceGroupTeamRuns(store.workspaceGroups[0])).toHaveLength(1);
     expect(store.workspaceGroups[0]?.agentDefinitions[0]?.runs[0]?.runId).toBe('run-1');
     expect(store.agentAvatarByDefinitionId['agent-def-1']).toBe('https://a');
+  });
+
+  it('strictly merges only AgentOrg roots beneath Teams using stable normalized workspace keys', async () => {
+    workspaceStoreMock.allWorkspaces = [{
+      workspaceId: 'ws-a', absolutePath: '/ws/a', workspaceRootPath: '/ws/a', name: 'Workspace A',
+    }];
+    workspaceStoreMock.workspaces = { 'ws-a': workspaceStoreMock.allWorkspaces[0] };
+    queryMock.mockImplementation(async ({ query }: { query: string }) => {
+      if (query === 'ListWorkspaceRunHistory') {
+        return {
+          data: { listWorkspaceRunHistory: [buildWorkspaceHistoryGroup({
+            workspaceRootPath: '/ws/a', workspaceName: 'Workspace A', agents: [],
+            teamRuns: [{
+              teamRunId: 'team-1', teamDefinitionId: 'team-definition', teamDefinitionName: 'Team One',
+              workspaceRootPath: '/ws/a', summary: 'Standalone Team', lastActivityAt: '2026-09-01T00:00:00.000Z',
+              isActive: false, deleteLifecycle: 'READY', members: [],
+            }],
+          })] },
+          errors: [],
+        };
+      }
+      if (query === 'ListCollaborationRootHistory') {
+        return {
+          data: { listCollaborationRootHistory: [
+            { root_subject_kind: 'agent_team', root_run_id: 'team-1' },
+            buildAgentOrgHistoryRow({ rootRunId: 'org-a', workspaceRootPath: '/ws/a/' }),
+            buildAgentOrgHistoryRow({ rootRunId: 'org-missing', workspaceRootPath: '/catalog/missing' }),
+            buildAgentOrgHistoryRow({ rootRunId: 'org-no-workspace', workspaceRootPath: null }),
+          ] },
+          errors: [],
+        };
+      }
+      throw new Error(`Unexpected query: ${String(query)}`);
+    });
+
+    const store = useRunHistoryStore();
+    await store.fetchTree();
+
+    const nodes = store.getTreeNodes();
+    expect(nodes.map((node) => [node.workspaceRootPath, node.stableKey])).toEqual([
+      ['/ws/a', 'workspace:/ws/a'],
+      ['/catalog/missing', 'workspace:/catalog/missing'],
+      ['__workspace_history_no_workspace__', 'workspace:__workspace_history_no_workspace__'],
+    ]);
+    expect(nodes[0]?.agentOrgDefinitions[0]?.runs.map((run) => run.rootRunId)).toEqual(['org-a']);
+    expect(store.getTeamNodes('/ws/a').map((team) => team.teamRunId)).toEqual(['team-1']);
+    expect(store.getTeamNodes('/ws/a')).toHaveLength(1);
+    expect(store.historyFamilyErrors).toEqual({ workspace: null, agentOrg: null });
+  });
+
+  it('retains each successful history-family slice when the other query fails', async () => {
+    workspaceStoreMock.allWorkspaces = [{
+      workspaceId: 'ws-a', absolutePath: '/ws/a', workspaceRootPath: '/ws/a', name: 'Workspace A',
+    }];
+    workspaceStoreMock.workspaces = { 'ws-a': workspaceStoreMock.allWorkspaces[0] };
+    let round = 0;
+    queryMock.mockImplementation(async ({ query }: { query: string }) => {
+      if (query === 'ListWorkspaceRunHistory') {
+        if (round === 1) throw new Error('Workspace history unavailable');
+        return {
+          data: { listWorkspaceRunHistory: [buildWorkspaceHistoryGroup({
+            workspaceRootPath: '/ws/a', workspaceName: 'Workspace A', agents: [{
+              agentDefinitionId: 'agent-def-1', agentName: 'SuperAgent', runs: [{
+                runId: round === 0 ? 'agent-old' : 'agent-new', summary: 'Agent run',
+                lastActivityAt: '2026-09-03T00:00:00.000Z', isActive: false,
+              }],
+            }], teamRuns: [],
+          })] }, errors: [],
+        };
+      }
+      if (query === 'ListCollaborationRootHistory') {
+        if (round === 2) throw new Error('AgentOrg history unavailable');
+        return {
+          data: { listCollaborationRootHistory: [buildAgentOrgHistoryRow({
+            rootRunId: round === 0 ? 'org-old' : 'org-new', workspaceRootPath: '/ws/a',
+          })] }, errors: [],
+        };
+      }
+      throw new Error(`Unexpected query: ${String(query)}`);
+    });
+
+    const store = useRunHistoryStore();
+    await store.fetchTree();
+    expect(store.workspaceGroups[0]?.agentDefinitions[0]?.runs[0]?.runId).toBe('agent-old');
+    expect(store.agentOrgHistory[0]?.rootRunId).toBe('org-old');
+
+    round = 1;
+    await store.fetchTree();
+    expect(store.workspaceGroups[0]?.agentDefinitions[0]?.runs[0]?.runId).toBe('agent-old');
+    expect(store.agentOrgHistory[0]?.rootRunId).toBe('org-new');
+    expect(store.historyFamilyErrors).toEqual({
+      workspace: 'Workspace history unavailable', agentOrg: null,
+    });
+
+    round = 2;
+    await store.fetchTree();
+    expect(store.workspaceGroups[0]?.agentDefinitions[0]?.runs[0]?.runId).toBe('agent-new');
+    expect(store.agentOrgHistory[0]?.rootRunId).toBe('org-new');
+    expect(store.historyFamilyErrors).toEqual({
+      workspace: null, agentOrg: 'AgentOrg history unavailable',
+    });
+  });
+
+  it('retains the prior AgentOrg slice when strict root correlation rejects a later response', async () => {
+    let invalid = false;
+    queryMock.mockImplementation(async ({ query }: { query: string }) => {
+      if (query === 'ListWorkspaceRunHistory') {
+        return { data: { listWorkspaceRunHistory: [] }, errors: [] };
+      }
+      if (query === 'ListCollaborationRootHistory') {
+        return {
+          data: { listCollaborationRootHistory: [buildAgentOrgHistoryRow({
+            rootRunId: 'org-run',
+            treeRootRunId: invalid ? 'different-org-run' : 'org-run',
+            workspaceRootPath: '/ws/a',
+          })] },
+          errors: [],
+        };
+      }
+      throw new Error(`Unexpected query: ${String(query)}`);
+    });
+
+    const store = useRunHistoryStore();
+    await store.fetchTree();
+    const accepted = store.agentOrgHistory[0];
+    invalid = true;
+    await store.fetchTree();
+
+    expect(store.agentOrgHistory[0]).toBe(accepted);
+    expect(store.historyFamilyErrors.agentOrg).toContain('does not match its execution tree root')
   });
 
   it('hydrates and connects newly discovered active runs from workspace history', async () => {
@@ -1737,12 +1922,14 @@ describe('runHistoryStore', () => {
     expect(alphaAgent?.runs[1]?.source).toBe('history');
 
     expect(nodes[1]).toEqual({
+      stableKey: 'workspace:/ws/b',
       workspaceId: 'ws-2',
       workspaceRootPath: '/ws/b',
       workspaceName: 'Beta',
       workspaceKind: 'filesystem',
       canRemoveFromWorkspaces: true,
       agents: [],
+      agentOrgDefinitions: [],
     });
   });
 

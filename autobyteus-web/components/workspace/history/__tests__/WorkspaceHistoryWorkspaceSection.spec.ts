@@ -4,7 +4,11 @@ import { reactive, ref } from 'vue';
 import WorkspaceHistoryWorkspaceSection from '../WorkspaceHistoryWorkspaceSection.vue';
 import { AgentStatus } from '~/types/agent/AgentStatus';
 import { buildRunHistoryTeamExecutionRows } from '~/stores/runHistoryTeamExecutionRows';
-import type { TeamMemberTreeRow, TeamTreeNode } from '~/stores/runHistoryTypes';
+import type {
+  AgentOrgHistoryDefinitionGroup,
+  TeamMemberTreeRow,
+  TeamTreeNode,
+} from '~/stores/runHistoryTypes';
 import {
   buildTestTeamContext,
   testAgentNode,
@@ -48,10 +52,58 @@ const rootRow = (children: TeamMemberTreeRow[], teamRunId = 'team-run-1'): TeamM
   children,
 });
 
+const agentOrgDefinitionGroup = (): AgentOrgHistoryDefinitionGroup => {
+  const launch = {
+    runtimeKind: 'codex_app_server' as const,
+    llmModelIdentifier: 'gpt-5.6-sol',
+    llmConfig: null,
+    autoExecuteTools: false,
+    skillAccessMode: 'PRELOADED_ONLY' as const,
+    workspaceRootPath: '/ws/a',
+  };
+  return {
+    stableKey: 'agent_org_definition:org-definition',
+    definitionId: 'org-definition',
+    name: 'Delivery Org',
+    runs: [{
+      stableKey: 'agent_org_run:org-run',
+      rootSubjectKind: 'agent_org',
+      rootRunId: 'org-run',
+      createdAt: '2026-09-03T00:00:00.000Z',
+      archivedAt: null,
+      isActive: true,
+      summary: 'Deliver current package',
+      executionTree: {
+        schemaVersion: 1,
+        subjectKind: 'agent_org',
+        createdAt: '2026-09-03T00:00:00.000Z',
+        archivedAt: null,
+        applicationBinding: null,
+        handoffs: [],
+        rootOrg: {
+          address: '/', orgDefinitionId: 'org-definition', orgDefinitionName: 'Delivery Org', orgRunId: 'org-run',
+          defaultLaunchConfiguration: launch, taskExecutions: [],
+          members: [{
+            address: '/software', teamDefinitionId: 'software-team', role: null, description: null,
+            teamRunId: 'mounted-team-run', coordinatorAddress: '/software/implementation',
+            defaultLaunchConfiguration: launch, taskExecutions: [],
+            members: [{
+              address: '/software/implementation', agentDefinitionId: 'implementation-agent', role: null,
+              description: null, agentRunId: 'implementation-run', platformAgentRunId: null,
+              launchConfiguration: launch,
+            }],
+          }],
+        },
+      },
+    }],
+  };
+};
+
 const mountSubject = (options: {
   stableChildren?: TeamMemberTreeRow[];
   liveContext?: ReturnType<typeof buildTestTeamContext>;
   workspaceTeams?: TeamTreeNode[];
+  agentOrgDefinitions?: AgentOrgHistoryDefinitionGroup[];
   teamExpanded?: boolean;
   selectedTeamRunId?: string | null;
   selectedType?: 'agent' | 'team' | null;
@@ -98,6 +150,7 @@ const mountSubject = (options: {
     onTerminateRun: vi.fn(), onArchiveRun: vi.fn(), onDeleteRun: vi.fn(),
     onSelectTeam: vi.fn(), onTerminateTeam: vi.fn(), onArchiveTeam: vi.fn(),
     onDeleteTeam: vi.fn(), onSelectTeamMember: vi.fn(),
+    onOpenAgentOrgRun: vi.fn(), onSelectAgentOrgMember: vi.fn(), onTerminateAgentOrg: vi.fn(),
   };
   const expandedTeamMembers = reactive<Record<string, boolean>>({});
   const selectedTeamRunId = ref<string | null>(options.selectedTeamRunId ?? 'team-run-1');
@@ -122,6 +175,18 @@ const mountSubject = (options: {
       const key = expansionKey(workspaceId, teamRunId, rowKey);
       expandedTeamMembers[key] = !expandedTeamMembers[key];
     }),
+    isAgentOrgDefinitionExpanded: () => true,
+    toggleAgentOrgDefinition: vi.fn(),
+    isAgentOrgRunExpanded: () => true,
+    toggleAgentOrgRun: vi.fn(),
+    isAgentOrgTeamExpanded: () => false,
+    toggleAgentOrgTeam: vi.fn(),
+    isAgentOrgRunSelected: () => false,
+    isAgentOrgMemberSelected: () => false,
+    isAgentOrgRestoring: false,
+    isAgentOrgTerminating: () => false,
+    agentOrgTerminationError: () => null,
+    agentOrgContextFor: () => null,
   };
 
   const wrapper = mount(WorkspaceHistoryWorkspaceSection, {
@@ -129,6 +194,7 @@ const mountSubject = (options: {
       workspaceNode: {
         workspaceId: 'workspace:/ws/a', workspaceRootPath: '/ws/a', workspaceName: 'Workspace A',
         workspaceKind: 'filesystem', canRemoveFromWorkspaces: false, agents: [],
+        stableKey: 'workspace:/ws/a', agentOrgDefinitions: options.agentOrgDefinitions ?? [],
       },
       workspaceTeams: options.workspaceTeams ?? [team], workspaceTeamHistoryGroups: [], state,
       avatars: {
@@ -161,6 +227,25 @@ const mountSubject = (options: {
 };
 
 describe('WorkspaceHistoryWorkspaceSection current execution rows', () => {
+  it('renders Agent Orgs directly after standalone Teams and delegates exact root/member actions', async () => {
+    const group = agentOrgDefinitionGroup()
+    const { wrapper, actions, state } = mountSubject({ agentOrgDefinitions: [group] })
+    const text = wrapper.text()
+    expect(text.indexOf('Teams')).toBeGreaterThanOrEqual(0)
+    expect(text.indexOf('Agent Orgs')).toBeGreaterThan(text.indexOf('Teams'))
+    expect(wrapper.findAll('[data-test="workspace-team-row-team-run-1"]')).toHaveLength(1)
+    expect(wrapper.find('[data-test="workspace-agent-orgs"]').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('Restore')
+
+    await wrapper.get('[data-test="agent-org-team-row-mounted-team-run"]').trigger('click')
+    expect(state.toggleAgentOrgTeam).toHaveBeenCalledWith('org-run', '/software')
+    expect(actions.onSelectAgentOrgMember).toHaveBeenCalledWith(group.runs[0], '/software')
+
+    const stop = wrapper.get(`button[aria-label="Stop Agent Org"]`)
+    await stop.trigger('click')
+    expect(actions.onTerminateAgentOrg).toHaveBeenCalledWith(group.runs[0])
+  })
+
   it('renders any-active definition activity and exact sibling run activity reactively', async () => {
     const activeRun: TeamTreeNode = {
       teamRunId: 'team-run-active', teamDefinitionId: 'team-def-1', teamDefinitionName: 'Team Alpha',

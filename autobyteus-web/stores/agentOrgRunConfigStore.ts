@@ -5,6 +5,8 @@ import type { TeamWorkspaceOperationState } from '~/types/agent/TeamLaunchDraft'
 import type { AgentConfigOverride, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
 import type { RuntimeModelConfigSchemaState } from '~/types/agent/RuntimeModelConfigSchemaState'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
+import { normalizeModelConfigRecord } from '~/types/launch/defaultLaunchConfig'
+import { canonicalizeAgentOrgPlacementLaunchPatch } from '~/utils/agentOrgLaunchPatch'
 
 export type AgentOrgRunConfigIntent = Readonly<{
   definitionId: string
@@ -17,6 +19,8 @@ export type AgentOrgRunConfigIntent = Readonly<{
   agentOverrides: Readonly<Record<AgentTeamAddress, AgentConfigOverride>>
   teamWorkspaceSelections: Readonly<Record<AgentTeamAddress, WorkspaceSelectionState>>
 }>
+
+export type AgentOrgRootWorkspaceSelectionSource = 'untouched' | 'defaulted' | 'explicit'
 
 const emptyWorkspace = (): WorkspaceSelectionState => ({ mode: 'new', existingWorkspaceId: null, newWorkspacePath: '' })
 const idleWorkspaceOperation = (): TeamWorkspaceOperationState => ({ status: 'idle', error: null })
@@ -40,6 +44,8 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
   const llmConfig = ref<Record<string, unknown> | null>(null)
   const autoExecuteTools = ref(false)
   const workspaceSelection = ref<WorkspaceSelectionState>(emptyWorkspace())
+  const draftEpoch = ref(0)
+  const rootWorkspaceSelectionSource = ref<AgentOrgRootWorkspaceSelectionSource>('untouched')
   const teamOverrides = ref<Record<AgentTeamAddress, TeamScopeConfigOverride>>({})
   const agentOverrides = ref<Record<AgentTeamAddress, AgentConfigOverride>>({})
   const teamWorkspaceSelections = ref<Record<AgentTeamAddress, WorkspaceSelectionState>>({})
@@ -57,13 +63,14 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
     llmModelIdentifier?: string | null
     llmConfig?: Record<string, unknown> | null
   }): void => {
-    if (definitionId.value === input.definitionId) return
+    draftEpoch.value += 1
     definitionId.value = input.definitionId
     runtimeKind.value = input.runtimeKind || 'autobyteus'
     llmModelIdentifier.value = input.llmModelIdentifier || ''
-    llmConfig.value = input.llmConfig ?? null
+    llmConfig.value = normalizeModelConfigRecord(input.llmConfig)
     autoExecuteTools.value = false
     workspaceSelection.value = emptyWorkspace()
+    rootWorkspaceSelectionSource.value = 'untouched'
     teamOverrides.value = {}
     agentOverrides.value = {}
     teamWorkspaceSelections.value = {}
@@ -74,12 +81,38 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
     launchError.value = null
   }
 
-  const setWorkspaceSelection = (selection: WorkspaceSelectionState): void => {
+  const setRootRuntimeKind = (value: string): void => {
+    if (runtimeKind.value === value) return
+    runtimeKind.value = value
+    llmConfig.value = null
+  }
+  const setRootLlmModelIdentifier = (value: string): void => {
+    if (llmModelIdentifier.value === value) return
+    llmModelIdentifier.value = value
+    llmConfig.value = null
+  }
+  const setRootLlmConfig = (value: Record<string, unknown> | null): void => {
+    llmConfig.value = normalizeModelConfigRecord(value)
+  }
+  const setRootAutoExecuteTools = (value: boolean): void => {
+    autoExecuteTools.value = value
+  }
+  const setWorkspaceSelection = (
+    selection: WorkspaceSelectionState,
+    source: AgentOrgRootWorkspaceSelectionSource = 'explicit',
+  ): void => {
     workspaceSelection.value = { ...selection }
+    rootWorkspaceSelectionSource.value = source
+  }
+  const selectDefaultRootWorkspace = (workspaceId: string | null | undefined): boolean => {
+    if (!workspaceId || rootWorkspaceSelectionSource.value !== 'untouched') return false
+    if (workspaceSelection.value.existingWorkspaceId || workspaceSelection.value.newWorkspacePath.trim()) return false
+    setWorkspaceSelection({ mode: 'existing', existingWorkspaceId: workspaceId, newWorkspacePath: '' }, 'defaulted')
+    return true
   }
   const setTeamOverride = (address: AgentTeamAddress, override: TeamScopeConfigOverride | null): void => {
     const next = { ...teamOverrides.value }
-    if (override) next[address] = cloneTeamOverride(override)
+    if (override) next[address] = cloneTeamOverride(canonicalizeAgentOrgPlacementLaunchPatch(override))
     else delete next[address]
     teamOverrides.value = next
   }
@@ -94,7 +127,7 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
   }
   const setAgentOverride = (address: AgentTeamAddress, override: AgentConfigOverride | null): void => {
     const next = { ...agentOverrides.value }
-    if (override) next[address] = { ...override }
+    if (override) next[address] = canonicalizeAgentOrgPlacementLaunchPatch(override)
     else delete next[address]
     agentOverrides.value = next
   }
@@ -173,10 +206,12 @@ export const useAgentOrgRunConfigStore = defineStore('agentOrgRunConfig', () => 
 
   return {
     definitionId, runtimeKind, llmModelIdentifier, llmConfig, autoExecuteTools,
+    draftEpoch, rootWorkspaceSelectionSource,
     workspaceSelection, teamOverrides, agentOverrides, teamWorkspaceSelections, teamWorkspaceOperations,
     modelSchemaScopeAddresses, modelSchemaStateByAddress, firstModelSchemaBlock, allModelSchemaScopesReady,
     projectionError, launchError, intent,
-    begin, setWorkspaceSelection, setTeamOverride, resetTeamOverride, setAgentOverride,
+    begin, setRootRuntimeKind, setRootLlmModelIdentifier, setRootLlmConfig, setRootAutoExecuteTools,
+    setWorkspaceSelection, selectDefaultRootWorkspace, setTeamOverride, resetTeamOverride, setAgentOverride,
     setTeamWorkspaceSelection, setTeamWorkspaceOperation, teamWorkspaceSelectionFor, teamWorkspaceOperationFor,
     reconcileModelSchemaScopes, setModelSchemaState, modelSchemaStateFor,
     setProjectionError, setLaunchError,

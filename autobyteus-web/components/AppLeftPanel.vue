@@ -79,14 +79,8 @@
         tabindex="-1"
         class="min-h-0 flex-1 border-b border-gray-200 bg-white outline-none"
       >
-        <div class="h-full overflow-y-auto">
-          <AgentOrgRunHistoryPanel
-            v-if="showAgentOrgRunHistory"
-            @run-selected="onRunningRunSelected"
-            @run-created="onRunningRunCreated"
-          />
+        <div class="h-full">
           <WorkspaceAgentRunsTreePanel
-            v-else
             @run-selected="onRunningRunSelected"
             @run-created="onRunningRunCreated"
           />
@@ -116,7 +110,6 @@ import { computed, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router';
 import WorkspaceAgentRunsTreePanel from '~/components/workspace/history/WorkspaceAgentRunsTreePanel.vue';
-import AgentOrgRunHistoryPanel from '~/components/workspace/history/AgentOrgRunHistoryPanel.vue';
 import { useAppLeftPanelSectionResize } from '~/composables/useAppLeftPanelSectionResize';
 import { useLeftPanel } from '~/composables/useLeftPanel';
 import {
@@ -136,10 +129,6 @@ const {
 
 const route = useRoute();
 const router = useRouter();
-const showAgentOrgRunHistory = computed(() => (
-  route.path === '/workspace'
-  && route.query?.rootSubjectKind === 'agent_org'
-));
 const { toggleLeftPanel } = useLeftPanel();
 const {
   panelSectionsContainerRef,

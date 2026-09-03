@@ -1,4 +1,5 @@
-import type { TeamMemberFocusTarget, TeamMemberTreeRow, TeamTreeNode } from '~/stores/runHistoryTypes';
+import type { AgentOrgRunHistoryItem, TeamMemberFocusTarget, TeamMemberTreeRow, TeamTreeNode } from '~/stores/runHistoryTypes';
+import type { AgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgExecutionContext';
 import type { RunTreeRow, RunTreeWorkspaceNode } from '~/utils/runTreeProjection';
 
 export interface WorkspaceHistorySectionState {
@@ -31,6 +32,18 @@ export interface WorkspaceHistorySectionState {
     teamRunId: string,
     memberAddress: string,
   ) => void;
+  isAgentOrgDefinitionExpanded?: (workspaceId: string, definitionId: string) => boolean;
+  toggleAgentOrgDefinition?: (workspaceId: string, definitionId: string) => void;
+  isAgentOrgRunExpanded?: (rootRunId: string) => boolean;
+  toggleAgentOrgRun?: (rootRunId: string) => void;
+  isAgentOrgTeamExpanded?: (rootRunId: string, address: string) => boolean;
+  toggleAgentOrgTeam?: (rootRunId: string, address: string) => void;
+  isAgentOrgRunSelected?: (rootRunId: string) => boolean;
+  isAgentOrgMemberSelected?: (rootRunId: string, address: string) => boolean;
+  isAgentOrgRestoring?: boolean;
+  isAgentOrgTerminating?: (rootRunId: string) => boolean;
+  agentOrgTerminationError?: (rootRunId: string) => string | null;
+  agentOrgContextFor?: (rootRunId: string) => AgentOrgExecutionContext | null;
 }
 
 export interface WorkspaceHistoryAvatarBindings {
@@ -71,4 +84,7 @@ export interface WorkspaceHistorySectionActions {
     member: TeamMemberFocusTarget,
     workspaceId?: string,
   ) => Promise<void> | void;
+  onOpenAgentOrgRun?: (run: AgentOrgRunHistoryItem) => Promise<void> | void;
+  onSelectAgentOrgMember?: (run: AgentOrgRunHistoryItem, address: string) => Promise<void> | void;
+  onTerminateAgentOrg?: (run: AgentOrgRunHistoryItem) => Promise<void> | void;
 }

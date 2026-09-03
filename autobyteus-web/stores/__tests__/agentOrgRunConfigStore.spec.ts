@@ -11,8 +11,8 @@ describe('agentOrgRunConfigStore', () => {
     store.setTeamOverride('/software', { runtimeKind: 'codex_app_server' })
     store.setAgentOverride('/software/worker', { llmModelIdentifier: 'gpt-worker' })
 
-    expect(store.intent.teamOverrides).toEqual({ '/software': { runtimeKind: 'codex_app_server' } })
-    expect(store.intent.agentOverrides).toEqual({ '/software/worker': { llmModelIdentifier: 'gpt-worker' } })
+    expect(store.intent.teamOverrides).toEqual({ '/software': { runtimeKind: 'codex_app_server', llmConfig: null } })
+    expect(store.intent.agentOverrides).toEqual({ '/software/worker': { llmModelIdentifier: 'gpt-worker', llmConfig: null } })
     expect(store.intent).not.toHaveProperty('memberOverrides')
   })
 
@@ -61,6 +61,45 @@ describe('agentOrgRunConfigStore', () => {
     expect(store.firstModelSchemaBlock).toEqual({
       address: '/', state: { status: 'loading', message: null },
     })
+  })
+
+  it('starts a fresh epoch for the same Org while preserving one epoch across retries', () => {
+    const store = useAgentOrgRunConfigStore()
+    store.begin({ definitionId: 'org-1', llmModelIdentifier: 'gpt-root' })
+    const firstEpoch = store.draftEpoch
+    expect(store.selectDefaultRootWorkspace('temp-workspace')).toBe(true)
+    expect(store.rootWorkspaceSelectionSource).toBe('defaulted')
+
+    store.setWorkspaceSelection({
+      mode: 'new', existingWorkspaceId: null, newWorkspacePath: '/explicit/root',
+    })
+    expect(store.selectDefaultRootWorkspace('replacement-temp')).toBe(false)
+    expect(store.workspaceSelection.newWorkspacePath).toBe('/explicit/root')
+
+    store.begin({ definitionId: 'org-1', llmModelIdentifier: 'gpt-root' })
+    expect(store.draftEpoch).toBe(firstEpoch + 1)
+    expect(store.rootWorkspaceSelectionSource).toBe('untouched')
+    expect(store.workspaceSelection).toEqual({
+      mode: 'new', existingWorkspaceId: null, newWorkspacePath: '',
+    })
+    expect(store.selectDefaultRootWorkspace('replacement-temp')).toBe(true)
+    expect(store.workspaceSelection).toEqual({
+      mode: 'existing', existingWorkspaceId: 'replacement-temp', newWorkspacePath: '',
+    })
+  })
+
+  it('keeps the root tuple coherent and isolated from later input mutation', () => {
+    const store = useAgentOrgRunConfigStore()
+    const nested = { z: [{ beta: 2, alpha: 1 }] }
+    store.begin({ definitionId: 'org-1', llmConfig: nested })
+    nested.z[0]!.alpha = 99
+    expect(store.llmConfig).toEqual({ z: [{ alpha: 1, beta: 2 }] })
+
+    store.setRootRuntimeKind('codex_app_server')
+    expect(store.llmConfig).toBeNull()
+    store.setRootLlmConfig({ effort: 'high' })
+    store.setRootLlmModelIdentifier('gpt-next')
+    expect(store.llmConfig).toBeNull()
   })
 
   it('retains exact schema readiness and prunes state outside the projected Org scope', () => {

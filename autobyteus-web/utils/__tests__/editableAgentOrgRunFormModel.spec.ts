@@ -89,7 +89,7 @@ describe('projectEditableAgentOrgRunFormModel', () => {
 
   it('keeps Team and exact-Agent customization independent while applying root -> Team -> Agent precedence', () => {
     const agentOnly = readyModel({
-      agentOverrides: { '/software/implementation_engineer': { llmModelIdentifier: 'gpt-agent' } },
+      agentOverrides: { '/software/implementation_engineer': { llmModelIdentifier: 'gpt-agent', llmConfig: null } },
     })
     expect(agentOnly.mountedTeams[1]!.scope.isCustomized).toBe(false)
     expect(agentOnly.mountedTeams[1]!.children[1]).toEqual(expect.objectContaining({
@@ -99,7 +99,7 @@ describe('projectEditableAgentOrgRunFormModel', () => {
     }))
 
     const teamAndAgent = readyModel({
-      teamOverrides: { '/software': { runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-team' } },
+      teamOverrides: { '/software': { runtimeKind: 'codex_app_server', llmModelIdentifier: 'gpt-team', llmConfig: null } },
       agentOverrides: { '/software/implementation_engineer': { autoExecuteTools: true } },
     })
     expect(teamAndAgent.mountedTeams[1]!.scope).toEqual(expect.objectContaining({

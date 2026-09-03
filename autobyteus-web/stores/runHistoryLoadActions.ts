@@ -8,8 +8,11 @@ import { useAgentTeamRunStore } from '~/stores/agentTeamRunStore';
 import {
   ListWorkspaceRunHistory,
 } from '~/graphql/queries/runHistoryQueries';
+import { ListCollaborationRootHistory } from '~/graphql/queries/collaborationRootHistoryQueries';
 import type {
+  AgentOrgRunHistoryItem,
   ListWorkspaceRunHistoryQueryData,
+  RunHistoryFamilyErrors,
   RunHistoryWorkspaceGroup,
   RunResumeConfigPayload,
   TeamRunHistoryItem,
@@ -18,6 +21,7 @@ import type {
 import {
   buildNextAgentAvatarIndex,
   flattenWorkspaceTeamRuns,
+  parseAgentOrgHistoryItems,
 } from '~/stores/runHistoryStoreSupport';
 import {
   findAgentNameByRunId,
@@ -53,6 +57,8 @@ export interface RunHistoryFetchStoreLike {
   selectedTeamRunId: string | null;
   selectedTeamMemberAddress: string | null;
   openingRun: boolean;
+  agentOrgHistory: AgentOrgRunHistoryItem[];
+  historyFamilyErrors: RunHistoryFamilyErrors;
   findAgentNameByRunId(runId: string): string | null;
   ensureWorkspaceByRootPath(rootPath: string): Promise<string | null>;
   resolveWorkspaceMetadataByRootPath(rootPath: string): Promise<WorkspaceMetadata | null>;
@@ -77,25 +83,65 @@ export const fetchRunHistoryTree = async (
     }
 
     const client = getApolloClient();
-    const workspaceHistoryResult = await client.query<ListWorkspaceRunHistoryQueryData>({
-      query: ListWorkspaceRunHistory,
-      variables: { limitPerAgent },
-      fetchPolicy: 'network-only',
-    });
+    const [workspaceResult, agentOrgResult] = await Promise.allSettled([
+      client.query<ListWorkspaceRunHistoryQueryData>({
+        query: ListWorkspaceRunHistory,
+        variables: { limitPerAgent },
+        fetchPolicy: 'network-only',
+      }).then((result) => {
+        if (result.errors?.length) {
+          throw new Error(result.errors.map((error: { message: string }) => error.message).join(', '));
+        }
+        return result.data?.listWorkspaceRunHistory || [];
+      }),
+      client.query<{ listCollaborationRootHistory: unknown }>({
+        query: ListCollaborationRootHistory,
+        fetchPolicy: 'network-only',
+      }).then((result) => {
+        if (result.errors?.length) {
+          throw new Error(result.errors.map((error: { message: string }) => error.message).join(', '));
+        }
+        return parseAgentOrgHistoryItems(result.data?.listCollaborationRootHistory ?? []);
+      }),
+    ]);
 
-    if (workspaceHistoryResult.errors && workspaceHistoryResult.errors.length > 0) {
-      throw new Error(workspaceHistoryResult.errors.map((error: { message: string }) => error.message).join(', '));
+    if (workspaceResult.status === 'fulfilled') {
+      store.workspaceGroups = workspaceResult.value;
+      store.historyFamilyErrors = { ...store.historyFamilyErrors, workspace: null };
+      store.error = null;
+      try {
+        store.agentAvatarByDefinitionId = await buildNextAgentAvatarIndex(
+          store.agentAvatarByDefinitionId,
+          { loadDefinitionsIfNeeded: true },
+        );
+        await reconcileDiscoveredActiveRuns(store);
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        store.historyFamilyErrors = { ...store.historyFamilyErrors, workspace: detail };
+        if (!quiet) store.error = detail;
+      }
+    } else {
+      const detail = workspaceResult.reason instanceof Error
+        ? workspaceResult.reason.message
+        : String(workspaceResult.reason);
+      store.historyFamilyErrors = { ...store.historyFamilyErrors, workspace: detail };
+      if (!quiet) store.error = detail;
     }
 
-    store.workspaceGroups = workspaceHistoryResult.data?.listWorkspaceRunHistory || [];
-    store.agentAvatarByDefinitionId = await buildNextAgentAvatarIndex(
-      store.agentAvatarByDefinitionId,
-      { loadDefinitionsIfNeeded: true },
-    );
-    await reconcileDiscoveredActiveRuns(store);
+    if (agentOrgResult.status === 'fulfilled') {
+      store.agentOrgHistory = agentOrgResult.value;
+      store.historyFamilyErrors = { ...store.historyFamilyErrors, agentOrg: null };
+    } else {
+      const detail = agentOrgResult.reason instanceof Error
+        ? agentOrgResult.reason.message
+        : String(agentOrgResult.reason);
+      store.historyFamilyErrors = { ...store.historyFamilyErrors, agentOrg: detail };
+    }
   } catch (error: any) {
+    const detail = error?.message || 'Failed to load run history.';
+    store.historyFamilyErrors = { workspace: detail, agentOrg: detail };
     if (!quiet) {
-      store.error = error?.message || 'Failed to load run history.';
+      store.error = detail;
     }
   } finally {
     if (!quiet) {

@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, nextTick, onMounted } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AgentOrgRunConfigPanel from '../AgentOrgRunConfigPanel.vue'
 import TeamScopeConfigEditor from '../TeamScopeConfigEditor.vue'
 import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
@@ -10,6 +10,7 @@ import { useAgentOrgRunConfigStore } from '~/stores/agentOrgRunConfigStore'
 import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
 import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
 import { useWorkspaceStore } from '~/stores/workspace'
+import { useRunHistoryStore } from '~/stores/runHistoryStore'
 import { localizationRuntime } from '~/localization/runtime/localizationRuntime'
 
 const { route, replace } = vi.hoisted(() => ({
@@ -63,6 +64,7 @@ const teams = [{
   nodes: [{ memberName: 'architect', ref: 'architect-agent' }, { memberName: 'implementer', ref: 'implementer-agent' }],
 }]
 
+const mountedPanels: Array<ReturnType<typeof mount>> = []
 const mountPanel = async () => {
   const wrapper = mount(AgentOrgRunConfigPanel, {
     global: {
@@ -74,6 +76,7 @@ const mountPanel = async () => {
       },
     },
   })
+  mountedPanels.push(wrapper)
   await flushPromises()
   return wrapper
 }
@@ -86,6 +89,10 @@ const prepareRunnableWorkspace = async () => {
 }
 
 describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
+  afterEach(() => {
+    mountedPanels.splice(0).forEach((wrapper) => wrapper.unmount())
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     setActivePinia(createPinia())
@@ -148,7 +155,9 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     await nextTick()
     software = wrapper.findAllComponents(TeamScopeConfigEditor)[1]!
     expect(software.props('scope')).toEqual(expect.objectContaining({ isCustomized: false, override: null }))
-    expect(configStore.agentOverrides['/software/implementer']).toEqual({ llmModelIdentifier: 'gpt-member' })
+    expect(configStore.agentOverrides['/software/implementer']).toEqual({
+      llmModelIdentifier: 'gpt-member', llmConfig: null,
+    }, { flush: 'sync' })
     expect(wrapper.get('[data-test="org-placement-/requirements_engineer"]').text()).toContain('Overridden')
   })
 
@@ -167,6 +176,7 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     vi.spyOn(workspaceStore, 'createWorkspace').mockResolvedValue('workspace-root')
     const runStore = useAgentOrgRunStore()
     vi.spyOn(runStore, 'launch').mockResolvedValue('org-run-1')
+    vi.spyOn(useRunHistoryStore(), 'refreshTreeQuietly').mockResolvedValue(undefined)
     await nextTick()
 
     await wrapper.get('[data-test="run-agent-org"]').trigger('click')
@@ -179,15 +189,66 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
         address: '/software',
         configuration: {
           runtimeKind: 'codex_app_server', autoExecuteTools: true,
+          llmConfig: null,
           workspaceRootPath: '/workspace/software',
         },
       }],
-      agentOverrides: [{ address: '/software/implementer', configuration: { llmModelIdentifier: 'gpt-member' } }],
+      agentOverrides: [{
+        address: '/software/implementer',
+        configuration: { llmModelIdentifier: 'gpt-member', llmConfig: null },
+      }],
     }))
     expect(workspaceStore.createWorkspace).toHaveBeenCalledWith({ root_path: '/workspace/software' })
     expect(replace).toHaveBeenCalledWith(expect.objectContaining({
       query: expect.objectContaining({ orgRunId: 'org-run-1', rootSubjectKind: 'agent_org' }),
     }))
+  })
+
+  it('selects the catalog Temp Workspace once for a fresh Org root and projects inheritance', async () => {
+    const workspaceStore = useWorkspaceStore()
+    workspaceStore.workspaces.temp_ws_default = {
+      workspaceId: 'temp_ws_default',
+      name: 'Temp Workspace',
+      workspaceConfig: { root_path: '/workspace/temp' },
+      absolutePath: '/workspace/temp',
+      workspaceRootPath: '/workspace/temp',
+      kind: 'temp',
+      isTemp: true,
+    }
+
+    const wrapper = await mountPanel()
+    const configStore = useAgentOrgRunConfigStore()
+    expect(configStore.rootWorkspaceSelectionSource).toBe('defaulted')
+    expect(configStore.workspaceSelection).toEqual({
+      mode: 'existing', existingWorkspaceId: 'temp_ws_default', newWorkspacePath: '',
+    })
+    const scopes = wrapper.findAllComponents(TeamScopeConfigEditor)
+    expect(scopes).toHaveLength(2)
+    expect(scopes.every((scope) => scope.props('scope').effectiveConfig.workspaceRootPath === '/workspace/temp')).toBe(true)
+    expect(scopes.every((scope) => scope.props('scope').override === null)).toBe(true)
+    expect(configStore.teamWorkspaceSelections).toEqual({})
+    expect(configStore.agentOverrides).toEqual({})
+
+    configStore.setWorkspaceSelection({
+      mode: 'new', existingWorkspaceId: null, newWorkspacePath: '/workspace/explicit',
+    })
+    delete workspaceStore.workspaces.temp_ws_default
+    workspaceStore.workspaces.replacement_temp = {
+      workspaceId: 'replacement_temp',
+      name: 'Replacement Temp',
+      workspaceConfig: { root_path: '/workspace/replacement' },
+      absolutePath: '/workspace/replacement',
+      workspaceRootPath: '/workspace/replacement',
+      kind: 'temp',
+      isTemp: true,
+    }
+    await nextTick()
+
+    expect(configStore.rootWorkspaceSelectionSource).toBe('explicit')
+    expect(configStore.workspaceSelection.newWorkspacePath).toBe('/workspace/explicit')
+    expect(wrapper.findAllComponents(TeamScopeConfigEditor).every(
+      (scope) => scope.props('scope').effectiveConfig.workspaceRootPath === '/workspace/explicit',
+    )).toBe(true)
   })
 
   it('fails closed and disables Run when a referenced Team is unavailable', async () => {
@@ -201,6 +262,9 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
   it('blocks the root invalid schema state with an exact accessible diagnostic until ready', async () => {
     const wrapper = await mountPanel()
     await prepareRunnableWorkspace()
+    const configStore = useAgentOrgRunConfigStore()
+    const begin = vi.spyOn(configStore, 'begin')
+    expect(configStore.workspaceSelection.newWorkspacePath).toBe('/workspace/root')
     const rootFields = wrapper.findAllComponents(PassiveField)
       .find((field) => field.props('idPrefix') === 'org-run')!
 
@@ -215,8 +279,11 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('aria-describedby')).toBe('org-model-schema-status')
 
     rootFields.vm.$emit('schema-state', { status: 'ready', message: null })
-    await nextTick()
+    await flushPromises()
+    expect(begin).not.toHaveBeenCalled()
     expect(wrapper.find('[data-test="org-config-schema-diagnostic"]').exists()).toBe(false)
+    expect(configStore.firstModelSchemaBlock).toBeNull()
+    expect(configStore.workspaceSelection.newWorkspacePath).toBe('/workspace/root')
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
   })
 
@@ -234,7 +301,7 @@ describe('AgentOrgRunConfigPanel mounted-Team hierarchy', () => {
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeDefined()
 
     teamFields.vm.$emit('schema-state', { status: 'ready', message: null })
-    await nextTick()
+    await flushPromises()
     expect(wrapper.find('[data-test="org-config-schema-diagnostic"]').exists()).toBe(false)
     expect(wrapper.get('[data-test="run-agent-org"]').attributes('disabled')).toBeUndefined()
   })

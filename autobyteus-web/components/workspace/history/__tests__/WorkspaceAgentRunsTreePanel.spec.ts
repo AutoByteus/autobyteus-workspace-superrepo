@@ -4,6 +4,20 @@ import { createPinia, setActivePinia } from 'pinia';
 import { nextTick } from 'vue';
 import WorkspaceAgentRunsTreePanel from '../WorkspaceAgentRunsTreePanel.vue';
 
+const routerHarness = vi.hoisted(() => ({
+  route: { query: {} as Record<string, string> },
+  push: vi.fn().mockResolvedValue(undefined),
+  replace: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('vue-router', () => ({
+  useRoute: () => routerHarness.route,
+  useRouter: () => ({
+    push: routerHarness.push,
+    replace: routerHarness.replace,
+  }),
+}));
+
 const flushPromises = async () => {
   await Promise.resolve();
   await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -126,9 +140,11 @@ const {
 
   const normalizeWorkspaceNode = (workspace: any): any => ({
     ...workspace,
+    stableKey: workspace.stableKey ?? `workspace:${workspace.workspaceRootPath}`,
     workspaceId: workspace.workspaceId ?? workspaceIdFromRoot(workspace.workspaceRootPath),
     workspaceKind: workspace.workspaceKind ?? 'filesystem',
     canRemoveFromWorkspaces: workspace.canRemoveFromWorkspaces ?? true,
+    agentOrgDefinitions: workspace.agentOrgDefinitions ?? [],
   });
 
   const state = {
@@ -377,6 +393,7 @@ describe('WorkspaceAgentRunsTreePanel', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
+    routerHarness.route.query = {};
     runHistoryState.loading = false;
     runHistoryState.error = null;
     runHistoryState.selectedRunId = null;
@@ -595,13 +612,13 @@ describe('WorkspaceAgentRunsTreePanel', () => {
     ];
   };
 
-  it('loads workspace list without eager history tree on mount', async () => {
+  it('loads the unified mixed history tree on mount', async () => {
     mountComponent();
     await flushPromises();
 
     expect(runHistoryStoreMock.loadWorkspaceCatalogForNavigation).toHaveBeenCalledTimes(1);
     expect(workspaceStoreMock.fetchAllWorkspaces).toHaveBeenCalledTimes(1);
-    expect(runHistoryStoreMock.fetchTree).not.toHaveBeenCalled();
+    expect(runHistoryStoreMock.fetchTree).toHaveBeenCalledTimes(1);
     expect(runHistoryStoreMock.fetchWorkspaceHistory).not.toHaveBeenCalled();
   });
 
@@ -626,7 +643,7 @@ describe('WorkspaceAgentRunsTreePanel', () => {
     await flushPromises();
 
     expect(runHistoryStoreMock.fetchWorkspaceHistory).toHaveBeenCalledWith('workspace:/ws/a');
-    expect(runHistoryStoreMock.fetchTree).not.toHaveBeenCalled();
+    expect(runHistoryStoreMock.fetchTree).toHaveBeenCalledTimes(1);
     expect(wrapper.find('[data-test="workspace-row"][data-workspace-root="/ws/a"]').attributes('aria-expanded')).toBe('true');
   });
 
@@ -969,7 +986,7 @@ describe('WorkspaceAgentRunsTreePanel', () => {
     ).toBe('true');
   });
 
-  it('refreshes expanded workspace history quietly on the background interval while mounted', async () => {
+  it('refreshes the unified mixed history quietly on the background interval while mounted', async () => {
     vi.useFakeTimers();
     try {
       const wrapper = mountComponent();
@@ -983,8 +1000,8 @@ describe('WorkspaceAgentRunsTreePanel', () => {
       expect(runHistoryStoreMock.refreshWorkspaceHistoryQuietly).not.toHaveBeenCalled();
 
       await vi.advanceTimersByTimeAsync(5000);
-      expect(runHistoryStoreMock.refreshTreeQuietly).not.toHaveBeenCalled();
-      expect(runHistoryStoreMock.refreshWorkspaceHistoryQuietly).toHaveBeenCalledWith('workspace:/ws/a');
+      expect(runHistoryStoreMock.refreshTreeQuietly).toHaveBeenCalledTimes(1);
+      expect(runHistoryStoreMock.refreshWorkspaceHistoryQuietly).not.toHaveBeenCalled();
       wrapper.unmount();
     } finally {
       vi.useRealTimers();

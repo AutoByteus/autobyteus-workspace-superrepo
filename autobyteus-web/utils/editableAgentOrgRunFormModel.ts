@@ -20,6 +20,10 @@ import {
   resolveOverrideLlmModelIdentifier,
   resolveOverrideRuntimeKind,
 } from '~/utils/teamRunConfigUtils'
+import {
+  agentOrgPlacementLaunchPatchesEqual,
+  canonicalizeAgentOrgPlacementLaunchPatch,
+} from '~/utils/agentOrgLaunchPatch'
 
 export type EditableAgentOrgRunFormModel = Readonly<{
   configurableAgentCount: number
@@ -35,6 +39,8 @@ export type EditableAgentOrgRunFormDiagnostic = Readonly<{
     | 'INVALID_TEAM_COORDINATOR'
     | 'STALE_TEAM_OVERRIDE'
     | 'STALE_AGENT_OVERRIDE'
+    | 'NON_CANONICAL_TEAM_OVERRIDE'
+    | 'NON_CANONICAL_AGENT_OVERRIDE'
   message: string
 }>
 
@@ -85,6 +91,21 @@ const resolveConfig = (
   })
 }
 
+const assertCanonicalOverride = (
+  address: AgentTeamAddress,
+  kind: 'Team' | 'Agent',
+  override: Readonly<AgentConfigOverride | TeamScopeConfigOverride> | null | undefined,
+): void => {
+  if (!override) return
+  const canonical = canonicalizeAgentOrgPlacementLaunchPatch(override)
+  if (!agentOrgPlacementLaunchPatchesEqual(override, canonical)) {
+    fail(
+      kind === 'Team' ? 'NON_CANONICAL_TEAM_OVERRIDE' : 'NON_CANONICAL_AGENT_OVERRIDE',
+      `AgentOrg configuration has non-canonical ${kind} override '${address}'.`,
+    )
+  }
+}
+
 export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
   orgDefinition: AgentOrgDefinition
   rootConfig: Readonly<ResolvedTeamRunLaunchConfig>
@@ -122,6 +143,7 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
       baseline: Readonly<ResolvedTeamRunLaunchConfig>
     }>): EditableTeamFormAgentNode => {
       const override = input.agentOverrides[inputNode.address]
+      assertCanonicalOverride(inputNode.address, 'Agent', override)
       const effectiveConfig = resolveConfig(inputNode.baseline, override)
       return Object.freeze({
         mode: 'editable' as const,
@@ -165,6 +187,7 @@ export const projectEditableAgentOrgRunFormModel = (input: Readonly<{
         )
       }
       const teamOverride = input.teamOverrides[address]
+      assertCanonicalOverride(address, 'Team', teamOverride)
       const resolvedConfig = resolveConfig(input.rootConfig, teamOverride)
       const workspaceSelection = input.workspaceSelectionFor(address, resolvedConfig)
       const effectiveConfig = workspaceSelection.mode === 'new' && workspaceSelection.newWorkspacePath.trim()

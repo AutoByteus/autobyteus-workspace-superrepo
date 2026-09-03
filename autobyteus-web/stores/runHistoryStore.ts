@@ -2,10 +2,13 @@ import { defineStore } from 'pinia';
 import { useWorkspaceStore } from '~/stores/workspace';
 import { AgentStatus } from '~/types/agent/AgentStatus';
 import type {
+  AgentOrgRunHistoryItem,
+  RunHistoryFamilyErrors,
   RunHistoryWorkspaceGroup,
   RunResumeConfigPayload,
   TeamMemberInspectionAttempt,
   TeamRunResumeConfigPayload,
+  WorkspaceHistoryWorkspaceNode,
 } from '~/stores/runHistoryTypes';
 import {
   findAgentNameByRunId as findAgentNameFromHistory,
@@ -56,6 +59,8 @@ import { teamRunExecutionTreeDtoSchema } from '@autobyteus/team-stream-contracts
 export const useRunHistoryStore = defineStore('runHistory', {
   state: () => ({
     workspaceGroups: [] as RunHistoryWorkspaceGroup[],
+    agentOrgHistory: [] as AgentOrgRunHistoryItem[],
+    historyFamilyErrors: { workspace: null, agentOrg: null } as RunHistoryFamilyErrors,
     workspaceHistoryLoadingById: {} as Record<string, boolean>,
     workspaceHistoryErrorById: {} as Record<string, string | null>,
     agentAvatarByDefinitionId: {} as Record<string, string>,
@@ -406,7 +411,7 @@ export const useRunHistoryStore = defineStore('runHistory', {
       this.refreshRunNavigationTopology('workspace-prune');
     },
 
-    getTreeNodes(): RunTreeWorkspaceNode[] {
+    getTreeNodes(): WorkspaceHistoryWorkspaceNode[] {
       if (!this.navigationProjection) this.refreshRunNavigationTopology('lazy-tree-read');
       return this.navigationProjection?.workspaceNodes ?? [];
     },
@@ -425,6 +430,11 @@ export const useRunHistoryStore = defineStore('runHistory', {
     getTeamNavigationAncestry(teamRunId: string): RunHistoryTeamNavigationAncestry | null {
       if (!this.navigationProjection) this.refreshRunNavigationTopology('lazy-team-ancestry-read');
       return this.navigationProjection?.teamAncestryById[teamRunId] ?? null;
+    },
+
+    getAgentOrgNavigationAncestry(rootRunId: string) {
+      if (!this.navigationProjection) this.refreshRunNavigationTopology('lazy-agent-org-ancestry-read');
+      return this.navigationProjection?.agentOrgAncestryById[rootRunId] ?? null;
     },
 
     getTeamMemberNavigationAncestorRowKeys(
