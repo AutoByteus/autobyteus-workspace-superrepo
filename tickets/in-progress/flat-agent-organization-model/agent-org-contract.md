@@ -4,10 +4,10 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-024`
-- Status: `Approved behavior — focused Product evidence pending`
-- Approval reference: Behavior/runtime/admission and Product authority through `RER-023` remain approved except for two exact slices superseded by the user's Electron review: AgentOrg must retain the standard unified Workspaces/history shell, and a fresh AgentOrg draft must select an available `Temp Workspace (Default)` like AgentTeam. `RER-024` also makes the existing `REQ-024` effective-configuration equivalence obligation explicit for runtime/model/model-config overrides. Current Product images show the rejected shell and empty Workspace, so focused Product-owned replacement evidence and user approval remain pending for `ORG-CASE-063`–`ORG-CASE-065` before Architecture resumes.
-- Owner/date: Requirements Engineer / 2026-09-03
+- Requirements revision: `RER-023`
+- Status: `Approved`
+- Approval reference: Behavior/runtime/admission and Product authority through `RER-021` remain approved except for the exact `RV-012` / `VIS-015` mounted-Team Member-overrides interaction superseded in `RER-022`. Focused Product package `AORG-TEAM-OVERRIDES-001` returned with explicit user approval, normative `VIS-OVR-001`–`VIS-OVR-006`, and no requirement-impact finding. `RER-023` integrates that authority for `ORG-CASE-059`–`ORG-CASE-061` and reopens Architecture Design.
+- Owner/date: Requirements Engineer / 2026-09-02
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
 This contract reuses the current TeamRun V2 child, handoff, launch, and task
@@ -56,9 +56,6 @@ AgentTeamDefinition
 13. Definition source ownership is independent of runtime snapshot ownership: external definition repositories are read-only dependencies for this ticket, while every server memory run package remains in the runtime transition cohort.
 14. A direct Team placement in an AgentOrg retains one presentation-only aggregate status signal over the exact Agent statuses in its branch; this does not create Team-root lifecycle or persistence ownership.
 15. AgentOrg Member overrides preserve the established AgentTeam launch hierarchy: the outer label carries the exact configurable-Agent count with an adjacent disclosure; the outer disclosure and every mounted-Team scope start collapsed; exact-scope inheritance/customization and exact coordinator-Agent identity are explicit; and Team/member controls are disclosed only on demand.
-16. AgentOrg configuration preview, launch input, server resolution, validation, and durable launched snapshot agree on one effective setting at Org root, Team placement, and exact Agent placement; an explicit runtime/model change does not silently restore incompatible inherited model config.
-17. AgentOrg configuration, active/focus, and history routes retain one recognizable standard Workspaces/history shell; Org hierarchy is incorporated into that shell instead of replacing it with an Org-only navigation surface.
-18. A fresh AgentOrg draft selects an actually available `Temp Workspace (Default)` like AgentTeam. Explicit user choice wins, no unavailable Workspace is invented, and Teams/Agents inherit the root Workspace except for the supported exact Team placement override.
 
 ## Behavioral Contract Cases
 
@@ -193,15 +190,6 @@ defaults still seed the definition's standalone launch journey.
 | ORG-CASE-059 | User invokes AgentOrg `Run` and reaches configuration | Render `Member overrides (N)` collapsed initially, with `N` equal to the exact configurable Agent placements across direct Org Agents and mounted-Team Agents and with its accessible disclosure immediately beside the label; opening it exposes direct placement rows but keeps every mounted Team independently collapsed | Opening the outer disclosure does not automatically expose all Team Agent rows, and direct-to-Org configuration/full-scope launch semantics remain unchanged. |
 | ORG-CASE-060 | User scans or expands one mounted Team under Member overrides | The collapsed Team row shows readable Team name, `TEAM`, exact mounted address, explicit `Inherited` or `Customized` Team-scope state, and an accessible expansion control. Expanding that Team reveals its Team-placement controls and exact direct-Agent rows in the established AgentTeam launch visual/control language while sibling Teams remain collapsed; coordinator identity appears on the exact coordinator Agent row only | No bespoke always-exposed child tree, implicit inherited state, Team-row/Org coordinator semantics, copied Team definition, configured nested Team, or shared Team/Org runtime payload is introduced. |
 | ORG-CASE-061 | User changes a Team-placement value or one exact Team Agent value, collapses/reopens the Team, then launches | Each state label remains local to the exact placement: Team scope is customized only by its own override, each Agent remains inherited until its own override exists, and an Agent-only override does not relabel the Team scope. Draft values survive disclosure changes; effective configuration still resolves Agent override → Team override → Org root and complete launch validation remains authoritative | Collapse/expand never discards a valid draft, mutates the referenced Team definition, changes coordinator ingress, selects a recipient, or alters persistence/transport semantics. |
-
-### AgentOrg Launch Parity And Unified Workspace Shell — Behavior Approved In RER-024; Focused Product Evidence Pending
-
-| Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
-| --- | --- | --- | --- |
-| ORG-CASE-062 | Org root, direct Team placement, or exact Agent placement changes to a supported runtime/model without supplying an explicit compatible model config | Configuration preview, validation, serialized launch semantics, server resolution, and the durable launched snapshot all resolve the same exact setting; incompatible inherited model config is cleared/null at the changed scope, while a compatible explicit config is preserved | No boundary may treat the same authored state as cleared in the UI but inherited on the server. This contract does not select omission, `null`, resolved payload, or another wire representation. |
-| ORG-CASE-063 | User opens AgentOrg configuration from a populated standard Workspaces tree, launches/focuses the Org, navigates to other roots, then reopens active or stopped history | One recognizable standard Workspaces/history shell remains continuously available and incorporates truthful AgentOrg roots, fixed-depth members, status, task lineage, focus, and history alongside standalone Agent/Team runs; unaffected expansion, selection, and scroll context are preserved | An AgentOrg route does not replace the entire shell with an Org-only panel, discard unrelated runs, invent a coordinator, or restore configured Team nesting. Product Design owns the concrete responsive presentation. |
-| ORG-CASE-064 | User opens a fresh AgentOrg draft while `Temp Workspace (Default)` is actually available | Select and visibly present that Workspace at the Org root using the established AgentTeam default behavior; a later explicit existing/new Workspace choice persists and is not overwritten. On a later fresh draft, reapply the available default | Do not initialize empty while the valid default is available, invent a path when unavailable, use Workspace selection as recipient focus, or mutate a definition. If no valid default exists or loading fails, keep Run blocked with an actionable selection/error until a valid root Workspace is supplied. |
-| ORG-CASE-065 | User inspects an independently collapsed mounted Team and its direct Agents after root Workspace default/choice, then sets or removes a supported exact Team Workspace override | Team and Agent rows truthfully inherit the Org-root Workspace unless that exact Team placement has its own supported Workspace override; the Team override applies to that Team's direct Agents and survives disclosure changes; removing it returns the branch to root inheritance | Do not add an unsupported exact-Agent Workspace override, erase a Team override because the root changes, mutate the referenced Team definition, select a recipient, or imply independent mounted-Team lifecycle ownership. |
 
 ## Normative Definition Package And Admission Contract — Approved In RER-018
 
@@ -638,8 +626,6 @@ identity.
 | ORG-VERIFY-010 | ORG-CASE-049–055 | Exact Team Definition V2 / Org Definition V1 codecs, source ownership, migration-only legacy decoding, target-only normal admission, external dependency diagnostics, runtime independence, and approved per-definition availability. |
 | ORG-VERIFY-011 | ORG-CASE-056–058 | Mounted Team aggregate status over exact in-branch Agent projections; five-state precedence; collapsed visibility; accessible meaning; truthful stopped/history behavior; no Team-root lifecycle or persistence authority. |
 | ORG-VERIFY-012 | ORG-CASE-059–061 | Exact-Agent count and adjacent accessible outer disclosure; outer and per-Team default collapse; established Team-scope identity/state/disclosure language; exact coordinator Agent identification; exact-placement-local inheritance/customization; sibling independence; draft preservation; unchanged effective-setting precedence, flat membership, coordinator-free Org, and distinct payload/runtime ownership. |
-| ORG-VERIFY-013 | ORG-CASE-062 | Cross-boundary equality of preview, validation, launch request semantics, server effective resolution, and durable snapshot for root/Team/Agent runtime-model-config inheritance, explicit clear/null, compatible explicit config, and invalid exact-scope failure. |
-| ORG-VERIFY-014 | ORG-CASE-063–065 | Standard unified Workspaces/history-shell continuity across configuration/active/history; truthful mixed root/member/status/task presentation; fresh available Temp Workspace default; explicit-choice stability; unavailable-default error behavior; root-to-Team/Agent inheritance; supported Team-only Workspace override; no recipient or definition/lifecycle side effect. |
 
 ## Contract Non-Goals
 
@@ -661,9 +647,6 @@ identity.
 - Persisting or transporting an independent mounted-Team aggregate status, registering a mounted Team as another collaboration root, or adding mounted-Team Stop/restore/archive lifecycle actions inside an AgentOrg.
 - Retaining the superseded `VIS-015` always-exposed Team-child hierarchy, showing inherited Team scope only by the absence of a badge, or introducing a third Member-overrides interaction instead of preserving the established AgentTeam launch language.
 - Interpreting presentation parity as configured Team recursion, AgentOrg coordinator semantics, Team-definition cloning, or shared Team/Org runtime and launch-payload ownership.
-- A route-selected AgentOrg-only replacement for the standard Workspaces/history shell or removal of unrelated standalone run context when entering AgentOrg configuration, active, or history views.
-- Fabricating a Workspace when the Temp default is unavailable, overwriting an explicit user Workspace selection, or introducing exact-Agent Workspace overrides as part of the parity correction.
-- Allowing client preview/validation and server launch resolution to assign different effective runtime, model, model config, Workspace, or auto-approval state to the same authored Org placement.
 
 ## Approval Basis
 
@@ -747,17 +730,3 @@ interaction slice. Product-declared fixture
 names/values remain illustrative, and the prototype's local mocked persistence,
 services, orchestration, streams, and writes do not define production
 architecture.
-
-The user's post-`RER-023` Electron review explicitly supersedes only the
-left-shell and empty-root-Workspace portions of original `VIS-014`,
-`VIS-016`–`VIS-018`, and `VIS-020`, plus the same shell/empty-Workspace
-portions visible in `VIS-OVR-001`–`VIS-OVR-006`. The Member-overrides content
-of the focused override package and every unrelated approved Product slice
-remain authoritative. `RER-024` approves the behavior in `ORG-CASE-062`–
-`ORG-CASE-065`: one standard Workspaces/history shell, an available Temp
-Workspace default with exact Team inheritance/override, and effective launch
-configuration equivalence. `ORG-CASE-062` is an Architecture/API-E2E
-cross-boundary obligation rather than a new visual design choice. A focused
-Product-owned supplement and explicit user approval are still required for
-the presentation in `ORG-CASE-063`–`ORG-CASE-065` before Architecture Design
-re-entry.
