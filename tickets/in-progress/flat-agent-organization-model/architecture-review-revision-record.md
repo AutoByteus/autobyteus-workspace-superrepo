@@ -18,6 +18,7 @@ concise chronological architecture-review history.
 | ARCH-REV-009 | Round 9 / `AD-REV-011` one-FIFO validation-coherence correction | `AD-REV-011` | Fail — Design Impact | Pass | `AR-FIND-005` |
 | ARCH-REV-010 | Round 10 / `AD-REV-012` response to `CRR-021 / CR-FIND-020` and approved `RER-023` | `AD-REV-012` | Pass | Pass | `CR-FIND-020` |
 | ARCH-REV-011 | Round 11 / `AD-REV-013` response to approved `RER-024` and DR-003 Electron findings | `AD-REV-013` | Pass | Fail — Design Impact | `AR-FIND-006` |
+| ARCH-REV-012 | Round 12 / `AD-REV-014` ownership-coherence recovery | `AD-REV-014` | Fail — Design Impact | Pass | `AR-FIND-006` |
 
 ## Revision Entries
 
@@ -295,3 +296,27 @@ None.
 - Material classification changes: The authoritative review changes from `Pass` to `Fail / Design Impact`. AD-REV-013 remains `Medium / High` in isolation and the cumulative package remains `Large / High`. The required recovery is expected to be `Small / Low` if it only corrects Architecture-owned ownership wording and maps. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: `/software_engineering_team/architecture_designer`
 - Remaining risks or uncertainty: Reconcile DS-025, terminology, ownership/file mapping, revision rationale, and VAL-032 to one presentation-state owner without adding new state or behavior. After re-review, Implementation must still prove cross-layer configuration equality, route-stable history state/category/actions, actual Workspace default selection/inheritance, standalone Team regression safety, and absence of new API/persistence/runtime/lifecycle machinery.
+
+### ARCH-REV-012 — Unified history owner-separation pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 12; `AD-REV-014` responded to `ARCH-REV-011 / AR-FIND-006` by reconciling the mixed history data owner and mounted presentation-state owner throughout the architecture package.
+- Triggering role, report path, and finding IDs: Architecture Designer; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; `AR-FIND-006`.
+- Relevant architecture design revision IDs: `AD-REV-014`, cumulative with unchanged accepted `AD-REV-001`-`AD-REV-013`
+- Prior authoritative decision: `Fail — Design Impact` (`ARCH-REV-011`)
+- Current authoritative decision: `Pass`
+- What changed in the review result or what baseline was established: Independently verified the focused correction against the canonical DS-025 narrative, terminology, spine/owner/dependency/interface maps, source/file responsibilities, risks, and VAL-032. The mixed history read owner now owns only the two existing query loads, strict subject decoding, family-scoped slices/errors, stable row keys, Workspace grouping, and category/row order. The always-mounted `WorkspaceAgentRunsTreePanel` creates exactly one `useWorkspaceHistoryTreeState` instance for expansion, ancestor reveal, and selected-row highlighting; the persistent panel container owns scroll. Existing selection/navigation state remains authoritative for selected subject identity and is only an input to the tree controller. No contradictory affirmative ownership statement remains. DS-024, DS-026, two-query composition, typed root actions, partial-family failure handling, alternate Org panel/cache deletion, and all cumulative contracts are unchanged.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-006` | Open — Design Impact | Resolved | `AD-REV-014`; DS-025; terminology; ownership/dependency/interface/file maps; VAL-032 | All current affirmative descriptions use the same non-overlapping read-data versus panel/tree-state presentation split, preserve selected subject identity outside the tree controller, and forbid a route-specific second controller. |
+| `AR-FIND-001`-`AR-FIND-005` | Resolved in prior architecture-review rounds | Remain resolved | `AD-REV-003`-`AD-REV-014`; `ARCH-REV-002`-`ARCH-REV-009` | AD-REV-014 is documentation-only and changes no accepted definition transition, handoff order, migration, runtime composition, settlement, or shutdown mechanism. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020`, `CR-FIND-020` | Resolved in prior rounds | Remain resolved at the design boundary | `AD-REV-004`-`AD-REV-014` | No source mechanism, public/durable contract, Product behavior, runtime/lifecycle, status, or launch-hierarchy decision changed. |
+| `CR-FIND-019` | Implemented; retained as regression obligation | Remains a regression obligation | `IR-026`, `CRR-032`, `AD-REV-013`-`AD-REV-014` | The documentation-only correction neither absorbs nor reverses the source behavior. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: The authoritative review changes from `Fail / Design Impact` to `Pass`. AD-REV-014 is `Small / Low` in isolation; the cumulative package remains `Large / High` and proceeds through reviewed Implementation reconciliation, source review, and API/E2E. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+- Remaining risks or uncertainty: Implementation must preserve the owner split while proving cross-layer configuration equality, route-stable history state/category/actions, actual Workspace default selection/inheritance, standalone Team regression safety, and absence of new API/persistence/runtime/lifecycle machinery. These are controlled implementation/validation risks, not open architecture decisions.
