@@ -15,6 +15,8 @@ The latest `api-e2e-coverage-investigation.md` and
 | API-REV-006 | Code Reviewer CRR-025 / cumulative IR-021 renewal | RER-023; AD-REV-012; ARCH-REV-010; IR-021; CRR-025 | Fail / 93.1% | Pass / 97.9% |
 | API-REV-007 | Code Reviewer CRR-030 / localized cumulative IR-025 renewal | RER-023; AD-REV-012; ARCH-REV-010; IR-025; CRR-030 | Pass / 97.9% | Fail / 86.9% |
 | API-REV-008 | Code Reviewer CRR-032 / browser-safe recovery and cumulative IR-026 renewal | RER-023; AD-REV-012; ARCH-REV-010; IR-026; CRR-032 | Fail / 86.9% | Pass / 98.4% |
+| API-REV-009 | Code Reviewer CRR-034 / canonical launch and unified-history IR-027 renewal | RER-024; AD-REV-014; ARCH-REV-012; IR-027; CRR-034 | Pass / 98.4% | Fail / 87.0% |
+| API-REV-010 | Code Reviewer CRR-036 / IR-028 route/config renewal | RER-024; AD-REV-014; ARCH-REV-012; IR-028; CRR-036 | Fail / 87.0% | Pass / 98.3% |
 
 ## Revision Entries
 
@@ -721,3 +723,72 @@ recovery:
   its exact AppImage provenance was verified. The live ERROR run selected bounded
   exhaustion, while direct current durable coverage proved the alternate complete
   snapshot publication branch. Neither is a material acceptance gap.
+
+### API-REV-009 — Canonical launch equality passes; unified Org-to-Team switch fails
+
+- Triggering role/report/round: Code Reviewer `CRR-034 / Pass`; API/E2E round 10.
+- Triggering scenarios: new `REQ-030–032`, `AC-025–027`, `SCN-014–016`, `DS-024–026`, plus cumulative critical renewal.
+- Related revisions: `RER-024`; `AD-REV-014`; `ARCH-REV-012 / Pass`; cumulative `IR-001–027`; `CRR-034 / Pass`.
+- Tested source/artifact: `f6da607ebb0264487f335b7110c69ff0c18602eb` / `05fdb29945856a59afee98f870b1bca33f3c7213`.
+- Why recorded: IR-027 changed canonical placement launch semantics, Temp Workspace provenance and the one continuously mounted mixed history surface. These observable cross-boundary changes required renewed repository and real browser/API/persistence proof rather than inference from API-REV-008.
+- Durable coverage changed: updated `autobyteus-web/stores/__tests__/runHistoryNavigationProjection.spec.ts` so two builders provide the now-required empty `agentOrgHistory` slice and the expectation uses the approved stable workspace key. Repaired file passed 7/7; retained web cohort passed 27/193. No production source was changed by API/E2E.
+- Repository result: focused web 10 files/153 tests, server resolver 1/1, retained server 15/61, repaired retained web 27/193, guards/audit/removal scan, server build/bootstrap and production renderer build/prerender 16 routes all passed.
+- Real execution: normal UI package remove/re-import; both packaged Orgs discoverable; prior Team/Org histories retained; actual Temp default and null focus; root/Team/exact-Agent preview -> request -> durable equality; active standalone Team plus active Org subject switching; exact cleanup.
+
+#### Prior Failure Resolution
+
+None. API-REV-008 passed its artifact; this round tests newly changed IR-027 boundaries.
+
+#### New finding
+
+`API-FIND-017` / `LIVE-003` fails `REQ-031 / AC-026 / SCN-015 / DS-025`:
+
+- standalone Team -> AgentOrg switching succeeds;
+- from the AgentOrg query route, selecting an active standalone Team exact member changes the Team row to selected/current but leaves the AgentOrg URL and Concierge center content unchanged;
+- the rendered screen contains simultaneous highlighted Team Analyst and Org Concierge targets;
+- the same behavior occurs with the prior inactive Team;
+- correlated real-browser evidence contains no GraphQL, console or page error;
+- preliminary source correlation identifies `AppLeftPanel.onRunningRunSelected` returning for every `/workspace` pathname, including AgentOrg query routes, rather than clearing the stale query by routing to plain `/workspace`.
+
+Preliminary classification is implementation/frontend `Local Fix`; Code Reviewer must confirm failure origin. Requirements and design explicitly require this switch, so no gap or redesign is inferred.
+
+- Canonical artifacts updated:
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-test-case-ledger.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-revision-record.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-009/`
+- Prior result/confidence: `Pass / 98.4%`.
+- Current result/confidence: **Fail / 87.0%**.
+- New/remaining finding: `API-FIND-017`.
+- `LIVE-004–005`: Not Tested after the critical supported-navigation failure; prior-artifact passes are not inferred.
+- Cleanup: server SIGTERM clean; renderer/tab stopped; ports/tabs closed; package 18/18 immutable; exact HEAD/source ancestry and diff check preserved.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for focused failure-origin review under the dynamic handoff rule.
+- Delivery readiness: not claimed.
+
+### API-REV-010 — IR-028 navigation/config fix and cumulative real-system Pass
+
+- Triggering role, report path, and round: Code Reviewer `CRR-036 / Pass`; API/E2E round 11.
+- Triggering finding or scenario IDs: prior `API-FIND-017`, `REQ-031 / AC-026 / SCN-015 / DS-025`, direct/mounted exact-Agent configuration under `DS-017`, and retained cumulative `REQ-001–032` critical coverage.
+- Related revisions: `RER-024`; cumulative `AD-REV-014`; `ARCH-REV-012 / Pass`; `IR-028`; `CRR-036 / Pass`.
+- Tested source/artifact: `4d378df9cba56bd1b9ebf20d9b055f964398f642` / `100e2c82cb948e1cbef4026ab6f74ab815285a34`.
+- Why recorded: IR-028 changed mutual exclusion between standalone Team and AgentOrg selection/query ownership and added exact current-Agent configuration/Back behavior. The Large/High route required a cumulative repository and realistic browser/provider/process renewal rather than inference from API-REV-009.
+- Durable coverage changed: no new edit in this round. The API-owned `autobyteus-web/stores/__tests__/runHistoryNavigationProjection.spec.ts` update made during API-REV-009 remains present and now passed in the 14-file/177-test focused and 27-file/195-test retained cohorts. It adds required `agentOrgHistory` fixture state and the approved `workspace:/workspace-a` stable key; proportional test-code review remains required.
+- Repository coverage: exact artifact/source/package preflight Pass; current web 14/177; retained server 15/61; retained web 27/195; web/localization guards and zero-finding audit; server build/bootstrap; production renderer build/prerender 16 routes — all Pass.
+- Real execution: current production browser on desktop and 390x844, real Fastify/GraphQL/WebSocket server, SQLite/filesystem, imported 4-Agent/2-Team/2-Org package, Codex App Server / `gpt-5.6-sol`, formal task tools, same-data SIGTERM/restart/Restore and cleanup.
+
+#### Prior Failure Resolution
+
+| Prior Scenario / Failure Reference | Previous Classification | Current Resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-017` / LIVE-003 / AC-026 | frontend implementation Local Fix, confirmed and source-resolved by IR-028/CRR-036 | Active and inactive AgentOrg -> standalone Team -> AgentOrg switching now produces the exact URL and center and exactly one current highlight at desktop and through the supported 390x844 strip/drawer hierarchy. | `API-REV-010/live/LIVE-001-active-switch.json`; `LIVE-001-inactive-org-switch.json`; screenshots |
+
+- Cumulative real outcomes: exact direct/mounted gear -> locked config -> same-monitor Back and distinct New Pass; family-scoped history failure/recovery Pass; inactive Team first-prompt activation and Team/Org Codex markers Pass; fresh delegate -> initial submit -> revision -> same-task revised submit -> accept Pass with durable sidecar; strict identity negatives Pass; legal-code automatic recovery exhaustion Pass; clean SIGTERM, migration preflight, mixed inactive history, whole-Org Restore, provider-identity semantics, Team/Org continuation and terminal Stop Pass.
+- Observed errors: two locator/wait detachments, one rapid-click inactive-Team warning, intermittent Codex model-catalog child-exit timeout stderr, the pre-existing `/health` 404 and two incorrectly constructed manual task probes were investigated. Supported reruns/boundary evidence passed; none remains a production finding.
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, and `api-e2e-evidence/API-REV-010/`.
+- Prior result/confidence: `Fail / 87.0%`.
+- Current result/confidence: **`Pass / 98.3%`**.
+- New or remaining failure IDs: none.
+- Broader validation: `Required and completed`.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for proportional test-code review.
+- Remaining bounded scope: unchanged Electron shell, separately owned external definition publication and destructive corruption of a live copied store; none is a material gap for IR-028.

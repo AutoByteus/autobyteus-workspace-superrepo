@@ -121,6 +121,18 @@ The Pinia stores act as the primary interface for the UI components to interact 
   Launch establishes the full coordinator-free scope without focus; `select()`
   later focuses an exact Agent or mounted Team. A mounted Team selection resolves
   to its direct coordinator but does not create a standalone Team lifecycle.
+- `AgentOrgStreamingService` fails closed on current-generation correlation,
+  schema, root, sequence, snapshot-barrier, or acknowledgement violations. It
+  retires that exact generation, schedules transparent recovery before asking
+  the browser to close the retired socket, and uses application close code
+  `4000` (`1002` is reserved and is never sent by the browser client). A stale
+  socket cannot reacquire ownership or mutate the replacement context.
+- Transparent recovery is private and automatic-only; no public/manual
+  **Reconnect** control is exposed. It checkpoint-verifies and hydrates a
+  replacement candidate, atomically publishes the verified context while
+  preserving exact focus, and clears any prior notice only after success. The
+  service makes at most five attempts; exhaustion produces one localized notice
+  and a terminal offline state rather than a permanent connecting state.
 - These stores never import the Team draft/config store as configuration
   authority, synthesize an Org coordinator, or convert AgentOrg persistence into
   Team V2 state.

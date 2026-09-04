@@ -37,6 +37,10 @@
 | `CRR-031` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-007 valid AgentOrg ERROR recovery failure | `Pass — cumulative source` | `Fail — Local Fix` | `CR-FIND-024`; `API-FIND-016` |
 | `CRR-032` | `code-review-report.md` | Implementation Review / IR-026 browser-safe recovery correction and fresh cumulative review | `Fail — Local Fix` | `Pass — cumulative source` | `CR-FIND-024`; `API-FIND-016` |
 | `CRR-033` | `api-e2e-test-review-report.md` | Successful API/E2E Test-Code Review / API-REV-008 | `Pass — cumulative source` | `Not Applicable — no durable test change` | `None` |
+| `CRR-034` | `code-review-report.md` | Implementation Review / IR-027 RER-024 launch/history/default reconciliation and fresh cumulative review | `Not Applicable — no durable test change` | `Pass — cumulative source` | `None`; prior `CR-FIND-001–024` remain resolved |
+| `CRR-035` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-009 plus user-reported active AgentOrg-member settings parity | `Pass — cumulative source` | `Fail — Local Fix` | `CR-FIND-025`, `CR-FIND-026`; `API-FIND-017` |
+| `CRR-036` | `code-review-report.md` | Implementation Review / IR-028 truthful center ownership and exact live-member settings | `Fail — Local Fix` | `Pass — cumulative source` | `CR-FIND-025`, `CR-FIND-026` resolved |
+| `CRR-037` | `api-e2e-test-review-report.md` | Successful API/E2E Test-Code Review / API-REV-010 | `Pass — cumulative source` | `Pass — proportional durable test-code review` | `None` |
 
 ## Revision Entries
 
@@ -1018,3 +1022,112 @@ New findings:
 - Review accountability: the successful-test entry point was applied proportionately. The implementation source review and API/E2E run were not repeated. Temporary probes, screenshots, logs and execution artifacts were not misclassified as durable tests.
 - Recommended recipient: exact successful post-API/E2E recipient returned by `get_handoff_rules`, expected `/software_engineering_team/delivery_engineer`
 - Remaining risks or uncertainty: the unchanged Electron shell was not launched, while exact AppImage provenance was verified; the live recovery run exercised bounded exhaustion and current durable service coverage exercised successful complete-snapshot publication. API/E2E classifies both as negligible, non-blocking residuals. Delivery owns integration, documentation synchronization, finalization, and applicable release/deployment work.
+
+### CRR-034 — IR-027 unifies effective launch semantics and Workspaces history
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review — skill-reloaded fresh cumulative source review`, round `34`
+- Triggering role, report path, and finding or scenario IDs: Implementation Engineer / `implementation-handoff.md` / `IR-027`; approved `RER-024`; `CR-SCN-045–048`; `CR-CAND-073–078`; user's standing whole-ticket-review instruction
+- Relevant architecture design revision IDs: cumulative `AD-REV-014`, with focused mechanisms `AD-REV-013/014 / DS-024–026`
+- Relevant architecture-review revision IDs: `ARCH-REV-012 / Pass`; resolved `AR-FIND-006`
+- Relevant implementation revision IDs: cumulative `IR-001–IR-027`; current source `f6da607ebb0264487f335b7110c69ff0c18602eb`; artifact `05fdb29945856a59afee98f870b1bca33f3c7213`
+- Relevant API/E2E revision IDs: `API-REV-008 / Pass / 98.4%` on IR-026; renewed cumulative execution pending for IR-027
+- Relevant delivery revision IDs: `DR-003 / Awaiting Explicit User Verification`, superseded as the final candidate by RER-024/IR-027
+- Prior authoritative result: `CRR-033 / Not Applicable — no durable API/E2E test-code change`; prior source `CRR-032 / Pass`
+- Current authoritative result: `Pass — cumulative source; advance to renewed API/E2E`
+- What changed in the review result and why: IR-027 implements one canonical sparse AgentOrg root/Team/Agent launch patch with explicit incompatible-config clearing, one actual-catalog root Temp Workspace default with explicit-choice provenance and exact Team override, and one continuously mounted Workspaces/history surface with strict two-query family composition and a single panel-owned tree-state controller. It deletes the alternate AgentOrg panel/cache/fetch owner. Independent review passed 10 web files/153 tests and the server resolver 1/1, confirmed source diff/inventory limits, inspected desktop/narrow production-component evidence, and found no cumulative runtime, durable, recovery, migration, lifecycle or accepted Team-like launch regression.
+- Supported product scenario / material-premise basis changes: `CR-SCN-045–047` record the user-confirmed normal launch-equality, unified-history and Temp Workspace parity journeys from RER-024. `CR-SCN-048` preserves approved cumulative scenarios. `CR-CAND-073–075` are rejected as current findings because the source/test evidence shows singular correct paths. `CR-CAND-076` is promoted only as a Delivery-owned docs-sync obligation: current docs still name the deleted panel/parallel owner, but this has no current runtime consequence and does not block source/API progression. Artificial query hangs/timing and tooling warnings are rejected under `CR-CAND-077/078` and do not affect the result.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001–023` | Resolved | Resolved / preserved | `CRR-025`, `CRR-030`; `API-REV-008`; `IR-027` | Fresh cumulative inventory (`425` implementation-source records; zero current `>500`), focused tests, strict owner/dependency/dead-path checks and source diff check found no regression. |
+| `CR-FIND-024 / API-FIND-016` | Resolved in source and production execution | Resolved / preserved | `IR-026`; `CRR-032`; `API-REV-008`; `IR-027` | IR-027 does not alter AgentOrg streaming/recovery; the source invariant and prior production-browser evidence remain applicable. |
+| `AR-FIND-006` | Resolved at architecture boundary | Resolved and implemented | `AD-REV-014`; `ARCH-REV-012`; `IR-027`; `CR-CAND-074` | `runHistoryStore` owns mixed data only; one always-mounted panel/controller owns expansion/reveal/highlight; selected identity remains external; the route-specific Org panel/cache are deleted. |
+
+- New or remaining finding IDs: `None`
+- Material score or classification changes: current cumulative score is `9.3/10 (93.1/100)`, every category at least `9.2`; classification is `Pass`. No Design Impact, Requirement Gap, Product UI gap, backend/API, persistence, runtime, recovery or migration impact exists. Docs impact is `Yes` and downstream-owned.
+- Review accountability: the Code Reviewer skill, shared design principles and Example 9 were reloaded. This was a fresh cumulative whole-ticket review, not a delta-only approval. Findings/deductions use only the supported normal RER-024 journeys or established contracts. Unsupported artificial timing, query non-settlement and speculative concurrency were rejected and did not drive machinery.
+- Recommended recipient: primary implementation-pass recipient returned by `get_handoff_rules` (expected `/software_engineering_team/api_e2e_engineer`), followed by the informational pass recipient if the rule set specifies it (expected `/software_engineering_team/implementation_engineer`).
+- Remaining risks or uncertainty: renewed API/E2E must prove actual-route cross-layer launch equality and persisted snapshots, actual Temp Workspace default/inheritance/override behavior, unified hierarchy continuity/category order/actions/partial-family errors across live/stopped/restart/restore, and retained API-REV-008 critical runtime paths. Delivery must then refresh stale history-ownership docs and replace the superseded DR-003 verification package.
+
+### CRR-035 — Unified-run switching and AgentOrg member settings have frontend ownership defects
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `API/E2E Failure-Origin Review — Code Reviewer skill reloaded`, round `35`
+- Triggering role, report path, and finding or scenario IDs: API/E2E Engineer / `api-e2e-execution-coverage-report.md` / `API-REV-009`, `LIVE-003`, `API-FIND-017`; direct user report for active AgentOrg-member settings; reviewer `CR-SCN-049–051`, `CR-CAND-079–082`, `CR-FIND-025/026`
+- Relevant architecture design revision IDs: cumulative `AD-REV-014`; focused `DS-017`, `DS-025`
+- Relevant architecture-review revision IDs: `ARCH-REV-012 / Pass`
+- Relevant implementation revision IDs: cumulative `IR-001–IR-027`; source `f6da607ebb0264487f335b7110c69ff0c18602eb`; artifact `05fdb29945856a59afee98f870b1bca33f3c7213`
+- Relevant API/E2E revision IDs: `API-REV-009 / Fail / 87.0%`; prior `API-REV-008 / Pass / 98.4%`
+- Relevant delivery revision IDs: `DR-003 / Awaiting Explicit User Verification`, no longer a final candidate
+- Prior authoritative result: `CRR-034 / Pass — cumulative source`
+- Current authoritative result: `Fail — implementation-owned frontend Local Fix`
+- What changed in the review result and why: API-REV-009 proved that selecting a standalone Team member from an AgentOrg query route updates the row selection but leaves the AgentOrg URL and center active. Source tracing confirms `AppLeftPanel.onRunningRunSelected` returns on pathname-only `/workspace`, while AgentOrg query ownership still wins the first center branch. The user's second report is also confirmed by source: the visible shared settings gear for a focused live AgentOrg direct Agent or mounted-Team Agent is aliased to the same fresh Org launch-config route as New, drops the exact run/focus identity, and cannot show the accepted locked current-run config with Back to events.
+- Supported product scenario / material-premise basis changes: `CR-SCN-049` is the explicit normal `REQ-031 / AC-026 / SCN-015` Team ↔ Org switch. `CR-SCN-050` is the normal visible gear action for inspecting a live AgentOrg member's current run and returning to its monitor; its basis is the user's direct clarification, accepted standalone/`origin/personal` behavior, and `DS-017` shared-surface/header-action contract. Both are production reachable without concurrency, artificial timing, or a downstream test establishing its own premise. `CR-CAND-079/081` are promoted. Backend/environment and new Product/design-gap attributions are rejected by `CR-CAND-080/082`.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001–024` | Resolved | Resolved / unaffected | `CRR-034`; `API-REV-008/009` | API-REV-009's material passes and focused source trace do not reopen prior runtime/durable/recovery/localization/migration findings. |
+| `CR-FIND-025 / API-FIND-017` | New | Open — implementation Local Fix | `CR-SCN-049`; `CR-CAND-079`; `API-REV-009` | Real browser shows simultaneous Team/Org highlights and stale Org center; pathname-only early return plus center precedence explains it exactly. |
+| `CR-FIND-026` | New | Open — implementation Local Fix | `CR-SCN-050`; `CR-CAND-081`; user report | Production gear is exposed; current Org adapter routes edit and New identically to fresh Org configuration; accepted standalone current-run config provides locked fields and Back. |
+
+- New or remaining finding IDs: `CR-FIND-025 / API-FIND-017`, `CR-FIND-026`
+- Material score or classification changes: CRR-034's full scorecard is not repeated in this focused failure-origin round and is superseded for routing. Both defects classify as bounded implementation-owned frontend `Local Fix`; no Design Impact, Requirement Gap, Product gap, backend/API, persistence, migration, provider, fixture, timing, or environment origin is supported.
+- Review accountability: both defects were reasonably detectable. CRR-034 failed to trace reverse standalone selection through route query ownership and center precedence. Earlier cumulative review also accepted shared AgentOrg header chrome while the test asserted the wrong gear semantics instead of comparing it with the accepted current-run configuration path.
+- Recommended recipient: exact implementation-owned Local Fix recipient returned by `get_handoff_rules`, expected `/software_engineering_team/implementation_engineer`
+- Remaining risks or uncertainty: require source review and renewed cumulative API/E2E. Validate one truthful center owner on Org -> active/inactive Team and back; validate direct and mounted-Team live Agent settings as locked exact-current-run views with Back to the same monitor. Preserve unified history, Org focus/root ownership, launch equality/defaults, automatic recovery, task/persistence/restore, localization, and strict identities.
+
+### CRR-036 — IR-028 restores truthful center ownership and exact live-member settings
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review — skill-reloaded fresh cumulative source review`, round `36`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md` / `IR-028`; `CRR-035`; `CR-FIND-025 / API-FIND-017`, `CR-FIND-026`; `CR-SCN-049/050`; `CR-CAND-079/081/083–085`
+- Relevant architecture design revision IDs: cumulative `AD-REV-014`; focused `DS-017`, `DS-025`
+- Relevant architecture-review revision IDs: `ARCH-REV-012 / Pass`
+- Relevant implementation revision IDs: cumulative `IR-001–IR-028`; source `4d378df9cba56bd1b9ebf20d9b055f964398f642`; artifact `100e2c82cb948e1cbef4026ab6f74ab815285a34`
+- Relevant API/E2E revision IDs: `API-REV-009 / Fail / 87.0%`; prior `API-REV-008 / Pass / 98.4%`; renewed execution pending
+- Relevant delivery revision IDs: `DR-003 / Awaiting Explicit User Verification`, superseded pending renewed source/API route
+- Prior authoritative result: `CRR-035 / Fail — implementation-owned frontend Local Fix`
+- Current authoritative result: `Pass — cumulative source; advance to renewed API/E2E`
+- What changed in the review result and why: IR-028 treats only query-free `/workspace` as canonical standalone ownership, clears standalone selection on Org open/select, separates member gear from New, and uses the exact live Org target with the existing locked `AgentRunConfigForm` and center-mode owner. Back returns to the same root/address/AgentRun monitor. Independent review passed `14` focused files / `177` tests, web/localization guards, zero-finding localization audit, production Nuxt build/prerender (`16` routes), current diff/inventory checks, and direct/mounted desktop/narrow evidence.
+- Supported product scenario / material-premise basis changes: no upstream behavior changed. `CR-SCN-049` remains the approved normal cross-family Workspaces switch; `CR-SCN-050` remains the user's directly confirmed live-Agent gear -> locked config -> Back journey. `CR-CAND-079/081` are rejected as current findings because the source defects are absent. `CR-CAND-083` rejects a broader editable/full-Org settings workflow as unsupported by the user's exact request; no speculative machinery or requirement is introduced. `CR-CAND-085` preserves the existing Delivery-owned docs-sync obligation.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001–024` | Resolved | Resolved / preserved | `CRR-034/035`; `API-REV-008/009`; `IR-028` | Fresh cumulative inventory (`430` implementation-source records, `406` current, `24` removed, zero current `>500`), focused tests, guards/build, unchanged runtime/durable owners, and API-REV-009 material passes reveal no reopening. |
+| `CR-FIND-025 / API-FIND-017` | Open — implementation Local Fix | Resolved at source-review boundary | `IR-028`; `CR-SCN-049`; `CR-CAND-079` | `AppLeftPanel` removes stale AgentOrg query ownership for standalone selection; reverse Org commands clear standalone selection; route/center tests pass. |
+| `CR-FIND-026` | Open — implementation Local Fix | Resolved at source-review boundary | `IR-028`; `CR-SCN-050`; `CR-CAND-081` | exact direct/mounted target identities feed a locked Agent form; gear/New are distinct; Back preserves the same monitor; tests and rendered evidence pass. |
+
+- New or remaining finding IDs: `None`
+- Material score/classification changes: outcome changes from implementation-owned `Local Fix` to cumulative source `Pass`; scorecard is `9.3/10 (93.4/100)`, every category at least `9.2`. No Design Impact, Requirement Gap, Product gap, backend/API, persistence, migration, provider, runtime or lifecycle change exists.
+- Review accountability: Code Reviewer skill, shared design principles, and Example 9 were reloaded. This was a fresh cumulative whole-ticket review, not delta-only approval. The prior review gap is preserved in CRR-035; current review traces both production paths forward and explicitly rejects unsupported expansion of the settings behavior.
+- Recommended recipient: primary implementation-pass recipient returned by `get_handoff_rules`, followed by its informational pass recipient.
+- Remaining risks/uncertainty: API/E2E must rerun active/inactive Org -> standalone Team switching and return with exact URL/center/single-highlight assertions; direct and mounted-Team Agent gear -> locked config -> same-monitor Back; then complete the stopped API-REV-009 cumulative cases. Delivery must update stale history-owner documentation after executable pass.
+
+### CRR-037 — API-REV-010 durable projection-fixture correction passes proportional review
+
+- Canonical test-review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-test-review-report.md`
+- Review entry point and round: `Successful API/E2E Test-Code Review`, proportional round `4`
+- Triggering role, report path, and scenario IDs: API/E2E Engineer / `api-e2e-execution-coverage-report.md`; `API-REV-010 / Pass / 98.3%`; `REPO-001–003`; `LIVE-001–006`; resolved `API-FIND-017`
+- Relevant architecture design revision IDs: cumulative `AD-REV-014`, especially `DS-025`
+- Relevant architecture-review revision IDs: `ARCH-REV-012 / Pass`
+- Relevant implementation revision IDs: cumulative `IR-001–028`; source `4d378df9cba56bd1b9ebf20d9b055f964398f642`; artifact `100e2c82cb948e1cbef4026ab6f74ab815285a34`
+- Relevant source-review revision IDs: `CRR-036 / Pass`
+- Relevant API/E2E revision IDs: `API-REV-010 / Pass / 98.3%`; prior `API-REV-009 / Fail / 87.0%`
+- Relevant delivery revision IDs: `DR-003 / Awaiting Explicit User Verification`; RER-024 and IR-027/028 superseded that final candidate, and the current validated package returns to Delivery for refresh/finalization
+- Prior authoritative result: `CRR-036 / Pass — cumulative source`
+- Current authoritative result: `Pass — proportional API/E2E durable test-code review`
+- What changed in the review result and why: API-REV-010 completed cumulative repository and real-system validation on IR-028 and retained one API-owned six-line update in `runHistoryNavigationProjection.spec.ts`. The two direct projection builders now supply the required empty `agentOrgHistory` family slice, and two ancestry expectations use the canonical normalized `workspace:/workspace-a` stable key. The update is coherent, deterministic, matches the production projection/key contracts, removes no coverage, and passed the current focused and retained cohorts.
+- Supported product scenario / material-premise basis changes: None. RER-024 independently establishes the normal unified Workspaces/history and cross-family selection journey, and DS-025 establishes stable normalized identity. The test fixture confirms those established contracts; it does not manufacture its own supported scenario. API-REV-010's real browser/API execution supplies the production-path evidence.
+- Changed durable test paths: `autobyteus-web/stores/__tests__/runHistoryNavigationProjection.spec.ts`
+- New or remaining test-review finding IDs: `None`
+- Material score or classification changes: No implementation scorecard or source thresholds apply to this proportional test review. `CRR-036 / Pass (9.3/10)` remains the authoritative source result; the separate downstream test-code result is `Pass`.
+- Review accountability: The one changed durable path and every changed line were reviewed. Temporary probes/evidence were excluded, no API/E2E workflow was redundantly rerun, and no test caller or synthetic fixture was used to establish scenario validity.
+- Recommended recipient: exact successful post-API/E2E recipient returned by `get_handoff_rules`, expected `/software_engineering_team/delivery_engineer`
+- Remaining risks or uncertainty: API/E2E records only bounded non-blocking residuals for the unchanged Electron shell, separately owned external-definition publication, and destructive live-store corruption injection. Delivery owns documentation refresh, integration, user verification, finalization, and applicable release/deployment work.

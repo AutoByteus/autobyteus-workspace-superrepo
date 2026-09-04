@@ -3,97 +3,87 @@
 ## Status
 
 - Ticket: `AORG-FLAT-TEAM-001`
-- Delivery result: `Blocked`
-- Classification: `Local Fix`
+- Delivery state: `Awaiting Explicit User Verification`
+- Current delivery revision: `DR-003`
 - Task size: `Large`
 - Architectural risk: `High`
 - Selected route: architecture design → architecture review → implementation → cumulative source review → API/E2E → proportional test-code review → delivery
-- Current delivery revision: `DR-002`
+- Ticket branch: `requirements/flat-agent-organization-model`
+- Finalization target: `origin/personal` / local `personal`
 
 ## Accepted Current Upstream Result Chain
 
 - Requirements: `RER-023`
 - Architecture: `AD-REV-012`
 - Architecture review: `ARCH-REV-010 / Pass`
-- Implementation: `IR-021`; production source `ee6b793599d57cffed1ee0c900abbc07b552ac6b`; tested artifact `c969b480a2aaabf7ae68cd2b576110f2de513ad6`
-- Cumulative source review: `CRR-025 / Pass`, `9.3/10`, no open source finding
-- API/E2E: `API-REV-006 / Pass`, `97.9%`; every REPO-001–005 and LIVE-001–014 case passed; no current `API-FIND-*`
-- Proportional durable test-code review: `CRR-026 / Not Applicable`; API-REV-006 changed no durable test or production source
-- Superseded result: DR-001's integration conflict is resolved; this report does not treat DR-001 as terminal.
+- Implementation: `IR-026`; source `3199ba081ad450be72fba239fe86e76c0c697a33`; tested artifact `06a918c71fc192e0b4ed9c3ef6b4df7163aef530`
+- Cumulative source review: `CRR-032 / Pass`, `9.4/10`, no open source finding
+- API/E2E: `API-REV-008 / Pass`, `98.4%`; REPO-001–003 and LIVE-001–006 passed; no current finding
+- Proportional durable test-code review: `CRR-033 / Not Applicable`; API/E2E changed no durable test file or production source
+- Superseded Delivery result: DR-002's localization/package blocker is resolved; DR-003 is authoritative.
 
-## Mandatory Latest-Base Refresh
+## Latest-Base Integration
 
-- Finalization target: `origin/personal` / `personal`
-- Refreshed base: `origin/personal@5fb16658e7bd2aefd750f99eb596a17382e161ac`
-- Ticket HEAD: `c969b480a2aaabf7ae68cd2b576110f2de513ad6`
-- Merge base: `5fb16658e7bd2aefd750f99eb596a17382e161ac`
-- Divergence (`origin/personal...HEAD`): base `0`, ticket `88`
-- Integration method/result: `Already current`; the remote base is an ancestor and contributed no new commits
-- Post-integration rerun: `Not required`; current artifact already carries the refreshed base and no integration occurred
-- Evidence: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-002/integration-status.log`
+- Refreshed remote base: `origin/personal@66056b5afc49240fa139bcefd00b62d119f35ec8`
+- Reviewed-state safety checkpoint: `b6d9bda8b993721d0eca0d59b2110989b0382efc`
+- Integration method: clean merge of latest `origin/personal` into the ticket branch
+- Integrated user-verification HEAD: `0fb57d902b63d2d927e34ead64a7fb62bf808c09`
+- Divergence after integration (`origin/personal...HEAD`): base `0`, ticket `100`
+- Post-integration executable check: repository-standard ARM64 Electron build passed completely
+- Evidence: `delivery-evidence/dr-003/integration-result.log`, `integration-and-build-preflight.log`, and `electron-linux-arm64-build.log`
 
 ## Docs Synchronization
 
-Long-lived root, server, and frontend docs now describe the flat Team V2 / AgentOrg V1 model, exact configuration/readiness/focus, task-only Team nesting, two-family persistence/history/restore, migration, and mounted-Team presentation.
+Canonical root, server, and frontend docs describe the flat Team V2 / AgentOrg V1 model, exact configuration/readiness/focus, task-only Team nesting, two-family persistence/history/restore, migration, mounted-Team presentation, and the IR-026 automatic-only stream recovery contract.
 
 - Docs report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/docs-sync-report.md`
-- Validation: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-002/docs-validation.log`
+- Validation: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-003/docs-validation.log`
 - Draft release notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/release-notes.md`
 
-## Electron Packaging Blocker
+## Electron User-Verification Build
 
-The user requested the current Electron application for testing. Delivery ran the documented ARM64 command:
+- Version: `1.4.67` (integrated base version; no ticket release was created)
+- Artifact: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/electron-dist/AutoByteus_enterprise_linux-arm64-1.4.67.AppImage`
+- Size: `523949965` bytes
+- SHA-256: `111830cfd723d160d9d692e8860130979403daf7af9ea5bfe51bc4ae31daf1a5`
+- Build command: `PATH=/tmp/aorg-delivery-corepack-bin:$PATH pnpm -C autobyteus-web build:electron:linux:arm64`
+- Build result: Passed all guards, zero-finding localization audit, server preparation/build, Nuxt production generation, Electron transpilation, and `electron-builder` ARM64 AppImage packaging.
 
-```bash
-PATH=/tmp/aorg-delivery-corepack-bin:$PATH pnpm -C autobyteus-web build:electron:linux:arm64
-```
+## Running Application
 
-The first environment-only attempt showed that nested `pnpm` commands needed a Corepack shim; Delivery added the temporary shim and reran the unchanged repository command. The real guarded build then passed `guard:web-boundary` and `guard:localization-boundary` but failed `audit:localization-literals` with 15 unresolved literals in five ticket-changed files:
+- Launch mode: packaged AppImage, `APPIMAGE_EXTRACT_AND_RUN=1`, `--no-sandbox` (root container has no FUSE)
+- Display/window: `DISPLAY=:99`; visible 1200×800 window titled `autobyteus`
+- Current page: Agent Orgs, ready for testing
+- AppImage wrapper PID: `50529`
+- Electron PID: `50564`
+- Embedded server PID: `50626`
+- Data root: `/root/.autobyteus/server-data`
+- Health: `http://127.0.0.1:29695/rest/health` → `{"status":"ok","message":"Server is running"}`
+- Launch/health/window evidence: `delivery-evidence/dr-003/electron-live-verification.log`
+- User-ready screenshot: `delivery-evidence/dr-003/electron-agent-orgs-ready.png`
 
-1. `autobyteus-web/components/agentTeams/AgentTeamDefinitionForm.vue`
-2. `autobyteus-web/components/agentTeams/form/AgentTeamLibraryPanel.vue`
-3. `autobyteus-web/components/workspace/org/AgentOrgWorkspaceView.vue`
-4. `autobyteus-web/components/workspace/history/AgentOrgRunHistoryPanel.vue`
-5. `autobyteus-web/components/workspace/config/AgentOrgRunConfigPanel.vue`
+## Suggested User Verification
 
-Because the standard build stopped before server preparation, Nuxt generation, Electron transpilation, and `electron-builder`, no package exists and no Electron process/window was started. Delivery did not bypass a mandatory repository guard or edit production source outside its ownership.
+1. Open **Agent Teams** and create a new flat Team with direct Agents and exactly one coordinator.
+2. Open **Agent Orgs**, create an Org containing the Team and/or direct Agents, and review the collapsed override hierarchy.
+3. Run the Org, select an exact Team or Agent, and exercise conversation/task actions as desired.
+4. Stop/restore the Org or restart the app if you want to exercise durable history.
+5. Reply with one of:
+   - `Verified; finalize without release`
+   - `Verified; finalize and create a new release`
+   - a reproducible issue description
 
-Evidence:
+## Bounded Context For Testing
 
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-002/electron-linux-arm64-build-attempt-1.log`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-002/electron-linux-arm64-build.log`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-002/localization-audit.log`
+Existing definitions under the separately owned `autobyteus-agents` and `autobyteus-private-agents` packages are still pre-Team-V2 and are intentionally rejected by current admission. The current production-data Team and Org catalogs may therefore be empty; create new compatible definitions in this app for the ticket journey. Delivery did not rewrite those external packages or seed/mutate the user's definitions.
 
-## Required Recovery
-
-1. Move all 15 product literals into the existing English/Simplified-Chinese localization system and use localized keys in the five Vue files.
-2. Add or update focused localization/component regressions as appropriate.
-3. Run `pnpm -C autobyteus-web audit:localization-literals` and the full `pnpm -C autobyteus-web build:electron:linux:arm64`.
-4. Re-enter applicable review/API-E2E gates and return the clean package to Delivery.
-5. Delivery will refresh `origin/personal`, launch the packaged Electron app, request explicit user verification, and only then finalize.
-
-## Preserved Bounded Residual Context
-
-- External definition publication remains separately owned.
-- Electron-shell-only behavior is unchanged/outside the implementation delta, but the shell must still be packaged/launched for user verification after this blocker is fixed.
-- No current API/E2E finding remains.
-- The unrelated fixed-pixel audit baseline remains unrelated.
-
-## Canonical Artifacts
-
-All ticket artifacts are under `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/`. The current chain includes `requirements-doc.md`, `investigation-notes.md`, `requirements-revision-record.md`, `agent-org-contract.md`, `design-spec.md`, architecture design/review artifacts, `implementation-handoff.md`, `implementation-revision-record.md`, code-review artifacts, API/E2E artifacts and API-REV-006 evidence, plus this Delivery revision/docs/handoff/release set.
-
-Prototype authorities remain:
-
-- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ui-ux-spec.md`
-- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-TEAM-OVERRIDES-001/ui-ux-spec.md`
-- `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-TEAM-OVERRIDES-001/user-decision-record.md`
+IR-026 changes browser-side AgentOrg stream close/recovery behavior, not preload, IPC, or window management. The actual packaged shell nevertheless built, launched, rendered, and served a healthy embedded backend. Destructive corrupt-live-copy injection remains outside this user-verification run; strict durable negative coverage passed upstream.
 
 ## Delivery Guard
 
-- User verification: `Not possible — package build blocked`
+- Explicit user verification received: `No`
 - Ticket moved to done: `No`
-- Ticket branch pushed: `No`
+- Ticket branch final commit/push: `No`
 - Merged/pushed to `personal`: `No`
 - Release/deployment: `Not started`
 - Cleanup: `Not started`

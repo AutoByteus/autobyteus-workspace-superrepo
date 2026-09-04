@@ -101,6 +101,14 @@ Context attachments and task reference files use AgentOrg-rooted content URLs.
 Unknown roots, stale AgentRun IDs, wrong member addresses, and cross-root
 targets are rejected rather than guessed.
 
+If a valid current stream fails strict admission, the workspace retires that
+exact connection generation and recovers automatically. Recovery preserves the
+exact selected Team or Agent, verifies the replacement snapshot against durable
+checkpoints, and prevents the stale socket from regaining ownership. There is
+no manual **Reconnect** action. The client makes at most five recovery attempts;
+if none succeeds, it leaves the Org offline and presents exactly one localized
+notice instead of remaining indefinitely in **Connecting**.
+
 A mounted Team uses the same Team workspace panel and task/communication
 presentation as a standalone Team. Its live task monitor continues to update
 without requiring focus-away/refocus.
