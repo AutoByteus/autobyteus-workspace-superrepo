@@ -18,6 +18,9 @@ const mocks = vi.hoisted(() => ({
     connect: vi.fn(),
     disconnect: vi.fn(),
   },
+  selection: {
+    clearSelection: vi.fn(),
+  },
 }))
 
 vi.mock('vue-router', () => ({
@@ -27,6 +30,7 @@ vi.mock('vue-router', () => ({
 vi.mock('~/stores/runHistoryStore', () => ({ useRunHistoryStore: () => mocks.history }))
 vi.mock('~/stores/agentOrgRunStore', () => ({ useAgentOrgRunStore: () => mocks.orgRun }))
 vi.mock('~/stores/agentOrgContextsStore', () => ({ useAgentOrgContextsStore: () => mocks.contexts }))
+vi.mock('~/stores/agentSelectionStore', () => ({ useAgentSelectionStore: () => mocks.selection }))
 
 const historyRun = (isActive: boolean) => ({
   rootRunId: 'org-run-1',
@@ -51,6 +55,7 @@ describe('useWorkspaceHistorySubjectActions', () => {
 
     expect(mocks.orgRun.restore).not.toHaveBeenCalled()
     expect(mocks.contexts.connect).not.toHaveBeenCalled()
+    expect(mocks.selection.clearSelection).toHaveBeenCalledOnce()
     expect(mocks.push).toHaveBeenCalledWith({
       path: '/workspace',
       query: {
@@ -77,6 +82,7 @@ describe('useWorkspaceHistorySubjectActions', () => {
     expect(mocks.orgRun.restore).toHaveBeenCalledWith('org-run-1')
     expect(mocks.contexts.select).toHaveBeenCalledWith('restored-org-run', '/software')
     expect(mocks.contexts.connect).toHaveBeenCalledWith('restored-org-run')
+    expect(mocks.selection.clearSelection).toHaveBeenCalledOnce()
     expect(mocks.history.refreshTreeQuietly).toHaveBeenCalledOnce()
     expect(mocks.push).toHaveBeenCalledWith({
       path: '/workspace',
@@ -84,6 +90,32 @@ describe('useWorkspaceHistorySubjectActions', () => {
         rootSubjectKind: 'agent_org',
         definitionId: 'delivery-org',
         orgRunId: 'restored-org-run',
+        mode: 'active',
+      },
+    })
+  })
+
+  it('returns from a standalone selection to one exact active AgentOrg member owner', async () => {
+    mocks.history.agentOrgHistory = [historyRun(true)]
+    const { execute } = useWorkspaceHistorySubjectActions()
+
+    await execute({
+      rootSubjectKind: 'agent_org',
+      rootRunId: 'org-run-1',
+      action: 'select',
+      memberAddress: '/software/coordinator',
+    })
+
+    expect(mocks.orgRun.restore).not.toHaveBeenCalled()
+    expect(mocks.selection.clearSelection).toHaveBeenCalledOnce()
+    expect(mocks.contexts.select).toHaveBeenCalledWith('org-run-1', '/software/coordinator')
+    expect(mocks.contexts.connect).toHaveBeenCalledWith('org-run-1')
+    expect(mocks.push).toHaveBeenCalledWith({
+      path: '/workspace',
+      query: {
+        rootSubjectKind: 'agent_org',
+        definitionId: 'delivery-org',
+        orgRunId: 'org-run-1',
         mode: 'active',
       },
     })

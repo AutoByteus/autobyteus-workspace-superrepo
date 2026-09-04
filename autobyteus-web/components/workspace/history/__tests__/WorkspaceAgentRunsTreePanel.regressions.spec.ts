@@ -93,6 +93,8 @@ const {
   const normalizeWorkspaceNode = (workspace: any): any => ({
     ...workspace,
     workspaceId: workspace.workspaceId ?? workspaceIdFromRoot(workspace.workspaceRootPath),
+    stableKey: workspace.stableKey ?? workspace.workspaceId
+      ?? workspaceIdFromRoot(workspace.workspaceRootPath),
   });
 
   const state = {

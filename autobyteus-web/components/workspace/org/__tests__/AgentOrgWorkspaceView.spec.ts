@@ -11,6 +11,12 @@ const state = reactive({
 const connect = vi.fn()
 const disconnect = vi.fn()
 const push = vi.fn().mockResolvedValue(undefined)
+const center = reactive({
+  mode: 'chat' as 'chat' | 'config',
+  get isConfigMode() { return this.mode === 'config' },
+  showChat: vi.fn(() => { center.mode = 'chat' }),
+  showConfig: vi.fn(() => { center.mode = 'config' }),
+})
 const route = reactive({ query: {
   rootSubjectKind: 'agent_org', definitionId: 'org-def', orgRunId: 'org-run', mode: 'active',
 } })
@@ -28,13 +34,27 @@ vi.mock('~/stores/activeContextStore', () => ({
     agentOrgErrorFor: () => state.error,
   }),
 }))
+vi.mock('~/stores/workspaceCenterViewStore', () => ({
+  useWorkspaceCenterViewStore: () => center,
+}))
 
 const context = (phase: 'live' | 'reopen_required' = 'live') => ({
   phase,
   error: phase === 'reopen_required' ? 'Sequence gap' : null,
   executionTree: { rootOrg: { orgDefinitionId: 'org-def' } },
 })
-const directTarget = { kind: 'agent_org_direct_agent', context: { state: { runId: 'agent-run' } } }
+const directTarget = {
+  kind: 'agent_org_direct_agent',
+  root: { orgRunId: 'org-run' },
+  address: '/writer',
+  context: { state: { runId: 'agent-run' } },
+}
+const mountedTeamTarget = {
+  kind: 'agent_org_team_member',
+  root: { orgRunId: 'org-run' },
+  address: '/delivery/reviewer',
+  context: { state: { runId: 'mounted-agent-run' } },
+}
 
 const mountSubject = () => mount(AgentOrgWorkspaceView, {
   global: { stubs: {
@@ -42,11 +62,17 @@ const mountSubject = () => mount(AgentOrgWorkspaceView, {
     AgentWorkspaceSurface: {
       props: ['target', 'showHeaderActions', 'recoveryNotice'],
       emits: ['new-agent', 'edit-config'],
-      template: '<div data-test="shared-agent-surface" :data-recovery="recoveryNotice || \'\'" :data-actions="String(showHeaderActions)"><button data-test="org-edit" @click="$emit(\'edit-config\')" /></div>',
+      template: '<div data-test="shared-agent-surface" :data-recovery="recoveryNotice || \'\'" :data-actions="String(showHeaderActions)"><button data-test="org-new" @click="$emit(\'new-agent\')" /><button data-test="org-edit" @click="$emit(\'edit-config\')" /></div>',
     },
     TeamWorkspaceSurface: {
       props: ['target', 'showHeaderActions', 'recoveryNotice'],
-      template: '<div data-test="shared-team-surface" />',
+      emits: ['new-team', 'edit-config'],
+      template: '<div data-test="shared-team-surface"><button data-test="org-team-edit" @click="$emit(\'edit-config\')" /></div>',
+    },
+    AgentOrgMemberRunConfigPanel: {
+      props: ['target'],
+      emits: ['back'],
+      template: '<div data-test="member-run-config" :data-org-run-id="target.root.orgRunId" :data-member-address="target.address" :data-agent-run-id="target.context.state.runId"><button data-test="config-back" @click="$emit(\'back\')" /></div>',
     },
   } },
 })
@@ -58,21 +84,55 @@ describe('AgentOrgWorkspaceView', () => {
     state.error = null
     state.target = directTarget
     route.query.mode = 'active'
+    center.mode = 'chat'
   })
 
-  it('renders the accepted shared Agent surface and routes header actions through the Org journey', async () => {
+  it('opens the exact direct-Agent locked run configuration and returns to the same monitor', async () => {
     const wrapper = mountSubject()
     expect(wrapper.find('[data-test="shared-agent-surface"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="shared-team-surface"]').exists()).toBe(false)
     expect(wrapper.get('[data-test="shared-agent-surface"]').attributes('data-actions')).toBe('true')
     expect(wrapper.text()).not.toContain('AGENT RUN EVENT')
     await wrapper.get('[data-test="org-edit"]').trigger('click')
+    expect(push).not.toHaveBeenCalled()
+    expect(wrapper.get('[data-test="member-run-config"]').attributes()).toEqual(expect.objectContaining({
+      'data-org-run-id': 'org-run',
+      'data-member-address': '/writer',
+      'data-agent-run-id': 'agent-run',
+    }))
+    expect(state.target).toStrictEqual(directTarget)
+
+    await wrapper.get('[data-test="config-back"]').trigger('click')
+    expect(wrapper.find('[data-test="shared-agent-surface"]').exists()).toBe(true)
+    expect(state.target).toStrictEqual(directTarget)
+
+    await wrapper.get('[data-test="org-new"]').trigger('click')
     expect(push).toHaveBeenCalledWith({
       path: '/workspace',
       query: { rootSubjectKind: 'agent_org', definitionId: 'org-def', mode: 'configuration' },
     })
     wrapper.unmount()
     expect(disconnect).toHaveBeenCalledWith('org-run')
+  })
+
+  it('opens the exact mounted-Team Agent run configuration without changing Org focus', async () => {
+    state.target = mountedTeamTarget
+    const wrapper = mountSubject()
+
+    expect(wrapper.find('[data-test="shared-team-surface"]').exists()).toBe(true)
+    await wrapper.get('[data-test="org-team-edit"]').trigger('click')
+
+    expect(push).not.toHaveBeenCalled()
+    expect(wrapper.get('[data-test="member-run-config"]').attributes()).toEqual(expect.objectContaining({
+      'data-org-run-id': 'org-run',
+      'data-member-address': '/delivery/reviewer',
+      'data-agent-run-id': 'mounted-agent-run',
+    }))
+    expect(state.target).toStrictEqual(mountedTeamTarget)
+
+    await wrapper.get('[data-test="config-back"]').trigger('click')
+    expect(wrapper.find('[data-test="shared-team-surface"]').exists()).toBe(true)
+    expect(state.target).toStrictEqual(mountedTeamTarget)
   })
 
   it('keeps the committed shared surface visible while bounded recovery remains transport-owned', () => {

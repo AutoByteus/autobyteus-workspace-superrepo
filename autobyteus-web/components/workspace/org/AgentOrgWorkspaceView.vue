@@ -31,6 +31,11 @@
         </div>
       </div>
     </template>
+    <AgentOrgMemberRunConfigPanel
+      v-else-if="target && center.isConfigMode"
+      :target="target"
+      @back="center.showChat"
+    />
     <AgentWorkspaceSurface
       v-else-if="target.kind === 'agent_org_direct_agent'"
       class="min-h-0 flex-1"
@@ -38,7 +43,7 @@
       :show-header-actions="true"
       :recovery-notice="recoveryNotice"
       @new-agent="openNewOrgRun"
-      @edit-config="openOrgConfiguration"
+      @edit-config="openMemberConfiguration"
     />
     <TeamWorkspaceSurface
       v-else-if="target.kind === 'agent_org_team_member'"
@@ -47,7 +52,7 @@
       :show-header-actions="true"
       :recovery-notice="recoveryNotice"
       @new-team="openNewOrgRun"
-      @edit-config="openOrgConfiguration"
+      @edit-config="openMemberConfiguration"
     />
   </div>
 </template>
@@ -60,10 +65,13 @@ import { useActiveContextStore } from '~/stores/activeContextStore'
 import AgentWorkspaceSurface from '~/components/workspace/agent/AgentWorkspaceSurface.vue'
 import TeamWorkspaceSurface from '~/components/workspace/team/TeamWorkspaceSurface.vue'
 import WorkspaceRecoveryNotice from '~/components/workspace/common/WorkspaceRecoveryNotice.vue'
+import AgentOrgMemberRunConfigPanel from '~/components/workspace/org/AgentOrgMemberRunConfigPanel.vue'
+import { useWorkspaceCenterViewStore } from '~/stores/workspaceCenterViewStore'
 
 const route = useRoute()
 const router = useRouter()
 const active = useActiveContextStore()
+const center = useWorkspaceCenterViewStore()
 const { t } = useLocalization()
 const orgRunId = computed(() => String(route.query.orgRunId || ''))
 const isHistorical = computed(() => route.query.mode === 'history')
@@ -78,25 +86,37 @@ const target = computed(() => {
     ? current
     : null
 })
+const targetIdentity = computed(() => target.value
+  ? `${target.value.root.orgRunId}\u0000${target.value.address}\u0000${target.value.context.state.runId}`
+  : null)
 const connect = () => { if (orgRunId.value && !isHistorical.value) active.connectAgentOrg(orgRunId.value) }
-const openConfiguration = () => {
+const openNewOrgRun = () => {
   const definitionId = context.value?.executionTree.rootOrg.orgDefinitionId
     || String(route.query.definitionId || '')
   if (!definitionId) return
+  center.showChat()
   void router.push({
     path: '/workspace',
     query: { rootSubjectKind: 'agent_org', definitionId, mode: 'configuration' },
   })
 }
-const openNewOrgRun = openConfiguration
-const openOrgConfiguration = openConfiguration
+const openMemberConfiguration = () => {
+  if (target.value) center.showConfig()
+}
 
-onMounted(connect)
+onMounted(() => {
+  center.showChat()
+  connect()
+})
 onBeforeUnmount(() => { if (orgRunId.value && !isHistorical.value) active.disconnectAgentOrg(orgRunId.value) })
 watch([orgRunId, isHistorical], ([nextRunId, nextHistorical], [previousRunId, previousHistorical]) => {
+  center.showChat()
   if (previousRunId && !previousHistorical && (previousRunId !== nextRunId || nextHistorical)) {
     active.disconnectAgentOrg(previousRunId)
   }
   if (!nextHistorical) connect()
+})
+watch(targetIdentity, (nextIdentity, previousIdentity) => {
+  if (previousIdentity && nextIdentity !== previousIdentity) center.showChat()
 })
 </script>

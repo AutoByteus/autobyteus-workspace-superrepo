@@ -2,6 +2,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
 import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
 import { useRunHistoryStore } from '~/stores/runHistoryStore'
+import { useAgentSelectionStore } from '~/stores/agentSelectionStore'
 
 export type WorkspaceHistorySubjectAction = Readonly<{
   rootSubjectKind: 'agent_org'
@@ -16,6 +17,7 @@ export const useWorkspaceHistorySubjectActions = () => {
   const historyStore = useRunHistoryStore()
   const orgRunStore = useAgentOrgRunStore()
   const orgContexts = useAgentOrgContextsStore()
+  const selection = useAgentSelectionStore()
 
   const execute = async (command: WorkspaceHistorySubjectAction): Promise<void> => {
     const run = historyStore.agentOrgHistory.find((item) => item.rootRunId === command.rootRunId)
@@ -39,6 +41,7 @@ export const useWorkspaceHistorySubjectActions = () => {
 
     if (command.action === 'open') {
       if (run.isActive) orgContexts.connect(run.rootRunId)
+      selection.clearSelection()
       await router.push({
         path: '/workspace',
         query: {
@@ -54,6 +57,7 @@ export const useWorkspaceHistorySubjectActions = () => {
     const memberAddress = command.memberAddress?.trim()
     if (!memberAddress) throw new Error('AgentOrg member selection requires an exact address.')
     const activeRunId = run.isActive ? run.rootRunId : await orgRunStore.restore(run.rootRunId)
+    selection.clearSelection()
     orgContexts.select(activeRunId, memberAddress)
     orgContexts.connect(activeRunId)
     await historyStore.refreshTreeQuietly()

@@ -156,13 +156,16 @@ const navigateToSettings = async (): Promise<void> => {
   await pushRoute('/settings');
 };
 
+const isPlainWorkspaceRoute = (): boolean =>
+  route.path === '/workspace' && Object.keys(route.query).length === 0;
+
 const onRunningRunSelected = async (): Promise<void> => {
-  if (route.path === '/workspace') return;
+  if (isPlainWorkspaceRoute()) return;
   await pushRoute('/workspace');
 };
 
 const onRunningRunCreated = async (): Promise<void> => {
-  if (route.path === '/workspace') return;
+  if (isPlainWorkspaceRoute()) return;
   await pushRoute('/workspace');
 };
 
