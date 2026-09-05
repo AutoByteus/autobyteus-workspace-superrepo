@@ -3,7 +3,7 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-015`
+- Architecture revision validated: `AD-REV-016`
 - Requirements authority: `RER-025` (approved `BEH-016` / `REQ-033` /
   `AC-028` / `SCN-017` first-accepted AgentOrg history-summary parity and
   conservative legacy recovery; all RER-024 and prior authority remains
@@ -18,7 +18,9 @@
   Validate the new live write/read-refresh and startup recovery spines for direct
   and mounted configured recipients, exclusions, first-write concurrency,
   restart/restore/rebuild stability, and deterministic ambiguous-evidence
-  fallback. Retain cumulative AD-REV-014 / ARCH-REV-012 ownership conclusions.
+  fallback. `ARCH-REV-013 / AR-FIND-007` additionally requires one unambiguous
+  terminal-status owner per migration ID without changing those mechanisms.
+  Retain cumulative AD-REV-014 / ARCH-REV-012 ownership conclusions.
 - Date: 2026-09-05
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
@@ -47,7 +49,7 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-012` Pass on cumulative AD-REV-014; the current RER-025 round is a later focused Architecture impact)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-013` Fail / Design Impact on AD-REV-015; AR-FIND-007 is the current migration-status coherence trigger)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -69,7 +71,7 @@ Inputs:
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-TEAM-OVERRIDES-001/ui-ux-spec.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-TEAM-OVERRIDES-001/user-decision-record.md`
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-TEAM-OVERRIDES-001/visual-references/visual-reference-manifest.json`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` and `code-review-revision-record.md` (`CRR-021` / `CR-FIND-020` trigger history; current `CRR-032` cumulative source Pass and `CRR-033` no-durable-test-change result)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` and `code-review-revision-record.md` (`CRR-021` / `CR-FIND-020` trigger history; current `CRR-036` cumulative source Pass and `CRR-037` proportional test-code Pass over IR-028 / API-REV-010)
 - `origin/personal@773bce779` implementations of `workspaceHistoryNestedTeamStatus.ts`, `NestedTeamAggregateStatusDot.vue`, and `WorkspaceTeamExecutionTree.vue` (inspected with `git show`; continuity evidence only)
 - `origin/personal@773bce779` implementations of `agent-run.ts`,
   `agent-run-input-admission-state.ts`, Team frozen/root termination, and the
@@ -1202,8 +1204,21 @@ package-family rename. It does not infer logical topology from directory depth.
   evidence writes once through the same physical primitive used by the normal
   catalog. No/tied/invalid evidence records
   `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE`, leaves empty summary/fallback, and yields
-  bounded `SUCCEEDED_WITH_WARNINGS`. Required current read or selected-value
-  atomic write/reread failure is runner `FAILED` / `RESTART_TO_RETRY`.
+  bounded `SUCCEEDED_WITH_WARNINGS` for
+  `20260905_agent_org_history_first_message_summary_v1`. Required current
+  package/index read or validation failure, or selected-value atomic
+  write/strict-reread failure, is runner `FAILED` / `RESTART_TO_RETRY` and takes
+  precedence over any warning skip. If there is no failed item, the summary
+  migration is `SUCCEEDED_WITH_WARNINGS` when at least one warning skip exists
+  and otherwise `SUCCEEDED`.
+- **Migration-ownership check:**
+  `20260901_agent_org_flat_team_families_v1` retains its separate terminal
+  matrix: unsupported in-scope source, invalid target/current structure, family
+  conflict, or required retired-authority cleanup failure is `FAILED`; with no
+  failed item it is `SUCCEEDED`; it has no `SUCCEEDED_WITH_WARNINGS`
+  disposition. The summary migration's independently valid nullable-metadata
+  warning cannot weaken that family migration, and the family migration's
+  cleanup rule cannot turn an ambiguous-but-valid empty summary into failure.
 - **Restart/retention check:** a successful write becomes an ordinary non-empty
   skip; an interrupted attempt is reclassified and retried by the existing
   runner. Diagnostics contain reason counts and capped IDs/paths, never message
@@ -1490,7 +1505,11 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
   mounted legacy evidence; absent/tied/invalid conservative fallback; runner
   prerequisite/restart/idempotence; redacted diagnostics; and scans proving no
   Team/schema/stream field, optimistic title, runtime migration import, trace-on-
-  read fallback, or second Org manager/catalog. The
+  read fallback, or second Org manager/catalog. AD-REV-016 additionally requires
+  a migration-ID-qualified status assertion: the family migration cannot warn;
+  the summary migration warns only for independently valid empty metadata with
+  no unique evidence; and required current-structure or selected-value
+  persistence failure wins as `FAILED`. The
   downstream implementation/test changes and evidence are not validated or
   claimed by this artifact.
 
@@ -1521,8 +1540,16 @@ established catalog-backed root workspace default/inheritance policy.
 `AD-REV-014` resolves `ARCH-REV-011 / AR-FIND-006` by assigning data loading,
 strict projection, grouping, order and family errors only to the mixed read
 owner, while one panel-scoped `useWorkspaceHistoryTreeState` instance owns
-expansion/reveal/highlight continuity and the mounted panel owns scroll. `AD-REV-015` resolves the RER-025 history-title impact with exact configured external-message qualification, catalog-owned first-write durability, authoritative live refresh, and startup-only unique-evidence recovery. All 37
-supported walkthroughs have a complete production spine, one authoritative
+expansion/reveal/highlight continuity and the mounted panel owns scroll.
+`AD-REV-015` resolves the RER-025 history-title impact with exact configured
+external-message qualification, catalog-owned first-write durability,
+authoritative live refresh, and startup-only unique-evidence recovery.
+`AD-REV-016` resolves
+`ARCH-REV-013 / AR-FIND-007` by assigning a separate terminal-status matrix to
+each registered migration: the family migration has no warning disposition,
+while the summary migration permits only the independently valid empty-metadata
+warning and keeps current-structure/write/reread failures fatal to its attempt.
+All 37 supported walkthroughs have a complete production spine, one authoritative
 owner, explicit status/
 lifecycle/durability truth and a one-directional dependency path. No
 walkthrough requires a synthetic Team root, standalone mounted Team, standalone
@@ -1552,8 +1579,11 @@ mechanism or public contract. The focused AD-REV-015 correction is `Medium /
 High`: it changes no public/durable run schema or Product layout, but crosses the
 Org command, persisted derived-history, first-write concurrency, authoritative
 web read, and registered migration boundaries. The cumulative ticket remains
-`Large / High`; independent Architecture Review is mandatory before
-Implementation reconciles AD-REV-015 or API/E2E resumes cumulative validation.
+`Large / High`. Focused AD-REV-016 is `Small / Low`: it changes only
+Architecture-owned migration-status wording and current-evidence navigation,
+with no production mechanism or contract change. Independent Architecture
+Review is mandatory before Implementation reconciles AD-REV-015/016 or API/E2E
+resumes cumulative validation.
 The already implemented `CR-FIND-019` behavior remains a distinct
 regression obligation. The
 unsupported self-review correlation remains retained only as technical evidence

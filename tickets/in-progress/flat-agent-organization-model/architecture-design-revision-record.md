@@ -23,6 +23,7 @@ does not revise intended behavior.
 | AD-REV-013 | User Electron production-path findings plus Requirements Engineer approved `RER-024` | `BEH-013`-`BEH-015`; `REQ-030`-`REQ-032`; `AC-025`-`AC-027`; `SCN-014`-`SCN-016` | `Architecture Revision — Effective Launch Equality, Unified Workspace History, And Root Workspace Default` | `Architecture Design Complete`; one canonical Org patch, one route-stable Workspace/history surface with distinct read/presentation owners, and established root default/inheritance; self-validation expanded to 33 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-014 | Architecture Reviewer `ARCH-REV-011` / ownership-coherence recovery round | `AR-FIND-006` | `Architecture Revision — Unified History Data Versus Presentation-State Ownership` | `Architecture Design Complete`; DS-025 assigns history data/grouping/order to the mixed read owner and expansion/reveal/highlight/scroll continuity to one always-mounted panel/tree-state owner; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-015 | Requirements Engineer approved `RER-025` after user Electron AgentOrg-versus-Team history-title comparison | `BEH-016`; `REQ-033`; `AC-028`; `SCN-017`; `QR-011`; `DEC-020` | `Architecture Revision — First Accepted AgentOrg Message History Summary` | `Architecture Design Complete`; accepted-message first-write filtered by exact execution kind, authoritative live refresh, and conservative registered recovery migration; self-validation expanded to 37 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-016 | Architecture Reviewer `ARCH-REV-013` / migration-status coherence recovery round | `AR-FIND-007`; `BEH-016`; `REQ-033`; `AC-028`; `DEC-020` | `Architecture Revision — Migration-Specific Terminal Status Authority` | `Architecture Design Complete`; family migration retains no-warning failure rules while summary migration retains bounded valid-empty warnings; no mechanism or behavior change; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -1297,3 +1298,80 @@ does not revise intended behavior.
   rewriting existing summaries/Team history. The design names exact controls and
   tests; this architecture-only revision claims no implementation or executable
   validation completion.
+
+### AD-REV-016 — Migration-Specific Terminal Status Authority
+
+- Triggering role, report path, and round: Architecture Reviewer
+  `ARCH-REV-013@d9baab112` reviewed cumulative
+  `AD-REV-015@9344e4ae8f16bf7571394bdcbab3a238bd6213d8` against approved
+  `RER-025@58925d043b3d5d01dabb9cc111681541aa532a4b` and returned
+  `Fail — Design Impact` for one Architecture-owned terminal-status wording
+  contradiction.
+- Triggering finding/behavior IDs: `AR-FIND-007`; protected `BEH-016`,
+  `REQ-033`, `AC-028`, and `DEC-020`. No Requirement Gap or Product UI gap.
+- Prior authoritative design/review result: AD-REV-015 defines the accepted
+  configured-message first-write, authoritative web refresh, and conservative
+  startup recovery. ARCH-REV-013 passed those mechanisms and found only that a
+  combined convention table applied incompatible status prose to two migration
+  IDs.
+- Current authoritative design result: `Architecture Design Complete` at the
+  canonical `design-spec.md`, revised in place as AD-REV-016 and self-validated
+  in `architecture-design-self-validation.md`.
+- Exact correction: the Production Migration Convention Application is split
+  by migration ID. `20260901_agent_org_flat_team_families_v1` succeeds only
+  when every supported item is current and required cleanup completes; it has
+  no `SUCCEEDED_WITH_WARNINGS` state, and unsupported source, invalid target,
+  family conflict, or cleanup residue remains `FAILED`.
+  `20260905_agent_org_history_first_message_summary_v1` separately treats
+  `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` as a bounded nonfatal item because the
+  empty current summary and `New - <name>` fallback are independently valid;
+  when present without a failed item it yields `SUCCEEDED_WITH_WARNINGS`.
+  Required current package/index read or validation failure and selected-value
+  atomic write/strict-reread failure remain `FAILED`, which takes precedence
+  over warning skips. All-success and ordinary-skip-only attempts are
+  `SUCCEEDED`.
+- Transition/outcome alignment: the migration outcome table now identifies the
+  owning migration for every disposition and states the terminal reduction
+  order separately for each migration. DS-027, the AD-REV-015 transition, and
+  VAL-037 use that same matrix. No warning rule crosses migration ownership.
+- Current-source traceability correction: current downstream navigation now
+  identifies `IR-028` source `4d378df9cba56bd1b9ebf20d9b055f964398f642`,
+  artifact `100e2c82cb948e1cbef4026ab6f74ab815285a34`, `CRR-036`,
+  `API-REV-010`, `CRR-037`, and latest Delivery evidence `DR-004`; older
+  IR-026/DR-003 references remain only where they describe the historical
+  discovery sequence.
+- Design-spec sections updated: document status/current downstream navigation;
+  focused classification; ARCH-REV-013 investigation evidence; explicit
+  AD-REV-016 reconciliation; migration-specific convention tables; disposition
+  and terminal-result table; supplemental-artifact navigation; validation and
+  implementation guidance.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-016 without a new
+  supported use case. VAL-037 now validates the two migration-specific terminal
+  matrices and failed-over-warning precedence. No supplement is added or
+  removed.
+- Persisted-data/interface impact: no change from AD-REV-015. The summary
+  transition remains `Migration Required — derived metadata, schema unchanged`;
+  the family transition remains its previously approved registered migration.
+  No source mechanism, API, schema, durable field, runner state, retry path,
+  lifecycle, Product surface, or current-reader fallback is added.
+- Classification: focused AD-REV-016 is `Small / Low` because it is an
+  Architecture-document coherence and traceability correction only. The
+  cumulative package remains `task_size=Large` and
+  `architectural_risk=High`, so independent Architecture Review remains
+  mandatory.
+- Downstream and architecture-review impact: Implementation and API/E2E remain
+  held until independent review confirms one status authority per migration ID,
+  the family migration's no-warning cleanup/unsupported-source contract, the
+  summary migration's bounded valid-empty warning, and `FAILED` precedence for
+  required current-structure or selected-value persistence failure. No source
+  reconciliation is authorized from this document-only correction before that
+  pass.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of
+  cumulative RER-025 / AD-REV-016 and the updated self-validation.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, or architecture
+  mechanism question remains. Residual risk is only an implementer collapsing
+  the two migration result policies back into one ambiguous rule; the design
+  now forbids that explicitly. This architecture-only revision claims no
+  implementation or executable validation completion.
