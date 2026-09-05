@@ -5,23 +5,23 @@
 - Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` (`RER-025`, approved commit `58925d043b3d5d01dabb9cc111681541aa532a4b`)
 - Upstream Investigation Notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - Upstream Requirements Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`
-- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` (`AD-REV-015`, architecture commit `9344e4ae8f16bf7571394bdcbab3a238bd6213d8`)
+- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` (`AD-REV-016`, architecture commit `ebd2ba75195afc3852e71c8e57e3f7a95e7f9ad2`)
 - Supplemental Task Artifacts Reviewed: approved `agent-org-contract.md`; Product `RV-012`, `VIS-001`-`VIS-020`, `BASELINE-PROMOTION-001`, approved `AORG-FLAT-TEAM-STATUS-001`, and approved `AORG-TEAM-OVERRIDES-001`; `architecture-design-self-validation.md`; current downstream evidence through `IR-028`, `CRR-036`, `API-REV-010`, `CRR-037`, and `DR-004`; deployed AgentOrg/AgentTeam index and trace evidence recorded by Requirements; current Team/Org server and web sources; repository `production_data_migration_conventions.md`
 - Architecture Design Revision Record Reviewed: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`
-- Relevant Architecture Design Revision IDs: `AD-REV-001`-`AD-REV-015`
+- Relevant Architecture Design Revision IDs: `AD-REV-001`-`AD-REV-016`
 - Architecture Review Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
-- Current Architecture Review Revision ID: `ARCH-REV-013`
-- Current Review Round: `13`
-- Trigger: `RER-025` approves AgentTeam-parity first-message summaries for AgentOrg history, and `AD-REV-015` defines the live first-write, authoritative refresh, and conservative startup transition.
-- Prior Review Round Reviewed: `ARCH-REV-012 / Pass`
-- Latest Authoritative Round: `ARCH-REV-013 / Round 13`
-- Current-State Evidence Basis: current source includes the exact Team accepted-command-to-history call, Team serialized first-non-empty catalog mutation and shared compaction helper; the Org handler accepts the same external command but has no summary call; the Org execution index distinguishes `configured`, `task`, and `task_team_member`; the Org history index, GraphQL/web projection, and row already carry/render `summary`; the web pending-command path already correlates ACKs. The latest reviewed implementation baseline is `IR-028` source `4d378df9cba56bd1b9ebf20d9b055f964398f642`, artifact `100e2c82cb948e1cbef4026ab6f74ab815285a34`, with `CRR-036`, `API-REV-010`, and `CRR-037` passing. Delivery-owned dirty files and DR-004 evidence remained read-only.
+- Current Architecture Review Revision ID: `ARCH-REV-014`
+- Current Review Round: `14`
+- Trigger: `AD-REV-016` responds to `ARCH-REV-013 / AR-FIND-007` by assigning one explicit, non-overlapping terminal-status matrix to each registered migration and correcting current downstream navigation.
+- Prior Review Round Reviewed: `ARCH-REV-013 / Fail — Design Impact`
+- Latest Authoritative Round: `ARCH-REV-014 / Round 14`
+- Current-State Evidence Basis: current source includes the exact Team accepted-command-to-history call, Team serialized first-non-empty catalog mutation and shared compaction helper; the Org handler accepts the same external command but has no summary call; the Org execution index distinguishes `configured`, `task`, and `task_team_member`; the Org history index, GraphQL/web projection, and row already carry/render `summary`; the web pending-command path already correlates ACKs. The latest reviewed implementation baseline is `IR-028` source `4d378df9cba56bd1b9ebf20d9b055f964398f642`, artifact `100e2c82cb948e1cbef4026ab6f74ab815285a34`, with `CRR-036`, `API-REV-010`, and `CRR-037` passing. AD-REV-016 changes only the three Architecture-owned artifacts; Delivery-owned dirty files and DR-004 evidence remained read-only.
 
 ## Routing Classification Review
 
 - Task size (`Small`/`Medium`/`Large`): `Large`
 - Architectural risk (`Low`/`High`): `High`
-- Classification rationale reviewed: `Confirmed`. AD-REV-015 is `Medium / High` in isolation because accepted command ordering, configured-versus-task identity, persistent first-write arbitration, authoritative web refresh, and a registered startup migration cross process and persistence boundaries. The cumulative package remains `Large / High`.
+- Classification rationale reviewed: `Confirmed`. AD-REV-016 is `Small / Low` in isolation because it changes Architecture-owned wording and traceability only. The underlying AD-REV-015 design remains `Medium / High`, and the cumulative package remains `Large / High`.
 - Independent Architecture Review required by the classification: `Yes`
 - Classification evidence or correction required: None.
 
@@ -32,13 +32,13 @@
 - Relevant existing behavior and evidence confirmed: `Yes`. Current Team, Org, history, index, stream, and web paths support the reported gap and the proposed reuse points.
 - Scope guardrail confirmed (`In-Scope Use Cases` / `Out of Scope` / `Preserved Behavior Boundary` / `Review Authority`): `Yes`. Derived history metadata and its live projection are in scope. Execution-tree/message/trace/task schemas, focus, routing, command admission, lifecycle, Product layout, and Team history behavior remain unchanged.
 - Approved change, preserved behavior, and outside scope understood: `Yes`
-- Every prospective blocking `Design Impact` finding is traceable to an approved requirement, acceptance criterion, or preserved-behavior ID (`Yes`/`No`): `Yes — AR-FIND-007 protects REQ-033 / AC-028 / DEC-020 and changes no approved behavior.`
-- Remaining material ambiguity, if any: None in upstream intent. The unresolved issue is an Architecture-owned contradiction in the migration result contract.
+- Every prospective blocking `Design Impact` finding is traceable to an approved requirement, acceptance criterion, or preserved-behavior ID (`Yes`/`No`): `Yes — no blocking finding remains.`
+- Remaining material ambiguity, if any: None.
 
 | Behavior ID | Kind | Design Alignment With Approved Intent (`Pass`/`Fail`) | Approved Trigger / Contract And Current-State Evidence (`Pass`/`Fail`/`Unclear`) | Target Outcome / Path / Spine Coherence (`Pass`/`Fail`/`Unclear`) | Status (`Confirmed`/`Needs Correction`/`Unclear`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| BEH-001-BEH-015 | Cumulative contract/system/user/durable behavior | Pass | Pass | Pass | Confirmed | None; AD-REV-015 preserves the previously reviewed family, runtime, task, migration, presentation, launch, and history-owner contracts. |
-| BEH-016 | AgentOrg first-message derived history | Pass | Pass | Fail | Needs Correction | Keep DS-027's accepted-result, configured-only, first-write, refresh, and conservative recovery paths, but make the terminal migration status unambiguous per migration ID. |
+| BEH-001-BEH-015 | Cumulative contract/system/user/durable behavior | Pass | Pass | Pass | Confirmed | None; AD-REV-016 preserves the previously reviewed family, runtime, task, migration, presentation, launch, and history-owner contracts. |
+| BEH-016 | AgentOrg first-message derived history | Pass | Pass | Pass | Confirmed | DS-027 and VAL-037 now apply the family migration's no-warning rule and the summary migration's valid-empty warning/failed-item precedence separately and consistently. |
 
 ## Supplemental Artifact Coherence Verdict
 
@@ -46,7 +46,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | Requirements, investigation inventory, revision record (`RER-025`) | Pass | Pass | Pass | Pass | Pass | None. |
 | `agent-org-contract.md` and retained Product authorities | Pass | Pass | Pass | Pass | Pass | None; the focused behavior needs no schema or Product change. |
-| `architecture-design-self-validation.md` (`VAL-034`-`VAL-037`) | Pass | Pass | Pass | Fail | Pass | VAL-037 correctly expects bounded warnings, but the design spec's combined convention table also says there is no warning disposition. Reconcile the authoritative design text. |
+| `architecture-design-self-validation.md` (`VAL-034`-`VAL-037`) | Pass | Pass | Pass | Pass | Pass | VAL-037 now checks migration-ID ownership, valid-empty warning eligibility, and failed-over-warning precedence against the same design matrix. |
 | `production_data_migration_conventions.md` | Pass | Pass | Pass | Pass | Pass | None; it explicitly permits `SUCCEEDED_WITH_WARNINGS` for independently valid nullable metadata with a truthful fallback. |
 | Current downstream source/review/API/Delivery evidence | Pass | Pass | Pass | Pass | Pass | None; it establishes current behavior and has not been edited by Architecture Review. |
 
@@ -54,7 +54,7 @@
 
 | Assessment Area | Result (`Pass`/`Fail`) | Evidence | Required Action |
 | --- | --- | --- | --- |
-| Assessment is present for the current task posture | Pass | AD-REV-015 identifies a derived-history omission rather than reopening the cumulative domain architecture. | None. |
+| Assessment is present for the current task posture | Pass | AD-REV-015 identifies the derived-history omission; AD-REV-016 is explicitly a document-only coherence recovery. | None. |
 | Root-cause classification is explicit and evidence-backed | Pass | The Org accepted-command path lacks Team-equivalent history mutation; task kinds make blind handler copying incorrect. | None. |
 | Refactor needed now / no refactor needed / deferred decision is explicit | Pass | Add a narrow command-with-kind result, service facade, stateless writer, refresh callback, and migration; do not change public schemas or root ownership. | None. |
 | Refactor decision is supported by the concrete design sections or residual-risk rationale | Pass | DS-027, file maps, dependency rules, removal rules, and VAL-034-037 cover the intended change. | None. |
@@ -66,7 +66,7 @@
 | DS-000-DS-026 | Previously reviewed cumulative spines | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 | DS-027 live write | Accepted external Org command to durable first summary | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 | DS-027 return/read | Accepted ACK to authoritative latest-generation Org history refresh | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-027 historical transition | Empty current Org row to unique-evidence backfill or truthful fallback | Pass | Fail | Pass | Pass | Pass | Pass | Fail |
+| DS-027 historical transition | Empty current Org row to unique-evidence backfill or truthful fallback | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 
 ## Boundary Encapsulation Verdict
 
@@ -93,7 +93,7 @@
 | `AgentOrgRunService.recordRunActivity` | Pass | Pass | Pass | Low | Pass |
 | `AgentOrgRunHistorySummaryWriter.commitFirstNonEmpty` | Pass | Pass | Pass | Low | Pass |
 | accepted external-message refresh callback | Pass | Pass | Pass | Low | Pass |
-| migration disposition/result contract | Pass | Fail | Pass | Medium | Fail |
+| migration disposition/result contract | Pass | Pass | Pass | Low | Pass |
 
 ## Existing Capability / Subsystem Reuse Verdict
 
@@ -128,7 +128,7 @@
 | Enriched Org command result | Pass | Pass | Pass | Pass | Pass | Exact operation result plus strict indexed kind; no address-depth inference. |
 | Org history row/index summary | Pass | Pass | Pass | Pass | Pass | Existing field remains sole durable summary authority. |
 | Summary-writer dispositions | Pass | Pass | Pass | Pass | Pass | Closed physical outcomes do not own migration status. |
-| Migration terminal status description | Fail | Pass | Fail | Fail | Fail | A combined table applies both warning and no-warning claims without migration-specific scope. |
+| Migration terminal status description | Pass | Pass | Pass | Pass | Pass | Separate migration-ID tables and a closed reduction rule prevent cross-application of warning or failure policy. |
 
 ## File Responsibility Mapping Verdict
 
@@ -138,7 +138,7 @@
 | Org history catalog and new summary writer | Pass | Pass | Pass | Pass | Queue/current-row and physical-write responsibilities do not overlap. |
 | Web streaming and mixed history files | Pass | Pass | Pass | Pass | ACK notification and authoritative history state remain separate. |
 | Registered summary migration folder | Pass | Pass | Pass | Pass | Owns all historical classifier/disposition logic. |
-| `design-spec.md` migration convention section | Fail | Fail | N/A | Fail | It combines the family migration and AD-REV-015 backfill under one singular status statement. |
+| `design-spec.md` migration convention section | Pass | Pass | N/A | Pass | Separate family and summary tables plus the migration-ID disposition matrix resolve AR-FIND-007. |
 
 ## Subsystem / Folder / File Placement Verdict
 
@@ -156,7 +156,7 @@
 | Optimistic prompt-derived browser title | Pass | Pass | Pass | Pass | Explicitly forbidden; authoritative reread only. |
 | Runtime trace-on-read/backfill | Pass | Pass | Pass | Pass | Migration-only inference and dependency guard are explicit. |
 | Duplicate Org manager/catalog or summary field | Pass | Pass | Pass | Pass | Explicitly rejected. |
-| Ambiguous combined migration-status text | Fail | Pass | Fail | Fail | Split or qualify the existing table; no new runtime mechanism is needed. |
+| Ambiguous combined migration-status text | Pass | Pass | Pass | Pass | AD-REV-016 removes the combined authority and names the replacement matrix without adding machinery. |
 
 ## Legacy / Backward-Compatibility Verdict
 
@@ -172,7 +172,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | Existing non-empty Org and Team summaries | Directly usable / preserve | Pass | Pass | N/A | Pass | No overwrite or Team write. |
 | New Org summary writes | Existing schema, new value lifecycle | Pass | Pass | N/A | Pass | Serialized first-write with strict reread. |
-| Empty current Org summary cohort | Migration Required — derived metadata, schema unchanged | Pass | Pass | Fail | Fail | Isolation, prerequisites, classification, validation, idempotence, restart, and bounded diagnostics are specified, but final status is contradictory between DS-027/VAL-037/table rows. |
+| Empty current Org summary cohort | Migration Required — derived metadata, schema unchanged | Pass | Pass | Pass | Pass | Isolation, prerequisites, classification, validation, idempotence, restart, bounded diagnostics, and migration-specific warning/failure precedence are complete and consistent. |
 
 ## Change / Refactor Safety Verdict
 
@@ -180,7 +180,7 @@
 | --- | --- | --- | --- | --- |
 | Live Org summary path | Pass | Pass | Pass | Pass |
 | Authoritative web refresh | Pass | Pass | Pass | Pass |
-| Startup historical transition | Pass | Pass | Fail | Fail |
+| Startup historical transition | Pass | Pass | Pass | Pass |
 
 ## Example Adequacy Verdict
 
@@ -188,52 +188,41 @@
 | --- | --- | --- | --- | --- | --- |
 | Direct/mounted/task eligibility | Yes | Pass | Pass | Pass | VAL-034/035 and scenario rows cover exact outcomes. |
 | Concurrent first acceptance and stale reads | Yes | Pass | Pass | Pass | VAL-036 defines both completion orders and newest-generation commit. |
-| Historical unique/ambiguous evidence | Yes | Fail | Pass | Fail | VAL-037 is locally clear, but the adjacent authoritative convention table reverses its warning outcome. |
+| Historical unique/ambiguous evidence | Yes | Pass | Pass | Pass | VAL-037 and the migration-specific convention/outcome tables now give one consistent warning/failure result. |
 
 ## Material Premise Validation (Only When Needed)
 
-None. AR-FIND-007 does not depend on an assumed production scenario. The no-evidence/ambiguous-evidence rollout outcome is expressly approved by `REQ-033` / `DEC-020` and is affirmatively designed in DS-027 and VAL-037; the finding is the direct contradiction in its terminal-status documentation.
+None. AR-FIND-007 depended on no assumed production scenario and is now resolved. The no-evidence/ambiguous-evidence rollout outcome remains expressly approved by `REQ-033` / `DEC-020`; AD-REV-016 only reconciles its terminal-status documentation.
 
 ## Unresolved Approved-Behavior Or Current-State Gaps
 
-None. Approved behavior and current-state evidence are sufficient. The remaining issue is a classified Architecture-owned design inconsistency, not a requirements or evidence gap.
+None. Approved behavior and current-state evidence are sufficient, and no unresolved Architecture-owned gap remains.
 
 ## Review Decision
 
-`Fail — Design Impact`. The live runtime and web paths, ownership boundaries, shared-writer composition, and conservative recovery mechanism are otherwise sound. Implementation must remain held until the one migration-status contradiction is corrected and independently re-reviewed.
+`Pass`. AD-REV-016 resolves AR-FIND-007 without changing the accepted AD-REV-015 mechanism. The family migration now has a separate no-warning terminal matrix; the summary migration returns `SUCCEEDED_WITH_WARNINGS` only for independently valid empty metadata with `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` and no failed item, while required current-structure or selected-value persistence failure takes precedence as `FAILED`. DS-027, transition/outcome tables, revision rationale, guidance, and VAL-037 agree. Current source navigation is also corrected to IR-028 / CRR-036 / API-REV-010 / CRR-037 / DR-004.
 
 ## Findings
 
-### AR-FIND-007 — AgentOrg summary migration has contradictory terminal-status authority
-
-- Type: `Design Impact`
-- Severity: `Medium`
-- Approved requirement, acceptance criterion, or preserved-behavior ID protected: `BEH-016`, `REQ-033`, `AC-028`, `DEC-020`; repository `production_data_migration_conventions.md` final-state contract
-- Scope status: `Within Approved Scope`
-- Whether the required update changes approved behavior: `No`
-- Affected approved behavior, relevant existing behavior, journey, or established contract: existing empty-summary Org rows with absent, tied, invalid, unreadable, or otherwise non-unique qualifying evidence must remain valid with the `New` fallback; independently valid nullable metadata may complete with bounded warnings.
-- Evidence: DS-027 says `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` yields `SUCCEEDED_WITH_WARNINGS`; the AD-REV-015 derived-transition section repeats that result; the convention table's `Nullable derived metadata backfill` row repeats it; VAL-037 and the migration outcome table repeat it. In the same singular `Production Migration Convention Application` table, the `Truthful statuses` row says “This migration defines no `SUCCEEDED_WITH_WARNINGS` disposition” and requires failure for every unsupported in-scope item. Most neighboring rows concern `20260901_agent_org_flat_team_families_v1`, but the table now also includes AD-REV-015 without identifying per-migration scope. An implementer cannot determine whether the approved valid empty-summary cohort terminates as warning or failure.
-- Material-premise validation ID: `N/A — direct approved migration outcome; no assumed lifecycle premise.`
-- Required update: split or clearly qualify the convention application by migration ID. Preserve the established family-migration rule that cleanup/unsupported source has no warning exception, and state separately that `20260905_agent_org_history_first_message_summary_v1` returns `SUCCEEDED_WITH_WARNINGS` for the explicitly nonfatal `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` cohort while required current-structure or selected-write/reread failures remain `FAILED`. Align DS-027, transition/outcome tables, revision rationale, and VAL-037 to that one status matrix.
-- Why the required update is proportionate to the verified consequence: this is an Architecture-document coherence correction only. It prevents incompatible startup/result handling without adding a schema, state, fallback, retry protocol, or new behavior.
-- Recommended recipient: `/software_engineering_team/architecture_designer`
+None.
 
 ## Classification
 
-`Design Impact`
+`N/A — no unresolved architecture-review finding.` AD-REV-016 is `Small / Low` in isolation; the cumulative reviewed package remains `Large / High`.
 
 ## Recommended Recipient
 
-`/software_engineering_team/architecture_designer`
+Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 
 ## Residual Risks
 
-- After AR-FIND-007 is corrected, implementation must still prove exact accepted-result ordering, configured-only qualification, task admission preservation, first-write normalization/stability, truthful Agent ACK on metadata failure, newest-generation authoritative refresh, unique historical provenance, current-value and Team preservation, runner prerequisites/restart, and no schema/runtime-inference leakage.
-- AD-REV-015 still labels parts of the current source baseline as `IR-026`; the actual latest reviewed baseline is `IR-028` / `CRR-036` / `API-REV-010` / `CRR-037`. Correcting those navigation labels while revising the design would improve traceability, but it is not a separate blocker because the reviewed current code/evidence and proposed boundary remain accurate.
+- Implementation must prove exact accepted-result ordering, configured-only qualification, unchanged task admission, first-write normalization/stability, truthful Agent ACK on metadata failure, newest-generation authoritative refresh, unique historical provenance, current-value and Team preservation, migration prerequisites/restart, and no schema/runtime-inference leakage.
+- Tests must assert the terminal matrix independently by migration ID: the family migration cannot warn; the summary migration warns only for an independently valid empty-summary cohort with no failed item; required current-structure or selected-value persistence failure wins as `FAILED`.
+- One historical supplemental-inventory row still says cumulative execution is held for the older AD-REV-013 review. Current document status, evidence navigation, AD-REV-016 rationale, and implementation guidance all identify the actual AD-REV-016 hold, so this is non-blocking editorial residue and should be corrected on the next Architecture document touch.
 - Delivery-owned dirty documentation/evidence remains outside Architecture Review ownership and was not modified.
 
 ## Latest Authoritative Result
 
-- Review Decision: `Fail — Design Impact`
+- Review Decision: `Pass`
 - Material-Premise Gate (`Pass`/`Fail`/`Blocked`): `Pass`
-- Notes: `ARCH-REV-013` supersedes `ARCH-REV-012` as the latest architecture-review result. Prior findings `AR-FIND-001`-`AR-FIND-006` remain resolved. New `AR-FIND-007` is confined to the contradictory migration terminal-status description; no Requirement Gap or Product UI gap exists.
+- Notes: `ARCH-REV-014` supersedes `ARCH-REV-013` as the latest architecture-review result. AR-FIND-007 is resolved; prior findings `AR-FIND-001`-`AR-FIND-006` remain resolved. The cumulative RER-025 / AD-REV-016 package may proceed to Implementation reconciliation and the configured source-review/API/E2E route.
