@@ -3,21 +3,23 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-014`
-- Requirements authority: `RER-024` (approved BEH-013-015/REQ-030-032/
-  AC-025-027/SCN-014-016 launch equality, unified Workspace/history continuity,
-  and fresh-Org Workspace default; all prior authority remains cumulative)
+- Architecture revision validated: `AD-REV-015`
+- Requirements authority: `RER-025` (approved `BEH-016` / `REQ-033` /
+  `AC-028` / `SCN-017` first-accepted AgentOrg history-summary parity and
+  conservative legacy recovery; all RER-024 and prior authority remains
+  cumulative)
 - Product authority: `RV-012` / `VIS-001`-`VIS-020`; focused
   `AORG-FLAT-TEAM-STATUS-001` / `VIS-STATUS-001`-`VIS-STATUS-003`; focused
   `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`-`VIS-OVR-006`, superseding only
   RV-012 Placement Overrides lines 89-95 and VIS-015
-- Trigger: `ARCH-REV-011 / AR-FIND-006` found contradictory ownership wording
-  inside AD-REV-013's otherwise accepted route-stable history design. Validate
-  one exact split: mixed read owner for history data/grouping/order and one
-  always-mounted panel/tree-state owner for expansion/reveal/highlight/scroll
-  continuity. Retain AD-REV-013's accepted configuration and Workspace-default
-  mechanisms plus all reviewed AD-REV-009-012 conclusions.
-- Date: 2026-09-03
+- Trigger: the user's delivered-Electron comparison showed that AgentOrg run
+  rows remain `New - <AgentOrg name>` after real conversation while established
+  Team rows use the first prompt. Requirements Engineering approved RER-025.
+  Validate the new live write/read-refresh and startup recovery spines for direct
+  and mounted configured recipients, exclusions, first-write concurrency,
+  restart/restore/rebuild stability, and deterministic ambiguous-evidence
+  fallback. Retain cumulative AD-REV-014 / ARCH-REV-012 ownership conclusions.
+- Date: 2026-09-05
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
 
@@ -45,7 +47,7 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-011` Fail / Design Impact on AD-REV-013 solely for `AR-FIND-006`; DS-024 and DS-026 passed)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-012` Pass on cumulative AD-REV-014; the current RER-025 round is a later focused Architecture impact)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -95,6 +97,10 @@ Inputs:
 - User Electron screenshots `ctx_d447ee010eb5__image.png`,
   `ctx_21d6681af54c__image.png`, `ctx_b956b806fc6f__image.png`,
   `ctx_fcf2f19f0f06__image.png`, and `ctx_02bf252bf8a2__image.png`
+- Current `autobyteus-server-ts/src/services/agent-streaming/agent-org-stream-handler.ts`, `agent-team-stream-handler.ts`, `agent-org-execution/domain/agent-org-run.ts`, `agent-org-execution/services/agent-org-execution-index.ts`, `agent-org-execution/services/agent-org-run-service.ts`, `run-history/services/agent-org-run-history-catalog-service.ts`, `team-run-history-catalog-service.ts`, and `run-history-service-helpers.ts` (exact accepted-command, configured/task-kind, missing Org write, established Team normalization/first-write, and current composition evidence)
+- Current `autobyteus-server-ts/src/agent-memory/store/agent-memory-layout.ts`, `agent-memory/store/memory-file-store.ts`, `agent-memory/services/runtime-memory-event-accumulator.ts`, root communication/task sidecars and deterministic input builders, and `app-data-migrations/app-data-migration-registry.ts` (exact configured direct/mounted paths, complete trace corpus, current trace limitations, internal-input exclusion evidence, and registered migration prerequisites)
+- Current `autobyteus-web/services/agentOrgExecution/agentOrgStreamingService.ts`, `stores/agentOrgContextsStore.ts`, `stores/runHistoryLoadActions.ts`, and `components/workspace/history/WorkspaceAgentOrgHistoryCollection.vue` (accepted ACK, missing invalidation, strict existing Org history read, and current summary/fallback rendering)
+- Deployed current Org/Team history indexes plus the configured-member raw trace and user screenshots `ctx_f1133d7d05d9__image.png` / `ctx_9b7731d65643__image.png` recorded by Requirements Engineering (3/3 empty Org summaries versus 6/6 non-empty Team summaries)
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md`
 
 ## Universal Invariants Used By Every Walkthrough
@@ -126,6 +132,7 @@ Inputs:
 | Settlement never waits for a non-quiescent execution | The existing one root FIFO and existing terminal sweep remain; exact handles offer non-waiting quiescence preparation, return deferred immediately while a turn/approval is live, and rely on the existing Agent idle/offline resweep | Pass |
 | Root shutdown fences input/provider starts before task drains | Team and Org stabilize and freeze their complete direct/mounted/task/prepared scope, then every AgentRun closes admission, cancels pre-forward work or tracks and interrupts provider-started work through terminal state before task command/settlement drain | Pass |
 | AgentRun fence and ordinary termination stay distinct | Root shutdown is irreversible and may use the existing pre-forward cancellation fact; ordinary prepared termination still drains admitted FIFO input and a prepared cancel cannot reopen a root-fenced run | Pass |
+| AgentOrg summary is derived once from exact accepted external input | Only an accepted non-empty SEND_MESSAGE to an execution-kind `configured` direct/mounted Agent may enter the serialized Org history first-write; later/task/system/inter-Agent/rejected/empty traffic cannot replace or seed it; web renders only an authoritative history read | Pass |
 
 ## Identity And Physical-Scope Truth Table
 
@@ -187,6 +194,10 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-031 | SCN-014; REQ-030; AC-025 | Runtime/model edit without explicit model config has one effective preview/request/server/snapshot result | DS-012, DS-024 | Pass |
 | VAL-032 | SCN-015; REQ-031; AC-026 | Unified Workspace/history surface and state persist across AgentOrg routes and subject switching | DS-008, DS-013, DS-019, DS-025 | Pass |
 | VAL-033 | SCN-016; REQ-032; AC-027 | Fresh Org selects actual Temp default and placements inherit or apply exact Team override without focus | DS-003, DS-012, DS-026 | Pass |
+| VAL-034 | SCN-017; REQ-033; AC-028 | First accepted non-empty external message to a direct configured Org Agent commits Team-normalized summary and updates the live row authoritatively | DS-027 | Pass |
+| VAL-035 | SCN-017; REQ-033; AC-028 | Mounted-Team configured Agent qualifies identically while task/system/inter-Agent/approval/interrupt/rejected/failed/empty inputs remain excluded | DS-027 | Pass |
+| VAL-036 | QR-011; REQ-033; AC-028 | Concurrent qualifying acceptances choose one first completion and preserve it across later traffic, stop, restore and rebuild; stale web reads cannot overwrite it | DS-027 | Pass |
+| VAL-037 | SCN-017; REQ-033; AC-028; DEC-020 | Startup recovery writes only one provenance-qualified uniquely earliest configured-member trace, preserves existing values, and leaves nonqualifying/absent/tied/invalid/ambiguous evidence on fallback | DS-027 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1070,6 +1081,142 @@ package-family rename. It does not infer logical topology from directory depth.
 - **Result:** Pass.
 
 
+### VAL-034 — Direct Configured Agent First Accepted Summary And Live Projection
+
+- **Trigger:** an active AgentOrg is focused on a direct configured Agent and the
+  user submits an external message whose collapsed/trimmed text is non-empty.
+- **Primary spine:** `accepted Agent composer -> AgentOrgStreamingService
+  SEND_MESSAGE -> AgentOrgStreamHandler -> AgentOrgRun unchanged exact command with indexed-kind outcome ->
+  exact AgentRun accepted with kind configured -> AgentOrgRunService.recordRunActivity -> serialized
+  AgentOrgRunHistoryCatalogService -> shared AgentOrgRunHistorySummaryWriter
+  first write -> atomic current index -> accepted
+  ACK -> injected callback -> newest-generation strict Org history query ->
+  existing Agent Orgs row`.
+- **Normalization check:** inputs with internal newlines/tabs/multiple spaces are
+  collapsed and trimmed by the exported Team helper; <=100 characters stay
+  exact and >100 uses the first 97 plus `...`. Empty compacted content performs
+  no history write.
+- **Owners:** AgentOrgRun owns exact command admission and returns indexed kind/liveness outcome; handler
+  owns external-command/result ordering; service is a narrow facade; catalog
+  owns normal-runtime serialization/current rows; shared writer owns compaction/
+  first-write/atomic reread; mixed web history owner owns the
+  authoritative slice; row/tree-state components own presentation only.
+- **Boundary/dependency check:** production composition injects the supervisor's
+  existing AgentOrgRunService into the handler. The startup migration invokes
+  the stateless shared writer before supervisor construction, while normal
+  runtime injects it into the single catalog. No second manager/catalog, no
+  stream DTO field, no optimistic submitted-text mutation, and no tree/sidecar
+  write exists.
+- **Failure check:** rejected/failed Agent command never reaches history. A
+  derived-index operational failure after Agent acceptance does not replay or
+  relabel the Agent input; it is reported through existing observability. A web
+  refresh failure retains the previous family slice and error state.
+- **Outcome:** after durable commit the same mounted left history row shows the
+  exact normalized first prompt without navigation/reload no later than the
+  first authoritative post-acceptance history result.
+- **Result:** Pass.
+
+### VAL-035 — Mounted Configured Agent Symmetry And Exclusion Boundary
+
+- **Trigger:** first send targets an Agent hosted by one directly mounted flat
+  Team; control cases target a task Agent or introduce task/system/inter-Agent,
+  approval, interrupt, rejected, failed, or compacted-empty traffic first.
+- **Primary spine:** mounted target resolves through the Org execution index as
+  `executionKind:'configured'`, then follows the same DS-027 root history path as
+  a direct Agent. Exact mounted ancestry affects Agent execution/memory only; it
+  does not select Team history.
+- **Bounded exclusion spine:** task Agent has `executionKind:'task'` or
+  `task_team_member`; its SEND_MESSAGE follows unchanged command admission and may
+  be accepted, but the returned non-configured kind suppresses only the history
+  mutation. Other input/command classes never enter the handler's accepted
+  external SEND_MESSAGE summary branch. A later qualifying configured external
+  send remains eligible.
+- **Owners:** the strict Org execution index supplies the kind fact; it does not
+  infer from address depth. Agent communication/task engines cannot call the Org
+  summary catalog. The Org catalog row is the only mutation target.
+- **Rejected shortcuts:** treating any live `getAgent` result as configured; rejecting task sends merely to filter history; using current focus;
+  parsing `/team/agent`; scanning Team memory; updating standalone Team history;
+  considering inter-Agent message records or task notifications.
+- **Outcome:** direct and mounted configured members behave identically, while
+  every approved exclusion leaves the Org row empty/stable as appropriate.
+- **Result:** Pass.
+
+### VAL-036 — First-Write Concurrency, Restart Stability, And Stale Web Reads
+
+- **Trigger:** two qualifying messages to different configured members are in
+  flight, their Agent command results complete in a controlled order, a prior
+  full history request is also in flight, and later traffic/stop/restore/rebuild
+  occurs.
+- **Primary spine:** each accepted-result continuation enqueues
+  `recordRunSummary` immediately before another await. The existing catalog
+  queue serializes normal-runtime mutations and invokes the shared summary
+  writer; first non-empty current row wins and the second is a no-op. Reversing
+  controlled result resolution reverses the expected winner.
+- **Return spine:** accepted ACK callbacks start AgentOrg-family refreshes with a
+  shared monotonic generation. Only the latest initiated successful response
+  commits, so an older pre-write response cannot overwrite the newer slice.
+  Neither response computes a winner.
+- **Persistence check:** stop/restore/rebuild project the existing non-empty
+  summary unchanged. Restart reads that same strict index. Later external or
+  internal traffic never replaces it.
+- **Owners/dependencies:** live accepted completion ordering belongs to the
+  handler plus catalog queue; durable value belongs to the Org history catalog;
+  physical compare/write belongs to the stateless shared writer; request ordering
+  belongs to the web history read owner. No shared root FIFO,
+  trace timestamp, socket-arrival time, address order, lock file, or client
+  arbitration is introduced.
+- **Failure check:** failed refresh retains last committed slice. Unsupported
+  storage failure uses existing observability/restart behavior and never causes
+  Agent input replay.
+- **Outcome:** one deterministic first accepted completion becomes the durable
+  stable title and stale reads cannot regress its live presentation.
+- **Result:** Pass.
+
+### VAL-037 — Deterministic Existing-Row Recovery
+
+- **Trigger:** the registered startup runner reaches an existing current
+  AgentOrg history row after AgentOrg-family and both raw-trace-layout
+  prerequisites. Cases include a pre-existing non-empty summary, one unique
+  earliest direct or mounted configured-member trace, no evidence, an equal
+  earliest tie, invalid/unreadable required candidate evidence, and a repeated
+  startup after interruption.
+- **Primary migration spine:** `strict current Org catalog row -> if empty,
+  strict V1 tree -> configured nodes only -> AgentMemoryLayout exact direct/
+  mounted paths -> complete archived+active trace corpora + root communication/
+  task exclusion evidence -> migration-only provenance validation -> one strictly
+  earliest qualified timestamp -> shared summary writer before supervisor/runtime
+  catalog construction -> strict reread`.
+- **Candidate check:** requires object `trace_type:'user'`,
+  `source_event:'AgentRun.postUserMessage'`, non-empty compacted string content,
+  and finite timestamp, plus a complete causal prefix. Root communication/task
+  records are consulted only to exclude their deterministic nonqualifying input
+  envelopes and finite creation/transition timestamps; the candidate must be
+  strictly earlier than every sidecar fact capable of configured-Agent delivery
+  and not exactly match an internal envelope for that recipient. Sidecars can
+  never establish a positive external-message candidate. A matching, earlier/
+  equal, incomplete, or otherwise ambiguous nonqualifying fact skips the row
+  rather than promoting a later trace. Task nodes/directories are never
+  enumerated. Tie-break or origin inference by path/address/file order/run ID/
+  content/prose is forbidden.
+- **Disposition check:** existing non-empty is skipped before trace read. Unique
+  evidence writes once through the same physical primitive used by the normal
+  catalog. No/tied/invalid evidence records
+  `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE`, leaves empty summary/fallback, and yields
+  bounded `SUCCEEDED_WITH_WARNINGS`. Required current read or selected-value
+  atomic write/reread failure is runner `FAILED` / `RESTART_TO_RETRY`.
+- **Restart/retention check:** a successful write becomes an ordinary non-empty
+  skip; an interrupted attempt is reclassified and retried by the existing
+  runner. Diagnostics contain reason counts and capped IDs/paths, never message
+  content. The retained migration/classifier is never imported by current
+  runtime or web reads.
+- **Rejected shortcuts:** trace-on-read/lazy backfill; normal dual writer;
+  directory scan; task/inter-Agent message inference; custom journal/backup;
+  fabricated earliest tie; rewrite of Team rows or current non-empty values.
+- **Outcome:** only provable historical evidence upgrades the derived row; all
+  other valid current rows retain their stable value or approved fallback.
+- **Result:** Pass.
+
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -1110,6 +1257,12 @@ package-family rename. It does not infer logical topology from directory depth.
 | Always-mounted history panel/tree-state owner | one `useWorkspaceHistoryTreeState` instance + persistent scroll container, consuming stable keys and selected-identity input | history query/grouping, subject selected identity/runtime/lifecycle, or route-scoped duplicate state | Pass |
 | AgentOrg command store | launch/restore/terminate result only | `history`/`historyError`/`fetchHistory`, unified read state, or store-to-store lifecycle refresh | Pass |
 | Shared root workspace selector | available workspace catalog + untouched Org/Team root draft | hard-coded default, descendant auto-default, focus or definition mutation | Pass |
+| AgentOrg WebSocket handler | injected `AgentOrgRunService` configured-command/activity surface | direct Org manager/history store construction or task/message owners | Pass |
+| AgentOrgRun command-with-kind outcome | strict execution index + unchanged exact direct/mounted/task handle path | address-depth inference, task-send rejection for metadata filtering, current focus, history catalog or task policy | Pass |
+| AgentOrgRunHistoryCatalogService | serialized normal-runtime attempts/current rows + shared writer invocation | trace inference, physical mutation duplication, Agent command admission or UI state | Pass |
+| AgentOrgRunHistorySummaryWriter | shared compaction + stateless first-write/atomic strict reread | runtime queue, migration inference, manager/catalog construction or UI state | Pass |
+| Web Org accepted-message callback | mixed history read action | submitted-text/optimistic summary, row mutation or tree-state reset | Pass |
+| AgentOrg summary migration | strict current Org tree/location/trace/sidecar readers + shared stateless summary writer | normal runtime reader/import, manager/catalog construction, positive inference from sidecars, Team rows, task directories or alternate index | Pass |
 
 ## Dependency-Direction Audit
 
@@ -1159,6 +1312,11 @@ Tagged subject history/context rows -> mixed workspace projector -> stable Works
 AppLeftPanel/router -X-> root-kind-selected history component / duplicate Org history owner
 Workspace catalog -> root-only default selection -> Org root draft -> descendant inherited projection
 Descendant workspace editor -X-> independent default discovery / focus / hard-coded path
+AgentOrg external SEND_MESSAGE -> unchanged exact command-with-kind boundary -> accepted configured result -> Org history service/catalog -> atomic current index
+Accepted Org SEND_MESSAGE ACK -> injected callback -> mixed history read owner -> strict AgentOrg slice -> existing row
+Registered Org-summary migration -> strict current Org tree/location/complete traces + root sidecar exclusions -> migration-only provenance classifier -> shared stateless summary writer
+Current runtime/web reads -X-> migration classifier / trace-on-read backfill
+Org row/context/tree-state -X-> optimistic submitted-text summary mutation
 ```
 
 No upward bypass is needed in any validated use case. The active-root directory
@@ -1203,6 +1361,11 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Prepared settlement cancel follows root fence | AgentRun + local registry | preserve root latch and closed admission; reverse local preparation without reopen; root retry joins fence | No post-shutdown input admission | Pass |
 | Admitted root operation can still publish a handle during freeze | Subject operation/materialization gate | close and drain that bounded publication operation before snapshot; include active+prepared handle | No omitted live execution | Pass |
 | Repeated settlement sweep sees the same non-quiescent terminal task | Existing terminal sweep + AgentRun quiescence boundary | each attempt either prepares atomically or defers without durable/local partial state; idle/offline resweep supplies progress | No duplicate job/token machinery | Pass |
+| External Org SEND_MESSAGE is rejected/failed or target is task-scoped | AgentOrg command-with-kind boundary + stream handler | preserve existing command admission/result; do not call history for rejected/failed or non-configured kind; no fallback target | No summary mutation | Pass |
+| First qualifying Agent result is accepted and history write reports operational failure | AgentOrg stream handler/history catalog | preserve truthful Agent acceptance, report metadata failure through existing observability, never replay input or substitute later/client text in that operation | No false Agent result or optimistic authority | Pass |
+| Older AgentOrg history request returns after post-commit refresh | Mixed web history read owner | reject stale generation commit; retain newest strict family slice | No presentation regression | Pass |
+| Legacy Org summary evidence is absent, tied, invalid or unreadable | Registered summary migration | bounded redacted warning, keep empty summary and approved fallback; do not guess | No fabricated derived data | Pass |
+| Existing Org summary is non-empty during migration/rebuild | Migration + Org catalog | skip before trace read and preserve exact normalized current value | No overwrite | Pass |
 
 ## Removal And Forbidden-Shortcut Audit
 
@@ -1250,13 +1413,19 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Duplicate settlement lanes or dependency graph beside the task tree | Rejected | existing serialized sweep and exact task hierarchy remain authoritative |
 | Team-domain shared settlement contract imported by Org | Yes | root-neutral nullable prepared-settlement adapter remains under collaboration execution task |
 | Timeout/replay/new `settling` status/self-review support | Rejected | ownership/sequencing correction preserves existing task contract |
+| Org summary stored in AgentOrg V1 tree/sidecars/stream ACK or new API field | Rejected | existing history row/index is the sole derived durable authority; web rereads it |
+| Any live AgentOrg Agent command or address depth treated as configured, or task SEND_MESSAGE rejected merely to filter history | Rejected | unchanged exact command returns strict indexed kind; only accepted+`configured` qualifies for summary |
+| Optimistic client title from submitted prompt | Rejected | accepted callback triggers authoritative strict Org-family refresh only |
+| Trace-on-read/lazy historical backfill or runtime import of migration classifier | Rejected | registered startup-only migration folder and dependency guard |
+| Legacy earliest-tie resolution by address/path/file/content order | Rejected | unique strictly earliest timestamp or valid empty fallback |
+| Second Org manager/catalog constructed by WebSocket defaults or startup migration | Rejected | WebSocket composition injects the supervisor's service; migration uses the stateless summary writer before supervisor construction |
 
 ## Design-Principle Self-Check
 
 | Principle | Evidence In Revised Design | Result |
 | --- | --- | --- |
 | Approved behavior first | Every case cites REQ/AC/SCN/Product or established runtime contract; no new product behavior | Pass |
-| Supported-scenario gate | 33 concrete supported cases, including SCN-013-016's launch hierarchy, effective-config equality, unified history and workspace-default paths; normal submit/independent-accept overlap, normal task activation plus SIGTERM before `TURN_STARTED`, and normal approval-gated shutdown prove the affected lifecycle reachability. The self-review witness is `Unsupported/Contrived` and used only as technical coupling evidence; global lookup/tampering/deep conversion remain rejected | Pass |
+| Supported-scenario gate | 37 concrete supported cases, including SCN-013-017's launch hierarchy, effective-config equality, unified history and workspace-default paths; normal submit/independent-accept overlap, normal task activation plus SIGTERM before `TURN_STARTED`, and normal approval-gated shutdown prove the affected lifecycle reachability. The self-review witness is `Unsupported/Contrived` and used only as technical coupling evidence; global lookup/tampering/deep conversion remain rejected | Pass |
 | Spine span sufficiency | Each primary case spans initiating caller through owner/durability/provider to result/event | Pass |
 | Multiple primary spines | Definition, Team launch, Org launch, message, task, persistence, migration, mixed read, focus, process lifecycle are distinct | Pass |
 | Ownership clarity | Root aggregates own subject lifecycle/order; frozen scopes own enumeration; AgentRun owns admission/provider-start/turn/interrupt; adapters own translation | Pass |
@@ -1280,6 +1449,10 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Concurrency lane ownership | One existing serialized task lane remains; it probes quiescence without waiting and defers to the existing execution-state resweep | Pass |
 | Shutdown dependency order | Admitted publication closes, full owned scope is frozen, and each AgentRun fence reaches terminal before command/settlement drain; no provider may start after the phase | Pass |
 | Durable failure boundary | Existing prepared termination is reversible before durability; after durability, finish is monotonic and whole-root fail-stop on failure | Pass |
+| Derived-metadata ownership | Unchanged exact command returns the execution kind used to filter summary eligibility; Org history catalog owns runtime sequencing/current rows; shared writer owns physical first-write; mixed read owner owns live projection; migration alone owns legacy inference | Pass |
+| First-write concurrency | Accepted-result completion plus immediate serialized catalog enqueue is the only live arbitration; later writes and rebuilds preserve the winner | Pass |
+| Conservative recovery | Unique-earliest complete configured-member evidence may backfill; absence/tie/invalid evidence retains valid fallback with bounded diagnostics | Pass |
+| Authoritative live update | Accepted SEND_MESSAGE triggers a newest-generation strict history read; no optimistic summary or row/context mutation | Pass |
 
 ## Questions / Open Decisions
 
@@ -1309,7 +1482,15 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
   actual-default/explicit-choice/inheritance/absent-default/no-focus matrix.
   It also requires scans proving no alternate history panel/route predicate,
   parallel raw patch, hard-coded workspace, or new API/persistence/lifecycle
-  contract remains. The
+  contract remains. AD-REV-015 additionally requires VAL-034-037: direct and
+  mounted configured accepted-message parity; exact Team compaction; all
+  exclusion classes; controlled first-accept completion in both orders; durable
+  preservation across stop/restore/rebuild; authoritative no-navigation refresh
+  with stale/failure ordering; current non-empty preservation; unique direct/
+  mounted legacy evidence; absent/tied/invalid conservative fallback; runner
+  prerequisite/restart/idempotence; redacted diagnostics; and scans proving no
+  Team/schema/stream field, optimistic title, runtime migration import, trace-on-
+  read fallback, or second Org manager/catalog. The
   downstream implementation/test changes and evidence are not validated or
   claimed by this artifact.
 
@@ -1340,7 +1521,7 @@ established catalog-backed root workspace default/inheritance policy.
 `AD-REV-014` resolves `ARCH-REV-011 / AR-FIND-006` by assigning data loading,
 strict projection, grouping, order and family errors only to the mixed read
 owner, while one panel-scoped `useWorkspaceHistoryTreeState` instance owns
-expansion/reveal/highlight continuity and the mounted panel owns scroll. All 33
+expansion/reveal/highlight continuity and the mounted panel owns scroll. `AD-REV-015` resolves the RER-025 history-title impact with exact configured external-message qualification, catalog-owned first-write durability, authoritative live refresh, and startup-only unique-evidence recovery. All 37
 supported walkthroughs have a complete production spine, one authoritative
 owner, explicit status/
 lifecycle/durability truth and a one-directional dependency path. No
@@ -1367,11 +1548,13 @@ passed through AD-REV-011/ARCH-REV-009. The focused AD-REV-013 correction is
 configuration-equality and shell history-owner boundaries are materially
 cross-layer and user-wide. AD-REV-014 is `Small / Low`: it corrects only
 Architecture-owned responsibility wording/file allocation and adds no source
-mechanism or public contract. The cumulative AD-REV-013/014 package changes no
-public API, server behavior, durable schema, migration, stream, focus, task, or
-lifecycle contract. The cumulative ticket remains `Large / High`; independent
-Architecture Review is mandatory before Implementation reconciles AD-REV-013/014
-or API/E2E resumes cumulative validation. The already implemented `CR-FIND-019` behavior remains a distinct
+mechanism or public contract. The focused AD-REV-015 correction is `Medium /
+High`: it changes no public/durable run schema or Product layout, but crosses the
+Org command, persisted derived-history, first-write concurrency, authoritative
+web read, and registered migration boundaries. The cumulative ticket remains
+`Large / High`; independent Architecture Review is mandatory before
+Implementation reconciles AD-REV-015 or API/E2E resumes cumulative validation.
+The already implemented `CR-FIND-019` behavior remains a distinct
 regression obligation. The
 unsupported self-review correlation remains retained only as technical evidence
 of the prior blocking coupling, never as intended behavior or as justification

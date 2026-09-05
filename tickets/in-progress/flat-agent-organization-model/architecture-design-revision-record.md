@@ -22,6 +22,7 @@ does not revise intended behavior.
 | AD-REV-012 | Code Review `CRR-021` / `CR-FIND-020` plus Requirements Engineer approved `RER-023` and focused Product `AORG-TEAM-OVERRIDES-001` | `CR-FIND-020`; separate `CR-FIND-019` retained as Implementation Local Fix | `Architecture Revision — Established AgentTeam Launch-Hierarchy Reuse For AgentOrg` | `Architecture Design Complete`; bespoke Org mounted-Team editor replaced at design boundary by strict Org projection into accepted Team presentation; self-validation expanded to 30 cases; focused delta `Medium/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-013 | User Electron production-path findings plus Requirements Engineer approved `RER-024` | `BEH-013`-`BEH-015`; `REQ-030`-`REQ-032`; `AC-025`-`AC-027`; `SCN-014`-`SCN-016` | `Architecture Revision — Effective Launch Equality, Unified Workspace History, And Root Workspace Default` | `Architecture Design Complete`; one canonical Org patch, one route-stable Workspace/history surface with distinct read/presentation owners, and established root default/inheritance; self-validation expanded to 33 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-014 | Architecture Reviewer `ARCH-REV-011` / ownership-coherence recovery round | `AR-FIND-006` | `Architecture Revision — Unified History Data Versus Presentation-State Ownership` | `Architecture Design Complete`; DS-025 assigns history data/grouping/order to the mixed read owner and expansion/reveal/highlight/scroll continuity to one always-mounted panel/tree-state owner; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-015 | Requirements Engineer approved `RER-025` after user Electron AgentOrg-versus-Team history-title comparison | `BEH-016`; `REQ-033`; `AC-028`; `SCN-017`; `QR-011`; `DEC-020` | `Architecture Revision — First Accepted AgentOrg Message History Summary` | `Architecture Design Complete`; accepted-message first-write filtered by exact execution kind, authoritative live refresh, and conservative registered recovery migration; self-validation expanded to 37 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -1169,4 +1170,130 @@ does not revise intended behavior.
   route-specific second tree controller, or changing selected subject identity
   while trying to preserve its row highlight. The design prohibits all three;
   this architecture-only revision claims no implementation or executable
+  validation completion.
+
+### AD-REV-015 — First Accepted AgentOrg Message History Summary
+
+- Triggering role, report path, and round: the user compared the delivered
+  AgentOrg Workspace history with the established AgentTeam behavior and showed
+  that multiple active Org runs remained `New - <AgentOrg name>` after real
+  external conversation. Requirements Engineering inspected the exact Team/Org
+  paths and approved the parity boundary as
+  `RER-025@58925d043b3d5d01dabb9cc111681541aa532a4b`. Canonical inputs are
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md`,
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`,
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`,
+  and the user screenshots referenced there.
+- Triggering finding/behavior IDs: `BEH-016`, `UC-018`, `REQ-033`, `AC-028`,
+  `SCN-017`, `QR-011`, and `DEC-020`. No Product gate or Product artifact change
+  applies; the existing row and fallback remain the approved presentation.
+- Prior authoritative design result: cumulative `AD-REV-014` at
+  `eb03d3559a52e304e9b2cd6fe9b48507c44226c7`, independently passed by
+  `ARCH-REV-012@613c38e19d8e42955be7d889205f72253491cdf5`.
+- Current authoritative design result: `Architecture Design Complete` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`,
+  revised in place as AD-REV-015 and self-validated in
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Current-state/root-cause evidence: established Team streaming records activity
+  only after exact Agent command acceptance; `TeamRunHistoryCatalogService`
+  imports shared `compactSummary` and serializes a first-non-empty atomic index
+  mutation. The Org handler builds the same external user message and receives
+  the same accepted result but never reaches an Org history mutation. The Org
+  history index, mixed GraphQL projection, web decoder, and row already contain
+  and render `summary`. The Org execution index also contains task Agents, so
+  simply copying the Team handler without observing the returned execution kind
+  would wrongly let task-scoped traffic seed the summary; rejecting such traffic
+  would also violate the unchanged command-admission boundary. The web ACK path currently performs no
+  authoritative history refresh.
+- Why this revision is recorded: the visible parity defect is not a label-only
+  UI patch. It requires one coherent production spine from exact configured
+  command admission through serialized derived persistence and authoritative
+  live read, plus a forward-only, conservative transition for current empty Org
+  rows. Without explicit ownership and exclusions, implementation could title
+  the Org from task/inter-Agent traffic, choose a race by socket order, or add a
+  second optimistic browser authority.
+- Exact design correction: DS-027 routes only external `SEND_MESSAGE` through a
+  new internal `AgentOrgRun.executeAgentCommandWithExecutionKind` outcome. It
+  preserves the existing direct/mounted/task command path and returns its exact
+  indexed kind. After a direct or mounted configured Agent returns `accepted`, the handler immediately calls
+  `AgentOrgRunService.recordRunActivity`; the Org history catalog serializes the
+  attempt and invokes one stateless `AgentOrgRunHistorySummaryWriter` that
+  compacts with the existing Team helper, atomically writes the first non-empty
+  value, and strictly rereads the index.
+  The accepted ACK then invokes an injected notification that asks the existing
+  mixed history read owner for a network-only AgentOrg-family refresh. Full and
+  focused history reads share one monotonic family request generation, so stale
+  responses cannot overwrite the durable winner. No submitted prompt is
+  optimistically written in the browser.
+- Historical transition: add registered startup-only
+  `20260905_agent_org_history_first_message_summary_v1` after the current
+  AgentOrg-family and raw-trace-layout migrations. It preserves non-empty rows
+  before trace reads; for an empty row it enumerates only configured Agents from
+  the strict Org V1 tree, derives exact direct/mounted physical locations, reads
+  complete archived-plus-active trace corpora, and writes only when one
+  provenance-qualified candidate has a strictly earliest finite timestamp. Root
+  communication/task records serve only as negative evidence against their
+  deterministic nonqualifying envelopes; they never prove external origin or
+  justify promoting a later trace. Equal earliest, nonqualifying earliest,
+  absent, invalid, ambiguous, or unreadable required evidence produces the bounded
+  `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` warning and retains the valid empty
+  summary/fallback. It invokes the same stateless summary writer used by the
+  normal catalog, before the supervisor/catalog is constructed, validates by
+  strict reread, follows ordinary runner restart/idempotence, logs no message
+  content, and is never imported by normal runtime/history reads.
+- Ownership and boundary result: AgentOrgRun owns unchanged exact command admission/handle delegation and returns
+  indexed kind/liveness; the stream handler owns command/result ordering;
+  AgentOrgRunService is the application facade; the Org history catalog alone
+  owns normal-runtime sequencing/current rows; the shared stateless writer owns
+  compaction/first-write durability and strict reread; the mixed web history owner
+  alone owns authoritative refresh/response ordering; the registered migration
+  alone owns legacy trace inference. Production composition injects the
+  supervisor's existing Org service through the WebSocket route; startup
+  migration invokes the stateless writer before supervisor construction. No
+  second manager/catalog is constructed.
+- Persisted-data/interface impact: `Migration Required — derived metadata,
+  schema unchanged`. The current AgentOrg history index shape is reused. No
+  AgentOrg V1 tree, task/message/trace sidecar, GraphQL field, WebSocket DTO,
+  command result, focus, routing, lifecycle, mounted-Team root, or Team history
+  contract changes. Existing non-empty Org and every Team row/package are
+  preserved.
+- Approved behavior/requirement IDs affected: `BEH-005`, `BEH-006`, `BEH-016`,
+  `REQ-016`, `REQ-025`, `REQ-033`, `AC-028`, `SCN-017`, `QR-011`, and
+  `DEC-020`; all RER-024 behavior remains unchanged.
+- Design-spec sections updated: document authority/current state and evidence;
+  focused classification; DS-027 canonical live/read/recovery decision;
+  behavior/scenario/spine maps; terminology; persisted-data transition;
+  ownership, dependency and interfaces; focused file responsibilities;
+  sequence, risks, removals and implementation guidance.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-015 and 37 cases.
+  VAL-034 covers direct configured acceptance/normalization/live projection;
+  VAL-035 covers mounted configured symmetry and every exclusion; VAL-036 covers
+  first-accept concurrency, durable restart/rebuild stability and stale web
+  responses; VAL-037 covers unique/ambiguous legacy recovery and ordinary runner
+  retry. No new supplement is created.
+- Classification: focused AD-REV-015 is `Medium / High`. The visible component
+  already exists, but implementation crosses the Org WebSocket command boundary,
+  strict configured/task execution identity, serialized persisted history,
+  cross-process live invalidation, and one registered migration over current
+  packages/traces. High is due to first-writer concurrency and persisted-data
+  inference, not UI/content volume. The cumulative ticket remains
+  `task_size=Large` and `architectural_risk=High`; independent Architecture
+  Review remains selected.
+- Downstream and architecture-review impact: review must verify unchanged task/direct/mounted command admission plus exact
+  direct/mounted configured summary eligibility and exhaustive exclusions, accepted-result
+  ordering, one catalog authority, truthful ACK/error behavior, newest-generation
+  authoritative refresh, no optimistic browser state, current-value preservation,
+  unique-earliest migration classification, convention-compliant restart/
+  warnings, and no schema/Team/runtime-inference leakage. Implementation and
+  API/E2E remain held until that review passes.
+- Next recipient or routing: dynamic handoff rules determine the exact recipient.
+  Selected next action is independent Architecture Review of cumulative
+  RER-025 / AD-REV-015 and the updated self-validation.
+- Remaining gaps or risks: no Requirement Gap or Product UI gap remains. Residual
+  risks are accidental task/inter-Agent qualification, concurrency-order drift,
+  accepted Agent input being mislabeled by derived-index failure, stale web
+  response overwrite, fabricated legacy chronology, migration-code leakage, or
+  rewriting existing summaries/Team history. The design names exact controls and
+  tests; this architecture-only revision claims no implementation or executable
   validation completion.
