@@ -2,233 +2,238 @@
 
 ## Review Round Meta
 
-- Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` (`RER-024`, approved commit `d881d815a995af166074728c0e6a6431829ad52f`)
+- Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` (`RER-025`, approved commit `58925d043b3d5d01dabb9cc111681541aa532a4b`)
 - Upstream Investigation Notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - Upstream Requirements Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`
-- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` (`AD-REV-014`, architecture commit `eb03d3559a52e304e9b2cd6fe9b48507c44226c7`)
-- Supplemental Task Artifacts Reviewed: approved `agent-org-contract.md`; Product `RV-012`, `VIS-001`-`VIS-020`, `BASELINE-PROMOTION-001`, approved `AORG-FLAT-TEAM-STATUS-001`, and approved `AORG-TEAM-OVERRIDES-001`; `architecture-design-self-validation.md`; current downstream source/review evidence through `IR-026`, `CRR-032`, `API-REV-008`, and `DR-003`; existing frontend and server configuration/history/workspace sources; repository `production_data_migration_conventions.md`
+- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` (`AD-REV-015`, architecture commit `9344e4ae8f16bf7571394bdcbab3a238bd6213d8`)
+- Supplemental Task Artifacts Reviewed: approved `agent-org-contract.md`; Product `RV-012`, `VIS-001`-`VIS-020`, `BASELINE-PROMOTION-001`, approved `AORG-FLAT-TEAM-STATUS-001`, and approved `AORG-TEAM-OVERRIDES-001`; `architecture-design-self-validation.md`; current downstream evidence through `IR-028`, `CRR-036`, `API-REV-010`, `CRR-037`, and `DR-004`; deployed AgentOrg/AgentTeam index and trace evidence recorded by Requirements; current Team/Org server and web sources; repository `production_data_migration_conventions.md`
 - Architecture Design Revision Record Reviewed: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`
-- Relevant Architecture Design Revision IDs: `AD-REV-001`-`AD-REV-014`
+- Relevant Architecture Design Revision IDs: `AD-REV-001`-`AD-REV-015`
 - Architecture Review Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
-- Current Architecture Review Revision ID: `ARCH-REV-012`
-- Current Review Round: `12`
-- Trigger: `AD-REV-014` responds to `ARCH-REV-011 / AR-FIND-006` by making the mixed history read owner and the one mounted panel/tree-state presentation owner explicit and non-overlapping throughout the architecture package.
-- Prior Review Round Reviewed: `ARCH-REV-011 / Fail — Design Impact`
-- Latest Authoritative Round: `ARCH-REV-012 / Round 12`
-- Current-State Evidence Basis: current source through `IR-026@3199ba081ad450be72fba239fe86e76c0c697a33`; `AppLeftPanel` route-selects two panels, `AgentOrgRunStore` owns a parallel history cache, the Org patch preview and serializer disagree with the server's omit/inherit versus null/clear contract, and the AgentOrg root disables the shared catalog-backed default selected by standalone Team. The existing GraphQL/service/resolver already carries and validates the required fields. Delivery-owned dirty files and DR-003 evidence remained read-only.
+- Current Architecture Review Revision ID: `ARCH-REV-013`
+- Current Review Round: `13`
+- Trigger: `RER-025` approves AgentTeam-parity first-message summaries for AgentOrg history, and `AD-REV-015` defines the live first-write, authoritative refresh, and conservative startup transition.
+- Prior Review Round Reviewed: `ARCH-REV-012 / Pass`
+- Latest Authoritative Round: `ARCH-REV-013 / Round 13`
+- Current-State Evidence Basis: current source includes the exact Team accepted-command-to-history call, Team serialized first-non-empty catalog mutation and shared compaction helper; the Org handler accepts the same external command but has no summary call; the Org execution index distinguishes `configured`, `task`, and `task_team_member`; the Org history index, GraphQL/web projection, and row already carry/render `summary`; the web pending-command path already correlates ACKs. The latest reviewed implementation baseline is `IR-028` source `4d378df9cba56bd1b9ebf20d9b055f964398f642`, artifact `100e2c82cb948e1cbef4026ab6f74ab815285a34`, with `CRR-036`, `API-REV-010`, and `CRR-037` passing. Delivery-owned dirty files and DR-004 evidence remained read-only.
 
 ## Routing Classification Review
 
 - Task size (`Small`/`Medium`/`Large`): `Large`
 - Architectural risk (`Low`/`High`): `High`
-- Classification rationale reviewed: `Confirmed`. AD-REV-014 is `Small / Low` in isolation because it corrects Architecture-owned ownership wording and mapping only. The cumulative package remains `Large / High` across definition, runtime, persistence, migration, task/lifecycle, API/stream/history, and frontend structures.
+- Classification rationale reviewed: `Confirmed`. AD-REV-015 is `Medium / High` in isolation because accepted command ordering, configured-versus-task identity, persistent first-write arbitration, authoritative web refresh, and a registered startup migration cross process and persistence boundaries. The cumulative package remains `Large / High`.
 - Independent Architecture Review required by the classification: `Yes`
 - Classification evidence or correction required: None.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
 - Overall Basis Status (`Confirmed`/`Contradicted`/`Blocked`): `Confirmed`
-- Approved requirements / intended behavior understood: `Yes`. `REQ-030`-`REQ-032`, `AC-025`-`AC-027`, and `SCN-014`-`SCN-016` require effective launch equality, a route-stable unified Workspaces/history experience, and actual default Workspace selection/inheritance for a fresh AgentOrg draft.
-- Relevant existing behavior and evidence confirmed: `Yes`. The Electron evidence and current frontend/server paths establish all three defects and the existing capabilities available for reuse.
-- Scope guardrail confirmed (`In-Scope Use Cases` / `Out of Scope` / `Preserved Behavior Boundary` / `Review Authority`): `Yes`. The focused change is frontend launch/configuration/history/navigation plus tests. No new backend API/schema, durable format, migration, runtime/lifecycle, mounted-Team authority, focus behavior, or Product artifact is authorized.
+- Approved requirements / intended behavior understood: `Yes`. `BEH-016`, `REQ-033`, `AC-028`, `SCN-017`, and `DEC-020` require the first accepted, non-empty external user message to a configured direct or mounted-Team Agent to become the stable Org summary; they exclude task/internal/rejected traffic and require conservative rollout recovery.
+- Relevant existing behavior and evidence confirmed: `Yes`. Current Team, Org, history, index, stream, and web paths support the reported gap and the proposed reuse points.
+- Scope guardrail confirmed (`In-Scope Use Cases` / `Out of Scope` / `Preserved Behavior Boundary` / `Review Authority`): `Yes`. Derived history metadata and its live projection are in scope. Execution-tree/message/trace/task schemas, focus, routing, command admission, lifecycle, Product layout, and Team history behavior remain unchanged.
 - Approved change, preserved behavior, and outside scope understood: `Yes`
-- Every prospective blocking `Design Impact` finding is traceable to an approved requirement, acceptance criterion, or preserved-behavior ID (`Yes`/`No`): `Yes — no blocking finding remains.`
-- Remaining material ambiguity, if any: None.
+- Every prospective blocking `Design Impact` finding is traceable to an approved requirement, acceptance criterion, or preserved-behavior ID (`Yes`/`No`): `Yes — AR-FIND-007 protects REQ-033 / AC-028 / DEC-020 and changes no approved behavior.`
+- Remaining material ambiguity, if any: None in upstream intent. The unresolved issue is an Architecture-owned contradiction in the migration result contract.
 
 | Behavior ID | Kind | Design Alignment With Approved Intent (`Pass`/`Fail`) | Approved Trigger / Contract And Current-State Evidence (`Pass`/`Fail`/`Unclear`) | Target Outcome / Path / Spine Coherence (`Pass`/`Fail`/`Unclear`) | Status (`Confirmed`/`Needs Correction`/`Unclear`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| BEH-001-BEH-012 | Cumulative contract/system/user/durable behavior | Pass | Pass | Pass | Confirmed | None; AD-REV-013 preserves the previously reviewed definition, runtime, persistence, task, migration, presentation, status, and launch-hierarchy contracts. |
-| BEH-013 | Effective AgentOrg launch configuration | Pass | Pass | Pass | Confirmed | DS-024/VAL-031 define one canonical placement patch, exact null/omission semantics, unchanged server authority, and cross-layer equality. |
-| BEH-014 | Unified Workspaces/history continuity | Pass | Pass | Pass | Confirmed | DS-025/VAL-032 consistently assign loading/decoding/slices/stable keys/grouping/order to the mixed read owner and expansion/reveal/highlight/scroll continuity to the single mounted panel/tree-state owner. |
-| BEH-015 | Fresh AgentOrg Workspace default | Pass | Pass | Pass | Confirmed | DS-026/VAL-033 define a catalog-backed root-only default, explicit draft epoch/provenance, exact inheritance, and fail-closed absence. |
+| BEH-001-BEH-015 | Cumulative contract/system/user/durable behavior | Pass | Pass | Pass | Confirmed | None; AD-REV-015 preserves the previously reviewed family, runtime, task, migration, presentation, launch, and history-owner contracts. |
+| BEH-016 | AgentOrg first-message derived history | Pass | Pass | Fail | Needs Correction | Keep DS-027's accepted-result, configured-only, first-write, refresh, and conservative recovery paths, but make the terminal migration status unambiguous per migration ID. |
 
 ## Supplemental Artifact Coherence Verdict
 
 | Artifact | Purpose And Scope Are Clear? (`Pass`/`Fail`) | Linked To Relevant Core Artifacts? (`Pass`/`Fail`) | Internally Complete? (`Pass`/`Fail`) | Consistent With Related Core Artifacts? (`Pass`/`Fail`) | Status And Approval Applicability Are Clear? (`Pass`/`Fail`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| Requirements, investigation inventory, and `agent-org-contract.md` (`RER-024`) | Pass | Pass | Pass | Pass | Pass | None. Textual RER-024 authority explicitly governs the clarified shell/default behavior without another Product gate. |
-| Product `RV-012`, status supplement, override supplement, and baseline promotion | Pass | Pass | Pass | Pass | Pass | None. Their supersession boundaries and continued approval applicability are explicit. |
-| `design-spec.md` / `architecture-design-revision-record.md` (`AD-REV-014`) | Pass | Pass | Pass | Pass | Pass | AR-FIND-006 is corrected consistently across DS-025, terminology, ownership/dependency maps, file responsibilities, risks, and revision rationale. |
-| `architecture-design-self-validation.md` (`VAL-031`-`VAL-033`) | Pass | Pass | Pass | Pass | Pass | VAL-032 now verifies distinct data and presentation-state owners, stable keys, selected-identity input, one controller instance, and no route recreation. |
-| `IR-026`, `CRR-032`, `API-REV-008`, and DR-003 evidence | Pass | Pass | Pass | Pass | Pass | Retain as current-state and regression evidence; it is not implementation completion for AD-REV-013. |
+| Requirements, investigation inventory, revision record (`RER-025`) | Pass | Pass | Pass | Pass | Pass | None. |
+| `agent-org-contract.md` and retained Product authorities | Pass | Pass | Pass | Pass | Pass | None; the focused behavior needs no schema or Product change. |
+| `architecture-design-self-validation.md` (`VAL-034`-`VAL-037`) | Pass | Pass | Pass | Fail | Pass | VAL-037 correctly expects bounded warnings, but the design spec's combined convention table also says there is no warning disposition. Reconcile the authoritative design text. |
+| `production_data_migration_conventions.md` | Pass | Pass | Pass | Pass | Pass | None; it explicitly permits `SUCCEEDED_WITH_WARNINGS` for independently valid nullable metadata with a truthful fallback. |
+| Current downstream source/review/API/Delivery evidence | Pass | Pass | Pass | Pass | Pass | None; it establishes current behavior and has not been edited by Architecture Review. |
 
 ## Task Design Health Assessment Verdict
 
 | Assessment Area | Result (`Pass`/`Fail`) | Evidence | Required Action |
 | --- | --- | --- | --- |
-| Assessment is present for the current task posture | Pass | The cumulative/refactor posture, current defects, focused delta, preserved boundaries, and validation plan are explicit. | None. |
-| Root-cause classification is explicit and evidence-backed | Pass | Current source establishes duplicated config policy, route-selected competing history owners, and the local root-default divergence. | None. |
-| Refactor needed now / no refactor needed / deferred decision is explicit | Pass | Canonicalize Org patches, consolidate the left history surface, reuse the existing root Workspace policy, and remove the obsolete alternate panel/cache. | None. |
-| Refactor decision is supported by concrete design sections or residual-risk rationale | Pass | DS-024-026, terminology, owner/dependency/file maps, VAL-031-033, removals, and validation requirements now agree. | None. |
+| Assessment is present for the current task posture | Pass | AD-REV-015 identifies a derived-history omission rather than reopening the cumulative domain architecture. | None. |
+| Root-cause classification is explicit and evidence-backed | Pass | The Org accepted-command path lacks Team-equivalent history mutation; task kinds make blind handler copying incorrect. | None. |
+| Refactor needed now / no refactor needed / deferred decision is explicit | Pass | Add a narrow command-with-kind result, service facade, stateless writer, refresh callback, and migration; do not change public schemas or root ownership. | None. |
+| Refactor decision is supported by the concrete design sections or residual-risk rationale | Pass | DS-027, file maps, dependency rules, removal rules, and VAL-034-037 cover the intended change. | None. |
 
 ## Spine Inventory Verdict
 
 | Spine ID | Scope | Spine Is Readable? (`Pass`/`Fail`) | Narrative Is Clear? (`Pass`/`Fail`) | Facade Vs Governing Owner Is Clear? (`Pass`/`Fail`/`N/A`) | Main Domain Subject Naming Is Clear? (`Pass`/`Fail`) | Ownership Is Clear? (`Pass`/`Fail`) | Off-Spine Concerns Stay Off Main Line? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| DS-000-DS-023 | Previously reviewed cumulative spines | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-024 / VAL-031 | Canonical effective configuration to stored Org snapshot | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-025 / VAL-032 | Route-stable mixed history and root actions | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-026 / VAL-033 | Fresh root Workspace default and exact inheritance | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-000-DS-026 | Previously reviewed cumulative spines | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-027 live write | Accepted external Org command to durable first summary | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-027 return/read | Accepted ACK to authoritative latest-generation Org history refresh | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-027 historical transition | Empty current Org row to unique-evidence backfill or truthful fallback | Pass | Fail | Pass | Pass | Pass | Pass | Fail |
 
 ## Boundary Encapsulation Verdict
 
 | Boundary / Owner | Authoritative Public Entry Point Is Clear? (`Pass`/`Fail`) | Internal Owned Mechanisms Stay Internal? (`Pass`/`Fail`) | Caller Bypass Risk Is Controlled? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| AgentOrg config store / canonical patch / form projector | Pass | Pass | Pass | Pass | One canonical authored state feeds preview and serialization; server remains independently authoritative. |
-| Mixed workspace-history projector and always-mounted panel | Pass | Pass | Pass | Pass | Read data/grouping/order and presentation continuity have explicit non-overlapping owners; selected subject identity remains external input. |
-| Typed root history actions and exact subject stores | Pass | Pass | Pass | Pass | Explicit compound root kind/ID; mounted Teams receive no root action. |
-| Shared Workspace catalog/default policy and AgentOrg config store | Pass | Pass | Pass | Pass | Catalog owns eligible records; Org draft owns root/Team selection state; focus remains separate. |
+| AgentOrg command admission | Pass | Pass | Pass | Pass | Internal enriched outcome preserves the existing public operation result and task admission. |
+| Runtime history mutation | Pass | Pass | Pass | Pass | Service is facade; catalog owns sequencing/current rows; writer owns only physical first-write/reread. |
+| Web history refresh | Pass | Pass | Pass | Pass | Mixed history owner remains authoritative; no submitted-text patch. |
+| Startup historical inference | Pass | Pass | Pass | Pass | Migration-only classifier cannot leak into runtime/history reads and invokes no manager/catalog. |
 
 ## Dependency Direction / Forbidden Shortcut Verdict
 
 | Owner / Boundary | Allowed Dependencies Are Clear? (`Pass`/`Fail`) | Forbidden Shortcuts Are Explicit? (`Pass`/`Fail`) | Direction Is Coherent With Ownership? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Org config route -> canonical Org store/projector -> existing GraphQL/server resolver | Pass | Pass | Pass | Pass | No Team config-store/payload import and no client-owned resolved launch plan. |
-| History queries -> mixed projector -> stable panel -> typed subject actions | Pass | Pass | Pass | Pass | Stable-keyed data flows one way to the mounted presentation owner; selected identity is an input, and actions delegate back to exact subject owners. |
-| Root Workspace selector -> Org draft -> inherited placement projection | Pass | Pass | Pass | Pass | No hard-coded path, descendant default, focus, or definition mutation. |
-| Cumulative Team/Org runtime and durable boundaries | Pass | Pass | Pass | Pass | No synthetic Team root, generic persisted family, or mounted-Team lifecycle is reintroduced. |
+| Org handler/service/catalog/writer | Pass | Pass | Pass | Pass | Direction ends at the current Org index; no root/store bypass or second catalog. |
+| Accepted ACK and mixed read owner | Pass | Pass | Pass | Pass | Network-only refresh is injected; component and runtime context do not own history. |
+| Migration to current readers/writer | Pass | Pass | Pass | Pass | Current strict tree/location/trace readers and stateless writer are reusable; legacy inference remains migration-local. |
 
 ## Interface Boundary Verdict
 
 | Interface / API / Query / Command / Method | Subject Is Clear? (`Pass`/`Fail`) | Responsibility Is Singular? (`Pass`/`Fail`) | Identity Shape Is Explicit? (`Pass`/`Fail`) | Generic Boundary Risk (`Low`/`Medium`/`High`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- | --- |
-| `canonicalizeAgentOrgPlacementLaunchPatch` | Pass | Pass | Pass | Low | Pass |
-| Org root commands and `toAgentOrgRunLaunchInput` | Pass | Pass | Pass | Low | Pass |
-| `projectWorkspaceHistoryByWorkspace` | Pass | Pass | Pass | Medium | Pass |
-| `WorkspaceHistorySubjectActions.execute` | Pass | Pass | Pass | Medium | Pass |
-| `selectDefaultWorkspaceForFreshRoot` | Pass | Pass | Pass | Low | Pass |
-| Existing Org GraphQL/service/resolver | Pass | Pass | Pass | Low | Pass |
+| `executeAgentCommandWithExecutionKind` | Pass | Pass | Pass | Low | Pass |
+| `AgentOrgRunService.recordRunActivity` | Pass | Pass | Pass | Low | Pass |
+| `AgentOrgRunHistorySummaryWriter.commitFirstNonEmpty` | Pass | Pass | Pass | Low | Pass |
+| accepted external-message refresh callback | Pass | Pass | Pass | Low | Pass |
+| migration disposition/result contract | Pass | Fail | Pass | Medium | Fail |
 
 ## Existing Capability / Subsystem Reuse Verdict
 
 | Need / Concern | Existing Capability Area Was Checked? (`Pass`/`Fail`) | Reuse / Extension Decision Is Sound? (`Pass`/`Fail`) | New Support Piece Is Justified? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Effective configuration semantics | Pass | Pass | Pass | Pass | Canonical client intent plus the unchanged authoritative server resolver avoids a second resolver. |
-| Unified Agent/Team/Org history shell | Pass | Pass | Pass | Pass | Extend the established panel/query model and extract Org row presentation; delete the competing panel/cache. |
-| Fresh root Workspace default | Pass | Pass | N/A | Pass | Reuse the catalog-backed Team-root policy at the Org root only. |
-| Org hierarchy/status and subject commands | Pass | Pass | N/A | Pass | Reuse passed AD-REV-006/007 projection/status and existing Org lifecycle commands without mounted-Team authority. |
+| Summary normalization | Pass | Pass | N/A | Pass | Reuse exact Team `compactSummary`. |
+| Serialized first-write persistence | Pass | Pass | Pass | Pass | Extend the existing Org catalog and extract only a stateless writer shared with startup. |
+| Live row update | Pass | Pass | Pass | Pass | Reuse the existing Org history query, strict decoder, and mixed owner with monotonic request generation. |
+| Startup execution/recovery | Pass | Pass | N/A | Pass | Reuse registered startup runner, prerequisites, atomic write, reread, and restart-to-retry. |
 
 ## Subsystem / Capability-Area Allocation Verdict
 
 | Subsystem / Capability Area | Ownership Allocation Is Clear? (`Pass`/`Fail`) | Reuse / Extend / Create-New Decision Is Sound? (`Pass`/`Fail`) | Supports The Right Spine Owners? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Web AgentOrg launch configuration | Pass | Pass | Pass | Pass | Owns canonical draft commands, projection, validation, and serialization. |
-| Web workspace-history presentation | Pass | Pass | Pass | Pass | Mixed read data and panel/tree-state presentation continuity are explicit separate capabilities under one route-stable surface. |
-| Subject-specific Agent/Team/Org lifecycle | Pass | Pass | Pass | Pass | Typed action delegation preserves exact existing owners. |
-| Server launch configuration | Pass | Pass | Pass | Pass | Existing fixed-depth resolver remains unchanged and authoritative. |
-| Cumulative runtime/persistence/migration | Pass | Pass | Pass | Pass | AD-REV-013 allocates no new responsibility here. |
+| AgentOrg execution/stream command | Pass | Pass | Pass | Pass | Adds eligibility evidence without changing admission. |
+| AgentOrg history catalog/index | Pass | Pass | Pass | Pass | Sole runtime sequencing/current-row owner. |
+| Web mixed history | Pass | Pass | Pass | Pass | Sole authoritative network projection owner. |
+| App-data migration | Pass | Pass | Pass | Pass | Sole historical provenance owner. |
 
 ## Reusable Owned Structures Verdict
 
 | Repeated Structure / Logic | Extraction Need Was Evaluated? (`Pass`/`Fail`) | Shared File Choice Is Sound? (`Pass`/`Fail`/`N/A`) | Ownership Of Shared Structure Is Clear? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Canonical AgentOrg placement patch | Pass | Pass | Pass | Pass | One pure/idempotent rule is consumed by preview and request mapping. |
-| Tagged mixed history root projection | Pass | Pass | Pass | Pass | Strictly composes the existing Agent/Team query with the Org-only branch of collaboration history. |
-| Existing Workspace root-default policy | Pass | Pass | Pass | Pass | Shared eligibility policy; draft provenance remains subject-owned. |
-| Org row/hierarchy presentation | Pass | Pass | Pass | Pass | Extracted into the unified workspace path without copying runtime authority. |
+| Team-identical compaction | Pass | Pass | Pass | Pass | Existing helper remains the canonical rule. |
+| Org runtime/migration physical first-write | Pass | Pass | Pass | Pass | Stateless writer is justified by two owners needing the same invariant without sharing their orchestration. |
+| Org full/focused request generation | Pass | Pass | Pass | Pass | One family generation prevents stale response overwrite. |
 
 ## Shared Structure / Data Model Tightness Verdict
 
 | Shared Structure / Type / Schema | One Clear Meaning Per Field? (`Pass`/`Fail`) | Redundant Attributes Removed? (`Pass`/`Fail`) | Overlapping Representation Risk Is Controlled? (`Pass`/`Fail`) | Shared Core Vs Specialized Variant / Composition Decision Is Sound? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Canonical Team/Agent sparse launch maps | Pass | Pass | Pass | Pass | Pass | Owned null and ordinary absence have distinct semantics; no parallel raw map. |
-| Tagged mixed history rows/categories | Pass | Pass | Pass | Pass | Pass | Root kind stays explicit; collaboration Team rows are excluded from the second query. |
-| Workspace selection provenance/epoch | Pass | Pass | Pass | Pass | Pass | `untouched/defaulted/explicit` and one explicit draft epoch prevent re-render or same-definition ambiguity. |
-| Team V2 / AgentOrg V1 durable families | Pass | Pass | Pass | Pass | Pass | Unchanged by AD-REV-013. |
+| Enriched Org command result | Pass | Pass | Pass | Pass | Pass | Exact operation result plus strict indexed kind; no address-depth inference. |
+| Org history row/index summary | Pass | Pass | Pass | Pass | Pass | Existing field remains sole durable summary authority. |
+| Summary-writer dispositions | Pass | Pass | Pass | Pass | Pass | Closed physical outcomes do not own migration status. |
+| Migration terminal status description | Fail | Pass | Fail | Fail | Fail | A combined table applies both warning and no-warning claims without migration-specific scope. |
 
 ## File Responsibility Mapping Verdict
 
 | File | Responsibility Is Singular And Clear? (`Pass`/`Fail`) | Responsibility Matches The Intended Owner/Boundary? (`Pass`/`Fail`) | Responsibilities Were Re-Tightened After Shared-Structure Extraction? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `agentOrgLaunchPatch.ts`, Org config store, form projector, and config panel | Pass | Pass | Pass | Pass | Canonical intent, pure projection, and thin event/command composition stay separate. |
-| Workspace-history store/types/projector | Pass | Pass | Pass | Pass | Owns query loading, strict decoding, family slices/errors, stable keys, grouping and order only. |
-| `WorkspaceAgentRunsTreePanel.vue`, workspace section/tree-state composable | Pass | Pass | Pass | Pass | Owns exactly one controller for expansion/reveal/highlight plus the persistent scroll surface; it consumes selected identity without owning it. |
-| Org row presentation and typed root action adapter | Pass | Pass | Pass | Pass | Read-only rendering and exact root command dispatch are separated. |
-| Workspace selector and Org draft | Pass | Pass | Pass | Pass | Shared eligibility remains distinct from Org-owned selection/provenance. |
+| Org run/stream/service files | Pass | Pass | Pass | Pass | Command admission, ordering, and application facade remain separate. |
+| Org history catalog and new summary writer | Pass | Pass | Pass | Pass | Queue/current-row and physical-write responsibilities do not overlap. |
+| Web streaming and mixed history files | Pass | Pass | Pass | Pass | ACK notification and authoritative history state remain separate. |
+| Registered summary migration folder | Pass | Pass | Pass | Pass | Owns all historical classifier/disposition logic. |
+| `design-spec.md` migration convention section | Fail | Fail | N/A | Fail | It combines the family migration and AD-REV-015 backfill under one singular status statement. |
 
 ## Subsystem / Folder / File Placement Verdict
 
 | Path / Item | Target Placement Is Clear? (`Pass`/`Fail`) | Folder Matches Owning Boundary? (`Pass`/`Fail`) | Mixed-Layer Or Over-Split Risk (`Low`/`Medium`/`High`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Web AgentOrg config files | Pass | Pass | Low | Pass | Subject draft/command and shared presentation boundaries remain explicit. |
-| Web workspace-history store/projector/panel files | Pass | Pass | Medium | Pass | Physical placement is clear and AD-REV-014 resolves AR-FIND-006's ownership semantics without changing folder choice. |
-| Server/API/runtime folders | Pass | Pass | Low | Pass | No AD-REV-013 change belongs there. |
+| Org execution/stream/history additions | Pass | Pass | Low | Pass | Existing owning folders are extended. |
+| Shared summary writer beside Org history | Pass | Pass | Low | Pass | Reused by runtime catalog and migration without becoming an orchestrator. |
+| `20260905_agent_org_history_first_message_summary_v1` | Pass | Pass | Low | Pass | Registered migration isolates legacy inference. |
+| Web accepted callback/history generation | Pass | Pass | Low | Pass | Existing service and mixed history owner are extended. |
 
 ## Removal / Decommission Completeness Verdict
 
 | Item / Area | Redundant / Obsolete Piece To Remove Is Named? (`Pass`/`Fail`) | Replacement Owner / Structure Is Clear? (`Pass`/`Fail`/`N/A`) | Removal / Decommission Scope Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Panel-local Org override serializer / noncanonical patch path | Pass | Pass | Pass | Pass | Canonical store/mapper replaces it with no fallback. |
-| `AppLeftPanel` route predicate and `AgentOrgRunHistoryPanel` | Pass | Pass | Pass | Pass | Stable unified panel is the only replacement; old panel is deleted. |
-| Org command-store history cache/fetch path | Pass | Pass | Pass | Pass | Unified history refresh replaces parallel state; subject commands remain. |
-| Hard-coded or descendant Workspace default paths | Pass | Pass | Pass | Pass | Actual catalog selection at the root replaces divergence; no compatibility path. |
+| Optimistic prompt-derived browser title | Pass | Pass | Pass | Pass | Explicitly forbidden; authoritative reread only. |
+| Runtime trace-on-read/backfill | Pass | Pass | Pass | Pass | Migration-only inference and dependency guard are explicit. |
+| Duplicate Org manager/catalog or summary field | Pass | Pass | Pass | Pass | Explicitly rejected. |
+| Ambiguous combined migration-status text | Fail | Pass | Fail | Fail | Split or qualify the existing table; no new runtime mechanism is needed. |
 
 ## Legacy / Backward-Compatibility Verdict
 
 | Area | Compatibility Wrapper / Dual-Path / Legacy Retention Exists? (`Yes`/`No`) | Clean-Cut Removal Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- |
-| Org launch canonicalization | No | Pass | Pass | No raw/canonical dual maps or server fallback semantics. |
-| Route-specific history | No | Pass | Pass | No alternate panel, flag, wrapper, or cache remains. |
-| Workspace default | No | Pass | Pass | No synthesized path or descendant fallback is retained. |
-| Cumulative Team V2 / Org V1 migration | Yes | Pass | Pass | Historical codecs remain migration-only; normal runtime is still forward-only. |
+| Normal Org command/history/runtime | No | Pass | Pass | Current schemas and paths only. |
+| Historical summary recovery | Yes | Pass | Pass | Legacy evidence classification is startup-migration-only and not a runtime compatibility path. |
+| Team history contract | No | Pass | Pass | Existing behavior is reused and preserved, not wrapped. |
 
 ## Persisted-Data Transition Verdict (When Applicable)
 
 | Area / Stored Subject | Approved Decision | Representative Reader / Semantic / Invariant Evidence Is Sufficient? (`Pass`/`Fail`) | Direct Use, Rebuild, Or Migration Choice Is Proportionate? (`Pass`/`Fail`) | Migration Safety Is Complete If Required? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| AD-REV-013 frontend draft/history/default state | Not Affected | Pass | Pass | N/A | Pass | Canonicalization happens before create, history is derived, and future snapshots use the existing schema/API. Existing Team V2/Org V1 packages and indexes remain directly usable. |
-| Cumulative Team V2 / Org V1 family transition | Migration Required | Pass | Pass | Pass | Pass | The prior reviewed startup migration/zero-write native Team boundary remains unchanged. |
+| Existing non-empty Org and Team summaries | Directly usable / preserve | Pass | Pass | N/A | Pass | No overwrite or Team write. |
+| New Org summary writes | Existing schema, new value lifecycle | Pass | Pass | N/A | Pass | Serialized first-write with strict reread. |
+| Empty current Org summary cohort | Migration Required — derived metadata, schema unchanged | Pass | Pass | Fail | Fail | Isolation, prerequisites, classification, validation, idempotence, restart, and bounded diagnostics are specified, but final status is contradictory between DS-027/VAL-037/table rows. |
 
 ## Change / Refactor Safety Verdict
 
 | Area | Sequence Is Realistic? (`Pass`/`Fail`) | Temporary Seams Are Explicit? (`Pass`/`Fail`) | Cleanup / Removal Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- |
-| Canonical launch patch and equality tests | Pass | Pass | Pass | Pass |
-| Unified history extraction and panel/cache deletion | Pass | Pass | Pass | Pass |
-| Fresh root default and inheritance tests | Pass | Pass | Pass | Pass |
-| Cumulative source reconciliation | Pass | Pass | Pass | Pass |
+| Live Org summary path | Pass | Pass | Pass | Pass |
+| Authoritative web refresh | Pass | Pass | Pass | Pass |
+| Startup historical transition | Pass | Pass | Fail | Fail |
 
 ## Example Adequacy Verdict
 
 | Topic / Area | Example Was Needed? (`Yes`/`No`) | Example Is Present And Clear? (`Pass`/`Fail`/`N/A`) | Bad / Avoided Shape Is Explained When Helpful? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Null versus omission configuration semantics | Yes | Pass | Pass | Pass | Concrete Codex/GPT-config to AutoByteus/DeepSeek/null example and equality matrix are sufficient. |
-| Unified history composition/actions | Yes | Pass | Pass | Pass | Query merge, category order, no-workspace case, per-family failure, typed actions, and the data-versus-presentation owner split are concrete and consistent. |
-| Workspace default epochs/inheritance | Yes | Pass | Pass | Pass | Fresh/same-definition/error/explicit-choice cases are explicit. |
+| Direct/mounted/task eligibility | Yes | Pass | Pass | Pass | VAL-034/035 and scenario rows cover exact outcomes. |
+| Concurrent first acceptance and stale reads | Yes | Pass | Pass | Pass | VAL-036 defines both completion orders and newest-generation commit. |
+| Historical unique/ambiguous evidence | Yes | Fail | Pass | Fail | VAL-037 is locally clear, but the adjacent authoritative convention table reverses its warning outcome. |
 
 ## Material Premise Validation (Only When Needed)
 
-None. AR-FIND-006 was an internal ownership contradiction on the already-approved SCN-015 route and is now resolved. Prior premise conclusions remain unchanged and no `Not Reachable` premise drives this result.
+None. AR-FIND-007 does not depend on an assumed production scenario. The no-evidence/ambiguous-evidence rollout outcome is expressly approved by `REQ-033` / `DEC-020` and is affirmatively designed in DS-027 and VAL-037; the finding is the direct contradiction in its terminal-status documentation.
 
 ## Unresolved Approved-Behavior Or Current-State Gaps
 
-None.
+None. Approved behavior and current-state evidence are sufficient. The remaining issue is a classified Architecture-owned design inconsistency, not a requirements or evidence gap.
 
 ## Review Decision
 
-`Pass`. AD-REV-014 resolves AR-FIND-006 without changing the accepted AD-REV-013 mechanism. The mixed history read owner owns only query loads, strict decoding, family-scoped slices/errors, stable row keys, Workspace grouping and category/row order. The always-mounted panel creates exactly one tree-state controller for expansion, ancestor reveal, and selected-row highlighting, while its persistent scroll surface owns scroll position. Existing selection/navigation state remains authoritative for selected subject identity. DS-024 effective launch equality, DS-026 Workspace default/inheritance, the two-query merge, typed actions, partial-family failure behavior, alternate panel/cache deletion, and all cumulative contracts remain intact.
+`Fail — Design Impact`. The live runtime and web paths, ownership boundaries, shared-writer composition, and conservative recovery mechanism are otherwise sound. Implementation must remain held until the one migration-status contradiction is corrected and independently re-reviewed.
 
 ## Findings
 
-None.
+### AR-FIND-007 — AgentOrg summary migration has contradictory terminal-status authority
+
+- Type: `Design Impact`
+- Severity: `Medium`
+- Approved requirement, acceptance criterion, or preserved-behavior ID protected: `BEH-016`, `REQ-033`, `AC-028`, `DEC-020`; repository `production_data_migration_conventions.md` final-state contract
+- Scope status: `Within Approved Scope`
+- Whether the required update changes approved behavior: `No`
+- Affected approved behavior, relevant existing behavior, journey, or established contract: existing empty-summary Org rows with absent, tied, invalid, unreadable, or otherwise non-unique qualifying evidence must remain valid with the `New` fallback; independently valid nullable metadata may complete with bounded warnings.
+- Evidence: DS-027 says `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` yields `SUCCEEDED_WITH_WARNINGS`; the AD-REV-015 derived-transition section repeats that result; the convention table's `Nullable derived metadata backfill` row repeats it; VAL-037 and the migration outcome table repeat it. In the same singular `Production Migration Convention Application` table, the `Truthful statuses` row says “This migration defines no `SUCCEEDED_WITH_WARNINGS` disposition” and requires failure for every unsupported in-scope item. Most neighboring rows concern `20260901_agent_org_flat_team_families_v1`, but the table now also includes AD-REV-015 without identifying per-migration scope. An implementer cannot determine whether the approved valid empty-summary cohort terminates as warning or failure.
+- Material-premise validation ID: `N/A — direct approved migration outcome; no assumed lifecycle premise.`
+- Required update: split or clearly qualify the convention application by migration ID. Preserve the established family-migration rule that cleanup/unsupported source has no warning exception, and state separately that `20260905_agent_org_history_first_message_summary_v1` returns `SUCCEEDED_WITH_WARNINGS` for the explicitly nonfatal `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` cohort while required current-structure or selected-write/reread failures remain `FAILED`. Align DS-027, transition/outcome tables, revision rationale, and VAL-037 to that one status matrix.
+- Why the required update is proportionate to the verified consequence: this is an Architecture-document coherence correction only. It prevents incompatible startup/result handling without adding a schema, state, fallback, retry protocol, or new behavior.
+- Recommended recipient: `/software_engineering_team/architecture_designer`
 
 ## Classification
 
-`N/A — no unresolved architecture-review finding.` AD-REV-014 is `Small / Low` in isolation; the cumulative reviewed package remains `Large / High`.
+`Design Impact`
 
 ## Recommended Recipient
 
-Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+`/software_engineering_team/architecture_designer`
 
 ## Residual Risks
 
-- Implementation must prove browser/request/server/snapshot configuration equality, including exact null/omission, workspace, and tool-approval cases.
-- The unified history extraction must preserve existing Agent/Team rows and state, exact category order, Org hierarchy/status/task lineage, strict Org parsing, per-family partial-read behavior, and root-specific actions without mounted-Team lifecycle.
-- Default selection must use the actual catalog record once per fresh untouched draft epoch, preserve explicit choices, keep descendant defaulting off, and fail closed when unavailable.
-- Standalone Team behavior and the distinct already-implemented `CR-FIND-019` correction remain regression obligations. Delivery-owned dirty artifacts remain outside Architecture Review ownership.
+- After AR-FIND-007 is corrected, implementation must still prove exact accepted-result ordering, configured-only qualification, task admission preservation, first-write normalization/stability, truthful Agent ACK on metadata failure, newest-generation authoritative refresh, unique historical provenance, current-value and Team preservation, runner prerequisites/restart, and no schema/runtime-inference leakage.
+- AD-REV-015 still labels parts of the current source baseline as `IR-026`; the actual latest reviewed baseline is `IR-028` / `CRR-036` / `API-REV-010` / `CRR-037`. Correcting those navigation labels while revising the design would improve traceability, but it is not a separate blocker because the reviewed current code/evidence and proposed boundary remain accurate.
+- Delivery-owned dirty documentation/evidence remains outside Architecture Review ownership and was not modified.
 
 ## Latest Authoritative Result
 
-- Review Decision: `Pass`
+- Review Decision: `Fail — Design Impact`
 - Material-Premise Gate (`Pass`/`Fail`/`Blocked`): `Pass`
-- Notes: `ARCH-REV-012` verifies cumulative `AD-REV-014` against approved `RER-024`, still-relevant Product authority, current source, and downstream evidence. AR-FIND-006 is resolved; the Large/High package may proceed to Implementation reconciliation and the configured source-review/API/E2E route.
+- Notes: `ARCH-REV-013` supersedes `ARCH-REV-012` as the latest architecture-review result. Prior findings `AR-FIND-001`-`AR-FIND-006` remain resolved. New `AR-FIND-007` is confined to the contradictory migration terminal-status description; no Requirement Gap or Product UI gap exists.

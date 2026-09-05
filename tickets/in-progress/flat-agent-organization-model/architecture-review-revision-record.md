@@ -19,6 +19,7 @@ concise chronological architecture-review history.
 | ARCH-REV-010 | Round 10 / `AD-REV-012` response to `CRR-021 / CR-FIND-020` and approved `RER-023` | `AD-REV-012` | Pass | Pass | `CR-FIND-020` |
 | ARCH-REV-011 | Round 11 / `AD-REV-013` response to approved `RER-024` and DR-003 Electron findings | `AD-REV-013` | Pass | Fail — Design Impact | `AR-FIND-006` |
 | ARCH-REV-012 | Round 12 / `AD-REV-014` ownership-coherence recovery | `AD-REV-014` | Fail — Design Impact | Pass | `AR-FIND-006` |
+| ARCH-REV-013 | Round 13 / `AD-REV-015` response to approved `RER-025` first-message AgentOrg history-title parity | `AD-REV-015` | Pass | Fail — Design Impact | `AR-FIND-007` |
 
 ## Revision Entries
 
@@ -320,3 +321,26 @@ None.
 - Material classification changes: The authoritative review changes from `Fail / Design Impact` to `Pass`. AD-REV-014 is `Small / Low` in isolation; the cumulative package remains `Large / High` and proceeds through reviewed Implementation reconciliation, source review, and API/E2E. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must preserve the owner split while proving cross-layer configuration equality, route-stable history state/category/actions, actual Workspace default selection/inheritance, standalone Team regression safety, and absence of new API/persistence/runtime/lifecycle machinery. These are controlled implementation/validation risks, not open architecture decisions.
+
+### ARCH-REV-013 — AgentOrg history-summary migration-status coherence failure
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 13; approved `RER-025` requires AgentTeam-parity first-message summaries for AgentOrg history, and `AD-REV-015` defines the configured-only accepted-command write, authoritative history refresh, and conservative startup backfill.
+- Triggering role, report path, and finding IDs: Architecture Designer; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; new `AR-FIND-007`.
+- Relevant architecture design revision IDs: `AD-REV-015`, cumulative with unchanged accepted `AD-REV-001`-`AD-REV-014`
+- Prior authoritative decision: `Pass` (`ARCH-REV-012`)
+- Current authoritative decision: `Fail — Design Impact`
+- What changed in the review result or what baseline was established: Independently confirmed the current Team accepted-command/history behavior, the missing Org mutation, strict configured/task execution kinds, existing Org summary schema/projection, and web ACK correlation. DS-027's live path is coherent: it preserves command admission, filters only accepted configured external sends, serializes the first summary through the single Org catalog and stateless writer, and refreshes through the authoritative mixed history owner without client optimism. Its historical path also has proportionate current-only prerequisites, unique-earliest inference, conservative fallback, shared physical writer, strict reread, and runner restart. One Architecture-owned contradiction prevents a pass: DS-027, the derived-transition section, the nullable-metadata convention row, the outcome table, and VAL-037 say `SKIPPED_NO_UNIQUE_QUALIFYING_TRACE` yields `SUCCEEDED_WITH_WARNINGS`, while the same singular convention-application table says “This migration defines no `SUCCEEDED_WITH_WARNINGS` disposition.” The table mixes the earlier family migration and the AD-REV-015 summary migration without identifying which status rule belongs to which migration.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001`-`AR-FIND-006` | Resolved in prior architecture-review rounds | Remain resolved | `AD-REV-003`-`AD-REV-015`; `ARCH-REV-002`-`ARCH-REV-012` | AD-REV-015 adds derived Org history-summary behavior only and changes none of the accepted definition transition, handoff order, family migration, root-neutral runtime, workspace presentation, status, launch, settlement/shutdown, Team-override, effective-config, or unified-history owner decisions. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020`, `CR-FIND-020` | Resolved in prior rounds | Remain resolved at the design boundary | `AD-REV-004`-`AD-REV-015` | The new design preserves exact public/durable root families, accepted presentation and status, one-FIFO/root-fence lifecycle, and Org-owned launch hierarchy. |
+| `CR-FIND-019` | Implemented; retained as regression obligation | Remains a regression obligation | `IR-026`-`IR-028`, `CRR-032`, `CRR-036`, `AD-REV-013`-`AD-REV-015` | The summary design neither absorbs nor reverses this source behavior. |
+
+- New or remaining finding IDs: `AR-FIND-007`
+- Material classification changes: The authoritative review changes from `Pass` to `Fail / Design Impact`. AD-REV-015 remains `Medium / High` in isolation and the cumulative package remains `Large / High`. The required recovery is expected to be `Small / Low` if confined to migration-specific status labeling and coherence. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: `/software_engineering_team/architecture_designer`
+- Remaining risks or uncertainty: Split or qualify the migration-convention table so the family migration retains its no-warning cleanup rule and the summary migration retains its approved bounded warning for independently valid empty metadata; align DS-027, outcome/transition tables, revision rationale, and VAL-037. The stale `IR-026` source-baseline navigation labels should also be corrected to the actual `IR-028` / `CRR-036` / `API-REV-010` / `CRR-037` baseline, but they are not a separate blocker. Implementation and API/E2E remain held.
