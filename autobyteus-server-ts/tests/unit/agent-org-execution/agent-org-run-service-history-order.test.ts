@@ -11,6 +11,7 @@ describe("AgentOrgRunService history ordering", () => {
     });
     let historyInitialized = false;
     const recordCreated = vi.fn();
+    const recordRunSummary = vi.fn(async () => undefined);
     const managerCreate = vi.fn(async (tree) => {
       expect(historyInitialized).toBe(true);
       return { orgRunId: tree.rootOrg.orgRunId, getExecutionTreeSnapshot: () => tree };
@@ -29,6 +30,7 @@ describe("AgentOrgRunService history ordering", () => {
         recordCreated,
         recordRestored: async () => undefined,
         recordTerminated: async () => undefined,
+        recordRunSummary,
       },
     } as never);
 
@@ -44,5 +46,7 @@ describe("AgentOrgRunService history ordering", () => {
     expect(run.orgRunId).toContain("org_one_");
     expect(managerCreate).toHaveBeenCalledOnce();
     expect(recordCreated).toHaveBeenCalledOnce();
+    await service.recordRunActivity(run as never, { summary: "First accepted input" });
+    expect(recordRunSummary).toHaveBeenCalledWith({ orgRunId: run.orgRunId, summary: "First accepted input" });
   });
 });

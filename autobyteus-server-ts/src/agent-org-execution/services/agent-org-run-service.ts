@@ -48,7 +48,7 @@ export class AgentOrgRunService {
     workspaces: Pick<WorkspaceManager, "ensureWorkspaceByRootPath">;
     admission: Pick<DefinitionAdmissionService, "requireAvailable">;
     modelConfigValidator: RunModelConfigValidator;
-    history: Pick<AgentOrgRunHistoryCatalogService, "initialize" | "recordCreated" | "recordRestored" | "recordTerminated">;
+    history: Pick<AgentOrgRunHistoryCatalogService, "initialize" | "recordCreated" | "recordRestored" | "recordTerminated" | "recordRunSummary">;
   }>) {}
 
   async create(command: CreateAgentOrgRunCommand): Promise<AgentOrgRun> {
@@ -143,6 +143,10 @@ export class AgentOrgRunService {
 
   getActive(agentOrgRunId: string): AgentOrgRun | null {
     return this.dependencies.manager.getActive(required(agentOrgRunId, "agentOrgRunId"));
+  }
+
+  recordRunActivity(run: AgentOrgRun, input: { summary?: string | null } = {}): Promise<void> {
+    return this.dependencies.history.recordRunSummary({ orgRunId: run.orgRunId, summary: input.summary });
   }
 
   private async normalizeOverrides(

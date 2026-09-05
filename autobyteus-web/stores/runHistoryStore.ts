@@ -22,6 +22,7 @@ import {
 import {
   ensureRunHistoryWorkspaceByRootPath,
   fetchRunHistoryTree,
+  refreshAgentOrgHistoryForStore,
   openHistoricalRun,
   resolveRunHistoryWorkspaceMetadataByRootPath,
   type RunHistorySelectionMode,
@@ -61,6 +62,7 @@ export const useRunHistoryStore = defineStore('runHistory', {
     workspaceGroups: [] as RunHistoryWorkspaceGroup[],
     agentOrgHistory: [] as AgentOrgRunHistoryItem[],
     historyFamilyErrors: { workspace: null, agentOrg: null } as RunHistoryFamilyErrors,
+    agentOrgRequestGeneration: 0,
     workspaceHistoryLoadingById: {} as Record<string, boolean>,
     workspaceHistoryErrorById: {} as Record<string, string | null>,
     agentAvatarByDefinitionId: {} as Record<string, string>,
@@ -111,6 +113,11 @@ export const useRunHistoryStore = defineStore('runHistory', {
     async fetchTree(limitPerAgent = 6, options: { quiet?: boolean } = {}): Promise<void> {
       await fetchRunHistoryTree(this, limitPerAgent, options);
       this.refreshRunNavigationTopology('history-fetch');
+    },
+
+    async refreshAgentOrgHistory(): Promise<void> {
+      await refreshAgentOrgHistoryForStore(this);
+      this.refreshRunNavigationTopology('agent-org-history-refresh');
     },
 
     async openRun(runId: string, options: { selectionMode?: RunHistorySelectionMode } = {}): Promise<void> {

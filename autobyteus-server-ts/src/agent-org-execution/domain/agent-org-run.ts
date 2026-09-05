@@ -16,7 +16,7 @@ import type { AgentOrgRunExecutionTreeSnapshot } from "./agent-org-run-execution
 import type { AgentOrgRunEvent } from "./agent-org-run-event.js";
 import type { AgentOrgTaskDelegationRecordsFileV1 } from "../persistence/agent-org-task-delegation-records-v1.js";
 import type { AgentOrgCommunicationMessagesFileV1 } from "../persistence/agent-org-communication-messages-v1.js";
-import { AgentOrgExecutionIndex } from "../services/agent-org-execution-index.js";
+import { AgentOrgExecutionIndex, type AgentOrgIndexedAgentExecution } from "../services/agent-org-execution-index.js";
 import { AgentOrgRootAgentExecutionRegistry } from "../services/agent-org-root-agent-execution-registry.js";
 import { AgentOrgTeamExecutionDirectory } from "../services/agent-org-team-execution-directory.js";
 import { AgentOrgRunPersistenceCoordinator } from "../services/agent-org-run-persistence-coordinator.js";
@@ -405,14 +405,25 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
       && Boolean(retired && sameCollaborationMemberExecutionIdentity(retired, identity));
   }
 
-  executeAgentCommand(agentRunId: string, command: TeamMemberExecutionCommand): Promise<AgentOperationResult> {
+  async executeAgentCommand(agentRunId: string, command: TeamMemberExecutionCommand): Promise<AgentOperationResult> {
+    return (await this.executeAgentCommandWithExecutionKind(agentRunId, command)).result;
+  }
+
+  executeAgentCommandWithExecutionKind(agentRunId: string, command: TeamMemberExecutionCommand): Promise<Readonly<{
+    result: AgentOperationResult;
+    executionKind: AgentOrgIndexedAgentExecution["executionKind"] | null;
+  }>> {
     return this.operationGate.run(async () => {
       this.assertAdmitting();
       const agent = this.index.getAgent(agentRunId);
-      if (!agent || !this.index.isLiveAgent(agentRunId)) return { accepted: false, code: "RUN_NOT_FOUND", message: `AgentRun '${agentRunId}' is not live in AgentOrg '${this.orgRunId}'.` };
-      return agent.host.hostKind === "root"
+      if (!agent || !this.index.isLiveAgent(agentRunId)) return Object.freeze({
+        result: { accepted: false, code: "RUN_NOT_FOUND", message: `AgentRun '${agentRunId}' is not live in AgentOrg '${this.orgRunId}'.` },
+        executionKind: agent?.executionKind ?? null,
+      });
+      const result = await (agent.host.hostKind === "root"
         ? this.options.rootAgents.executeCommand(agentRunId, command)
-        : this.options.teams.require(agent.host.hostRunId).executeDirectAgentCommand(agentRunId, command);
+        : this.options.teams.require(agent.host.hostRunId).executeDirectAgentCommand(agentRunId, command));
+      return Object.freeze({ result, executionKind: agent.executionKind });
     });
   }
 

@@ -64,6 +64,11 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     orgRunId: string
     publish(context: AgentOrgExecutionContext): void
     reportError(message: string): void
+    onAcceptedExternalUserMessage?(event: Readonly<{
+      orgRunId: string
+      agentRunId: string
+      commandId: string
+    }>): void
   }>) {}
 
   connect(): void {
@@ -304,8 +309,20 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     }
     clearTimeout(command.timeout)
     this.pending.delete(message.payload.command_id)
-    if (message.payload.state === 'accepted') command.resolve()
-    else command.reject(new Error(message.payload.message ?? message.payload.code ?? 'AgentOrg command rejected.'))
+    if (message.payload.state === 'accepted') {
+      command.resolve()
+      if (command.commandType === 'SEND_MESSAGE') {
+        try {
+          this.options.onAcceptedExternalUserMessage?.({
+            orgRunId: this.options.orgRunId,
+            agentRunId: command.targetAgentRunId,
+            commandId: message.payload.command_id,
+          })
+        } catch (cause) {
+          console.error('Accepted AgentOrg message history refresh could not be requested.', cause)
+        }
+      }
+    } else command.reject(new Error(message.payload.message ?? message.payload.code ?? 'AgentOrg command rejected.'))
   }
 
   private failClosed(cause: unknown, generation: StreamGeneration): void {

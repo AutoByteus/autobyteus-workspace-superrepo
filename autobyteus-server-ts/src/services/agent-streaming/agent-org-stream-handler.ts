@@ -6,7 +6,7 @@ import {
   type CollaborationStreamServerMessage,
 } from "@autobyteus/collaboration-stream-contracts";
 import { AgentInputUserMessage, ContextFile, ContextFileType } from "autobyteus-ts";
-import { AgentOrgRunManager } from "../../agent-org-execution/services/agent-org-run-manager.js";
+import type { AgentOrgRunService } from "../../agent-org-execution/services/agent-org-run-service.js";
 import { projectAgentOrgExecutionEvent, projectAgentOrgExecutionView } from "./agent-org-execution-view-projector.js";
 import type { WebSocketConnection } from "./agent-team-stream-handler.js";
 
@@ -36,11 +36,11 @@ const commandAck = (
 /** Native AgentOrg stream. It does not reuse or reinterpret the Team envelope. */
 export class AgentOrgStreamHandler {
   private readonly sessions = new Map<string, { connection: WebSocketConnection; orgRunId: string; close(): void }>();
-  constructor(private readonly manager: Pick<AgentOrgRunManager, "getActive"> = AgentOrgRunManager.getInstance()) {}
+  constructor(private readonly service: Pick<AgentOrgRunService, "getActive" | "recordRunActivity">) {}
 
   async connect(connection: WebSocketConnection, orgRunIdInput: string): Promise<string | null> {
     const orgRunId = orgRunIdInput.trim();
-    const run = orgRunId ? this.manager.getActive(orgRunId) : null;
+    const run = orgRunId ? this.service.getActive(orgRunId) : null;
     if (!run) {
       connection.send(serialize(error("AGENT_ORG_NOT_ACTIVE", `AgentOrg run '${orgRunId}' is not active.`)));
       connection.close(4004);
@@ -115,7 +115,7 @@ export class AgentOrgStreamHandler {
     }
     try {
       if (message.payload.root_run_id !== session.orgRunId) throw new Error("AgentOrg command root correlation mismatch.");
-      const run = this.manager.getActive(session.orgRunId);
+      const run = this.service.getActive(session.orgRunId);
       if (!run) throw new Error(`AgentOrg run '${session.orgRunId}' is not active.`);
       const command = message.type === "SEND_MESSAGE"
         ? (() => {
@@ -144,7 +144,21 @@ export class AgentOrgStreamHandler {
               approved: message.type === "APPROVE_TOOL",
               reason: message.payload.reason,
             };
-      const result = await run.executeAgentCommand(message.payload.target_agent_run_id, command);
+      const outcome = message.type === "SEND_MESSAGE"
+        ? await run.executeAgentCommandWithExecutionKind(message.payload.target_agent_run_id, command)
+        : Object.freeze({
+            result: await run.executeAgentCommand(message.payload.target_agent_run_id, command),
+            executionKind: null,
+          });
+      const result = outcome.result;
+      if (message.type === "SEND_MESSAGE" && result.accepted && outcome.executionKind === "configured") {
+        const historyCommit = this.service.recordRunActivity(run, { summary: message.payload.content });
+        try {
+          await historyCommit;
+        } catch (cause) {
+          console.error(`Accepted AgentOrg input history summary commit failed for '${session.orgRunId}':`, cause);
+        }
+      }
       session.connection.send(serialize(commandAck(
         message,
         result.accepted ? "accepted" : "rejected",
@@ -168,6 +182,3 @@ export class AgentOrgStreamHandler {
     this.sessions.delete(sessionId);
   }
 }
-
-let cached: AgentOrgStreamHandler | null = null;
-export const getAgentOrgStreamHandler = (): AgentOrgStreamHandler => cached ??= new AgentOrgStreamHandler();

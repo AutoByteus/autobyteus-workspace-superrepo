@@ -19,6 +19,7 @@ import { TokenUsageRunRecordsV1AppDataMigration } from "./migrations/token-usage
 import { TeamAgentMemoryLayoutAppDataMigration } from "./migrations/team-agent-memory-layout-app-data-migration.js";
 import { TeamRunExecutionTreeV2AppDataMigration } from "./migrations/team-run-execution-tree-v2-app-data-migration.js";
 import { AgentOrgFlatTeamFamiliesV1AppDataMigration } from "./migrations/agent-org-flat-team-families-v1/agent-org-flat-team-families-v1-app-data-migration.js";
+import { AgentOrgHistoryFirstMessageSummaryV1AppDataMigration } from "./migrations/agent-org-history-first-message-summary-v1/agent-org-history-first-message-summary-v1-app-data-migration.js";
 
 export class AppDataMigrationRegistry {
   private readonly definitions: AppDataMigrationDefinition[];
@@ -51,6 +52,9 @@ export class AppDataMigrationRegistry {
       new RawTraceRotationLayoutMigration(appConfigProvider.config.getMemoryDir()),
       new RawTraceActiveFileNameMigration(appConfigProvider.config.getMemoryDir()),
       new MigrateNativeWorkingContextSnapshotsV5Migration(
+        appConfigProvider.config.getMemoryDir(),
+      ),
+      new AgentOrgHistoryFirstMessageSummaryV1AppDataMigration(
         appConfigProvider.config.getMemoryDir(),
       ),
       new TeamCommunicationProjectionAddressMigration(appConfigProvider.config.getMemoryDir()),

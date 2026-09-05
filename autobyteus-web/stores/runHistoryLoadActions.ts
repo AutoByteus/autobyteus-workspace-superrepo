@@ -59,6 +59,7 @@ export interface RunHistoryFetchStoreLike {
   openingRun: boolean;
   agentOrgHistory: AgentOrgRunHistoryItem[];
   historyFamilyErrors: RunHistoryFamilyErrors;
+  agentOrgRequestGeneration: number;
   findAgentNameByRunId(runId: string): string | null;
   ensureWorkspaceByRootPath(rootPath: string): Promise<string | null>;
   resolveWorkspaceMetadataByRootPath(rootPath: string): Promise<WorkspaceMetadata | null>;
@@ -70,6 +71,7 @@ export const fetchRunHistoryTree = async (
   options: { quiet?: boolean } = {},
 ): Promise<void> => {
   const quiet = options.quiet === true;
+  const agentOrgGeneration = ++store.agentOrgRequestGeneration;
   if (!quiet) {
     store.loading = true;
     store.error = null;
@@ -128,7 +130,9 @@ export const fetchRunHistoryTree = async (
       if (!quiet) store.error = detail;
     }
 
-    if (agentOrgResult.status === 'fulfilled') {
+    if (agentOrgGeneration !== store.agentOrgRequestGeneration) {
+      // A newer full or focused Org-family request owns the slice.
+    } else if (agentOrgResult.status === 'fulfilled') {
       store.agentOrgHistory = agentOrgResult.value;
       store.historyFamilyErrors = { ...store.historyFamilyErrors, agentOrg: null };
     } else {
@@ -139,7 +143,12 @@ export const fetchRunHistoryTree = async (
     }
   } catch (error: any) {
     const detail = error?.message || 'Failed to load run history.';
-    store.historyFamilyErrors = { workspace: detail, agentOrg: detail };
+    store.historyFamilyErrors = {
+      workspace: detail,
+      agentOrg: agentOrgGeneration === store.agentOrgRequestGeneration
+        ? detail
+        : store.historyFamilyErrors.agentOrg,
+    };
     if (!quiet) {
       store.error = detail;
     }
@@ -147,6 +156,32 @@ export const fetchRunHistoryTree = async (
     if (!quiet) {
       store.loading = false;
     }
+  }
+};
+
+export const refreshAgentOrgHistoryForStore = async (
+  store: RunHistoryFetchStoreLike,
+): Promise<void> => {
+  const generation = ++store.agentOrgRequestGeneration;
+  try {
+    const windowNodeContextStore = useWindowNodeContextStore();
+    const isReady = await windowNodeContextStore.waitForBoundBackendReady();
+    if (!isReady) throw new Error(windowNodeContextStore.lastReadyError || 'Bound backend is not ready');
+    const result = await getApolloClient().query<{ listCollaborationRootHistory: unknown }>({
+      query: ListCollaborationRootHistory,
+      fetchPolicy: 'network-only',
+    });
+    if (result.errors?.length) {
+      throw new Error(result.errors.map((error: { message: string }) => error.message).join(', '));
+    }
+    const rows = parseAgentOrgHistoryItems(result.data?.listCollaborationRootHistory ?? []);
+    if (generation !== store.agentOrgRequestGeneration) return;
+    store.agentOrgHistory = rows;
+    store.historyFamilyErrors = { ...store.historyFamilyErrors, agentOrg: null };
+  } catch (error) {
+    if (generation !== store.agentOrgRequestGeneration) return;
+    const detail = error instanceof Error ? error.message : String(error);
+    store.historyFamilyErrors = { ...store.historyFamilyErrors, agentOrg: detail };
   }
 };
 

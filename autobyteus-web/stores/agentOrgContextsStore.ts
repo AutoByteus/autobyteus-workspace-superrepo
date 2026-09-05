@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { AgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgExecutionContext'
 import { AgentOrgStreamingService } from '~/services/agentOrgExecution/agentOrgStreamingService'
+import { useRunHistoryStore } from '~/stores/runHistoryStore'
 
 const services = new Map<string, AgentOrgStreamingService>()
 
@@ -28,6 +29,9 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
       },
       reportError: (message) => {
         errors.value = { ...errors.value, [orgRunId]: message }
+      },
+      onAcceptedExternalUserMessage: () => {
+        void useRunHistoryStore().refreshAgentOrgHistory()
       },
     })
     services.set(orgRunId, service)

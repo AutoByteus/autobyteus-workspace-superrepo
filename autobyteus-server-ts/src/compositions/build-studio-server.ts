@@ -323,6 +323,7 @@ export const buildStudioServer = async (input: {
       await registerWebsocketRoutes(app, {
         lifecycleReadiness: currentApplicationRuntime.lifecycle,
         application: currentApplicationRuntime.realtime,
+        agentOrgRunService: generalProcessRunSupervisor.agentOrgRunService,
       });
       await registerGraphql(app);
       return Object.freeze({

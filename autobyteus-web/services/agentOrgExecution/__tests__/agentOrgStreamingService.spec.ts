@@ -507,6 +507,39 @@ describe('AgentOrgStreamingService', () => {
     expect(context.requireReopen).not.toHaveBeenCalled()
   })
 
+  it('notifies history only after an accepted external SEND_MESSAGE ACK without exposing message text', async () => {
+    const context = candidate()
+    mocks.hydrate.mockResolvedValue(context)
+    const onAcceptedExternalUserMessage = vi.fn()
+    const service = new AgentOrgStreamingService({
+      orgRunId: 'org-run', publish: vi.fn(), reportError: vi.fn(), onAcceptedExternalUserMessage,
+    })
+    service.connect()
+    const socket = TestWebSocket.instances[0]!
+    socket.emit(connected)
+    socket.emit(snapshot)
+    await vi.waitFor(() => expect(mocks.hydrate).toHaveBeenCalled())
+
+    const completed = service.interactionFor('agent-run').send('Authoritative first message', [])
+    await vi.waitFor(() => expect(socket.sent).toHaveLength(1))
+    const command = JSON.parse(socket.sent[0]!)
+    expect(onAcceptedExternalUserMessage).not.toHaveBeenCalled()
+    socket.emit({
+      type: 'AGENT_COMMAND_ACK',
+      payload: {
+        root_subject_kind: 'agent_org', root_run_id: 'org-run',
+        command_id: command.payload.command_id, command_type: 'SEND_MESSAGE',
+        target_agent_run_id: 'agent-run', state: 'accepted', code: null, message: null,
+      },
+    })
+
+    await expect(completed).resolves.toBeUndefined()
+    expect(onAcceptedExternalUserMessage).toHaveBeenCalledWith({
+      orgRunId: 'org-run', agentRunId: 'agent-run', commandId: command.payload.command_id,
+    })
+    expect(JSON.stringify(onAcceptedExternalUserMessage.mock.calls)).not.toContain('Authoritative first message')
+  })
+
   it.each([
     ['command type', 'SEND_MESSAGE', 'agent-run'],
     ['target AgentRun', 'INTERRUPT_GENERATION', 'other-agent-run'],

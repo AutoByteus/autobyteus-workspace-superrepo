@@ -760,6 +760,66 @@ describe('runHistoryStore', () => {
     expect(store.historyFamilyErrors.agentOrg).toContain('does not match its execution tree root')
   });
 
+  it('commits only the newest initiated AgentOrg refresh and retains its slice on a later failure', async () => {
+    let resolveOlder!: (value: unknown) => void;
+    let resolveNewer!: (value: unknown) => void;
+    const older = new Promise((resolve) => { resolveOlder = resolve; });
+    const newer = new Promise((resolve) => { resolveNewer = resolve; });
+    queryMock.mockReturnValueOnce(older).mockReturnValueOnce(newer);
+    const store = useRunHistoryStore();
+    store.agentOrgHistory = [buildAgentOrgHistoryRow({ rootRunId: 'org-existing', summary: 'Existing' }) as any];
+
+    const olderRefresh = store.refreshAgentOrgHistory();
+    const newerRefresh = store.refreshAgentOrgHistory();
+    resolveNewer({ data: { listCollaborationRootHistory: [buildAgentOrgHistoryRow({ rootRunId: 'org-winner', summary: 'Winner' })] }, errors: [] });
+    await newerRefresh;
+    resolveOlder({ data: { listCollaborationRootHistory: [buildAgentOrgHistoryRow({ rootRunId: 'org-stale', summary: 'Stale' })] }, errors: [] });
+    await olderRefresh;
+    expect(store.agentOrgHistory[0]?.rootRunId).toBe('org-winner');
+
+    queryMock.mockRejectedValueOnce(new Error('Focused Org refresh failed'));
+    await store.refreshAgentOrgHistory();
+    expect(store.agentOrgHistory[0]?.rootRunId).toBe('org-winner');
+    expect(store.historyFamilyErrors.agentOrg).toBe('Focused Org refresh failed');
+  });
+
+  it('shares AgentOrg request generation between full history loads and focused refreshes', async () => {
+    let resolveFullOrg!: (value: unknown) => void;
+    const fullOrg = new Promise((resolve) => { resolveFullOrg = resolve; });
+    let orgRequestCount = 0;
+    queryMock.mockImplementation(async ({ query }: { query: string }) => {
+      if (query === 'ListWorkspaceRunHistory') {
+        return { data: { listWorkspaceRunHistory: [] }, errors: [] };
+      }
+      if (query === 'ListCollaborationRootHistory') {
+        orgRequestCount += 1;
+        if (orgRequestCount === 1) return fullOrg;
+        return {
+          data: { listCollaborationRootHistory: [buildAgentOrgHistoryRow({
+            rootRunId: 'org-focused-winner', summary: 'Committed winner',
+          })] },
+          errors: [],
+        };
+      }
+      throw new Error(`Unexpected query: ${String(query)}`);
+    });
+    const store = useRunHistoryStore();
+
+    const olderFullLoad = store.fetchTree();
+    await vi.waitFor(() => expect(orgRequestCount).toBe(1));
+    await store.refreshAgentOrgHistory();
+    resolveFullOrg({
+      data: { listCollaborationRootHistory: [buildAgentOrgHistoryRow({
+        rootRunId: 'org-stale-full-load', summary: 'Stale',
+      })] },
+      errors: [],
+    });
+    await olderFullLoad;
+
+    expect(store.agentOrgHistory[0]?.rootRunId).toBe('org-focused-winner');
+    expect(store.agentOrgHistory[0]?.summary).toBe('Committed winner');
+  });
+
   it('hydrates and connects newly discovered active runs from workspace history', async () => {
     queryMock.mockResolvedValue({
       data: {

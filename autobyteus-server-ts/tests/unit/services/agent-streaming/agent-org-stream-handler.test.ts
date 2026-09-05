@@ -81,14 +81,20 @@ const connection = () => {
 const harness = (snapshot = { tree, tasks, messages, statuses }) => {
   const publisher = new RootEventPublisher<AgentOrgRunEvent>();
   const executeAgentCommand = vi.fn(async () => ({ accepted: true }));
+  const executeAgentCommandWithExecutionKind = vi.fn(async (agentRunId: string) => ({
+    result: { accepted: true },
+    executionKind: agentRunId.includes("task") ? "task" as const : "configured" as const,
+  }));
+  const recordRunActivity = vi.fn(async () => undefined);
   const run = {
     orgRunId,
     isActive: () => true,
     openPackageSnapshotConnection: () => publisher.openSnapshotConnection(() => snapshot),
     executeAgentCommand,
+    executeAgentCommandWithExecutionKind,
   };
-  const manager = { getActive: vi.fn((id: string) => id === orgRunId ? run : null) };
-  return { publisher, executeAgentCommand, manager, handler: new AgentOrgStreamHandler(manager as never) };
+  const service = { getActive: vi.fn((id: string) => id === orgRunId ? run : null), recordRunActivity };
+  return { publisher, executeAgentCommand, executeAgentCommandWithExecutionKind, recordRunActivity, service, run, handler: new AgentOrgStreamHandler(service as never) };
 };
 
 describe("AgentOrgStreamHandler", () => {
@@ -143,10 +149,68 @@ describe("AgentOrgStreamHandler", () => {
     expect(test.executeAgentCommand).not.toHaveBeenCalled();
     expect(JSON.parse(client.sent.at(-1) ?? "{}")).toMatchObject({ type: "AGENT_COMMAND_ACK", payload: { command_id: "wrong-root", state: "failed", code: "AGENT_ORG_COMMAND_FAILED" } });
     await test.handler.handleMessage(sessionId!, command(orgRunId, "accepted"));
-    expect(test.executeAgentCommand).toHaveBeenCalledTimes(1);
-    expect(test.executeAgentCommand.mock.calls[0]?.[0]).toBe(agent.agentRunId);
-    expect(test.executeAgentCommand.mock.calls[0]?.[1]).toMatchObject({ kind: "post_message", message: { content: "Hello", metadata: { message_id: "message-1", dedupe_key: "dedupe-1" } } });
+    expect(test.executeAgentCommandWithExecutionKind).toHaveBeenCalledTimes(1);
+    expect(test.executeAgentCommandWithExecutionKind.mock.calls[0]?.[0]).toBe(agent.agentRunId);
+    expect(test.executeAgentCommandWithExecutionKind.mock.calls[0]?.[1]).toMatchObject({ kind: "post_message", message: { content: "Hello", metadata: { input_origin: "user_message", message_id: "message-1", dedupe_key: "dedupe-1" } } });
+    expect(test.recordRunActivity).toHaveBeenCalledWith(test.run, { summary: "Hello" });
     expect(JSON.parse(client.sent.at(-1) ?? "{}")).toMatchObject({ type: "AGENT_COMMAND_ACK", payload: { command_id: "accepted", state: "accepted" } });
+  });
+
+  it("keeps task-scoped and rejected sends out of Org history summary qualification", async () => {
+    const test = harness(taskBearingPackage()); const client = connection();
+    const sessionId = await test.handler.connect(client.socket, orgRunId); expect(sessionId).toBeTruthy();
+    const send = (target: string, id: string) => JSON.stringify({ type: "SEND_MESSAGE", payload: {
+      root_subject_kind: "agent_org", root_run_id: orgRunId, target_agent_run_id: target,
+      command_id: id, content: "Do not title", context_file_paths: [], image_urls: [],
+      message_id: `message-${id}`, dedupe_key: `dedupe-${id}`,
+    } });
+    await test.handler.handleMessage(sessionId!, send("agent-worker-task", "task"));
+    test.executeAgentCommandWithExecutionKind.mockResolvedValueOnce({
+      result: { accepted: false, code: "NOT_ACCEPTED" }, executionKind: "configured",
+    });
+    await test.handler.handleMessage(sessionId!, send(agent.agentRunId, "rejected"));
+    expect(test.recordRunActivity).not.toHaveBeenCalled();
+  });
+
+  it("preserves an accepted ACK when derived history metadata cannot be committed", async () => {
+    const test = harness(); const client = connection();
+    test.recordRunActivity.mockRejectedValueOnce(new Error("index unavailable"));
+    const observed = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const sessionId = await test.handler.connect(client.socket, orgRunId); expect(sessionId).toBeTruthy();
+    await test.handler.handleMessage(sessionId!, JSON.stringify({ type: "SEND_MESSAGE", payload: {
+      root_subject_kind: "agent_org", root_run_id: orgRunId, target_agent_run_id: agent.agentRunId,
+      command_id: "metadata-failure", content: "Accepted once", context_file_paths: [], image_urls: [],
+      message_id: "message-metadata", dedupe_key: "dedupe-metadata",
+    } }));
+    expect(JSON.parse(client.sent.at(-1) ?? "{}")).toMatchObject({
+      type: "AGENT_COMMAND_ACK", payload: { command_id: "metadata-failure", state: "accepted" },
+    });
+    expect(observed).toHaveBeenCalledOnce();
+    observed.mockRestore();
+  });
+
+  it("enqueues concurrent summary attempts in accepted-result completion order", async () => {
+    const test = harness(); const client = connection();
+    let acceptFirst!: (value: unknown) => void;
+    let acceptSecond!: (value: unknown) => void;
+    const firstResult = new Promise((resolve) => { acceptFirst = resolve; });
+    const secondResult = new Promise((resolve) => { acceptSecond = resolve; });
+    test.executeAgentCommandWithExecutionKind.mockImplementation((_id, command) =>
+      ((command as { message: { content: string } }).message.content === "Arrived first" ? firstResult : secondResult) as never);
+    const sessionId = await test.handler.connect(client.socket, orgRunId); expect(sessionId).toBeTruthy();
+    const send = (content: string, commandId: string) => JSON.stringify({ type: "SEND_MESSAGE", payload: {
+      root_subject_kind: "agent_org", root_run_id: orgRunId, target_agent_run_id: agent.agentRunId,
+      command_id: commandId, content, context_file_paths: [], image_urls: [],
+      message_id: `message-${commandId}`, dedupe_key: `dedupe-${commandId}`,
+    } });
+    const first = test.handler.handleMessage(sessionId!, send("Arrived first", "first"));
+    const second = test.handler.handleMessage(sessionId!, send("Completed first", "second"));
+    acceptSecond({ result: { accepted: true }, executionKind: "configured" });
+    await vi.waitFor(() => expect(test.recordRunActivity).toHaveBeenCalledTimes(1));
+    acceptFirst({ result: { accepted: true }, executionKind: "configured" });
+    await Promise.all([first, second]);
+    expect(test.recordRunActivity.mock.calls.map((call) => call[1]?.summary))
+      .toEqual(["Completed first", "Arrived first"]);
   });
 
   it.each([

@@ -7,17 +7,8 @@ import type { AgentOrgRunIndexRowRecord } from "../store/agent-org-run-history-i
 import { AgentOrgRunHistoryIndexStore } from "../store/agent-org-run-history-index-store.js";
 import { AgentOrgRunExecutionTreeStore } from "../store/agent-org-run-execution-tree-store.js";
 import { AgentOrgRunPackageCatalog } from "./agent-org-run-package-catalog.js";
-
-const rowFromTree = (tree: AgentOrgRunExecutionTreeSnapshot, existing?: AgentOrgRunIndexRowRecord | null): AgentOrgRunIndexRowRecord => Object.freeze({
-  orgRunId: tree.rootOrg.orgRunId,
-  orgDefinitionId: tree.rootOrg.orgDefinitionId,
-  orgDefinitionName: tree.rootOrg.orgDefinitionName,
-  workspaceRootPath: tree.rootOrg.defaultLaunchConfiguration.workspaceRootPath,
-  summary: existing?.summary ?? "",
-  createdAt: tree.createdAt,
-  archivedAt: tree.archivedAt,
-  terminatedAt: existing?.terminatedAt ?? null,
-});
+import { AgentOrgRunHistorySummaryWriter } from "./agent-org-run-history-summary-writer.js";
+import { projectAgentOrgRunHistoryRow } from "./agent-org-run-history-row-projector.js";
 
 /** Derived AgentOrg history authority. Runtime/history reads never consult live definitions. */
 export class AgentOrgRunHistoryCatalogService {
@@ -25,6 +16,7 @@ export class AgentOrgRunHistoryCatalogService {
   private readonly index: AgentOrgRunHistoryIndexStore;
   private readonly trees: AgentOrgRunExecutionTreeStore;
   private readonly packages: AgentOrgRunPackageCatalog;
+  private readonly summaryWriter: AgentOrgRunHistorySummaryWriter;
   private rows = new Map<string, AgentOrgRunIndexRowRecord>();
   private initialized = false;
   private queue: Promise<void> = Promise.resolve();
@@ -32,11 +24,13 @@ export class AgentOrgRunHistoryCatalogService {
     indexStore?: AgentOrgRunHistoryIndexStore;
     treeStore?: AgentOrgRunExecutionTreeStore;
     packageCatalog?: AgentOrgRunPackageCatalog;
+    summaryWriter?: AgentOrgRunHistorySummaryWriter;
   } = {}) {
     this.layout = new AgentMemoryLayout(memoryDir);
     this.index = options.indexStore ?? new AgentOrgRunHistoryIndexStore(memoryDir);
     this.trees = options.treeStore ?? new AgentOrgRunExecutionTreeStore();
     this.packages = options.packageCatalog ?? new AgentOrgRunPackageCatalog(memoryDir);
+    this.summaryWriter = options.summaryWriter ?? new AgentOrgRunHistorySummaryWriter(this.index);
   }
   async listRows(): Promise<readonly AgentOrgRunIndexRowRecord[]> {
     await this.ensureInitialized();
@@ -45,6 +39,22 @@ export class AgentOrgRunHistoryCatalogService {
   async initialize(): Promise<void> { await this.ensureInitialized(); }
   async recordCreated(tree: AgentOrgRunExecutionTreeSnapshot): Promise<void> { await this.upsert(tree, false); }
   async recordRestored(tree: AgentOrgRunExecutionTreeSnapshot): Promise<void> { await this.upsert(tree, true); }
+  async recordRunSummary(input: Readonly<{ orgRunId: string; summary?: string | null }>): Promise<void> {
+    await this.ensureInitialized();
+    await this.withQueue(async () => {
+      const result = await this.summaryWriter.commitFirstNonEmpty({
+        rows: [...this.rows.values()],
+        orgRunId: input.orgRunId,
+        summary: input.summary,
+      });
+      if (result.disposition === "MISSING_ROW") {
+        throw new Error(`AgentOrg run '${input.orgRunId}' is missing from current history.`);
+      }
+      if (result.disposition === "WRITTEN") {
+        this.rows = new Map(result.rows.map((row) => [row.orgRunId, row]));
+      }
+    });
+  }
   async recordTerminated(orgRunId: string, terminatedAt = new Date().toISOString()): Promise<void> {
     await this.mutate(async (rows) => {
       const current = rows.get(orgRunId);
@@ -69,7 +79,7 @@ export class AgentOrgRunHistoryCatalogService {
     await this.mutate(async (rows) => {
       const existing = rows.get(tree.rootOrg.orgRunId) ?? null;
       if (existing && !restored) throw new Error(`AgentOrg run '${tree.rootOrg.orgRunId}' already exists in history.`);
-      rows.set(tree.rootOrg.orgRunId, Object.freeze({ ...rowFromTree(tree, existing), terminatedAt: restored ? null : existing?.terminatedAt ?? null }));
+      rows.set(tree.rootOrg.orgRunId, Object.freeze({ ...projectAgentOrgRunHistoryRow(tree, existing), terminatedAt: restored ? null : existing?.terminatedAt ?? null }));
     });
   }
   private async ensureInitialized(): Promise<void> {
@@ -81,7 +91,7 @@ export class AgentOrgRunHistoryCatalogService {
       const next = new Map<string, AgentOrgRunIndexRowRecord>();
       for (const orgRunId of this.packages.listAdmitted()) {
         const tree = await this.trees.read(this.layout.getOrgDirPath(orgRunId), orgRunId);
-        if (tree) next.set(orgRunId, rowFromTree(tree, persisted.get(orgRunId)));
+        if (tree) next.set(orgRunId, projectAgentOrgRunHistoryRow(tree, persisted.get(orgRunId)));
       }
       this.rows = next;
       await this.index.writeIndex([...next.values()]);

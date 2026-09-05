@@ -11,7 +11,7 @@ import {
   authorizeRemoteAccessWebSocket,
   closeSocketForRemoteAccessRejection,
 } from "./remote-access-websocket-auth.js";
-import { AgentOrgStreamHandler, getAgentOrgStreamHandler } from "../../services/agent-streaming/agent-org-stream-handler.js";
+import { AgentOrgStreamHandler } from "../../services/agent-streaming/agent-org-stream-handler.js";
 
 const logger = {
   info: (...args: unknown[]) => console.info(...args),
@@ -31,7 +31,7 @@ export async function registerAgentWebsocket(
   app: FastifyInstance,
   agentHandler: AgentStreamHandler = getAgentStreamHandler(),
   teamHandler: AgentTeamStreamHandler = getAgentTeamStreamHandler(),
-  orgHandler: AgentOrgStreamHandler = getAgentOrgStreamHandler(),
+  orgHandler?: AgentOrgStreamHandler,
 ): Promise<void> {
   app.get("/ws/agent/:runId", { websocket: true }, (connection: unknown, req) => {
     const socket = (connection as { socket?: unknown }).socket ?? connection;
@@ -155,7 +155,7 @@ export async function registerAgentWebsocket(
       ));
   });
 
-  app.get("/ws/agent-org/:orgRunId", { websocket: true }, (connection: unknown, req) => {
+  if (orgHandler) app.get("/ws/agent-org/:orgRunId", { websocket: true }, (connection: unknown, req) => {
     const socket = (connection as { socket?: unknown }).socket ?? connection;
     if (!socket || typeof (socket as { on?: unknown }).on !== "function") return;
     void authorizeRemoteAccessWebSocket(req).then(async () => {
