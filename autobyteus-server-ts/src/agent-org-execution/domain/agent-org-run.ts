@@ -34,6 +34,7 @@ import {
   createFrozenAgentOrgTerminationScope,
   type FrozenAgentOrgTerminationScope,
 } from "./frozen-agent-org-termination-scope.js";
+import { projectAgentOrgAgentStatusSnapshots } from "../services/agent-org-agent-status-snapshot-projector.js";
 
 export type AgentOrgRunPackageSnapshot = Readonly<{
   tree: AgentOrgRunExecutionTreeSnapshot;
@@ -146,9 +147,11 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   getTaskRecordsSnapshot(): AgentOrgTaskDelegationRecordsFileV1 { return this.tasks; }
   getCommunicationSnapshot(): AgentOrgCommunicationMessagesFileV1 { return this.messages; }
   getAgentStatusSnapshots(): readonly CollaborationAgentStatusSnapshot[] {
-    const direct = this.options.rootAgents.listHandles().map((handle) => handle.getStatusSnapshot());
-    const mounted = this.options.teams.list().flatMap((team) => team.getLeafAgentStatusSnapshots());
-    return Object.freeze([...direct, ...mounted]);
+    return projectAgentOrgAgentStatusSnapshots({
+      tree: this.tree,
+      rootAgents: this.options.rootAgents,
+      teams: this.options.teams,
+    });
   }
   hasOpenExecutionWork(): boolean {
     return this.taskEngine.hasOpenWork()
