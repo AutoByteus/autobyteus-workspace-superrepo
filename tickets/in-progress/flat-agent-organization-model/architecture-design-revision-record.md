@@ -24,6 +24,7 @@ does not revise intended behavior.
 | AD-REV-014 | Architecture Reviewer `ARCH-REV-011` / ownership-coherence recovery round | `AR-FIND-006` | `Architecture Revision — Unified History Data Versus Presentation-State Ownership` | `Architecture Design Complete`; DS-025 assigns history data/grouping/order to the mixed read owner and expansion/reveal/highlight/scroll continuity to one always-mounted panel/tree-state owner; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-015 | Requirements Engineer approved `RER-025` after user Electron AgentOrg-versus-Team history-title comparison | `BEH-016`; `REQ-033`; `AC-028`; `SCN-017`; `QR-011`; `DEC-020` | `Architecture Revision — First Accepted AgentOrg Message History Summary` | `Architecture Design Complete`; accepted-message first-write filtered by exact execution kind, authoritative live refresh, and conservative registered recovery migration; self-validation expanded to 37 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-016 | Architecture Reviewer `ARCH-REV-013` / migration-status coherence recovery round | `AR-FIND-007`; `BEH-016`; `REQ-033`; `AC-028`; `DEC-020` | `Architecture Revision — Migration-Specific Terminal Status Authority` | `Architecture Design Complete`; family migration retains no-warning failure rules while summary migration retains bounded valid-empty warnings; no mechanism or behavior change; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-017 | API/E2E `API-FIND-019`, explicit user AgentTeam-parity confirmation, and Requirements Engineer approved `RER-026` | `API-FIND-019`; `BEH-017`; `REQ-034`; `AC-029`; `SCN-018`; `QR-012`; `DEC-021` | `Architecture Revision — AgentOrg Communication Observability Parity` | `Architecture Design Complete`; exact post-durable receiver event plus owning-root selected-member Messages facet over the existing sidecar; self-validation expanded to 40 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -1375,3 +1376,84 @@ does not revise intended behavior.
   the two migration result policies back into one ambiguous rule; the design
   now forbids that explicitly. This architecture-only revision claims no
   implementation or executable validation completion.
+
+### AD-REV-017 — AgentOrg Communication Observability Parity
+
+- Triggering role, report path, and round: API/E2E Engineer post-pass
+  `API-FIND-019` at
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-013/post-pass-user-discovery/API-FIND-019-agentorg-communication-visibility-gap.md`,
+  followed by the user's explicit AgentTeam-parity confirmation and Requirements
+  Engineer re-entry with approved
+  `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`.
+- Triggering finding/behavior IDs: `API-FIND-019`, `BEH-017`, `UC-019`,
+  `REQ-034`, `AC-029`, `SCN-018`, `QR-012`, and `DEC-021`.
+- Prior authoritative design/review result: cumulative
+  `AD-REV-016@ebd2ba75195afc3852e71c8e57e3f7a95e7f9ad2` passed independent
+  Architecture Review as
+  `ARCH-REV-014@567663894766dceeb03f59baa88132ed8bc82c8a`.
+- Current authoritative design result: `Architecture Design Complete` at the
+  canonical `design-spec.md`, revised in place as AD-REV-017 and self-validated
+  across 40 supported cases in `architecture-design-self-validation.md`.
+- Root cause and correction: the existing Org durable delivery is correct, but
+  its private commit adapter publishes only the root communication event while
+  the established Team path also publishes the exact receiver member-input
+  presentation. The server correction preserves the one Org sidecar record and
+  orders root communication followed by configured-receiver member-input before
+  input release through the existing AgentOrgRun presentation boundary. The
+  new consequence is configured-receiver-only: logically addressed task targets
+  remain rejected, while the separately supported exact-run-ID task delivery
+  path retains its current behavior and remains outside the configured-member
+  Messages facet.
+- Presentation ownership correction: root communication is removed from
+  `TeamWorkspaceContextView`. A tight read-only
+  `CollaborationMessagesContextView` represents the selected configured Agent's
+  owning Team/Org sidecar perspective. Every direct or mounted AgentOrg target
+  receives the Org implementation; mounted targets separately retain Team
+  identity/roster/task presentation. The Org projector uses the complete strict
+  configured Agent index, so direct↔mounted and cross-Team counterparts remain
+  exact.
+- Product/UI mapping: reuse the established Team Messages list/detail/reference/
+  empty-state components and event monitor. Gate the right tool on the facet,
+  not Team target kind; retain `Team` for Team roots and use `Org` with
+  accessible `Agent Org` meaning for Org roots on both desktop and narrow paths.
+  A mounted Org target retains the established Team-scoped delegated-Tasks
+  section beside its Org-root Messages facet; direct Org targets do not invent
+  Team task ownership. No bespoke Org dashboard or new Product artifact is
+  introduced.
+- Persisted-data/interface impact: `Directly Usable — No Migration`. Existing
+  `agent_org_communication_messages.json`, configured Agent traces, Org V1 tree,
+  stream/command schemas, routing and acknowledgements remain unchanged. The
+  new boundary is internal event ordering plus frontend presentation
+  composition; no second ledger, cache, root, history field, or lifecycle owner
+  is authorized.
+- Design-spec sections updated: document authority/current state; focused
+  classification; investigation evidence; AD-REV-017/DS-028 target decision;
+  behavior/Product/scenario/spine maps; terminology; ownership, dependencies,
+  interfaces, file/folder allocation, removals, sequence, tradeoffs, risks and
+  implementation guidance.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-017 and adds
+  VAL-038-040 for direct receiver presentation and sender/receiver perspectives,
+  complete direct/mounted/cross-Team identity/references, live/reconnect/restore,
+  desktop/narrow, exclusions, and standalone Team regression. No new supplement
+  is added.
+- Classification: focused AD-REV-017 is `Medium / High`. The schema and durable
+  store do not change, but the correction crosses post-durable server event
+  ordering, exact configured identity, shared active-target/right-tool
+  composition and checkpoint recovery; incorrect work can hide or duplicate an
+  accepted durable message. The cumulative ticket remains `task_size=Large` and
+  `architectural_risk=High`; independent Architecture Review remains mandatory.
+- Downstream and architecture-review impact: review must verify one-record/two-
+  presentation ordering, exact configured-receiver admission, complete-Org
+  perspective scope, Team-versus-Org facet separation, established UI reuse,
+  current-schema/no-migration posture and every VAL-038-040 exclusion/recovery
+  condition. Implementation and API/E2E remain held until that review passes.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of
+  cumulative RER-026 / AD-REV-017 plus the updated self-validation.
+- Remaining gaps or risks: no Requirement Gap or Product UI gap remains.
+  Residual risks are omitted/duplicate receiver publication, same-Team or
+  basename scoping, a direct/narrow target losing the Messages facet,
+  reconnect/restore duplication, or rejected/uncommitted leakage. The design
+  specifies exact controls and tests; Architecture claims no implementation,
+  executable validation, or delivery completion.

@@ -3,25 +3,24 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture revision validated: `AD-REV-016`
-- Requirements authority: `RER-025` (approved `BEH-016` / `REQ-033` /
-  `AC-028` / `SCN-017` first-accepted AgentOrg history-summary parity and
-  conservative legacy recovery; all RER-024 and prior authority remains
+- Architecture revision validated: `AD-REV-017`
+- Requirements authority: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`
+  (approved `BEH-017` / `REQ-034` / `AC-029` / `SCN-018` AgentOrg
+  communication-observability parity; all RER-025 and prior authority remains
   cumulative)
 - Product authority: `RV-012` / `VIS-001`-`VIS-020`; focused
   `AORG-FLAT-TEAM-STATUS-001` / `VIS-STATUS-001`-`VIS-STATUS-003`; focused
   `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`-`VIS-OVR-006`, superseding only
   RV-012 Placement Overrides lines 89-95 and VIS-015
-- Trigger: the user's delivered-Electron comparison showed that AgentOrg run
-  rows remain `New - <AgentOrg name>` after real conversation while established
-  Team rows use the first prompt. Requirements Engineering approved RER-025.
-  Validate the new live write/read-refresh and startup recovery spines for direct
-  and mounted configured recipients, exclusions, first-write concurrency,
-  restart/restore/rebuild stability, and deterministic ambiguous-evidence
-  fallback. `ARCH-REV-013 / AR-FIND-007` additionally requires one unambiguous
-  terminal-status owner per migration ID without changing those mechanisms.
-  Retain cumulative AD-REV-014 / ARCH-REV-012 ownership conclusions.
-- Date: 2026-09-05
+- Trigger: post-pass `API-FIND-019` and the user's AgentOrg-versus-AgentTeam
+  comparison proved that an accepted Org message is delivered but the receiver
+  lacks the established member-input presentation and selected Org members lack
+  the owning-root Messages view. Requirements Engineering approved RER-026.
+  Validate direct/mounted/cross-Team sender and receiver perspectives, exact
+  identity/references, durable-event ordering, exclusions, live/reconnect/
+  restore, desktop/narrow behavior and standalone Team regression. Retain
+  cumulative AD-REV-016 / ARCH-REV-014 conclusions.
+- Date: 2026-09-06
 - Result: `Design Self-Validation Pass — independent Architecture Review still required`
 - Code/API/E2E validation: `Not performed; this artifact validates the design, not the partial implementation`
 
@@ -49,12 +48,13 @@ Inputs:
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-013` Fail / Design Impact on AD-REV-015; AR-FIND-007 is the current migration-status coherence trigger)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (`ARCH-REV-014` Pass on AD-REV-016; retained baseline before API-FIND-019)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-013/post-pass-user-discovery/API-FIND-019-agentorg-communication-visibility-gap.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008/correlated-rerun-observed-boundaries.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008-settlement/settlement-correlation-observed-boundaries.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-002/followup-api-find008-settlement/boundary-evidence-assertions.log`
@@ -102,6 +102,8 @@ Inputs:
 - Current `autobyteus-server-ts/src/services/agent-streaming/agent-org-stream-handler.ts`, `agent-team-stream-handler.ts`, `agent-org-execution/domain/agent-org-run.ts`, `agent-org-execution/services/agent-org-execution-index.ts`, `agent-org-execution/services/agent-org-run-service.ts`, `run-history/services/agent-org-run-history-catalog-service.ts`, `team-run-history-catalog-service.ts`, and `run-history-service-helpers.ts` (exact accepted-command, configured/task-kind, missing Org write, established Team normalization/first-write, and current composition evidence)
 - Current `autobyteus-server-ts/src/agent-memory/store/agent-memory-layout.ts`, `agent-memory/store/memory-file-store.ts`, `agent-memory/services/runtime-memory-event-accumulator.ts`, root communication/task sidecars and deterministic input builders, and `app-data-migrations/app-data-migration-registry.ts` (exact configured direct/mounted paths, complete trace corpus, current trace limitations, internal-input exclusion evidence, and registered migration prerequisites)
 - Current `autobyteus-web/services/agentOrgExecution/agentOrgStreamingService.ts`, `stores/agentOrgContextsStore.ts`, `stores/runHistoryLoadActions.ts`, and `components/workspace/history/WorkspaceAgentOrgHistoryCollection.vue` (accepted ACK, missing invalidation, strict existing Org history read, and current summary/fallback rendering)
+- Current `autobyteus-server-ts/src/agent-org-execution/services/agent-org-communication-adapter.ts`, `agent-org-execution/domain/agent-org-run.ts`, established `services/team-communication/team-communication-message-append-plan.ts`, and `agent-collaboration/execution/events/member-input-presentation-event-builder.ts` (one durable Org record succeeds; Team publishes root plus receiver input; Org currently omits the latter despite an existing strict receiver presentation boundary)
+- Current `autobyteus-web/types/workspace/activeAgentWorkspaceTarget.ts`, `services/agentOrgExecution/agentOrgExecutionContext.ts`, `agentOrgTeamPresentation.ts`, `components/layout/RightSideTabs.vue`, `composables/useRightSideTabs.ts`, `TeamOverviewPanel.vue`, and `TeamCommunicationPanel.vue` (direct Org target has no collaboration view; mounted projection filters to one Team; established Team Messages presentation is reusable)
 - Deployed current Org/Team history indexes plus the configured-member raw trace and user screenshots `ctx_f1133d7d05d9__image.png` / `ctx_9b7731d65643__image.png` recorded by Requirements Engineering (3/3 empty Org summaries versus 6/6 non-empty Team summaries)
 - `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/BASELINE-PROMOTION-001/ui-ux-spec.md`
 
@@ -200,6 +202,9 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-035 | SCN-017; REQ-033; AC-028 | Mounted-Team configured Agent qualifies identically while task/system/inter-Agent/approval/interrupt/rejected/failed/empty inputs remain excluded | DS-027 | Pass |
 | VAL-036 | QR-011; REQ-033; AC-028 | Concurrent qualifying acceptances choose one first completion and preserve it across later traffic, stop, restore and rebuild; stale web reads cannot overwrite it | DS-027 | Pass |
 | VAL-037 | SCN-017; REQ-033; AC-028; DEC-020 | Startup recovery writes only one provenance-qualified uniquely earliest configured-member trace, preserves existing values, and leaves nonqualifying/absent/tied/invalid/ambiguous evidence on fallback | DS-027 | Pass |
+| VAL-038 | SCN-018; REQ-034; AC-029; API-FIND-019 | Accepted direct-to-direct Org communication yields one receiver-center member input and truthful sender/receiver owning-Org Messages perspectives | DS-004, DS-016-DS-018, DS-028 | Pass |
+| VAL-039 | SCN-018; REQ-034; AC-029; QR-012 | Direct↔mounted and mounted↔mounted messages resolve exact complete-Org identities/references and exclude unrelated selected Agents | DS-028 | Pass |
+| VAL-040 | SCN-018; REQ-034; AC-029 | Live/reconnect/restore and desktop/narrow presentation preserve one record/event perspective; rejected/uncommitted sends remain absent and standalone Team does not regress | DS-016-DS-018, DS-028 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1232,6 +1237,100 @@ package-family rename. It does not infer logical topology from directory depth.
 - **Result:** Pass.
 
 
+### VAL-038 — Direct Org Receiver Event And Owning-Root Perspectives
+
+- **Trigger:** configured direct Org Agent `/lead` sends a non-self same-root
+  message with references to configured direct Org Agent `/verifier`; the
+  existing delivery result is accepted and durably recorded.
+- **Primary spine:** `sender tool -> bound root delivery -> AgentOrgRun exact
+  configured receiver -> RootCommunicationEngine reservation/record -> Org
+  persistence coordinator -> one communication sidecar commit -> recipient
+  input commit -> Org root communication event -> exact receiver member-input
+  presentation -> input release`.
+- **Return/read spine:** the root event updates the one strict Org sidecar view;
+  the receiver event passes through the existing presentation adapter into only
+  `/verifier`'s AgentContext. Selecting `/lead` or `/verifier` creates an
+  Org-root `CollaborationMessagesContextView`; the one sidecar row projects as
+  sent or received with exact counterpart, time, type and references.
+- **Owners:** RootCommunicationEngine owns reservation/record policy;
+  AgentOrgRun and its private adapter own durable post-commit event order and
+  receiver correlation; AgentOrgExecutionContext owns sidecar/AgentContexts and
+  the owning-root facet; the shared component owns rendering only.
+- **Boundary/dependency check:** the engine does not publish receiver UI events;
+  the browser does not synthesize them; components do not import Org stores or
+  sockets; TeamWorkspaceContextView is absent for both direct Agents.
+- **Failure/durability check:** both presentation consequences occur only after
+  durability. Root and receiver events share the committed correlation but are
+  distinct sequence entries/read destinations. Post-durable publication failure
+  enters existing fail-stop/reopen; it does not delete/replay the record.
+- **Outcome:** receiver center shows exactly one MEMBER_INPUT_MESSAGE; each
+  selected participant sees exactly one truthful row; an unrelated configured
+  Agent sees none.
+- **Result:** Pass.
+
+### VAL-039 — Cross-Placement Complete-Org Identity And References
+
+- **Trigger:** exercise direct-to-mounted, mounted-to-direct and
+  mounted-Team-A-to-mounted-Team-B accepted same-root messages, including two
+  Agents whose address basenames collide and a message with reference files.
+- **Primary/read spine:** `strict rootOrg snapshot -> complete configured
+  AgentRun ID/address/label index -> one communication sidecar -> exact selected
+  participant filter -> sent/received direction -> exact counterpart/reference
+  projection -> stable Team-equivalent sort -> shared Messages section`.
+- **Center spine:** each accepted send invokes the same post-durable receiver
+  member-input path regardless of placement; the shared Agent/Team surface
+  receives the facet's complete root identity map when rendering that event.
+- **Owners:** Org context owns complete identity and sidecar truth; Org
+  perspective projector owns filtering/direction/counterpart projection;
+  mounted Team view owns only Team identity/roster/tasks.
+- **Boundary/dependency check:** containing Team, collapsed/visible rows,
+  basename and current definitions are not inputs. No Team store, Team root ID,
+  Team communication copy or mounted-Team lifecycle is introduced.
+- **Failure check:** a participant in neither the strict configured index nor
+  the already-correlated task execution index triggers existing
+  `reopen_required` recovery rather than a hidden row or `Unknown` counterpart.
+  A valid existing exact-ID message involving a known task execution is outside
+  this configured-member facet and is filtered without changing its delivery.
+- **Outcome:** all three placement combinations produce exact receiver events
+  and sender/receiver rows across the whole Org; unrelated focus excludes them;
+  references open through the owning Org path.
+- **Result:** Pass.
+
+### VAL-040 — Live/Restore, Responsive Presentation, Exclusions And Team Regression
+
+- **Trigger:** observe an accepted configured-member message live, reconnect the
+  stream, stop and restore the Org, select both participants on desktop and
+  narrow layouts; also attempt rejected, failed, self, out-of-root, logically
+  addressed task-recipient, reservation-conflict and pre-durability-failed
+  sends, preserve one supported exact-run-ID task communication control, then
+  run the standalone Team control.
+- **Primary spine:** live updates use strict sequenced Org communication and
+  Agent presentation events. Reconnect/restore hydrates one candidate from the
+  current communication sidecar plus exact member projections, verifies the
+  checkpoint and atomically swaps the context/facets.
+- **Presentation spine:** one active-target Messages facet drives the same
+  shared list/detail/reference component and one desktop/narrow tab definition;
+  Team roots retain visible `Team`, Org roots use visible `Org` with accessible
+  `Agent Org` meaning. A mounted Org target continues to compose the existing
+  Team-scoped delegated-Tasks section beside the Org-root Messages section;
+  direct Org targets compose Messages without inventing Team task ownership.
+- **Owners:** hydration service owns candidate correlation; context store owns
+  swap; right-tool composition owns responsive placement only; subject adapters
+  own exact Team/Org scope.
+- **Boundary/dependency check:** no migration, second cache/ledger, browser
+  event fabrication, custom Org dashboard, alias wrapper or Team-kind gate is
+  required. Standalone Agent intentionally has no collaboration facet.
+- **Failure/durability check:** rejected/uncommitted and logically addressed
+  task attempts stop before successful post-commit effects and produce neither
+  receiver event nor configured-member Messages row. The supported exact-run-ID
+  task control retains its prior delivery/sidecar behavior but produces no row
+  in the new configured-member facet. A reconnect replays/reduces by canonical
+  identity/sequence without duplication.
+- **Outcome:** live and restored perspectives are equivalent on desktop/narrow;
+  excluded attempts remain absent; standalone Team sender/receiver center and
+  Messages behavior remain unchanged.
+- **Result:** Pass.
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -1278,6 +1377,10 @@ package-family rename. It does not infer logical topology from directory depth.
 | AgentOrgRunHistorySummaryWriter | shared compaction + stateless first-write/atomic strict reread | runtime queue, migration inference, manager/catalog construction or UI state | Pass |
 | Web Org accepted-message callback | mixed history read action | submitted-text/optimistic summary, row mutation or tree-state reset | Pass |
 | AgentOrg summary migration | strict current Org tree/location/trace/sidecar readers + shared stateless summary writer | normal runtime reader/import, manager/catalog construction, positive inference from sidecars, Team rows, task directories or alternate index | Pass |
+| RootCommunicationEngine | Org-private communication adapter | AgentOrgRun/index/publisher/browser presentation internals | Pass |
+| AgentOrg communication adapter | AgentOrgRun exact configured-receiver presentation callback after durability | second record/schema, browser state, Team root or task-recipient normalization | Pass |
+| AgentOrgExecutionContext | strict Org sidecar + complete configured identity + root Messages facet | Team store/root, second message cache, delivery or event fabrication | Pass |
+| Shared Agent/Team/right Messages surfaces | ActiveAgentWorkspaceTarget + CollaborationMessagesContextView | subject stores/sockets, Team-kind inference, lifecycle or same-Team filtering | Pass |
 
 ## Dependency-Direction Audit
 
@@ -1332,6 +1435,12 @@ Accepted Org SEND_MESSAGE ACK -> injected callback -> mixed history read owner -
 Registered Org-summary migration -> strict current Org tree/location/complete traces + root sidecar exclusions -> migration-only provenance classifier -> shared stateless summary writer
 Current runtime/web reads -X-> migration classifier / trace-on-read backfill
 Org row/context/tree-state -X-> optimistic submitted-text summary mutation
+RootCommunicationEngine -> Org-private adapter -> one durable sidecar/input -> AgentOrgRun root event -> exact configured receiver presentation -> input release
+RootCommunicationEngine -X-> browser/component/receiver presentation schema
+strict Org sidecar + complete configured identity -> AgentOrgExecutionContext -> owning-root Messages facet -> ActiveAgentWorkspaceTarget -> shared Messages presentation
+TeamWorkspaceContextView -X-> Org message scope/filter/store
+visible Team/basename/current definition -X-> Org message counterpart identity
+browser -X-> synthetic MEMBER_INPUT_MESSAGE / duplicate ledger / delivery repair
 ```
 
 No upward bypass is needed in any validated use case. The active-root directory
@@ -1381,6 +1490,11 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Older AgentOrg history request returns after post-commit refresh | Mixed web history read owner | reject stale generation commit; retain newest strict family slice | No presentation regression | Pass |
 | Legacy Org summary evidence is absent, tied, invalid or unreadable | Registered summary migration | bounded redacted warning, keep empty summary and approved fallback; do not guess | No fabricated derived data | Pass |
 | Existing Org summary is non-empty during migration/rebuild | Migration + Org catalog | skip before trace read and preserve exact normalized current value | No overwrite | Pass |
+| Org message rejects or fails before durable commit | Root communication engine + Org adapter | release/cancel through existing path; publish neither root message nor receiver input presentation | No UI/ledger fact | Pass |
+| Org post-durable root/member publication fails | AgentOrgRun | enter existing fail-stop/reopen path; preserve one committed record/input; do not replay/delete/fabricate | No second durable authority | Pass |
+| Committed Org record participant is neither a configured nor known task execution | AgentOrgExecutionContext / hydration | reject candidate or enter `reopen_required`; retain prior committed context | No hidden/unknown counterpart row; known task traffic remains outside the configured facet | Pass |
+| Direct or mounted target lacks Messages facet | Active target resolver | treat as invariant/test failure for configured Org focus; do not fall back to Team store or hide the tool | No false Team authority | Pass |
+| Reconnect re-delivers already reduced Org events | AgentOrg stream/context | apply canonical sequence/dedupe rules and atomically replace correlated candidate | No duplicate center or ledger row | Pass |
 
 ## Removal And Forbidden-Shortcut Audit
 
@@ -1434,13 +1548,17 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Trace-on-read/lazy historical backfill or runtime import of migration classifier | Rejected | registered startup-only migration folder and dependency guard |
 | Legacy earliest-tie resolution by address/path/file/content order | Rejected | unique strictly earliest timestamp or valid empty fallback |
 | Second Org manager/catalog constructed by WebSocket defaults or startup migration | Rejected | WebSocket composition injects the supervisor's service; migration uses the stateless summary writer before supervisor construction |
+| Same-Team-only `projectAgentOrgTeamMessages` path | Yes | Replaced by complete-Org selected-Agent perspective over the sole Org sidecar |
+| Root message ownership inside `TeamWorkspaceContextView` | Yes | Separate `CollaborationMessagesContextView`; Team view retains identity/roster/tasks only |
+| Team-kind-only Messages tab gate or direct Org omission | Yes | Active target's owning-root facet governs one shared desktop/narrow tool definition |
+| Bespoke Org Messages dashboard/second ledger/browser MEMBER_INPUT synthesis | Rejected | Established Team Messages/event-monitor presentation consumes strict Org context projections only |
 
 ## Design-Principle Self-Check
 
 | Principle | Evidence In Revised Design | Result |
 | --- | --- | --- |
 | Approved behavior first | Every case cites REQ/AC/SCN/Product or established runtime contract; no new product behavior | Pass |
-| Supported-scenario gate | 37 concrete supported cases, including SCN-013-017's launch hierarchy, effective-config equality, unified history and workspace-default paths; normal submit/independent-accept overlap, normal task activation plus SIGTERM before `TURN_STARTED`, and normal approval-gated shutdown prove the affected lifecycle reachability. The self-review witness is `Unsupported/Contrived` and used only as technical coupling evidence; global lookup/tampering/deep conversion remain rejected | Pass |
+| Supported-scenario gate | 40 concrete supported cases, including SCN-013-018's launch hierarchy, effective-config equality, unified history, workspace-default, history-summary and communication-observability paths; normal submit/independent-accept overlap, normal task activation plus SIGTERM before `TURN_STARTED`, and normal approval-gated shutdown prove the affected lifecycle reachability. The self-review witness is `Unsupported/Contrived` and used only as technical coupling evidence; global lookup/tampering/deep conversion remain rejected | Pass |
 | Spine span sufficiency | Each primary case spans initiating caller through owner/durability/provider to result/event | Pass |
 | Multiple primary spines | Definition, Team launch, Org launch, message, task, persistence, migration, mixed read, focus, process lifecycle are distinct | Pass |
 | Ownership clarity | Root aggregates own subject lifecycle/order; frozen scopes own enumeration; AgentRun owns admission/provider-start/turn/interrupt; adapters own translation | Pass |
@@ -1468,6 +1586,12 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | First-write concurrency | Accepted-result completion plus immediate serialized catalog enqueue is the only live arbitration; later writes and rebuilds preserve the winner | Pass |
 | Conservative recovery | Unique-earliest complete configured-member evidence may backfill; absence/tie/invalid evidence retains valid fallback with bounded diagnostics | Pass |
 | Authoritative live update | Accepted SEND_MESSAGE triggers a newest-generation strict history read; no optimistic summary or row/context mutation | Pass |
+| One-record/two-presentation communication | One sidecar record drives the root ledger; a post-durable exact receiver event drives the receiver AgentContext; neither is a copy or alternate authority | Pass |
+| Root-scoped presentation reuse | Team and Org adapters implement one tight selected-member Messages facet; the shared Team interaction is reused without merging root stores, Team tasks/rosters or lifecycles | Pass |
+| Complete identity and recovery | Org perspective uses all configured direct/mounted Agents keyed by exact AgentRun/address and is recreated only inside a fully correlated checkpoint candidate | Pass |
+| One communication authority | Team or Org sidecar remains the single durable message record; receiver-center and Messages rows are correlated projections, never copies | Pass |
+| Exact receiver presentation | Only the configured receiver obtains the new post-durable MEMBER_INPUT_MESSAGE before input release; rejected/uncommitted/logically addressed task attempts obtain none, and separately supported exact-ID task delivery remains unchanged/outside this facet | Pass |
+| Owning-root selected-member scope | Every configured Org target receives one Org-root Messages facet over complete configured identity; mounted Team presentation cannot narrow or own it | Pass |
 
 ## Questions / Open Decisions
 
@@ -1509,7 +1633,14 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
   a migration-ID-qualified status assertion: the family migration cannot warn;
   the summary migration warns only for independently valid empty metadata with
   no unique evidence; and required current-structure or selected-value
-  persistence failure wins as `FAILED`. The
+  persistence failure wins as `FAILED`. AD-REV-017 additionally requires
+  VAL-038-040: exact post-durable root/member event order, direct↔direct,
+  direct↔mounted and mounted↔mounted sender/receiver perspectives, complete
+  address identity and references, unrelated-focus/exclusion paths, live/
+  reconnect/restore equivalence, desktop/narrow shared Messages behavior,
+  standalone Team regression, and scans proving no same-Team filter, Team-kind
+  gate, second ledger, browser event synthesis, schema or lifecycle expansion.
+  The
   downstream implementation/test changes and evidence are not validated or
   claimed by this artifact.
 
@@ -1549,7 +1680,13 @@ authoritative live refresh, and startup-only unique-evidence recovery.
 each registered migration: the family migration has no warning disposition,
 while the summary migration permits only the independently valid empty-metadata
 warning and keeps current-structure/write/reread failures fatal to its attempt.
-All 37 supported walkthroughs have a complete production spine, one authoritative
+`AD-REV-017` resolves `API-FIND-019` at the design boundary under approved
+RER-026 by completing the Org-private post-durable receiver member-input event
+and separating owning-root Messages presentation from Team identity/task
+presentation. One strict Org sidecar and complete configured identity index now
+drive direct/mounted/cross-Team perspectives through the established shared
+Messages UI; no second store, Team root, or browser event authority is added.
+All 40 supported walkthroughs have a complete production spine, one authoritative
 owner, explicit status/
 lifecycle/durability truth and a one-directional dependency path. No
 walkthrough requires a synthetic Team root, standalone mounted Team, standalone
@@ -1564,6 +1701,9 @@ Nor does any walkthrough require a field-dropping local serializer, client/serve
 inheritance disagreement, route-selected Org-only history panel, Org roots under
 Teams, mounted-Team lifecycle, hard-coded Temp path, descendant auto-default, or
 workspace-derived focus.
+Nor does any walkthrough require same-Team-only message scope, address-basename
+identity, Team-kind-only Messages gating, a second AgentOrg ledger, browser-
+fabricated MEMBER_INPUT_MESSAGE, or a custom Org communication dashboard.
 
 The self-validation therefore passes. The focused AD-REV-012 correction is
 `Medium / Low` in isolation: it changes a bounded set of frontend draft,
@@ -1581,9 +1721,13 @@ Org command, persisted derived-history, first-write concurrency, authoritative
 web read, and registered migration boundaries. The cumulative ticket remains
 `Large / High`. Focused AD-REV-016 is `Small / Low`: it changes only
 Architecture-owned migration-status wording and current-evidence navigation,
-with no production mechanism or contract change. Independent Architecture
-Review is mandatory before Implementation reconciles AD-REV-015/016 or API/E2E
-resumes cumulative validation.
+with no production mechanism or contract change. Focused AD-REV-017 is `Medium /
+High`: the durable schema and public wire remain unchanged, but exact post-
+durable event ordering, root-scoped presentation ownership, active-target
+composition and reconnect/restore truth cross backend/frontend boundaries and
+can otherwise make accepted messages disappear or duplicate. Independent
+Architecture Review is mandatory before Implementation reconciles AD-REV-017
+or API/E2E resumes cumulative validation.
 The already implemented `CR-FIND-019` behavior remains a distinct
 regression obligation. The
 unsupported self-review correlation remains retained only as technical evidence
