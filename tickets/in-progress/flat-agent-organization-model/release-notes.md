@@ -4,27 +4,29 @@
 
 - Agent Teams are reusable flat groups of direct Agents with one direct Agent coordinator.
 - Agent Orgs combine direct Agents with reusable flat Teams without inventing an Org coordinator.
-- Running an Org configures the whole organization first; you then choose the exact Agent or Team to work with.
-- Member overrides use the approved collapsed Team hierarchy, show exact inheritance/customization state and coordinator identity, and preserve exact root/Team/Agent readiness.
-- Failed Agent runtime choices remain retryable and can be safely abandoned without leaking a stale override.
-- Team and AgentOrg authoring and runtime surfaces use the current English and Simplified-Chinese localization catalogs.
-- AgentOrg stream recovery is automatic-only and preserves exact focus through a verified replacement. It uses a browser-legal close code, makes at most five attempts, exposes no manual Reconnect action, and reports one localized notice rather than remaining indefinitely in Connecting.
-- Standalone Teams and Agent Orgs keep separate durable history, Restore, Stop, task, messaging, and provider-identity behavior.
-- Existing supported fixed-depth data migrates at startup to the flat Team V2 and AgentOrg V1 families. Incompatible external definition packages must be republished by their owning repositories.
+- The familiar **Workspaces** hierarchy remains available throughout AgentOrg configuration, active work, focus changes, Restore, and stopped history. **Agent Orgs** appears as a distinct sibling directly below **Teams**.
+- Switching between an AgentOrg member and a standalone Agent or Team now keeps one truthful URL, center surface, and highlighted history row.
+- Fresh AgentOrg configurations select the real **Temp Workspace (Default)** when it is available, while explicit existing/new Workspace choices remain authoritative.
+- A focused direct or mounted-Team Agent's gear opens that exact current AgentRun in the locked configuration view. **Back** returns to the same Event Monitor; **New** remains a separate fresh-Org action.
+- Member overrides retain the approved collapsed Team hierarchy, exact inheritance/customization state, and coordinator identity.
+- Failed Agent runtime choices remain retryable and can be safely abandoned without leaking stale configuration.
+- AgentOrg stream recovery is automatic-only, exact-focus preserving, browser-contract safe, bounded to five attempts, and reports once instead of remaining indefinitely in Connecting.
+- Standalone Teams and Agent Orgs retain separate durable root families for history, Restore, Stop, tasks, messaging, and provider identity.
+- Existing supported fixed-depth data migrates at startup to Team V2 and AgentOrg V1. Incompatible external packages require publication by their owning repositories.
 
 ## Validation
 
-- Cumulative source review: `CRR-032 / Pass`, `9.4/10`.
-- API/E2E: `API-REV-008 / Pass`, `98.4%`; REPO-001–003 and LIVE-001–006 passed.
-- Production Chromium confirmed legal close code `4000`, no `InvalidAccessError`, no permanent Connecting state, no manual Reconnect, and exactly one notice after bounded exhaustion.
-- Delivery merged the latest `origin/personal`, ran the full guarded ARM64 Electron build, and launched the packaged app with a healthy embedded server and visible window.
+- Cumulative source review: `CRR-036 / Pass`.
+- API/E2E: `API-REV-010 / Pass`, `98.3%`; all REPO-001–003 and LIVE-001–006 passed.
+- Proportional durable test-code review: `CRR-037 / Pass`.
+- Delivery merged latest `origin/personal`, passed the current 15-file/189-test navigation/config/history cohort, completed the guarded ARM64 Electron build, and launched the actual package with a healthy embedded server and visible window.
 
 ## User-Verification Build
 
-- Integrated commit: `0fb57d902b63d2d927e34ead64a7fb62bf808c09`.
-- AppImage: `AutoByteus_enterprise_linux-arm64-1.4.67.AppImage`.
-- SHA-256: `111830cfd723d160d9d692e8860130979403daf7af9ea5bfe51bc4ae31daf1a5`.
-- Status: running for explicit user verification; this draft is not yet released.
+- Integrated commit: `fa7693e5210d306d8216a035e93e9dc11f8efe04`.
+- AppImage: `AutoByteus_enterprise_linux-arm64-1.4.68.AppImage`.
+- SHA-256: `661032b9c10f5cafefd2029d0a9ea63171b12911b5953c88f5af37ab636d5aa1`.
+- Status: running for renewed explicit user verification; this draft is not released.
 
 ## Compatibility Note
 

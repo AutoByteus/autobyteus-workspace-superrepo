@@ -2,93 +2,90 @@
 
 ## Scope And Current State
 
-Delivery re-entry, latest-base integration, documentation synchronization, ARM64 Electron packaging, and live user-verification launch for `AORG-FLAT-TEAM-001`.
+Current Delivery re-entry, mandatory latest-base integration, documentation synchronization, ARM64 Electron packaging, and live renewed user-verification launch for `AORG-FLAT-TEAM-001`.
 
-- Current delivery revision: `DR-003`
+- Current delivery revision: `DR-004`
 - Current state: `Awaiting Explicit User Verification`
+- Current chain: RER-024 / AD-REV-014 / ARCH-REV-012 Pass / IR-028 / CRR-036 Pass / API-REV-010 Pass / CRR-037 Pass
+- DR-003 disposition: superseded before user acceptance
 - Handoff summary: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/handoff-summary.md`
-- Delivery revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-revision-record.md`
-- Repository finalization/release is intentionally not started before explicit user acceptance.
 
 ## Initial Delivery Integration Refresh
 
-- Reviewed artifact: `06a918c71fc192e0b4ed9c3ef6b4df7163aef530`
-- Latest tracked remote base: `origin/personal@66056b5afc49240fa139bcefd00b62d119f35ec8`
-- Base advanced since the reviewed artifact: `Yes`; six base-only commits were found.
-- Safety checkpoint: `b6d9bda8b993721d0eca0d59b2110989b0382efc` (`chore(delivery): checkpoint reviewed AgentOrg package`)
-- Integration method: merge latest remote base into ticket branch
-- Integration result: `Completed without conflict`
-- Integrated HEAD: `0fb57d902b63d2d927e34ead64a7fb62bf808c09`
-- Post-integration divergence: base `0`, ticket `100`
-- Post-integration executable check: `Passed`; full ARM64 Electron build executed after the merge.
-- Evidence: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-003/integration-result.log`
+- Reviewed artifact: `100e2c82cb948e1cbef4026ab6f74ab815285a34`
+- Latest tracked remote base: `origin/personal@a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27`
+- Base advanced beyond candidate: `Yes`; 18 base-only commits
+- Protected state: upstream review/API/E2E evidence, prior Delivery artifacts, and the CRR-037 durable test update
+- Safety checkpoint: `8eacba244d4621b2a4aed43c2b3dee335f8c532d`
+- Integration method/result: merge latest remote base into ticket branch; completed without conflict
+- Integrated HEAD: `fa7693e5210d306d8216a035e93e9dc11f8efe04`
+- Post-integration divergence: base `0`, ticket `113`
+- Base changes of note: current release version `1.4.68`, standalone error-state Stop work, Gemini 3.8 release, and run-history read-model coverage
+- Required post-integration checks: full ARM64 Electron build plus focused navigation/config/history/read-model cohort
+- Check result: `Passed`; 15 files / 189 tests and complete package build
 
-## Verification Evidence
+## Validation Evidence
 
-- Upstream source review: `CRR-032 / Pass`, `9.4/10`.
-- Upstream API/E2E: `API-REV-008 / Pass`, `98.4%`; REPO-001–003 and LIVE-001–006 all passed.
-- Proportional test-code review: `CRR-033 / Not Applicable`; no API/E2E durable source/test delta.
-- Integrated Electron build command: `PATH=/tmp/aorg-delivery-corepack-bin:$PATH pnpm -C autobyteus-web build:electron:linux:arm64`.
-- Electron guards/audit: web boundary passed; localization boundary passed; localization-literal audit reported zero findings.
-- Electron package/build: server preparation/build, Nuxt production generation, Electron transpilation, and ARM64 AppImage packaging passed.
-- Package: `AutoByteus_enterprise_linux-arm64-1.4.67.AppImage`, `523949965` bytes, SHA-256 `111830cfd723d160d9d692e8860130979403daf7af9ea5bfe51bc4ae31daf1a5`.
-- Actual shell launch: passed on `DISPLAY=:99`; 1200×800 window visible, embedded server healthy on port `29695`.
-- Evidence directory: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-003/`.
+- Source review: `CRR-036 / Pass`.
+- API/E2E: `API-REV-010 / Pass`, `98.3%`, all REPO-001–003 and LIVE-001–006 passed.
+- Durable test-code review: `CRR-037 / Pass`, no finding.
+- Integrated focused tests: `15 files / 189 tests` passed.
+- Electron build: both boundary guards passed; localization literal audit zero; server/mobile/electron renderer builds and 16-route generation passed; native modules rebuilt; ARM64 AppImage packaged.
+- Package: `AutoByteus_enterprise_linux-arm64-1.4.68.AppImage`, `523962651` bytes, SHA-256 `661032b9c10f5cafefd2029d0a9ea63171b12911b5953c88f5af37ab636d5aa1`.
+- Shell smoke: actual packaged window visible on `DISPLAY=:99`; embedded server healthy on port `29695`.
+- Evidence root: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-004/`.
 
 ## Docs Synchronization
 
 - Result: `Pass`.
-- Updated scope: root overview; server Team definition/execution, AgentOrg and run-history docs; frontend Team/AgentOrg/contributor/execution docs.
-- IR-026 addition: automatic-only, exact-generation AgentOrg recovery; legal browser close code `4000`; checkpoint-verified focus-preserving replacement; five-attempt limit; one localized exhaustion notice; no manual Reconnect/permanent Connecting state.
-- Validation: diff whitespace, Markdown fence balance, relative-link, and stale-model audits passed with one documented unrelated pre-existing link.
-- Artifact: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/docs-sync-report.md`.
+- Updated current scope: frontend AgentOrg and execution architecture docs for unified Workspaces/history, Temp Workspace default, exact cross-family selection ownership, exact locked live member configuration, same-monitor Back, distinct New, and family failure isolation.
+- Earlier root/server/web Team V2 / AgentOrg V1, recovery, migration, task, persistence and lifecycle docs remain current.
+- Docs report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/docs-sync-report.md`.
 
 ## User Verification
 
-- Explicit user acceptance received: `No`.
-- Current offered state: packaged Electron app is running on `DISPLAY=:99` and left at the Agent Orgs page.
-- Verification build/head: `0fb57d902b63d2d927e34ead64a7fb62bf808c09`.
-- Requested acceptance options: finalize without release; finalize and create a new release; or report a reproducible issue.
-- Renewed verification condition: if `origin/personal` advances and final integration materially changes user-visible behavior, Delivery must rebuild/update artifacts and obtain renewed verification.
+- Explicit verification for current DR-004 build: `No`.
+- Offered state: Electron 1.4.68 is running on `DISPLAY=:99`, left on Agent Orgs with unified Workspaces visible.
+- Verified commit if accepted: `fa7693e5210d306d8216a035e93e9dc11f8efe04` plus current uncommitted Delivery docs/evidence only.
+- Required user response: accept without release, accept and request a new release, or report a reproducible issue.
+- Renewal rule: after acceptance, refresh `origin/personal` again. Material user-facing change requires rebuild/docs update and renewed acceptance.
 
 ## Ticket State And Repository Finalization
 
 - Ticket moved to `tickets/done/flat-agent-organization-model`: `No`.
-- Delivery docs/evidence final commit: `Not started; waiting for acceptance`.
+- Final Delivery commit: `Not started; waiting for user acceptance`.
 - Ticket branch push: `Not started`.
-- Finalization target refresh after acceptance: `Not started`.
-- Merge/push to `personal`: `Not started`.
+- Target refresh/merge/push: `Not started`.
 - Repository finalization status: `Waiting on mandatory user verification`.
 
 ## Release / Publication / Deployment
 
-- Applicability: `Undetermined until user direction after verification`.
-- Version bump/tag/release commit: `Not started`.
+- Applicability: `Undetermined until user direction`.
+- Version bump/tag/release commit: `Not started`; `1.4.68` came from the integrated base and is not this ticket's new release.
 - Draft release notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/release-notes.md`.
-- External definition publication: `Not part of this repository/ticket`; separately owned packages must publish Team V2-compatible definitions independently.
+- External definition publication: `Not applicable to this repository/ticket`; separate owners must publish Team V2-compatible definitions.
 - Rollout/deployment: `Not started`.
 
 ## Environment And Persisted Data
 
-- Approved cumulative transition: fixed-depth persisted data is `Migration Required`; IR-026 itself is `Not Affected`.
-- Upstream evidence: isolated current server/data startup migration, restart, history, Restore, continuation, provider/task preservation, Stop, and cleanup passed.
-- Delivery launch: normal app startup used `/root/.autobyteus/server-data`; embedded health passed. No external definition source was rewritten.
-- Expected diagnostic: incompatible external Team definitions are individually skipped by target admission, which can leave existing Team/Org catalogs empty until a compatible definition is created/published.
+- Approved cumulative transition: `Migration Required`; IR-028 delta: `Not Affected`.
+- Upstream live evidence covers migration, shutdown/restart, mixed history, Restore, provider/task identity, continuation, terminal Stop, and cleanup.
+- Delivery launch uses `/root/.autobyteus/server-data`; health passed and no external definition source was rewritten.
+- Expected diagnostics: incompatible external Team definitions are individually skipped, so catalogs can remain empty until compatible publication/creation.
 
 ## Cleanup
 
-- Ticket worktree removal: `Not started`.
-- Local ticket branch removal: `Not started`.
-- Remote ticket branch cleanup: `Not required yet`.
-- Running verification app shutdown: `Deferred until the user finishes testing`.
-- Reason: the worktree, branch, package, and live process must remain available during user verification.
+- Verification app shutdown: deferred until the user finishes testing.
+- Worktree/branch cleanup: not started; unsafe before finalization.
+- Generated build-only SDK outputs: moved out of the worktree and recorded under DR-004 evidence.
 
 ## Rollback And Risk Notes
 
-- No target branch, tag, release, or deployment has changed.
-- The local ticket branch includes a clean latest-base merge and can be reset to checkpoint `b6d9bda8...` if integration rollback is required before finalization.
-- Do not weaken strict address/root/schema/sequence/acknowledgement admission or reintroduce a manual Reconnect path.
-- Destructive corrupt-live-copy injection was not performed; strict durable negative coverage passed. The formerly unlaunched unchanged Electron shell residual is closed for Delivery's current environment by the successful actual package launch.
+- No target branch, tag, release, publication, or deployment changed.
+- Reviewed/downstream state is protected at `8eacba244d...`; integrated state is `fa7693e5210...`.
+- Do not reintroduce stale simultaneous Org/standalone selection, pathname-only route ownership, or gear-to-New aliasing.
+- Preserve strict root/address/runtime/persistence/recovery contracts and automatic-only AgentOrg stream recovery.
+- Destructive corrupt-live-copy injection was not performed; strict durable negatives passed.
 
 ## Final Status
 

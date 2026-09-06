@@ -41,6 +41,10 @@
 | `CRR-035` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-009 plus user-reported active AgentOrg-member settings parity | `Pass — cumulative source` | `Fail — Local Fix` | `CR-FIND-025`, `CR-FIND-026`; `API-FIND-017` |
 | `CRR-036` | `code-review-report.md` | Implementation Review / IR-028 truthful center ownership and exact live-member settings | `Fail — Local Fix` | `Pass — cumulative source` | `CR-FIND-025`, `CR-FIND-026` resolved |
 | `CRR-037` | `api-e2e-test-review-report.md` | Successful API/E2E Test-Code Review / API-REV-010 | `Pass — cumulative source` | `Pass — proportional durable test-code review` | `None` |
+| `CRR-038` | `code-review-report.md` | Implementation Review / IR-029 RER-025 AgentOrg first-message history-summary lifecycle | `Pass — proportional durable test-code review` | `Pass — cumulative source` | `None`; prior `CR-FIND-001–026` remain resolved |
+| `CRR-039` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-011 plus API-REV-012 confirmation | `Pass — cumulative source` | `Fail — Local Fix` | `CR-FIND-027`; `API-FIND-018` |
+| `CRR-040` | `code-review-report.md` | Implementation Review / IR-030 handled atomic-write settlement correction and fresh cumulative review | `Fail — Local Fix` | `Pass — cumulative source` | `CR-FIND-027`; `API-FIND-018` resolved at source boundary |
+| `CRR-041` | `api-e2e-test-review-report.md` | Successful API/E2E Test-Code Review / API-REV-013 | `Pass — cumulative source` | `Not Applicable — no durable test change` | `None` |
 
 ## Revision Entries
 
@@ -1131,3 +1135,121 @@ New findings:
 - Review accountability: The one changed durable path and every changed line were reviewed. Temporary probes/evidence were excluded, no API/E2E workflow was redundantly rerun, and no test caller or synthetic fixture was used to establish scenario validity.
 - Recommended recipient: exact successful post-API/E2E recipient returned by `get_handoff_rules`, expected `/software_engineering_team/delivery_engineer`
 - Remaining risks or uncertainty: API/E2E records only bounded non-blocking residuals for the unchanged Electron shell, separately owned external-definition publication, and destructive live-store corruption injection. Delivery owns documentation refresh, integration, user verification, finalization, and applicable release/deployment work.
+
+### CRR-038 — IR-029 adds one exact AgentOrg first-message summary lifecycle
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review — skill-reloaded fresh cumulative source review`, round `38`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md` / `IR-029`; approved `RER-025`; `CR-SCN-053–057`; `CR-CAND-086–092`; no open Code Review finding
+- Relevant architecture design revision IDs: cumulative `AD-REV-016`; focused `AD-REV-015/016`, `DS-027`
+- Relevant architecture-review revision IDs: `ARCH-REV-014 / Pass`; `AR-FIND-007` resolved
+- Relevant implementation revision IDs: cumulative `IR-001–IR-029`; source `0d7b6e7e7bc1050a43d3681eb83b09a342537ef7`; artifact `54716ad0ffd4c4be7aab389a84d3d7e41f72ecb5`
+- Relevant API/E2E revision IDs: `API-REV-010 / Pass / 98.3%` on prior IR-028; renewed current-artifact execution pending
+- Relevant delivery revision IDs: `DR-004`, superseded by `RER-025`
+- Prior authoritative result: `CRR-037 / Pass — proportional durable test-code review`; prior source authority `CRR-036 / Pass`
+- Current authoritative result: `Pass — cumulative source; advance to renewed API/E2E`
+- What changed in the review result and why: IR-029 adds a narrow internal command result carrying exact execution kind while preserving public admission; qualifies only accepted external `SEND_MESSAGE` to configured direct/mounted Agents; serializes compact first-write history through the existing catalog and one stateless atomic-write/strict-reread writer; refreshes only from correlated accepted ACK through the authoritative newest-generation Org history query; and registers the required startup-only migration with strict current-data validation, configured trace corpora, exclusion-only sidecars, unique-earliest inference, shared writing, idempotent restart, and the AD-REV-016 warning/failure matrix. Focused implementation evidence passes `11/69` server tests, `3/58` web tests, production server/web builds, guards/audit, diff and source-size checks.
+- Supported product scenario / material-premise basis changes: `CR-SCN-053/054` are the normal RER-025 direct/mounted configured-Agent first-message journeys; `CR-SCN-055` is QR-011's explicit accepted-completion and metadata-failure integrity contract; `CR-SCN-056` is the approved required startup reconciliation event; `CR-SCN-057` preserves cumulative behavior. No test, endpoint, callback, or migration proves its own scenario. `CR-CAND-090` rejects request-time/later inference for ambiguous evidence as contrary to the approved conservative fallback; `CR-CAND-092` rejects a new static Product redesign because RER-025 explicitly reuses the current row.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001–026` | Resolved | Resolved / preserved | `CRR-036/037`; `API-REV-010`; `IR-029` | fresh cumulative source inventory (`432` implementation-source records, `408` current, `24` removed, zero current files `>500`), bounded IR-029 diff, focused tests/builds, and unchanged owning paths reveal no reopening |
+| `CR-FIND-019` | Resolved with retained regression obligation | Resolved / preserved | `IR-018–029`; `CRR-022/036`; `API-REV-010`; `AD-REV-016` | summary invalidation uses the existing AgentOrg context owner and does not replace the shallow-reactive context identity or mounted-Team task projection path |
+| `AR-FIND-007` | Resolved by Architecture | Resolved / implemented consistently | `AD-REV-016`; `ARCH-REV-014`; `IR-029` | implementation warns only for conservative no-unique-evidence skips and gives any required current/write failure terminal `FAILED` precedence |
+
+- New or remaining finding IDs: `None`
+- Material score/classification changes: current cumulative source score is `9.4/10 (93.7/100)`, every category at least `9.2`; outcome remains `Pass`. No Design Impact, Requirement Gap, Product gap, API/schema, task/message/trace shape, focus, routing, lifecycle, or compatibility runtime impact exists. Approved migration impact is implemented. Docs impact is `Yes` and downstream-owned.
+- Review accountability: the Code Reviewer skill, shared design principles, and scenario/reachability gate were reloaded. This was a fresh cumulative whole-ticket review, not a delta-only check. Every candidate was tied to the user's approved direct/mounted first-message journey, QR-011, the startup migration contract, or rejected; no unsupported/contrived path drives a finding, deduction, attribution, or machinery.
+- Recommended recipient: primary implementation-pass recipient returned by `get_handoff_rules`, followed by the informational pass recipient specified by the rule set.
+- Remaining risks or uncertainty: renewed API/E2E must prove direct and mounted first-message same-row refresh, stable first winner, exclusions, restart/restore preservation, current-data migration unique/ambiguous/failure/restart outcomes, and the cumulative prior runtime surface. Delivery must document the new history-summary and migration spine. The reviewer-local Vitest worker-start failure ran no assertions and is recorded as shared-host runner infrastructure, not product evidence.
+
+### CRR-039 — Accepted metadata failure exposes an unhandled shared-writer queue-tail rejection
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `API/E2E Failure-Origin Review`, round `39`
+- Triggering role, report path, and finding/scenario IDs: API/E2E Engineer / `api-e2e-execution-coverage-report.md` / `API-REV-011`, user-requested confirmation `API-REV-012`, `LIVE-003B`, `API-FIND-018`; reviewer `CR-SCN-058`, `CR-CAND-093–097`, `CR-FIND-027`
+- Relevant architecture design revision IDs: cumulative `AD-REV-016`; focused `DS-027`
+- Relevant architecture-review revision IDs: `ARCH-REV-014 / Pass`
+- Relevant implementation revision IDs: cumulative `IR-001–IR-029`; source `0d7b6e7e7bc1050a43d3681eb83b09a342537ef7`; artifact `54716ad0ffd4c4be7aab389a84d3d7e41f72ecb5`
+- Relevant API/E2E revision IDs: `API-REV-011 / Fail / 95.7%`; `API-REV-012 / Fail / 96.6%`; prior `API-REV-010 / Pass / 98.3%`
+- Relevant delivery revision IDs: `DR-004`, superseded by RER-025 and current failure
+- Prior authoritative result: `CRR-038 / Pass — cumulative source`
+- Current authoritative result: `Fail — implementation-owned server Local Fix`
+- What changed in the review result and why: API-REV-011 reproduced twice, and API-REV-012 confirmed a third time on the exact unchanged artifact, that a derived AgentOrg history-index rejection is caught/logged by the stream handler and followed by a truthful accepted ACK, yet the process exits from the same rejection as unhandled. API-REV-012 first passed an ordinary summary write and subsequent HTTP 200 on the same isolated process, then produced accepted ACK -> caught EISDIR -> socket `1006` -> unreachable GraphQL -> Node exit `1`, ruling out startup/provider/browser instability. Source confirms `atomicWriteJsonFile` returns `next` but stores a distinct rejecting `next.finally(...)` promise with no consumer; cleanup compares the stored promise to `next`, so it cannot match.
+- Supported product scenario / material-premise basis changes: `CR-SCN-058` is an explicitly governed QR-011/DS-027 storage-failure scenario after accepted Agent work. Its independent basis is DS-027's derived-index I/O failure contract, risk row, and truthful-ACK guidance—not the test's directory replacement. The replacement is only deterministic reproduction evidence. `CR-CAND-093/094` are promoted; `CR-CAND-095` rejects discarding the scenario as synthetic; `CR-CAND-096/097` reject swallowing errors, handler-only patching, or new retry/replay/journal machinery.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001–026` | Resolved | Remain resolved / unaffected | through `CRR-038`; API-REV-011/012 material passes | direct/mounted summary, exclusions, accepted winner, migration and retained repository evidence pass; current failure is the shared rejected-tail implementation |
+| `AR-FIND-007` | Resolved | Remains resolved | `AD-REV-016`; `ARCH-REV-014`; `IR-029` | migration terminal-status authority is unrelated |
+| `CR-FIND-027 / API-FIND-018` | New | Open — implementation Local Fix | `CR-SCN-058`; `CR-CAND-093/094`; `API-REV-011/012` | three production reproductions plus same-process normal control and exact source identity/rejection trace |
+
+- New or remaining finding IDs: `CR-FIND-027 / API-FIND-018`
+- Material score or classification changes: CRR-038's full scorecard is not repeated. Its API/E2E Readiness and Runtime Correctness conclusions are superseded for routing until correction. Failure is a bounded shared server implementation `Local Fix`; no Requirement Gap, Design Impact, Product gap, API/schema, migration-design, provider, fixture, or environment origin is supported.
+- Review accountability: this is a real earlier source-review gap. CRR-038's `CR-CAND-087` accepted the handler/writer metadata-failure path but missed JavaScript `finally` promise identity and rejection propagation plus the impossible cleanup comparison. The issue was reasonably detectable in source review. This correction is recorded explicitly rather than attributed to API/E2E or runtime unpredictability.
+- Recommended recipient: `/software_engineering_team/implementation_engineer`
+- Remaining risks or uncertainty: fix the shared writer while preserving caller-visible rejection, exact per-path serialization, latest-tail cleanup, subsequent writes after failure, and no unhandled rejection. Add direct durable shared-writer regressions and preserve handler accepted-ACK behavior. Then perform fresh cumulative source review and renewed API/E2E, including the exact real-process failure isolation and held LIVE-004/005 scope. Do not add retry/replay/journal/timeout/rollback machinery.
+
+### CRR-040 — IR-030 restores exact atomic-write failure settlement without replay machinery
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review — skill-reloaded fresh cumulative source review`, round `40`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md` / `IR-030`; `CRR-039`; `CR-FIND-027 / API-FIND-018`; `CR-SCN-053–058`; `CR-CAND-093–100`
+- Relevant architecture design revision IDs: cumulative `AD-REV-016`; focused `AD-REV-015/016`, `DS-027`
+- Relevant architecture-review revision IDs: `ARCH-REV-014 / Pass`; `AR-FIND-007` remains resolved
+- Relevant implementation revision IDs: cumulative `IR-001–IR-030`; source `d741874e9a35367d0c64b57a8e7e4cd15e0e93c5`; artifact `e3b3a840052cdb6cb8c552b3bf9d66ee233fc3bb`
+- Relevant API/E2E revision IDs: `API-REV-011 / Fail / 95.7%`; `API-REV-012 / Fail / 96.6%`; renewed current-artifact execution pending
+- Relevant delivery revision IDs: `DR-004`, superseded by `RER-025` and pending renewed validation
+- Prior authoritative result: `CRR-039 / Fail — implementation-owned server Local Fix`
+- Current authoritative result: `Pass — cumulative source; advance to renewed API/E2E`
+- What changed in the review result and why: IR-030 keeps the original atomic write operation as the caller-visible rejecting result while storing one distinct handled/non-rejecting per-path settlement tail. Both operation outcomes invoke the same exact-owner release; cleanup compares against the actual stored tail, cannot delete a later owner, and permits a write queued before the earlier failure to run in order. The former rejecting `next.finally(...)` tail and impossible stored-tail-versus-`next` comparison are absent. Independent review passed exact writer/handler `11/11`, cumulative affected server `75/75` after the disclosed generated prerequisite, writer regression `20/20`, source/invariant scans, and retained implementation production-build evidence.
+- Supported product scenario / material-premise basis changes: None. `CR-SCN-055/058` remain Supported Explicit Edge Scenarios under QR-011/DS-027, independently of the test injection. `CR-CAND-093/094/098/099` are rejected as current findings because the source now preserves caller rejection, handled internal settlement, sequential later writes, and exact-owner cleanup. `CR-CAND-095–097/100` continue to reject discarding the governed scenario, handler-only swallowing, speculative retry/replay/journal machinery, or a new public queue-inspection surface.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001–026` | Resolved | Remain resolved / preserved | through `CRR-038`; `IR-030` | fresh cumulative inventory (`433` implementation-source records, `409` current, `24` removed, zero current `>500`), unchanged owning paths, affected `75/75` suite, and prior API material passes reveal no reopening |
+| `AR-FIND-007` | Resolved | Remains resolved / preserved | `AD-REV-016`; `ARCH-REV-014`; `IR-029/030` | migration terminal authority and implementation remain unchanged; cumulative migration tests pass |
+| `CR-FIND-027 / API-FIND-018` | Open — implementation Local Fix | Resolved at source-review boundary | `CRR-039`; `IR-030`; `CR-SCN-058`; `CR-CAND-093/094/098/099` | real filesystem caller rejection, non-rejecting exact tail, queued-before-settlement and later persistence, zero unhandled event, `20/20` repeated writer runs, and retained accepted-ACK/log handler assertions |
+
+- New or remaining finding IDs: `None`
+- Material score or classification changes: result changes from implementation-owned `Local Fix` to cumulative source `Pass`; score is `9.4/10 (94.0/100)`, every category at least `9.2`. No Requirement Gap, Design Impact, Product gap, API/schema, migration-design, provider, frontend, persistence-shape, or lifecycle impact exists.
+- Review accountability: the Code Reviewer skill, shared design principles, and Example 9 were reloaded. This was a fresh cumulative whole-ticket review, not delta-only approval. CRR-039's prior source-review gap remains recorded; current review traces the corrected failure path and rejects unsupported recovery/test-hook expansion.
+- Recommended recipient: primary implementation-pass recipient returned by `get_handoff_rules`, followed only by any informational pass recipient expressly required by the returned rule set.
+- Remaining risks or uncertainty: renewed API/E2E must repeat the real-process metadata-failure isolation and prove truthful accepted ACK, no replay/relabel, no unhandled rejection/process exit, subsequent HTTP/GraphQL reachability, and later same-path persistence, then complete the cumulative held scope. Delivery owns docs/finalization after executable pass.
+
+### CRR-041 — API-REV-013 has no durable test-code delta
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-test-review-report.md`
+- Review entry point and round: `Successful API/E2E Test-Code Review`, proportional round `5`
+- Triggering role, report path, and finding/scenario IDs: API/E2E Engineer / `api-e2e-execution-coverage-report.md`; `API-REV-013 / Pass / 98.4%`; resolved `API-FIND-018 / LIVE-003B`; cumulative `LIVE-004/005`
+- Relevant architecture design revision IDs: cumulative `AD-REV-016`, especially `DS-027`
+- Relevant architecture-review revision IDs: `ARCH-REV-014 / Pass`
+- Relevant implementation revision IDs: cumulative `IR-001–030`; source `d741874e9a35367d0c64b57a8e7e4cd15e0e93c5`; artifact `e3b3a840052cdb6cb8c552b3bf9d66ee233fc3bb`
+- Relevant source-review revision IDs: `CRR-040 / Pass — cumulative source / 9.4`
+- Relevant API/E2E revision IDs: `API-REV-013 / Pass / 98.4%`; prior `API-REV-011/012 / Fail`
+- Relevant delivery revision IDs: `DR-004`, superseded by `RER-025` and now ready for Delivery-owned refresh/finalization
+- Prior authoritative result: `CRR-040 / Pass — cumulative source`
+- Current authoritative result: `Not Applicable — no durable API/E2E test-code change`
+- What changed in the review result and why: API-REV-013 directly passed the corrected real-process metadata-failure path and every held cumulative repository/browser/provider/task/restart/recovery case, but added, updated, and removed no repository-resident durable test file. The changed ledger and files under `api-e2e-evidence/API-REV-013/` are execution artifacts, not durable test code. Therefore proportional test-code review is correctly `Not Applicable`; the implementation source scorecard is not reopened.
+- Supported product scenario / material-premise basis changes: None. RER-025 / QR-011 / DS-027 independently establish first-message parity and accepted-work failure integrity. API-REV-013's deterministic fault injection and browser probes confirm those supported paths but do not prove their own scenario validity.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-001–026` | Resolved | Remain resolved / cumulatively validated | through `CRR-040`; `API-REV-013` | current repository, browser, Team/Org/task, restart/restore, recovery, migration, identity, localization, and shutdown cases passed |
+| `CR-FIND-027 / API-FIND-018` | Resolved at source-review boundary | Resolved / executable validation passed | `IR-030`; `CRR-040`; `API-REV-013` | accepted ACK, one caught EISDIR, live socket/GraphQL/Node, byte-exact restore, later same-path persistence, no replay/relabel/unhandled/fatal marker, clean exit 0 |
+| Prior test-review findings | None | None | prior proportional reviews through `CRR-037` | API-REV-013 changed no durable test code |
+
+- Changed durable test paths: `None`
+- New or remaining test-review finding IDs: `None`
+- Material score or classification changes: No implementation scorecard or source thresholds apply. `CRR-040 / Pass (9.4/10)` remains authoritative; this separate proportional result is `Not Applicable`.
+- Review accountability: tracked/untracked test-source scope was checked; the ledger and temporary evidence were correctly excluded; the successful API/E2E workflow was not redundantly rerun.
+- Recommended recipient: exact successful post-API/E2E recipient returned by `get_handoff_rules`, expected `/software_engineering_team/delivery_engineer`
+- Remaining risks or uncertainty: API/E2E records only bounded residuals for the unchanged Electron shell and temporary probes not being a repository browser suite. The changed server boundary, production renderer, real provider/task, restart/restore, and lifecycle paths are directly validated. Delivery owns final documentation, integration, user verification, release/deployment, and package finalization.

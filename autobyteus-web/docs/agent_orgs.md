@@ -44,6 +44,14 @@ Team Agent:   Agent override -> Team override -> Org root
 Referenced Agent/Team definition defaults remain standalone defaults and do not
 silently override Org choices.
 
+A fresh launch draft selects the real **Temp Workspace (Default)** catalog entry
+when it is available, matching fresh AgentTeam launch behavior. Mounted Teams
+and Agents inherit that root Workspace unless an exact supported Team-placement
+override applies. A deliberate existing/new Workspace choice wins for the rest
+of the draft. If the catalog/default is unavailable, the client does not invent
+a path; it keeps the exact actionable selection state and blocks Run until a
+valid root Workspace is supplied.
+
 ### Member Overrides
 
 **Member overrides (N)** starts collapsed, where `N` is the exact number of
@@ -113,6 +121,23 @@ A mounted Team uses the same Team workspace panel and task/communication
 presentation as a standalone Team. Its live task monitor continues to update
 without requiring focus-away/refocus.
 
+The left **Workspaces** hierarchy remains mounted across configuration, active,
+focused, and stopped/history states. Within each Workspace it retains the
+existing Agent and **Teams** groups and places **Agent Orgs** as the distinct
+sibling group immediately below **Teams**. Switching between an Org member and
+a standalone Agent/Team makes the destination the sole URL, center, and current
+row owner: standalone selection uses query-free `/workspace`, while an Org
+selection uses its exact `rootSubjectKind=agent_org`, root-run, and mode query.
+The transition retires the other selection family rather than keeping a stale
+Org center or two highlighted rows.
+
+For a focused live direct Agent or Agent inside a mounted Team, the header gear
+opens that exact AgentRun in the established locked Agent configuration form.
+Runtime, model, Workspace, and tool-approval identity remain inspection-only.
+**Back** returns to the same exact Org/member event monitor without disconnecting
+the live context; **New** remains a separate action that starts a fresh AgentOrg
+launch configuration without retaining the current `orgRunId`.
+
 ## Status And Hierarchy
 
 Each Agent row shows its exact runtime status. Every direct mounted Team row also
@@ -132,9 +157,10 @@ nested by task delegation without changing the fixed configured Org topology.
 
 ## History, Restore, And Stop
 
-AgentOrg history is a distinct root family. The workspace lists AgentTeam and
-AgentOrg roots through their explicit root kinds while using family-specific
-trees and loaders.
+AgentOrg history is a distinct root family projected into the same unified
+Workspaces hierarchy. AgentTeam and AgentOrg roots keep explicit root kinds and
+family-specific loaders; a failure in one family retains the other family and
+the last good slice instead of blanking the entire navigation tree.
 
 - Stopped history retains the AgentOrg V1 execution tree, messages, task records,
   member memory, and provider bindings.
@@ -162,7 +188,12 @@ trees and loaders.
 - `components/workspace/history/AgentOrgRunHistoryPanel.vue`: root/tree
   history and exact focus.
 - `components/workspace/org/AgentOrgWorkspaceView.vue`: focused/unfocused and
-  stopped workspace states.
+  stopped workspace states plus the exact-member config/Back adapter.
+- `components/workspace/org/AgentOrgMemberRunConfigPanel.vue`: locked current-
+  Agent configuration presentation.
+- `components/workspace/history/WorkspaceAgentRunsTreePanel.vue` and
+  `WorkspaceHistoryWorkspaceSection.vue`: always-mounted mixed-family
+  Workspaces hierarchy and sibling Agent/Team/AgentOrg groups.
 
 Backend contract details are in
 [`autobyteus-server-ts/docs/modules/agent_orgs.md`](../../autobyteus-server-ts/docs/modules/agent_orgs.md).

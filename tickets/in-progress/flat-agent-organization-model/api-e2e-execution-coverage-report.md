@@ -2,18 +2,22 @@
 
 ## Execution Round Meta
 
-- Requirements: `requirements-doc.md`; `investigation-notes.md`; `requirements-revision-record.md` (`RER-024`).
-- Contract/design: `agent-org-contract.md`; `design-spec.md`; `architecture-design-revision-record.md` (`AD-REV-014`, `DS-024–026`).
-- Architecture review: `design-review-report.md`; `architecture-review-revision-record.md` (`ARCH-REV-012 / Pass`).
-- Implementation: `implementation-handoff.md`; `implementation-revision-record.md` (`IR-028`).
-- Code review: `code-review-report.md`; `code-review-revision-record.md` (`CRR-036 / Pass`).
-- Coverage investigation / ledger / revisions: `api-e2e-coverage-investigation.md`; `api-e2e-test-case-ledger.md`; `api-e2e-revision-record.md`.
-- Supplemental authority: approved AORG-FLAT-TEAM-001, mounted-Team-status, AORG-TEAM-OVERRIDES-001 and task-monitor artifacts referenced upstream.
-- Current revision / execution round: `API-REV-010` / 11.
-- Trigger: cumulative Large/High source Pass after IR-028 corrected mutually exclusive Team/AgentOrg navigation and exact existing-Agent config routing.
-- Prior round: `API-REV-009 / Fail / 87.0% / API-FIND-017`.
-- Tested source / artifact: `4d378df9cba56bd1b9ebf20d9b055f964398f642` / `100e2c82cb948e1cbef4026ab6f74ab815285a34`.
-- Latest authoritative result: **`API-REV-010 / Pass / 98.3%`**.
+- Requirements Doc: `requirements-doc.md` (`RER-025`).
+- Investigation Notes: `investigation-notes.md`.
+- Requirements Revision Record: `requirements-revision-record.md`.
+- Design Spec: `design-spec.md` (`AD-REV-016`, `DS-027`).
+- Supplemental Task Artifacts: AgentOrg contract; approved AgentOrg, mounted-Team status, task-monitor, Team-overrides and Product UI/UX specifications referenced by the upstream package.
+- Architecture Design Revision Record: `architecture-design-revision-record.md`.
+- Design Review / Revision: `design-review-report.md`; `architecture-review-revision-record.md` (`ARCH-REV-014 / Pass`).
+- Implementation Handoff / Revision: `implementation-handoff.md`; `implementation-revision-record.md` (`IR-030`).
+- Code Review / Revision: `code-review-report.md`; `code-review-revision-record.md` (`CRR-040 / Pass`).
+- Delivery re-entry artifacts: `delivery-revision-record.md`; prior delivery evidence remains downstream-owned and superseded pending this result.
+- Coverage Investigation / Ledger / Revision Record: `api-e2e-coverage-investigation.md`; `api-e2e-test-case-ledger.md`; `api-e2e-revision-record.md`.
+- Current API/E2E revision / round: `API-REV-013` / round 14.
+- Trigger: CRR-040 source Pass after IR-030 corrected `API-FIND-018`, plus completion of the cumulative LIVE-004/005 scope held by API-REV-011/012.
+- Prior round: `API-REV-012 / Fail / 96.6%` on IR-029; `API-FIND-018` confirmed three times.
+- Tested source / artifact: `d741874e9a35367d0c64b57a8e7e4cd15e0e93c5` / `e3b3a840052cdb6cb8c552b3bf9d66ee233fc3bb`.
+- Latest authoritative result: **`API-REV-013 / Pass / 98.4%`**.
 
 ## Routing Classification
 
@@ -21,153 +25,180 @@
 - Architectural risk: `High`.
 - Input route: `Reviewed`.
 - Successful-output route: `Code Review`.
-- Proportional test-code review: `Required` for the retained API-owned update to `autobyteus-web/stores/__tests__/runHistoryNavigationProjection.spec.ts`.
-- Delivery readiness: subject to proportional test-code review; API/E2E itself passes.
+- Proportional test-code review decision: `Required by route`; no repository-resident durable test changed in API-REV-013, so the expected review outcome is `Not Applicable`.
 
-## Investigation And Ledger Reconciliation
+## Investigation And Execution Basis
 
-- Investigation completed before execution: `Yes`.
-- Plan followed: `Yes`; no material deviation.
-- Canonical ledger: `api-e2e-test-case-ledger.md`; initialized before execution and updated after each case/checkpoint.
-- Last event: sequence 17, `LIVE-006 / Pass`, owned cleanup and immutability.
-- Running, interrupted or unstarted cases: none.
-- Context-compression handling: all intermediate outcomes were persisted immediately in the ledger as requested by the user.
+- Investigation completed before execution: `Yes`; current section is `API-REV-013 IR-030 Coverage Investigation` in `api-e2e-coverage-investigation.md`.
+- Plan followed: `Yes`. Repository, exact real-process regression, migration, production-browser, provider/task, restart/recovery and cleanup cases all ran.
+- Material deviations: three browser/probe assumptions were corrected against current approved behavior and preserved as checkpoints: stopped-member selection itself performs Restore; focus remains store-owned rather than adding `memberAddress` to the URL; current history rows are identified by summary and use nested semantic sections. A generic stale console 404 was correlated to the initial `/favicon.ico` request and disproved by a clean request-aware reload.
+- Existing coverage decision: current writer/handler and retained Team/Org coverage remained valid; no new durable test gap was found.
+- Reroute required during execution: `No`.
 
-| Case | Result | Reconciled outcome |
-| --- | --- | --- |
-| REPO-001 | Pass | exact artifact/source/instructions/resources/package hashes/diff |
-| REPO-002 | Pass | IR-028 focused route/config tests, guards/audit and production web build |
-| REPO-003 | Pass | retained server/web task, history, stream, lifecycle, migration and build |
-| LIVE-001 | Pass | active and inactive Org -> Team -> Org exact switching at desktop/narrow |
-| LIVE-002 | Pass | direct/mounted Agent gear, locked exact config, same-monitor Back, distinct New |
-| LIVE-003 | Pass | family-scoped history failure retains other/prior data and recovers |
-| LIVE-004 | Pass | real Codex Team/Org prompts, formal task revision/acceptance, strict negatives and recovery exhaustion |
-| LIVE-005 | Pass | SIGTERM, restart/migration, mixed inactive history, Restore, identity/content and continuation |
-| LIVE-006 | Pass | browser/process cleanup and source/package immutability |
+## Test-Case Ledger Reconciliation
+
+- Ledger: `api-e2e-test-case-ledger.md`.
+- Initialized before execution: `Yes`.
+- Every completed case recorded immediately: `Yes`.
+- Long-running checkpoints recorded: `Yes`; sequences 21–43.
+- Reconciled into this report: `Yes`.
+- Last event: `CLEAN-001 / Pass`, sequence 43.
+- Cases still running, interrupted, or not started: `None`.
+
+| Case | Result | Reconciled outcome | Primary evidence |
+| --- | --- | --- | --- |
+| REPO-001 | Pass | exact IR-030/CRR-040 source/artifact, fixture 4 Agents/2 Teams/2 Orgs, hashes 18/18, owned ports/tabs clear | `API-REV-013/repository/preflight.log` |
+| REPO-002 | Pass | documented server build; exact writer/handler 11/11; affected server 54/54; retained web 147/147; production renderer 16 routes | `API-REV-013/repository/*.log` |
+| LIVE-003B | Pass | real EISDIR derived-index failure contained after accepted ACK; HTTP/socket/process survive; no replay; later same-path write persists; clean SIGTERM | `live/LIVE-003B-observed-boundaries.md`; `metadata-failure-fixed-result.json` |
+| MIG-001 | Pass | current startup keeps one-attempt SUCCEEDED migration; Org/Team history queryable and both indexes byte-stable | `migration/idempotent-current/observed-result.json` |
+| LIVE-004 | Pass | production-browser stopped history, Team↔Org switching, member Restore, 390x844 drawer/focus, exact locked config/Back and no overflow | `live/LIVE-004-config-after-drawer.json`; screenshots |
+| LIVE-005 | Pass | real Codex direct/mounted/Team continuation, task revision/acceptance, strict identity, stop/terminal, SIGTERM/restart/Restore, post-restart continuation, scoped history recovery | `live/LIVE-005-*.json`; `LIVE-003-family-failure-adjudication.json` |
+| CLEAN-001 | Pass | exact owned processes/tabs/ports removed; copied secrets/build outputs absent; fixture/source/diff intact | `API-REV-013/cleanup.log` |
+
+## Prior Failure Resolution
+
+| Prior scenario / finding | Prior result | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `LIVE-003B / API-FIND-018` | IR-029 accepted the Agent input and caught derived-index `EISDIR`, but a second rejecting settlement tail escaped, closed the socket and terminated Node; confirmed three times | **Resolved.** IR-030 returns the original caller-visible rejecting operation while retaining one handled non-rejecting tail. The exact real process accepted the message, caught the injected failure once, kept its socket and GraphQL reachable, retained the failed Org's empty summary, restored the exact index, persisted a later Org's summary through the same path, emitted no unhandled/fatal marker, and exited 0 on SIGTERM. | `live/LIVE-003B-observed-boundaries.md`; `failure-contained.json`; `later-success.json`; `post-fix-process-and-log-check.log`; `server.log` |
+| API-REV-011/012 `LIVE-004/005` held by fail-fast | Not Tested on IR-029 after the critical failure | **Resolved / Pass.** Current IR-030 ran the held production browser, real provider/task, strict negative, restart/Restore/continuation, scoped recovery and terminal-stop paths. | Ledger sequences 27–42 and corresponding `live/` evidence |
 
 ## Compatibility / Persisted-Data Scope
 
 - Invalid backward compatibility in approved scope: `No`.
 - Compatibility-only implementation or durable coverage observed: `No`.
-- Approved cumulative persisted-data decision: `Migration Required`; IR-028 is `Not Affected`.
-- Representative Team V2 and AgentOrg V1 data: directly exercised across same-data shutdown/restart/history/Restore/continuation.
-- Startup found 24 Prisma migrations, none pending, and completed normally. No dual parser/read/write or request-time legacy fallback was observed.
+- Approved persisted-data transition: `Migration Required`; current startup/idempotence and both history families passed.
+- Version-specific normal-runtime fallback observed: `No`.
+- Durable compatibility-only coverage added: `No`.
 
 ## Changed Boundary And Evidence Matrix
 
-| Scenario | Requirement / boundary | Mode | Result | Evidence |
+| Scenario | Requirement / boundary | Execution surface | Evidence type | Result | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| LIVE-003B | QR-011 / DS-027 accepted work remains accepted while derived metadata failure is isolated | built Fastify process, WebSocket, GraphQL, filesystem, process lifecycle | Live temporary probe | Pass | `live/metadata-failure-fixed-result.json`; `LIVE-003B-observed-boundaries.md` |
+| LIVE-003B later write | exact per-path queue ordering/owner release after failure | same real process and same physical index path | Live/API/files | Pass | `live/later-success.json`; `index-after-later-success.json` |
+| LIVE-004 | AC-026, stopped/history/Restore and exact focus/config | production renderer through AutoByteus `open_tab` at desktop and 390x844 | Browser | Pass | `live/LIVE-004-*.json`; screenshots |
+| LIVE-005 task | mounted-Team formal delegate/submit/revise/resubmit/accept | real Codex App Server, Agent Tools MCP, durable Org sidecar and browser | Live/browser/provider/files | Pass | `live/LIVE-005-task-revision-accept.json`; task sidecar |
+| LIVE-005 restart | Team/Org/task persistence, stop, SIGTERM, restart, Restore and continuation | browser, server process, GraphQL, files, Codex | Live/browser/lifecycle | Pass | `LIVE-005-after-restart-summary.json`; `LIVE-005-postrestart-adjudication.json` |
+| LIVE-005 identity | exact root/address/AgentRun ownership while active and stopped | GraphQL against real history/runtime services | Live/API | Pass | `LIVE-005-strict-identity.json`; `LIVE-005-stopped-strict-identity.json` |
+| LIVE-005 recovery | unified Team/Org history family-scoped failure and automatic poll recovery | production browser with one-operation HTTP 500 interception | Browser/live | Pass | `LIVE-003-family-failure-adjudication.json` |
+| MIG-001 | current migration status/idempotence and Team preservation | current built process on copied migrated store | Live/files/API | Pass | `migration/idempotent-current/*` |
+
+## Repository Coverage Execution
+
+| Order | Command / scope | Working directory | Result | Evidence |
 | --- | --- | --- | --- | --- |
-| REPO-001 | reviewed artifact, fixture and environment identity | git/files/process | Pass | `API-REV-010/repository/preflight.log`; `preflight-tabs.json` |
-| REPO-002 | AC-026; DS-017/025; API-FIND-017 | Vitest/static/build | Pass | `repository/web-focused.log`; `web-guards-audit.log`; `web-build.log` |
-| REPO-003 | cumulative Team/Org/task/stream/history/migration | Vitest/build | Pass | `repository/server-retained.log`; `web-retained.log`; `server-build.log` |
-| LIVE-001 | REQ-031 / AC-026 / SCN-015 | production browser/API | Pass | `live/LIVE-001-active-switch.json`; `LIVE-001-inactive-org-switch.json`; screenshots |
-| LIVE-002 | DS-017 exact existing-Agent config | production browser/API | Pass | `live/LIVE-002-direct-gear.json`; `LIVE-002-mounted-gear.json`; `LIVE-002-new-distinct.json` |
-| LIVE-003 | unified history family isolation | browser/network | Pass | `live/LIVE-003-family-failure.json`; screenshot |
-| LIVE-004 | real provider/task/strict/recovery | browser/Codex/MCP/API/files | Pass | `live/LIVE-004-*.json`; task sidecar; recovery CDP corpus |
-| LIVE-005 | lifecycle/persistence/migration/Restore | process/browser/API/files | Pass | `live/LIVE-005-*`; restart and shutdown logs |
-| LIVE-006 | cleanup/immutability | browser/process/files | Pass | `live/cleanup.log`; `cleanup-tabs.json`; `final-shutdown-tail.log` |
+| 1 | documented server `pnpm build` including shared preparation, Prisma and bootstrap | `autobyteus-server-ts` | Pass | `repository/server-build.log` |
+| 2 | exact atomic writer + Org stream-handler cohort, 2 files / 11 tests | `autobyteus-server-ts` | Pass | `repository/server-exact.log` |
+| 3 | affected cumulative server cohort, 14 files / 54 tests | `autobyteus-server-ts` | Pass | `repository/server-cumulative.log` |
+| 4 | retained history/navigation/recovery web cohort, 21 files / 147 tests | `autobyteus-web` | Pass | `repository/web-retained.log` |
+| 5 | production Nuxt build/prerender, 16 routes | `autobyteus-web` | Pass | `repository/web-build.log` |
 
-## Repository Execution
+Expected invalid-fixture stderr and Vue injection warnings remained assertion-covered. No test was waived.
 
-1. Exact current artifact/source preflight, applicable instructions, owned ports/tabs, 18/18 package hashes and `git diff --check`: Pass.
-2. Focused current web cohort: 14 files / 177 tests Pass; both web/localization guards and zero-finding literal audit Pass; production Nuxt build/prerender 16 routes Pass.
-3. Retained server cohort: 15 files / 61 tests Pass; retained web cohort: 27 files / 195 tests Pass; current server TypeScript build/bootstrap Pass.
+## Validation Confidence Scorecard
 
-Evidence root: `api-e2e-evidence/API-REV-010/repository/`.
+| Category | Post-repository | Final | Final support | Residual uncertainty |
+| --- | ---: | ---: | --- | --- |
+| Requirement and acceptance-criteria proof | 92% | 99% | held critical Team/Org/task/history/restart requirements directly passed | negligible unchanged shell-only surface |
+| Changed-boundary execution directness | 94% | 100% | exact real-process failure, same-path recovery write and clean exit | none material |
+| Cross-boundary integration realism and mock gap | 91% | 99% | production renderer, Fastify, GraphQL, WebSocket, SQLite/files, MCP and Codex crossed real boundaries | external network/provider availability is inherently variable |
+| Environment, configuration, identity and fixture fidelity | 94% | 99% | isolated copied store, exact registered package, real Codex `gpt-5.6-sol`, exact identities and hashes | no fresh package re-import was needed; current package hashes and registration were verified |
+| Failure, edge-case, lifecycle and recovery evidence | 91% | 99% | EISDIR containment, later write, query-family 500 recovery, strict negatives, stop, two SIGTERMs and restart passed | destructive damage to unrelated shared data intentionally not attempted |
+| User-surface, browser and desktop-shell confidence | 92% | 98% | actual `open_tab` production Chromium, desktop/narrow, route/focus/config/history/terminal journeys | unchanged Electron shell itself was not launched |
+| Durable regression coverage quality and relevance | 95% | 95% | exact reviewed writer/handler and broad retained cohorts pass; no new gap | browser journeys remain evidence probes rather than a repository browser suite |
+
+- Overall post-repository confidence: `92.7%`.
+- Overall final confidence: **`98.4%`**.
+- Calculation: simple mean of seven applicable category scores, rounded to one decimal.
+- Every critical acceptance criterion directly proven: `Yes`.
+- Applicable category below 90%: `No`.
+- Default 95% target met: `Yes`.
 
 ## Broader Validation Decision And Execution
 
 - Decision: **Required and completed**.
-- Mode: current production Nuxt renderer in a real persistent AutoByteus `open_tab` Chromium tab; current built Fastify/GraphQL/WebSocket server; isolated copied data; real Codex App Server / `gpt-5.6-sol`; SQLite/filesystem and application process correlation.
-- Environment: owned server `127.0.0.1:8589`, renderer `127.0.0.1:3589`, browser tab 13; all closed after execution.
-- Fixture: `api-e2e-fixtures/aorg-api-rev-002-agent-package`, containing 4 Agents, 2 flat Teams and 2 AgentOrgs with explicit submit/review tools; 18/18 hashes before and after.
-- Authentication/permissions: local product configuration; no external account or permission boundary changed.
+- Why: repository tests could not prove absence of process-level unhandled rejection, survival after real filesystem failure, same-path later persistence, actual browser route/focus/Restore, real provider/task flow, or shutdown/restart durability.
+- Environment: exact built source/artifact; isolated copied data; ports 8697/8698 for focused process/migration and 8592/3592 for server/production renderer; fixture root `api-e2e-fixtures/aorg-api-rev-002-agent-package`; real Codex App Server with `gpt-5.6-sol`; SQLite/filesystem; persistent AutoByteus tab 1.
+- Browser: actual `open_tab` created the persistent tab; Playwright attached to that exact tab only for semantic interaction/evidence. Desktop `1502x844` and narrow `390x844` were exercised.
+- Notable exact observations:
+  - Direct Concierge, mounted Team lead and standalone Team lead retained history and accepted exact post-restart markers.
+  - Task `task_520783d1cf8b44bf92db55a96fb87738` kept one identity, four ordered updates and final `accepted` status across restart.
+  - Stop Org routes away from stale active identity to configuration; selecting the retained inactive row renders the approved terminal history; selecting a member performs the supported Restore.
+  - During separately injected Org and workspace history 500s, both already-rendered families remained visible and the error cleared on the next real poll without reload.
 
-### Current Browser And Real-System Results
+## Desktop Application Validation
 
-1. **Navigation and focus:** Active and inactive AgentOrg -> standalone Team -> same AgentOrg switching produced exact destination URL/center and one current selection. The 390x844 path used the approved primary strip -> drawer -> unified hierarchy.
-2. **Exact Agent configuration:** Direct concierge and mounted analyst gear opened exact run/address configuration with runtime/model/workspace locked. Back returned to the same monitor; New used configuration mode without `orgRunId`.
-3. **Family failure isolation:** Forced exact Org-history and workspace-history HTTP 500s retained prior good slices and the other family, displayed only the relevant error, then recovered without duplication.
-4. **Provider and task:** A previously inactive standalone Team activated on its first real prompt. Direct Org and mounted-Team members returned exact markers. Fresh task `task_e8ac5ad7530e4a68abde501aed8d27cf` completed delegate -> initial submit -> request revision -> same-task revised submit -> accept, matching the durable sidecar and UI.
-5. **Strict identity:** Wrong address and wrong AgentRun projections failed closed; an immediate valid projection succeeded without poisoning context.
-6. **Stream recovery:** A stopped root produced six correlated current-generation ERROR attempts. All browser closes used legal application code 4000; there was no `InvalidAccessError`, unhandled rejection, permanent Connecting state or Reconnect control, and exactly one notice after five failed recovery attempts.
-7. **Lifecycle and durability:** Application SIGTERM closed cleanly with Team and Org active. Same-data restart completed migration preflight, returned both families inactive and preserved the accepted task sidecar. Inactive-row selection performed supported whole-Org Restore.
-8. **Restore semantics:** Conversation-bearing concierge/lead retained exact AgentRun/provider identity and content; a system-instruction-only member received a renewed durable provider ID. Direct/mounted Org and standalone Team conversations continued with new exact markers.
-9. **Terminal state:** Stop Agent Org terminated the whole root and routed to configuration without `orgRunId` or a live Stop control; inactive history showed `Stopped Agent Org`.
+- Browser-tested web-equivalent renderer behavior: complete for the selected scope through the production-built renderer and actual AutoByteus Chromium tab.
+- Shell-specific evidence: server process lifecycle, production builds and prior exact AppImage provenance are retained. The unchanged Electron shell was not relaunched because no IR-030 shell boundary changed.
+- Effect on any user application: `None`; only owned ports, copied data and the test tab were used.
 
-Evidence root: `api-e2e-evidence/API-REV-010/live/`.
+## Platform / Runtime Targets
 
-## Observed Errors And Disposition
+- Platform: Linux ARM64.
+- Runtime: Node.js `22.23.2`; current Fastify/GraphQL application build; Playwright Core `1.58.2` attaching to AutoByteus Chromium.
+- Browser viewports: `1502x844` desktop and `390x844` narrow.
+- Locale/data: exact Unicode Team/Org package data retained; prior en/zh-CN authored data remained visible/durable.
 
-The run did encounter errors, but none remained a confirmed production failure:
+## Lifecycle / Upgrade / Restart / Persisted-Data Checks
 
-1. Two browser automation waits lost locators during the five-second history refresh. Repeating the same supported clicks passed; classified as harness timing.
-2. One rapid scripted inactive-Team selection transiently showed `Couldn't load task activity. Retry`. A paced exact reprobe after Team termination/reload returned retained history, authoritative `0 tasks`, no alert, and only HTTP 200/no-GraphQL-error requests; not reproduced as supported product behavior.
-3. Codex model-catalog refresh intermittently logged a child-process exit timeout. Actual AgentRuns published and every required prompt/tool call succeeded; classified as non-blocking provider-catalog environment stderr.
-4. The only browser 404 was the existing `/health` capability probe.
-5. Two manually constructed task-record probes used non-root-neutral IDs and correctly returned not-found. The authoritative Org task was verified through its sidecar and UI; these were API-owned probe mistakes.
+- Representative data: previously migrated Team/Org corpus and the retained APIREV8 Team/Org/task history.
+- Migration result: `20260905_agent_org_history_first_message_summary_v1` remained `SUCCEEDED`, attempt count 1, exact prior summary retained; both family indexes SHA-stable.
+- Restart result: before/after SHA-256 equality for Org index, Team index and task sidecar; histories inactive, summaries retained, task accepted; browser then restored and continued both families.
+- Shutdown result: two direct application-owned SIGTERM cycles each logged clean shutdown and exited 0.
+- Compatibility fallback: none.
 
-No current `API-FIND-*` was opened from these observations.
+## Tests Implemented Or Updated
 
-## Desktop / Platform Targets
+No repository-resident durable test was added, updated or removed in API-REV-013. Temporary evidence probes and browser scripts are retained under `api-e2e-evidence/API-REV-013/`; they are not production test-suite changes.
 
-- Linux ARM64; current Chrome 151 persistent AutoByteus browser.
-- Desktop web-equivalent behavior exercised at approximately 1502x797 and narrow 390x844.
-- Actual Electron shell not launched because IR-028 changes no preload/IPC/window/native boundary. This bounded unchanged-shell uncertainty is reflected in the score.
+## Temporary Execution Methods / Scaffolding
 
-## Durable Coverage Changed
+| Method | Purpose | Result | Cleanup |
+| --- | --- | --- | --- |
+| `metadata-failure-fixed-probe.mjs` | exact real-process EISDIR regression and later same-path write | Pass | injected path restored byte-exactly; process exited 0 |
+| `LIVE-004/005-*.mjs` | semantic interaction with the actual `open_tab` tab | Pass after documented assertion corrections | tab closed; browser left available |
+| GraphQL/filesystem comparison scripts | strict identity, history/task and hash equality | Pass | no process retained |
+| isolated copied data roots | real migration/runtime without shared-data mutation | Pass | secrets removed; non-secret evidence retained |
 
-- Updated path retained from API-REV-009: `autobyteus-web/stores/__tests__/runHistoryNavigationProjection.spec.ts`.
-- Change: add the required empty `agentOrgHistory` slice to two builders and use approved stable workspace key `workspace:/workspace-a`.
-- Current execution: included in focused 14/177 and retained 27/195 passing cohorts.
-- Removed tests: none. Production source changed by API/E2E: none.
-- Proportional test-code review attachment: required.
+## Dependencies Mocked Or Emulated
 
-## Temporary Execution Methods / Mocking
+- Real Codex provider, MCP tools, server, browser, database and filesystem were used for critical journeys.
+- Only selected error stimuli were controlled: one derived-index path was temporarily made unwritable through deterministic directory replacement, and one history query family at a time was intercepted with HTTP 500. Both exercise explicit supported failure requirements rather than replacing the production owners.
 
-- Playwright/CDP attached to the exact persistent `open_tab` for semantic DOM, network, console and WebSocket correlation. Scripts and captures are retained under `API-REV-010/live/`; no production test hook was added.
-- Real browser, server, GraphQL, WebSocket, SQLite/files, Team/Org runtimes and Codex provider were used. No material dependency was mocked in live execution.
-
-## Validation Confidence Scorecard
-
-| Category | Post-repository | Final | Final basis / residual |
-| --- | ---: | ---: | --- |
-| Requirement and acceptance-criteria proof | 94% | 99% | all critical current and retained cumulative scenarios directly pass |
-| Changed-boundary execution directness | 96% | 99% | exact active/inactive route/config behavior in current production browser |
-| Cross-boundary integration realism/mock gap | 92% | 99% | real browser/server/provider/MCP/SQLite/process; no material live mock gap |
-| Environment/configuration/identity/fixture fidelity | 95% | 99% | exact artifact, imported Team+Org package, hashes, identities and same-data restart |
-| Failure/edge/lifecycle/recovery evidence | 93% | 99% | family faults, strict negatives, legal-close exhaustion, SIGTERM/restart/Restore |
-| User-surface/browser/desktop-shell confidence | 92% | 96% | desktop+narrow real renderer; unchanged Electron shell not launched |
-| Durable regression coverage quality/relevance | 96% | 97% | broad current suites; one narrow API-owned fixture update awaits review |
-
-- Overall post-repository confidence: `94.0%`.
-- Overall final confidence: **`98.3%`** (`688 / 7`, rounded).
-- Every critical acceptance criterion directly proven: `Yes`.
-- Applicable category below 90%: `No`.
-- Default 95% target met: `Yes`.
-- Residuals: unchanged Electron shell, separately owned external definition publication and destructive corruption of a live copied store were not exercised; none intersects the changed IR-028 boundary or blocks Pass.
-
-## Result Summary And Cleanup
+## Result Summary
 
 | Result | Scenarios | Summary |
 | --- | --- | --- |
-| Pass | REPO-001–003; LIVE-001–006 | all planned current and cumulative cases completed |
-| Fail | none | no confirmed product failure |
-| Blocked / Not Tested | none | no planned case left incomplete |
+| Pass | REPO-001/002, LIVE-003B/004/005, MIG-001, CLEAN-001 | all planned current-artifact repository, real-process, migration, production-browser, Codex/task, recovery, restart and cleanup cases passed |
+| Fail | None | no current product failure |
+| Blocked / Not Tested | None | no held or missing critical scope |
 
-Cleanup completed: tab 13 closed and tab list empty; server accepted application-owned SIGTERM and logged clean closure; renderer stopped; ports 8589/3589 closed; fixture hashes remained 18/18; exact HEAD/source ancestry and `git diff --check` pass. Isolated live data is retained as evidence rather than reused.
+## Cleanup Performed
 
-## Preliminary Classification / Recommended Recipient
+- API-REV-013 backend processes and renderer stopped; ports 8592/3592/8697/8698 have no listener.
+- AutoByteus tab 1 closed; `list_tabs` returned `[]`.
+- Copied `.env` and `production.db.secret.key` files removed from both runtime and migration copies.
+- Generated top-level shared build output removed with scoped filesystem operations.
+- Fixture `PACKAGE.sha256` passes 18/18; HEAD remains `e3b3a840...`, source remains an ancestor, and `git diff --check` passes.
+- Other-owner docs, code-review and delivery changes were not edited or discarded.
 
-- Result classification: **Pass**.
-- `API-FIND-017`: resolved on the current reviewed artifact.
-- Requirement Gap / Design Impact / implementation failure: none.
-- Recommended recipient: `/software_engineering_team/code_reviewer` for proportional review of the retained durable test update.
+## Preliminary Classification
+
+- Current outcome: `Pass`.
+- Prior `API-FIND-018`: resolved by IR-030 and directly verified.
+- New API/E2E, implementation, design, requirement or product finding: `None`.
+
+## Recommended Recipient
+
+`/software_engineering_team/code_reviewer` for reviewed-route proportional API/E2E test-code review. No durable test changed, so record `Not Applicable` without reopening the implementation scorecard.
 
 ## Latest Authoritative Result
 
 - Result: **Pass**.
-- Revision/confidence: **`API-REV-010 / 98.3%`**.
-- Broader validation: **Required and completed**.
-- Critical acceptance criteria lacking direct proof: none.
-- Next recipient: Code Reviewer for proportional test-code review.
+- Final validation confidence: **98.4%**.
+- Default 95% confidence target met: `Yes`.
+- Final applicable category below 90%: `No`.
+- Broader validation: `Required and completed`.
+- Critical acceptance criteria lacking direct proof: `None`.
+- Required next recipient: `Code Reviewer` under dynamic handoff rules.
+- Delivery readiness: not self-declared; downstream routing follows successful proportional review.

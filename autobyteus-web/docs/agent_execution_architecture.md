@@ -113,6 +113,13 @@ The Pinia stores act as the primary interface for the UI components to interact 
   Agent overrides, workspace operations, and exact schema-readiness states. The
   Run action is admitted only when every registered root/Team/Agent scope is
   ready; unavailable or invalid scope state remains address-specific.
+- A deliberate new-launch draft epoch selects the real
+  `Temp Workspace (Default)` catalog record when available. The root selection
+  flows through the existing Org inheritance resolver; descendants do not
+  independently default themselves. Once the user chooses an existing or new
+  Workspace, later catalog changes cannot overwrite that choice. Missing or
+  failed inventory leaves an actionable unset state rather than fabricating a
+  path.
 - `agentOrgRunStore.launch()` sends one complete projected payload and records
   only the returned `agentOrgRunId`. `restore()`, `terminate()`, and
   `fetchHistory()` use the AgentOrg GraphQL operations and the
@@ -136,6 +143,28 @@ The Pinia stores act as the primary interface for the UI components to interact 
 - These stores never import the Team draft/config store as configuration
   authority, synthesize an Org coordinator, or convert AgentOrg persistence into
   Team V2 state.
+
+### AgentOrg Workspace Subject And Current-Member Configuration
+
+Standalone Agent/Team selection and AgentOrg selection are mutually exclusive
+center subjects. `AppLeftPanel.isPlainWorkspaceRoute()` accepts only an exact
+query-free `/workspace` as the canonical standalone route; selecting or creating
+a standalone run therefore removes any stale AgentOrg query before the existing
+standalone selection owns the center. In the reverse direction,
+`useWorkspaceHistorySubjectActions` clears the standalone selection before it
+connects/selects the exact Org context and publishes the typed AgentOrg route.
+URL, center content, and one highlighted history row consequently describe the
+same root/member for active, inactive/Restore, and return transitions.
+
+`AgentOrgWorkspaceView` keeps **Edit config** and **New** separate. For the gear
+action it retains the connected Org context and passes the current exact direct
+or mounted-Team Agent target to `AgentOrgMemberRunConfigPanel`. That panel adapts
+the live target's immutable run configuration into the existing
+`AgentRunConfigForm` with runtime, model, Workspace, and existing-run editing
+locked. The center store's **Back** action returns to chat/Event Monitor for the
+same `orgRunId`, address, and AgentRun id; changing target/root or leaving the
+route resets config mode. **New** deliberately enters a fresh AgentOrg launch
+route with the definition id and no current `orgRunId`.
 
 ### Stopped-Run Follow-Up Recovery
 
@@ -767,13 +796,18 @@ become configured focus targets. Exact Agent selection waits for authoritative
 projection before changing the current-row state, and an offline Agent may be
 focused when retained projection is authoritative.
 
-`AgentOrgRunHistoryPanel` owns the parallel AgentOrg hierarchy. It renders the
-coordinator-free Org root, direct Agents, and direct mounted Teams from the Org
-V1 projection. Mounted Teams start collapsed and disclose their direct Agents
-and task rows. Selecting a mounted Team focuses its exact direct coordinator
-through the active Org context; it does not create or replace a standalone
-TeamRun. The panel preserves independent workspace/Org/run/Team disclosure
-state while reactive live context mutations update rows without refocus.
+The same always-mounted Workspaces panel also projects the AgentOrg family.
+Inside each Workspace, existing Agent groups remain first, **Teams** remains its
+existing category, and **Agent Orgs** is a distinct sibling immediately below
+Teams. The Org collection renders the coordinator-free root, direct Agents, and
+direct mounted Teams from the Org V1 projection. Mounted Teams start collapsed
+and disclose their direct Agents and task rows. Selecting a mounted Team focuses
+its exact direct coordinator through the active Org context; it does not create
+or replace a standalone TeamRun. Stable normalized Workspace/root/member keys
+preserve expansion, scroll, and exact selection across catalog, configuration,
+active, and history routes. Workspace-history and AgentOrg-history fetches
+commit independent slices and errors, so one family failure retains the other
+family and the last good data instead of replacing the tree.
 
 Topology operations build and index the complete run-history navigation
 projection once, retaining equal workspace/team branches by reference. The

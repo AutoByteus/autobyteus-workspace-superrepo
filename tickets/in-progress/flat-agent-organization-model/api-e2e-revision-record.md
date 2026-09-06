@@ -17,6 +17,10 @@ The latest `api-e2e-coverage-investigation.md` and
 | API-REV-008 | Code Reviewer CRR-032 / browser-safe recovery and cumulative IR-026 renewal | RER-023; AD-REV-012; ARCH-REV-010; IR-026; CRR-032 | Fail / 86.9% | Pass / 98.4% |
 | API-REV-009 | Code Reviewer CRR-034 / canonical launch and unified-history IR-027 renewal | RER-024; AD-REV-014; ARCH-REV-012; IR-027; CRR-034 | Pass / 98.4% | Fail / 87.0% |
 | API-REV-010 | Code Reviewer CRR-036 / IR-028 route/config renewal | RER-024; AD-REV-014; ARCH-REV-012; IR-028; CRR-036 | Fail / 87.0% | Pass / 98.3% |
+| API-REV-011 | Code Reviewer CRR-038 / DS-027 summary-parity renewal | RER-025; AD-REV-016; ARCH-REV-014; IR-029; CRR-038 | Pass / 98.3% | Fail / 95.7% |
+| API-REV-012 | User-requested same-artifact confirmation | RER-025; AD-REV-016; ARCH-REV-014; IR-029; CRR-038; API-FIND-018 | Fail / 95.7% | Fail / 96.6% |
+
+| API-REV-013 | Code Reviewer CRR-040 / IR-030 cumulative renewal | RER-025; AD-REV-016; ARCH-REV-014; IR-030; CRR-040; API-FIND-018 | Fail / 96.6% | Pass / 98.4% |
 
 ## Revision Entries
 
@@ -792,3 +796,91 @@ Preliminary classification is implementation/frontend `Local Fix`; Code Reviewer
 - Broader validation: `Required and completed`.
 - Recommended recipient: `/software_engineering_team/code_reviewer` for proportional test-code review.
 - Remaining bounded scope: unchanged Electron shell, separately owned external definition publication and destructive corruption of a live copied store; none is a material gap for IR-028.
+
+### API-REV-011 — DS-027 live summary passes normal paths but accepted metadata failure crashes server
+
+- Triggering role/report/round: Code Reviewer `CRR-038 / Pass`; API/E2E round 12.
+- Triggering scenarios: `REQ-033 / AC-028 / SCN-017 / QR-011 / DS-027` plus cumulative retained critical coverage.
+- Related revisions: `RER-025`; `AD-REV-016`; `ARCH-REV-014 / Pass`; `IR-029`; `CRR-038 / Pass`.
+- Tested source/artifact: `0d7b6e7e7bc1050a43d3681eb83b09a342537ef7` / `54716ad0ffd4c4be7aab389a84d3d7e41f72ecb5`.
+- Why recorded: RER-025 added accepted external AgentOrg message summary capture, authoritative same-row refresh and startup recovery. Those process/browser/persistence boundaries cannot inherit API-REV-010.
+- Durable coverage changed by API/E2E: none. The new reviewed owner tests and retained cohorts were rerun. Evidence-only browser/API/process/migration probes were retained under `API-REV-011`.
+- Commands/environment delta: exact preflight; focused server 6 files/28 tests; focused web 3 files/58 tests; documented server build/bootstrap; web guards/audit/build; retained server 15 files/64 tests and web 27 files/196 tests; production renderer/browser, real Codex/gpt-5.6-sol, GraphQL/WebSocket, SQLite/files, real startup migration, and isolated deterministic derived-index failure.
+
+#### Prior Failure Resolution
+
+None. API-REV-010 passed its IR-028 artifact; API-REV-011 validates the newly changed IR-029 boundary.
+
+#### Executed result
+
+- Direct and mounted-Team first accepted messages changed the same rendered Org history row without reload using exact normalization/truncation; later configured/task traffic did not overwrite.
+- A real mounted-Team delegate -> task Agent `submit_task_result` created the exact durable awaiting-review sidecar without affecting the root summary.
+- Whitespace and invalid-target sends were excluded. Both A→B and B→A concurrent accepted orders selected their exact first ACK winner durably.
+- Startup migration unique direct/mounted, existing, no-evidence, ambiguous, Team-preservation, warning, idempotent-restart and invalid-current terminal-failure cases passed.
+- `API-FIND-018`: deterministic derived history-index `EISDIR` after accepted Agent input was caught/logged and the exact accepted ACK was observed, but the same rejection then escaped as an unhandled promise, closed the socket abnormally and terminated Node. Reproduced twice. Preliminary source correlation is the separately rejecting `next.finally(...)` promise stored by `atomic-json-file-writer.ts` while only `next` is returned/caught.
+- Critical fail-fast left LIVE-004 and the current-artifact validation part of LIVE-005 Not Tested; prior API-REV-010 material passes remain historical only.
+
+- Canonical artifacts updated:
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-test-case-ledger.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-revision-record.md`
+  - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-011/`
+- Finding evidence: `API-REV-011/live/metadata-failure-v2/API-FIND-018-accepted-summary-write-crashes-server.md`, `accepted-ack-rerun.json`, `probe-rerun-result.json`, `server-rerun.log` and index restore hashes.
+- Prior result/confidence: `Pass / 98.3%`.
+- Current result/confidence: **Fail / 95.7%** — high confidence in the failure; a critical criterion prevents Pass.
+- New/remaining finding: `API-FIND-018`.
+- Cleanup: browser tab closed/list empty; owned servers/renderer and ports 8590/3590/8695 closed; injected index restored byte-identically; fixture 18/18 hash-valid.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for focused failure-origin review.
+- Delivery readiness: not claimed.
+
+### API-REV-012 — User-requested local confirmation distinguishes healthy control from deterministic crash
+
+- Trigger: after API-REV-011 handoff, the user asked to test again in case the server would now run successfully and the earlier termination was our environment problem.
+- Authority/source/artifact: unchanged `RER-025 / AD-REV-016 / ARCH-REV-014 / IR-029 / CRR-038`; source `0d7b6e7e7bc1050a43d3681eb83b09a342537ef7`; artifact `54716ad0ffd4c4be7aab389a84d3d7e41f72ecb5`.
+- Scope: focused prior-failure resolution only; ordinary intact summary write control followed by exact `LIVE-003B / API-FIND-018` reinjection on the same healthy isolated server.
+- Durable test/source changes: none.
+
+#### Prior Failure Resolution
+
+| Prior failure | Previous result | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-018` / LIVE-003B | Fail; accepted derived-index I/O failure terminates server, reproduced twice | **Not resolved / confirmed a third time.** Intact control first passed with accepted ACK, exact durable summary and subsequent HTTP 200. The same server then returned accepted ACK for the injected failure, logged/caught EISDIR, closed socket 1006, became unreachable and exited 1 from the unhandled rejection. | `API-REV-012/user-requested-retry/control-result.json`; `failure-accepted-ack.json`; `retry-result.json`; `retry-probe.log`; `server-final-retry.log` |
+
+- Setup corrections: the first attempt correctly exposed missing cleaned shared SDK build output and never listened; documented `prepare:shared` passed. A second readiness start exposed a copied old temp-workspace path and was stopped before messages; the path/port were changed to API-REV-012 ownership. Neither is product behavior or part of the reproduction.
+- Cleanup: copied `.env` and secret key removed; generated shared build outputs removed with scoped filesystem operations; port 8696 and retry processes absent; before/restored/current index SHA-256 identical.
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, and `api-e2e-evidence/API-REV-012/`.
+- Prior result/confidence: `Fail / 95.7%`.
+- Current result/confidence: **Fail / 96.6%** — stronger confidence in the same defect, not a Pass.
+- Remaining finding: `API-FIND-018`.
+- Recommended recipient: `/software_engineering_team/code_reviewer` as a focused evidence update to the existing failure-origin review.
+- Delivery readiness: not claimed.
+
+
+### API-REV-013 — IR-030 process-failure containment and cumulative real-system Pass
+
+- Triggering role/report/round: Code Reviewer `CRR-040 / Pass`; API/E2E round 14.
+- Triggering finding/scenario: prior `API-FIND-018 / LIVE-003B`, plus the cumulative `LIVE-004/005` scope held by API-REV-011/012 fail-fast.
+- Related revisions: `RER-025`; `AD-REV-016 / DS-027`; `ARCH-REV-014 / Pass`; `IR-030`; `CRR-040 / Pass`.
+- Tested source/artifact: `d741874e9a35367d0c64b57a8e7e4cd15e0e93c5` / `e3b3a840052cdb6cb8c552b3bf9d66ee233fc3bb`.
+- Why recorded: IR-030 corrected the shared atomic writer settlement-tail defect proven three times by API-REV-011/012. The fix and all held current-artifact cumulative journeys required direct renewal; no prior pass was inferred.
+- Durable coverage changed by API/E2E: none. Exact reviewed writer/handler tests and affected/retained cohorts were rerun. Evidence-only real-process/browser scripts were retained under `api-e2e-evidence/API-REV-013/`.
+- Repository delta: server build Pass; exact writer/handler `2 files / 11 tests`; affected server `14 / 54`; retained web `21 / 147`; production Nuxt build/prerender `16 routes`.
+- Environment/execution delta: exact built server, isolated copied SQLite/files, imported/registered 4-Agent/2-Team/2-Org fixture, actual AutoByteus `open_tab` production Chromium at desktop and 390x844, real Codex App Server / `gpt-5.6-sol`, Agent Tools MCP, GraphQL/WebSocket, deterministic derived-index failure, current migration, two SIGTERM cycles and same-data restart.
+
+#### Prior Failure Resolution
+
+| Prior scenario / failure | Previous classification/result | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-018 / LIVE-003B` | implementation-owned shared atomic-writer Local Fix; accepted work's caught derived-index failure also escaped through a rejecting cleanup tail and terminated Node | **Resolved / Pass.** Accepted ACK stayed truthful; exact EISDIR was caught once; socket/GraphQL/process remained available; no replay/relabel; exact restore; later same-path persistence; no unhandled/fatal marker; SIGTERM exit 0. | `API-REV-013/live/LIVE-003B-observed-boundaries.md`; `metadata-failure-fixed-result.json`; `post-fix-process-and-log-check.log` |
+| API-REV-011/012 held `LIVE-004/005` | Not Tested after critical fail-fast | **Resolved / Pass.** Production-browser history/switch/Restore/config/narrow focus, real Team/Org/task, active+stopped strict negatives, stop/terminal, restart/post-restart continuation and scoped history recovery all passed. | `API-REV-013/live/LIVE-004-*.json`; `LIVE-005-*.json`; ledger sequences 27–42 |
+
+- Migration/idempotence: Pass; status remained `SUCCEEDED`, attempt count 1, both histories queryable and both indexes byte-stable.
+- Cleanup: complete; owned ports/processes/tabs absent, copied secrets and generated outputs removed, fixture hashes `18/18`, source/artifact and diff integrity pass.
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, and `api-e2e-evidence/API-REV-013/`.
+- Prior result/confidence: `Fail / 96.6%`.
+- Current result/confidence: **`Pass / 98.4%`**.
+- New or remaining finding IDs: `None`; `API-FIND-018` resolved.
+- Broader validation: `Required and completed`.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for proportional test-code review. No durable test changed in this round, so expected disposition is `Not Applicable`.
+- Remaining bounded risk: unchanged Electron shell was not relaunched; temporary live browser probes are not a repository browser suite. Neither limits the IR-030 server-writer acceptance result.
