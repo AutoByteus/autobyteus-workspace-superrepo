@@ -730,6 +730,19 @@ backend-provided history summary. Team row title behavior remains owned by the
 team-history path and is not reinterpreted by the standalone live-context
 overlay.
 
+AgentOrg rows use the same stable first-accepted-message presentation while
+retaining separate family ownership. A new row keeps an empty backend summary
+and renders `New - <AgentOrg name>` until one successfully accepted non-empty
+external `SEND_MESSAGE` reaches an exact configured direct Agent or an Agent in
+a directly mounted Team. After that acknowledgement,
+`AgentOrgStreamingService` invokes its accepted-message callback and the
+existing mixed history owner performs one `network-only` AgentOrg-family read.
+The submitted text is never applied optimistically; the durable server winner
+is the only title source. Full and focused Org reads share a monotonic request
+generation so a stale response cannot replace the newest slice, while a failed
+refresh preserves the last good Org rows and family-scoped error. Later or
+task-scoped messages and non-user command traffic never become title sources.
+
 ### Workspace History Progressive Disclosure
 
 The Workspaces sidebar history tree uses progressive disclosure for its

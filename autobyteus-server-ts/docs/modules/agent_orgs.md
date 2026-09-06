@@ -162,6 +162,27 @@ both families into one persisted generic root. `listCollaborationRootHistory`
 exposes the two root kinds while family-specific loaders retain strict package
 validation.
 
+An AgentOrg history row starts with an empty `summary`, displayed by clients as
+`New - <AgentOrg name>`. The first successfully accepted external
+`SEND_MESSAGE` whose compacted content is non-empty and whose exact target is a
+configured direct Org Agent or an Agent inside a directly mounted Team becomes
+the durable summary. Whitespace sequences collapse to one space; values longer
+than 100 characters use the first 97 characters plus `...`. Task-scoped
+recipients, rejected or failed sends, later user messages, inter-Agent traffic,
+task/system input, and approval or interrupt commands never set or replace the
+summary.
+
+The command boundary identifies configured versus task-scoped execution from
+the strict execution tree. After configured Agent admission succeeds, the
+AgentOrg history catalog serializes summary attempts, commits the first
+non-empty value through the shared atomic JSON writer, strictly rereads the
+index, and only then returns the truthful accepted command acknowledgement.
+History-write failure is derived-metadata failure: it is logged without
+replaying or relabelling the accepted Agent input. The per-path writer retains
+a handled settlement tail, so one caller-visible write rejection cannot escape
+as an unhandled rejection, poison later same-path writes, or retain stale queue
+ownership.
+
 ## Migration And External Publication
 
 Required startup migration
@@ -171,6 +192,17 @@ preflights candidates before writes, uses atomic replacement or same-root
 family rename, rereads and validates target families, updates the two history
 indexes, and reports per-item failures for restart Retry. Current runtime has no unversioned decoder, dual write, or
 request-time migration fallback.
+
+The later required startup migration
+`20260905_agent_org_history_first_message_summary_v1` reconciles only empty
+AgentOrg summary metadata. It preserves every existing non-empty summary and
+backfills an empty row only when strict current Org packages, configured-member
+trace corpora, and root sidecar exclusion evidence establish one uniquely
+earliest qualifying external user message. Missing, invalid, contradictory, or
+ambiguous evidence leaves the valid empty summary unchanged and reports a
+bounded `SUCCEEDED_WITH_WARNINGS`; required current-structure or selected
+write/reread failure is `FAILED`. Normal runtime never infers titles from trace
+files or performs backfill on read.
 
 Registered external definition repositories are read-only dependencies to this
 ticket. Their owners must publish valid Team V2 and AgentOrg V1 definitions
@@ -212,4 +244,5 @@ Reference-content REST routes are rooted below
 - `src/run-history/store/agent-org-*`
 - `src/run-history/services/agent-org-*`
 - `src/app-data-migrations/migrations/agent-org-flat-team-families-v1`
+- `src/app-data-migrations/migrations/agent-org-history-first-message-summary-v1`
 - `@autobyteus/collaboration-stream-contracts`

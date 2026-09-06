@@ -162,6 +162,21 @@ Workspaces hierarchy. AgentTeam and AgentOrg roots keep explicit root kinds and
 family-specific loaders; a failure in one family retains the other family and
 the last good slice instead of blanking the entire navigation tree.
 
+- A new AgentOrg row displays `New - <AgentOrg name>` until the first
+  successfully accepted non-empty external user message reaches an exact
+  configured direct Agent or an Agent inside a mounted Team.
+- That first message becomes the stable one-line summary after the server's
+  authoritative AgentOrg-only history refresh. Whitespace is compacted and the
+  title is limited to 100 characters (97 plus `...` when truncated).
+- The client never patches the submitted text optimistically. Correlated
+  accepted acknowledgements trigger a `network-only` Org-family refresh, and a
+  monotonic request generation prevents an older response from replacing the
+  newest slice.
+- Later messages, task-scoped recipients, inter-Agent/task/system traffic,
+  approval or interrupt commands, and rejected or failed sends do not set or
+  replace the summary. A failed refresh retains the last authoritative rows and
+  family-scoped error.
+
 - Stopped history retains the AgentOrg V1 execution tree, messages, task records,
   member memory, and provider bindings.
 - Restore rebuilds the same logical placements and preserves supported provider

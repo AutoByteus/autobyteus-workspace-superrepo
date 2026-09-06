@@ -19,8 +19,10 @@ The latest `api-e2e-coverage-investigation.md` and
 | API-REV-010 | Code Reviewer CRR-036 / IR-028 route/config renewal | RER-024; AD-REV-014; ARCH-REV-012; IR-028; CRR-036 | Fail / 87.0% | Pass / 98.3% |
 | API-REV-011 | Code Reviewer CRR-038 / DS-027 summary-parity renewal | RER-025; AD-REV-016; ARCH-REV-014; IR-029; CRR-038 | Pass / 98.3% | Fail / 95.7% |
 | API-REV-012 | User-requested same-artifact confirmation | RER-025; AD-REV-016; ARCH-REV-014; IR-029; CRR-038; API-FIND-018 | Fail / 95.7% | Fail / 96.6% |
-
 | API-REV-013 | Code Reviewer CRR-040 / IR-030 cumulative renewal | RER-025; AD-REV-016; ARCH-REV-014; IR-030; CRR-040; API-FIND-018 | Fail / 96.6% | Pass / 98.4% |
+| API-REV-014 | Code Reviewer CRR-042 / IR-031 communication-observability renewal | RER-026; AD-REV-018; ARCH-REV-016; IR-031; CRR-042; API-FIND-019 | Pass / 98.4% for API-REV-013 scope, then reopened | Fail / 87.0% |
+| API-REV-015 | Code Reviewer CRR-044 / IR-032 status-traversal and cumulative renewal | RER-026; AD-REV-018; ARCH-REV-016; IR-032; CRR-044; API-FIND-020 | Fail / 87.0% | Fail / 92.0% |
+| API-REV-016 | Code Reviewer CRR-045 / same-artifact correlated runtime rerun | RER-026; AD-REV-018; ARCH-REV-016; IR-032; CRR-044/045; API-FIND-021 | Fail / 92.0% | Pass / 97.6% |
 
 ## Revision Entries
 
@@ -665,7 +667,6 @@ recovery:
   `/software_engineering_team/code_reviewer` for focused failure-origin review.
 - Delivery readiness: not claimed.
 
-
 ### API-REV-008 — Browser-safe recovery and cumulative real-system Pass
 
 - Triggering role, report path, and round: Code Reviewer `CRR-032 / Pass`;
@@ -884,3 +885,121 @@ None. API-REV-010 passed its IR-028 artifact; API-REV-011 validates the newly ch
 - Broader validation: `Required and completed`.
 - Recommended recipient: `/software_engineering_team/code_reviewer` for proportional test-code review. No durable test changed in this round, so expected disposition is `Not Applicable`.
 - Remaining bounded risk: unchanged Electron shell was not relaunched; temporary live browser probes are not a repository browser suite. Neither limits the IR-030 server-writer acceptance result.
+
+
+#### Post-Result Factual Correction — API-FIND-019 (Trigger for API-REV-014)
+
+- The user supplied latest Delivery-built Electron screenshots demonstrating an AgentOrg communication-observability scenario not asserted in API-REV-013.
+- Standalone AgentTeam exposes received/sent messages through the selected member and right-side `Team > Messages` surface; AgentOrg lacks corresponding target event-monitor visibility and any root communication/messages tab even though `send_message_to` succeeds.
+- The API-REV-013 Pass remains the historical result for its executed plan, but its clean ticket-level readiness implication is withdrawn. `API-FIND-019` is open and routed to Architecture Designer as `Unclear / likely Design Impact or Requirement Gap`.
+- Evidence: `api-e2e-evidence/API-REV-013/post-pass-user-discovery/API-FIND-019-agentorg-communication-visibility-gap.md` plus the four user screenshots referenced there.
+- The approved RER-026/AD-REV-018/IR-031 correction returned through CRR-042 and triggered the completed `API-REV-014` renewal below.
+
+### API-REV-014 — IR-031 configured-message parity passes, but task-Team activation invalidates the Org stream
+
+- Triggering role/report/round: Code Reviewer `CRR-042 / Pass`; API/E2E round 15.
+- Triggering finding/scenario: user-discovered `API-FIND-019`, now specified by `REQ-034 / AC-029 / SCN-018 / QR-012 / DS-028`, plus cumulative retained task/history/recovery/migration/shutdown coverage.
+- Related revisions: `RER-026`; cumulative `AD-REV-018`; `ARCH-REV-016 / Pass`; `IR-031`; `CRR-042 / Pass`.
+- Tested source/artifact: `f519a2093c98f265df9ea958bb5be15d6a5b2494` / `3656220d2f7a1551aa54d8e7e9d3eb8d767b96f6`.
+- Why recorded: IR-031 added AgentOrg selected-member communication observability and post-commit receiver presentation. The new critical provider/browser/persistence boundary and prior cumulative behavior required renewed direct execution; no result was inferred from API-REV-013.
+- Durable coverage changed by API/E2E: none. The reviewed current tests and retained cohorts were rerun; evidence-only browser/API scripts are retained under `api-e2e-evidence/API-REV-014/`.
+- Repository result: new server `3 files / 19 tests`; new web `14 / 96`; retained server `14 / 54`; retained web `21 / 147`; server build/bootstrap; web guards/audit; production Nuxt build/prerender `16 routes` — all Pass.
+- Real environment: exact built Fastify/GraphQL/WebSocket server on isolated copied SQLite/data/workspace roots; production renderer; actual AutoByteus `open_tab`; normal Settings package import; real Codex App Server / `gpt-5.6-sol`; Agent Tools MCP; durable Org message/task sidecars.
+
+#### Prior Failure Resolution
+
+| Prior finding | Previous result | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-019` | post-API-REV-013 user evidence proved missing AgentOrg target-center and root Messages parity | **Resolved for configured directions.** Direct-to-direct, direct-to-mounted, mounted-to-direct and mounted cross-Team messages each committed once, updated live, produced one exact receiver input and truthful selected sender/receiver rows with exact full address/reference; unrelated focus remained empty. Reconnect/restore/narrow completion was stopped by the new cumulative failure. | `API-REV-014/live/LIVE-001-direct-messages.json`; `LIVE-002-*.json`; screenshots/traces |
+
+#### New finding
+
+`API-FIND-020 / LIVE-003` fails the approved task-Team/current-root projection path:
+
+- Configured-to-task, task-to-configured and task-to-task exact-ID traffic passed and was correctly excluded from configured center/Messages presentation.
+- Mounted `/research-team/lead` then delegated a real task to `/support-team`. Task `task_a7edf3fb6dfe49e3b032e0a18b4c270f` was durably active, task TeamRun `aorg_support_pair_381ed079b0f64287a7b9a38108a90371` materialized, and coordinator AgentRun `aorg_e2e_lead_279d32a369bc4e83b2adffa867ae2ebc` returned the exact readiness marker.
+- The current AgentOrg stream thereafter rejected the task Team's coordinator and specialist AgentRun status records as duplicated. Supported exact-root reselect opened five fresh WebSockets; all five returned `CONNECTED` then `AGENT_ORG_STREAM_UNAVAILABLE` for the same two duplicate IDs.
+- No complete snapshot published. The browser showed the bounded terminal recovery notice, all visible members offline, only two of three durable tasks, no task Team, and stale center state. Zero HTTP/page/console errors occurred and the backend remained reachable.
+- Preliminary origin: implementation/server `Local Fix`, subject to Code Review. Candidate composition is directory-level task-Team status traversal plus recursive mounted-parent traversal of the same leaves; the strict duplicate rejection is correct. No permissive dedupe, manual reconnect, timeout or alternate lifecycle owner is proposed.
+
+- Fail-fast: `LIVE-004`, `LIVE-005`, `LIVE-006`, and `MIG-001` are `Not Tested` on IR-031; prior revision passes remain historical only.
+- Cleanup: direct SIGTERM logged clean shutdown; tab/renderer/processes/ports closed; copied secrets/generated outputs absent; fixture hashes `18/18`; exact source ancestry and diff integrity pass.
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, and `api-e2e-evidence/API-REV-014/`.
+- Primary finding evidence: `API-REV-014/live/API-FIND-020-task-team-status-duplication-breaks-org-stream.md`; `LIVE-003-task-team-stream-recovery.json`; task sidecar/raw traces; screenshots.
+- Prior result/confidence: `API-REV-013 / Pass / 98.4%` for its executed IR-030 scope, subsequently reopened by API-FIND-019.
+- Current result/confidence: **`Fail / 87.0%`** — high direct confidence in API-FIND-020, but critical current-artifact scopes fail or remain untested.
+- New/remaining finding: `API-FIND-020`.
+- Broader validation: `Required; partially executed and stopped by critical failure`.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for focused failure-origin review.
+- Delivery readiness: not claimed.
+
+### API-REV-015 — IR-032 status traversal passes; clean standalone-Team task submission stalls
+
+- Triggering role/report/round: Code Reviewer `CRR-044 / Pass`; API/E2E round 16.
+- Triggering finding/scenario: prior `API-FIND-020 / REQ-015 / AC-010`, current-artifact completion of IR-031 `REQ-034 / AC-029`, and retained cumulative task/history/recovery/migration/shutdown behavior.
+- Related revisions: `RER-026`; cumulative `AD-REV-018 / DS-028`; `ARCH-REV-016 / Pass`; `IR-032`; `CRR-044 / Pass`.
+- Tested source/artifact: `8f9f9ce3f7f4ab9312813de8faf5b651578a7310` / `43ef19f2de69b2c16133577dac40471f75ebd913`.
+- Why recorded: IR-032 corrected AgentOrg structural-root status traversal. The Large/High reviewed package required exact real-provider/browser/status/settlement renewal and completion of the prior fail-fast scope.
+- Durable coverage changed by API/E2E: none. Current and retained repository coverage was rerun. Evidence-only probes remain under `api-e2e-evidence/API-REV-015/`.
+- Repository result: exact server cohort `4 files / 19 tests`; cumulative server `16 / 71`; current communication web `14 / 96`; retained web `21 / 147`; server build/bootstrap, guards, zero-finding localization audit, and production Nuxt build/prerender of 16 routes — all Pass.
+- Real environment: exact built server and production renderer on owned ports, isolated copied SQLite/data/workspace, normal UI import of the four-Agent/two-Team/two-Org package, actual AutoByteus `open_tab`, real Codex App Server / `gpt-5.6-sol`, Agent Tools MCP, GraphQL/WebSocket, provider traces and durable sidecars.
+
+#### Prior Failure Resolution
+
+| Prior finding | Previous result | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-020` | active task Team made the strict current Org status snapshot invalid through duplicate descendant ownership | **Resolved / Pass.** Mounted, root-hosted and recursively nested task Teams produced complete unique snapshots; deepest-first formal settlement contracted status ownership `11 -> 8 -> 6` while durable lineage remained. | `API-REV-015/live/LIVE-001-*.json`; `LIVE-002-auto-recursive-task-team.json`; `LIVE-002-recursive-settlement.json` |
+| `API-FIND-019` current-artifact remainder | IR-031 configured directions passed, but reconnect/restore/narrow was stopped by API-FIND-020 | **Resolved / Pass.** All four configured directions, references, truthful participant views, no-refocus updates and exclusions passed; exact message bytes/identity survived Stop/SIGTERM/restart/Restore without duplication; 390x844 strip/drawer exact focus passed. | `API-REV-015/live/LIVE-004-*.json`; `LIVE-004-direct-stop-restart-restore.json`; `LIVE-005-direct-narrow-messages.json` |
+
+#### New Finding
+
+`API-FIND-021 / LIVE-006` contradicts the preserved standalone-Team task lifecycle:
+
+- A normal imported `AORG E2E Research Squad` ran with Codex App Server / GPT-5.6-Sol and auto approval. Its ordinary lead-to-analyst message committed and rendered correctly.
+- The lead delegated one valid task to `/verifier`. The task Agent loaded explicit task-assignee instructions and had `submit_task_result` configured.
+- The real provider dispatched exactly one `submit_task_result` call (`exec-57c491b0-8dbb-45a5-919d-4cb9c374012d`) at `2026-09-06T13:46:52.819Z`; no result returned after 240 seconds or more than six minutes.
+- Durable task `task_14677c387408431b896143b6e82eba2f` remained `active` with `updates: []`; the selected task monitor remained Thinking/In progress. GraphQL continued returning HTTP 200, so the server did not crash.
+- Normal Team termination durably interrupted the task. Only after retirement did the late provider completion arrive and get rejected as `CODEX_SEGMENT_TURN_INACTIVE`; root termination and final SIGTERM both completed cleanly.
+- This is not the old missing-tool fixture and not API-FIND-008's self-review confound. Exact MCP-ingress/Team task-queue correlation was not instrumented, so preliminary origin is `Unclear` within provider dispatch -> Agent Tools MCP -> root Team task queue/persistence.
+
+- Completed current-artifact cumulative cases: configured communications and references, no-refocus updates, Stop/restart/Restore and provider continuation, 390x844 focus/accessibility, strict identity negatives, recursive task-Team settlement/removal, frozen whole-Org scope, migration idempotence and clean shutdown.
+- Not Tested after fail-fast: standalone Team review/acceptance/completion and its post-settlement process restart/Restore continuation. No historical pass is inferred.
+- Cleanup: complete; roots stopped, server SIGTERM exited 0, actual tab/renderer/ports/processes cleared, copied secrets/generated outputs removed, fixture hashes `18/18`, exact source/artifact/diff/shared-environment integrity retained.
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, and `api-e2e-evidence/API-REV-015/`.
+- Primary finding evidence: `API-REV-015/live/API-FIND-021-standalone-team-submit-stall.md`; `API-FIND-021-boundary-evidence.log`; pre/post task sidecars; provider trace; screenshots.
+- Prior result/confidence: `Fail / 87.0%`.
+- Current result/confidence: **`Fail / 92.0%`**.
+- New/remaining finding: `API-FIND-021`.
+- Broader validation: `Required and substantially executed through fail-fast`.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for focused failure-origin review.
+- Delivery readiness: not claimed.
+
+### API-REV-016 — Correlated standalone-Team task lifecycle and Restore pass
+
+- Triggering role, report path, and round: Code Reviewer `CRR-045` focused failure-origin review in `code-review-report.md`; API/E2E round 17.
+- Triggering finding/scenario IDs: `API-FIND-021 / LIVE-006`, plus the held standalone-Team review/acceptance and post-settlement `LIVE-006R` restart/Restore continuation.
+- Related revisions: `RER-026`; cumulative `AD-REV-018 / DS-028`; `ARCH-REV-016 / Pass`; `IR-032`; `CRR-044 / cumulative Pass`; `CRR-045 / API/E2E execution-runtime Local Fix`.
+- Tested source/artifact: unchanged `8f9f9ce3f7f4ab9312813de8faf5b651578a7310` / `43ef19f2de69b2c16133577dac40471f75ebd913`.
+- Why recorded: API-REV-015's provider `TOOL_EXECUTION_STARTED` proved neither local Agent Tools MCP ingress nor Team FIFO admission. CRR-045 required a clean supported rerun with passive correlation through every local boundary before any source attribution, followed by completion of the held lifecycle.
+- Coverage decision: no durable test changed. The reviewed task tests remain valid. API/E2E added evidence-only Node Inspector logpoints and browser/process captures under `api-e2e-evidence/API-REV-016/`; no production or built file was modified.
+- Scenarios rechecked: exact artifact/fixture preflight; fresh standalone-Team initial task submission; one request revision; same-task resubmission; acceptance and settlement; normal Team termination; SIGTERM; same-data restart; inactive first-send Restore; real provider continuation; cleanup/integrity.
+- Environment delta: exact built backend on 8596, production renderer 3596, passive Inspector 9238, actual AutoByteus `open_tab`, imported 18-file package, real Codex App Server / `gpt-5.6-sol`, local Agent Tools MCP, GraphQL/WebSocket, SQLite/files and original provider `HOME=/root`.
+
+#### Prior Failure Resolution
+
+| Prior scenario / failure | Previous classification | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-021 / LIVE-006` | API-REV-015 Fail; provider-side submit item stalled >6 minutes, but local ingress/FIFO was unproven. CRR-045: API/E2E execution/runtime Local Fix, no source defect established. | **Not Reproduced / resolved for validation.** Initial and revised submits both crossed provider start -> exact MCP HTTP ingress -> dispatcher/executor/adapter -> empty Team FIFO -> durable commit -> notification -> HTTP 200 -> provider success. | `API-REV-016/live/LIVE-006-correlated-observed-boundaries.md`; three correlation logs; exact task sidecars/provider traces |
+| held formal review/acceptance | Not Tested after API-REV-015 fail-fast | **Pass.** Same task received one revision, resubmitted, was accepted durably and settled; browser retained the ordered lifecycle exactly once. | `LIVE-006-task-sidecar-accepted.json`; `LIVE-006-team-tree-after-accept.json`; `screenshots/LIVE-006-task-accepted.png` |
+| held restart/Restore continuation | Not Tested after API-REV-015 fail-fast | **Pass.** Accepted bytes survived Stop/SIGTERM/restart; inactive first-send restored the same TeamRun and real lead provider identity/content, did not revive the settled task Agent, and returned the exact continuation. | `LIVE-006R-restored-identity-hash-report.json`; `LIVE-006R-provider-continuation-proof.log`; restored screenshot |
+
+- Execution corrections: the first Inspector controller never resumed the initial break and executed no product code. The first restart used the wrong provider home and failed before prompt commit; same-data bytes remained unchanged. Both were recorded and corrected before the relevant assertion.
+- Cleanup: restored Team stopped; server SIGTERM clean; browser/renderer/Inspector/ports/processes clear; copied secrets and generated prerequisites removed; seven observed production dist hashes unchanged; fixture 18/18; exact source ancestry/diff/shared environment verified; other-owner PID 48 preserved.
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, and `api-e2e-evidence/API-REV-016/`.
+- Prior result/confidence: `Fail / 92.0%`.
+- Current result/confidence: **`Pass / 97.6%`**.
+- New or remaining failure IDs: none; `API-FIND-021` is Not Reproduced/runtime-only historical evidence. No timeout, retry, replay or recovery machinery is proposed.
+- Broader validation: `Required and completed`.
+- Durable test-code review: `Not Applicable` — no repository-resident test changed.
+- Recommended recipient: `/software_engineering_team/code_reviewer` for the reviewed-route successful result.
+- Remaining bounded risk: unchanged Electron-only shell behavior was not relaunched, and passive correlation is evidence-only rather than a repository browser suite; neither is material to the directly proven provider/MCP/FIFO/durability/browser path.

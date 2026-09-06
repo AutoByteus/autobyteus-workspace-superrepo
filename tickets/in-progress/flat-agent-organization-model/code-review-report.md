@@ -2,207 +2,124 @@
 
 ## Review Round Meta
 
-- Review Entry Point: `Implementation Review — skill-reloaded fresh cumulative source review`
-- Current Code Review Revision: `CRR-040`, round `40`
-- Requirements authority: approved `RER-025`, especially `REQ-033`, `AC-028`, `SCN-017`, and `QR-011`
-- Design authority: cumulative `AD-REV-016`, especially `DS-027`; `ARCH-REV-014 / Pass`
-- Supplemental authority: `agent-org-contract.md`; Product `RV-012 / VIS-001–020`; mounted-Team-status and `AORG-TEAM-OVERRIDES-001` supplements
-- Implementation authority: cumulative `IR-001–IR-030`; source `d741874e9a35367d0c64b57a8e7e4cd15e0e93c5`; artifact / HEAD `e3b3a840052cdb6cb8c552b3bf9d66ee233fc3bb`
-- Trigger: `IR-030` returns `CRR-039 / CR-FIND-027`, correlated to `API-FIND-018` from `API-REV-011/012`
-- Prior authoritative result: `CRR-039 / Fail — implementation-owned server Local Fix`
-- Relevant API/E2E: `API-REV-011 / Fail / 95.7%` and user-requested same-artifact confirmation `API-REV-012 / Fail / 96.6%`; prior current-scope material passes retained; renewed execution pending
-- Relevant Delivery: `DR-004`, superseded by `RER-025` and the current reviewed route
-- Independent evidence: exact writer/handler `2 files / 11 tests` passed; cumulative affected server cohort `14 files / 75 tests` passed after the disclosed generated workspace-contract prerequisite; writer regression repeated `20/20`; current source inventory and invariant scans passed
-- Reviewer evidence: `/tmp/aorg-crr040-server-cumulative-corrected.log`, `/tmp/aorg-crr040-application-contract-build.log`, `/tmp/aorg-crr040-writer-1.log`–`20.log`, `/tmp/aorg-crr040-source-inventory.log`, `/tmp/aorg-crr040-invariants.log`
+- Review Entry Point: `API/E2E Failure-Origin Review`
+- Requirements Doc Reviewed As Context: approved `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`; `requirements-doc.md`
+- Investigation Notes / Requirements Revision Record Reviewed As Context: `investigation-notes.md`; `requirements-revision-record.md`
+- Design / Architecture Context: cumulative `AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00`; `ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`
+- Implementation Context: cumulative `IR-001–032`; source `8f9f9ce3f7f4ab9312813de8faf5b651578a7310`; artifact `43ef19f2de69b2c16133577dac40471f75ebd913`
+- Code Review Revision Record: `code-review-revision-record.md`; current revision `CRR-045`, round `45`
+- Trigger: `API-REV-015 / Fail / 92.0%`; focused origin review of `API-FIND-021 / LIVE-006`
+- Prior Review Round: `CRR-044 / Pass — cumulative source / 9.4`
+- Latest Authoritative Round: `CRR-045`
+- Coverage / Execution / API Revision Records Reviewed: `api-e2e-coverage-investigation.md`; `api-e2e-execution-coverage-report.md`; `api-e2e-test-case-ledger.md`; `api-e2e-revision-record.md`
+- Exact Execution Mode: production-built isolated server/renderer; package imported through normal UI; standalone `AORG E2E Research Squad`; real Codex App Server / `gpt-5.6-sol` / low / Auto approve; one valid task delegated to `/verifier`
+- Failure Evidence: `api-e2e-evidence/API-REV-015/live/API-FIND-021-standalone-team-submit-stall.md`; `API-FIND-021-boundary-evidence.log`; before/after task sidecars and Team tree; exact task-Agent raw trace; LIVE-006 script/log/partial result; screenshots; shutdown/cleanup logs
+- Reviewer Evidence: `/tmp/aorg-crr045-boundary-analysis.log`
 
 ## Routing Classification Review
 
 - Task size: `Large`
 - Architectural risk: `High`
-- Selected route: `Implementation Review`
-- Independent source review required: `Yes`
-- Classification correction: `None`. IR-030 is a bounded server Local Fix within the cumulative Large/High package.
+- Selected route: `API/E2E Failure-Origin Review`
+- Independent source review required by classification: `Failure-origin exception`; no new full scorecard is performed.
+- Classification: `Local Fix — API/E2E execution/runtime evidence correction and rerun`.
+- Classification basis: the supported product scenario failed to complete, but the only observed start event is the Codex provider's native MCP-item notification, not proof of local HTTP MCP ingress. Current lifecycle and control evidence exclude the Team root FIFO/persistence path as the supported explanation. No requirement, design, or implementation-source correction is justified by this evidence.
 
 ## Review Scope
 
-- Fresh cumulative basis: approved requirements, investigation and revision history; cumulative architecture and review; Product supplements; complete implementation chain; prior findings; API-REV-011/012 evidence; current implementation-source inventory relative to the integrated pinned base; structural boundaries, migration/legacy posture, tests, build evidence, and cleanup.
-- Focused rework: `atomic-json-file-writer.ts`, its new durable regression, the unchanged AgentOrg accepted-command handler behavior, and all shared Agent/Team/Org history-index consumers affected by the writer.
-- Preserved cumulative paths: configured-only AgentOrg first-message qualification, first-write catalog/strict reread, accepted ACK and authoritative web refresh, required startup migration and terminal matrix, Team/Org runtime and persistence, task lifecycle, navigation/configuration, localization, recovery, restore, and shutdown.
-- Explicit exclusions: external Agent repositories remain read-only. API/E2E and Delivery reports/evidence are downstream-owned dirty state, not implementation source. IR-030 changes no frontend, public API/schema, persisted shape, migration design, provider, command admission, or root lifecycle.
+- Changed behavior reviewed: none; API/E2E changed no source or durable test file.
+- Failure boundary reviewed: provider MCP item start -> generated local MCP descriptor -> Agent Tools HTTP route -> dispatcher/executor -> task adapter/service -> standalone Team root FIFO -> task durability/publication/notification -> HTTP/provider tool result.
+- Smallest relevant source areas: Codex native-event conversion and MCP configuration; Agent Tools MCP route/dispatcher/executor/task adapter; shared root task lifecycle engine/FIFO; standalone Team termination ordering.
+- Explicit exclusions: no full implementation audit or scorecard; no replay, retry, timeout, alternate queue, or recovery redesign; no inference from API-REV-014's held historical cases. `API-REV-015` remains a validation failure until the held execution is completed.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
 - Approved requirements basis understood: `Yes`.
-- Design map verified: `Confirmed`; DS-027 explicitly governs accepted-work metadata failure and forbids replay/retry/rollback expansion.
-- Architecture review basis: `Confirmed`; `ARCH-REV-014 / Pass` remains applicable.
-- Changed or newly discovered behavior: `None`. IR-030 corrects the implementation of an already-approved explicit storage-failure contract.
-- Remaining material ambiguity: `None`.
+- Design-spec behavior map verified: `Yes` for the affected path. The design explicitly states that normal `submit_task_result` records `awaiting_review`, notifies the delegator, and returns the MCP result before the provider turn completes.
+- Behavior-basis status: `Confirmed`.
+- Changed or newly discovered behavior: `None`.
+- Remaining material ambiguity: no product ambiguity. The exact runtime sub-boundary of this single stall was not instrumented, but the available evidence is sufficient to avoid an implementation attribution and route a bounded execution rerun.
 
-| Behavior / Contract | Current Status | Current Production Path / Lifecycle Evidence | Contradicting Evidence |
+| Behavior / Contract | Status | Forward Production Path And Lifecycle Evidence | Current Consequence |
 | --- | --- | --- | --- |
-| `REQ-033 / AC-028 / SCN-017` first-message parity | Confirmed / preserved | accepted external `SEND_MESSAGE` -> exact configured direct or mounted-Team Agent -> Org history catalog -> compact first-write -> atomic write/strict reread -> truthful ACK -> authoritative history refresh | None |
-| `QR-011 / DS-027` derived-metadata failure integrity | Confirmed / corrected | accepted Agent input -> derived index write rejects -> original operation rejects to handler -> handler logs -> accepted ACK; handled internal queue tail settles/cleans without process-level rejection | None in current source; API-REV-011/012 prove the superseded defect only |
-| `DS-027 / VAL-036–037` startup recovery | Confirmed / preserved | registered startup-only migration -> strict current package/index preflight -> configured trace corpus -> conservative unique-earliest classifier -> same history writer -> strict reread -> exact terminal matrix | None |
-| Cumulative `BEH-001–016` contract | Confirmed / preserved | reviewed definition, launch, execution, task, persistence, history, restore, recovery, navigation, configuration, status, localization, migration, and shutdown owners remain unchanged outside the shared writer correction | None |
-
-## Data-Flow Spine Inventory
-
-| Spine | Start -> End | Governing Owner | Current Result |
-| --- | --- | --- | --- |
-| `SP-ORG-SUMMARY-LIVE` | accepted configured-Agent command -> Org handler qualification -> catalog queue -> summary writer -> strict index store -> ACK -> authoritative web refresh -> existing row | AgentOrg run/handler plus history catalog and mixed history read owner | Complete and unchanged except corrected shared physical-write settlement |
-| `SP-ATOMIC-WRITE-SUCCESS` | per-path previous handled tail -> atomic temp write/fsync/rename -> caller operation resolves -> current tail releases exact map entry | `atomicWriteJsonFile` | Complete; one sequential per-path owner and exact cleanup |
-| `SP-ATOMIC-WRITE-FAILURE` | atomic operation rejects -> original rejection remains caller-visible -> success/failure release handler settles non-rejecting tail -> exact-owner cleanup or preservation of later owner | `atomicWriteJsonFile` | Corrected; no duplicate unhandled rejection and no stale/wrong-owner deletion |
-| `SP-SUMMARY-MIGRATION` | startup runner -> required prerequisites -> current strict row/tree/evidence -> unique provenance -> same summary writer -> strict reread -> migration-specific status | migration directory plus shared history writer | Preserved; IR-030 changes no classifier or status authority |
-| `SP-CUMULATIVE` | Team/Org definition and launch -> flat runtime/task/durable state -> stream/history/recovery -> accepted desktop/narrow UI | previously reviewed Team/Org owners | Preserved; affected tests and source inventory reveal no reopening |
+| `SCN-005 / AC-007 / AC-010 / REQ-015` | Confirmed | user launches standalone Team -> coordinator delegates one task -> exact task Agent invokes `submit_task_result` -> Agent Tools MCP -> root Team FIFO -> durable `awaiting_review` -> delegator notification -> tool result | Valid normal scenario; the observed run did not complete it |
+| Normal task submission design contract | Confirmed | design-spec normal submission row and root-neutral lifecycle engine | no timeout/retry/replay behavior is implied |
+| Root Team termination contract | Confirmed | close admission -> fence AgentRuns -> drain task FIFO -> interrupt/settle -> persistence drain -> finish | prompt successful termination is material origin evidence |
 
 ## Supported Product Scenario And Reachability Gate
 
-| Scenario ID | Related IDs | Kind | Actor / Initiator | Coherent Goal Or Governing Event | Supported Entry Surface / Event | Shape | Forward Production Path / Lifecycle | Expected Outcome / Consequence | Independent Evidence | Validity | Use |
+| Scenario ID | Related IDs | Kind | Actor / Initiator | Coherent Goal / Event | Supported Entry Surface | Shape | Forward Production Path / Lifecycle | Expected Outcome | Independent Evidence | Validity | Use |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-SCN-053` | `REQ-033`, `AC-028`, `SCN-017` | User | AgentOrg user | Give a configured direct Agent its first instruction and obtain a useful history title | Org composer targeting an exact configured direct Agent | Normal | accepted send -> configured outcome -> first-write history -> ACK -> history refresh | compact stable first summary; later traffic cannot overwrite | RER-025; DS-027; current source; prior real execution | Supported Normal Scenario | Use |
-| `CR-SCN-054` | `REQ-033`, `AC-028`, `SCN-017` | User | AgentOrg user | Give a configured Agent inside a mounted Team its first instruction with the same Org-row result | mounted-Team Agent composer | Normal | same path with strict `configured` execution kind under the Org root | Org row changes; no standalone Team-root authority is fabricated | RER-025; DS-027; current source; prior real execution | Supported Normal Scenario | Use |
-| `CR-SCN-055` | `QR-011`, `DS-027` | Contract | accepted-command completion and derived metadata subsystem | Preserve accepted work truth if derived index persistence rejects | supported accepted Org send followed by governed storage failure | Explicit Edge | Agent accepts -> derived write rejects -> handler observes -> truthful ACK -> process remains usable | no relabel/replay; failure observable and bounded | QR-011; DS-027; API-REV-011/012; current source/tests | Supported Explicit Edge Scenario | Use; corrected |
-| `CR-SCN-056` | `REQ-033`, `DS-027`, `VAL-036/037` | Operational | application startup | Reconcile empty legacy-derived rows without guessing provenance | registered startup migration | Explicit Edge | strict current inputs -> complete configured trace evidence -> unique-earliest decision -> same writer -> terminal status | deterministic backfill or truthful fallback; required failure is terminal | RER-025; AD-REV-016; ARCH-REV-014; migration source/tests | Supported Explicit Edge Scenario | Use; preserved |
-| `CR-SCN-057` | cumulative `BEH-001–015` | User/System | existing users and runtime | Preserve all approved Team/Org behavior while adding summary parity | existing product surfaces and supported lifecycle events | Normal / approved explicit edges | unchanged cumulative owners | no regression | cumulative approved artifacts; prior CRR/API evidence; current inventory/tests | Supported Normal / Explicit Edge Scenarios | Use; preserve |
-| `CR-SCN-058` | `CR-FIND-027 / API-FIND-018`, `QR-011`, `DS-027` | Contract / Operational | one exact derived history-index I/O rejection after accepted Agent input | Keep the application alive while exposing the metadata error and preserving accepted truth | ordinary Org send plus the independently governed storage-rejection event | Explicit Edge | handler -> catalog -> shared atomic writer rejection -> handler catch/log -> accepted ACK -> later HTTP/GraphQL and writes | one caller rejection, no second unhandled rejection, exact queue continuation/cleanup | DS-027 text/risk/guidance; three API reproductions; current source and durable regression | Supported Explicit Edge Scenario | Use; resolved at source boundary |
+| `CR-SCN-070` | `SCN-005`, `AC-007`, `AC-010`, `REQ-015` | User | standalone Team coordinator and assigned task Agent | delegate one bounded task and submit it for independent review | normal Team workspace plus `delegate_task` / `submit_task_result` | Normal | Team prompt -> task activation -> exact task Agent -> local Agent Tools MCP -> Team root FIFO -> durable submission -> result | one exact submission becomes `awaiting_review` and returns | approved requirements/design; real imported Team; valid exact task/tool | Supported Normal Scenario | Use |
+| `CR-SCN-071` | root termination contract | Operational | normal Team Stop during the stalled run | terminate the Team cleanly without abandoning root-owned mutations | established Team termination | Explicit Edge | Agent fences -> root task FIFO drain -> interruption/settlement -> persistence drain | termination completes only after admitted task commands drain | approved design/source; API-REV-015 prompt clean termination | Supported Explicit Edge Scenario | Use as origin evidence |
 
-## Candidate Finding And Mechanism Gate
+### Candidate Finding And Mechanism Gate
 
-| Candidate ID | Observation Or Mechanism | Scenario / Contract | Independent Trigger | Forward Path / Lifecycle / Consequence | Evidence | Disposition | Reason / Proportionate Response |
+| Candidate ID | Observation Or Mechanism | Scenario / Contract | Independent Trigger | Forward Path / Consequence | Evidence | Disposition | Reason / Proportionate Response |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `CR-CAND-093` | Recheck the former distinct rejecting `next.finally(...)` queue tail. | `CR-SCN-055/058`; shared writer contract | governed atomic-write rejection | current map stores `next.then(release, release)`, whose failure branch handles the original rejection for tracking while returned `next` still rejects to the caller | current writer lines 33–51; exact regression; `20/20` repeats | Reject as current finding | The prior defect is absent; the bounded approved mechanism is now implemented. |
-| `CR-CAND-094` | Recheck the former impossible stored-tail-versus-`next` cleanup comparison. | `CR-SCN-058`; exact-owner queue contract | either operation settlement | `releaseIfCurrent` compares the map against the actual `settlementTail`; a later owner prevents premature deletion | current writer; queued-before-failure regression; source reasoning | Reject as current finding | Exact identity ownership is correct for no-later-write and later-write cases. |
-| `CR-CAND-098` | Separating the caller operation from a handled settlement tail could accidentally swallow the caller-visible failure. | `CR-SCN-055/058` | same I/O rejection | function returns `next`; only the internal map stores the non-rejecting tail; caller assertion receives the original Error | source and real-filesystem rejection assertion | Reject as current finding | The operation/tail split preserves both caller truth and internal observation. |
-| `CR-CAND-099` | A later same-path write queued before prior failure could run concurrently or be deleted by the earlier owner. | shared serialization contract / `CR-SCN-058` | second call while first operation is unsettled | second `next` chains from the first handled tail; first release sees the newer stored tail and cannot delete it; second starts only after first settles | source; real filesystem regression; cumulative Agent/Team/Org store tests | Reject as current finding | Sequential execution and latest-owner cleanup are evidenced without a second queue or lock. |
-| `CR-CAND-095` | Discard the failure path because the API reproduction used a directory at the destination. | `CR-SCN-055/058` | test fault injection | would ignore a defect on an independently approved storage-error path | QR-011/DS-027 establish the event independently | Reject | The injection reproduces the contract; it does not create the scenario. |
-| `CR-CAND-096` | Patch only the handler or swallow physical-write errors. | `CR-SCN-055/058`; shared writer contract | same rejection | would leave shared queue semantics wrong or hide required caller-visible failure | multiple writer consumers; handler already catches/logs correctly | Reject | Wrong owner and contrary to error-truth requirements. |
-| `CR-CAND-097` | Add retry, replay, journal, timeout, rollback, or provider recovery. | `CR-SCN-055/058` | same rejection | could replay already accepted Agent work or create another authority | DS-027 explicitly forbids this expansion | Reject | Unsupported and disproportionate; current Promise settlement correction is sufficient. |
-| `CR-CAND-100` | Add a public/test-only queue-inspection API solely to assert the private map size. | shared writer ownership contract | completed write | would widen a private implementation boundary without improving product behavior | exact source comparison, repeated behavior tests, later-write persistence | Reject | Direct map exposure is unnecessary machinery; current source plus externally observable continuation is adequate. |
+| `CR-CAND-119` | The standalone Team task did not submit or return. | `CR-SCN-070` | one normal valid task | provider exposed one started item, but task stayed `active` with `updates: []` for more than six minutes | exact trace, sidecar, monitor, live log | Promote | Retain API/E2E Fail; the supported scenario was not completed. |
+| `CR-CAND-120` | Attribute the stall to the Team root FIFO/persistence implementation. | `CR-SCN-070/071` | same call | a route-entered valid call has no async observer in Codex bootstrap, reaches the adapter, then the FIFO; a stuck admitted FIFO command would block termination drain. Yet termination promptly interrupted and settled the task with no submission update. | current source; before/after sidecars; shutdown evidence | Reject | Current evidence contradicts this origin. Do not create a source finding. |
+| `CR-CAND-121` | Classify the observed boundary as provider/MCP-client runtime before proven application ingress and rerun with passive correlation. | `CR-SCN-070` | real provider native `item/started` | Codex reports its pending MCP item; no local ingress/dispatcher/queue evidence or durable update follows; provider `item/completed` arrives only after interruption | notification-handler source; raw trace; late completion; exact current-artifact Org controls | Promote | API/E2E owns a same-artifact rerun with boundary evidence. This is runtime/execution classification, not a product-source defect. |
+| `CR-CAND-122` | Treat the provider `TOOL_EXECUTION_STARTED` event as proof the server MCP route or FIFO admitted the request. | `CR-SCN-070` | native Codex `item/started` | notification handling only records the provider's pending MCP item; local HTTP route dispatch is a separate path | `codex-thread-notification-handler.ts:151–180`; MCP route source | Reject | The event cannot prove its downstream ingress. |
+| `CR-CAND-123` | Add timeout, retry, replay, alternate queue, or forced completion. | none beyond a single runtime stall | elapsed time only | such machinery could duplicate a late provider request or weaken truthful task durability | no approved SLA/retry contract; late provider completion | Reject | Technically conceivable but unsupported and disproportionate. Instrument/rerun first. |
+| `CR-CAND-124` | Reject the scenario as an invalid fixture/tool/self-review sequence. | `CR-SCN-070` | real imported package and exact assigned task | one enabled `submit_task_result` call by the assignee; no self-review or second task | instructions, tool trace, task record | Reject as origin | The test scenario is valid and production-reachable. |
 
-## Structural / Design Checks
+## Focused Failure-Origin Analysis
 
-| Check | Result | Evidence | Required Action |
+1. `TOOL_EXECUTION_STARTED` is derived from Codex App Server `item/started` for an `mcpToolCall`. It records a provider-side pending item; it is not emitted by `agent-tools-mcp-routes.ts` and does not establish HTTP ingress.
+2. If a valid request reaches the application route, the route awaits the dispatcher, whose executor has no configured Codex `toolExecutionObserver`; it immediately selects the task adapter. The adapter awaits the task service and the root Team's shared lifecycle engine.
+3. The submission engine performs empty reference validation, enqueues one FIFO command, commits `awaiting_review`, then notifies and returns. There was one task and no submission record.
+4. Normal Team termination fences the Agents and then awaits `shutdownAndSettle`, whose first action drains admitted FIFO work. Termination completed promptly and durably wrote the interruption. A still-admitted queue/persistence command is therefore inconsistent with the observed lifecycle.
+5. On the exact API-REV-015 artifact/process, two separate AgentOrg task `submit_task_result` calls traversed the same Agent Tools MCP and root-neutral lifecycle path and returned in `16 ms`. In addition, no relevant Team/task/MCP/Codex production source changed between API-REV-010's passing package and IR-032.
+6. The most specific supported classification is therefore a provider/MCP-client runtime stall before proven local application ingress. This is an evidence-grounded inference, not a claim that the exact external transport subcomponent is known.
+
+## Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Evidence |
 | --- | --- | --- | --- |
-| Task design health assessment is present, evidence-backed, and preserved | Pass | IR-030 records a bounded Local Fix in the existing shared writer; no refactor/design expansion | Preserve |
-| Implementation matches approved behavior-defining supplemental artifacts | Pass | no frontend/Product change; cumulative accepted Team/Org experiences remain unchanged | None |
-| Data-flow spine inventory clarity and preservation | Pass | operation, handled tail, exact cleanup, live summary, migration, and UI refresh owners are explicit | None |
-| Ownership boundary preservation and clarity | Pass | caller owns operation error; shared writer owns per-path settlement; handler owns logging/ACK; catalog owns summary | None |
-| Off-spine concern clarity | Pass | physical temp-file durability stays inside the store helper; observability stays in handler | None |
-| Existing capability/subsystem reuse | Pass | one existing atomic writer is corrected for all consumers; no parallel writer/queue | None |
-| Reusable owned structures | Pass | shared per-path queue remains one small owned primitive | None |
-| Shared-structure/data-model tightness | Pass | map value remains `Promise<void>`; no new result or persisted shape | None |
-| Repeated coordination ownership | Pass | success/failure release policy is one local function; caller-specific recovery is not duplicated | None |
-| Empty indirection | Pass | helper performs real atomic persistence and serialization rather than forwarding only | None |
-| Scope-appropriate separation of concerns and file responsibility | Pass | 61-line writer and dedicated regression remain cohesive | None |
-| Ownership-driven dependency | Pass | consumers depend on the writer; writer does not reach into catalogs, handlers, or migration | None |
-| Authoritative Boundary Rule | Pass | handler uses service/catalog boundary and never reaches into path queue; consumers use only `atomicWriteJsonFile` | None |
-| File placement | Pass | correction remains with the existing run-history storage primitive and its unit test | None |
-| Flat-vs-over-split layout judgment | Pass | no unnecessary new helper/file; test covers one coherent contract | None |
-| Interface/API/query/command/service-method boundary clarity | Pass | caller-visible operation and internal settlement tail have distinct, narrow responsibilities | None |
-| Naming quality and naming-to-responsibility alignment | Pass | `settlementTail` and `releaseIfCurrent` state exact lifecycle/ownership | None |
-| No unjustified duplication / repeated structures | Pass | one release callback is used for both outcomes | None |
-| Patch-on-patch complexity control | Pass | defective `finally` construction is replaced, not wrapped; delta is `+8/-8` | None |
-| Dead/obsolete cleanup completeness | Pass | former `next.finally` and wrong-identity comparison are removed; negative scan is clean | None |
-| Relevant test scenarios and assertions are requirement-aligned | Pass | real rename failure, caller rejection, pre-settlement queued write, later write, persistence, and zero unhandled events directly cover QR-011/DS-027 | Renew real-process API/E2E |
-| Test fixtures/helpers are reasonably reusable and coherent | Pass | isolated temp root and deterministic cleanup; no product fixture mutation | None |
-| No stale, duplicated, or compatibility-only tests in changed scope | Pass | one focused writer regression plus retained handler/cumulative suites | None |
-| API/E2E readiness for next stage | Pass | source invariant is corrected; exact `11/11`, cumulative `75/75`, repeated writer runs, and implementation production build evidence pass | Execute renewed cumulative API/E2E |
-
-## Source File Size And Structure Audit
-
-The cumulative inventory relative to integrated base `a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27` contains `433` implementation-source records (`409` current, `24` removed) and zero current files above `500` effective non-empty lines. IR-030 changes one implementation-source file; tests are excluded from source thresholds.
-
-| Source File | Effective Non-Empty Lines | `>500` Hard-Limit Check | `>220` Delta Check | SoC / Ownership Check | Placement Check | Preliminary Classification | Required Action |
-| --- | ---: | --- | --- | --- | --- | --- | --- |
-| `autobyteus-server-ts/src/run-history/store/atomic-json-file-writer.ts` | 61 | Pass | Pass (`+8/-8`) | Pass — atomic file durability plus exact per-path serialization | Pass — existing shared history-store primitive | Clean | None |
-
-## Legacy / Backward-Compatibility Verdict
-
-| Check | Result | Notes |
-| --- | --- | --- |
-| No backward-compatibility mechanisms in changed scope | Pass | Promise settlement only; no version branch |
-| No legacy old-behavior retention in changed scope | Pass | the defective rejecting tail and wrong identity check are removed |
-| Dead/obsolete code cleanup completeness in changed scope | Pass | negative source scan finds neither prior pattern |
-| Approved persisted-data transition decision followed without unnecessary migration work | Pass | required DS-027 migration is unchanged; current index shape remains authoritative |
-| No version-specific dual reads/writes or request-time old-shape fallback | Pass | none added |
-| Approved transition mechanics match reviewed design | Pass | same shared physical writer remains used by runtime and migration; only settlement observation changes |
-
-## Dead / Obsolete / Legacy Items Requiring Removal
-
-None.
-
-## Docs-Impact Verdict
-
-- Docs impact: `Yes — cumulative RER-025 behavior`, but `No additional IR-030 product/API documentation change`.
-- Why: Delivery already owns synchronization of the first-message history/migration spine. The internal Promise settlement fix changes no public behavior beyond satisfying the documented availability/error boundary.
-- Files or areas likely affected: existing Delivery-owned AgentOrg/run-history/migration architecture documentation; no new API reference.
-
-## Additional Material Premise Validation
-
-### Upstream Design-Review Material-Premise Decisions
-
-| Premise ID | Current Status | Changed Evidence / Reason |
-| --- | --- | --- |
-| `AR-FIND-007` migration-specific terminal status authority | Confirmed / remains resolved | IR-030 changes neither migration outcomes nor reduction precedence; cumulative migration tests pass |
-| `CR-SCN-058` accepted-work derived-metadata failure applicability | Confirmed | QR-011/DS-027 independently govern it, and current source now implements the promised bounded failure behavior |
-
-No new or reclassified material premise is required.
-
-## Review Scorecard
-
-- Overall score (`/10`): `9.4`
-- Overall score (`/100`): `94.0`
-- Score calculation note: simple mean of the ten categories; the numerical average does not replace the pass decision.
-
-| Priority | Category | Score | Why This Score | What Is Weak / Holding It Down | What Should Improve |
-| --- | --- | ---: | --- | --- | --- |
-| `1` | Data-Flow Spine Inventory and Clarity | 9.4 | accepted-command, derived-history, physical-write, migration, refresh, and cumulative spines have explicit owners | cumulative ticket remains broad | Keep future changes confined to the named spine owner |
-| `2` | Ownership Clarity and Boundary Encapsulation | 9.5 | operation error, queue settlement, catalog mutation, handler observability, and UI refresh do not overlap | shared writer has several consumers, increasing consequence of future mistakes | Preserve one shared contract and direct regressions |
-| `3` | API / Interface / Query / Command Clarity | 9.4 | public command/ACK and store APIs are unchanged; Promise responsibilities are now explicit | operation-versus-tail distinction is subtle | Retain precise naming and regression coverage |
-| `4` | Separation of Concerns and File Placement | 9.5 | bounded correction stays in the physical-write owner; handler and migration remain untouched | none material | Preserve current placement |
-| `5` | Shared-Structure / Data-Model Tightness and Reusable Owned Structures | 9.4 | one `Promise<void>` tail serializes every shared consumer without added state shape | shared primitive is high leverage | Keep new consumers on the same owner and tests |
-| `6` | Naming Quality and Local Readability | 9.3 | `settlementTail` / `releaseIfCurrent` explain intent in a compact implementation | Promise scheduling/identity still requires careful reading | Maintain the focused comment/test contract if code evolves |
-| `7` | API/E2E Readiness | 9.2 | exact and cumulative tests plus production-build evidence pass | prior failure was process-level and must be rechecked in the real server | Reproduce API-FIND-018 and complete held cumulative live cases |
-| `8` | Runtime Correctness And Behavioral Fidelity | 9.3 | source proves exact-owner sequencing and no duplicated rejection; repeat tests are stable | current artifact has not yet passed the same real-process fault path | Confirm accepted ACK, server survival, HTTP/GraphQL reachability, and later write |
-| `9` | No Backward-Compatibility / No Legacy Retention | 9.6 | no fallback, dual read/write, retry, or obsolete Promise pattern remains | none material | Preserve current-only runtime and approved migration isolation |
-| `10` | Cleanup Completeness | 9.4 | old code removed, diff/invariant scans clean, generated reviewer prerequisite removed | downstream review/API/Delivery artifacts intentionally remain dirty | Preserve ownership and clean only stage-owned outputs |
-
-## Prior-Finding Resolution
-
-| Finding ID | Prior Status | Current Status | Related Revisions | Verification Evidence |
-| --- | --- | --- | --- | --- |
-| `CR-FIND-001–026` | Resolved | Remain resolved / preserved | through `CRR-038`; `IR-030` | fresh cumulative inventory, unchanged owning paths, affected `75/75` suite, and retained API material passes reveal no reopening |
-| `AR-FIND-007` | Resolved | Remains resolved / preserved | `AD-REV-016`; `ARCH-REV-014`; `IR-029/030` | migration status authority and implementation are unchanged; migration cohort passes |
-| `CR-FIND-027 / API-FIND-018` | Open — implementation Local Fix | Resolved at source-review boundary | `CRR-039`; `IR-030`; `CR-SCN-058`; `CR-CAND-093/094/098/099` | caller-visible real filesystem failure, handled non-rejecting tail, exact-owner cleanup, queued/later persistence, zero unhandled event, `20/20` repeats, retained handler ACK/log behavior |
+| `CR-FIND-028 / API-FIND-020` | Resolved at source boundary by IR-032 | Resolved in production execution | API-REV-015 mounted/root/recursive task-Team statuses and settlement contracted `11 -> 8 -> 6` with complete unique snapshots |
+| `API-FIND-019` | Source-resolved / partially executed | Renewed executable Pass | four configured directions, live no-refocus, task exclusions, restart/Restore and narrow accessibility passed |
+| `CR-FIND-001–027` | Resolved | No reopening attributed | retained repository checks and completed current execution slices |
+| `API-FIND-021` | New validation failure | Open as an API/E2E execution blocker; no implementation-source finding | `CR-CAND-119–124`; same-artifact boundary-correlated rerun required |
 
 ## Findings
 
-None.
+No new `CR-FIND-*` is opened. The valid supported scenario failed, but available evidence does not establish an implementation defect. `API-FIND-021` remains an API/E2E execution blocker until a same-artifact correlated rerun completes.
 
 ## Classification
 
-- Review decision: `Pass`
-- Failure classification: `N/A`
-- Requirement Gap: `No`
-- Design Impact: `No`
-- Product gap: `No`
-- Recommended primary recipient: use current handoff rules for implementation-source Pass, expected `/software_engineering_team/api_e2e_engineer`
-- Informational recipient: only if explicitly returned by the matching handoff rules after the primary handoff
+- Review decision: `Fail — API/E2E validation incomplete; implementation attribution rejected on current evidence`.
+- Failure origin: `Runtime-only / API/E2E execution boundary`, most likely before proven local Agent Tools MCP ingress.
+- Route classification: `Local Fix -> api_e2e_engineer` for bounded rerun/evidence correction.
+- Requirement Gap: `No`.
+- Design Impact: `No`.
+- Implementation change after review: `No`.
+- Earlier source-review gap: `No`. This behavior was source-reviewed, the relevant source path is unchanged from a real passing baseline, and the decisive missing fact is runtime ingress correlation rather than an inspectable violated invariant.
+
+## Recommended Recipient
+
+`/software_engineering_team/api_e2e_engineer`, subject to `get_handoff_rules`.
+
+Required proportional next step:
+
+1. Rerun the exact standalone Team one-task submission on the unchanged reviewed artifact.
+2. Add passive correlation for: Codex native `item/started` -> local HTTP route ingress -> dispatcher/executor start -> task adapter/root FIFO admission -> durable commit -> HTTP result -> provider `item/completed`.
+3. Do not add timeout/retry/replay machinery or change production source merely to instrument the run.
+4. If the request reaches the FIFO and stalls, return the correlated package for renewed implementation attribution. If it does not reach local ingress or the rerun passes, classify the original as provider/runtime-only and complete the held standalone review/acceptance/restart/Restore plan.
 
 ## Residual Risks
 
-- Renewed API/E2E must reproduce the real-process derived-index rejection on the corrected artifact and prove accepted ACK, no replay/relabel, no unhandled rejection or process exit, subsequent HTTP/GraphQL reachability, and later same-path persistence.
-- API/E2E must resume the cumulative cases held by API-REV-011/012 rather than infer them from prior artifacts.
-- The first reviewer cumulative `14`-file attempt encountered only the disclosed absent generated application-contract prerequisite and ran `74` assertions before one import failure; after generating that prerequisite, the exact same `14 files / 75 tests` passed. The generated output was removed afterward. This is setup evidence, not a product finding.
-- Delivery-owned documentation/finalization remains pending after executable validation.
+- The exact provider-to-local-MCP transport sub-boundary was not captured in API-REV-015.
+- Standalone Team review/acceptance/completion and its post-settlement restart/Restore continuation remain unexecuted on IR-032 due fail-fast.
+- A passing rerun must not erase the original observation; it must record the boundary disposition and finish the held plan.
 
 ## Latest Authoritative Result
 
-- Review Decision: `Pass — cumulative source`
-- Review Entry Point: `Implementation Review — skill-reloaded fresh cumulative source review`
+- Review Decision: `Fail — API/E2E execution rerun required; no implementation source defect established`
+- Review Entry Point: `API/E2E Failure-Origin Review`
 - Supported Product Scenario Gate: `Pass`
 - Material-Premise Gate: `Pass`
-- Score Summary: `9.4/10 (94.0/100)`; every category is at least `9.2`
-- Failure Origin: `CR-FIND-027 / API-FIND-018 resolved at the source-review boundary by IR-030`
-- Recommended Recipient: current implementation-pass handoff recipient returned by `get_handoff_rules`
-- Notes: no current source finding remains. Renewed cumulative API/E2E is mandatory before Delivery.
+- Score Summary: `N/A — focused failure-origin review`; `CRR-044 / 9.4` remains the latest cumulative source score, but does not constitute delivery readiness.
+- Failure Origin: `Runtime-only / execution boundary before proven local MCP ingress`
+- Recommended Recipient: exact API/E2E owner returned by `get_handoff_rules`
+- Notes: `API-REV-015` remains Fail. No source or durable test change was reviewed, and no timeout/retry/replay fix is prescribed.

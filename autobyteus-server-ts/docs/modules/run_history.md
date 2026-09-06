@@ -2,15 +2,22 @@
 
 ## Scope
 
-`src/run-history` owns persisted execution history, resume metadata, workspace history listing, and read-model projection for standalone agent runs and team runs.
+`src/run-history` owns persisted execution history, resume metadata, workspace
+history listing, and read-model projection for standalone Agent runs, Team runs,
+and AgentOrg roots.
 
 ## Responsibilities
 
 - Persist standalone agent run resume metadata and the V2 standalone history catalog index.
 - Persist the current V2 TeamRun state package and the V2 team history catalog
   index.
+- Persist the current AgentOrg V1 package family and AgentOrg history catalog
+  index without converting either root family into a generic on-disk schema.
 - Keep standalone index mutation behind `AgentRunHistoryCatalogService`; normal runtime, GraphQL, and lifecycle code must not rewrite `run_history_index.json` directly.
 - Keep team index mutation behind `TeamRunHistoryCatalogService`; normal runtime, GraphQL, and lifecycle code must not rewrite `team_run_history_index.json` directly.
+- Keep AgentOrg index mutation behind `AgentOrgRunHistoryCatalogService` and
+  `AgentOrgRunHistorySummaryWriter`; runtime and migration share the strict
+  first-non-empty writer rather than implementing title policy separately.
 - Keep legacy/partial standalone and team index repair explicit and bounded to startup app-data migrations, plus the standalone manual migration script; normal history listing must not perform metadata-directory repair scans.
 - Expose resume configuration for stored runs:
   - agent: `agent-run-resume-config-service.ts`
@@ -53,6 +60,11 @@ Team operations:
 - `getTeamMemberRunProjection`
 - `archiveStoredTeamRun`
 - `deleteStoredTeamRun`
+
+Collaboration-root operations:
+
+- `listCollaborationRootHistory`, which returns explicit `agent_team` or
+  `agent_org` roots through family-specific strict loaders.
 
 ## Stopped Run Model Configuration
 
@@ -227,6 +239,33 @@ V1 sidecars. The coordinator-free `rootOrg` contains direct Org Agents and
 direct mounted Teams with their direct Agents. Family-specific loaders remain
 authoritative; the unified list does not convert either persisted root into a
 generic on-disk schema.
+
+AgentOrg summaries follow the established Team first-message rule. Only a
+successfully accepted external `SEND_MESSAGE` with non-empty compacted content
+to an exact configured direct or mounted-Team Agent qualifies. The shared
+compactor collapses whitespace, trims, and caps the title at 100 characters
+(97 plus `...` when truncated). The first non-empty summary wins; later,
+task-scoped, inter-Agent, task/system, approval/interrupt, rejected, and failed
+inputs cannot replace it. Before any qualifying input, an empty summary remains
+valid and clients display `New - <AgentOrg name>`.
+
+The AgentOrg catalog serializes normal-runtime attempts and supplies a strict
+row snapshot to `AgentOrgRunHistorySummaryWriter`. A successful first write is
+atomically replaced and strictly reread before the catalog adopts it. The
+shared `atomicWriteJsonFile` returns the original operation to its caller while
+storing a distinct handled settlement tail for per-path ordering and cleanup.
+Consequently, a caller can observe one deterministic write failure without an
+unhandled-rejection escape, later queued same-path writes remain ordered, and
+the failed write does not poison the process or queue.
+
+Startup migration `20260905_agent_org_history_first_message_summary_v1`
+preserves existing non-empty values and considers configured-member complete
+trace corpora only for empty rows. Root communication/task sidecars can
+disqualify internal provenance but never qualify it. The migration writes only
+one uniquely earliest qualifying external user trace; absent or ambiguous
+evidence retains the valid empty fallback with `SUCCEEDED_WITH_WARNINGS`, while
+required structure or selected-value persistence/reread failures are
+`FAILED`. Normal list/read paths never scan traces to repair summaries.
 
 Prepared-new run identities are explicit metadata facts, not inferred from a
 missing `platformAgentRunId` and not represented by a persisted

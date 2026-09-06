@@ -4,30 +4,31 @@
 
 - Agent Teams are reusable flat groups of direct Agents with one direct Agent coordinator.
 - Agent Orgs combine direct Agents with reusable flat Teams without inventing an Org coordinator.
-- The familiar **Workspaces** hierarchy remains available throughout AgentOrg configuration, active work, focus changes, Restore, and stopped history. **Agent Orgs** appears as a distinct sibling directly below **Teams**.
-- Switching between an AgentOrg member and a standalone Agent or Team now keeps one truthful URL, center surface, and highlighted history row.
-- Fresh AgentOrg configurations select the real **Temp Workspace (Default)** when it is available, while explicit existing/new Workspace choices remain authoritative.
-- A focused direct or mounted-Team Agent's gear opens that exact current AgentRun in the locked configuration view. **Back** returns to the same Event Monitor; **New** remains a separate fresh-Org action.
+- A new AgentOrg run shows `New - <AgentOrg name>` until its first accepted non-empty user message reaches an exact configured direct Agent or an Agent inside a mounted Team.
+- That first message becomes the stable history title using the same whitespace compaction and 100-character limit as Team history. Later messages, task-scoped recipients, internal/task/system/control traffic, and rejected or failed sends do not replace it.
+- The active Workspaces row refreshes from authoritative persisted history after acceptance without page reload or optimistic submitted-text projection.
+- Existing empty AgentOrg titles are recovered at startup only when one uniquely earliest qualifying configured-member trace can be proven; ambiguous or absent evidence safely keeps the `New` fallback.
+- A failed derived history-index write no longer risks an unhandled promise rejection or server termination. The accepted Agent message remains accepted, later same-path persistence remains available, and no replay/relabel is introduced.
+- The familiar **Workspaces** hierarchy remains available throughout AgentOrg configuration, active work, focus changes, Restore, and stopped history. **Agent Orgs** remains a distinct sibling directly below **Teams**.
+- Fresh AgentOrg configurations select the real **Temp Workspace (Default)** when available; exact URL/center/highlight, locked member configuration, same-monitor **Back**, and distinct **New** behavior remain intact.
 - Member overrides retain the approved collapsed Team hierarchy, exact inheritance/customization state, and coordinator identity.
-- Failed Agent runtime choices remain retryable and can be safely abandoned without leaking stale configuration.
-- AgentOrg stream recovery is automatic-only, exact-focus preserving, browser-contract safe, bounded to five attempts, and reports once instead of remaining indefinitely in Connecting.
-- Standalone Teams and Agent Orgs retain separate durable root families for history, Restore, Stop, tasks, messaging, and provider identity.
-- Existing supported fixed-depth data migrates at startup to Team V2 and AgentOrg V1. Incompatible external packages require publication by their owning repositories.
+- AgentOrg recovery remains automatic-only and bounded; standalone Teams and Agent Orgs retain separate durable families for history, Restore, Stop, tasks, messaging, and provider identity.
+- Existing supported fixed-depth data migrates to Team V2 and AgentOrg V1. Incompatible external packages require publication by their owning repositories.
 
 ## Validation
 
-- Cumulative source review: `CRR-036 / Pass`.
-- API/E2E: `API-REV-010 / Pass`, `98.3%`; all REPO-001–003 and LIVE-001–006 passed.
-- Proportional durable test-code review: `CRR-037 / Pass`.
-- Delivery merged latest `origin/personal`, passed the current 15-file/189-test navigation/config/history cohort, completed the guarded ARM64 Electron build, and launched the actual package with a healthy embedded server and visible window.
+- Cumulative source review: `CRR-040 / Pass`.
+- API/E2E: `API-REV-013 / Pass`, `98.4%`; broader validation completed and no current finding remains.
+- Proportional durable test-code review: `CRR-041 / Not Applicable` because API/E2E changed no durable test or production source.
+- Delivery confirmed the latest base was already integrated, passed the exact atomic-writer/AgentOrg stream regression (`2` files / `11` tests), completed the guarded ARM64 Electron build, and launched the actual package with a healthy embedded server and visible window.
 
 ## User-Verification Build
 
-- Integrated commit: `fa7693e5210d306d8216a035e93e9dc11f8efe04`.
+- Package source/checkpoint: `759a2b470f4826db4bb4bb6c9788f4c490cf97b2`.
 - AppImage: `AutoByteus_enterprise_linux-arm64-1.4.68.AppImage`.
-- SHA-256: `661032b9c10f5cafefd2029d0a9ea63171b12911b5953c88f5af37ab636d5aa1`.
+- SHA-256: `2e23ff1a10d74b0743620d311a36a095c77d14ad82670099fe0fa53564c834aa`.
 - Status: running for renewed explicit user verification; this draft is not released.
 
 ## Compatibility Note
 
-Definitions in separately maintained external packages remain unavailable until their owners publish Team V2-compatible packages. Compatible definitions and server/history functions remain available; there is no legacy runtime fallback.
+Definitions in separately maintained external packages remain unavailable until their owners publish Team V2 / AgentOrg V1-compatible packages. Compatible definitions and server/history functions remain available; there is no legacy runtime fallback.
