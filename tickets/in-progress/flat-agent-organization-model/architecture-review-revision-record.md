@@ -22,6 +22,7 @@ concise chronological architecture-review history.
 | ARCH-REV-013 | Round 13 / `AD-REV-015` response to approved `RER-025` first-message AgentOrg history-title parity | `AD-REV-015` | Pass | Fail — Design Impact | `AR-FIND-007` |
 | ARCH-REV-014 | Round 14 / `AD-REV-016` migration-status coherence and traceability recovery | `AD-REV-016` | Fail — Design Impact | Pass | `AR-FIND-007` |
 | ARCH-REV-015 | Round 15 / post-pass `API-FIND-019`, approved `RER-026`, and `AD-REV-017` AgentOrg communication-observability recovery | `AD-REV-017` | Pass | Fail — Design Impact | `AR-FIND-008` |
+| ARCH-REV-016 | Round 16 / `AD-REV-018` both-endpoint configured-message eligibility recovery | `AD-REV-018` | Fail — Design Impact | Pass | `AR-FIND-008` |
 
 ## Revision Entries
 
@@ -393,3 +394,27 @@ None.
 - Material classification changes: The authoritative review changes from `Pass` to `Fail / Design Impact`. AD-REV-017 remains `Medium / High` in isolation and the cumulative package remains `Large / High`. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: `/software_engineering_team/architecture_designer`
 - Remaining risks or uncertainty: Define one AgentOrgRun-owned post-commit predicate over both committed participants. Only configured-to-configured emits the new receiver `MEMBER_INPUT_MESSAGE` and configured Messages rows; configured-to-task, task-to-configured, and task-to-task preserve existing exact-ID delivery/sidecar behavior without the new facet consequences. Align DS-028, the callback/identity shape, file/risk/guidance maps, and VAL-040 deterministic coverage. No new store, route, schema, event type, queue, or lifecycle is warranted.
+
+### ARCH-REV-016 — Both-endpoint configured-message eligibility pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 16; `AD-REV-018` responded to `ARCH-REV-015 / AR-FIND-008` by replacing receiver-only qualification with one AgentOrgRun-owned classification over both committed endpoint AgentRun IDs.
+- Triggering role, report path, and finding IDs: Architecture Designer; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; `AR-FIND-008`.
+- Relevant architecture design revision IDs: `AD-REV-018`, cumulative with unchanged accepted `AD-REV-001`-`AD-REV-017`
+- Prior authoritative decision: `Fail — Design Impact` (`ARCH-REV-015`)
+- Current authoritative decision: `Pass`
+- What changed in the review result or what baseline was established: Independently verified the supported task-to-configured premise and the complete correction. `AgentOrgRun` now owns one closed classifier over both endpoint IDs already present on the committed message and resolves them through the current configured/task/task-Team-member execution index. Configured-to-configured alone publishes the new exact receiver `MEMBER_INPUT_MESSAGE` and enters configured-member Messages projection. Configured-to-task, task-to-configured and task-to-task preserve the existing exact-ID delivery, single sidecar/root event and input release without either new configured-member consequence. The Org communication adapter remains kind/address-lookup blind; the web projection uses the same configured-pair versus known-task partition; unknown or miscorrelated identities fail closed. DS-028, interface/dependency/file maps, risks, guidance and VAL-040 agree. No public/durable schema, store, route, event type, queue, lifecycle, migration or Product behavior changes.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-008` | Open — Design Impact | Resolved | `AD-REV-018`; DS-028; endpoint classification contract; interface/file/dependency maps; VAL-040 | One subject-owned both-endpoint predicate and the deterministic four-direction matrix eliminate receiver-only presentation leakage while preserving exact-ID task delivery. |
+| `AR-FIND-001`-`AR-FIND-007` | Resolved in prior architecture-review rounds | Remain resolved | `AD-REV-003`-`AD-REV-018`; `ARCH-REV-002`-`ARCH-REV-014` | AD-REV-018 is a focused internal predicate/test correction and changes none of the accepted definition, handoff, migration, runtime, presentation, status, configuration, history-summary, task-settlement or shutdown decisions. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020`, `CR-FIND-020` | Resolved in prior rounds | Remain resolved at the design boundary | `AD-REV-004`-`AD-REV-018` | No prior root, storage, lifecycle, workspace, status or launch/configuration boundary changes. |
+| `CR-FIND-019` | Implemented; retained as regression obligation | Remains a regression obligation | `IR-026`-`IR-028`, `CRR-032`, `CRR-036`, `AD-REV-013`-`AD-REV-018` | The endpoint correction neither absorbs nor reverses this source behavior. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: The authoritative review changes from `Fail / Design Impact` to `Pass`. AD-REV-018 is `Small / Low` in isolation; the cumulative package remains `Large / High` and proceeds through reviewed Implementation reconciliation, source review and API/E2E. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
+- Remaining risks or uncertainty: Implementation must avoid receiver-only/address-shape inference and prove configured→configured, configured→task, task→configured and task→task for both task kinds; preserve one sidecar/root event and exact-ID delivery, emit the new receiver event only for configured pairs, keep web projection aligned, and retain reconnect/restore and standalone Team behavior. These are controlled implementation/validation risks, not open architecture decisions.
