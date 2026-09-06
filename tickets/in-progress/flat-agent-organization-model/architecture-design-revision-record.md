@@ -25,6 +25,7 @@ does not revise intended behavior.
 | AD-REV-015 | Requirements Engineer approved `RER-025` after user Electron AgentOrg-versus-Team history-title comparison | `BEH-016`; `REQ-033`; `AC-028`; `SCN-017`; `QR-011`; `DEC-020` | `Architecture Revision — First Accepted AgentOrg Message History Summary` | `Architecture Design Complete`; accepted-message first-write filtered by exact execution kind, authoritative live refresh, and conservative registered recovery migration; self-validation expanded to 37 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-016 | Architecture Reviewer `ARCH-REV-013` / migration-status coherence recovery round | `AR-FIND-007`; `BEH-016`; `REQ-033`; `AC-028`; `DEC-020` | `Architecture Revision — Migration-Specific Terminal Status Authority` | `Architecture Design Complete`; family migration retains no-warning failure rules while summary migration retains bounded valid-empty warnings; no mechanism or behavior change; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-017 | API/E2E `API-FIND-019`, explicit user AgentTeam-parity confirmation, and Requirements Engineer approved `RER-026` | `API-FIND-019`; `BEH-017`; `REQ-034`; `AC-029`; `SCN-018`; `QR-012`; `DEC-021` | `Architecture Revision — AgentOrg Communication Observability Parity` | `Architecture Design Complete`; exact post-durable receiver event plus owning-root selected-member Messages facet over the existing sidecar; self-validation expanded to 40 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-018 | Architecture Reviewer `ARCH-REV-015` / endpoint-eligibility recovery round | `AR-FIND-008`; retained `API-FIND-019`; `REQ-034`; `AC-029`; `SCN-018` | `Architecture Revision — Both-Endpoint Configured Message Eligibility` | `Architecture Design Complete`; only configured→configured receives the new member event/Messages projection while all three task-involved exact-ID directions preserve prior delivery/sidecar behavior; 40-case self-validation tightened; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 
 ## Revision Entries
 
@@ -1457,3 +1458,78 @@ does not revise intended behavior.
   reconnect/restore duplication, or rejected/uncommitted leakage. The design
   specifies exact controls and tests; Architecture claims no implementation,
   executable validation, or delivery completion.
+
+### AD-REV-018 — Both-Endpoint Configured Message Eligibility
+
+- Triggering role, report path, and round: Architecture Reviewer
+  `ARCH-REV-015@920240026e56697af9bfcdaa837290ef89af8716` reviewed cumulative
+  `AD-REV-017@1c639f1b550b042069b0805914728dd99498b8ce` against approved
+  `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6` and returned
+  `Fail — Design Impact` for the endpoint-eligibility gap recorded in
+  `design-review-report.md` and `architecture-review-revision-record.md`.
+- Triggering finding/behavior IDs: `AR-FIND-008`; protected
+  `API-FIND-019`, `BEH-017`, `REQ-034`, `AC-029`, and `SCN-018`. No
+  Requirement Gap or Product UI gap exists.
+- Prior authoritative design/review result: AD-REV-017 established one Org
+  durable message authority, ordered post-commit presentation, one complete-Org
+  selected-member Messages facet, shared Team presentation reuse, and no
+  migration. ARCH-REV-015 accepted those decisions but found that qualifying
+  only the receiver as configured would wrongly expose supported task-to-
+  configured exact-ID traffic through the new configured-member presentation.
+- Current authoritative design result: `Architecture Design Complete` at the
+  canonical `design-spec.md`, revised in place as AD-REV-018 and self-validated
+  across the same 40 supported cases in
+  `architecture-design-self-validation.md`.
+- Exact correction: `AgentOrgRun` owns one closed classification over both
+  committed endpoint AgentRun identities. Configured-to-configured preserves
+  the AD-REV-017 order—one durable sidecar record, root communication event,
+  exact receiver `MEMBER_INPUT_MESSAGE`, then input release—and is the only
+  direction eligible for configured-member Messages rows. Configured-to-task,
+  task-to-configured, and task-to-task preserve existing exact-ID delivery,
+  the one sidecar record/root event, and release behavior but emit no new
+  configured-member event and produce no configured-member Messages row.
+  Unknown or wrong-root identity fails closed through existing Org recovery.
+- Ownership and dependency correction: the Org-private communication adapter
+  remains kind-blind and carries the committed message—whose existing fields
+  contain both endpoint AgentRun IDs—plus the receiver input into the narrow
+  callback. It does not query indexes, resolve addresses, or infer task kind.
+  `AgentOrgRun` classifies against the existing configured/task
+  execution index and alone invokes the established presentation adapter for a
+  configured pair. The browser projector applies the same closed configured-
+  pair versus known-task partition; it does not infer kind from address depth,
+  selected Team, or basename.
+- Persisted-data/interface impact: unchanged from AD-REV-017 and
+  `Directly Usable — No Migration`. No store, message record, sidecar/tree
+  schema, public route or command, event type, queue, lifecycle owner, replay,
+  timeout, or Product surface is added or changed. Existing exact-ID task
+  messaging is explicitly preserved rather than narrowed.
+- Design-spec sections updated: document status/current state; focused
+  classification and review evidence; DS-028 ordered post-commit decision and
+  primary spine; endpoint classification contract; behavior/owner/dependency/
+  interface/file maps; AD-REV-018 sequence; risk controls; and implementation
+  and validation guidance.
+- Architecture supplements updated, added, or removed:
+  `architecture-design-self-validation.md` advances to AD-REV-018 without a
+  new use-case ID. VAL-040 now deterministically covers all four endpoint-kind
+  directions and requires server event eligibility to match browser Messages
+  projection. VAL-038/039 retain configured direct/mounted/cross-Team coverage.
+  No supplemental artifact is added or removed.
+- Classification: focused AD-REV-018 is `Small / Low` because it corrects one
+  internal eligibility predicate and its deterministic validation matrix within
+  owners already selected by AD-REV-017. It introduces no structural mechanism
+  or contract. The cumulative ticket remains `task_size=Large` and
+  `architectural_risk=High`; independent Architecture Review remains mandatory.
+- Downstream and architecture-review impact: review must verify the closed
+  four-direction matrix, AgentOrgRun ownership, kind-blind adapter, parity
+  between server event eligibility and browser projection, and unchanged
+  exact-ID task delivery/sidecar behavior. Implementation and API/E2E remain
+  held until the corrected cumulative package passes that review.
+- Next recipient or routing: dynamic handoff rules determine the exact
+  recipient. Selected next action is independent Architecture Review of
+  cumulative RER-026 / AD-REV-018 plus the updated self-validation.
+- Remaining gaps or risks: no Requirement Gap, Product UI gap, or mechanism
+  question remains. Residual risk is a receiver-only check or browser-side
+  endpoint inference reintroducing task traffic into configured-member
+  presentation; the design now names one owner and a deterministic matrix to
+  prevent that. Architecture claims no implementation, executable validation,
+  or delivery completion.
