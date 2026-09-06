@@ -28,10 +28,12 @@ import type { FlatTeamExecutionCallbacks } from "../../agent-team-execution/loca
 import type { RootSnapshotConnection } from "../../agent-collaboration/execution/services/root-event-publisher.js";
 import type { CollaborationAgentStatusSnapshot } from "../../agent-collaboration/execution/domain/collaboration-agent-execution-event.js";
 import { CollaborationAgentPresentationEventAdapter } from "../../agent-collaboration/execution/events/collaboration-agent-presentation-event-adapter.js";
-import type { FrozenTeamRunTerminationScope } from "../../agent-team-execution/domain/frozen-team-run-termination-scope.js";
-import type { ConfiguredAgentExecutionHandle } from "../../agent-collaboration/execution/backends/configured-agent-execution-handle.js";
 import { AgentOrgOperationGate } from "./agent-org-operation-gate.js";
 import type { TaskExecutionReference } from "../../agent-collaboration/execution/task/task-delegation-record-v1.js";
+import {
+  createFrozenAgentOrgTerminationScope,
+  type FrozenAgentOrgTerminationScope,
+} from "./frozen-agent-org-termination-scope.js";
 
 export type AgentOrgRunPackageSnapshot = Readonly<{
   tree: AgentOrgRunExecutionTreeSnapshot;
@@ -40,10 +42,22 @@ export type AgentOrgRunPackageSnapshot = Readonly<{
   statuses: readonly CollaborationAgentStatusSnapshot[];
 }>;
 
-type FrozenAgentOrgTerminationScope = Readonly<{
-  fenceAgentRunsForRootShutdown(): Promise<AgentOperationResult>;
-  finish(): Promise<AgentOperationResult>;
-}>;
+type ConfiguredOrgAgentExecutionIdentity = Readonly<
+  Pick<AgentOrgIndexedAgentExecution, "agentRunId" | "address" | "host"> & {
+    executionKind: "configured";
+  }
+>;
+
+type OrgCommittedMessagePresentationEligibility =
+  | Readonly<{
+      kind: "configured_pair";
+      sender: ConfiguredOrgAgentExecutionIdentity;
+      receiver: ConfiguredOrgAgentExecutionIdentity;
+    }>
+  | Readonly<{
+      kind: "preserved_task_pair";
+      direction: "configured_to_task" | "task_to_configured" | "task_to_task";
+    }>;
 
 /** Native coordinator-free AgentOrg aggregate and sole live owner of its scope. */
 export class AgentOrgRun implements ActiveRootMessageBoundary {
@@ -115,6 +129,9 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
       reserveRecipientInput: (agentRunId, message) => this.reserveAgentInput(agentRunId, message),
       replaceMessages: (messages) => { this.messages = messages; },
       publish: (message) => options.publisher.publish({ kind: "communication", message }),
+      presentCommittedMessage: (message, receiverInput) => {
+        this.presentCommittedCommunication(message, receiverInput);
+      },
     }));
   }
 
@@ -291,10 +308,10 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
   private async terminateOnce(failStopped: boolean): Promise<AgentOperationResult> {
     const errors: string[] = [];
     await this.operationGate.closeAndDrain();
-    this.frozenTerminationScope ??= this.createFrozenTerminationScope(
-      this.options.rootAgents.freezeForRootTermination(),
-      this.options.teams.freezeForRootTermination(),
-    );
+    this.frozenTerminationScope ??= createFrozenAgentOrgTerminationScope({
+      agentHandles: this.options.rootAgents.freezeForRootTermination(),
+      teamScopes: this.options.teams.freezeForRootTermination(),
+    });
     const fenced = await this.frozenTerminationScope.fenceAgentRunsForRootShutdown();
     if (!fenced.accepted) return fenced;
     try {
@@ -311,39 +328,6 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     return errors.length
       ? { accepted: false, code: "AGENT_ORG_TERMINATION_FAILED", message: errors.join("; ") }
       : { accepted: true };
-  }
-
-  private createFrozenTerminationScope(
-    agentHandles: readonly ConfiguredAgentExecutionHandle[],
-    teamScopes: readonly FrozenTeamRunTerminationScope[],
-  ): FrozenAgentOrgTerminationScope {
-    let fencing: Promise<AgentOperationResult> | null = null;
-    let finishing: Promise<AgentOperationResult> | null = null;
-    return Object.freeze({
-      fenceAgentRunsForRootShutdown: () => {
-        if (fencing) return fencing;
-        fencing = Promise.all([
-          ...agentHandles.map((handle) => handle.fenceForRootShutdown()),
-          ...teamScopes.map((scope) => scope.fenceAgentRunsForRootShutdown()),
-        ]).then((results) => results.find((result) => !result.accepted) ?? { accepted: true });
-        return fencing;
-      },
-      finish: () => {
-        if (finishing) return finishing;
-        finishing = (async () => {
-          for (const scope of teamScopes) {
-            const result = await scope.finish();
-            if (!result.accepted) return result;
-          }
-          for (const handle of [...agentHandles].reverse()) {
-            const result = await handle.terminate();
-            if (!result.accepted) return result;
-          }
-          return { accepted: true };
-        })();
-        return finishing;
-      },
-    });
   }
 
   private reserveAgentInput(agentRunId: string, message: AgentInputUserMessage, options: AgentRunInputOptions = {}): Promise<AgentRunInputReservationResult> {
@@ -364,6 +348,60 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     return agent.host.hostKind === "root"
       ? this.options.rootAgents.executeCommand(agentRunId, { kind: "post_message", message })
       : this.options.teams.require(agent.host.hostRunId).executeDirectAgentCommand(agentRunId, { kind: "post_message", message });
+  }
+
+  private presentCommittedCommunication(
+    message: AgentOrgCommunicationMessagesFileV1["messages"][number],
+    receiverInput: AgentInputUserMessage,
+  ): void {
+    const eligibility = this.classifyCommittedMessageEndpoints(
+      message.senderAgentRunId,
+      message.receiverAgentRunId,
+    );
+    if (eligibility.kind !== "configured_pair") return;
+
+    const identity = this.identityFor(eligibility.receiver.agentRunId, eligibility.receiver.address);
+    const adapted = this.presentation.adapt(identity, {
+      kind: "member_input",
+      message: receiverInput,
+      receivedAt: message.createdAt,
+    });
+    if (adapted.kind !== "publish") {
+      throw new Error(adapted.kind === "rejected"
+        ? adapted.message
+        : `Committed AgentOrg message '${message.messageId}' produced no receiver presentation.`);
+    }
+    this.options.publisher.publish({ kind: "agent_presentation", execution: identity, message: adapted.message });
+  }
+
+  private classifyCommittedMessageEndpoints(
+    senderAgentRunId: string,
+    receiverAgentRunId: string,
+  ): OrgCommittedMessagePresentationEligibility {
+    const sender = this.index.getAgent(senderAgentRunId);
+    const receiver = this.index.getAgent(receiverAgentRunId);
+    if (!sender || !receiver
+      || !this.index.isLiveAgent(sender.agentRunId)
+      || !this.index.isLiveAgent(receiver.agentRunId)) {
+      throw new Error(`Committed AgentOrg message '${senderAgentRunId}' -> '${receiverAgentRunId}' has an unclassified endpoint.`);
+    }
+    const senderConfigured = sender.executionKind === "configured";
+    const receiverConfigured = receiver.executionKind === "configured";
+    if (senderConfigured && receiverConfigured) {
+      return Object.freeze({
+        kind: "configured_pair",
+        sender: sender as ConfiguredOrgAgentExecutionIdentity,
+        receiver: receiver as ConfiguredOrgAgentExecutionIdentity,
+      });
+    }
+    return Object.freeze({
+      kind: "preserved_task_pair",
+      direction: senderConfigured
+        ? "configured_to_task"
+        : receiverConfigured
+          ? "task_to_configured"
+          : "task_to_task",
+    });
   }
 
   private beginTaskExecutionEventRetirement(reference: TaskExecutionReference): () => void {

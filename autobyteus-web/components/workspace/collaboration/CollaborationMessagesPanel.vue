@@ -10,9 +10,9 @@
       <p class="mt-1 text-sm">{{ $t('workspace.components.workspace.team.TeamCommunicationPanel.empty_detail') }}</p>
     </div>
 
-    <div v-else class="flex min-h-0 flex-1 overflow-hidden" data-test="team-communication-split">
+    <div v-else class="collaboration-message-split flex min-h-0 flex-1 overflow-hidden" data-test="team-communication-split">
       <aside
-        class="min-h-0 shrink-0 overflow-y-auto border-r border-gray-200 pb-2"
+        class="collaboration-message-list min-h-0 shrink-0 overflow-y-auto border-r border-gray-200 pb-2"
         :style="{ width: `${leftPaneWidth}px` }"
         data-test="team-communication-left-list"
       >
@@ -39,16 +39,17 @@
                 />
                 <div class="min-w-0 flex-1">
                   <div class="flex items-baseline justify-between gap-2">
-                    <div class="min-w-0 truncate">
-                      <span class="text-sm font-semibold" :class="isMessageSelected(message) ? 'text-blue-700' : 'text-gray-800'">
-                        {{ compactMessageLabel(message) }}
-                      </span>
-                      <span class="ml-1 text-xs text-gray-500">
-                        · {{ counterpartMetadata(message) }}
-                      </span>
-                    </div>
+                    <span class="min-w-0 truncate text-sm font-semibold" :class="isMessageSelected(message) ? 'text-blue-700' : 'text-gray-800'">
+                      {{ compactMessageLabel(message) }}
+                    </span>
                     <span class="shrink-0 text-xs text-gray-400">{{ formatTimestamp(message.createdAt) }}</span>
                   </div>
+                  <p class="mt-0.5 truncate text-xs text-gray-500">
+                    {{ counterpartMetadata(message) }}
+                  </p>
+                  <p class="truncate font-mono text-xs text-gray-400" :title="message.counterpartAddress">
+                    {{ message.counterpartAddress }}
+                  </p>
                   <p class="mt-1 line-clamp-2 whitespace-pre-line text-sm leading-5 text-gray-600">
                     {{ message.content }}
                   </p>
@@ -78,25 +79,26 @@
       </aside>
 
       <div
-        class="w-1 shrink-0 cursor-col-resize bg-gray-100 transition-colors hover:bg-blue-200"
+        class="collaboration-message-resize-handle w-1 shrink-0 cursor-col-resize bg-gray-100 transition-colors hover:bg-blue-200"
         role="separator"
         aria-orientation="vertical"
         data-test="team-communication-resize-handle"
         @mousedown="startResize"
       />
 
-      <main class="min-h-0 min-w-0 flex-1 overflow-hidden" data-test="team-communication-detail-pane">
+      <main class="collaboration-message-detail min-h-0 min-w-0 flex-1 overflow-hidden" data-test="team-communication-detail-pane">
         <div v-if="selectedType === 'reference' && selectedMessage && selectedReference" class="h-full">
-          <TeamCommunicationReferenceViewer
-            :content-path="team.communicationReferenceContentPath(selectedMessage.messageId, selectedReference.referenceId)"
+          <CollaborationMessageReferenceViewer
+            :content-path="messages.referenceContentPath(selectedMessage.messageId, selectedReference.referenceId)"
             :reference="selectedReference"
             :refresh-signal="referenceRefreshSignal"
           />
         </div>
         <div v-else-if="selectedMessage" class="h-full overflow-y-auto p-4">
-          <div class="mb-3 flex items-start justify-between gap-3">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
+          <div class="mb-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+              <div class="flex min-w-0 items-center gap-2">
                 <Icon
                   :icon="directionIcon(selectedMessage)"
                   class="h-4 w-4 shrink-0"
@@ -112,8 +114,12 @@
                   <span class="truncate">{{ counterpartName(selectedMessage) }}</span>
                 </span>
               </div>
+              </div>
+              <span class="shrink-0 text-xs text-gray-400">{{ formatTimestamp(selectedMessage.createdAt) }}</span>
             </div>
-            <span class="shrink-0 text-xs text-gray-400">{{ formatTimestamp(selectedMessage.createdAt) }}</span>
+            <p class="ml-6 mt-0.5 break-all font-mono text-xs text-gray-400">
+              {{ selectedMessage.counterpartAddress }}
+            </p>
           </div>
           <MarkdownRenderer
             :content="selectedMessage.content"
@@ -135,19 +141,19 @@ import { Icon } from '@iconify/vue';
 import { useLocalization } from '~/composables/useLocalization';
 import { useHorizontalSplitResize } from '~/composables/useHorizontalSplitResize';
 import type {
-  TeamCommunicationPerspectiveMessage,
-  TeamCommunicationReferenceFile,
-} from '~/stores/teamCommunicationTypes';
-import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget';
+  CollaborationMessagePerspectiveRow,
+  CollaborationMessagesContextView,
+} from '~/types/workspace/collaborationMessagesContextView';
+import type { TeamReferenceFile } from '~/types/teamReferenceFile';
 import MarkdownRenderer from '~/components/conversation/segments/renderer/MarkdownRenderer.vue';
 import {
   referenceFileIcon,
   referenceFileName,
 } from '~/utils/teamCommunication/referenceFilePresentation';
-import TeamCommunicationReferenceViewer from './TeamCommunicationReferenceViewer.vue';
+import CollaborationMessageReferenceViewer from './CollaborationMessageReferenceViewer.vue';
 
 const props = defineProps<{
-  team: TeamWorkspaceContextView;
+  messages: CollaborationMessagesContextView;
 }>();
 
 const { t } = useLocalization();
@@ -162,11 +168,11 @@ const { paneWidth: leftPaneWidth, startResize } = useHorizontalSplitResize({
 });
 
 const hasFocusedMemberIdentity = computed(() => Boolean(
-  props.team.focusedAgentRunId
-    && props.team.listMembers().some((member) => member.agentRunId === props.team.focusedAgentRunId),
+  props.messages.focusedAgentRunId
+    && props.messages.memberIdentityByAgentRunId()[props.messages.focusedAgentRunId],
 ));
-const teamRunId = computed(() => props.team.rootRunId);
-const displayMessages = computed(() => props.team.listCommunicationMessages());
+const teamRunId = computed(() => props.messages.rootRunId);
+const displayMessages = computed(() => props.messages.listMessages());
 const selectedMessage = computed(() =>
   displayMessages.value.find((message) => message.messageId === selectedMessageId.value) || null,
 );
@@ -174,7 +180,7 @@ const selectedReference = computed(() =>
   selectedMessage.value?.referenceFiles.find((reference) => reference.referenceId === selectedReferenceId.value) || null,
 );
 
-const compactMessageLabel = (message: TeamCommunicationPerspectiveMessage): string => {
+const compactMessageLabel = (message: CollaborationMessagePerspectiveRow): string => {
   const normalized = (message.messageType || 'agent_message').trim();
   if (!normalized || normalized === 'agent_message') {
     return 'Message';
@@ -184,19 +190,19 @@ const compactMessageLabel = (message: TeamCommunicationPerspectiveMessage): stri
     .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-const counterpartMetadata = (message: TeamCommunicationPerspectiveMessage): string => {
+const counterpartMetadata = (message: CollaborationMessagePerspectiveRow): string => {
   return message.direction === 'sent'
     ? `${t('workspace.components.workspace.team.TeamCommunicationPanel.to_counterpart')} ${counterpartName(message)}`
     : `${t('workspace.components.workspace.team.TeamCommunicationPanel.from_counterpart')} ${counterpartName(message)}`;
 };
-const counterpartName = (message: TeamCommunicationPerspectiveMessage): string => {
+const counterpartName = (message: CollaborationMessagePerspectiveRow): string => {
   return message.counterpartLabel || t('workspace.components.workspace.team.TeamCommunicationPanel.unknown_teammate');
 };
-const directionIcon = (message: TeamCommunicationPerspectiveMessage): string =>
+const directionIcon = (message: CollaborationMessagePerspectiveRow): string =>
   message.direction === 'sent' ? 'heroicons:paper-airplane' : 'heroicons:inbox-arrow-down';
-const directionIconClass = (message: TeamCommunicationPerspectiveMessage): string =>
+const directionIconClass = (message: CollaborationMessagePerspectiveRow): string =>
   message.direction === 'sent' ? 'text-blue-500' : 'text-emerald-500';
-const isMessageSelected = (message: TeamCommunicationPerspectiveMessage): boolean =>
+const isMessageSelected = (message: CollaborationMessagePerspectiveRow): boolean =>
   selectedMessageId.value === message.messageId;
 const formatTimestamp = (value: string): string => {
   const date = new Date(value);
@@ -204,15 +210,15 @@ const formatTimestamp = (value: string): string => {
   return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
 
-const selectMessage = (message: TeamCommunicationPerspectiveMessage) => {
+const selectMessage = (message: CollaborationMessagePerspectiveRow) => {
   selectedMessageId.value = message.messageId;
   selectedReferenceId.value = null;
   selectedType.value = 'message';
 };
 
 const selectReference = (
-  message: TeamCommunicationPerspectiveMessage,
-  reference: TeamCommunicationReferenceFile,
+  message: CollaborationMessagePerspectiveRow,
+  reference: TeamReferenceFile,
 ) => {
   if (selectedMessageId.value === message.messageId && selectedReferenceId.value === reference.referenceId) {
     referenceRefreshSignal.value += 1;
@@ -254,5 +260,26 @@ watch(
 
 .team-communication-message-markdown :deep(.markdown-body > :last-child) {
   margin-bottom: 0;
+}
+
+@media (max-width: 639px) {
+  .collaboration-message-split {
+    flex-direction: column;
+  }
+
+  .collaboration-message-list {
+    width: 100% !important;
+    max-height: 48%;
+    border-right: 0;
+    border-bottom: 1px solid rgb(229 231 235);
+  }
+
+  .collaboration-message-resize-handle {
+    display: none;
+  }
+
+  .collaboration-message-detail {
+    min-height: 0;
+  }
 }
 </style>

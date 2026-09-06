@@ -11,6 +11,8 @@ const shellMessages = {
   'shell.navigation.settings': '设置',
   'shell.rightTabs.files': '文件',
   'shell.rightTabs.team': '团队',
+  'shell.rightTabs.org': '组织',
+  'shell.rightTabs.agentOrg': '智能体组织',
   'shell.rightTabs.terminal': '终端',
   'shell.rightTabs.usage': 'Token',
   'shell.tokenUsage.title': 'Token 用量计',

@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { defineComponent, nextTick } from 'vue';
 import type { TeamStreamServerMessage } from '@autobyteus/team-stream-contracts';
-import TeamOverviewPanel from '../TeamOverviewPanel.vue';
+import CollaborationOverviewPanel from '../CollaborationOverviewPanel.vue';
 import { useAgentSelectionStore } from '~/stores/agentSelectionStore';
 import { useAgentTeamContextsStore } from '~/stores/agentTeamContextsStore';
 import {
@@ -13,7 +13,7 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
-import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
+import { testCollaborationMessagesContextView, testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
 
 const labels: Record<string, string> = {
   'workspace.components.workspace.team.TeamOverviewPanel.messages': 'Messages',
@@ -25,10 +25,10 @@ const labels: Record<string, string> = {
   'workspace.components.workspace.team.TeamDelegatedTasksSection.empty_detail': 'Delegated work appears here from saved task records.',
 };
 
-const TeamCommunicationPanelStub = defineComponent({
-  name: 'TeamCommunicationPanel',
-  props: ['team'],
-  template: '<div data-test="team-communication-panel" />',
+const CollaborationMessagesPanelStub = defineComponent({
+  name: 'CollaborationMessagesPanel',
+  props: ['messages'],
+  template: '<div data-test="collaboration-messages-panel" />',
 });
 
 const task = (taskId: string, targetAgentRunId = `${taskId}-run`) => testTaskRecord({
@@ -88,19 +88,22 @@ const seedNestedTeam = () => {
   return team;
 };
 
-const mountSubject = () => mount(TeamOverviewPanel, {
-  props: { team: testTeamWorkspaceContextView(useAgentTeamContextsStore().activeTeamContext!) },
+const mountSubject = () => mount(CollaborationOverviewPanel, {
+  props: {
+    team: testTeamWorkspaceContextView(useAgentTeamContextsStore().activeTeamContext!),
+    messages: testCollaborationMessagesContextView(useAgentTeamContextsStore().activeTeamContext!),
+  },
   global: {
-    stubs: { TeamCommunicationPanel: TeamCommunicationPanelStub },
+    stubs: { CollaborationMessagesPanel: CollaborationMessagesPanelStub },
     mocks: { $t: (key: string) => labels[key] ?? key },
   },
 });
 const tasksVisible = (wrapper: ReturnType<typeof mountSubject>) =>
   !(wrapper.get('[data-test="team-delegated-tasks-body"]').attributes('style') ?? '').includes('display: none');
 const messagesVisible = (wrapper: ReturnType<typeof mountSubject>) =>
-  !(wrapper.get('[data-test="team-communication-panel"]').attributes('style') ?? '').includes('display: none');
+  !(wrapper.get('[data-test="collaboration-messages-panel"]').attributes('style') ?? '').includes('display: none');
 
-describe('TeamOverviewPanel current execution aggregate', () => {
+describe('CollaborationOverviewPanel current execution aggregate', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     seedActiveTeam();
@@ -109,7 +112,7 @@ describe('TeamOverviewPanel current execution aggregate', () => {
   it('shows exact focused communication count and no removed Task Plan section', () => {
     const wrapper = mountSubject();
     expect(wrapper.text()).not.toContain('Task Plan');
-    expect(wrapper.get('[data-test="team-messages-header"]').text()).toContain('1 Messages');
+    expect(wrapper.get('[data-test="collaboration-messages-header"]').text()).toContain('1 Messages');
     expect(wrapper.get('[data-test="team-delegated-tasks-header"]').text()).toContain('0 tasks');
     expect(messagesVisible(wrapper)).toBe(true);
     expect(tasksVisible(wrapper)).toBe(false);
@@ -120,7 +123,7 @@ describe('TeamOverviewPanel current execution aggregate', () => {
     await wrapper.get('[data-test="team-delegated-tasks-header"]').trigger('click');
     expect(messagesVisible(wrapper)).toBe(false);
     expect(tasksVisible(wrapper)).toBe(true);
-    await wrapper.get('[data-test="team-messages-header"]').trigger('click');
+    await wrapper.get('[data-test="collaboration-messages-header"]').trigger('click');
     expect(messagesVisible(wrapper)).toBe(true);
     expect(tasksVisible(wrapper)).toBe(false);
   });
@@ -157,12 +160,15 @@ describe('TeamOverviewPanel current execution aggregate', () => {
     const wrapper = mountSubject();
     await wrapper.get('[data-test="team-delegated-tasks-header"]').trigger('click');
     const nested = seedNestedTeam();
-    await wrapper.setProps({ team: testTeamWorkspaceContextView(nested) });
+    await wrapper.setProps({
+      team: testTeamWorkspaceContextView(nested),
+      messages: testCollaborationMessagesContextView(nested),
+    });
     await nextTick();
     expect(messagesVisible(wrapper)).toBe(true);
     expect(tasksVisible(wrapper)).toBe(false);
-    const panel = wrapper.getComponent({ name: 'TeamCommunicationPanel' });
-    expect(panel.props('team').focusedAgentRunId).toBe('review-run');
-    expect(wrapper.get('[data-test="team-messages-header"]').text()).toContain('1 Messages');
+    const panel = wrapper.getComponent({ name: 'CollaborationMessagesPanel' });
+    expect(panel.props('messages').focusedAgentRunId).toBe('review-run');
+    expect(wrapper.get('[data-test="collaboration-messages-header"]').text()).toContain('1 Messages');
   });
 });

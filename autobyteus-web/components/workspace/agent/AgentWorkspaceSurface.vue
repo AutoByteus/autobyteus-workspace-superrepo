@@ -31,6 +31,7 @@
         :run-id="target.context.state.runId"
         :agent-name="agentName"
         :agent-avatar-url="avatarUrl || null"
+        :inter-agent-sender-name-by-id="senderNameByAgentRunId"
         :presentation-revision="target.context.state.eventMonitorPresentationRevision"
         :has-earlier-active-trace-events="target.context.state.hasEarlierActiveTraceEvents"
         :browse-subject="target.browse"
@@ -76,6 +77,11 @@ const headerTitle = computed(() => {
   const suffix = props.target.context.state.runId.slice(-4).toUpperCase()
   return `${agentName.value} - ${suffix}`
 })
+const senderNameByAgentRunId = computed(() => 'collaborationMessages' in props.target
+  ? Object.freeze(Object.fromEntries(Object.entries(
+      props.target.collaborationMessages.memberIdentityByAgentRunId(),
+    ).map(([agentRunId, identity]) => [agentRunId, identity.label])))
+  : Object.freeze({}))
 const skillTarget = computed<SkillImprovementComposerCtaTarget | null>(() =>
   props.target.kind === 'standalone_agent'
     ? {

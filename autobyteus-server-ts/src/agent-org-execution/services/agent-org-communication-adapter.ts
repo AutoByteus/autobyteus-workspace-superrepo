@@ -19,6 +19,10 @@ export class AgentOrgCommunicationAdapter implements RootCommunicationAdapter {
     reserveRecipientInput(agentRunId: string, message: ReturnType<RootCommunicationAdapter["buildRecipientInput"]>): Promise<AgentRunInputReservationResult>;
     replaceMessages(messages: AgentOrgCommunicationMessagesFileV1): void;
     publish(message: AgentOrgCommunicationMessagesFileV1["messages"][number]): void;
+    presentCommittedMessage(
+      message: AgentOrgCommunicationMessagesFileV1["messages"][number],
+      receiverInput: ReturnType<RootCommunicationAdapter["buildRecipientInput"]>,
+    ): void;
   }>) {
     this.root = options.root;
     this.initialMessages = options.initial.messages;
@@ -44,6 +48,7 @@ export class AgentOrgCommunicationAdapter implements RootCommunicationAdapter {
       orgRunId: this.root.rootRunId,
       messages: [...input.getCurrentMessages(), input.message],
     }, this.root.rootRunId);
+    let reservationCommitted = false;
     try {
       return await this.options.persistence.commitCommunication({
         nextMessages: next,
@@ -52,12 +57,17 @@ export class AgentOrgCommunicationAdapter implements RootCommunicationAdapter {
           input.commitMessages(next.messages);
           this.options.replaceMessages(next);
           const committed = input.reservation.commit();
-          this.options.publish(input.message);
-          committed.release();
+          reservationCommitted = true;
+          try {
+            this.options.publish(input.message);
+            this.options.presentCommittedMessage(input.message, input.inputMessage);
+          } finally {
+            committed.release();
+          }
         },
       });
     } catch (error) {
-      input.reservation.cancel();
+      if (!reservationCommitted) input.reservation.cancel();
       throw error;
     }
   }

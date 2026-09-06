@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
-import TeamCommunicationPanel from '../TeamCommunicationPanel.vue';
+import CollaborationMessagesPanel from '../CollaborationMessagesPanel.vue';
 import { buildTestTeamContext, testAgentNode, testTaskRecord } from '~/test-support/currentTeamTestFixtures';
-import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
+import { testCollaborationMessagesContextView } from '~/test-support/teamWorkspaceContextView';
 
 const labels: Record<string, string> = {
   'workspace.components.workspace.team.TeamCommunicationPanel.to_counterpart': 'to',
@@ -32,23 +32,23 @@ const team = buildTestTeamContext({
     { message_id: 'message-received', sender_agent_run_id: 'task-reviewer-run', receiver_agent_run_id: 'focused-run', content: 'The task review is complete.', message_type: 'assignment', created_at: '2026-04-12T10:01:00.000Z', reference_files: [] },
   ],
 });
-const mountSubject = (focusedAgentRunId = 'focused-run') => mount(TeamCommunicationPanel, {
+const mountSubject = (focusedAgentRunId = 'focused-run') => mount(CollaborationMessagesPanel, {
   props: {
-    team: focusedAgentRunId === 'focused-run'
-      ? testTeamWorkspaceContextView(team, focusedAgentRunId)
-      : { ...testTeamWorkspaceContextView(team), focusedAgentRunId },
+    messages: focusedAgentRunId === 'focused-run'
+      ? testCollaborationMessagesContextView(team, focusedAgentRunId)
+      : { ...testCollaborationMessagesContextView(team), focusedAgentRunId },
   },
   global: {
     stubs: {
       Icon: { props: ['icon'], template: '<span v-bind="$attrs" :data-icon="icon"></span>' },
       MarkdownRenderer: { props: ['content'], template: '<article data-test="markdown-renderer">{{ content }}</article>' },
-      TeamCommunicationReferenceViewer: { props: ['contentPath', 'reference'], template: '<div data-test="reference-viewer">{{ contentPath }}:{{ reference.referenceId }}</div>' },
+      CollaborationMessageReferenceViewer: { props: ['contentPath', 'reference'], template: '<div data-test="reference-viewer">{{ contentPath }}:{{ reference.referenceId }}</div>' },
     },
     mocks: { $t: (key: string) => labels[key] ?? key },
   },
 });
 
-describe('TeamCommunicationPanel current AgentRun perspective', () => {
+describe('CollaborationMessagesPanel current AgentRun perspective', () => {
   it('renders newest-first exact persistent/task messages with human placement labels', async () => {
     const wrapper = mountSubject();
     await wrapper.vm.$nextTick();
@@ -56,8 +56,10 @@ describe('TeamCommunicationPanel current AgentRun perspective', () => {
     expect(rows).toHaveLength(2);
     expect(rows[0].text()).toContain('Assignment');
     expect(rows[0].text()).toContain('from reviewer');
+    expect(rows[0].text()).toContain('/reviewer');
     expect(rows[1].text()).toContain('Handoff');
     expect(rows[1].text()).toContain('to reviewer');
+    expect(rows[1].text()).toContain('/reviewer');
     expect(wrapper.get('[data-test="team-communication-message-markdown"]').text()).toContain('The task review is complete.');
     expect(wrapper.text()).not.toContain('task-reviewer-run');
   });

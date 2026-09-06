@@ -18,6 +18,7 @@ import type {
   ActiveAgentWorkspaceTarget,
   TeamWorkspaceContextView,
 } from '~/types/workspace/activeAgentWorkspaceTarget';
+import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView';
 import type { AgentTeamContext } from '~/types/agent/AgentTeamContext';
 import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress';
 import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective';
@@ -59,23 +60,37 @@ export const useActiveContextStore = defineStore('activeContext', () => {
         address: entry.memberAddress, agentRunId: entry.agentRunId,
         context: entry.agentContext, coordinator: entry.memberAddress === tree.root_team.coordinator_address,
       }))),
-      senderNameByAgentRunId: () => Object.freeze(Object.fromEntries(entries.map((entry) => [
-        entry.agentRunId,
-        entry.memberAddress.split('/').at(-1)?.replace(/[_-]+/g, ' ') || entry.memberAddress,
-      ]))),
-      listCommunicationMessages: () => Object.freeze(projectTeamCommunicationPerspective({
-        view,
-        messages: view.listCommunicationMessages(),
-        focusedAgentRunId: view.getFocusedAgentRunId(),
-      }).messages),
       listDelegatedTaskEntries: () => Object.freeze(deriveDelegatedTaskEntries(
         team,
         view.getFocusedAgentRunId(),
       )),
-      communicationReferenceContentPath: (messageId: string, referenceId: string) =>
-        `team-runs/${encodeURIComponent(view.getRootTeamRunId())}/team-communication/messages/${encodeURIComponent(messageId)}/references/${encodeURIComponent(referenceId)}/content`,
       taskReferenceContentPath: (taskId: string, referenceId: string) =>
         `team-runs/${encodeURIComponent(view.getRootTeamRunId())}/task-delegations/${encodeURIComponent(taskId)}/references/${encodeURIComponent(referenceId)}/content`,
+    });
+  };
+
+  const standaloneTeamMessagesView = (team: AgentTeamContext): CollaborationMessagesContextView => {
+    const view = team.view;
+    const entries = view.listAgentContextEntries();
+    return Object.freeze({
+      rootKind: 'agent_team',
+      rootRunId: view.getRootTeamRunId(),
+      focusedAgentRunId: view.getFocusedAgentRunId(),
+      focusedMemberAddress: view.getFocusedMemberAddress(),
+      memberIdentityByAgentRunId: () => Object.freeze(Object.fromEntries(entries.map((entry) => [
+        entry.agentRunId,
+        Object.freeze({
+          address: entry.memberAddress,
+          label: entry.memberAddress.split('/').at(-1)?.replace(/[_-]+/g, ' ') || entry.memberAddress,
+        }),
+      ]))),
+      listMessages: () => Object.freeze(projectTeamCommunicationPerspective({
+        view,
+        messages: view.listCommunicationMessages(),
+        focusedAgentRunId: view.getFocusedAgentRunId(),
+      }).messages),
+      referenceContentPath: (messageId: string, referenceId: string) =>
+        `team-runs/${encodeURIComponent(view.getRootTeamRunId())}/team-communication/messages/${encodeURIComponent(messageId)}/references/${encodeURIComponent(referenceId)}/content`,
     });
   };
 
@@ -106,6 +121,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
       const teamView = standaloneTeamView(team);
       return Object.freeze({
         kind: 'standalone_team_member', context, team: teamView,
+        collaborationMessages: standaloneTeamMessagesView(team),
         interaction: Object.freeze({
           send: async (content: string, paths: readonly ContextFilePath[]) => {
             await agentTeamRunStore.sendMessageToFocusedMember(content, [...paths]);

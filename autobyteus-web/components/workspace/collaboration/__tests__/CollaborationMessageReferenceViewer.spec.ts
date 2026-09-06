@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import TeamCommunicationReferenceViewer from '../TeamCommunicationReferenceViewer.vue';
+import CollaborationMessageReferenceViewer from '../CollaborationMessageReferenceViewer.vue';
 import { useMobileNodeSessionStore } from '~/stores/mobileNodeSessionStore';
-import type { TeamCommunicationReferenceFileType } from '~/stores/teamCommunicationTypes';
+import type { TeamReferenceFileType } from '~/types/teamReferenceFile';
 import type { FileDataType } from '~/stores/fileExplorerState';
 import { mobileCredentialStorage } from '~/utils/remoteAccess/mobileCredentialStorage';
 import type { MobileNodeSession } from '~/types/remoteAccess';
@@ -59,7 +59,7 @@ const storedSession = (): MobileNodeSession => ({
   },
 });
 
-const mountSubject = (props: Record<string, unknown> = {}) => mount(TeamCommunicationReferenceViewer, {
+const mountSubject = (props: Record<string, unknown> = {}) => mount(CollaborationMessageReferenceViewer, {
   props: {
     contentPath: 'team-runs/team%20run%2F1/team-communication/messages/message%2F1/references/ref%3Awith%2Fslash/content',
     reference: baseReference,
@@ -79,7 +79,7 @@ const mountSubject = (props: Record<string, unknown> = {}) => mount(TeamCommunic
   },
 });
 
-describe('TeamCommunicationReferenceViewer.vue', () => {
+describe('CollaborationMessageReferenceViewer.vue', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     window.localStorage.clear();
@@ -123,7 +123,7 @@ describe('TeamCommunicationReferenceViewer.vue', () => {
     ['pdf', 'PDF', '/tmp/spec.pdf'],
     ['csv', 'Excel', '/tmp/data.csv'],
     ['excel', 'Excel', '/tmp/report.xlsx'],
-  ] satisfies Array<[TeamCommunicationReferenceFileType, FileDataType, string]>)(
+  ] satisfies Array<[TeamReferenceFileType, FileDataType, string]>)(
     'fetches %s reference bytes through the authorized route and passes a blob URL to FileViewer',
     async (referenceType, expectedFileType, path) => {
       mobileCredentialStorage.save(storedSession());

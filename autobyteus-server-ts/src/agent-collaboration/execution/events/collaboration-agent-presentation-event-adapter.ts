@@ -55,6 +55,7 @@ export class CollaborationAgentPresentationEventAdapter {
     if (rawEvent.kind === "member_input") return publish(buildMemberInputPresentationEvent({
       execution,
       message: rawEvent.message,
+      receivedAt: rawEvent.receivedAt,
     }));
     if (rawEvent.kind === "status_overlay") {
       if (!sameCollaborationMemberExecutionIdentity(rawEvent.snapshot.execution, execution)) return Object.freeze({

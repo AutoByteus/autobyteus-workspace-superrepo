@@ -48,7 +48,7 @@
         :conversation="target.context.state.conversation"
         :run-id="target.context.state.runId"
         :agent-name="memberName"
-        :inter-agent-sender-name-by-id="target.team.senderNameByAgentRunId()"
+        :inter-agent-sender-name-by-id="senderNameByAgentRunId"
         :presentation-revision="target.context.state.eventMonitorPresentationRevision"
         :has-earlier-active-trace-events="target.context.state.hasEarlierActiveTraceEvents"
         :browse-subject="target.browse"
@@ -117,6 +117,9 @@ const showAuthoritativeTaskEmpty = computed(() => Boolean(
   && props.target.context.state.hasEarlierActiveTraceEvents !== true
   && activityStore.getActivities(props.target.context.state.runId).length === 0,
 ))
+const senderNameByAgentRunId = computed(() => Object.freeze(Object.fromEntries(Object.entries(
+  props.target.collaborationMessages.memberIdentityByAgentRunId(),
+).map(([agentRunId, identity]) => [agentRunId, identity.label]))))
 const skillTarget = computed<SkillImprovementComposerCtaTarget | null>(() =>
   props.target.kind === 'standalone_team_member'
     ? {

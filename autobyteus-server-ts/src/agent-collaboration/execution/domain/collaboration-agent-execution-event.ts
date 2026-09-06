@@ -23,7 +23,7 @@ export type CollaborationAgentStatusSnapshot = Readonly<{
 
 export type CollaborationAgentExecutionEvent =
   | Readonly<{ kind: "agent_run"; event: AgentRunEvent }>
-  | Readonly<{ kind: "member_input"; message: AgentInputUserMessage }>
+  | Readonly<{ kind: "member_input"; message: AgentInputUserMessage; receivedAt?: string | null }>
   | Readonly<{ kind: "status_overlay"; snapshot: CollaborationAgentStatusSnapshot }>
   | Readonly<{ kind: "readiness_failure"; code: string; message: string }>;
 

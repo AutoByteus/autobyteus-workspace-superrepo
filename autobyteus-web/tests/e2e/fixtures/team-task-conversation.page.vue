@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-screen bg-slate-100 p-6" data-test="team-task-conversation-probe">
     <section class="mx-auto h-[760px] max-w-[1180px] overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
-      <TeamOverviewPanel :team="team" />
+      <CollaborationOverviewPanel :team="team" :messages="messages" />
     </section>
   </main>
 </template>
@@ -13,7 +13,7 @@ import type {
   TeamCommunicationMessageDto,
   TeamStreamServerMessage,
 } from '@autobyteus/team-stream-contracts';
-import TeamOverviewPanel from '~/components/workspace/team/TeamOverviewPanel.vue';
+import CollaborationOverviewPanel from '~/components/workspace/collaboration/CollaborationOverviewPanel.vue';
 import { useLocalization } from '~/composables/useLocalization';
 import { useAgentSelectionStore } from '~/stores/agentSelectionStore';
 import { useAgentTeamContextsStore } from '~/stores/agentTeamContextsStore';
@@ -23,7 +23,7 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
-import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
+import { testCollaborationMessagesContextView, testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
 
 const ROOT_TEAM_RUN_ID = 'browser-team-run';
 const TEACHER_RUN_ID = 'teacher-run';
@@ -163,7 +163,11 @@ const restoredContext = buildTestTeamContext({
 const teamStore = useAgentTeamContextsStore();
 const selectionStore = useAgentSelectionStore();
 const team = shallowRef(testTeamWorkspaceContextView(initialContext));
-const refreshTeam = () => { team.value = testTeamWorkspaceContextView(initialContext); };
+const messages = shallowRef(testCollaborationMessagesContextView(initialContext));
+const refreshTeam = () => {
+  team.value = testTeamWorkspaceContextView(initialContext);
+  messages.value = testCollaborationMessagesContextView(initialContext);
+};
 teamStore.addTeamContext(initialContext);
 selectionStore.setRunSelection(ROOT_TEAM_RUN_ID, 'team');
 

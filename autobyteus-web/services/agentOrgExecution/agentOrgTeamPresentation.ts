@@ -1,7 +1,6 @@
 import type { AgentOrgExecutionViewDto } from '@autobyteus/collaboration-stream-contracts'
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import { memberAddressBasename } from '~/types/agent/AgentTeamAddress'
-import type { TeamCommunicationPerspectiveMessage } from '~/stores/teamCommunicationTypes'
 import type {
   DelegatedTaskDirection,
   DelegatedTaskEntry,
@@ -31,36 +30,6 @@ const displayStatus = (task: TaskRecord): DelegatedTaskEntry['displayStatus'] =>
       : 'in_progress'
   }
   return task.status
-}
-
-export const projectAgentOrgTeamMessages = (input: Readonly<{
-  view: AgentOrgExecutionViewDto
-  team: ConfiguredTeam
-  focusedAgentRunId: string
-}>): readonly TeamCommunicationPerspectiveMessage[] => {
-  const memberByRun = new Map(input.team.members.map((member) => [member.agentRunId, member.address]))
-  return input.view.communication_messages.messages.flatMap((message): TeamCommunicationPerspectiveMessage[] => {
-    const sent = message.senderAgentRunId === input.focusedAgentRunId
-    const received = message.receiverAgentRunId === input.focusedAgentRunId
-    if (!sent && !received) return []
-    const counterpartAgentRunId = sent ? message.receiverAgentRunId : message.senderAgentRunId
-    const counterpartAddress = memberByRun.get(counterpartAgentRunId)
-    if (!counterpartAddress) return []
-    return [{
-      messageId: message.messageId,
-      senderAgentRunId: message.senderAgentRunId,
-      receiverAgentRunId: message.receiverAgentRunId,
-      content: message.content,
-      messageType: message.messageType,
-      createdAt: message.createdAt,
-      referenceFiles: message.referenceFiles.map((filePath) =>
-        projectAgentOrgReference(message.messageId, filePath, message.createdAt)),
-      direction: sent ? 'sent' : 'received',
-      counterpartAgentRunId,
-      counterpartLabel: memberAddressBasename(counterpartAddress),
-    }]
-  }).sort((left, right) => right.createdAt.localeCompare(left.createdAt)
-    || left.messageId.localeCompare(right.messageId))
 }
 
 const lifecycle = (

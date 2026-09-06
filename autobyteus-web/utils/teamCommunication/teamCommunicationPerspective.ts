@@ -1,22 +1,22 @@
 import type { TeamCommunicationMessageDto } from '@autobyteus/team-stream-contracts';
 import type { TeamExecutionViewState } from '~/services/teamExecution/teamExecutionViewState';
 import type {
-  TeamCommunicationPerspective,
-  TeamCommunicationPerspectiveMessage,
-} from '~/stores/teamCommunicationTypes';
+  CollaborationMessagePerspectiveRow,
+  CollaborationMessagesPerspective,
+} from '~/types/workspace/collaborationMessagesContextView';
 import { memberAddressBasename } from '~/types/agent/AgentTeamAddress';
 
-const compareDesc = (left: TeamCommunicationPerspectiveMessage, right: TeamCommunicationPerspectiveMessage): number =>
+const compareDesc = (left: CollaborationMessagePerspectiveRow, right: CollaborationMessagePerspectiveRow): number =>
   right.createdAt.localeCompare(left.createdAt) || left.messageId.localeCompare(right.messageId);
 
 export const projectTeamCommunicationPerspective = (input: {
   view: TeamExecutionViewState;
   messages: readonly TeamCommunicationMessageDto[];
   focusedAgentRunId: string;
-}): TeamCommunicationPerspective => {
+}): CollaborationMessagesPerspective => {
   const focusedAgentRunId = input.focusedAgentRunId.trim();
   if (!focusedAgentRunId || !input.view.hasAgentRun(focusedAgentRunId)) return { messages: [] };
-  const messages = input.messages.flatMap((message): TeamCommunicationPerspectiveMessage[] => {
+  const messages = input.messages.flatMap((message): CollaborationMessagePerspectiveRow[] => {
     const sent = message.sender_agent_run_id === focusedAgentRunId;
     const received = message.receiver_agent_run_id === focusedAgentRunId;
     if (!sent && !received) return [];
@@ -39,6 +39,7 @@ export const projectTeamCommunicationPerspective = (input: {
       })),
       direction: sent ? 'sent' : 'received',
       counterpartAgentRunId,
+      counterpartAddress,
       counterpartLabel: memberAddressBasename(counterpartAddress),
     }];
   }).sort(compareDesc);

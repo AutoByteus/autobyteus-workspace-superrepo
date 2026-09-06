@@ -39,7 +39,11 @@
         />
       </div>
       <div v-if="effectiveActiveTab === 'teamMembers'" class="h-full min-h-0">
-        <TeamOverviewPanel v-if="activeTeamView" :team="activeTeamView" />
+        <CollaborationOverviewPanel
+          v-if="activeMessagesView"
+          :messages="activeMessagesView"
+          :team="activeTeamView"
+        />
       </div>
       <div
         v-if="shouldMountTerminalPanel"
@@ -79,7 +83,7 @@ import { useRightPanel } from '~/composables/useRightPanel';
 import { useRightPanelOpenFileAutoSwitch } from '~/composables/useRightPanelOpenFileAutoSwitch';
 import { useRightSideTabs } from '~/composables/useRightSideTabs';
 import TabList from '~/components/tabs/TabList.vue';
-import TeamOverviewPanel from '~/components/workspace/team/TeamOverviewPanel.vue';
+import CollaborationOverviewPanel from '~/components/workspace/collaboration/CollaborationOverviewPanel.vue';
 import TerminalPanel from '~/components/workspace/tools/TerminalPanel.vue';
 import VncViewer from '~/components/workspace/tools/VncViewer.vue';
 import FileExplorerLayout from '~/components/fileExplorer/FileExplorerLayout.vue';
@@ -109,6 +113,13 @@ const activeTeamView = computed(() => {
     ? target.team
     : null;
 });
+const activeMessagesView = computed(() => {
+  const target = activeContextStore.activeWorkspaceTarget;
+  return target && 'collaborationMessages' in target ? target.collaborationMessages : null;
+});
+const activeMessagesScopeKey = computed(() => activeMessagesView.value
+  ? `${activeMessagesView.value.rootKind}:${activeMessagesView.value.rootRunId}`
+  : null);
 const filesTabEnabled = computed(() => props.mode !== 'mobile-tools');
 const fileExplorerLayout = computed(() => props.mode === 'desktop' ? 'split' : 'stacked');
 const showPanelToggle = computed(() => props.mode === 'desktop');
@@ -137,11 +148,11 @@ const handleTabSelect = (tabName: string) => {
   setActiveTab(tabName as any);
 };
 
-// Watch for changes in the selected profile type to adjust the active tab via the composable logic
-watch(() => activeContextStore.activeWorkspaceTarget?.kind, (kind) => {
-  if (kind === 'standalone_team_member' || kind === 'agent_org_team_member') {
+// Keep the contextual collaboration tool aligned with the selected tagged root.
+watch(activeMessagesScopeKey, (scopeKey) => {
+  if (scopeKey) {
     setActiveTab('teamMembers');
-  } else if (kind === 'standalone_agent' || kind === 'agent_org_direct_agent') {
+  } else if (activeContextStore.activeWorkspaceTarget?.kind === 'standalone_agent') {
     setActiveTab('progress');
   }
 }, { immediate: true });

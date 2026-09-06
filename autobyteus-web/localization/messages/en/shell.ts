@@ -11,6 +11,8 @@ const shellMessages = {
   'shell.navigation.settings': 'Settings',
   'shell.rightTabs.files': 'Files',
   'shell.rightTabs.team': 'Team',
+  'shell.rightTabs.org': 'Org',
+  'shell.rightTabs.agentOrg': 'Agent Org',
   'shell.rightTabs.terminal': 'Terminal',
   'shell.rightTabs.usage': 'Token',
   'shell.tokenUsage.title': 'Token Meter',

@@ -76,7 +76,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue';
 import type { FileDataType, FileOpenMode } from '~/stores/fileExplorerState';
-import type { TeamCommunicationReferenceFile } from '~/stores/teamCommunicationTypes';
+import type { TeamReferenceFile } from '~/types/teamReferenceFile';
 import { useWindowNodeContextStore } from '~/stores/windowNodeContextStore';
 import { determineFileType } from '~/utils/fileExplorer/fileUtils';
 import FileViewer from '~/components/fileExplorer/FileViewer.vue';
@@ -84,7 +84,7 @@ import { authorizedFetch } from '~/utils/remoteAccess/authorizedTransport';
 
 const props = defineProps<{
   contentPath: string;
-  reference: TeamCommunicationReferenceFile;
+  reference: TeamReferenceFile;
   refreshSignal?: number;
   disableRichTextPreview?: boolean;
 }>();

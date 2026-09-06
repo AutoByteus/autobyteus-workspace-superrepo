@@ -1,6 +1,7 @@
 import type { AgentTeamContext } from '~/types/agent/AgentTeamContext'
 import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget'
+import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView'
 import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective'
 import { deriveDelegatedTaskEntries } from '~/utils/teamDelegatedTaskEntries'
 import { isTeamMemberProjectionAuthoritative } from '~/services/runHydration/teamMemberProjectionHydrationService'
@@ -34,19 +35,38 @@ export const testTeamWorkspaceContextView = (
       context: entry.agentContext,
       coordinator: entry.memberAddress === view.getExecutionTree().root_team.coordinator_address,
     })),
-    senderNameByAgentRunId: () => Object.fromEntries(entries.map((entry) => [
+    listDelegatedTaskEntries: () => deriveDelegatedTaskEntries(team, focusedAgentRunId),
+    taskReferenceContentPath: (taskId, referenceId) =>
+      `team-runs/${view.getRootTeamRunId()}/task-delegations/${taskId}/references/${referenceId}/content`,
+  }
+}
+
+export const testCollaborationMessagesContextView = (
+  team: AgentTeamContext,
+  focusedAgentRunId = team.view.getFocusedAgentRunId(),
+): CollaborationMessagesContextView => {
+  const view = team.view
+  const focusedMemberAddress = view.getMemberAddress(focusedAgentRunId)
+  if (!focusedMemberAddress) throw new Error(`Missing test focused address '${focusedAgentRunId}'.`)
+  const entries = view.listAgentContextEntries()
+  return {
+    rootKind: 'agent_team',
+    rootRunId: view.getRootTeamRunId(),
+    focusedAgentRunId,
+    focusedMemberAddress,
+    memberIdentityByAgentRunId: () => Object.fromEntries(entries.map((entry) => [
       entry.agentRunId,
-      entry.memberAddress.split('/').at(-1) || entry.memberAddress,
+      {
+        address: entry.memberAddress,
+        label: entry.memberAddress.split('/').at(-1) || entry.memberAddress,
+      },
     ])),
-    listCommunicationMessages: () => projectTeamCommunicationPerspective({
+    listMessages: () => projectTeamCommunicationPerspective({
       view,
       messages: view.listCommunicationMessages(),
       focusedAgentRunId,
     }).messages,
-    listDelegatedTaskEntries: () => deriveDelegatedTaskEntries(team, focusedAgentRunId),
-    communicationReferenceContentPath: (messageId, referenceId) =>
+    referenceContentPath: (messageId, referenceId) =>
       `team-runs/${view.getRootTeamRunId()}/team-communication/messages/${messageId}/references/${referenceId}/content`,
-    taskReferenceContentPath: (taskId, referenceId) =>
-      `team-runs/${view.getRootTeamRunId()}/task-delegations/${taskId}/references/${referenceId}/content`,
   }
 }

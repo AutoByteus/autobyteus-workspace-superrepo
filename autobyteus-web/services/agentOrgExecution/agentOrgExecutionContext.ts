@@ -11,12 +11,16 @@ import type {
   AgentInteractionPort,
   TeamWorkspaceContextView,
 } from '~/types/workspace/activeAgentWorkspaceTarget'
+import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView'
 import { toAgentPresentationProjectionMessage } from '~/services/agentStreaming/teamStreamDtoAdapters'
 import { dispatchAgentStreamMessage } from '~/services/agentStreaming/agentStreamMessageProjector'
+import { projectAgentOrgTeamTasks } from './agentOrgTeamPresentation'
 import {
-  projectAgentOrgTeamMessages,
-  projectAgentOrgTeamTasks,
-} from './agentOrgTeamPresentation'
+  assertAgentOrgCommunicationMessagesCorrelated,
+  createAgentOrgCommunicationPerspectiveIndex,
+  projectAgentOrgCommunicationPerspective,
+  type AgentOrgCommunicationPerspectiveIndex,
+} from './agentOrgCommunicationPerspective'
 
 export type AgentOrgSyncPhase = 'hydrating' | 'live' | 'reopen_required' | 'closed'
 export type AgentOrgEventApplication = 'applied' | 'checkpoint_required'
@@ -56,6 +60,8 @@ export class AgentOrgExecutionContext {
   private readonly configuredPlacementKindByAddress = new Map<AgentTeamAddress, ConfiguredPlacementKind>()
   private readonly taskAgentAddressByRunId = new Map<string, AgentTeamAddress>()
   private readonly taskTeamAddressByRunId = new Map<string, AgentTeamAddress>()
+  private readonly communicationIndex: AgentOrgCommunicationPerspectiveIndex
+  private readonly messagesViewByAgentRunId = new Map<string, CollaborationMessagesContextView>()
   private nextChangeSequence: number
 
   constructor(input: Readonly<{
@@ -77,6 +83,11 @@ export class AgentOrgExecutionContext {
       this.addressByRunId.set(entry.agentRunId, entry.memberAddress)
     }
     this.indexAndValidateIdentities()
+    this.communicationIndex = createAgentOrgCommunicationPerspectiveIndex(this.view)
+    assertAgentOrgCommunicationMessagesCorrelated(
+      this.communicationIndex,
+      this.view.communication_messages.messages,
+    )
     for (const status of input.view.agent_statuses) {
       const address = this.addressByRunId.get(status.agent_run_id)
       if (address !== status.member_address) {
@@ -138,6 +149,7 @@ export class AgentOrgExecutionContext {
         kind: 'agent_org_direct_agent',
         root: Object.freeze({ orgRunId: this.orgRunId }),
         address: rootMember.address,
+        collaborationMessages: this.messagesView(rootMember.address, rootMember.agentRunId),
         context,
         interaction: this.transport.interactionFor(rootMember.agentRunId),
         browse: Object.freeze({
@@ -163,6 +175,7 @@ export class AgentOrgExecutionContext {
       root: Object.freeze({ orgRunId: this.orgRunId }),
       team: this.teamView(team, memberAddress, agentRunId, context),
       address: memberAddress,
+      collaborationMessages: this.messagesView(memberAddress, agentRunId),
       context,
       interaction: this.transport.interactionFor(agentRunId),
       browse: Object.freeze({
@@ -205,10 +218,9 @@ export class AgentOrgExecutionContext {
         task_records: { ...this.view.task_records, records },
       }
     } else {
-      const senderAddress = this.addressByRunId.get(event.message.senderAgentRunId)
-      const receiverAddress = this.addressByRunId.get(event.message.receiverAgentRunId)
-      if (!senderAddress || !receiverAddress
-        || event.message.senderAgentRunId === event.message.receiverAgentRunId) {
+      try {
+        assertAgentOrgCommunicationMessagesCorrelated(this.communicationIndex, [event.message])
+      } catch {
         this.correlationFailure(`AgentOrg communication message '${event.message.messageId}' identity mismatch.`)
       }
       this.view = {
@@ -404,24 +416,44 @@ export class AgentOrgExecutionContext {
       focusedTaskPresentation: () => null,
       isFocusedProjectionAuthoritative: () => true,
       listMembers: () => Object.freeze(members),
-      senderNameByAgentRunId: () => Object.freeze(Object.fromEntries(
-        members.map((member) => [member.agentRunId, nameAt(member.address)]),
-      )),
-      listCommunicationMessages: () => projectAgentOrgTeamMessages({
-        view: this.view,
-        team,
-        focusedAgentRunId,
-      }),
       listDelegatedTaskEntries: () => projectAgentOrgTeamTasks({
         orgRunId: this.orgRunId,
         view: this.view,
         team,
         focusedAgentRunId,
       }),
-      communicationReferenceContentPath: (messageId: string, referenceId: string) =>
-        `agent-org-runs/${encodeURIComponent(this.orgRunId)}/communication/messages/${encodeURIComponent(messageId)}/references/${encodeURIComponent(referenceId)}/content`,
       taskReferenceContentPath: (taskId: string, referenceId: string) =>
         `agent-org-runs/${encodeURIComponent(this.orgRunId)}/task-delegations/${encodeURIComponent(taskId)}/references/${encodeURIComponent(referenceId)}/content`,
     })
+  }
+
+  private messagesView(
+    focusedMemberAddress: AgentTeamAddress,
+    focusedAgentRunId: string,
+  ): CollaborationMessagesContextView {
+    const current = this.messagesViewByAgentRunId.get(focusedAgentRunId)
+    if (current) return current
+    const memberIdentities = Object.freeze(Object.fromEntries(
+      [...this.communicationIndex.configuredByRunId].map(([agentRunId, identity]) => [
+        agentRunId,
+        Object.freeze({ ...identity }),
+      ]),
+    ))
+    const messages = Object.freeze({
+      rootKind: 'agent_org',
+      rootRunId: this.orgRunId,
+      focusedAgentRunId,
+      focusedMemberAddress,
+      memberIdentityByAgentRunId: () => memberIdentities,
+      listMessages: () => projectAgentOrgCommunicationPerspective({
+        index: this.communicationIndex,
+        messages: this.view.communication_messages.messages,
+        focusedAgentRunId,
+      }),
+      referenceContentPath: (messageId: string, referenceId: string) =>
+        `agent-org-runs/${encodeURIComponent(this.orgRunId)}/communication/messages/${encodeURIComponent(messageId)}/references/${encodeURIComponent(referenceId)}/content`,
+    })
+    this.messagesViewByAgentRunId.set(focusedAgentRunId, messages)
+    return messages
   }
 }
