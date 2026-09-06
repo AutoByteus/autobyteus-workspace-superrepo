@@ -21,6 +21,7 @@ concise chronological architecture-review history.
 | ARCH-REV-012 | Round 12 / `AD-REV-014` ownership-coherence recovery | `AD-REV-014` | Fail — Design Impact | Pass | `AR-FIND-006` |
 | ARCH-REV-013 | Round 13 / `AD-REV-015` response to approved `RER-025` first-message AgentOrg history-title parity | `AD-REV-015` | Pass | Fail — Design Impact | `AR-FIND-007` |
 | ARCH-REV-014 | Round 14 / `AD-REV-016` migration-status coherence and traceability recovery | `AD-REV-016` | Fail — Design Impact | Pass | `AR-FIND-007` |
+| ARCH-REV-015 | Round 15 / post-pass `API-FIND-019`, approved `RER-026`, and `AD-REV-017` AgentOrg communication-observability recovery | `AD-REV-017` | Pass | Fail — Design Impact | `AR-FIND-008` |
 
 ## Revision Entries
 
@@ -369,3 +370,26 @@ None.
 - Material classification changes: The authoritative review changes from `Fail / Design Impact` to `Pass`. AD-REV-016 is `Small / Low` in isolation; the cumulative package remains `Large / High` and proceeds through reviewed Implementation reconciliation, source review, and API/E2E. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must prove exact accepted-result ordering, configured-only qualification, unchanged task admission, first-write normalization/stability, truthful ACK/error behavior, newest-generation authoritative refresh, unique provenance, preserved Team/current values, and the migration-ID-specific terminal matrix. One historical supplemental-inventory sentence still names the older AD-REV-013 hold; current status/navigation and implementation guidance are authoritative, so this is non-blocking editorial residue for the next Architecture document touch.
+
+### ARCH-REV-015 — AgentOrg configured-message eligibility failure
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 15; `API-FIND-019` exposed missing AgentOrg receiver-center and selected-member Messages presentation, Requirements approved `RER-026`, and `AD-REV-017` defined the communication-observability recovery.
+- Triggering role, report path, and finding IDs: Architecture Designer, based on approved `RER-026` and API/E2E evidence at `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-013/post-pass-user-discovery/API-FIND-019-agentorg-communication-visibility-gap.md`; new `AR-FIND-008`.
+- Relevant architecture design revision IDs: `AD-REV-017`, cumulative with unchanged accepted `AD-REV-001`-`AD-REV-016`
+- Prior authoritative decision: `Pass` (`ARCH-REV-014`)
+- Current authoritative decision: `Fail — Design Impact`
+- What changed in the review result or what baseline was established: Independently confirmed the supported user-visible gap and most of AD-REV-017's correction. One AgentOrg sidecar remains authoritative; root communication precedes the receiver member-input consequence; complete-Org identity supplies direct/mounted/cross-Team perspectives; a tight read-only Messages facet reuses established Team presentation; reconnect/restore rehydrates from current authority; and no schema or migration is needed. One implementation-blocking inconsistency remains. DS-028 qualifies the new receiver event using only the receiver's `executionKind:'configured'`, while the unchanged exact-ID route accepts task-scoped senders and receivers. A supported task Agent receives its configured delegator's exact run ID in the normal work packet and may use `send_message_to(target_agent_run_id=...)`; therefore task-to-configured delivery reaches the durable post-commit callback and would emit the new configured-member receiver event, contrary to `REQ-034`, `AC-029`, and AD-REV-017's own task-scoped exclusion.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-001`-`AR-FIND-007` | Resolved in prior architecture-review rounds | Remain resolved | `AD-REV-003`-`AD-REV-017`; `ARCH-REV-002`-`ARCH-REV-014` | AD-REV-017 changes none of the accepted definition, handoff, migration, runtime-composition, presentation, status, configuration, history-summary, task-settlement, or shutdown-fence corrections. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020`, `CR-FIND-020` | Resolved in prior rounds | Remain resolved at the design boundary | `AD-REV-004`-`AD-REV-017` | The focused observability delta adds no generic root, mounted-Team authority, second ledger, migration, lifecycle owner, or public/durable contract. |
+| `CR-FIND-019` | Implemented; retained as regression obligation | Remains a regression obligation | `IR-026`-`IR-028`, `CRR-032`, `CRR-036`, `AD-REV-013`-`AD-REV-017` | The communication design neither absorbs nor reverses this source behavior. |
+
+- New or remaining finding IDs: `AR-FIND-008`
+- Material classification changes: The authoritative review changes from `Pass` to `Fail / Design Impact`. AD-REV-017 remains `Medium / High` in isolation and the cumulative package remains `Large / High`. No Requirement Gap or Product UI gap exists.
+- Recommended recipient: `/software_engineering_team/architecture_designer`
+- Remaining risks or uncertainty: Define one AgentOrgRun-owned post-commit predicate over both committed participants. Only configured-to-configured emits the new receiver `MEMBER_INPUT_MESSAGE` and configured Messages rows; configured-to-task, task-to-configured, and task-to-task preserve existing exact-ID delivery/sidecar behavior without the new facet consequences. Align DS-028, the callback/identity shape, file/risk/guidance maps, and VAL-040 deterministic coverage. No new store, route, schema, event type, queue, or lifecycle is warranted.
