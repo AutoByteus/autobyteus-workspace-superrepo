@@ -2,7 +2,7 @@
 
 ## Current Result
 
-**Implementation Complete — Ready for independent Code Review.** This is an implementation-stage result, not API/E2E acceptance or delivery. Initial baseline `IR-001`; approved `RER-004`, reviewed `AD-REV-001` and `ARCH-REV-001` remain unchanged.
+**Implementation Complete — Ready for independent Code Review.** This is an implementation-stage result, not API/E2E acceptance or delivery. Initial baseline `IR-001`; approved `RER-004` and reviewed `AD-REV-001` remain unchanged. Initial `ARCH-REV-001` is supplemented by `ARCH-REV-002` (Pass retained; ownership/navigation clarification only).
 
 - Worktree: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model`
 - Branch: `requirements/stopped-run-compatible-model`
@@ -10,8 +10,8 @@
 - Production/test/evidence development commit: `083387598db6e470078f5637f2f95b666fabe9e5`. The later handoff-record commit changes only implementation records/log whitespace, not production code.
 - Implementation cycle: Initial. Current code and this handoff are authoritative; history is navigational, not proof of acceptance.
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/implementation-revision-record.md`
-- Related revisions: AD-REV-001; ARCH-REV-001; CRR: N/A; API-REV: N/A; DR: N/A.
-- Triggering findings: N/A — initial reviewed-design implementation. AR-N01 is an upstream, nonblocking supplement-index navigation note, not a product finding.
+- Related revisions: AD-REV-001; ARCH-REV-001 and informational ARCH-REV-002; CRR: N/A; API-REV: N/A; DR: N/A.
+- Triggering findings: N/A — initial reviewed-design implementation. AR-N01 is resolved by ARCH-REV-002: use the architecture-owned design/AD-record indexes. Requirements investigation remains read-only; no upstream edit, approval, AD-REV-002 or implementation change is requested.
 
 ## Upstream Artifact Package
 
@@ -131,3 +131,8 @@ API/E2E, source-review and delivery result artifacts: **N/A — not yet performe
 ## Rule-Based Handoff Confirmation
 
 `get_handoff_rules` returned the most-specific initial-completion rule: implementation complete, architectural_risk=High, implementation-scoped validation complete, cumulative package ready for independent source review. Selected single exact recipient: `/software_engineering_team/code_reviewer`. The Local Fix, Low-risk direct, and escalation rules do not apply. The outgoing message carries IR-001 plus RER-004/AD-REV-001/ARCH-REV-001 and the evidence/limitations above; no delivery or review outcome is implied.
+
+
+## Post-Handoff Informational Update — ARCH-REV-002
+
+2026-09-08: Architecture Reviewer retained Pass and resolved AR-N01 as an ownership/navigation clarification. Approved RER-004, AD-REV-001, Medium/High classification, production code, IR-001 implementation result and all downstream real-resume/compacted-history gates are unchanged. The authoritative design-review-report.md and architecture-review-revision-record.md now carry ARCH-REV-002. Use design-spec.md and architecture-design-revision-record.md for the architecture probe index; investigation-notes.md is Requirements Engineer-owned/read-only. This is a supplement to the existing Code Reviewer handoff, not a new implementation round or assignment.
