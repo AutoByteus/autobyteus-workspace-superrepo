@@ -3,132 +3,148 @@
 ## Upstream Artifact Package
 
 - Ticket: `AORG-FLAT-TEAM-001`.
+- Upstream route: `Architecture Design`.
 - Workspace / branch: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model` / `requirements/flat-agent-organization-model`.
-- Approved requirements: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6` in `requirements-doc.md`, with `investigation-notes.md`, `requirements-revision-record.md`, and `agent-org-contract.md`.
-- Approved architecture: cumulative `AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00` in `design-spec.md` and `architecture-design-revision-record.md`.
-- Independent architecture review: `ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577` in `design-review-report.md` and `architecture-review-revision-record.md`.
-- Supplemental Product authority: approved `RV-012 / VIS-001–VIS-020`, `AORG-FLAT-TEAM-STATUS-001`, and `AORG-TEAM-OVERRIDES-001`; `BASELINE-PROMOTION-001` remains clean-entry evidence only.
-- Prior implementation baseline: `IR-031@f519a2093c98f265df9ea958bb5be15d6a5b2494`, artifact `3656220d2f7a1551aa54d8e7e9d3eb8d767b96f6`, followed by `CRR-042 / Pass`.
-- Triggering rework: `API-REV-014 / API-FIND-020` and Code Reviewer `CRR-043 / Fail — Local Fix / CR-FIND-028`.
-- Delivery/API-E2E-owned dirty documents and evidence predate this round and remain preserved, unstaged, unmodified, and unclaimed by Implementation.
+- Requirements doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` (`RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`).
+- Investigation notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`.
+- Requirements revision record and routing assessment: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`; the approved architecture route remains authoritative.
+- Supplemental task contract: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`.
+- Design spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` (`AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00`).
+- Architecture design revision record and self-validation: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
+- Independent architecture review: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md` (`ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`).
+- Product authority: approved `RV-012 / VIS-001–VIS-020`, `AORG-FLAT-TEAM-STATUS-001`, and `AORG-TEAM-OVERRIDES-001`; `BASELINE-PROMOTION-001` remains clean-entry evidence only.
+- Triggering rework: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` and `code-review-revision-record.md` (`CRR-047 / Fail — Local Fix / CR-FIND-029`), after `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md` and `api-e2e-revision-record.md` (`API-REV-017 / Fail / API-FIND-022`).
+- API/E2E failure evidence: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-017/live/API-FIND-022-agentorg-edit-sends-graphql-typename.md` and `API-FIND-022-update-request-response.json`.
+- Delivery state: `DR-006 / Awaiting Explicit User Verification` is superseded for finalization by this source correction. Delivery/API-E2E-owned dirty documents and evidence predate IR-033 and remain preserved, unstaged, unmodified, and unclaimed by Implementation.
 
 ## Current Implementation Summary
 
-`IR-032` resolves `CR-FIND-028 / API-FIND-020` on production source commit `8f9f9ce3f7f4ab9312813de8faf5b651578a7310`.
+`IR-033` resolves `CR-FIND-029 / API-FIND-022` on production source commit `161483fcb980c6bbe1b14b1d97cb582c40b7e929`.
 
-1. AgentOrg status projection now traverses only structural status roots: active Org-root Agent handles, direct configured TeamRuns in saved Org member order, and active root-hosted task TeamRuns in saved root-task order.
-2. Each selected TeamRun remains the sole recursive status owner for its local task-Agent/task-Team descendants. A task Team registered flat for Org identity/lifecycle lookup is therefore not separately re-walked when its owning mounted or root task Team already includes it.
-3. The flat `AgentOrgTeamExecutionDirectory` remains unchanged and authoritative for exact lookup, task registration/settlement, routing, and complete frozen shutdown scope. The correction is not downstream deduplication and removes no registration.
-4. Durably settled root task Teams are not treated as live status roots after local removal. Any unsettled structural root missing from the flat directory still fails closed through `require`.
-5. The strict collaboration stream DTO remains unchanged and continues rejecting actual duplicate or miscorrelated AgentRun statuses. Production-shaped reselect snapshots now contain each configured/task AgentRun exactly once while retaining the complete task tree.
-6. All IR-031 configured-pair message behavior and cumulative Team V2 / AgentOrg V1 definition, runtime, task, migration, history, recovery, shutdown, launch, localization, and unified-workspace contracts remain unchanged.
+1. `agentOrgDefinitionStore` is the single AgentOrg result-to-mutation boundary. It explicitly projects every mutation member to the four declared `AgentOrgMemberInput` fields: `memberName`, `ref`, `refType`, and `refScope`.
+2. Apollo-hydrated `__typename` is accurately modeled as optional response metadata but never forwarded into create or member-bearing update variables. No cache or form object is mutated.
+3. Partial updates that omit `members` continue omitting them; visible edits continue omitting hidden durable fields. Strict GraphQL validation and atomic no-write rejection remain unchanged.
+4. Direct-Agent and referenced-Team member order remains exact. Handoff order and user-authored content remain exact, and referenced Team definitions remain untouched.
+5. A real mounted `AgentOrgExperience` plus the actual Pinia definition store now covers normal Apollo fetch -> visible description edit -> save variables, while a store regression isolates the same transport boundary.
+6. All cumulative Team V2 / AgentOrg V1 definition, migration, runtime, task, history, message, recovery, shutdown, configuration, localization, unified-workspace, and standalone-Team behavior remains unchanged.
 
 - Implementation cycle: `Rework`.
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`.
-- Current implementation revision ID: `IR-032`.
+- Current implementation revision ID: `IR-033`.
+- Related architecture design revisions: cumulative `AD-REV-018`.
+- Related architecture-review revisions: `ARCH-REV-016 / Pass`.
+- Related code-review revisions: `CRR-044 / Pass`, `CRR-047 / Fail — Local Fix`.
+- Related API/E2E revisions: `API-REV-016 / Pass`, `API-REV-017 / Fail`.
+- Related delivery revisions: `DR-006` (existing downstream state; not modified).
+- Triggering finding IDs: `CR-FIND-029`, `API-FIND-022`.
 - Current result: `Implementation Complete — cumulative Large/High package ready for independent source review`.
 
 ## Routing Classification (Mandatory)
 
-- Task size: `Large` (the CR-FIND-028 correction is bounded, but the cumulative ticket remains Large).
-- Architecture risk: `High` (strict root/task execution identity, recursive lifecycle ownership, stream recovery, and shutdown remain material cumulative boundaries).
+- Task size: `Large` (the IR-033 correction is bounded, while the cumulative ticket remains Large).
+- Architecture risk: `High` (the cumulative package retains strict persistence, migration, runtime identity, task, recovery, and root-lifecycle boundaries).
 - Requirements routing assessment path: approved architecture route in `RER-026`.
 - Classification confirmed or changed: `Confirmed`.
-- Evidence and rationale: the change introduces one narrow status projector under the existing AgentOrg aggregate, keeps all current runtime/lifecycle owners, and adds no schema, API, persistence, migration, task-routing, retry, recovery, or Product behavior.
-- Selected route: `Code Review`, using the exact recipient returned by `get_handoff_rules`.
+- Evidence and rationale: IR-033 changes one existing frontend mutation boundary and focused tests only. It adds no API/schema, backend, persistence, migration, runtime, recovery, lifecycle, cache authority, compatibility path, or Product behavior.
+- Selected route: `Code Review`, subject to the exact result returned by `get_handoff_rules`.
 - Lightweight implementation self-review for direct route: `Not Applicable — architecture-routed Large/High package`.
 - New Design Impact, Requirement Gap, Product gap, or escalation trigger: `None`.
 
 ## Reviewed Behavior Implementation Trace
 
-| Behavior / Finding | Required or Preserved Outcome | Implemented Production Path | Result |
+| Behavior / Finding | Required Or Preserved Outcome | Implemented Production Path | Result |
 | --- | --- | --- | --- |
-| `REQ-015`, `AC-010`, `SCN-005`, `CR-FIND-028`, `API-FIND-020` | A configured Org member may delegate to a flat Team while the owning Org remains usable; snapshot/reselect must show every live AgentRun exactly once. | `AgentOrgRun.getAgentStatusSnapshots` -> `projectAgentOrgAgentStatusSnapshots` -> root Agent handles + structural configured/root-task Team roots -> each `TeamRun.getLeafAgentStatusSnapshots` recursively. | Implemented; strict stream snapshot parses and two independent reselect connections publish the same unique status set. |
-| Exact mounted/root/recursive task-Team ownership | Mounted-parent and root-hosted task Teams own descendants recursively, while the Org directory remains flat for identity/lifecycle lookup. | Structural roots come from the strict Org execution tree; exact active TeamRun lookup remains `AgentOrgTeamExecutionDirectory.require`. Nested registered TeamRuns are not independent status roots. | Implemented without deduplication, registration removal, or routing change. |
-| Settlement/removal | A durably settled root task Team removed locally must not be required for a live status snapshot. | Root task Team is selected only when `settledAt === null`; configured Teams remain required while the Org is active. | Implemented and covered. |
-| Root shutdown | Every flat registered active Team scope, including nested task Teams, remains frozen/fenced/finished during whole-Org shutdown. | Existing `AgentOrgTeamExecutionDirectory.freezeForRootTermination` and `createFrozenAgentOrgTerminationScope`; status projection does not replace or filter this lifecycle path. | Preserved and covered. |
-| Strict admission/recovery | Real contradictions still fail closed; no permissive output repair or extra recovery machinery. | Existing strict DTO, AgentOrg stream connection, checkpoint, and automatic recovery owners are unchanged. | Preserved. |
-| Cumulative `BEH-001–017`, `REQ-001–034`, prior `CR-FIND-001–027` | Preserve all previously reviewed definition, execution, task, history, message, migration, UI, and lifecycle behavior. | Current Team V2 / AgentOrg V1 and root-neutral runtime owners remain authoritative. | No cumulative behavior was intentionally changed. |
+| `REQ-018`, `AC-013`, `SCN-006` | A mixed AgentOrg may retain a direct Agent and reference the same standalone Team identity through later edits. | Apollo query -> `AgentOrgExperience.hydrateForm` -> visible edit -> `agentOrgDefinitionStore.update` -> exact member-input projector -> GraphQL mutation. | Implemented; both member kinds remain ordered and contain only the four declared fields. |
+| `REQ-023`, `AC-017`, `SCN-008`, `CR-FIND-029`, `API-FIND-022` | A normal fetched AgentOrg visible edit saves atomically instead of failing on Apollo response metadata. | `toMutationMembers` constructs new allowlisted input objects at the store mutation boundary for create and member-bearing update. | Implemented; `__typename` remains on source response objects and is absent from outbound variables. |
+| `AC-017` | Member and handoff order, user-authored rules, save feedback, and failed-draft semantics remain exact. | Projection maps members in input order; handoffs are passed through their existing authoring conversion/order owner. | Preserved and covered. |
+| `AC-018`, prior `CR-FIND-003` | Org edit changes only Org-owned visible data, preserves referenced Team ownership, and does not clear hidden durable Org fields. | `AgentOrgExperience.visibleInput` remains narrow; store projection touches only copied mutation member values. | Preserved; hidden fields are absent and Team/cache objects are not mutated. |
+| Strict GraphQL input / atomic no-write | Undeclared input still fails closed, without server relaxation or partial persistence. | Existing GraphQL schema/resolver/persistence path is unchanged. | Preserved. |
+| Cumulative `BEH-001–017`, `REQ-001–034`, prior `CR-FIND-001–028` | Preserve all reviewed definition, runtime, migration, task, communication, history, UI, and lifecycle behavior. | Existing Team V2 / AgentOrg V1 and root-neutral owners remain authoritative. | No cumulative behavior was intentionally changed. |
 
 ## Key Files Or Areas
 
-- Aggregate call site: `autobyteus-server-ts/src/agent-org-execution/domain/agent-org-run.ts`.
-- New single status traversal owner: `autobyteus-server-ts/src/agent-org-execution/services/agent-org-agent-status-snapshot-projector.ts`.
-- Production-shaped regression: `autobyteus-server-ts/tests/unit/agent-org-execution/agent-org-status-snapshot-traversal.test.ts`.
-- Preserved recursive Team status owner: `autobyteus-server-ts/src/agent-team-execution/local/flat-team-execution-manager.ts`.
-- Preserved flat identity/lifecycle owner: `autobyteus-server-ts/src/agent-org-execution/services/agent-org-team-execution-directory.ts`.
-- Preserved task activation/settlement owner: `autobyteus-server-ts/src/agent-org-execution/services/agent-org-task-lifecycle-adapter.ts`.
-- Preserved strict transport boundary: `autobyteus-server-ts/src/services/agent-streaming/agent-org-stream-handler.ts` and `agent-org-execution-view-projector.ts`.
+- Mutation projection owner: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/stores/agentOrgDefinitionStore.ts`.
+- Store transport regression: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/stores/__tests__/agentOrgDefinitionStore.spec.ts`.
+- Production-shaped visible-edit integration regression: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/components/agentOrgs/__tests__/AgentOrgExperienceApolloEdit.spec.ts`.
+- Preserved authoring surface: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/components/agentOrgs/AgentOrgExperience.vue` (unchanged by IR-033).
 
 ## Important Assumptions
 
-- The strict current Org execution tree is the structural ownership authority: configured Teams are direct Org members, and only unsettled Team tasks directly under `rootOrg.taskExecutions` are root-hosted task-Team status roots.
-- Root Agent handles already contain active configured direct Agents and active root-hosted task Agents exactly once.
-- `TeamRun.getLeafAgentStatusSnapshots` remains recursively complete for configured members plus local task Agents and task Teams.
-- The flat Team directory intentionally contains configured and task TeamRuns beyond the structural status roots because exact routing, settlement, and shutdown require those registrations.
-- Task activation and settlement commit directory/tree state synchronously after durability; an unsettled structural Team missing from the directory is invalid and must remain a strict failure.
+- Apollo response objects may carry `__typename`; this is response metadata, not an AgentOrg mutation-input field.
+- `AgentOrgMemberInput` has exactly four declared member fields under the current strict GraphQL contract.
+- The definition store is the narrow existing mutation owner for both create and update, so projection there covers every caller without creating a second authoring or normalization authority.
+- An update with `members === undefined` is a legitimate partial update and must remain omission, not an empty member list.
 
 ## Known Risks
 
-- Independent cumulative source review and renewed real-system API/E2E are mandatory before Delivery resumes.
-- The implementation-scoped regression uses strict current-shape trees, the real aggregate/stream serializer, and production-shaped status owners, but not a live provider/MCP task. API/E2E owns the real mounted-Agent delegation and recovery rerun.
-- API-REV-014 `LIVE-004–006` and `MIG-001` remain downstream-held until the corrected package passes source review.
+- Independent cumulative source review and renewed complete API/E2E remain mandatory before Delivery can resume.
+- Component/store tests exercise the exact production client boundaries but do not replace a real Apollo/server/browser replay. API/E2E owns the fresh complete API-REV-017 matrix.
+- The API-REV-017 cases held by the critical fail-fast gate remain unvalidated on IR-033 until downstream execution completes.
 
 ## Task Design Health Assessment Implementation Check
 
-- Reviewed root-cause classification: flat directory identity/lifecycle enumeration was incorrectly reused as structural recursive status traversal.
-- Reviewed refactor decision: bounded implementation Local Fix inside the existing enumeration boundary; no architecture revision required.
+- Reviewed change posture: bounded frontend serialization Local Fix.
+- Reviewed root-cause classification: Apollo query-result member objects were treated as strict GraphQL member-input objects.
+- Reviewed refactor decision: `No Refactor Needed`; one explicit allowlisted projection at the existing mutation owner is sufficient.
 - Implementation matched the reviewed assessment: `Yes`.
-- Boundary result: the aggregate has one explicit status projector; directory, Team recursion, strict DTO, task lifecycle, and shutdown ownership remain separate and unchanged.
-- If challenged, route as Design Impact: `N/A`.
+- If challenged, routed as Design Impact: `N/A`.
+- Evidence / notes: no component-side stripping, generic recursive cleaner, cache mutation, compatibility handling, retry, or server relaxation was introduced.
 
 ## Legacy / Compatibility Removal Check
 
-- Backward-compatibility mechanism introduced: `None`.
-- Legacy behavior retained in scope: `No`.
-- Permissive downstream deduplication introduced: `No`.
-- Dead/obsolete status path removed: `Yes`; AgentOrg no longer recursively enumerates every flat directory Team as a status root.
-- Shared structures remain tight: `Yes`; the new projector accepts only the strict tree and narrow root-Agent/Team lookup capabilities.
-- Source guardrails: `AgentOrgRun` is `492` effective non-empty lines and the new projector is `26`; both remain below `500`. Production delta is `+33/-3`, below the `>220` split signal.
+- Backward-compatibility mechanisms introduced: `None`.
+- Legacy old behavior retained in scope: `No`.
+- Dead/obsolete path removed in scope: `Yes`; unchanged forwarding of response-shaped member objects is replaced by one exact input projection.
+- Shared structures remain tight: `Yes`; the response type has only one optional response-only field, and mutation members use a four-field specialized input shape.
+- Canonical shared design guidance reapplied: `Yes`.
+- Source guardrails: `agentOrgDefinitionStore.ts` is `75` effective non-empty lines; the production delta is `+14/-2`, below the `>220` split signal and `500` hard limit.
 
 ## Persisted Data Transition Check (When Applicable)
 
-- Approved decision for this correction: `Not Affected`.
-- Schema/file/path/bytes changed: `No`.
-- Migration added or changed: `No`.
-- Current Team V2 / AgentOrg V1 ownership, startup migration ordering/result matrices, external read-only definitions, and native Team V2 zero-write cohort: `Preserved`.
+- Approved decision: `Not Affected`.
+- Design-spec decision reference: cumulative `AD-REV-018`; IR-033 introduces no persistence transition.
+- Implementation follows the approved decision: `Yes`.
+- Schema/file/path/bytes or migration changed: `No`.
+- Existing strict GraphQL rejection and atomic no-write behavior: `Preserved`.
+- Deviation: `None`.
 
 ## Environment Or Dependency Notes
 
+- `pnpm` was invoked through Corepack per the frontend README.
+- The production Nuxt build required the existing shared `@autobyteus/application-sdk-contracts` and `@autobyteus/application-backend-sdk` build prerequisites. Their generated untracked `dist/` directories were removed after validation.
 - External `autobyteus-agents` and `autobyteus-private-agents` remain read-only and untouched.
-- The server tests/build require the existing workspace shared-package build prerequisite. A temporary Corepack command shim was used because `pnpm` was not directly on this shell PATH; generated shared `dist/` output was removed after validation.
-- Direct `tsc -p tsconfig.json --noEmit` remains an unsuitable repository gate because that config includes `tests` below a `src` rootDir. The production `tsconfig.build.json` path passes through the standard build.
-- Downstream-owned modified reports/docs and untracked API/E2E/Delivery evidence were not staged, reset, edited, or claimed.
+- Delivery/API/E2E-owned modified reports/docs and untracked evidence were not staged, reset, edited, or claimed.
 
 ## Local Implementation Checks Run
 
 These are implementation-scoped checks, not downstream API/E2E sign-off.
 
-- Exact status/stream/reselect plus recursive Team and shutdown regression cohort: `4` files / `19` tests passed (`/tmp/aorg-ir032-server-focused.log`).
-- Cumulative AgentOrg execution, stream, task, history, migration, and flat-Team regression cohort: `16` files / `71` tests passed (`/tmp/aorg-ir032-server-cumulative.log`).
-- Server production build, Prisma generation, shared-package preparation, built-in Agent bootstrap, and sanitized built-module/bootstrap smoke: passed (`/tmp/aorg-ir032-server-build.log`).
-- `git diff --check`: passed for the source/test change and final implementation artifacts.
-- Source-size check: passed; all changed production sources remain under `500` effective non-empty lines and the production delta remains below the `>220` split signal.
+- Exact AgentOrg authoring/store cohort: `3` files / `7` tests passed (`/tmp/aorg-ir033-web-focused.log`).
+- Cumulative AgentOrg authoring, configuration, context, stream, history, projection, and localization cohort: `23` files / `135` tests passed (`/tmp/aorg-ir033-web-cumulative.log`).
+- `guard:web-boundary`, `guard:localization-boundary`, and `audit:localization-literals`: passed, with zero unresolved localization findings (`/tmp/aorg-ir033-web-guards.log`).
+- Shared SDK prerequisites plus Nuxt production build/prerender: passed; `3,815` client modules and `16` routes (`/tmp/aorg-ir033-web-build.log`).
+- `git diff --check`: passed.
+- Source-size check: passed; the changed production file is `75` effective non-empty lines.
 
 ## Frontend Rendered-Result Check (When Applicable)
 
-- `Not Applicable — IR-032 is a server-only status traversal and test correction. No frontend template, styling, interaction, accessibility, route, or Product behavior changed.`
-- The visible stale/offline recovery consequence requires renewed real-browser API/E2E after source review; no rendered validation is claimed by Implementation for this round.
+- Affected journey: normal AgentOrg Edit after an Apollo-backed mixed direct-Agent/referenced-Team fetch; change the visible description and save.
+- Approved references reviewed: `REQ-018`, `REQ-023`, `AC-013`, `AC-017`, `AC-018`, `SCN-006`, `SCN-008`; RV-012 AgentOrg authoring and `VIS-009–VIS-013`, `VIS-019`; `autobyteus-web/README.md`.
+- Existing surface reviewed: current `AgentOrgExperience` form and its established Pinia/Apollo store boundary.
+- Rendered interaction used: Vue Test Utils mounted the real `AgentOrgExperience`; the test populated it from Apollo-shaped direct-Agent/Team results, edited the rendered textarea, and submitted the rendered form through the actual store.
+- States inspected: fetched edit state, visible description change, submit, exact outbound variables, preserved source metadata/order, and hidden-field omission.
+- Visual or interaction issues found and corrected: the user-visible save failure was corrected at transport serialization. No template, CSS, layout, copy, focus, responsive, or accessibility source changed, so no new visual composition required adjustment.
+- Limitation: this implementation loop does not claim real GraphQL/browser success; API/E2E must replay the complete real production journey after source review.
 
 ## Downstream Coverage Hints / Suggested Scenarios
 
-1. Repeat API-FIND-020: from a mounted configured Agent, delegate to a flat Team, retain/reselect the exact owning Org, and assert one complete strict snapshot with every configured/task AgentRun ID exactly once and the new task Team visible.
-2. Cover root-hosted task Team, mounted-host task Team, and a recursive task-Team descendant; assert each subtree is traversed only through its structural root and all exact members remain visible.
-3. Settle/remove nested and root-hosted task Teams, reconnect, and assert retired AgentRun statuses are absent while configured/live statuses remain complete.
-4. Terminate the Org with configured, root-task, mounted-task, and recursive task-Team scopes; assert the unchanged flat directory freezes/fences/finishes the entire scope and unregisters cleanly.
-5. Confirm a genuinely duplicated or miscorrelated status still fails strict DTO/recovery handling; do not accept downstream deduplication.
-6. Resume API-REV-014 `LIVE-004–006` and `MIG-001`, then regress IR-031 configured/task communication directions, exact Messages presentation, reconnect/restore, standalone Team, and cumulative migration/history behavior.
+1. Repeat `AUTH-ORG-001`: create or fetch an Org containing one direct Agent and one referenced Team, edit only its visible description, save, and assert revision advances with no GraphQL input error.
+2. Capture the update variables and prove every member contains exactly `memberName`, `ref`, `refType`, and `refScope`; no `__typename` or hidden Org field is present.
+3. Reopen the Org and prove member order, handoff/rules order, hidden durable fields, and referenced Team identity/local definition remain exact.
+4. Exercise a partial AgentOrg update that omits `members` and prove omission is retained rather than serialized as an empty list.
+5. Confirm deliberately undeclared GraphQL input still fails strictly and makes no partial write; do not infer server relaxation.
+6. Resume the complete fresh API-REV-017 matrix, including every case held after `AUTH-ORG-001`, rather than substituting historical or delta-only evidence.
 
 ## API / E2E / Executable Coverage Investigation And Execution Still Required
 
-Yes. This handoff reports implementation-scoped checks only. The cumulative Large/High package requires independent source review first, followed by renewed API/E2E and Delivery according to their owning stages and dynamic handoff rules.
+Yes. IR-033 reports implementation-scoped checks only. The cumulative Large/High package requires independent cumulative source review first, followed by the complete renewed API/E2E matrix and Delivery according to their owning stages and dynamic handoff rules.
