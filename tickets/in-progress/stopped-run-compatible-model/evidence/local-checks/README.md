@@ -32,3 +32,5 @@ The adapter uses configured-runtime evidence, not model-name capacities. The Cod
 - https://raw.githubusercontent.com/openai/codex/rust-v0.153.4/codex-rs/models-manager/src/manager.rs
 - https://raw.githubusercontent.com/openai/codex/rust-v0.153.4/codex-rs/models-manager/src/model_info.rs
 These sources inform only the isolated metadata adapter; no provider compression logic was changed. Unknown/unattributable metadata does not create an extra model-pair rule and does not block same-model schema validation.
+
+Retained text logs have trailing whitespace normalized for repository hygiene; observations, assertions, and result counts are unchanged.

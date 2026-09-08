@@ -399,7 +399,7 @@ Error: Test timed out in 5000ms.
 If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
  ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:826:3
     824|   });
-    825| 
+    825|
     826|   it("carries one explicit task-identity pair through every Team and t…
        |   ^
     827|     const exactTestFiles = (symbol: string): string[] => typescriptFil…
@@ -412,7 +412,7 @@ Error: Test timed out in 5000ms.
 If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
  ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:863:3
     861|   });
-    862| 
+    862|
     863|   it("keeps context translation provider-neutral and all path authorit…
        |   ^
     864|     const forbiddenProviderOwners = [
@@ -425,7 +425,7 @@ Error: Test timed out in 5000ms.
 If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
  ❯ tests/architecture/application-framework-boundaries.test.ts:2049:3
     2047|   });
-    2048| 
+    2048|
     2049|   it("keeps required tool registration behind the single lifecycle rea…
        |   ^
     2050|     type ToolSpec = Readonly<{
@@ -438,7 +438,7 @@ Error: Test timed out in 15000ms.
 If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
  ❯ tests/architecture/application-framework-boundaries.test.ts:3139:3
     3137|   });
-    3138| 
+    3138|
     3139|   it("guards the exact SR-013 root-bound task construction inventory",…
        |   ^
     3140|     const managerOccurrences = sr013NewOccurrences("MixedTeamManager");
@@ -451,4 +451,3 @@ If this is a long-running test, pass a timeout value as the last argument or con
       Tests  8 failed | 65 passed (73)
    Start at  08:58:59
    Duration  118.51s (transform 8.92s, setup 131ms, import 37.19s, tests 74.94s, environment 1ms)
-
