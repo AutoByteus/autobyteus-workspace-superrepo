@@ -8,6 +8,7 @@ import type { DefaultLaunchConfig } from '~/types/launch/defaultLaunchConfig'
 import type { DefinitionHandoff } from '~/types/collaboration/handoffs'
 
 export type AgentOrgMember = {
+  __typename?: 'AgentOrgMember'
   memberName: string
   ref: string
   refType: 'AGENT' | 'AGENT_TEAM'
@@ -27,6 +28,15 @@ export type AgentOrgDefinition = {
 }
 export type AgentOrgDefinitionDraft = Omit<AgentOrgDefinition, 'id' | 'revision'>
 
+type AgentOrgMemberInput = Omit<AgentOrgMember, '__typename'>
+
+const toMutationMembers = (members: readonly AgentOrgMember[]): AgentOrgMemberInput[] => members.map((member) => ({
+  memberName: member.memberName,
+  ref: member.ref,
+  refType: member.refType,
+  refScope: member.refScope,
+}))
+
 export const useAgentOrgDefinitionStore = defineStore('agentOrgDefinition', () => {
   const definitions = ref<AgentOrgDefinition[]>([])
   const loading = ref(false)
@@ -43,14 +53,16 @@ export const useAgentOrgDefinitionStore = defineStore('agentOrgDefinition', () =
     } catch (cause) { error.value = cause; throw cause } finally { loading.value = false }
   }
   const create = async (input: AgentOrgDefinitionDraft): Promise<AgentOrgDefinition> => {
-    const { data, errors } = await getApolloClient().mutate({ mutation: CreateAgentOrgDefinition, variables: { input } })
+    const mutationInput = { ...input, members: toMutationMembers(input.members) }
+    const { data, errors } = await getApolloClient().mutate({ mutation: CreateAgentOrgDefinition, variables: { input: mutationInput } })
     if (errors?.length) throw new Error(errors.map((entry: { message: string }) => entry.message).join(', '))
     const created = data.createAgentOrgDefinition as AgentOrgDefinition
     definitions.value = [...definitions.value, created]
     return created
   }
   const update = async (id: string, expectedRevision: string, input: Partial<AgentOrgDefinitionDraft>): Promise<AgentOrgDefinition> => {
-    const { data, errors } = await getApolloClient().mutate({ mutation: UpdateAgentOrgDefinition, variables: { input: { id, expectedRevision, ...input } } })
+    const mutationInput = input.members === undefined ? input : { ...input, members: toMutationMembers(input.members) }
+    const { data, errors } = await getApolloClient().mutate({ mutation: UpdateAgentOrgDefinition, variables: { input: { id, expectedRevision, ...mutationInput } } })
     if (errors?.length) throw new Error(errors.map((entry: { message: string }) => entry.message).join(', '))
     const updated = data.updateAgentOrgDefinition as AgentOrgDefinition
     definitions.value = definitions.value.map((item) => item.id === id ? updated : item)
