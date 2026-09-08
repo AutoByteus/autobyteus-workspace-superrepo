@@ -156,4 +156,37 @@ describe('RuntimeModelConfigFields stored historical values', () => {
       { reasoning_effort: 'low' },
     ])
   })
+
+  it('offers only verified replacements and emits a reset coherent pair for existing Settings', async () => {
+    providers = [{
+      provider: { id: 'OPENAI', name: 'OpenAI', providerType: 'OPENAI', isCustom: false },
+      models: ['saved', 'larger', 'smaller'].map((id) => ({
+        modelIdentifier: id, name: id, value: id, canonicalName: id,
+        providerId: 'OPENAI', providerName: 'OpenAI', providerType: 'OPENAI', runtime: 'api',
+        configSchema: null,
+      })),
+    }]
+    const wrapper = mount(RuntimeModelConfigFields, {
+      props: {
+        runtimeKind: 'autobyteus', llmModelIdentifier: 'saved', llmConfig: { old: true },
+        originalModelIdentifier: 'saved', runtimeSelectionLocked: true,
+        modelOptions: { status: 'ready', options: {
+          currentModelIdentifier: 'saved', currentContextTokens: 128000,
+          replacements: [{ llmModelIdentifier: 'larger', contextTokens: 272000 }], unavailableReason: null,
+        } },
+      },
+    })
+    await flushPromises()
+    const picker = wrapper.findComponent({ name: 'SearchableGroupedSelect' })
+    expect(picker.props('options').flatMap((group: any) => group.items.map((item: any) => item.id))).toEqual(['saved', 'larger'])
+    picker.vm.$emit('update:modelValue', 'smaller')
+    expect(wrapper.emitted('selection-change')).toBeUndefined()
+    picker.vm.$emit('update:modelValue', 'larger')
+    expect(wrapper.emitted('selection-change')?.at(-1)).toEqual([{ llmModelIdentifier: 'larger', llmConfig: null }, true])
+    await wrapper.setProps({ modelOptions: { status: 'unavailable', options: null } })
+    expect(picker.props('options').flatMap((group: any) => group.items.map((item: any) => item.id))).toEqual(['saved'])
+    expect(wrapper.get('[data-test="model-capacity-status"]').text()).toContain('Current-model settings can still be edited')
+    wrapper.unmount()
+  })
+
 })

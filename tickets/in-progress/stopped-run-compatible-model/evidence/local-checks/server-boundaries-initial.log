@@ -1,0 +1,454 @@
+
+ RUN  v4.0.18 /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "autobyteus-server-test.db" at "file:/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/autobyteus-server-test.db"
+
+Applying migration `20260203074245_init`
+Applying migration `20260208094000_add_external_channel_tables`
+Applying migration `20260209174500_add_channel_message_receipt_turn_id`
+Applying migration `20260209213000_remove_agent_conversation_tables`
+Applying migration `20260210101500_add_agent_avatar`
+Applying migration `20260210192000_add_agent_team_avatar`
+Applying migration `20260211214500_add_sync_columns_and_tombstones`
+Applying migration `20260212070000_remove_workflow_definition`
+Applying migration `20260309103000_add_channel_binding_launch_preset`
+Applying migration `20260310153000_add_channel_binding_team_definition_id`
+Applying migration `20260331102000_remove_channel_bindings_table`
+Applying migration `20260331130000_receipt_lifecycle_and_remove_channel_idempotency`
+Applying migration `20260517090000_add_app_data_migration_records`
+Applying migration `20260624090000_add_token_usage_ledger_events`
+Applying migration `20260625193000_token_usage_component_pricing_explainability`
+Applying migration `20260629120000_add_token_usage_display_fields`
+Applying migration `20260702093000_token_usage_execution_address`
+Applying migration `20260726090000_add_secret_vault`
+Applying migration `20260730090000_add_token_usage_provider_name`
+Applying migration `20260801090000_token_usage_member_display_name`
+Applying migration `20260814090000_team_run_execution_tree_v1`
+Applying migration `20260819090000_add_token_usage_run_records`
+Applying migration `20260820090000_redesign_app_data_migration_summary`
+Applying migration `20260822090000_add_token_usage_analytics`
+
+Database reset successful
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260203074245_init/
+    └─ migration.sql
+  └─ 20260208094000_add_external_channel_tables/
+    └─ migration.sql
+  └─ 20260209174500_add_channel_message_receipt_turn_id/
+    └─ migration.sql
+  └─ 20260209213000_remove_agent_conversation_tables/
+    └─ migration.sql
+  └─ 20260210101500_add_agent_avatar/
+    └─ migration.sql
+  └─ 20260210192000_add_agent_team_avatar/
+    └─ migration.sql
+  └─ 20260211214500_add_sync_columns_and_tombstones/
+    └─ migration.sql
+  └─ 20260212070000_remove_workflow_definition/
+    └─ migration.sql
+  └─ 20260309103000_add_channel_binding_launch_preset/
+    └─ migration.sql
+  └─ 20260310153000_add_channel_binding_team_definition_id/
+    └─ migration.sql
+  └─ 20260331102000_remove_channel_bindings_table/
+    └─ migration.sql
+  └─ 20260331130000_receipt_lifecycle_and_remove_channel_idempotency/
+    └─ migration.sql
+  └─ 20260517090000_add_app_data_migration_records/
+    └─ migration.sql
+  └─ 20260624090000_add_token_usage_ledger_events/
+    └─ migration.sql
+  └─ 20260625193000_token_usage_component_pricing_explainability/
+    └─ migration.sql
+  └─ 20260629120000_add_token_usage_display_fields/
+    └─ migration.sql
+  └─ 20260702093000_token_usage_execution_address/
+    └─ migration.sql
+  └─ 20260726090000_add_secret_vault/
+    └─ migration.sql
+  └─ 20260730090000_add_token_usage_provider_name/
+    └─ migration.sql
+  └─ 20260801090000_token_usage_member_display_name/
+    └─ migration.sql
+  └─ 20260814090000_team_run_execution_tree_v1/
+    └─ migration.sql
+  └─ 20260819090000_add_token_usage_run_records/
+    └─ migration.sql
+  └─ 20260820090000_redesign_app_data_migration_summary/
+    └─ migration.sql
+  └─ 20260822090000_add_token_usage_analytics/
+    └─ migration.sql
+
+ ❯ tests/architecture/application-framework-boundaries.test.ts (20 tests | 2 failed) 32233ms
+     ✓ keeps the complete current TS/JS/Vue tree inside AFB-001 through AFB-005  4648ms
+     × keeps required tool registration behind the single lifecycle readiness owner 6371ms
+     ✓ extracts every governed import form without reading comments or arbitrary strings 5ms
+     ✓ enforces every named AFB-001 private runtime category while retaining exact inputs 11ms
+     ✓ enforces each GraphQL and Studio presentation direction in AFB-002 9ms
+     ✓ enforces every AFB-003 outward owner direction with only the named catalog-transition seam 11ms
+     ✓ fails closed for malformed Vue and unresolved governed source 4ms
+     ✓ resolves Vue external-script imports from that script while keeping SFC-owned diagnostics 4ms
+     ✓ governs Vue external-script targets under AFB-002 and AFB-005 5ms
+     ✓ resolves package imports only from the owning manifest 5ms
+     ✓ uses each AFB-005 importer's own manifest and project root 6ms
+     ✓ resolves named aliases and namespace members for every direct AFB-004 callee 8ms
+     ✓ accepts only the two named assembly roots as general-process selection exemptions 5ms
+     ✓ accepts complete construction shapes and rejects every omission, null, undefined, and opaque spread 197ms
+     ✓ enforces the exact scope, orchestration, and platform assembly call shapes 78ms
+     ✓ guards the exact ApplicationExecutionScope containment and consumer shapes 157ms
+     ✓ rejects synthetic live-aggregate escape and direct consumer access 2ms
+     ✓ guards the exact SR-011 host definition and public/general run authority  2463ms
+     ✓ guards SR-003 completion-only correlation and the two lifecycle control callsites  325ms
+     × guards the exact SR-013 root-bound task construction inventory 17918ms
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts (14 tests | 6 failed) 42534ms
+     ✓ keeps each supported root on one exact workspace, builder, Host, and authority family 5ms
+     ✓ keeps application capability injection tight on the tokenless run-session foundation 5ms
+     ✓ closes retired symbols and provider-specific construction below supported roots  1458ms
+     ✓ keeps activation provider-local and deactivation at the AgentRun resource owner 7ms
+     ✓ keeps the application kernel private to its builder and owning scope  626ms
+     × fails closed on the exact direct-constructor test sets and narrow fixture property 4977ms
+     × keeps AgentTeamRunManager creation explicit and process access lookup-only 527ms
+     ✓ binds exactly two production Mixed Team factories to complete root families  450ms
+     × closes complete Agent manager and AgentRun construction to exact roots and fixtures 14764ms
+     × selects one host validator and propagates it to the two exact lifecycle roots 2573ms
+     × carries one explicit task-identity pair through every Team and task constructor 9642ms
+     × keeps context translation provider-neutral and all path authority explicit 6364ms
+     ✓ creates one frozen context path value per host and shares it across both roots  1114ms
+     ✓ rejects synthetic omission, null, undefined, casts, ambient getters, and broad substitutes 17ms
+stdout | tests/unit/standalone-application-host/standalone-application-host-lifecycle.test.ts
+AgentFactory (Singleton) initialized.
+
+ ✓ tests/unit/standalone-application-host/standalone-application-host-lifecycle.test.ts (11 tests) 16ms
+stdout | tests/unit/application-platform/application-execution-scope.test.ts
+AgentFactory (Singleton) initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > owns one complete graph-local kernel and freezes every outward capability
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > projects configured Team members depth-first, excludes task nodes, and deep-freezes
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > projects Agent launch identity without leaking the service result
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > authorizes configured and dynamic application Team producers through the live root topology
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > maps restore-aware Agent and Team input without changing target or errors
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > quiesces issue admission and closes run graph before authority exactly once
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > continues authority close after shutdown failure and aggregates both failures
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope.test.ts > ApplicationExecutionScope > delegates construction abort exactly once after kernel transfer
+AgentRunManager initialized.
+
+ ✓ tests/unit/application-platform/application-execution-scope.test.ts (8 tests) 32ms
+stdout | tests/unit/application-platform/application-execution-scope-kernel-builder.test.ts
+AgentFactory (Singleton) initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope-kernel-builder.test.ts > buildApplicationExecutionScopeKernel construction transaction > unwinds the exact owned authority at K6
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope-kernel-builder.test.ts > buildApplicationExecutionScopeKernel construction transaction > unwinds the exact owned authority at K7
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-execution-scope-kernel-builder.test.ts > buildApplicationExecutionScopeKernel construction transaction > transfers one complete frozen K8 kernel with fixed idempotent construction abort
+AgentRunManager initialized.
+
+ ✓ tests/unit/application-platform/application-execution-scope-kernel-builder.test.ts (9 tests) 29ms
+stdout | tests/unit/agent-execution/general-process-run-supervisor-ownership.test.ts
+AgentFactory (Singleton) initialized.
+
+(node:39901) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | tests/unit/agent-execution/general-process-run-supervisor-ownership.test.ts > GeneralProcessRunSupervisor ownership > keeps migration/history construction passive and owns exactly one process manager family
+Platform detection: Windows=false
+App root directory: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts
+App data directory: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.753Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+
+stdout | tests/unit/agent-execution/general-process-run-supervisor-ownership.test.ts > GeneralProcessRunSupervisor ownership > keeps migration/history construction passive and owns exactly one process manager family
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.758Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+
+stdout | tests/unit/agent-execution/general-process-run-supervisor-ownership.test.ts > GeneralProcessRunSupervisor ownership > releases the agent manager when exclusive team-manager initialization fails
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.760Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.760Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+
+stdout | tests/unit/agent-execution/general-process-run-supervisor-ownership.test.ts > GeneralProcessRunSupervisor ownership > fails on an early process run service and releases constructed managers
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.762Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.762Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+
+stdout | tests/unit/agent-execution/general-process-run-supervisor-ownership.test.ts > GeneralProcessRunSupervisor ownership > rejects every omitted, null, or undefined required input before manager mutation
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.764Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.764Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.764Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.765Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.765Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.765Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.765Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.765Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.766Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.766Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.766Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.766Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.766Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.766Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.766Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.767Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.768Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.768Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.768Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.768Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.768Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.768Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.768Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-08T09:00:50.769Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+
+ ✓ tests/unit/agent-execution/general-process-run-supervisor-ownership.test.ts (4 tests) 37ms
+(node:39969) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | tests/unit/application-platform/application-platform-runtime-isolation.test.ts
+AgentFactory (Singleton) initialized.
+
+stdout | tests/unit/application-platform/application-platform-runtime-isolation.test.ts > application platform runtime isolation > builds isolated services without starting an agent or team run
+Platform detection: Windows=false
+App root directory: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts
+App data directory: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts
+
+stdout | tests/unit/application-platform/application-platform-runtime-isolation.test.ts > application platform runtime isolation > builds isolated services without starting an agent or team run
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-platform-runtime-isolation.test.ts > application platform runtime isolation > builds isolated services without starting an agent or team run
+AgentRunManager initialized.
+
+stdout | tests/unit/application-platform/application-platform-runtime-isolation.test.ts > application platform runtime isolation > aborts a completed scope when later platform assembly fails without closing process owners
+AgentRunManager initialized.
+
+ ✓ tests/unit/application-platform/application-platform-runtime-isolation.test.ts (2 tests) 34ms
+stderr | tests/unit/agent-team-execution/agent-team-run-manager-lifecycle.test.ts > AgentTeamRunManager root lifecycle > never unregisters from an inactive read and isolates lifecycle listener failures
+RootTeamRun lifecycle listener failed: Error: listener failure
+    at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/unit/agent-team-execution/agent-team-run-manager-lifecycle.test.ts:127:62
+    at AgentTeamRunManager.notify (/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts:469:13)
+    at AgentTeamRunManager.register (/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts:457:10)
+    at register (/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/unit/agent-team-execution/agent-team-run-manager-lifecycle.test.ts:45:65)
+    at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/unit/agent-team-execution/agent-team-run-manager-lifecycle.test.ts:130:18
+    at Proxy.assertThrows (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:2798:5)
+    at Proxy.methodWrapper (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)
+    at Proxy.<anonymous> (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vitest+expect@4.0.18/node_modules/@vitest/expect/dist/index.js:1149:12)
+    at Proxy.overwritingMethodWrapper (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1750:33)
+    at Proxy.<anonymous> (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vitest+expect@4.0.18/node_modules/@vitest/expect/dist/index.js:1485:16)
+
+ ✓ tests/unit/agent-team-execution/agent-team-run-manager-lifecycle.test.ts (5 tests) 27ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > fails closed on the exact direct-constructor test sets and narrow fixture property
+AssertionError: expected [ …(11) ] to deeply equal [ …(9) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,9 @@
+  [
++   "autobyteus-server-ts/tests/e2e/agent/standalone-error-termination-lifecycle.e2e.test.ts",
+    "autobyteus-server-ts/tests/e2e/memory/codex-live-memory-persistence.e2e.test.ts",
++   "autobyteus-server-ts/tests/e2e/run-history/run-projection-toolcalls-graphql.e2e.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-manager.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-manager.memory-layout.real.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-prompt-fallback.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/autobyteus-agent-run-backend-factory.lmstudio.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/codex-agent-run-backend-factory.integration.test.ts",
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:590:56
+    588|       }
+    589|     }
+    590|     expect([...actual.get("AgentRunManager")!].sort()).toEqual([...AGE…
+       |                                                        ^
+    591|     expect([...actual.get("MixedTeamRunBackendFactory")!].sort())
+    592|       .toEqual([...MIXED_BACKEND_FACTORY_TESTS].sort());
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > keeps AgentTeamRunManager creation explicit and process access lookup-only
+AssertionError: autobyteus-server-ts/tests/e2e/run-history/run-projection-toolcalls-graphql.e2e.test.ts:initialize:complete input: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:616:11
+    614|           ),
+    615|           `${relativePath}:${occurrence.kind}:complete input`,
+    616|         ).toBe(true);
+       |           ^
+    617|       }
+    618|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > closes complete Agent manager and AgentRun construction to exact roots and fixtures
+AssertionError: expected [ …(10) ] to deeply equal [ …(9) ]
+
+- Expected
++ Received
+
+@@ -1,6 +1,7 @@
+  [
++   "autobyteus-server-ts/tests/e2e/agent/standalone-error-termination-lifecycle.e2e.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-manager.memory-layout.real.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-prompt-fallback.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-service.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/run-history/memory-layout-and-projection.integration.test.ts",
+    "autobyteus-server-ts/tests/unit/agent-execution/agent-run-create-service.test.ts",
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:764:32
+    762|       .map(relativeRoot)
+    763|       .sort();
+    764|     expect(directServiceTests).toEqual([...AGENT_RUN_SERVICE_TESTS].so…
+       |                                ^
+    765|     for (const relativePath of [...productionServiceRoots, ...directSe…
+    766|       const path = join(ROOT, relativePath);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > selects one host validator and propagates it to the two exact lifecycle roots
+AssertionError: expected [ …(3) ] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+  [
+    "autobyteus-server-ts/src/compositions/build-studio-server.ts",
++   "autobyteus-server-ts/src/llm-management/services/run-model-selection-service.ts",
+    "autobyteus-server-ts/src/standalone-application-host/start-standalone-application-host.ts",
+  ]
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:784:16
+    782|       .filter((path) => directNewOccurrences(path, "RunModelSelectionS…
+    783|       .map(relativeRoot)
+    784|       .sort()).toEqual([...hosts].sort());
+       |                ^
+    785|     for (const relativePath of hosts) {
+    786|       const path = join(ROOT, relativePath);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > carries one explicit task-identity pair through every Team and task constructor
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:826:3
+    824|   });
+    825| 
+    826|   it("carries one explicit task-identity pair through every Team and t…
+       |   ^
+    827|     const exactTestFiles = (symbol: string): string[] => typescriptFil…
+    828|       .filter((path) => path !== THIS_FILE && directNewOccurrences(pat…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > keeps context translation provider-neutral and all path authority explicit
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:863:3
+    861|   });
+    862| 
+    863|   it("keeps context translation provider-neutral and all path authorit…
+       |   ^
+    864|     const forbiddenProviderOwners = [
+    865|       "agent-customization/processors/prompt/user-input-context-buildi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/architecture/application-framework-boundaries.test.ts > application framework architecture boundaries > keeps required tool registration behind the single lifecycle readiness owner
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/application-framework-boundaries.test.ts:2049:3
+    2047|   });
+    2048| 
+    2049|   it("keeps required tool registration behind the single lifecycle rea…
+       |   ^
+    2050|     type ToolSpec = Readonly<{
+    2051|       key?: string;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/architecture/application-framework-boundaries.test.ts > application framework architecture boundaries > guards the exact SR-013 root-bound task construction inventory
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/application-framework-boundaries.test.ts:3139:3
+    3137|   });
+    3138| 
+    3139|   it("guards the exact SR-013 root-bound task construction inventory",…
+       |   ^
+    3140|     const managerOccurrences = sr013NewOccurrences("MixedTeamManager");
+    3141|     expect(sr013OccurrencePaths(managerOccurrences)).toEqual([
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  2 failed | 6 passed (8)
+      Tests  8 failed | 65 passed (73)
+   Start at  08:58:59
+   Duration  118.51s (transform 8.92s, setup 131ms, import 37.19s, tests 74.94s, environment 1ms)
+

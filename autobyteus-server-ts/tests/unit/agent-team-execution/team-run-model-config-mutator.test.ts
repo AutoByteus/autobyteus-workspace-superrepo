@@ -24,25 +24,26 @@ describe('Team run model-config mutator', () => {
   it('changes only the addressed configured launch configurations', () => {
     const original = tree();
     const targets = resolveTeamRunModelConfigTargets(original, [{
-      scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/agent', llmConfig: { effort: 'high' },
+      scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/agent', llmModelIdentifier: 'target', llmConfig: { effort: 'high' },
     }]);
     const updated = applyTeamRunModelConfigPatches(original, targets);
     expect(updated.rootTeam.defaultLaunchConfiguration.llmConfig).toEqual({ effort: 'medium' });
     expect((updated.rootTeam.members[0] as any).launchConfiguration.llmConfig).toEqual({ effort: 'high' });
+    expect((updated.rootTeam.members[0] as any).launchConfiguration.llmModelIdentifier).toBe('target');
     expect(original.rootTeam.members[0].launchConfiguration.llmConfig).toEqual({ effort: 'medium' });
   });
 
   it('rejects duplicate, missing, and kind-mismatched configured targets', () => {
     const original = tree();
     expect(() => resolveTeamRunModelConfigTargets(original, [
-      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/agent', llmConfig: null },
-      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/agent', llmConfig: null },
+      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/agent', llmModelIdentifier: 'target', llmConfig: null },
+      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/agent', llmModelIdentifier: 'target', llmConfig: null },
     ])).toThrow(/Duplicate/);
     expect(() => resolveTeamRunModelConfigTargets(original, [
-      { scopeKind: 'CONFIGURED_TEAM', scopeAddress: '/agent', llmConfig: null },
+      { scopeKind: 'CONFIGURED_TEAM', scopeAddress: '/agent', llmModelIdentifier: 'target', llmConfig: null },
     ])).toThrow(/does not match kind/);
     expect(() => resolveTeamRunModelConfigTargets(original, [
-      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/task-agent', llmConfig: null },
+      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/task-agent', llmModelIdentifier: 'target', llmConfig: null },
     ])).toThrow(/was not found/);
   });
 });

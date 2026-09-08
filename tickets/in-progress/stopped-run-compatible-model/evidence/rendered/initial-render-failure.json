@@ -1,0 +1,494 @@
+{
+  "startedAt": "2026-09-08T08:49:42.202Z",
+  "platform": "linux-arm64",
+  "node": "v22.23.2",
+  "browserExecutable": "/usr/bin/chromium",
+  "webDir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web",
+  "fixturePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/fixtures/existing-run-model-config.page.vue",
+  "installedPagePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/pages/api-e2e-existing-run-model-config.vue",
+  "routePath": "/api-e2e-existing-run-model-config",
+  "graphqlOperations": [
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetRuntimeAvailabilities",
+      "variables": {}
+    },
+    {
+      "operationName": "GetProviderModelCatalogSnapshots",
+      "variables": {
+        "runtimeKind": "autobyteus"
+      }
+    },
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetRuntimeAvailabilities",
+      "variables": {}
+    },
+    {
+      "operationName": "GetProviderModelCatalogSnapshots",
+      "variables": {
+        "runtimeKind": "autobyteus"
+      }
+    }
+  ],
+  "scenarios": {
+    "LOCAL-RENDER": {
+      "id": "LOCAL-RENDER",
+      "description": "Implementation interaction/visual inspection; deterministic transport, no API/E2E acceptance",
+      "status": "Fail",
+      "startedAt": "2026-09-08T08:49:56.273Z",
+      "finishedAt": "2026-09-08T08:51:26.967Z",
+      "failure": {
+        "id": "LOCAL-RENDER",
+        "description": "Implementation interaction/visual inspection; deterministic transport, no API/E2E acceptance",
+        "message": "locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-reasoning_effort') to be visible\u001b[22m\n\u001b[2m    2 × waiting for\" http://127.0.0.1:38555/api-e2e-existing-run-model-config\" navigation to finish...\u001b[22m\n\u001b[2m      - navigated to \"http://127.0.0.1:38555/api-e2e-existing-run-model-config\"\u001b[22m\n",
+        "browserState": {
+          "bodyText": "Error 500\n\nCannot read properties of undefined (reading 'map')\n\nTypeError: Cannot read properties of undefined (reading 'map')\n    at ComputedRefImpl.fn (http://127.0.0.1:38555/_nuxt/components/launch-config/RuntimeModelConfigFields.vue:97:119)\n    at refreshComputed (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:363:29)\n    at get value (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:1638:5)\n    at unref (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:1491:45)\n    at Object.get (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:1497:64)\n    at Proxy._sfc_render (http://127.0.0.1:38555/_nuxt/components/launch-config/RuntimeModelConfigFields.vue:360:25)\n    at renderComponentRoot (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+runtime-core@3.5.28/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=ac11785a:4532:16)\n    at ReactiveEffect.componentUpdateFn [as fn] (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+runtime-core@3.5.28/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=ac11785a:6164:26)\n    at ReactiveEffect.run (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:209:19)\n    at updateComponent (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+runtime-core@3.5.28/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=ac11785a:6025:18)\nGo back home",
+          "catalogByRuntimeKind": {
+            "autobyteus": {
+              "runtimeKind": "autobyteus",
+              "currentRequestId": 1,
+              "state": "ready",
+              "hasSuccessfulPayload": true,
+              "providersById": {
+                "OPENAI": {
+                  "__typename": "ProviderModelCatalogSnapshotObject",
+                  "runtimeKind": "autobyteus",
+                  "ownerProvider": {
+                    "__typename": "CatalogProviderObject",
+                    "id": "OPENAI",
+                    "name": "OpenAI",
+                    "providerType": "OPENAI",
+                    "isCustom": false,
+                    "baseUrl": null,
+                    "catalogMode": "STATIC"
+                  },
+                  "sources": [
+                    {
+                      "__typename": "ModelSourceStatusObject",
+                      "modelKind": "LLM",
+                      "state": "READY",
+                      "modelCount": 1,
+                      "successfulUnitCount": 1,
+                      "failedUnitCount": 0,
+                      "safeMessage": null
+                    }
+                  ],
+                  "llmModels": [
+                    {
+                      "__typename": "ModelDetail",
+                      "modelIdentifier": "gpt-5.6-luna",
+                      "name": "GPT-5.6 Luna",
+                      "description": "Deterministic browser fixture model.",
+                      "value": "gpt-5.6-luna",
+                      "canonicalName": "gpt-5.6-luna",
+                      "providerId": "OPENAI",
+                      "providerName": "OpenAI",
+                      "providerType": "OPENAI",
+                      "runtime": "autobyteus",
+                      "hostUrl": null,
+                      "configSchema": {
+                        "type": "object",
+                        "properties": {
+                          "reasoning_effort": {
+                            "type": "string",
+                            "title": "Reasoning Effort",
+                            "enum": [
+                              "low",
+                              "high"
+                            ],
+                            "default": "low"
+                          },
+                          "reasoning_summary": {
+                            "type": "string",
+                            "title": "Reasoning Summary",
+                            "enum": [
+                              "none",
+                              "auto"
+                            ],
+                            "default": "auto"
+                          }
+                        }
+                      },
+                      "maxContextTokens": 128000,
+                      "activeContextTokens": 128000,
+                      "maxInputTokens": 120000,
+                      "maxOutputTokens": 8000,
+                      "metadataProvenance": null
+                    },
+                    {
+                      "__typename": "ModelDetail",
+                      "modelIdentifier": "larger-model",
+                      "name": "Larger Model",
+                      "description": "Deterministic browser fixture model.",
+                      "value": "larger-model",
+                      "canonicalName": "larger-model",
+                      "providerId": "OPENAI",
+                      "providerName": "OpenAI",
+                      "providerType": "OPENAI",
+                      "runtime": "autobyteus",
+                      "hostUrl": null,
+                      "configSchema": {
+                        "type": "object",
+                        "properties": {
+                          "reasoning_effort": {
+                            "type": "string",
+                            "title": "Reasoning Effort",
+                            "enum": [
+                              "low",
+                              "high"
+                            ],
+                            "default": "low"
+                          },
+                          "reasoning_summary": {
+                            "type": "string",
+                            "title": "Reasoning Summary",
+                            "enum": [
+                              "none",
+                              "auto"
+                            ],
+                            "default": "auto"
+                          }
+                        }
+                      },
+                      "maxContextTokens": 272000,
+                      "activeContextTokens": 272000,
+                      "maxInputTokens": 120000,
+                      "maxOutputTokens": 8000,
+                      "metadataProvenance": null
+                    }
+                  ],
+                  "audioModels": [],
+                  "imageModels": [],
+                  "videoModels": []
+                }
+              },
+              "errorMessage": null
+            }
+          },
+          "draftState": {
+            "draft": null,
+            "schemaStateByAddress": {},
+            "feedback": null
+          }
+        },
+        "stack": "locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-reasoning_effort') to be visible\u001b[22m\n\u001b[2m    2 × waiting for\" http://127.0.0.1:38555/api-e2e-existing-run-model-config\" navigation to finish...\u001b[22m\n\u001b[2m      - navigated to \"http://127.0.0.1:38555/api-e2e-existing-run-model-config\"\u001b[22m\n\n    at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-render-inspection.mjs:475:55\n    at async runScenario (/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-render-inspection.mjs:388:21)\n    at async file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-render-inspection.mjs:473:3"
+      }
+    }
+  },
+  "browserEvents": [
+    {
+      "type": "console:debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+devtools-api@6.6.4/node_modules/@vue/devtools-api/lib/esm/index.js?v=87f3c04d net::ERR_ABORTED"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/nuxt@3.21.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7_05eb989a4903fdbf6aed2be910db586e/node_modules/nuxt/dist/app/compat/vue-demi.js?v=87f3c04d net::ERR_ABORTED"
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Initializing server config"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Not in Electron environment. Skipping server initialization."
+    },
+    {
+      "type": "console:info",
+      "text": "<Suspense> is an experimental feature and its API will likely change."
+    },
+    {
+      "type": "console:log",
+      "text": "ServerLoading: Component mounted with status: running"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Checking server health at /rest/health"
+    },
+    {
+      "type": "console:error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "console:error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/node_modules/.cache/vite/client/deps/katex.js?v=19398400 net::ERR_ABORTED"
+    },
+    {
+      "type": "console:error",
+      "text": "Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep)"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/node_modules/.cache/vite/client/deps/mermaid.js?v=3fa34baf net::ERR_ABORTED"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/components/conversation/segments/renderer/mermaidDiagramViewport.ts net::ERR_ABORTED"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/node_modules/.cache/vite/client/deps/chunk-V226WHAP.js?v=ac11785a net::ERR_ABORTED"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/node_modules/.cache/vite/client/deps/chunk-LQBIKZ6L.js?v=ac11785a net::ERR_ABORTED"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/components/conversation/segments/renderer/MermaidDiagramViewer.vue?vue&type=style&index=0&scoped=5d462ee6&lang.css net::ERR_ABORTED"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/node_modules/.cache/vite/client/deps/chunk-RZ55PUNP.js?v=ac11785a net::ERR_ABORTED"
+    },
+    {
+      "type": "requestfailed",
+      "text": "GET http://127.0.0.1:38555/_nuxt/node_modules/.cache/vite/client/deps/chunk-US53JEWZ.js?v=ac11785a net::ERR_ABORTED"
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Initializing server config"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Not in Electron environment. Skipping server initialization."
+    },
+    {
+      "type": "console:info",
+      "text": "<Suspense> is an experimental feature and its API will likely change."
+    },
+    {
+      "type": "console:log",
+      "text": "ServerLoading: Component mounted with status: running"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Checking server health at /rest/health"
+    },
+    {
+      "type": "console:error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "console:log",
+      "text": "Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm"
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] hot updated: /components/launch-config/RuntimeModelConfigFields.vue"
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] hot updated: /app.vue?vue&type=style&index=0&lang.css"
+    }
+  ],
+  "failures": [
+    {
+      "id": "LOCAL-RENDER",
+      "description": "Implementation interaction/visual inspection; deterministic transport, no API/E2E acceptance",
+      "message": "locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-reasoning_effort') to be visible\u001b[22m\n\u001b[2m    2 × waiting for\" http://127.0.0.1:38555/api-e2e-existing-run-model-config\" navigation to finish...\u001b[22m\n\u001b[2m      - navigated to \"http://127.0.0.1:38555/api-e2e-existing-run-model-config\"\u001b[22m\n",
+      "browserState": {
+        "bodyText": "Error 500\n\nCannot read properties of undefined (reading 'map')\n\nTypeError: Cannot read properties of undefined (reading 'map')\n    at ComputedRefImpl.fn (http://127.0.0.1:38555/_nuxt/components/launch-config/RuntimeModelConfigFields.vue:97:119)\n    at refreshComputed (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:363:29)\n    at get value (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:1638:5)\n    at unref (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:1491:45)\n    at Object.get (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:1497:64)\n    at Proxy._sfc_render (http://127.0.0.1:38555/_nuxt/components/launch-config/RuntimeModelConfigFields.vue:360:25)\n    at renderComponentRoot (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+runtime-core@3.5.28/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=ac11785a:4532:16)\n    at ReactiveEffect.componentUpdateFn [as fn] (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+runtime-core@3.5.28/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=ac11785a:6164:26)\n    at ReactiveEffect.run (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+reactivity@3.5.28/node_modules/@vue/reactivity/dist/reactivity.esm-bundler.js?v=ac11785a:209:19)\n    at updateComponent (http://127.0.0.1:38555/_nuxt/@fs/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/node_modules/.pnpm/@vue+runtime-core@3.5.28/node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js?v=ac11785a:6025:18)\nGo back home",
+        "catalogByRuntimeKind": {
+          "autobyteus": {
+            "runtimeKind": "autobyteus",
+            "currentRequestId": 1,
+            "state": "ready",
+            "hasSuccessfulPayload": true,
+            "providersById": {
+              "OPENAI": {
+                "__typename": "ProviderModelCatalogSnapshotObject",
+                "runtimeKind": "autobyteus",
+                "ownerProvider": {
+                  "__typename": "CatalogProviderObject",
+                  "id": "OPENAI",
+                  "name": "OpenAI",
+                  "providerType": "OPENAI",
+                  "isCustom": false,
+                  "baseUrl": null,
+                  "catalogMode": "STATIC"
+                },
+                "sources": [
+                  {
+                    "__typename": "ModelSourceStatusObject",
+                    "modelKind": "LLM",
+                    "state": "READY",
+                    "modelCount": 1,
+                    "successfulUnitCount": 1,
+                    "failedUnitCount": 0,
+                    "safeMessage": null
+                  }
+                ],
+                "llmModels": [
+                  {
+                    "__typename": "ModelDetail",
+                    "modelIdentifier": "gpt-5.6-luna",
+                    "name": "GPT-5.6 Luna",
+                    "description": "Deterministic browser fixture model.",
+                    "value": "gpt-5.6-luna",
+                    "canonicalName": "gpt-5.6-luna",
+                    "providerId": "OPENAI",
+                    "providerName": "OpenAI",
+                    "providerType": "OPENAI",
+                    "runtime": "autobyteus",
+                    "hostUrl": null,
+                    "configSchema": {
+                      "type": "object",
+                      "properties": {
+                        "reasoning_effort": {
+                          "type": "string",
+                          "title": "Reasoning Effort",
+                          "enum": [
+                            "low",
+                            "high"
+                          ],
+                          "default": "low"
+                        },
+                        "reasoning_summary": {
+                          "type": "string",
+                          "title": "Reasoning Summary",
+                          "enum": [
+                            "none",
+                            "auto"
+                          ],
+                          "default": "auto"
+                        }
+                      }
+                    },
+                    "maxContextTokens": 128000,
+                    "activeContextTokens": 128000,
+                    "maxInputTokens": 120000,
+                    "maxOutputTokens": 8000,
+                    "metadataProvenance": null
+                  },
+                  {
+                    "__typename": "ModelDetail",
+                    "modelIdentifier": "larger-model",
+                    "name": "Larger Model",
+                    "description": "Deterministic browser fixture model.",
+                    "value": "larger-model",
+                    "canonicalName": "larger-model",
+                    "providerId": "OPENAI",
+                    "providerName": "OpenAI",
+                    "providerType": "OPENAI",
+                    "runtime": "autobyteus",
+                    "hostUrl": null,
+                    "configSchema": {
+                      "type": "object",
+                      "properties": {
+                        "reasoning_effort": {
+                          "type": "string",
+                          "title": "Reasoning Effort",
+                          "enum": [
+                            "low",
+                            "high"
+                          ],
+                          "default": "low"
+                        },
+                        "reasoning_summary": {
+                          "type": "string",
+                          "title": "Reasoning Summary",
+                          "enum": [
+                            "none",
+                            "auto"
+                          ],
+                          "default": "auto"
+                        }
+                      }
+                    },
+                    "maxContextTokens": 272000,
+                    "activeContextTokens": 272000,
+                    "maxInputTokens": 120000,
+                    "maxOutputTokens": 8000,
+                    "metadataProvenance": null
+                  }
+                ],
+                "audioModels": [],
+                "imageModels": [],
+                "videoModels": []
+              }
+            },
+            "errorMessage": null
+          }
+        },
+        "draftState": {
+          "draft": null,
+          "schemaStateByAddress": {},
+          "feedback": null
+        }
+      },
+      "stack": "locator.waitFor: Timeout 90000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-reasoning_effort') to be visible\u001b[22m\n\u001b[2m    2 × waiting for\" http://127.0.0.1:38555/api-e2e-existing-run-model-config\" navigation to finish...\u001b[22m\n\u001b[2m      - navigated to \"http://127.0.0.1:38555/api-e2e-existing-run-model-config\"\u001b[22m\n\n    at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-render-inspection.mjs:475:55\n    at async runScenario (/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-render-inspection.mjs:388:21)\n    at async file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-render-inspection.mjs:473:3"
+    }
+  ],
+  "cleanup": {
+    "context": "closed",
+    "browser": "closed",
+    "devServer": {
+      "status": "terminated",
+      "pid": 31944,
+      "initialExitCode": null,
+      "initialSignalCode": null,
+      "sigtermTarget": "process-group",
+      "exitedAfterSigterm": true,
+      "finalExitCode": null,
+      "finalSignalCode": "SIGTERM",
+      "processGroupExited": true
+    },
+    "devLog": "closed",
+    "temporaryPage": "removed"
+  },
+  "port": 38555,
+  "baseUrl": "http://127.0.0.1:38555",
+  "finishedAt": "2026-09-08T08:51:27.980Z",
+  "result": "Fail"
+}

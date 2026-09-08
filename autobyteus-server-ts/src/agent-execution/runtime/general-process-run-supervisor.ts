@@ -43,7 +43,7 @@ import { RunFileChangeService } from "../../services/run-file-changes/run-file-c
 import { createGeneralProcessPublishedArtifactRelayService } from "../../application-orchestration/services/application-published-artifact-relay-service.js";
 import { TokenUsageMigrationReadiness } from "../../token-usage/providers/token-usage-migration-readiness.js";
 import type { WorkspaceManager } from "../../workspaces/workspace-manager.js";
-import type { RunModelConfigValidator } from "../../llm-management/services/model-config-validation-service.js";
+import type { RunModelSelectionValidator } from "../../llm-management/services/run-model-selection-service.js";
 
 export type GeneralProcessRunSupervisorInput = Readonly<{
   memoryDir: string;
@@ -53,7 +53,7 @@ export type GeneralProcessRunSupervisorInput = Readonly<{
   workspaceManager: WorkspaceManager;
   agentProviderFactoryBuilder: AgentProviderFactoryBuilder;
   agentToolMcpSessionAuthority: ScopedAgentToolMcpSessionAuthority;
-  modelConfigValidator: RunModelConfigValidator;
+  modelSelectionValidator: RunModelSelectionValidator;
 }>;
 
 const requireGeneralProcessRunSupervisorInput = (
@@ -73,8 +73,8 @@ const requireGeneralProcessRunSupervisorInput = (
     || !input.workspaceManager
     || !input.agentProviderFactoryBuilder
     || !input.agentToolMcpSessionAuthority
-    || !input.modelConfigValidator
-    || typeof input.modelConfigValidator.validate !== "function"
+    || !input.modelSelectionValidator
+    || typeof input.modelSelectionValidator.validate !== "function"
   ) {
     throw new Error("Complete GeneralProcessRunSupervisor input is required.");
   }
@@ -174,7 +174,7 @@ export class GeneralProcessRunSupervisor {
       agentTeamRunManager = AgentTeamRunManager.initializeProcessInstance({
         memoryDir,
         taskExecutionIdentity,
-        modelConfigValidator: input.modelConfigValidator,
+        modelSelectionValidator: input.modelSelectionValidator,
         mixedTeamRunBackendFactory: new MixedTeamRunBackendFactory({
           createTeamManager: (managerInput) =>
             new MixedTeamManager(managerInput.context, {
@@ -207,7 +207,7 @@ export class GeneralProcessRunSupervisor {
         historyCatalogService,
         workspaceManager,
         tokenUsageReadiness,
-        modelConfigValidator: input.modelConfigValidator,
+        modelSelectionValidator: input.modelSelectionValidator,
       });
       agentRunService = new AgentRunService(memoryDir, {
         agentRunManager,

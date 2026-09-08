@@ -263,10 +263,10 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
         memoryDir,
         mixedTeamRunBackendFactory: teamBackendFactory,
         taskExecutionIdentity,
-        modelConfigValidator: {
-          validate: vi.fn(async ({ llmConfig }) => ({
+        modelSelectionValidator: {
+          validate: vi.fn(async ({ selection }) => ({
             kind: "valid" as const,
-            config: llmConfig,
+            selection,
           })),
         },
       });

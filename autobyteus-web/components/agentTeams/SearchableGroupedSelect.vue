@@ -3,6 +3,9 @@
     <div class="relative" ref="wrapperRef">
       <button
         @click="toggleDropdown"
+        aria-haspopup="listbox"
+        :aria-expanded="isOpen"
+        :aria-controls="listboxId"
         :disabled="disabled || loading"
         type="button"
         :class="[triggerClass, { 'cursor-not-allowed opacity-50': disabled || loading }]"
@@ -23,20 +26,23 @@
       <div
         v-if="isOpen"
         ref="popoverRef"
+        @keydown.esc.prevent="closeWithFocus"
         :style="popoverStyle"
         class="max-w-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-[30rem] overflow-y-auto flex flex-col"
       >
         <div class="p-2 sticky top-0 bg-white dark:bg-gray-800/95 z-10 backdrop-blur-sm">
           <input
             ref="searchInputRef"
+            @keydown.down.prevent="focusOption(0)"
             v-model="searchTerm"
             type="text"
             :placeholder="effectiveSearchPlaceholder"
+            :aria-label="effectiveSearchPlaceholder"
             class="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
-        <div class="flex-grow overflow-y-auto">
+        <div class="flex-grow overflow-y-auto" role="listbox" :id="listboxId" :aria-label="effectivePlaceholder">
           <div v-if="filteredOptions.length === 0" class="p-3 text-sm text-center text-gray-500">{{ $t('agentTeams.components.agentTeams.SearchableGroupedSelect.no_options_found') }}</div>
           <div v-for="group in filteredOptions" :key="group.label" class="py-1">
             <div class="px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -46,8 +52,15 @@
               <li
                 v-for="item in group.items"
                 :key="item.id"
+                role="option"
+                tabindex="-1"
+                :aria-selected="modelValue === item.id"
+                @keydown.enter.prevent="selectItem(item.id)"
+                @keydown.space.prevent="selectItem(item.id)"
+                @keydown.down.prevent="moveOption($event, 1)"
+                @keydown.up.prevent="moveOption($event, -1)"
                 @click="selectItem(item.id)"
-                class="pl-6 pr-3 py-2 text-sm text-gray-800 dark:text-gray-200 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/50 flex items-start justify-between"
+                class="pl-6 pr-3 py-2 text-sm text-gray-800 dark:text-gray-200 cursor-pointer focus:outline-none focus:bg-blue-50 focus:ring-2 focus:ring-inset focus:ring-blue-500 dark:focus:bg-blue-900/50 hover:bg-blue-50 dark:hover:bg-blue-900/50 flex items-start justify-between"
                 :class="{ 'bg-blue-100 dark:bg-blue-800': modelValue === item.id }"
               >
                 <div class="min-w-0 flex-1">
@@ -72,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick, reactive } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick, reactive, useId } from 'vue'
 import { useLocalization } from '~/composables/useLocalization'
 
 export interface SelectItem {
@@ -104,6 +117,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits(['update:modelValue'])
 const { t } = useLocalization()
 
+const listboxId = useId()
 const isOpen = ref(false)
 const searchTerm = ref('')
 const wrapperRef = ref<HTMLDivElement | null>(null)
@@ -196,10 +210,24 @@ const toggleDropdown = () => {
   isOpen.value = !isOpen.value
 }
 
+const closeWithFocus = () => {
+  isOpen.value = false
+  wrapperRef.value?.querySelector('button')?.focus()
+}
+const focusOption = (index: number) => {
+  const options = popoverRef.value?.querySelectorAll<HTMLElement>('[role="option"]')
+  if (options?.length) options[(index + options.length) % options.length]?.focus()
+}
+const moveOption = (event: KeyboardEvent, delta: number) => {
+  const options = Array.from(popoverRef.value?.querySelectorAll<HTMLElement>('[role="option"]') ?? [])
+  focusOption(options.indexOf(event.currentTarget as HTMLElement) + delta)
+}
 const selectItem = (itemId: string) => {
+  if (props.disabled || props.loading) return
   emit('update:modelValue', itemId)
   isOpen.value = false
   searchTerm.value = ''
+  wrapperRef.value?.querySelector('button')?.focus()
 }
 
 const handleClickOutside = (event: MouseEvent) => {

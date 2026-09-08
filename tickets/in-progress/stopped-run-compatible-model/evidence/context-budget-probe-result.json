@@ -1,0 +1,71 @@
+{
+  "source": "autobyteus-ts/src/agent/token-budget.ts",
+  "method": "Node type erasure; import declarations removed; unmodified pure function bodies",
+  "scope": "Synthetic current-code probe, not end-to-end or provider validation",
+  "cases": [
+    {
+      "name": "A: baseline",
+      "budget": {
+        "effectiveContextCapacity": 128000,
+        "contextDerivedInputCapTokens": 120000,
+        "providerInputCapTokens": null,
+        "effectiveInputCapacity": 120000,
+        "reservedOutputTokens": 8000,
+        "safetyMarginTokens": 256,
+        "inputBudget": 119744,
+        "overrideActive": false,
+        "compactionRatio": 0.8,
+        "triggerThresholdTokens": 95795
+      }
+    },
+    {
+      "name": "B: same context, larger output reservation",
+      "budget": {
+        "effectiveContextCapacity": 128000,
+        "contextDerivedInputCapTokens": 112000,
+        "providerInputCapTokens": null,
+        "effectiveInputCapacity": 112000,
+        "reservedOutputTokens": 16000,
+        "safetyMarginTokens": 256,
+        "inputBudget": 111744,
+        "overrideActive": false,
+        "compactionRatio": 0.8,
+        "triggerThresholdTokens": 89395
+      }
+    },
+    {
+      "name": "C: same context, smaller provider input cap",
+      "budget": {
+        "effectiveContextCapacity": 128000,
+        "contextDerivedInputCapTokens": 120000,
+        "providerInputCapTokens": 100000,
+        "effectiveInputCapacity": 100000,
+        "reservedOutputTokens": 8000,
+        "safetyMarginTokens": 256,
+        "inputBudget": 99744,
+        "overrideActive": false,
+        "compactionRatio": 0.8,
+        "triggerThresholdTokens": 79795
+      }
+    },
+    {
+      "name": "D: same context, different model compaction default",
+      "budget": {
+        "effectiveContextCapacity": 128000,
+        "contextDerivedInputCapTokens": 120000,
+        "providerInputCapTokens": null,
+        "effectiveInputCapacity": 120000,
+        "reservedOutputTokens": 8000,
+        "safetyMarginTokens": 256,
+        "inputBudget": 119744,
+        "overrideActive": false,
+        "compactionRatio": 0.7,
+        "triggerThresholdTokens": 83820
+      }
+    },
+    {
+      "name": "E: unknown context and input cap",
+      "budget": null
+    }
+  ]
+}

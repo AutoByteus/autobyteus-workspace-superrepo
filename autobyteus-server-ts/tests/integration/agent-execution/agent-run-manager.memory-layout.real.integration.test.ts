@@ -138,8 +138,8 @@ describe("AgentRunService real memory layout integration", () => {
     const lifecycleService = new StandaloneAgentRunLifecycleService(memoryDir, {
       agentRunManager: manager,
       workspaceManager,
-      modelConfigValidator: {
-        validate: async ({ llmConfig }) => ({ kind: "valid", config: llmConfig as Readonly<Record<string, unknown>> | null }),
+      modelSelectionValidator: {
+        validate: async ({ selection }) => ({ kind: "valid", selection }),
       },
     });
     runService = new AgentRunService(memoryDir, {

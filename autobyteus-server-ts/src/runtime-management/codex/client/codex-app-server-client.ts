@@ -31,9 +31,16 @@ export class CodexAppServerClient {
   private stdoutBuffer = "";
   private nextRequestId = 1;
   private closed = false;
+  private launchContext: CodexAppServerClientOptions | null = null;
 
   constructor(options: CodexAppServerClientOptions) {
     this.options = options;
+  }
+
+  /** Snapshot of the actual child launch context; never expose this through transport. */
+  getLaunchContext(): CodexAppServerClientOptions {
+    if (!this.launchContext) throw new Error("Codex client has not been launched.");
+    return { ...this.launchContext, args: [...this.launchContext.args], env: { ...this.launchContext.env } };
   }
 
   async start(): Promise<void> {
@@ -41,10 +48,11 @@ export class CodexAppServerClient {
       return;
     }
     this.closed = false;
+    this.launchContext = { ...this.options, args: [...this.options.args], env: { ...(this.options.env ?? process.env) } };
     try {
       this.process = spawn(this.options.command, this.options.args, {
         cwd: this.options.cwd,
-        env: this.options.env ?? process.env,
+        env: this.launchContext.env,
         stdio: ["pipe", "pipe", "pipe"],
       });
     } catch (error) {

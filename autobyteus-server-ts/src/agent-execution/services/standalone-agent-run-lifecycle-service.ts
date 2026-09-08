@@ -14,7 +14,7 @@ import {
   isAgentRunActivationQuarantineError,
 } from "../errors.js";
 import { TokenUsageMigrationReadiness } from "../../token-usage/providers/token-usage-migration-readiness.js";
-import type { RunModelConfigValidator } from "../../llm-management/services/model-config-validation-service.js";
+import type { RunModelSelectionValidator } from "../../llm-management/services/run-model-selection-service.js";
 import {
   runModelConfigEditability,
   type RunModelConfigUpdateResult,
@@ -40,7 +40,7 @@ export class StandaloneAgentRunLifecycleService {
   private readonly workspaceManager: ReturnType<typeof getWorkspaceManager>;
   private readonly tokenUsageReadiness: Pick<TokenUsageMigrationReadiness,
     "assertCurrentSchemaReady" | "assertExistingRunRestoreReady">;
-  private readonly modelConfigValidator: RunModelConfigValidator;
+  private readonly modelSelectionValidator: RunModelSelectionValidator;
 
   constructor(
     memoryDir: string,
@@ -51,7 +51,7 @@ export class StandaloneAgentRunLifecycleService {
       workspaceManager?: ReturnType<typeof getWorkspaceManager>;
       tokenUsageReadiness?: Pick<TokenUsageMigrationReadiness,
         "assertCurrentSchemaReady" | "assertExistingRunRestoreReady">;
-      modelConfigValidator: RunModelConfigValidator;
+      modelSelectionValidator: RunModelSelectionValidator;
     },
   ) {
     this.agentRunManager = deps.agentRunManager ?? AgentRunManager.getInstance();
@@ -59,11 +59,11 @@ export class StandaloneAgentRunLifecycleService {
     this.historyCatalogService = deps.historyCatalogService ?? new AgentRunHistoryCatalogService(memoryDir);
     this.workspaceManager = deps.workspaceManager ?? getWorkspaceManager();
     this.tokenUsageReadiness = deps.tokenUsageReadiness ?? new TokenUsageMigrationReadiness();
-    if (!deps.modelConfigValidator ||
-        typeof deps.modelConfigValidator.validate !== "function") {
-      throw new Error("modelConfigValidator is required.");
+    if (!deps.modelSelectionValidator ||
+        typeof deps.modelSelectionValidator.validate !== "function") {
+      throw new Error("modelSelectionValidator is required.");
     }
-    this.modelConfigValidator = deps.modelConfigValidator;
+    this.modelSelectionValidator = deps.modelSelectionValidator;
   }
 
   async resolveCommandReadyAgentRun(runId: string): Promise<AgentRun> {
@@ -83,6 +83,7 @@ export class StandaloneAgentRunLifecycleService {
 
   updateStoppedModelConfig(input: {
     agentRunId: string;
+    llmModelIdentifier: string;
     llmConfig: Readonly<Record<string, unknown>> | null;
   }): Promise<RunModelConfigUpdateResult<AgentRunMetadata | null>> {
     const runId = requiredRunId(input.agentRunId);
@@ -112,10 +113,10 @@ export class StandaloneAgentRunLifecycleService {
       if (row.archivedAt) {
         return this.updateResult({ outcome: "RUN_ARCHIVED", message: "Archived runs cannot be edited.", metadata, active: false, archived: true });
       }
-      const validation = await this.modelConfigValidator.validate({
-        runtimeKind: metadata.runtimeKind,
-        llmModelIdentifier: metadata.llmModelIdentifier,
-        llmConfig: input.llmConfig,
+      const validation = await this.modelSelectionValidator.validate({
+        context: { runtimeKind: metadata.runtimeKind, currentModelIdentifier: metadata.llmModelIdentifier,
+          workspaceRootPath: metadata.workspaceRootPath },
+        selection: { llmModelIdentifier: input.llmModelIdentifier, llmConfig: input.llmConfig },
       });
       if (validation.kind !== "valid") {
         const outcome = validation.kind === "model_unavailable"
@@ -135,7 +136,7 @@ export class StandaloneAgentRunLifecycleService {
       }
       const committed = await this.historyCatalogService.commitRunModelConfig({
         runId,
-        llmConfig: validation.config,
+        ...validation.selection,
       });
       if (committed.kind === "committed" || committed.kind === "unchanged") {
         return this.updateResult({

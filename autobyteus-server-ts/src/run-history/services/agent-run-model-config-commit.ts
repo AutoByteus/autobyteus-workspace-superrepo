@@ -11,29 +11,32 @@ export const commitAgentRunModelConfig = async (input: {
   runId: string;
   cataloged: boolean;
   archived: boolean;
+  llmModelIdentifier: string;
   llmConfig: Readonly<Record<string, unknown>> | null;
 }): Promise<AgentRunModelConfigCommitResult> => {
   const metadata = await input.metadataStore.readMetadata(input.runId);
   if (!metadata || !input.cataloged) return { kind: "not_found", metadata };
   if (input.archived) return { kind: "archived", metadata };
   const nextLlmConfig = input.llmConfig ? structuredClone(input.llmConfig) : null;
-  if (isDeepStrictEqual(metadata.llmConfig ?? null, nextLlmConfig)) {
+  if (metadata.llmModelIdentifier === input.llmModelIdentifier && isDeepStrictEqual(metadata.llmConfig ?? null, nextLlmConfig)) {
     return { kind: "unchanged", metadata };
   }
   const nextMetadata: AgentRunMetadata = {
     ...metadata,
+    llmModelIdentifier: input.llmModelIdentifier,
     llmConfig: nextLlmConfig,
   };
   try {
     await input.metadataStore.writeMetadata(input.runId, nextMetadata);
     const reread = await input.metadataStore.readMetadata(input.runId);
-    if (!reread || !isDeepStrictEqual(reread.llmConfig ?? null, nextLlmConfig)) {
-      return { kind: "failed", metadata };
+    if (!reread) return { kind: "indeterminate", metadata };
+    if (reread.llmModelIdentifier !== input.llmModelIdentifier || !isDeepStrictEqual(reread.llmConfig ?? null, nextLlmConfig)) {
+      return { kind: "failed", metadata: reread };
     }
     return { kind: "committed", metadata: reread };
   } catch {
-    const reread = await input.metadataStore.readMetadata(input.runId);
-    if (reread && isDeepStrictEqual(reread.llmConfig ?? null, nextLlmConfig)) {
+    const reread = await input.metadataStore.readMetadata(input.runId).catch(() => null);
+    if (reread && reread.llmModelIdentifier === input.llmModelIdentifier && isDeepStrictEqual(reread.llmConfig ?? null, nextLlmConfig)) {
       return { kind: "committed", metadata: reread };
     }
     return {

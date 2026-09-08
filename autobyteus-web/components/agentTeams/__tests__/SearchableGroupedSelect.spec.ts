@@ -117,3 +117,27 @@ it('keeps the closed label compact and emits only the selected identifier', asyn
 
   wrapper.unmount()
 })
+
+
+it('supports keyboard search, option navigation, selection and Escape focus recovery', async () => {
+  const wrapper = await openSelect(describedOptions, 'sonnet')
+  const trigger = wrapper.get('button')
+  const input = new DOMWrapper(document.body.querySelector<HTMLInputElement>('input')!)
+  expect(trigger.attributes('aria-expanded')).toBe('true')
+  expect(document.body.querySelector('[role="listbox"]')?.id).toBe(trigger.attributes('aria-controls'))
+  expect(optionRows()[0]?.getAttribute('aria-selected')).toBe('true')
+  await input.trigger('keydown', { key: 'ArrowDown' })
+  expect(document.activeElement).toBe(optionRows()[0])
+  await new DOMWrapper(optionRows()[0]!).trigger('keydown', { key: 'ArrowDown' })
+  expect(document.activeElement).toBe(optionRows()[1])
+  await new DOMWrapper(optionRows()[1]!).trigger('keydown', { key: 'Enter' })
+  expect(wrapper.emitted('update:modelValue')).toEqual([['opus']])
+  expect(document.activeElement).toBe(trigger.element)
+  expect(trigger.attributes('aria-expanded')).toBe('false')
+  await trigger.trigger('click')
+  await nextTick()
+  await new DOMWrapper(document.body.querySelector('input')!).trigger('keydown', { key: 'Escape' })
+  expect(document.body.querySelector('input')).toBeNull()
+  expect(document.activeElement).toBe(trigger.element)
+  wrapper.unmount()
+})

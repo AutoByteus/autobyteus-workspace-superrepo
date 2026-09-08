@@ -313,6 +313,8 @@ const operationResponse = async (operationName, variables) => {
       modelConfigEditability: { editable: true, reason: null },
     } } }
   }
+  if (operationName === 'AgentRunModelOptions') return { data: { agentRunModelOptions: { __typename: 'RunModelOptionsObject', currentModelIdentifier: 'gpt-5.6-luna', currentContextTokens: null, replacements: [], unavailableReason: 'Fixture has no replacement metadata.' } } }
+  if (operationName === 'TeamRunModelOptions') return { data: { teamRunModelOptions: [] } }
   if (operationName === 'GetProviderModelCatalogSnapshots') return { data: { providerModelCatalogSnapshots: [catalogSnapshot] } }
   if (operationName === 'GetRuntimeAvailabilities') return { data: { runtimeAvailabilities: [{ runtimeKind: 'autobyteus', enabled: true, reason: null }] } }
   if (operationName === 'UpdateStoppedAgentRunModelConfig') {
@@ -325,7 +327,7 @@ const operationResponse = async (operationName, variables) => {
         message: 'A supported external workflow resumed this run.',
         isActive: true,
         editability: { editable: false, reason: 'RUN_ACTIVE' },
-        canonicalLlmConfig: clone(state.agentConfig),
+        canonicalSelection: { llmModelIdentifier: 'gpt-5.6-luna', llmConfig: clone(state.agentConfig) },
         fieldErrors: [],
       } } }
     }
@@ -336,7 +338,7 @@ const operationResponse = async (operationName, variables) => {
       message: 'Agent model settings saved.',
       isActive: false,
       editability: { editable: true, reason: null },
-      canonicalLlmConfig: clone(state.agentConfig),
+      canonicalSelection: { llmModelIdentifier: 'gpt-5.6-luna', llmConfig: clone(state.agentConfig) },
       fieldErrors: [],
     } } }
   }
@@ -458,7 +460,7 @@ try {
     }
   })
 
-  await runScenario('API-E2E-004-A', 'Agent Settings loads network-fresh, locks fixed identity, and saves model config only', async () => {
+  await runScenario('API-E2E-004-A', 'Agent Settings loads network-fresh, locks runtime identity, and saves a same-model selection', async () => {
     await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'domcontentloaded', timeout: timeoutMs })
     await page.locator('[data-test="existing-run-model-config-probe"]').waitFor({ state: 'visible', timeout: timeoutMs })
     await page.waitForFunction(() => Boolean(window.__existingRunModelConfigProbe), null, { timeout: timeoutMs })
@@ -472,7 +474,7 @@ try {
     await waitFor('Agent schema readiness', async () => await effort.isEnabled())
     assert(await page.locator('#agent-run-runtime-kind').isDisabled(), 'Existing Agent runtime must remain fixed')
     const modelButton = page.locator('#agent-run-runtime-kind').locator('xpath=../following-sibling::div[1]//button').first()
-    assert(await modelButton.isDisabled(), 'Existing Agent model identity must remain fixed')
+    assert(await modelButton.isEnabled(), 'Stopped Agent model selection must be editable')
     assert((await page.locator('[data-test="editor-host"]').innerText()).includes('This run is stopped.'), 'Agent stopped editability notice must render')
     await effort.selectOption('high')
     await waitFor('Agent Save enablement', async () => !(await save.isDisabled()))
@@ -482,8 +484,9 @@ try {
     assert(state.agentMutations.length === 1, 'Exactly one Agent mutation must be sent', state.agentMutations)
     assert(JSON.stringify(state.agentMutations[0]) === JSON.stringify({ input: {
       agentRunId: 'agent-run-browser-1',
+      llmModelIdentifier: 'gpt-5.6-luna',
       llmConfig: modelConfig('high'),
-    } }), 'Agent mutation must contain only run ID and model config with no revision or fixed-field input', state.agentMutations[0])
+    } }), 'Agent mutation must contain run ID and the required selection with no revision/runtime input', state.agentMutations[0])
     await page.screenshot({ path: path.join(outputDir, 'API-E2E-004-A-agent-saved.png'), fullPage: true })
     return { mutation: state.agentMutations[0], resumeReads: state.agentResumeReads }
   })
@@ -518,8 +521,8 @@ try {
     assert(state.teamMutations.length === 1, 'Exactly one Team mutation must be sent', state.teamMutations)
     assert(JSON.stringify(state.teamMutations[0]) === JSON.stringify({ input: {
       teamRunId: 'team-run-browser-1',
-      patches: [{ scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/Nested/reviewer', llmConfig: modelConfig('high') }],
-    } }), 'Team mutation must contain one narrow configured-Agent patch with no revision or fixed-field input', state.teamMutations[0])
+      patches: [{ scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/Nested/reviewer', llmModelIdentifier: 'gpt-5.6-luna', llmConfig: modelConfig('high') }],
+    } }), 'Team mutation must contain one narrow configured-Agent patch with no revision/runtime input', state.teamMutations[0])
     await page.screenshot({ path: path.join(outputDir, 'API-E2E-004-B-team-saved.png'), fullPage: true })
     return { mutation: state.teamMutations[0], renderedMembers: 3, resumeReads: state.teamResumeReads }
   })
@@ -565,8 +568,9 @@ try {
     assert((await page.locator('[data-test="editor-host"]').innerText()).includes('Stop this run before changing model settings.'), 'Active Agent notice must replace the stopped notice')
     assert(JSON.stringify(state.agentMutations.at(-1)) === JSON.stringify({ input: {
       agentRunId: 'agent-run-browser-1',
+      llmModelIdentifier: 'gpt-5.6-luna',
       llmConfig: modelConfig('low'),
-    } }), 'RUN_ACTIVE attempt must remain revision-free and model-config-only', state.agentMutations.at(-1))
+    } }), 'RUN_ACTIVE attempt must remain revision-free and contain the required selection', state.agentMutations.at(-1))
     await page.screenshot({ path: path.join(outputDir, 'API-E2E-004-D-agent-run-active.png'), fullPage: true })
     return { mutation: state.agentMutations.at(-1), resumeReadsBeforeSave, resumeReadsAfterSave: state.agentResumeReads }
   })

@@ -1,15 +1,11 @@
 import type { ModelInfo } from "autobyteus-ts/llm/models.js";
-import { RuntimeKind } from "../../runtime-management/runtime-kind-enum.js";
-import type { ModelCatalogService } from "./model-catalog-service.js";
 import type { RunModelConfigFieldError } from "../../run-history/domain/run-model-config.js";
 
 export type ModelConfigValidationResult =
   | Readonly<{ kind: "valid"; config: Readonly<Record<string, unknown>> | null }>
-  | Readonly<{ kind: "model_unavailable" }>
   | Readonly<{ kind: "schema_unavailable" }>
   | Readonly<{ kind: "invalid"; errors: readonly RunModelConfigFieldError[] }>;
 
-export type RunModelConfigValidator = Pick<ModelConfigValidationService, "validate">;
 
 type JsonSchema = Readonly<Record<string, unknown>>;
 
@@ -114,37 +110,18 @@ const validateValue = (
   }
 };
 
-export class ModelConfigValidationService {
-  constructor(private readonly catalog: Pick<ModelCatalogService, "listLlmModels">) {
-    if (!catalog || typeof catalog.listLlmModels !== "function") {
-      throw new Error("Model catalog is required.");
-    }
+export function validateModelConfigSchema(model: ModelInfo, llmConfig: unknown): ModelConfigValidationResult {
+  if (llmConfig !== null && !isPlainObject(llmConfig)) {
+    return { kind: "invalid", errors: [{ path: "llmConfig", message: "Model configuration must be null or an object." }] };
   }
-
-  async validate(input: {
-    runtimeKind: RuntimeKind;
-    llmModelIdentifier: string;
-    llmConfig: unknown;
-  }): Promise<ModelConfigValidationResult> {
-    if (input.llmConfig !== null && !isPlainObject(input.llmConfig)) {
-      return { kind: "invalid", errors: [{ path: "llmConfig", message: "Model configuration must be null or an object." }] };
-    }
-    let models: ModelInfo[];
-    try {
-      models = await this.catalog.listLlmModels(input.runtimeKind);
-    } catch {
-      return { kind: "model_unavailable" };
-    }
-    const model = models.find((candidate) => candidate.model_identifier === input.llmModelIdentifier);
-    if (!model) return { kind: "model_unavailable" };
     if (model.config_schema == null) {
-      return input.llmConfig === null
+      return llmConfig === null
         ? { kind: "valid", config: null }
         : { kind: "invalid", errors: [{ path: "llmConfig", message: "This model has no adjustable settings." }] };
     }
     const normalized = normalizeSchema(model.config_schema);
     if (!normalized) return { kind: "schema_unavailable" };
-    const config = input.llmConfig as Record<string, unknown> | null;
+    const config = llmConfig as Record<string, unknown> | null;
     const errors: RunModelConfigFieldError[] = [];
     for (const required of normalized.required) {
       if (!config || !Object.hasOwn(config, required)) {
@@ -162,5 +139,4 @@ export class ModelConfigValidationService {
     return errors.length
       ? { kind: "invalid", errors }
       : { kind: "valid", config: config ? structuredClone(config) : null };
-  }
 }

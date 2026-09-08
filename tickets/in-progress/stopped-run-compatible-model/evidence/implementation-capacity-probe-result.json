@@ -1,0 +1,74 @@
+{
+  "observations": [
+    {
+      "runtime": "codex_app_server",
+      "observedAt": "2026-09-08T09:05:51.937Z",
+      "scope": "production reader; metadata only, no feature acceptance",
+      "cwd": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model",
+      "capacities": {
+        "gpt-6-astra": {
+          "kind": "known",
+          "tokens": 272000,
+          "source": "codex-runtime-catalog:context_window"
+        },
+        "gpt-5.6-sol": {
+          "kind": "known",
+          "tokens": 272000,
+          "source": "codex-runtime-catalog:context_window"
+        },
+        "gpt-5.6-terra": {
+          "kind": "known",
+          "tokens": 272000,
+          "source": "codex-runtime-catalog:context_window"
+        },
+        "gpt-5.6-luna": {
+          "kind": "known",
+          "tokens": 272000,
+          "source": "codex-runtime-catalog:context_window"
+        },
+        "gpt-5.5": {
+          "kind": "known",
+          "tokens": 272000,
+          "source": "codex-runtime-catalog:context_window"
+        },
+        "gpt-5.4-mini": {
+          "kind": "known",
+          "tokens": 272000,
+          "source": "codex-runtime-catalog:context_window"
+        },
+        "gpt-5.3-codex-spark": {
+          "kind": "known",
+          "tokens": 128000,
+          "source": "codex-runtime-catalog:context_window"
+        }
+      }
+    },
+    {
+      "runtime": "claude_agent_sdk",
+      "observedAt": "2026-09-08T09:05:56.785Z",
+      "scope": "production Claude client auth/environment; metadata only",
+      "capacities": {
+        "default": {
+          "kind": "known",
+          "tokens": 1000000,
+          "source": "claude-sdk:rawMaxTokens"
+        },
+        "opus": {
+          "kind": "known",
+          "tokens": 200000,
+          "source": "claude-sdk:rawMaxTokens"
+        },
+        "sonnet": {
+          "kind": "known",
+          "tokens": 200000,
+          "source": "claude-sdk:rawMaxTokens"
+        },
+        "haiku": {
+          "kind": "known",
+          "tokens": 200000,
+          "source": "claude-sdk:rawMaxTokens"
+        }
+      }
+    }
+  ]
+}

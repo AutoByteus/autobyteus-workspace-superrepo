@@ -1,8 +1,10 @@
+import { TeamScopeModelOptionsObject } from "./run-model-config.js";
 import {
   Arg,
   Field,
   InputType,
   Mutation,
+  Query,
   ObjectType,
   Resolver,
   registerEnumType,
@@ -133,6 +135,9 @@ export class TeamRunModelConfigPatchInput {
   @Field(() => String)
   scopeAddress!: string;
 
+  @Field(() => String)
+  llmModelIdentifier!: string;
+
   @Field(() => GraphQLJSON, { nullable: true })
   llmConfig!: Record<string, unknown> | null;
 }
@@ -234,6 +239,11 @@ export class AgentTeamRunResolver {
         teamRunId: null,
       };
     }
+  }
+
+  @Query(() => [TeamScopeModelOptionsObject])
+  teamRunModelOptions(@Arg("teamRunId", () => String) teamRunId: string): Promise<TeamScopeModelOptionsObject[]> {
+    return this.runModelConfigService.teamRunModelOptions(teamRunId);
   }
 
   @Mutation(() => UpdateStoppedTeamRunModelConfigsResult)

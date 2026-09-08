@@ -226,6 +226,7 @@ export class AgentRunHistoryCatalogService {
 
   async commitRunModelConfig(input: {
     runId: string;
+    llmModelIdentifier: string;
     llmConfig: Readonly<Record<string, unknown>> | null;
   }): Promise<AgentRunModelConfigCommitResult> {
     return this.enqueueValue(async () => {
@@ -236,6 +237,7 @@ export class AgentRunHistoryCatalogService {
         runId,
         cataloged: Boolean(row),
         archived: Boolean(row?.archivedAt),
+        llmModelIdentifier: input.llmModelIdentifier,
         llmConfig: input.llmConfig,
       });
     });
