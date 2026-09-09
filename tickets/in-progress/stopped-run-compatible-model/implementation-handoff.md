@@ -2,16 +2,16 @@
 
 ## Current Result
 
-**Implementation Complete — Ready for independent Code Review.** This is an implementation-stage result, not API/E2E acceptance or delivery. Initial baseline `IR-001`; approved `RER-004` and reviewed `AD-REV-001` remain unchanged. Initial `ARCH-REV-001` is supplemented by `ARCH-REV-002` (Pass retained; ownership/navigation clarification only).
+**Local Fix Complete — Ready for independent source re-review of CRF-001 (IR-002).** CRR-001 remains the authoritative review Fail until re-review; this implementation result is not review Pass, API/E2E acceptance or delivery. Initial baseline `IR-001` is retained; approved `RER-004` and reviewed `AD-REV-001` remain unchanged. Initial `ARCH-REV-001` is supplemented by `ARCH-REV-002` (Pass retained; ownership/navigation clarification only).
 
 - Worktree: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model`
 - Branch: `requirements/stopped-run-compatible-model`
 - Approved base: `a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27`
-- Production/test/evidence development commit: `083387598db6e470078f5637f2f95b666fabe9e5`. The later handoff-record commit changes only implementation records/log whitespace, not production code.
-- Implementation cycle: Initial. Current code and this handoff are authoritative; history is navigational, not proof of acceptance.
+- Production/test/evidence development commit: `083387598db6e470078f5637f2f95b666fabe9e5`. IR-001 baseline; current correction commit is `88afb0512964b59d4734117c01ee0cb6925c2e81`. Later record/evidence commits do not change production behavior.
+- Implementation cycle: Rework; current implementation revision **IR-002** (trigger CRR-001 / CRF-001). Current code and this handoff are authoritative; history is navigational, not proof of acceptance.
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/implementation-revision-record.md`
-- Related revisions: AD-REV-001; ARCH-REV-001 and informational ARCH-REV-002; CRR: N/A; API-REV: N/A; DR: N/A.
-- Triggering findings: N/A — initial reviewed-design implementation. AR-N01 is resolved by ARCH-REV-002: use the architecture-owned design/AD-record indexes. Requirements investigation remains read-only; no upstream edit, approval, AD-REV-002 or implementation change is requested.
+- Related revisions: AD-REV-001; ARCH-REV-001 and informational ARCH-REV-002; CRR: CRR-001 (Fail, Local Fix); API-REV: N/A; DR: N/A.
+- Triggering finding: **CRF-001**, CRR-001, `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/code-review-report.md`; history `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/code-review-revision-record.md`. AR-N01 is resolved by ARCH-REV-002: use the architecture-owned design/AD-record indexes. Requirements investigation remains read-only; no upstream edit, approval, AD-REV-002 or implementation change is requested.
 
 ## Upstream Artifact Package
 
@@ -28,7 +28,7 @@ Upstream route: **Architecture Design**, independently reviewed Pass.
 - Native-budget supplemental source/result: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/context-budget-probe.mjs`; `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/context-budget-probe-result.json`
 - Architecture runtime metadata source/result: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/architecture-runtime-capacity-probe.mjs`; `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/architecture-runtime-capacity-probe-result.json`
 - Original existing-surface screenshot: `/home/autobyteus/data/memory/agent_teams/software_development_department_fc281441d1a2400d8fdf7f1813a7986d/requirements_engineer_7b3a3989359d44b5bd614b7b8140527e/context_files/ctx_0ab58212a636__image.png`. Existing-behavior evidence, not a normative target mockup.
-- Prototype/Product Design/UI-UX supplements: **N/A — not applicable**. Triggering downstream rework reports: **N/A — not applicable**.
+- Prototype/Product Design/UI-UX supplements: **N/A — not applicable**. Triggering source review report/history: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/code-review-report.md`; `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/code-review-revision-record.md`; reviewer reproduction/index: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/code-review/README.md` (all retained unchanged).
 
 ## Routing Classification
 
@@ -36,7 +36,7 @@ Upstream route: **Architecture Design**, independently reviewed Pass.
 - `architectural_risk`: **High** — confirmed, not downgraded.
 - Evidence: bounded stopped-run selection change through existing Agent/Team owners, GraphQL contract, saved pair, metadata adapters and frontend. Numerous dependency/fixture edits propagate one renamed invariant rather than introduce additional product features or lifecycle owners.
 - High risk remains warranted for persistence/restore coherence, provider metadata provenance and same-conversation continuation. Runtime-metadata feasibility is positive; real changed-model continuation is not yet validated.
-- Selected route: **Code Review**, subject to the completed-result handoff rule confirmation recorded below.
+- Selected route: **Code Review re-review**, subject to the completed Local Fix rule confirmation recorded below. No API/E2E advancement before source Pass.
 - Lightweight direct-route self-review: **Not Applicable**; this package requires independent source review. Implementation checks and rendered inspection do not replace it.
 - New Design Impact, Requirement Gap, or Unclear escalation: **None identified**. Existing unrelated static-test inventory failures are evidenced separately below.
 
@@ -46,7 +46,7 @@ A required model identifier plus explicit nullable settings is now the stopped-r
 
 Codex evidence comes from its actual saved-workspace launch, model/list, config/read, configured executable version and attributable current catalog. Claude metadata uses the production SDK auth/env/executable/runtime setting sources, a bounded zero-turn control, exact resolved identity and rawMaxTokens, with cleanup. Native evidence requires verified metadata provenance and applicable active context. No family-name guessing, budget/output/threshold/tokenizer restrictions, compression changes, migration or history conversion/reset were added.
 
-The Agent commit compares and read-backs both fields. Team validates all explicit patches before one existing tree write, preserves topology/tasks and verifies the canonical tree. The frontend resets settings coherently on a model change, applies target schema/defaults, preserves original Team links and sticky direct edits, sends the pair, and consumes the canonical pair/tree through existing Save/recovery states.
+The Agent commit compares and read-backs both fields. Team validates all explicit patches before one existing tree write, preserves topology/tasks and verifies the canonical tree. IR-002 preserves post-write read uncertainty as PERSISTENCE_INDETERMINATE through the existing canonical refresh/Retry path and clears stale Web error feedback after verification succeeds. The frontend resets settings coherently on a model change, applies target schema/defaults, preserves original Team links and sticky direct edits, sends the pair, and consumes the canonical pair/tree through existing Save/recovery states.
 
 ## Reviewed Behavior Implementation Trace
 
@@ -55,7 +55,7 @@ In this table `S` is `/home/autobyteus/workspace/.codex/worktrees/stopped-run-co
 | Behavior | Implemented / preserved production paths | Outcome and evidence |
 | --- | --- | --- |
 | BEH-001 | W/components/workspace/config/{ExistingRunConfigEditor,AgentRunConfigForm,TeamRunConfigForm,TeamScopeConfigEditor,MemberOverrideItem,TeamMemberConfigTree}.vue; W/components/launch-config/RuntimeModelConfigFields.vue; W/stores/existingRunModelConfigStore.ts | Stopped model selection enabled, runtime/other identities remain locked; explicit Save/discard and eligibility preserved. Component/store tests and rendered Agent/root/nested/member inspection. |
-| BEH-002 | S/api/graphql/types/{agent-run,agent-team-run,run-model-config}.ts → S/run-history/services/studio-run-model-config-service.ts → existing Agent/Team services; S/llm-management/services/run-model-selection-service.ts; S/run-history/services/agent-run-model-config-commit.ts; S/agent-team-execution/services/team-run-model-config-mutator.ts | Required pair, fresh baseline validation, schema checking, model-only dirty/no-op/read-back/canonical recovery. Local unit checks cover wrong-model readback, ambiguous reads, and whole-tree all-before-write behavior. |
+| BEH-002 | S/api/graphql/types/{agent-run,agent-team-run,run-model-config}.ts → S/run-history/services/studio-run-model-config-service.ts → existing Agent/Team services; S/llm-management/services/run-model-selection-service.ts; S/run-history/services/agent-run-model-config-commit.ts; S/agent-team-execution/services/team-run-model-config-mutator.ts | Required pair, fresh baseline validation, schema checking, model-only dirty/no-op/read-back/canonical recovery. Local unit checks cover wrong-model readback, ambiguous reads, and whole-tree all-before-write behavior; IR-002 adds the full Team physical-result/read-back matrix through Studio/resolver and Web verification/Retry coverage. |
 | BEH-003 | W/services/runConfigEditing/{existingTeamModelConfigDraft,existingTeamRunFormModel}.ts → paired events in Team forms → S/agent-team-execution/services/agent-team-run-manager.ts | Original runtime/model/settings links only; direct/divergent branches stay separate. Automatic schema defaults do not falsely mark a descendant as explicitly edited. Every patched configured scope validated before one write; retained task entry unchanged in local fixture. |
 | BEH-004 | Existing standalone lifecycle Save/restore lane and configured-tree restore → existing native/Codex/Claude runtime creation/resume owners | Saved selection reaches normal reconstruction without changing run/provider identity; local lane/provider-neutral native-member tests pass. **Real changed-model Codex resume and configured-member continuation remain mandatory downstream.** |
 | BEH-005 | Existing normal runtime resume and compaction/history owners remain untouched; Save writes only selected metadata/tree fields | No compaction calls, memory rewrites, history reset or new-conversation fallback introduced. Native-budget counterexample retained; differing output/input/threshold budgets are not eligibility criteria. **Already-compacted-history acceptance remains downstream.** |
@@ -85,7 +85,18 @@ In this table `S` is `/home/autobyteus/workspace/.codex/worktrees/stopped-run-co
 - Existing Agent metadata and configured Team tree already store model and settings. Current readers remain version-agnostic; only selected fields change under existing write protocols.
 - No migration, dual reader/writer, version-specific fallback, task/history conversion or rollout mechanism introduced. Deviation: **None**.
 
-## Local Implementation Checks
+## Current Round Local Checks — IR-002
+
+- Correction commit: `88afb0512964b59d4734117c01ee0cb6925c2e81`; complete detail and commands: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/README.md`.
+- Existing Team Save owner: catch only post-write read uncertainty; preserve known post-rename indeterminate outcome and use indeterminate for committed-but-unreadable/no canonical state. Known pre-rename failure remains failure. Return last known tree for verification, with no rollback/write retry/new lock/migration.
+- Web Team reconciliation: clear obsolete error feedback after canonical verification succeeds; this was found in local rendered inspection. No new UI state or workflow.
+- Build: Pass. Server local tests: **4 files / 23 tests Pass**, including nine physical-result/readback combinations through manager → Studio → resolver. Web: **3 files / 22 tests Pass**, including pending verification lock, first-refresh success and failed-refresh/Retry with no duplicate mutation.
+- Actual temporary-filesystem writer reproduction: both CRF-001 cases now assert **PERSISTENCE_INDETERMINATE**, last known tree and exactly one new-model write. `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/team-readback-probe.mjs`; `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/team-readback-probe-result.json`. Reviewer evidence is preserved separately, unchanged.
+- Rendered existing Settings components with deterministic transport: changed-model Team Save → indeterminate → injected automatic verification failure → visible Retry with locked Save/controls → canonical pair installed on Retry, error cleared, clean draft. Exactly one mutation/three reads. Directly inspected at 1280x900 and 520x900, no narrow overflow, no page/console errors; owned processes/temp page cleaned. Source/result/images are under `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/IR-002` and its `rendered/` directory. Not API networking or provider acceptance.
+- Classification recheck: **Medium / High confirmed**, Local Fix only; no design/requirements change. Changed manual source sizes **474 / 454**, round deltas **6 / 1**; source-size and syntax/diff checks Pass. No new migration, rollback, history edit, protocol or ownership mechanism.
+- CRF-001 status from Implementation: **correction implemented, awaiting independent source re-review**. No Code Reviewer Pass is implied. All downstream real changed-model/configured-member/compacted-history gates remain unchanged.
+
+## Retained Initial Local Implementation Checks — IR-001
 
 Commands, environment, raw result logs and baseline comparison: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/README.md`.
 
@@ -97,7 +108,7 @@ Commands, environment, raw result logs and baseline comparison: `/home/autobyteu
 - Production capacity source/result: `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-capacity-probe.mjs`; `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/implementation-capacity-probe-result.json`. Codex 0.153.4 yielded six 272k models and spark 128k; Claude production control yielded default 1m and opus/sonnet/haiku aliases 200k in this actual environment. These are timestamped environment observations, **not hard-coded policy, inference or feature acceptance**.
 - Syntax checks and product diff hygiene pass. Evidence-log trailing whitespace was normalized separately.
 
-## Frontend Rendered-Result Check
+## Frontend Rendered-Result Check — Retained IR-001 (IR-002 supplement above)
 
 - References: approved requirements/design, supplied existing Team screenshot, existing quiet controls, adjacent launch/config components, web README/AGENTS development instructions.
 - Project-supported surface: Nuxt dev renderer; actual existing Settings editor in the repository's fixture page. Only transport/health responses are deterministic; no API server or provider is exercised.
@@ -126,12 +137,11 @@ Required downstream gates include:
 4. Required model+explicit nullable settings contract, model-only no-op/dirtiness/canonical readback, stale options/new saved baseline, unknown capacities, equal/larger acceptance and smaller rejection, target schema/defaults and persisted re-open behavior.
 5. Runtime readers in actual supported launch/auth profiles; verify positive usable replacement choices, not an all-targets-disabled “success.” Probe metadata feasibility alone is not sufficient delivery evidence.
 
-API/E2E, source-review and delivery result artifacts: **N/A — not yet performed for IR-001**.
+Source review: **CRR-001 Fail / CRF-001 Local Fix**; IR-002 awaits re-review. API/E2E and delivery artifacts: **N/A — not yet performed**.
 
 ## Rule-Based Handoff Confirmation
 
-`get_handoff_rules` returned the most-specific initial-completion rule: implementation complete, architectural_risk=High, implementation-scoped validation complete, cumulative package ready for independent source review. Selected single exact recipient: `/software_engineering_team/code_reviewer`. The Local Fix, Low-risk direct, and escalation rules do not apply. The outgoing message carries IR-001 plus RER-004/AD-REV-001/ARCH-REV-001 and the evidence/limitations above; no delivery or review outcome is implied.
-
+IR-001 initial High-risk handoff was delivered to Code Reviewer. IR-002 is an implementation-owned Local Fix requested by Code Reviewer. get_handoff_rules returned the most-specific completed Local Fix + High-risk return rule; selected single exact recipient `/software_engineering_team/code_reviewer`. The generic initial-completion, Low-risk direct and escalation rules are not selected. No API/E2E handoff or review Pass is claimed.
 
 ## Post-Handoff Informational Update — ARCH-REV-002
 

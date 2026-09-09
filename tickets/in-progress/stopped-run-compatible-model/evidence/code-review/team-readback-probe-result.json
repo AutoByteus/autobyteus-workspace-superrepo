@@ -1,0 +1,49 @@
+{
+  "observedAt": "2026-09-08T09:14:58.424Z",
+  "observations": [
+    {
+      "finalization": "committed",
+      "physicalOutcome": "committed",
+      "writes": 1,
+      "persistedModel": "new",
+      "response": {
+        "success": false,
+        "outcome": "INTERNAL_ERROR",
+        "message": "Team model settings could not be updated.",
+        "isActive": false,
+        "editability": {
+          "editable": false,
+          "reason": "INTERNAL_ERROR"
+        },
+        "canonicalExecutionTree": null,
+        "fieldErrors": []
+      },
+      "expectedOutcome": "PERSISTENCE_INDETERMINATE",
+      "expectedCanonicalVerification": true,
+      "storeWillReconcile": false,
+      "note": "Store reconciliation predicate and editor retry visibility independently source-inspected; browser not executed."
+    },
+    {
+      "finalization": "renamed_finalization_indeterminate",
+      "physicalOutcome": "renamed_finalization_indeterminate",
+      "writes": 1,
+      "persistedModel": "new",
+      "response": {
+        "success": false,
+        "outcome": "INTERNAL_ERROR",
+        "message": "Team model settings could not be updated.",
+        "isActive": false,
+        "editability": {
+          "editable": false,
+          "reason": "INTERNAL_ERROR"
+        },
+        "canonicalExecutionTree": null,
+        "fieldErrors": []
+      },
+      "expectedOutcome": "PERSISTENCE_INDETERMINATE",
+      "expectedCanonicalVerification": true,
+      "storeWillReconcile": false,
+      "note": "Store reconciliation predicate and editor retry visibility independently source-inspected; browser not executed."
+    }
+  ]
+}

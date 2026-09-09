@@ -1,0 +1,58 @@
+Stopped Team model-config update failed unexpectedly. Error: injected post-write canonical read EIO
+    at Object.read (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/code-review/team-readback-probe.mjs:42:56)
+    at file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/dist/agent-team-execution/services/agent-team-run-manager.js:221:61
+    at async AgentTeamRunManager.withRootTransition (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/dist/agent-team-execution/services/agent-team-run-manager.js:384:20)
+    at async Object.updateStoppedTeamRunModelConfigs (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/dist/api/graphql/types/agent-team-run.js:339:28)
+    at async file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/code-review/team-readback-probe.mjs:52:22
+Stopped Team model-config update failed unexpectedly. Error: injected post-write canonical read EIO
+    at Object.read (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/code-review/team-readback-probe.mjs:42:56)
+    at file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/dist/agent-team-execution/services/agent-team-run-manager.js:221:61
+    at async AgentTeamRunManager.withRootTransition (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/dist/agent-team-execution/services/agent-team-run-manager.js:384:20)
+    at async Object.updateStoppedTeamRunModelConfigs (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/dist/api/graphql/types/agent-team-run.js:339:28)
+    at async file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/code-review/team-readback-probe.mjs:52:22
+[
+  {
+    "finalization": "committed",
+    "physicalOutcome": "committed",
+    "writes": 1,
+    "persistedModel": "new",
+    "response": {
+      "success": false,
+      "outcome": "INTERNAL_ERROR",
+      "message": "Team model settings could not be updated.",
+      "isActive": false,
+      "editability": {
+        "editable": false,
+        "reason": "INTERNAL_ERROR"
+      },
+      "canonicalExecutionTree": null,
+      "fieldErrors": []
+    },
+    "expectedOutcome": "PERSISTENCE_INDETERMINATE",
+    "expectedCanonicalVerification": true,
+    "storeWillReconcile": false,
+    "note": "Store reconciliation predicate and editor retry visibility independently source-inspected; browser not executed."
+  },
+  {
+    "finalization": "renamed_finalization_indeterminate",
+    "physicalOutcome": "renamed_finalization_indeterminate",
+    "writes": 1,
+    "persistedModel": "new",
+    "response": {
+      "success": false,
+      "outcome": "INTERNAL_ERROR",
+      "message": "Team model settings could not be updated.",
+      "isActive": false,
+      "editability": {
+        "editable": false,
+        "reason": "INTERNAL_ERROR"
+      },
+      "canonicalExecutionTree": null,
+      "fieldErrors": []
+    },
+    "expectedOutcome": "PERSISTENCE_INDETERMINATE",
+    "expectedCanonicalVerification": true,
+    "storeWillReconcile": false,
+    "note": "Store reconciliation predicate and editor retry visibility independently source-inspected; browser not executed."
+  }
+]

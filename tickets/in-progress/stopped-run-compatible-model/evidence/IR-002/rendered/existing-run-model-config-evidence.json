@@ -1,0 +1,209 @@
+{
+  "startedAt": "2026-09-09T01:30:47.162Z",
+  "platform": "linux-arm64",
+  "node": "v22.23.2",
+  "browserExecutable": "/usr/bin/chromium",
+  "webDir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web",
+  "fixturePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/fixtures/existing-run-model-config.page.vue",
+  "installedPagePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/pages/api-e2e-existing-run-model-config.vue",
+  "routePath": "/api-e2e-existing-run-model-config",
+  "graphqlOperations": [
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetRuntimeAvailabilities",
+      "variables": {}
+    },
+    {
+      "operationName": "GetProviderModelCatalogSnapshots",
+      "variables": {
+        "runtimeKind": "autobyteus"
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedTeamRunModelConfigs",
+      "variables": {
+        "input": {
+          "teamRunId": "team-run-browser-1",
+          "patches": [
+            {
+              "scopeKind": "CONFIGURED_TEAM",
+              "scopeAddress": "/",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/coordinator",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_TEAM",
+              "scopeAddress": "/Nested",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/lead",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/reviewer",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    }
+  ],
+  "scenarios": {
+    "IR-002-RENDER": {
+      "id": "IR-002-RENDER",
+      "description": "CRF-001 Team indeterminate outcome -> automatic verification failure -> Retry; deterministic transport only",
+      "status": "Pass",
+      "startedAt": "2026-09-09T01:31:02.867Z",
+      "finishedAt": "2026-09-09T01:31:08.768Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "teamRunId": "team-run-browser-1",
+            "patches": [
+              {
+                "scopeKind": "CONFIGURED_TEAM",
+                "scopeAddress": "/",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/coordinator",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_TEAM",
+                "scopeAddress": "/Nested",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/Nested/lead",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/Nested/reviewer",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              }
+            ]
+          }
+        },
+        "canonicalModel": "larger-model",
+        "canonicalConfig": null,
+        "mutationCount": 1,
+        "canonicalReadCount": 3,
+        "expectedInjectedFailure": "One automatic canonical refresh returns a GraphQL error; Retry succeeds."
+      }
+    }
+  },
+  "browserEvents": [
+    {
+      "type": "console:debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Initializing server config"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Not in Electron environment. Skipping server initialization."
+    },
+    {
+      "type": "console:info",
+      "text": "<Suspense> is an experimental feature and its API will likely change."
+    },
+    {
+      "type": "console:log",
+      "text": "ServerLoading: Component mounted with status: running"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Checking server health at /rest/health"
+    }
+  ],
+  "failures": [],
+  "cleanup": {
+    "context": "closed",
+    "browser": "closed",
+    "devServer": {
+      "status": "terminated",
+      "pid": 52970,
+      "initialExitCode": null,
+      "initialSignalCode": null,
+      "sigtermTarget": "process-group",
+      "exitedAfterSigterm": true,
+      "finalExitCode": null,
+      "finalSignalCode": "SIGTERM",
+      "processGroupExited": true
+    },
+    "devLog": "closed",
+    "temporaryPage": "removed"
+  },
+  "port": 46333,
+  "baseUrl": "http://127.0.0.1:46333",
+  "finishedAt": "2026-09-09T01:31:09.685Z",
+  "result": "Pass"
+}

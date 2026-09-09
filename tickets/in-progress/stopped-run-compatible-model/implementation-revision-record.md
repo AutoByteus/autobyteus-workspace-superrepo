@@ -7,6 +7,7 @@ Current code and `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compat
 | Revision ID | Triggering role / report / round | Findings | Classification | Related revisions | Result |
 | --- | --- | --- | --- | --- | --- |
 | IR-001 | Architecture Reviewer; design-review-report.md; ARCH-REV-001 Pass | N/A | Initial Baseline | RER-004; AD-REV-001; ARCH-REV-001; CRR/API-REV/DR: N/A | Implementation Complete — Ready for independent Code Review |
+| IR-002 | Code Reviewer; code-review-report.md; CRR-001 | CRF-001 | Local Fix | RER-004; AD-REV-001; ARCH-REV-002; CRR-001; API-REV/DR: N/A | Local Fix Complete — Ready for source re-review |
 
 ## IR-001 — Coherent stopped-run compatible model selection
 
@@ -30,3 +31,20 @@ Current code and `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compat
 ### Informational annotation to IR-001 — ARCH-REV-002
 
 2026-09-08: Received Architecture Review ARCH-REV-002, Pass retained, AR-N01 resolved. This annotation does not replace the initial trigger/history above or establish IR-002: no production/test delta, new requirement, design revision, revalidation request or implementation round occurred. Current handoff now references the supplement. Architecture-owned indexes are authoritative for their probe evidence; Requirements investigation remains read-only. RER-004, AD-REV-001, Medium/High, existing source-review assignment and mandatory live-resume/compacted-history gates are unchanged.
+
+
+## IR-002 — Preserve Team post-write canonical verification
+
+- Completed: 2026-09-09. Triggering role/report/round: Code Reviewer, `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/code-review-report.md`, CRR-001 initial review Fail. Review history `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/code-review-revision-record.md`; finding **CRF-001**.
+- Classification: **Local Fix — implementation-owned**. task_size=Medium; architectural_risk=High, confirmed. No Design Impact, Requirement Gap or Unclear issue; no new approval or architecture revision.
+- Prior authoritative result: IR-001 implementation ready for review, followed by **CRR-001 Fail** for CRF-001. No prior Pass inferred.
+- Current authoritative implementation result: **Local Fix Complete — Ready for independent source re-review**. CRF-001 correction is implemented with local evidence; Code Reviewer owns resolution/Pass.
+- Related revisions: approved RER-004; AD-REV-001; latest ARCH-REV-002 Pass (AR-N01 resolved); CRR-001; API-REV: N/A; DR: N/A.
+- Why recorded: satisfy the explicitly preserved uncertain Save contract identified by CRF-001, not general infrastructure hardening or a newly claimed regression.
+- Affected basis: **SCN-005 / BEH-002 / REQ-006 / AC-007; AD-D02 / DS-06/07**.
+- Production/test delta: commit `88afb0512964b59d4734117c01ee0cb6925c2e81`. `autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts` catches the post-write read and preserves indeterminate when rename is known but canonical verification unavailable; known non-rename remains ordinary failure. `autobyteus-web/stores/existingRunModelConfigStore.ts` clears stale error only after Team verification succeeds. No new owner, lock, write retry/rollback, migration or history action.
+- Durable regression deltas: existing `team-run-model-selection-save.test.ts` adds nine owner/Studio/resolver physical-result × readback cases with one-write/tree preservation assertions; existing `existingRunModelConfigStore.spec.ts` adds deferred verification and failure/Retry cases asserting the full canonical pair, clean planner, lockout, cleared feedback and one mutation.
+- Local validation: server production build Pass; 23 focused server tests Pass; 22 focused Web tests Pass. Independent reviewer reproduction copied to implementation-owned `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/team-readback-probe.mjs`, with assertions and separate result: both actual temporary-filesystem post-write cases now retain PERSISTENCE_INDETERMINATE. Existing component renderer exercised verification failure/Retry at 1280/520 widths; final images inspected, obsolete error corrected, final Pass. Text/commands/results in `/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/README.md`.
+- Size/classification check: two changed manual sources 474 and 454 nonempty lines; round deltas 6 and 1. Medium/High and original architecture rationale unchanged.
+- Next route: get_handoff_rules selected the most-specific completed implementation-owned Local Fix + High-risk return rule and exact recipient `/software_engineering_team/code_reviewer`; re-review CRF-001, not API/E2E yet.
+- Remaining limits: CRR-001 remains Fail pending re-review. All real supported changed-model Codex continuation, configured-member and compacted-history gates remain mandatory; no full Web typecheck/build, broad API/E2E or delivery performed here. Three previously evidenced baseline architecture guard failures retained, not rerun or reclassified this round. Reviewer/upstream artifacts unchanged.

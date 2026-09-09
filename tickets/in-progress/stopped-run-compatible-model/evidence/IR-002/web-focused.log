@@ -1,0 +1,41 @@
+
+> autobyteus@1.4.68 test:nuxt /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web
+> cross-env NUXT_TEST=true vitest stores/__tests__/existingRunModelConfigStore.spec.ts components/workspace/config/__tests__/TeamRunConfigForm.spec.ts components/workspace/config/__tests__/TeamScopeConfigEditor.spec.ts --run
+
+isElectronBuild false
+[Electron Module] Skipping electron module setup: BUILD_TARGET is not electron
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+ RUN  v3.2.4 /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web
+
+stderr | components/workspace/config/__tests__/TeamScopeConfigEditor.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | components/workspace/config/__tests__/TeamRunConfigForm.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | stores/__tests__/existingRunModelConfigStore.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stdout | components/workspace/config/__tests__/TeamRunConfigForm.spec.ts
+serverStore: Initializing server config
+serverStore: Not in Electron environment. Skipping server initialization.
+
+stdout | stores/__tests__/existingRunModelConfigStore.spec.ts
+serverStore: Initializing server config
+serverStore: Not in Electron environment. Skipping server initialization.
+
+stdout | components/workspace/config/__tests__/TeamScopeConfigEditor.spec.ts
+serverStore: Initializing server config
+serverStore: Not in Electron environment. Skipping server initialization.
+
+ ✓ stores/__tests__/existingRunModelConfigStore.spec.ts (11 tests) 130ms
+ ✓ components/workspace/config/__tests__/TeamScopeConfigEditor.spec.ts (5 tests) 56ms
+ ✓ components/workspace/config/__tests__/TeamRunConfigForm.spec.ts (6 tests) 43ms
+
+ Test Files  3 passed (3)
+      Tests  22 passed (22)
+   Start at  01:30:53
+   Duration  15.85s (transform 6.62s, setup 39.67s, collect 1.21s, tests 229ms, environment 3.25s, prepare 1.28s)

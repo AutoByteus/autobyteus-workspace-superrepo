@@ -1,0 +1,391 @@
+{
+  "base": "a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27",
+  "head": "4a9940ebb62cc6ed21634eb3ff701b6b40770d36",
+  "rule": "Nonempty physical lines; delta = additions + removals (rename counted conservatively as new path); tests/evidence excluded; generated output separately marked",
+  "files": [
+    {
+      "path": "autobyteus-server-ts/src/agent-execution/runtime/general-process-run-supervisor.ts",
+      "nonEmptyLines": 300,
+      "added": 6,
+      "removed": 6,
+      "totalDelta": 12,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/agent-execution/services/agent-run-service.ts",
+      "nonEmptyLines": 273,
+      "added": 1,
+      "removed": 0,
+      "totalDelta": 1,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/agent-execution/services/standalone-agent-run-lifecycle-service.ts",
+      "nonEmptyLines": 391,
+      "added": 13,
+      "removed": 12,
+      "totalDelta": 25,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts",
+      "nonEmptyLines": 472,
+      "added": 15,
+      "removed": 17,
+      "totalDelta": 32,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/agent-team-execution/services/team-run-model-config-mutator.ts",
+      "nonEmptyLines": 99,
+      "added": 7,
+      "removed": 5,
+      "totalDelta": 12,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/api/graphql/types/agent-run.ts",
+      "nonEmptyLines": 339,
+      "added": 15,
+      "removed": 4,
+      "totalDelta": 19,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/api/graphql/types/agent-team-run.ts",
+      "nonEmptyLines": 237,
+      "added": 10,
+      "removed": 0,
+      "totalDelta": 10,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/api/graphql/types/run-model-config.ts",
+      "nonEmptyLines": 48,
+      "added": 35,
+      "removed": 1,
+      "totalDelta": 36,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/application-platform/execution/application-execution-scope-contracts.ts",
+      "nonEmptyLines": 131,
+      "added": 2,
+      "removed": 2,
+      "totalDelta": 4,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/application-platform/execution/application-execution-scope-kernel-builder.ts",
+      "nonEmptyLines": 325,
+      "added": 3,
+      "removed": 3,
+      "totalDelta": 6,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/application-platform/runtime/build-application-platform-runtime.ts",
+      "nonEmptyLines": 302,
+      "added": 3,
+      "removed": 3,
+      "totalDelta": 6,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/compositions/build-studio-server.ts",
+      "nonEmptyLines": 328,
+      "added": 9,
+      "removed": 8,
+      "totalDelta": 17,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/llm-management/domain/run-model-selection.ts",
+      "nonEmptyLines": 17,
+      "added": 17,
+      "removed": 0,
+      "totalDelta": 17,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/llm-management/domain/runtime-model-capacity.ts",
+      "nonEmptyLines": 8,
+      "added": 8,
+      "removed": 0,
+      "totalDelta": 8,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/llm-management/services/model-catalog-service.ts",
+      "nonEmptyLines": 440,
+      "added": 2,
+      "removed": 2,
+      "totalDelta": 4,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/llm-management/services/model-config-schema-validation.ts",
+      "nonEmptyLines": 133,
+      "added": 142,
+      "removed": 0,
+      "totalDelta": 142,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/llm-management/services/run-model-selection-service.ts",
+      "nonEmptyLines": 116,
+      "added": 121,
+      "removed": 0,
+      "totalDelta": 121,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/llm-management/services/runtime-model-capacity-service.ts",
+      "nonEmptyLines": 29,
+      "added": 31,
+      "removed": 0,
+      "totalDelta": 31,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/run-history/services/agent-run-history-catalog-service.ts",
+      "nonEmptyLines": 474,
+      "added": 2,
+      "removed": 0,
+      "totalDelta": 2,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/run-history/services/agent-run-model-config-commit.ts",
+      "nonEmptyLines": 45,
+      "added": 8,
+      "removed": 5,
+      "totalDelta": 13,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/run-history/services/studio-run-model-config-service.ts",
+      "nonEmptyLines": 162,
+      "added": 36,
+      "removed": 0,
+      "totalDelta": 36,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/runtime-management/claude/client/claude-sdk-client.ts",
+      "nonEmptyLines": 477,
+      "added": 17,
+      "removed": 0,
+      "totalDelta": 17,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/runtime-management/claude/client/claude-sdk-context-capacity.ts",
+      "nonEmptyLines": 53,
+      "added": 55,
+      "removed": 0,
+      "totalDelta": 55,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/runtime-management/codex/client/codex-app-server-client.ts",
+      "nonEmptyLines": 345,
+      "added": 9,
+      "removed": 1,
+      "totalDelta": 10,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/runtime-management/codex/client/codex-model-capacity-reader.ts",
+      "nonEmptyLines": 102,
+      "added": 106,
+      "removed": 0,
+      "totalDelta": 106,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-server-ts/src/standalone-application-host/start-standalone-application-host.ts",
+      "nonEmptyLines": 366,
+      "added": 4,
+      "removed": 4,
+      "totalDelta": 8,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/agentTeams/SearchableGroupedSelect.vue",
+      "nonEmptyLines": 239,
+      "added": 31,
+      "removed": 3,
+      "totalDelta": 34,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/launch-config/RuntimeModelConfigFields.vue",
+      "nonEmptyLines": 349,
+      "added": 34,
+      "removed": 3,
+      "totalDelta": 37,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/workspace/config/AgentRunConfigForm.vue",
+      "nonEmptyLines": 166,
+      "added": 15,
+      "removed": 8,
+      "totalDelta": 23,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/workspace/config/ExistingRunConfigEditor.vue",
+      "nonEmptyLines": 186,
+      "added": 5,
+      "removed": 3,
+      "totalDelta": 8,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/workspace/config/MemberOverrideItem.vue",
+      "nonEmptyLines": 338,
+      "added": 7,
+      "removed": 4,
+      "totalDelta": 11,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/workspace/config/ModelConfigSection.vue",
+      "nonEmptyLines": 300,
+      "added": 7,
+      "removed": 5,
+      "totalDelta": 12,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/workspace/config/TeamMemberConfigTree.vue",
+      "nonEmptyLines": 88,
+      "added": 4,
+      "removed": 3,
+      "totalDelta": 7,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/workspace/config/TeamRunConfigForm.vue",
+      "nonEmptyLines": 150,
+      "added": 4,
+      "removed": 3,
+      "totalDelta": 7,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/components/workspace/config/TeamScopeConfigEditor.vue",
+      "nonEmptyLines": 333,
+      "added": 22,
+      "removed": 15,
+      "totalDelta": 37,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/generated/graphql.ts",
+      "nonEmptyLines": 9200,
+      "added": 151,
+      "removed": 3,
+      "totalDelta": 154,
+      "generated": true
+    },
+    {
+      "path": "autobyteus-web/graphql/mutations/runHistoryMutations.ts",
+      "nonEmptyLines": 52,
+      "added": 1,
+      "removed": 1,
+      "totalDelta": 2,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/graphql/queries/runModelOptionsQueries.ts",
+      "nonEmptyLines": 14,
+      "added": 14,
+      "removed": 0,
+      "totalDelta": 14,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/localization/messages/en/workspace.ts",
+      "nonEmptyLines": 354,
+      "added": 5,
+      "removed": 1,
+      "totalDelta": 6,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/localization/messages/zh-CN/workspace.ts",
+      "nonEmptyLines": 353,
+      "added": 5,
+      "removed": 1,
+      "totalDelta": 6,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/services/runConfigEditing/existingAgentModelConfigDraft.ts",
+      "nonEmptyLines": 35,
+      "added": 12,
+      "removed": 0,
+      "totalDelta": 12,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/services/runConfigEditing/existingRunModelConfigMutationClient.ts",
+      "nonEmptyLines": 50,
+      "added": 3,
+      "removed": 2,
+      "totalDelta": 5,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/services/runConfigEditing/existingRunModelOptionsClient.ts",
+      "nonEmptyLines": 15,
+      "added": 15,
+      "removed": 0,
+      "totalDelta": 15,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/services/runConfigEditing/existingTeamModelConfigDraft.ts",
+      "nonEmptyLines": 106,
+      "added": 15,
+      "removed": 14,
+      "totalDelta": 29,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/services/runConfigEditing/existingTeamRunFormModel.ts",
+      "nonEmptyLines": 101,
+      "added": 10,
+      "removed": 5,
+      "totalDelta": 15,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/stores/existingRunModelConfigStore.ts",
+      "nonEmptyLines": 453,
+      "added": 51,
+      "removed": 17,
+      "totalDelta": 68,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/types/agent/ExistingRunModelConfigDraft.ts",
+      "nonEmptyLines": 42,
+      "added": 16,
+      "removed": 2,
+      "totalDelta": 18,
+      "generated": false
+    },
+    {
+      "path": "autobyteus-web/types/agent/ExistingTeamRunFormModel.ts",
+      "nonEmptyLines": 41,
+      "added": 5,
+      "removed": 0,
+      "totalDelta": 5,
+      "generated": false
+    }
+  ]
+}
