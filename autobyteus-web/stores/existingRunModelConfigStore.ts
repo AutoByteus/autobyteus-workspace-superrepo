@@ -435,6 +435,7 @@ export const useExistingRunModelConfigStore = defineStore('existingRunModelConfi
       this.cachedLifecycleLock = null
       try {
         this.syncTeamCanonical(await useRunHistoryStore().refreshTeamResumeConfig(teamRunId))
+        this.feedback = null
       } catch (error) {
         this.feedback = { kind: 'error', message: error instanceof Error ? error.message : String(error) }
       } finally {

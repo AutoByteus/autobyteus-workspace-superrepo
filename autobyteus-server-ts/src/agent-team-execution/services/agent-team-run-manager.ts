@@ -288,8 +288,10 @@ export class AgentTeamRunManager {
         return this.modelConfigUpdateResult("UNCHANGED", "Team model settings are already up to date.", tree, false);
       }
       const write = await this.executionTreeStore.write(this.teamMemoryDir(teamRunId), nextTree);
-      const canonical = await this.executionTreeStore.read(this.teamMemoryDir(teamRunId), teamRunId);
-      if (write.outcome === "renamed_finalization_indeterminate") {
+      // Once renamed, unreadable canonical state requires verification, not an ordinary failure.
+      const canonical = await this.executionTreeStore.read(this.teamMemoryDir(teamRunId), teamRunId).catch(() => null);
+      if (write.outcome === "renamed_finalization_indeterminate" ||
+          (write.outcome === "committed" && !canonical)) {
         return this.modelConfigUpdateResult(
           "PERSISTENCE_INDETERMINATE",
           "Update outcome is being verified. Refresh the Team configuration before saving again.",
