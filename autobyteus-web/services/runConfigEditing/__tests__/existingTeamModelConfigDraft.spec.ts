@@ -47,33 +47,44 @@ const tree = (): TeamRunExecutionTreeDto => ({
 describe('existing Team model-config draft planner', () => {
   it('propagates only through draft-start equal links and stops at divergent branches', () => {
     const updated = updateExistingTeamScopeModelConfig(
-      createExistingTeamModelConfigDraft(tree()), '/', { effort: 'high' },
+      createExistingTeamModelConfigDraft(tree()), '/', { llmModelIdentifier: 'gpt', llmConfig: { effort: 'high' } },
     )
-    expect(updated.scopesByAddress['/linked']?.draftLlmConfig).toEqual({ effort: 'high' })
-    expect(updated.scopesByAddress['/divergent']?.draftLlmConfig).toEqual({ effort: 'low' })
-    expect(updated.scopesByAddress['/divergent/child']?.draftLlmConfig).toEqual({ effort: 'low' })
+    expect(updated.scopesByAddress['/linked']?.draftSelection.llmConfig).toEqual({ effort: 'high' })
+    expect(updated.scopesByAddress['/divergent']?.draftSelection.llmConfig).toEqual({ effort: 'low' })
+    expect(updated.scopesByAddress['/divergent/child']?.draftSelection.llmConfig).toEqual({ effort: 'low' })
     expect(planExistingTeamModelConfigPatches(updated).map((patch) => patch.scopeAddress)).toEqual(['/', '/linked'])
   })
 
   it('makes a direct edit an order-independent branch boundary', () => {
     let draft = createExistingTeamModelConfigDraft(tree())
-    draft = updateExistingTeamScopeModelConfig(draft, '/', { effort: 'high' })
-    draft = updateExistingTeamScopeModelConfig(draft, '/linked', { effort: 'max' })
-    draft = updateExistingTeamScopeModelConfig(draft, '/', { effort: 'low' })
+    draft = updateExistingTeamScopeModelConfig(draft, '/', { llmModelIdentifier: 'gpt', llmConfig: { effort: 'high' } })
+    draft = updateExistingTeamScopeModelConfig(draft, '/linked', { llmModelIdentifier: 'gpt', llmConfig: { effort: 'max' } })
+    draft = updateExistingTeamScopeModelConfig(draft, '/', { llmModelIdentifier: 'gpt', llmConfig: { effort: 'low' } })
     expect(draft.scopesByAddress['/linked']).toEqual(expect.objectContaining({
       directlyEdited: true,
-      draftLlmConfig: { effort: 'max' },
+      draftSelection: { llmModelIdentifier: 'gpt', llmConfig: { effort: 'max' } },
     }))
     expect(planExistingTeamModelConfigPatches(draft)).toEqual([
-      { scopeKind: 'CONFIGURED_TEAM', scopeAddress: '/', llmConfig: { effort: 'low' } },
-      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/linked', llmConfig: { effort: 'max' } },
+      { scopeKind: 'CONFIGURED_TEAM', scopeAddress: '/', llmModelIdentifier: 'gpt', llmConfig: { effort: 'low' } },
+      { scopeKind: 'CONFIGURED_AGENT', scopeAddress: '/linked', llmModelIdentifier: 'gpt', llmConfig: { effort: 'max' } },
     ])
   })
 
   it('lets a direct edit before a parent change win without touching its branch', () => {
     let draft = createExistingTeamModelConfigDraft(tree())
-    draft = updateExistingTeamScopeModelConfig(draft, '/linked', { effort: 'max' })
-    draft = updateExistingTeamScopeModelConfig(draft, '/', { effort: 'high' })
-    expect(draft.scopesByAddress['/linked']?.draftLlmConfig).toEqual({ effort: 'max' })
+    draft = updateExistingTeamScopeModelConfig(draft, '/linked', { llmModelIdentifier: 'gpt', llmConfig: { effort: 'max' } })
+    draft = updateExistingTeamScopeModelConfig(draft, '/', { llmModelIdentifier: 'gpt', llmConfig: { effort: 'high' } })
+    expect(draft.scopesByAddress['/linked']?.draftSelection.llmConfig).toEqual({ effort: 'max' })
   })
+})
+
+it('propagates the complete pair on a model-only edit and keeps defaults non-direct', () => {
+  let draft = updateExistingTeamScopeModelConfig(createExistingTeamModelConfigDraft(tree()), '/', { llmModelIdentifier: 'larger', llmConfig: null })
+  expect(draft.scopesByAddress['/linked']?.draftSelection).toEqual({ llmModelIdentifier: 'larger', llmConfig: null })
+  expect(draft.scopesByAddress['/divergent']?.draftSelection.llmModelIdentifier).toBe('other')
+  draft = updateExistingTeamScopeModelConfig(draft, '/linked', { llmModelIdentifier: 'larger', llmConfig: { effort: 'medium' } }, false)
+  expect(draft.scopesByAddress['/linked']?.directlyEdited).toBe(false)
+  draft = updateExistingTeamScopeModelConfig(draft, '/', { llmModelIdentifier: 'largest', llmConfig: null })
+  expect(draft.scopesByAddress['/linked']?.draftSelection.llmModelIdentifier).toBe('largest')
+  expect(planExistingTeamModelConfigPatches(draft)).toHaveLength(2)
 })

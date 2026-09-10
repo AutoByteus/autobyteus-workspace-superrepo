@@ -35,7 +35,7 @@
       <SearchableGroupedSelect
         :model-value="llmModelIdentifier || ''"
         @update:modelValue="updateModel"
-        :options="groupedModelOptions"
+        :options="selectableModelOptions"
         :disabled="modelSelectionLockedComputed || !availableProviderGroups.length"
         :placeholder="modelPlaceholderText"
         search-placeholder="Search models..."
@@ -58,12 +58,15 @@
       </div>
     </div>
 
+    <p v-if="modelOptionsMessage" role="status" class="text-xs text-amber-700" data-test="model-capacity-status">{{ modelOptionsMessage }}</p>
     <ModelConfigSection
+      :key="llmModelIdentifier || ''"
       :schema="modelConfigSchema"
       :model-config="llmConfig"
       :disabled="modelConfigDisabledComputed"
       :read-only="modelConfigReadOnlyComputed"
       :apply-defaults="true"
+      :track-automatic-changes="originalModelIdentifier !== undefined"
       :thinking-label="thinkingLabel"
       :thinking-description="thinkingDescription"
       :id-prefix="idPrefix"
@@ -84,6 +87,7 @@
 
 <script setup lang="ts">
 import { computed, toRef, watch } from 'vue'
+import type { ExistingRunModelSelection, ExistingRunModelOptionsState } from '~/types/agent/ExistingRunModelConfigDraft'
 import SearchableGroupedSelect from '~/components/agentTeams/SearchableGroupedSelect.vue'
 import ModelConfigSection from '~/components/workspace/config/ModelConfigSection.vue'
 import {
@@ -102,6 +106,8 @@ import { useLocalization } from '~/composables/useLocalization'
 const { t } = useLocalization()
 
 const props = defineProps<{
+  originalModelIdentifier?: string
+  modelOptions?: ExistingRunModelOptionsState
   runtimeKind?: string | null
   llmModelIdentifier?: string | null
   llmConfig?: Record<string, unknown> | null
@@ -131,6 +137,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  (e: 'selection-change', value: ExistingRunModelSelection, directlyEdited: boolean): void
   (e: 'update:runtimeKind', value: string): void
   (e: 'update:llmModelIdentifier', value: string): void
   (e: 'update:llmConfig', value: Record<string, unknown> | null): void
@@ -180,6 +187,26 @@ const {
 } = useRuntimeScopedModelSelection({
   runtimeKind: toRef(props, 'runtimeKind'),
   allowBlankRuntime: props.allowBlankRuntime,
+})
+
+const selectableModelOptions = computed(() => {
+  if (props.originalModelIdentifier === undefined) return groupedModelOptions.value
+  const ids = new Set([props.originalModelIdentifier, ...(props.modelOptions?.options?.replacements.map((row) => row.llmModelIdentifier) ?? [])])
+  const groups = groupedModelOptions.value.map((group) => ({ ...group, items: group.items.filter((item) => ids.has(item.id)) })).filter((group) => group.items.length)
+  const current = props.llmModelIdentifier
+  if (current && !groups.some((group) => group.items.some((item) => item.id === current))) {
+    groups.unshift({ label: 'Saved / selected model', items: [{ id: current, name: current, selectedLabel: current, description: null }] })
+  }
+  return groups
+})
+const modelOptionsMessage = computed(() => {
+  if (props.originalModelIdentifier === undefined) return null
+  const state = props.modelOptions
+  if (!state || state.status === 'loading') return t('workspace.runModelConfig.loadingCapacity')
+  if (state.status === 'unavailable') return t('workspace.runModelConfig.capacityUnavailable')
+  if (state.options?.unavailableReason) return state.options.unavailableReason
+  if (props.llmModelIdentifier !== props.originalModelIdentifier && !state.options?.replacements.some((row) => row.llmModelIdentifier === props.llmModelIdentifier)) return t('workspace.runModelConfig.capacityInvalid')
+  return state.options?.replacements.length ? null : t('workspace.runModelConfig.noReplacements')
 })
 
 watch(
@@ -253,7 +280,7 @@ const modelConfigSchema = computed(() =>
   modelConfigSchemaByIdentifier(props.llmModelIdentifier),
 )
 const selectedModelUnavailable = computed(() => Boolean(
-  props.historicalModelConfig &&
+  (props.historicalModelConfig || props.originalModelIdentifier !== undefined) &&
   props.llmModelIdentifier?.trim() &&
   !isLoadingModels.value &&
   !hasModelIdentifier(props.llmModelIdentifier),
@@ -329,12 +356,16 @@ const updateModel = (value: string) => {
   if (value === (props.llmModelIdentifier ?? '')) {
     return
   }
+  if (props.originalModelIdentifier !== undefined && value !== props.originalModelIdentifier &&
+      !props.modelOptions?.options?.replacements.some((row) => row.llmModelIdentifier === value)) return
+  emit('selection-change', { llmModelIdentifier: value, llmConfig: null }, true)
   emit('update:llmModelIdentifier', value)
   emit('update:llmConfig', null)
 }
 
-const updateModelConfig = (config: Record<string, unknown> | null) => {
+const updateModelConfig = (config: Record<string, unknown> | null, automatic = false) => {
   if (modelConfigReadOnlyComputed.value || modelConfigDisabledComputed.value) return
+  emit('selection-change', { llmModelIdentifier: props.llmModelIdentifier ?? '', llmConfig: config }, !automatic)
   emit('update:llmConfig', config)
 }
 </script>

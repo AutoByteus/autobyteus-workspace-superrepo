@@ -1,0 +1,64 @@
+{
+  "resume": {
+    "data": {
+      "getAgentRunResumeConfig": {
+        "runId": "api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438",
+        "isActive": false,
+        "metadataConfig": {
+          "llmModelIdentifier": "gpt-5.6-luna",
+          "llmConfig": null,
+          "runtimeKind": "codex_app_server",
+          "runtimeReference": {
+            "threadId": "01a0868b-deac-7ec0-94ae-b93fb14b6753",
+            "sessionId": null
+          }
+        }
+      }
+    }
+  },
+  "options": {
+    "data": {
+      "agentRunModelOptions": {
+        "currentModelIdentifier": "gpt-5.6-luna",
+        "currentContextTokens": 272000,
+        "replacements": [
+          {
+            "llmModelIdentifier": "gpt-6-astra",
+            "contextTokens": 272000
+          },
+          {
+            "llmModelIdentifier": "gpt-5.6-sol",
+            "contextTokens": 272000
+          },
+          {
+            "llmModelIdentifier": "gpt-5.6-terra",
+            "contextTokens": 272000
+          },
+          {
+            "llmModelIdentifier": "gpt-5.5",
+            "contextTokens": 272000
+          }
+        ],
+        "unavailableReason": null
+      }
+    }
+  },
+  "invalid": {
+    "data": {
+      "updateStoppedAgentRunModelConfig": {
+        "success": false,
+        "outcome": "VALIDATION_FAILED",
+        "fieldErrors": [
+          {
+            "path": "llmModelIdentifier",
+            "message": "The replacement model must have at least the current model's context capacity."
+          }
+        ],
+        "canonicalSelection": {
+          "llmModelIdentifier": "gpt-5.6-luna",
+          "llmConfig": null
+        }
+      }
+    }
+  }
+}

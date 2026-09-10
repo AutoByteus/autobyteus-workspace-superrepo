@@ -53,9 +53,9 @@ import {
   type ModelCatalogService,
 } from "../llm-management/services/model-catalog-service.js";
 import {
-  ModelConfigValidationService,
-  type RunModelConfigValidator,
-} from "../llm-management/services/model-config-validation-service.js";
+  RunModelSelectionService,
+  type RunModelSelectionValidator,
+} from "../llm-management/services/run-model-selection-service.js";
 import { getModelAvailabilityService } from "../llm-management/services/model-availability-service.js";
 import { getLlmProviderService } from "../llm-management/llm-providers/services/llm-provider-service.js";
 import { getCodexAppServerClientManager } from "../runtime-management/codex/client/codex-app-server-client-manager.js";
@@ -151,7 +151,7 @@ const createStudioApplicationServices = (input: {
   workspaceManager: WorkspaceManager;
   contextFilePathEnvironment: ContextFilePathEnvironment;
   modelCatalogService: ModelCatalogService;
-  modelConfigValidator: RunModelConfigValidator;
+  modelSelectionValidator: RunModelSelectionValidator;
 }) => {
   const applicationRuntime = buildApplicationPlatformRuntime({
     appConfig: input.appConfig,
@@ -164,7 +164,7 @@ const createStudioApplicationServices = (input: {
     workspaceManager: input.workspaceManager,
     runtimeAvailabilityService: getRuntimeAvailabilityService(),
     modelCatalogService: input.modelCatalogService,
-    modelConfigValidator: input.modelConfigValidator,
+    modelSelectionValidator: input.modelSelectionValidator,
     modelAvailabilityService: getModelAvailabilityService(),
     llmProviderService: getLlmProviderService(),
     codexClientManager: getCodexAppServerClientManager(),
@@ -220,7 +220,7 @@ export const buildStudioServer = async (input: {
       workspaceManager,
     });
     const modelCatalogService = getModelCatalogService();
-    const modelConfigValidator = new ModelConfigValidationService(modelCatalogService);
+    const modelSelectionValidator = new RunModelSelectionService(modelCatalogService);
     const generalAssembly = agentToolsMcpHost.sessionAuthorities.begin({
       scopeIdentity: "general-process",
     });
@@ -239,7 +239,7 @@ export const buildStudioServer = async (input: {
       workspaceManager,
       agentProviderFactoryBuilder,
       agentToolMcpSessionAuthority: generalProcessAuthority,
-      modelConfigValidator,
+      modelSelectionValidator,
     });
     generalProcessAuthority = null;
     const applicationServices = createStudioApplicationServices({
@@ -251,11 +251,12 @@ export const buildStudioServer = async (input: {
       workspaceManager,
       contextFilePathEnvironment,
       modelCatalogService,
-      modelConfigValidator,
+      modelSelectionValidator,
     });
     const currentApplicationRuntime = applicationServices.applicationRuntime;
     applicationRuntime = currentApplicationRuntime;
     const runModelConfigService = new StudioRunModelConfigService({
+      modelSelectionService: modelSelectionValidator,
       applicationRunOwnership: currentApplicationRuntime.hostManagement.runOwnership,
       agentResumeConfigService: generalProcessRunSupervisor.agentRunResumeConfigService,
       teamResumeConfigService: generalProcessRunSupervisor.teamRunHistoryService,

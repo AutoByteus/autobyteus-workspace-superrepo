@@ -27,10 +27,12 @@
       :disabled="scope.mode === 'editable' && isInteractionDisabled"
       :read-only="scope.mode === 'editable' && isInteractionDisabled"
       :runtime-selection-locked="isFixedFieldDisabled"
-      :model-selection-locked="isFixedFieldDisabled"
+      :model-selection-locked="isInteractionDisabled"
+      :original-model-identifier="existingScope?.originalModelIdentifier"
+      :model-options="existingScope?.modelOptions"
       :model-config-disabled="isInteractionDisabled"
       :model-config-read-only="isInteractionDisabled"
-      :historical-model-config="scope.mode === 'existing'"
+      :historical-model-config="scope.mode === 'existing' && scope.originalModelIdentifier === scope.effectiveConfig.llmModelIdentifier"
       :runtime-help-text="scope.mode === 'existing' ? t('workspace.runModelConfig.fixedIdentity') : t('workspace.components.workspace.config.TeamRunConfigForm.selects_the_runtime_backend_used_by')"
       :model-label="t('workspace.components.workspace.config.TeamRunConfigForm.default_llm_model_global')"
       :model-help-text="scope.mode === 'existing' ? t('workspace.runModelConfig.fixedIdentity') : t('workspace.components.workspace.config.TeamRunConfigForm.this_model_will_be_used_by')"
@@ -40,9 +42,10 @@
       :historical-model-config-title="historicalModelConfigTitle"
       :validation-errors="modelConfigFieldErrors"
       control-variant="quiet"
-      @update:runtime-kind="updateField('runtime', $event)"
-      @update:llm-model-identifier="updateField('model', $event)"
-      @update:llm-config="updateField('llmConfig', $event)"
+      v-on="existingScope ? { 'selection-change': updateSelection } : {
+        'update:runtimeKind': (value: string) => updateField('runtime', value),
+        'update:llmModelIdentifier': (value: string) => updateField('model', value),
+        'update:llmConfig': (value: Record<string, unknown> | null) => updateField('llmConfig', value) }"
       @schema-state="emit('schema-state', scope.address, $event)"
     />
 
@@ -173,10 +176,12 @@
         :disabled="scope.mode === 'editable' && isInteractionDisabled"
         :read-only="scope.mode === 'editable' && isInteractionDisabled"
         :runtime-selection-locked="isFixedFieldDisabled"
-        :model-selection-locked="isFixedFieldDisabled"
+        :model-selection-locked="isInteractionDisabled"
+      :original-model-identifier="existingScope?.originalModelIdentifier"
+      :model-options="existingScope?.modelOptions"
         :model-config-disabled="isInteractionDisabled"
         :model-config-read-only="isInteractionDisabled"
-        :historical-model-config="scope.mode === 'existing'"
+        :historical-model-config="scope.mode === 'existing' && scope.originalModelIdentifier === scope.effectiveConfig.llmModelIdentifier"
         :runtime-help-text="scope.mode === 'existing' ? t('workspace.runModelConfig.fixedIdentity') : t('workspace.components.workspace.config.TeamScopeConfigEditor.runtime_help')"
         :model-label="t('workspace.components.workspace.config.TeamScopeConfigEditor.team_default_model')"
         :model-help-text="scope.mode === 'existing' ? t('workspace.runModelConfig.fixedIdentity') : t('workspace.components.workspace.config.TeamScopeConfigEditor.model_help')"
@@ -186,9 +191,10 @@
         :historical-model-config-title="historicalModelConfigTitle"
         :validation-errors="modelConfigFieldErrors"
         control-variant="quiet"
-        @update:runtime-kind="updateField('runtime', $event)"
-        @update:llm-model-identifier="updateField('model', $event)"
-        @update:llm-config="updateField('llmConfig', $event)"
+        v-on="existingScope ? { 'selection-change': updateSelection } : {
+        'update:runtimeKind': (value: string) => updateField('runtime', value),
+        'update:llmModelIdentifier': (value: string) => updateField('model', value),
+        'update:llmConfig': (value: Record<string, unknown> | null) => updateField('llmConfig', value) }"
         @schema-state="emit('schema-state', scope.address, $event)"
       />
 
@@ -238,6 +244,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ExistingRunModelSelection } from '~/types/agent/ExistingRunModelConfigDraft'
 import { computed, ref, watch } from 'vue'
 import RuntimeModelConfigFields from '~/components/launch-config/RuntimeModelConfigFields.vue'
 import AutoApproveSwitch from './AutoApproveSwitch.vue'
@@ -263,7 +270,7 @@ const emit = defineEmits<{
   (e: 'reset'): void
   (e: 'update:workspace-selection', address: string, selection: WorkspaceSelectionState): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
-  (e: 'update-existing-model-config', address: string, config: Record<string, unknown> | null): void
+  (e: 'update-existing-model-config', address: string, config: ExistingRunModelSelection, directlyEdited: boolean): void
   (e: 'schema-state', address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void
 }>()
 const { t } = useLocalization()
@@ -307,12 +314,12 @@ const emitOverride = (next: TeamScopeConfigOverride) => {
   pendingOverride.value = { ...(normalized ?? {}) }
   emit('update-override', normalized)
 }
+const updateSelection = (selection: ExistingRunModelSelection, directlyEdited: boolean) => {
+  if (existingScope.value && !isInteractionDisabled.value) emit('update-existing-model-config', props.scope.address, selection, directlyEdited)
+}
 const updateField = (field: 'runtime' | 'model' | 'llmConfig' | 'auto', value: unknown) => {
   if (isInteractionDisabled.value) return
-  if (existingScope.value) {
-    if (field === 'llmConfig') emit('update-existing-model-config', props.scope.address, value as Record<string, unknown> | null)
-    return
-  }
+  if (existingScope.value) return
   if (!editableScope.value) return
   if (props.isRoot) { emit('update-root', field, value); return }
   const next = { ...pendingOverride.value }

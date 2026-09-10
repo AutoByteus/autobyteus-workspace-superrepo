@@ -1,0 +1,22 @@
+{
+  "head": "5f7a9b47e228e25529f5bd0acf80ea3a2142d303",
+  "files": [
+    {
+      "path": "autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts",
+      "nonEmptyLines": 474,
+      "roundDelta": 6,
+      "cumulativeDelta": 38,
+      "sizePass": true,
+      "deltaPass": true
+    },
+    {
+      "path": "autobyteus-web/stores/existingRunModelConfigStore.ts",
+      "nonEmptyLines": 454,
+      "roundDelta": 1,
+      "cumulativeDelta": 69,
+      "sizePass": true,
+      "deltaPass": true
+    }
+  ],
+  "upstreamUnchangedFromPriorHandoff": true
+}

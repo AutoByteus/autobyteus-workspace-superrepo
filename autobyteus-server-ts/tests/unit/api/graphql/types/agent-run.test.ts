@@ -39,20 +39,22 @@ describe("AgentRunResolver", () => {
       message: "locked",
       isActive: true,
       editability: { editable: false, reason: "RUN_ACTIVE" },
-      canonical: { llmConfig: { reasoning_effort: "medium" } },
+      canonical: { llmModelIdentifier: "model-1", llmConfig: { reasoning_effort: "medium" } },
       fieldErrors: [],
     });
     const resolver = new AgentRunResolver();
 
     await expect(resolver.updateStoppedAgentRunModelConfig({
       agentRunId: "run-1",
+      llmModelIdentifier: "model-1",
       llmConfig: { reasoning_effort: "high" },
     })).resolves.toMatchObject({
       outcome: "RUN_ACTIVE",
-      canonicalLlmConfig: { reasoning_effort: "medium" },
+      canonicalSelection: { llmModelIdentifier: "model-1", llmConfig: { reasoning_effort: "medium" } },
     });
     expect(mockRunModelConfigService.updateStoppedAgentRunModelConfig).toHaveBeenCalledWith({
       agentRunId: "run-1",
+      llmModelIdentifier: "model-1",
       llmConfig: { reasoning_effort: "high" },
     });
   });

@@ -1,0 +1,76 @@
+
+ RUN  v4.0.18 /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-ts
+
+ ✓ tests/unit/memory/compaction-policy.test.ts (3 tests) 2ms
+ ✓ tests/unit/memory/memory-compaction-configuration.test.ts (3 tests) 4ms
+ ✓ tests/unit/agent/token-budget.test.ts (8 tests) 5ms
+stdout | tests/unit/agent/loop/llm-phase-memory-compaction-configuration.test.ts > LlmPhase disabled automatic compaction > reports capacity but performs no automatic-compaction work at captured proactive pressure
+AgentRuntimeState initialized for agent_id 'disabled-leaf'. Initial status: uninitialized. Workspace linked. AgentEventInbox pending initialization. Output data via notifier.
+AgentConfig created for name='leaf', role='compactor'.
+AgentContext composed for agent_id 'disabled-leaf'. Config and State linked.
+
+stdout | tests/unit/agent/loop/llm-phase-memory-compaction-configuration.test.ts > LlmPhase disabled automatic compaction > reports capacity but performs no automatic-compaction work at the policy hard cap
+AgentRuntimeState initialized for agent_id 'disabled-leaf'. Initial status: uninitialized. Workspace linked. AgentEventInbox pending initialization. Output data via notifier.
+AgentConfig created for name='leaf', role='compactor'.
+AgentContext composed for agent_id 'disabled-leaf'. Config and State linked.
+
+ ✓ tests/unit/agent/loop/llm-phase-memory-compaction-configuration.test.ts (2 tests) 17ms
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts
+AgentFactory (Singleton) initialized.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > uses the injected compaction agent runner to compact memory before the next LLM leg
+Registered AgentContext for agent_id 'runtimecompactionagent_tester_7282'. Total registered contexts: 1
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > uses the injected compaction agent runner to compact memory before the next LLM leg
+Unregistered AgentContext for agent_id 'runtimecompactionagent_tester_7282'.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+Registered AgentContext for agent_id 'runtimecompactionagent_tester_6495'. Total registered contexts: 1
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+Agent 'runtimecompactionagent_tester_6495' requesting runtime to stop (timeout: 2s).
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+AgentExternalEventNotifier (NotifierID: fe81c2c7-fab3-4abb-94ba-fe4bad30b298, AgentID: runtimecompactionagent_tester_6495) emitted agent_status. Kwarg keys for emit: agent_id,payload
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+AgentWorker 'runtimecompactionagent_tester_6495': Stop requested.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+AgentExternalEventNotifier (NotifierID: fe81c2c7-fab3-4abb-94ba-fe4bad30b298, AgentID: runtimecompactionagent_tester_6495) emitted agent_status. Kwarg keys for emit: agent_id,payload
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+AgentWorker 'runtimecompactionagent_tester_6495' asyncRun() loop has finished.
+AgentWorker 'runtimecompactionagent_tester_6495': Running shutdown sequence on worker loop.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+AgentWorker 'runtimecompactionagent_tester_6495': Shutdown resource cleanup completed successfully.
+AgentWorker 'runtimecompactionagent_tester_6495': Shutdown sequence completed.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+Unregistered AgentContext for agent_id 'runtimecompactionagent_tester_6495'.
+AgentRuntime for 'runtimecompactionagent_tester_6495': Context unregistered.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails before a child launch and blocks the USER retry dispatch when the final prompt invariant fails
+AgentRuntime for 'runtimecompactionagent_tester_6495' stop() method completed.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails closed on a typed runner error and admits one USER retry ahead of retained non-user starts
+Registered AgentContext for agent_id 'runtimecompactionagent_tester_6268'. Total registered contexts: 1
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > fails closed on a typed runner error and admits one USER retry ahead of retained non-user starts
+Unregistered AgentContext for agent_id 'runtimecompactionagent_tester_6268'.
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > keeps compaction pending and blocks the next provider dispatch when compaction agent output is invalid
+Registered AgentContext for agent_id 'runtimecompactionagent_tester_8323'. Total registered contexts: 1
+
+stdout | tests/integration/agent/runtime/agent-runtime-compaction.test.ts > Agent runtime compaction integration > keeps compaction pending and blocks the next provider dispatch when compaction agent output is invalid
+Unregistered AgentContext for agent_id 'runtimecompactionagent_tester_8323'.
+
+ ✓ tests/integration/agent/runtime/agent-runtime-compaction.test.ts (4 tests) 940ms
+     ✓ uses the injected compaction agent runner to compact memory before the next LLM leg  329ms
+
+ Test Files  5 passed (5)
+      Tests  20 passed (20)
+   Start at  14:42:53
+   Duration  2.66s (transform 1.73s, setup 62ms, import 2.57s, tests 968ms, environment 0ms)
+

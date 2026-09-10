@@ -1,0 +1,63 @@
+{
+  "deliveryRevision": "DR-002",
+  "observedAt": "2026-09-10T18:38:16.119828+00:00",
+  "result": "Pass \u2014 requested local build and package checks; user verification remains pending",
+  "head": "5f7a9b47e228e25529f5bd0acf80ea3a2142d303",
+  "base": "a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27",
+  "command": "pnpm build:electron:linux",
+  "platform": "linux",
+  "arch": "arm64",
+  "version": "1.4.68",
+  "electronVersion": "42.4.1",
+  "buildFlavor": "enterprise \u2014 default artifact naming inferred by repository build script on ticket branch; no publication",
+  "buildExitCode": 0,
+  "packageChecksExitCode": 0,
+  "artifact": {
+    "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/electron-dist/AutoByteus_enterprise_linux-arm64-1.4.68.AppImage",
+    "bytes": 523581170,
+    "sha256": "9ee0b9d410554741d83c52fdc67b2de0c6ee96bc3c40ee04ca34a2edbe931881"
+  },
+  "unpackedExecutable": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/electron-dist/linux-arm64-unpacked/autobyteus",
+  "reviewedTestsAndSyncedDocsUnchanged": true,
+  "bundledChangedServerModules": [
+    {
+      "path": "llm-management/services/run-model-selection-service.js",
+      "sha256": "555015459a607c75082abc73c8d35cb5f9d09c6454b30241f923383726f6c557",
+      "matchesCurrentBuiltServer": true
+    },
+    {
+      "path": "llm-management/services/runtime-model-capacity-service.js",
+      "sha256": "7e8ef12fe80f4b3adc1e164bf7f86964c111ea724aadb212c33c5d9eae862c83",
+      "matchesCurrentBuiltServer": true
+    },
+    {
+      "path": "agent-team-execution/services/agent-team-run-manager.js",
+      "sha256": "6aded0d63a18f856363d6d7df75ac696cf00f7e66389238032a89decb82eed26",
+      "matchesCurrentBuiltServer": true
+    },
+    {
+      "path": "api/graphql/types/agent-run.js",
+      "sha256": "8a72241144878918a8610ae62cd05793f104b9971b38e57cf7909ecc499a4dd8",
+      "matchesCurrentBuiltServer": true
+    },
+    {
+      "path": "api/graphql/types/agent-team-run.js",
+      "sha256": "f9b32924b515e29cfe2f06c133e56c4a23afaf58c7a0309d57a7ad74c6d04049",
+      "matchesCurrentBuiltServer": true
+    }
+  ],
+  "checks": [
+    "AppImage executable/ARM64 ELF",
+    "Linux ARM64 updater metadata/embedded blockMapSize",
+    "packaged server using bundled Electron runtime: Prisma migrations + HTTP health"
+  ],
+  "smokeCleanup": {
+    "temporaryDataRoot": "/tmp/autobyteus-packaged-server-fGp8Xp",
+    "removed": true,
+    "server": "cleanly stopped"
+  },
+  "guiLaunched": false,
+  "userAcceptanceReceived": false,
+  "published": false,
+  "repositoryFinalized": false
+}

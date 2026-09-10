@@ -64,7 +64,7 @@ const createSupervisorInput = () => {
     workspaceManager: WorkspaceManager.getInstance(),
     agentProviderFactoryBuilder: createProviderBuilder(),
     agentToolMcpSessionAuthority: createAuthority(),
-    modelConfigValidator: { validate: vi.fn() },
+    modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
   };
 };
 
@@ -185,7 +185,7 @@ describe("GeneralProcessRunSupervisor ownership", () => {
       taskExecutionIdentity: createTaskExecutionIdentityCapabilities({
         allocateForAgentDefinition: async () => "task-agent-run",
       }),
-      modelConfigValidator: { validate: vi.fn() },
+      modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
     });
     try {
       expect(() => new GeneralProcessRunSupervisor(createSupervisorInput())).toThrow(
@@ -223,7 +223,7 @@ describe("GeneralProcessRunSupervisor ownership", () => {
       "workspaceManager",
       "agentProviderFactoryBuilder",
       "agentToolMcpSessionAuthority",
-      "modelConfigValidator",
+      "modelSelectionValidator",
     ] as const) {
       for (const value of ["omitted", null, undefined] as const) {
         const invalid = { ...createSupervisorInput() } as Record<string, unknown>;

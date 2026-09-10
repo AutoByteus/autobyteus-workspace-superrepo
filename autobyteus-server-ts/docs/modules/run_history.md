@@ -17,8 +17,9 @@
   - team: `team-run-history-service.ts#getTeamRunResumeConfig(...)`
 - Keep resume configuration and model-setting editability truthful about General
   Process activity, archive/catalog state, and live Application ownership.
-- Validate stopped-run `llmConfig` changes against the current catalog schema for
-  the run's fixed runtime and model, then persist only that narrow field.
+- Validate stopped-run model/settings selections within the fixed runtime,
+  requiring verified non-decreasing context for replacements, then persist only
+  the coherent `llmModelIdentifier` + `llmConfig` pair.
 - For standalone agent runs, frontend follow-up sends should not restore
   directly; the backend `SEND_MESSAGE` command coordinator owns
   restore/start/send lifecycle. WebSocket connection can attach to a durable
@@ -42,6 +43,7 @@ Workspace + agent operations:
 - `workspaceRunHistory(workspaceId, limitPerAgent)` for history under one visible workspace. The resolver resolves registered filesystem workspace ids through the workspace registry, resolves the fixed default temp workspace id through the temp workspace lifecycle, and rejects missing, unregistered, removed filesystem, or unrelated transient workspace ids.
 - `getRunProjection`
 - `getAgentRunResumeConfig`
+- `agentRunModelOptions(agentRunId)`
 - `updateStoppedAgentRunModelConfig(input)`
 - `archiveStoredRun`
 - `deleteStoredRun`
@@ -49,6 +51,7 @@ Workspace + agent operations:
 Team operations:
 
 - `getTeamRunResumeConfig`
+- `teamRunModelOptions(teamRunId)`
 - `updateStoppedTeamRunModelConfigs(input)`
 - `getTeamMemberRunProjection`
 - `archiveStoredTeamRun`
@@ -58,10 +61,14 @@ Team operations:
 
 Studio exposes one revision-free edit contract for persisted standalone Agent
 and Team runs. `getAgentRunResumeConfig` and `getTeamRunResumeConfig` return the
-canonical stored configuration together with `modelConfigEditability`. The only
-mutable field is `llmConfig`; runtime kind, model identifier, run identity,
-workspace, automatic-tool policy, provider binding, Team topology, and all
-other launch facts remain fixed.
+canonical stored configuration together with `modelConfigEditability`. The
+mutable selection is the coherent `llmModelIdentifier` + `llmConfig` pair;
+runtime kind, run identity, workspace, automatic-tool policy, provider binding,
+Team topology, and all other launch facts remain fixed. Both Save commands
+require a nonblank model identifier and an explicitly present, nullable
+`llmConfig`; omission is not an implicit request to reuse old settings. Agent
+results return `canonicalSelection` (replacing `canonicalLlmConfig`); Team
+results retain `canonicalExecutionTree`.
 
 The GraphQL resolvers use `StudioRunModelConfigService` rather than calling the
 General history owners directly. That service first reads the canonical
@@ -79,15 +86,25 @@ General lifecycle owners:
 
 - `StandaloneAgentRunLifecycleService.updateStoppedModelConfig(...)` shares one
   per-run transition lane with restore/activation and commits the validated
-  value to `run_metadata.json` through `AgentRunHistoryCatalogService`.
+  pair to `run_metadata.json` through `AgentRunHistoryCatalogService`.
 - `AgentTeamRunManager.updateStoppedModelConfigs(...)` shares the root
   transition lane with Team restore. Each patch names an exact configured Team
-  or Agent address, can change only that scope's `llmConfig`, and commits the
-  resulting current V2 execution tree. Task nodes and fixed launch identity are
-  not mutation targets.
+  or Agent address, can change only that scope's model/settings pair, and commits
+  the resulting current V2 execution tree once every intended patch validates
+  against the original saved tree. Task nodes and fixed launch identity are not
+  mutation targets.
 
-The server resolves the exact fixed runtime/model in the current catalog and
-validates submitted values against that model's current schema. Unknown keys,
+`RunModelSelectionService` resolves the selected model in the fixed runtime's
+current catalog. For replacement, both the freshly saved model and target need
+verified positive context capacities, with target capacity at least the saved
+baseline for that scope. Smaller or unknown capacity fails validation; picker
+options are advisory and never substitute for fresh Save-time evidence. There
+is no additional input-budget, output-reservation, tokenizer, or compaction-
+threshold matching rule. Keeping the same model bypasses replacement-capacity
+comparison, but still requires model availability and valid settings.
+
+The server validates submitted values against the selected model's current
+schema. Unknown keys,
 invalid types/ranges/enums, missing required values, unavailable models, and
 unavailable schemas produce explicit non-success outcomes without persistence.
 Successful responses are `UPDATED` or `UNCHANGED`; other outcomes include
@@ -95,13 +112,24 @@ Successful responses are `UPDATED` or `UNCHANGED`; other outcomes include
 `SCHEMA_UNAVAILABLE`, `VALIDATION_FAILED`, `PERSISTENCE_FAILED`,
 `PERSISTENCE_INDETERMINATE`, and `INTERNAL_ERROR`. Every result carries the
 best canonical state, current editability, and field errors when available so
-the client can relock or reconcile instead of assuming success.
+the client can relock or reconcile instead of assuming success. If a Team write
+may have committed but canonical readback fails, the outcome is indeterminate
+with the last known tree, not a claimed rollback. The client verifies canonical
+state and locks duplicate Save until refresh/Retry succeeds; verification does
+not retry the write.
 
 A successful save does not hot-mutate a live backend. The next eligible
 General restore of the same Agent/Team/provider identity consumes the persisted
-`llmConfig`. There is no configuration revision, optimistic rebase, or
+model/settings pair. Save does not compact, convert, reset, or rewrite history
+or retained compaction state, and it does not create a new provider conversation.
+Ordinary later execution retains the existing runtime compaction algorithm;
+future budgets and timing need not be identical across models. There is no
+configuration revision, optimistic rebase, or
 multi-writer compatibility field. Current metadata and Team V2 packages are
-updated in place, so no persisted-data migration is required.
+updated in place, so no persisted-data migration is required. Frontend/backend
+must use the complete-pair API together; there is no old-client fallback.
+See [LLM Management](./llm_management.md#persisted-run-model-selection-validation)
+for runtime-specific capacity evidence and its fail-closed limits.
 
 ## Default History Visibility, Archive, And Delete Semantics
 

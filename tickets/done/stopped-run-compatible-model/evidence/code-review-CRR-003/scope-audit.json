@@ -1,0 +1,32 @@
+{
+  "reviewRevision": "CRR-003",
+  "observedAt": "2026-09-09T14:54:49.920623+00:00",
+  "head": "5f7a9b47e228e25529f5bd0acf80ea3a2142d303",
+  "paths": [
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/e2e/run-history/stopped-run-model-config-graphql.e2e.test.ts",
+      "sha256": "0ac2bbf8a92d0f21435ee6611f33fc3d867ef11bebb677d4a8f178cbabe1ab37",
+      "matchesApiAudit": true
+    },
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/integration/agent-team-execution/agent-team-run-manager.integration.test.ts",
+      "sha256": "c9260586563a630de4eac8b36547b2bb7b8d1dbf392e6771b03865de05df3581",
+      "matchesApiAudit": true
+    },
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs",
+      "sha256": "5403766af60da6bdc37670dec73b74735d218586e4c6f06bb692c8fabc66b887",
+      "matchesApiAudit": true
+    }
+  ],
+  "matchesSuppliedDurableDiff": true,
+  "durableDiffSha256": "c438def3173f99f523d7deaf87821f4de3022d0f2ad6e6f56fa68aeb232de735",
+  "removedPaths": [],
+  "implementationReviewReport": {
+    "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/code-review-report.md",
+    "sha256": "d556d75c4c211e18a3a793602caf532c8e39103116cb742630c4eae1d870b17d",
+    "modifiedByThisReview": false
+  },
+  "testExecutionByReviewerThisRound": "None; diff and supplied final execution sufficient",
+  "sourceOrTestEditsByReviewer": false
+}

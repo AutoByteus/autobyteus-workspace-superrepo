@@ -19,7 +19,7 @@ import { TaskDelegationRecordsV1Store } from "../task-delegation/records/task-de
 import type { TaskDelegationRecordsSnapshot } from "../task-delegation/task-delegation-record-v1.js";
 import type { TeamCommunicationMessagesSnapshot } from "../../services/team-communication/team-communication-v1-types.js";
 import { TeamRunPackageCatalog } from "../../run-history/services/team-run-package-catalog.js";
-import type { RunModelConfigValidator } from "../../llm-management/services/model-config-validation-service.js";
+import type { RunModelSelectionValidator } from "../../llm-management/services/run-model-selection-service.js";
 import {
   runModelConfigEditability,
   type RunModelConfigUpdateResult,
@@ -47,7 +47,7 @@ export type AgentTeamRunManagerOptions = Readonly<{
   executionTreeStore?: TeamRunExecutionTreeStore;
   taskRecordsStore?: TaskDelegationRecordsV1Store;
   communicationStore?: TeamCommunicationV1Store;
-  modelConfigValidator: RunModelConfigValidator;
+  modelSelectionValidator: RunModelSelectionValidator;
 }>;
 
 /** Process-wide catalog and lifecycle owner for root executions only. */
@@ -60,7 +60,7 @@ export class AgentTeamRunManager {
   private readonly communicationStore: TeamCommunicationV1Store;
   private readonly packageCatalog: TeamRunPackageCatalog;
   private readonly taskExecutionIdentity: TaskExecutionIdentityCapabilities;
-  private readonly modelConfigValidator: RunModelConfigValidator;
+  private readonly modelSelectionValidator: RunModelSelectionValidator;
   private readonly managedRoots = new Map<string, RootTeamRun>();
   private readonly rootTransitionLanes = new Map<string, Promise<void>>();
   private readonly lifecycleListeners = new Map<string, Set<TeamRunLifecycleListener>>();
@@ -93,9 +93,9 @@ export class AgentTeamRunManager {
         typeof options.taskExecutionIdentity.taskTeams?.create !== "function") {
       throw new Error("taskExecutionIdentity is required.");
     }
-    if (!options.modelConfigValidator ||
-        typeof options.modelConfigValidator.validate !== "function") {
-      throw new Error("modelConfigValidator is required.");
+    if (!options.modelSelectionValidator ||
+        typeof options.modelSelectionValidator.validate !== "function") {
+      throw new Error("modelSelectionValidator is required.");
     }
     const memoryDir = required(options.memoryDir, "memoryDir");
     this.memoryLayout = new AgentMemoryLayout(memoryDir);
@@ -105,7 +105,7 @@ export class AgentTeamRunManager {
     this.executionTreeStore = options.executionTreeStore ?? new TeamRunExecutionTreeStore();
     this.taskRecordsStore = options.taskRecordsStore ?? new TaskDelegationRecordsV1Store();
     this.communicationStore = options.communicationStore ?? new TeamCommunicationV1Store();
-    this.modelConfigValidator = options.modelConfigValidator;
+    this.modelSelectionValidator = options.modelSelectionValidator;
   }
 
   async createTeamRun(input: {
@@ -241,14 +241,13 @@ export class AgentTeamRunManager {
           [{ path: "patches", message: error instanceof Error ? error.message : String(error) }],
         );
       }
-      const validations = await Promise.all(targets.map(async (target) => ({
-        target,
-        result: await this.modelConfigValidator.validate({
-          runtimeKind: target.launchConfiguration.runtimeKind,
-          llmModelIdentifier: target.launchConfiguration.llmModelIdentifier,
-          llmConfig: target.patch.llmConfig,
-        }),
+      const results = await this.modelSelectionValidator.validateMany(targets.map((target) => ({
+        context: { runtimeKind: target.launchConfiguration.runtimeKind,
+          currentModelIdentifier: target.launchConfiguration.llmModelIdentifier,
+          workspaceRootPath: target.launchConfiguration.workspaceRootPath ?? process.cwd() },
+        selection: target.patch,
       })));
+      const validations = targets.map((target, index) => ({ target, result: results[index]! }));
       const unavailable = validations.find(({ result }) =>
         result.kind === "model_unavailable" || result.kind === "schema_unavailable");
       if (unavailable) {
@@ -280,9 +279,8 @@ export class AgentTeamRunManager {
         ...target,
         patch: {
           ...target.patch,
-          llmConfig: validations[index]!.result.kind === "valid"
-            ? validations[index]!.result.config
-            : target.patch.llmConfig,
+          ...(validations[index]!.result.kind === "valid"
+            ? validations[index]!.result.selection : target.patch),
         },
       }));
       const nextTree = applyTeamRunModelConfigPatches(tree, normalizedTargets);
@@ -290,8 +288,10 @@ export class AgentTeamRunManager {
         return this.modelConfigUpdateResult("UNCHANGED", "Team model settings are already up to date.", tree, false);
       }
       const write = await this.executionTreeStore.write(this.teamMemoryDir(teamRunId), nextTree);
-      const canonical = await this.executionTreeStore.read(this.teamMemoryDir(teamRunId), teamRunId);
-      if (write.outcome === "renamed_finalization_indeterminate") {
+      // Once renamed, unreadable canonical state requires verification, not an ordinary failure.
+      const canonical = await this.executionTreeStore.read(this.teamMemoryDir(teamRunId), teamRunId).catch(() => null);
+      if (write.outcome === "renamed_finalization_indeterminate" ||
+          (write.outcome === "committed" && !canonical)) {
         return this.modelConfigUpdateResult(
           "PERSISTENCE_INDETERMINATE",
           "Update outcome is being verified. Refresh the Team configuration before saving again.",

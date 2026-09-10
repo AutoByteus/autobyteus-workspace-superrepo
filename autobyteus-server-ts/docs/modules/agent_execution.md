@@ -199,19 +199,27 @@ committed attempt rather than being converted into success.
 ## Stopped Model Configuration And Restore Serialization
 
 `StandaloneAgentRunLifecycleService` also owns the narrow stopped-run
-`llmConfig` update. Update and restore share the same per-run transition lane,
+model/settings-pair update. Update and restore share the same per-run transition lane,
 so the supported General Process orders are deterministic: Save can commit
 before restore reads the config, or restore can make the run active before Save
 rechecks and returns `RUN_ACTIVE`. This lane is not a browser multi-writer or
 revision protocol.
 
-The update keeps runtime kind, model identifier, workspace, provider
+The update keeps runtime kind, workspace, provider
 conversation identity, tool policy, and local run ID fixed. It requires a
 current, cataloged, unarchived, manager-inactive run; validates the submitted
-`llmConfig` against the current schema for the persisted runtime/model; and
-writes/rereads only the metadata configuration. A successful value is consumed
-when the same run is next prepared or restored. It does not mutate a live
-backend or replace its provider conversation.
+`llmModelIdentifier` + `llmConfig` against the selected model's current schema
+within that fixed runtime; and writes/rereads the pair together. Replacement
+requires verified target context capacity at least the fresh saved-model
+capacity. Same-model settings updates bypass that replacement comparison, not
+ordinary availability/schema checks. No-op and canonical confirmation compare
+both fields. See [LLM Management](./llm_management.md#persisted-run-model-selection-validation).
+
+The same run's next normal message/restore consumes the saved pair without a
+new provider conversation. Save neither activates a backend nor compacts,
+converts, or resets history. Existing memory/compaction lineage remains in
+place; ordinary later execution uses its existing runtime algorithm with the
+selected model, without promising identical future compaction timing.
 
 Studio adds a separate owner-aware guard before this General lane. A live
 Application binding locks configuration without exposing Application managers

@@ -97,7 +97,7 @@ describe("application platform runtime isolation", () => {
         llmProviderService: {} as never,
         codexClientManager: {} as never,
         requireCurrentModelIdentifier: vi.fn(async () => undefined),
-        modelConfigValidator: { validate: vi.fn() },
+        modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
         staticAdapterToolNames: agentToolsMcpHost.staticAdapterToolNames,
         selectedApplicationIds: new Set([applicationId]),
       });
@@ -210,7 +210,7 @@ describe("application platform runtime isolation", () => {
         llmProviderService: processOwners.llmProvider as never,
         codexClientManager: processOwners.codexClient as never,
         requireCurrentModelIdentifier: vi.fn(async () => undefined),
-        modelConfigValidator: { validate: vi.fn() },
+        modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
         staticAdapterToolNames: new Set(),
         selectedApplicationIds: new Set(["app-a"]),
       });

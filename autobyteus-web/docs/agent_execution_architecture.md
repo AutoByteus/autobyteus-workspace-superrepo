@@ -871,13 +871,29 @@ load, local draft, schema readiness, mutation state, and reconciliation. Cached
 history lifecycle state may conservatively relock the current target but cannot
 unlock it or supersede the Settings-owned read.
 
-Existing-run editing is intentionally narrow. Runtime kind, model identifier,
+Existing-run editing is intentionally narrow. Runtime kind,
 workspace, automatic-tool policy, definition/provider identity, concrete run
-IDs, Team topology, and addresses are fixed presentation. Only schema-backed
-`llmConfig` controls are writable when the canonical editability contract says
+IDs, Team topology, and addresses are fixed presentation. The model/settings
+pair is writable when the canonical editability contract says
 the persisted run is available, unarchived, and inactive. Locked forms keep
 their disclosures operable, but expose no launch action, workspace authoring,
-runtime/model selection, or stopped-run Reset.
+runtime selection, or stopped-run Reset.
+
+`existingRunModelOptionsClient` reads server-owned Agent or configured-Team
+options for the saved subject. Replacements stay within the fixed runtime and
+require verified target context >= fresh saved-model context for each scope.
+Unknown/smaller options are not eligible, and advisory picker evidence is
+rechecked by the server on Save. Unavailable capacity does not block same-model
+settings when ordinary model/schema/editability checks pass. No extra derived
+budget, output, tokenizer, or compaction-threshold compatibility gate exists.
+
+Existing-run consumers subscribe to one coherent `selection-change` pair.
+Changing model clears old explicit config to null before target-schema/default
+presentation; changing settings keeps the selected model. Dirty/no-op compares
+both model identity and semantic settings. Launch consumers retain their
+existing event contract; model defaults displayed by the shared controls are
+not implicitly persisted. Option results are scoped to the current subject and
+saved identifier so stale reads do not authorize another target's draft.
 
 The server composes General Process liveness with the separate Application
 ownership lease. `ATTACHED`, `TERMINATING`, and `FAILED` Application bindings
@@ -885,31 +901,50 @@ lock the exact Agent/Team identity; `TERMINATED` and `ORPHANED` release it.
 Startup recovery, lookup/provenance disagreement, or unreadable binding evidence
 fails closed. The user journey is sequential: complete Stop/terminalization,
 enter Settings for a fresh read, edit, Save, then let a later message restore the
-same identity with the saved model settings.
+same identity with the saved model/settings pair.
 
 For Team runs, `existingTeamModelConfigDraft.ts` projects the exact V2 configured
-topology. A parent scope edit propagates only through descendants that shared its
-starting value; divergent descendants and directly edited scopes remain stable.
+topology. A parent pair edit follows only original links established by
+draft-start runtime/model/settings equality. Divergent descendants, mixed-runtime
+branches, and explicitly directly edited scopes remain stable; direct edits
+remain sticky even after later equality.
 The resulting mutation contains exact configured-Team/configured-Agent patches
 only. Task nodes and fixed launch identity are not patch targets, and no Reset is
 offered because historical snapshots do not preserve definition-override
-provenance.
+provenance. All intended scopes must validate against their own original saved
+baseline before the one tree write; incompatible descendants are not silently
+removed from the patch set.
 
 `projectHistoricalModelConfigFields(...)` still owns residual safety. Explicit
 values that current controls can represent remain normal fields; stale, removed,
 or unrepresentable values remain visible once as historical residuals. Catalog
 or schema unavailability keeps Save locked, and the server validates every
-submitted scope against its own fixed runtime/model before persistence.
+submitted scope against its fixed runtime and selected model before persistence.
+Historical residuals belong to the unchanged canonical model; replacement does
+not transfer its old explicit keys into the target schema.
 
 Save requires a stopped, editable, schema-ready, changed draft. The
 revision-free Agent/Team mutations return canonical state, editability, outcome,
-and field errors. A supported restore that wins the General lifecycle lane
+and field errors. Both commands require `llmModelIdentifier` and explicitly
+present nullable `llmConfig` per selection. Agent `canonicalSelection` replaces
+the former config-only response; Team retains `canonicalExecutionTree`. A
+supported restore that wins the General lifecycle lane
 relocks the client with `RUN_ACTIVE`; a persistence-indeterminate response forces
-canonical verification before another Save. Navigation discards unsaved values.
+canonical verification before another Save. Post-write Team read uncertainty
+can return the last known tree without claiming rollback. The existing client
+verification lock persists through failed reads; Retry rereads canonical state,
+installs the pair/tree, and clears stale feedback without a second mutation.
+Navigation discards unsaved values.
 There is no configuration revision, retained-draft rebase, or browser
 multi-writer merge policy. A successful update changes only persisted
-`llmConfig` and is applied by AutoByteus, Codex, or Claude when the same run is
-next restored; it never hot-mutates the active backend.
+model/settings pairs and is consumed on the same run/provider conversation's
+next normal message/restore. It never starts/hot-mutates a backend or performs
+Save-time compaction, history conversion, or reset. Existing runtime compaction
+algorithms remain; future model-specific budgets/timing need not be identical.
+Frontend and backend use the complete-pair API together, without an old-client
+adapter or persisted-data migration. See [Settings](./settings.md#existing-run-model-configuration)
+for the user workflow and [server capacity evidence](../../autobyteus-server-ts/docs/modules/llm_management.md#persisted-run-model-selection-validation)
+for runtime-specific authority and uncertainty limits.
 
 The model-config surface is schema-driven, not thinking-only. It renders
 explicit `llmConfig` values first and valid schema defaults second; showing a

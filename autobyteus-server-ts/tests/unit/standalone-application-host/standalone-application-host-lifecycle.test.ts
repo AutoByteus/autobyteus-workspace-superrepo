@@ -299,7 +299,7 @@ describe("standalone application host latest-Personal prerequisite lifecycle", (
       workspaceManager: mocks.workspaceManager,
       agentProviderFactoryBuilder: mocks.providerFactoryBuilder,
       agentToolMcpSessionAuthority: mocks.generalAuthority,
-      modelConfigValidator: expect.anything(),
+      modelSelectionValidator: expect.anything(),
     });
     expect(mocks.buildApplicationPlatformRuntime).toHaveBeenCalledWith(expect.objectContaining({
       agentDefinitionService: mocks.hostDefinitionServices.agentDefinitionService,
@@ -318,7 +318,7 @@ describe("standalone application host latest-Personal prerequisite lifecycle", (
     const supervisorInput = mocks.createGeneralProcessRunSupervisor.mock.calls[0]![0];
     expect(platformInput.contextFilePathEnvironment)
       .toBe(supervisorInput.contextFilePathEnvironment);
-    expect(platformInput.modelConfigValidator).toBe(supervisorInput.modelConfigValidator);
+    expect(platformInput.modelSelectionValidator).toBe(supervisorInput.modelSelectionValidator);
     await platformInput.requireCurrentModelIdentifier("model-1");
     expect(mocks.requireCurrentModelIdentifier).toHaveBeenCalledWith("model-1");
     expect(mocks.applicationLifecycle.prepareBeforeListen.mock.invocationCallOrder[0])

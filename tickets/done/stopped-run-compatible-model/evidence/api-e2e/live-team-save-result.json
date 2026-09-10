@@ -1,0 +1,332 @@
+{
+  "before": {
+    "schemaVersion": 2,
+    "createdAt": "2026-09-09T14:29:37.812Z",
+    "archivedAt": null,
+    "applicationBinding": null,
+    "handoffs": [],
+    "rootTeam": {
+      "address": "/",
+      "teamDefinitionId": "api-model-live-1788963702207-root",
+      "teamDefinitionName": "api-model-live-1788963702207-root",
+      "teamRunId": "api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c",
+      "coordinatorAddress": "/coordinator",
+      "defaultLaunchConfiguration": {
+        "runtimeKind": "codex_app_server",
+        "llmModelIdentifier": "gpt-5.6-luna",
+        "llmConfig": null,
+        "autoExecuteTools": false,
+        "skillAccessMode": "PRELOADED_ONLY",
+        "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+      },
+      "members": [
+        {
+          "address": "/coordinator",
+          "agentDefinitionId": "api-model-live-1788963702207",
+          "role": null,
+          "description": null,
+          "agentRunId": "api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed",
+          "platformAgentRunId": null,
+          "launchConfiguration": {
+            "runtimeKind": "codex_app_server",
+            "llmModelIdentifier": "gpt-5.6-luna",
+            "llmConfig": null,
+            "autoExecuteTools": false,
+            "skillAccessMode": "PRELOADED_ONLY",
+            "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+          }
+        },
+        {
+          "address": "/Nested",
+          "teamDefinitionId": "api-model-live-1788963702207-nested",
+          "role": null,
+          "description": null,
+          "teamRunId": "api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1",
+          "coordinatorAddress": "/Nested/lead",
+          "defaultLaunchConfiguration": {
+            "runtimeKind": "codex_app_server",
+            "llmModelIdentifier": "gpt-5.6-luna",
+            "llmConfig": null,
+            "autoExecuteTools": false,
+            "skillAccessMode": "PRELOADED_ONLY",
+            "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+          },
+          "members": [
+            {
+              "address": "/Nested/lead",
+              "agentDefinitionId": "api-model-live-1788963702207",
+              "role": null,
+              "description": null,
+              "agentRunId": "api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a",
+              "platformAgentRunId": "01a08693-ac12-74c2-92a8-542827b4e0b5",
+              "launchConfiguration": {
+                "runtimeKind": "codex_app_server",
+                "llmModelIdentifier": "gpt-5.6-luna",
+                "llmConfig": null,
+                "autoExecuteTools": false,
+                "skillAccessMode": "PRELOADED_ONLY",
+                "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+              }
+            },
+            {
+              "address": "/Nested/reviewer",
+              "agentDefinitionId": "api-model-live-1788963702207",
+              "role": null,
+              "description": null,
+              "agentRunId": "api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca",
+              "platformAgentRunId": "01a08694-0a65-79c3-9f3a-5811bcee1dda",
+              "launchConfiguration": {
+                "runtimeKind": "codex_app_server",
+                "llmModelIdentifier": "gpt-5.6-luna",
+                "llmConfig": null,
+                "autoExecuteTools": false,
+                "skillAccessMode": "PRELOADED_ONLY",
+                "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+              }
+            }
+          ],
+          "taskExecutions": []
+        }
+      ],
+      "taskExecutions": []
+    }
+  },
+  "after": {
+    "schemaVersion": 2,
+    "createdAt": "2026-09-09T14:29:37.812Z",
+    "archivedAt": null,
+    "applicationBinding": null,
+    "handoffs": [],
+    "rootTeam": {
+      "address": "/",
+      "teamDefinitionId": "api-model-live-1788963702207-root",
+      "teamDefinitionName": "api-model-live-1788963702207-root",
+      "teamRunId": "api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c",
+      "coordinatorAddress": "/coordinator",
+      "defaultLaunchConfiguration": {
+        "runtimeKind": "codex_app_server",
+        "llmModelIdentifier": "gpt-5.6-luna",
+        "llmConfig": null,
+        "autoExecuteTools": false,
+        "skillAccessMode": "PRELOADED_ONLY",
+        "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+      },
+      "members": [
+        {
+          "address": "/coordinator",
+          "agentDefinitionId": "api-model-live-1788963702207",
+          "role": null,
+          "description": null,
+          "agentRunId": "api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed",
+          "platformAgentRunId": null,
+          "launchConfiguration": {
+            "runtimeKind": "codex_app_server",
+            "llmModelIdentifier": "gpt-5.6-luna",
+            "llmConfig": null,
+            "autoExecuteTools": false,
+            "skillAccessMode": "PRELOADED_ONLY",
+            "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+          }
+        },
+        {
+          "address": "/Nested",
+          "teamDefinitionId": "api-model-live-1788963702207-nested",
+          "role": null,
+          "description": null,
+          "teamRunId": "api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1",
+          "coordinatorAddress": "/Nested/lead",
+          "defaultLaunchConfiguration": {
+            "runtimeKind": "codex_app_server",
+            "llmModelIdentifier": "gpt-5.6-sol",
+            "llmConfig": null,
+            "autoExecuteTools": false,
+            "skillAccessMode": "PRELOADED_ONLY",
+            "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+          },
+          "members": [
+            {
+              "address": "/Nested/lead",
+              "agentDefinitionId": "api-model-live-1788963702207",
+              "role": null,
+              "description": null,
+              "agentRunId": "api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a",
+              "platformAgentRunId": "01a08693-ac12-74c2-92a8-542827b4e0b5",
+              "launchConfiguration": {
+                "runtimeKind": "codex_app_server",
+                "llmModelIdentifier": "gpt-5.6-sol",
+                "llmConfig": null,
+                "autoExecuteTools": false,
+                "skillAccessMode": "PRELOADED_ONLY",
+                "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+              }
+            },
+            {
+              "address": "/Nested/reviewer",
+              "agentDefinitionId": "api-model-live-1788963702207",
+              "role": null,
+              "description": null,
+              "agentRunId": "api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca",
+              "platformAgentRunId": "01a08694-0a65-79c3-9f3a-5811bcee1dda",
+              "launchConfiguration": {
+                "runtimeKind": "codex_app_server",
+                "llmModelIdentifier": "gpt-5.6-terra",
+                "llmConfig": null,
+                "autoExecuteTools": false,
+                "skillAccessMode": "PRELOADED_ONLY",
+                "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+              }
+            }
+          ],
+          "taskExecutions": []
+        }
+      ],
+      "taskExecutions": []
+    }
+  },
+  "hashesBefore": {
+    "api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca/raw_traces_active.jsonl": "6946239e12dbdf6bc92f41ba6695878d03cafc7b20138bcbd41be69f117f2a1c",
+    "api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a/raw_traces_active.jsonl": "04d7d2a05869a9f11cadc61cc2dd73946544aafcd45c2cd259ef8115094274ff",
+    "task_delegation_records.json": "5c459cea85520f9bfd47217b4f6f367d2eecec3c701cec87d369f291f66b8334",
+    "team_communication_messages.json": "3b6b7c14ea34a71f2475fe49074d0636454130201dcf8a22fdb58b9fe8893ef9"
+  },
+  "hashesAfter": {
+    "api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca/raw_traces_active.jsonl": "6946239e12dbdf6bc92f41ba6695878d03cafc7b20138bcbd41be69f117f2a1c",
+    "api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a/raw_traces_active.jsonl": "04d7d2a05869a9f11cadc61cc2dd73946544aafcd45c2cd259ef8115094274ff",
+    "task_delegation_records.json": "5c459cea85520f9bfd47217b4f6f367d2eecec3c701cec87d369f291f66b8334",
+    "team_communication_messages.json": "3b6b7c14ea34a71f2475fe49074d0636454130201dcf8a22fdb58b9fe8893ef9"
+  },
+  "requests": [
+    {
+      "operationName": "UpdateStoppedTeamRunModelConfigs",
+      "variables": {
+        "input": {
+          "teamRunId": "api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c",
+          "patches": [
+            {
+              "scopeKind": "CONFIGURED_TEAM",
+              "scopeAddress": "/Nested",
+              "llmModelIdentifier": "gpt-5.6-sol",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/lead",
+              "llmModelIdentifier": "gpt-5.6-sol",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/reviewer",
+              "llmModelIdentifier": "gpt-5.6-terra",
+              "llmConfig": null
+            }
+          ]
+        }
+      },
+      "query": "mutation UpdateStoppedTeamRunModelConfigs($input: UpdateStoppedTeamRunModelConfigsInput!) {\n  updateStoppedTeamRunModelConfigs(input: $input) {\n    success\n    outcome\n    message\n    isActive\n    editability {\n      editable\n      reason\n      __typename\n    }\n    canonicalExecutionTree\n    fieldErrors {\n      path\n      message\n      __typename\n    }\n    __typename\n  }\n}"
+    }
+  ],
+  "canonical": {
+    "data": {
+      "getTeamRunResumeConfig": {
+        "isActive": false,
+        "executionTree": {
+          "schema_version": 2,
+          "created_at": "2026-09-09T14:29:37.812Z",
+          "archived_at": null,
+          "application_binding": null,
+          "handoffs": [],
+          "root_team": {
+            "address": "/",
+            "team_definition_id": "api-model-live-1788963702207-root",
+            "team_definition_name": "api-model-live-1788963702207-root",
+            "team_run_id": "api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c",
+            "coordinator_address": "/coordinator",
+            "default_launch_configuration": {
+              "runtime_kind": "codex_app_server",
+              "llm_model_identifier": "gpt-5.6-luna",
+              "llm_config": null,
+              "auto_execute_tools": false,
+              "skill_access_mode": "PRELOADED_ONLY",
+              "workspace_root_path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+            },
+            "members": [
+              {
+                "kind": "configured_agent",
+                "address": "/coordinator",
+                "agent_definition_id": "api-model-live-1788963702207",
+                "role": null,
+                "description": null,
+                "agent_run_id": "api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed",
+                "platform_agent_run_id": null,
+                "launch_configuration": {
+                  "runtime_kind": "codex_app_server",
+                  "llm_model_identifier": "gpt-5.6-luna",
+                  "llm_config": null,
+                  "auto_execute_tools": false,
+                  "skill_access_mode": "PRELOADED_ONLY",
+                  "workspace_root_path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+                }
+              },
+              {
+                "kind": "configured_team",
+                "address": "/Nested",
+                "team_definition_id": "api-model-live-1788963702207-nested",
+                "role": null,
+                "description": null,
+                "team_run_id": "api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1",
+                "coordinator_address": "/Nested/lead",
+                "default_launch_configuration": {
+                  "runtime_kind": "codex_app_server",
+                  "llm_model_identifier": "gpt-5.6-sol",
+                  "llm_config": null,
+                  "auto_execute_tools": false,
+                  "skill_access_mode": "PRELOADED_ONLY",
+                  "workspace_root_path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+                },
+                "members": [
+                  {
+                    "kind": "configured_agent",
+                    "address": "/Nested/lead",
+                    "agent_definition_id": "api-model-live-1788963702207",
+                    "role": null,
+                    "description": null,
+                    "agent_run_id": "api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a",
+                    "platform_agent_run_id": "01a08693-ac12-74c2-92a8-542827b4e0b5",
+                    "launch_configuration": {
+                      "runtime_kind": "codex_app_server",
+                      "llm_model_identifier": "gpt-5.6-sol",
+                      "llm_config": null,
+                      "auto_execute_tools": false,
+                      "skill_access_mode": "PRELOADED_ONLY",
+                      "workspace_root_path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+                    }
+                  },
+                  {
+                    "kind": "configured_agent",
+                    "address": "/Nested/reviewer",
+                    "agent_definition_id": "api-model-live-1788963702207",
+                    "role": null,
+                    "description": null,
+                    "agent_run_id": "api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca",
+                    "platform_agent_run_id": "01a08694-0a65-79c3-9f3a-5811bcee1dda",
+                    "launch_configuration": {
+                      "runtime_kind": "codex_app_server",
+                      "llm_model_identifier": "gpt-5.6-terra",
+                      "llm_config": null,
+                      "auto_execute_tools": false,
+                      "skill_access_mode": "PRELOADED_ONLY",
+                      "workspace_root_path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace"
+                    }
+                  }
+                ],
+                "task_executions": []
+              }
+            ],
+            "task_executions": []
+          }
+        }
+      }
+    }
+  }
+}

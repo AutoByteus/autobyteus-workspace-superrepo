@@ -27,7 +27,9 @@
         :existing-model-config-reason="draftStore.reconciliationRequired ? 'REFRESH_REQUIRED' : draft.editability.reason"
         :saving="draftStore.saving || draftStore.reconciling"
         :model-config-field-errors="agentModelConfigFieldErrors"
-        @update:llm-config="draftStore.updateAgentModelConfig"
+        :original-model-identifier="draft.metadata.llmModelIdentifier"
+        :model-options="draftStore.modelOptionsByAddress['/']"
+        @selection-change="draftStore.updateAgentModelConfig"
         @schema-state="draftStore.setSchemaState('/', $event)"
       />
 
@@ -149,8 +151,7 @@ const agentConfig = computed<AgentRunConfig | null>(() => {
     agentDefinitionName: hydrated?.agentDefinitionName ?? 'Agent',
     agentAvatarUrl: hydrated?.agentAvatarUrl ?? null,
     runtimeKind: current.metadata.runtimeKind ?? 'autobyteus',
-    llmModelIdentifier: current.metadata.llmModelIdentifier,
-    llmConfig: current.draftLlmConfig,
+    ...current.draftSelection,
     workspaceId: hydrated?.workspaceId ?? null,
     workspaceMetadata: hydrated?.workspaceMetadata ?? null,
     autoExecuteTools: current.metadata.autoExecuteTools,
@@ -191,6 +192,7 @@ const teamFormModel = computed(() => {
     isActive: current.isActive,
     modelConfigEditable: current.editability.editable && !current.isActive && !draftStore.reconciliationRequired,
     modelConfigReason: draftStore.reconciliationRequired ? 'REFRESH_REQUIRED' : current.editability.reason ?? null,
+    modelOptionsByAddress: draftStore.modelOptionsByAddress,
     saving: draftStore.saving || draftStore.reconciling,
   })
 })

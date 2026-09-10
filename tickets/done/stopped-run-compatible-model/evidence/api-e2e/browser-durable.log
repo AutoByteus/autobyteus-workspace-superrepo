@@ -1,0 +1,24 @@
+
+> autobyteus@1.4.68 test:e2e:existing-run-model-config /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web
+> node tests/e2e/existing-run-model-config-probe.mjs --output-dir ../tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable
+
+Existing run model-config probe failed with 1 failure(s). Evidence: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/existing-run-model-config-evidence.json
+- API-E2E-004-E: locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('#agent-run-runtime-kind').locator('../following-sibling::div[1]//button').first()[22m
+[2m    - locator resolved to <button disabled type="button" aria-controls="v-12" aria-expanded="false" aria-haspopup="listbox" class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors duration-200 focus:outline-none border border-transparent bg-blue-50/40 text-gray-900 ring-1 ring-inset ring-blue-100/80 hover:bg-blue-50/70 hover:ring-blue-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/50 cursor-not-allowed opacity-50">…</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    58 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not enabled[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+ ELIFECYCLE  Command failed with exit code 1.

@@ -7,10 +7,11 @@ import { createTaskExecutionIdentityCapabilities } from "../../../src/agent-team
 const taskExecutionIdentity = createTaskExecutionIdentityCapabilities({
   allocateForAgentDefinition: async () => "task-agent-run",
 });
-const modelConfigValidator = Object.freeze({
-  validate: async ({ llmConfig }: { llmConfig: unknown }) => ({
+const modelSelectionValidator = Object.freeze({
+  validateMany: async () => [],
+  validate: async ({ selection }: { selection: { llmModelIdentifier: string; llmConfig: Record<string, unknown> | null } }) => ({
     kind: "valid" as const,
-    config: llmConfig as Readonly<Record<string, unknown>> | null,
+    selection,
   }),
 });
 
@@ -27,7 +28,7 @@ const createManager = () => new AgentTeamRunManager({
   memoryDir: "/tmp/api-e2e-agent-team-run-manager",
   mixedTeamRunBackendFactory: backendFactory,
   taskExecutionIdentity,
-  modelConfigValidator,
+  modelSelectionValidator,
 });
 
 const createRoot = (input: {
@@ -56,7 +57,7 @@ describe("AgentTeamRunManager root lifecycle", () => {
         memoryDir: "/tmp/api-e2e-agent-team-run-manager",
         mixedTeamRunBackendFactory: backendFactory,
         taskExecutionIdentity,
-        modelConfigValidator,
+        modelSelectionValidator,
       };
       if (value === "omitted") delete options.mixedTeamRunBackendFactory;
       else options.mixedTeamRunBackendFactory = value;
@@ -70,14 +71,14 @@ describe("AgentTeamRunManager root lifecycle", () => {
         memoryDir: "/tmp/api-e2e-agent-team-run-manager",
         mixedTeamRunBackendFactory: backendFactory,
         taskExecutionIdentity,
-        modelConfigValidator,
+        modelSelectionValidator,
       };
-      if (value === "omitted") delete options.modelConfigValidator;
-      else options.modelConfigValidator = value;
+      if (value === "omitted") delete options.modelSelectionValidator;
+      else options.modelSelectionValidator = value;
       expect(
         () => Reflect.construct(AgentTeamRunManager, [options]),
         String(value),
-      ).toThrow("modelConfigValidator is required.");
+      ).toThrow("modelSelectionValidator is required.");
     }
   });
 

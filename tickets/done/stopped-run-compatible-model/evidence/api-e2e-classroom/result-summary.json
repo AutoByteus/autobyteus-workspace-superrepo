@@ -1,0 +1,37 @@
+{
+  "revision": "API-REV-002",
+  "completedAt": "2026-09-10T23:11:39.101681+00:00",
+  "overallResult": "Fail",
+  "finalConfidencePercent": 84.3,
+  "scorecard": [
+    90,
+    95,
+    90,
+    95,
+    50,
+    75,
+    95
+  ],
+  "priorResult": "Pass",
+  "priorConfidencePercent": 95,
+  "coreRequestedModelSwitch": "Pass",
+  "cases": {
+    "API-C15": "Pass",
+    "API-C16": "Fail",
+    "API-C17": "Pass",
+    "API-C18": "Pass",
+    "API-C19": "Pass"
+  },
+  "remainingFailureIds": [
+    "API-F001"
+  ],
+  "preliminaryClassification": "Unclear",
+  "failureBeforeModelChange": true,
+  "pendingSeconds": 161.302796,
+  "studentPendingProviderCallId": "call_XYnZdKnQnyfw523jfpi9D4QT",
+  "studentPendingRuntimeInvocation": "exec-ec7b79eb-b998-484f-bbe1-29194da31ec4",
+  "changedProductionPaths": [],
+  "changedDurablePaths": [],
+  "cleanup": "Complete, retained own evidence/2new provider transcripts; WS observer detach exit1 after own tab closure recorded",
+  "recommendedReview": "Focused failure-origin, not proportional test review"
+}

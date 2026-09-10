@@ -1,0 +1,259 @@
+{
+  "startedAt": "2026-09-09T14:19:18.281Z",
+  "platform": "linux-arm64",
+  "node": "v22.23.2",
+  "browserExecutable": "/usr/bin/chromium",
+  "webDir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web",
+  "fixturePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/fixtures/existing-run-model-config.page.vue",
+  "installedPagePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/pages/api-e2e-existing-run-model-config.vue",
+  "routePath": "/api-e2e-existing-run-model-config",
+  "graphqlOperations": [
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetRuntimeAvailabilities",
+      "variables": {}
+    },
+    {
+      "operationName": "GetProviderModelCatalogSnapshots",
+      "variables": {
+        "runtimeKind": "autobyteus"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedAgentRunModelConfig",
+      "variables": {
+        "input": {
+          "agentRunId": "agent-run-browser-1",
+          "llmModelIdentifier": "gpt-5.6-luna",
+          "llmConfig": {
+            "reasoning_effort": "high",
+            "reasoning_summary": "auto"
+          }
+        }
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedTeamRunModelConfigs",
+      "variables": {
+        "input": {
+          "teamRunId": "team-run-browser-1",
+          "patches": [
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/reviewer",
+              "llmModelIdentifier": "gpt-5.6-luna",
+              "llmConfig": {
+                "reasoning_effort": "high",
+                "reasoning_summary": "auto"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedAgentRunModelConfig",
+      "variables": {
+        "input": {
+          "agentRunId": "agent-run-browser-1",
+          "llmModelIdentifier": "gpt-5.6-luna",
+          "llmConfig": {
+            "reasoning_effort": "low",
+            "reasoning_summary": "auto"
+          }
+        }
+      }
+    }
+  ],
+  "scenarios": {
+    "API-E2E-004-A": {
+      "id": "API-E2E-004-A",
+      "description": "Agent Settings loads network-fresh, locks runtime identity, and saves a same-model selection",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:19:27.673Z",
+      "finishedAt": "2026-09-09T14:19:30.848Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "agentRunId": "agent-run-browser-1",
+            "llmModelIdentifier": "gpt-5.6-luna",
+            "llmConfig": {
+              "reasoning_effort": "high",
+              "reasoning_summary": "auto"
+            }
+          }
+        },
+        "resumeReads": 1
+      }
+    },
+    "API-E2E-004-B": {
+      "id": "API-E2E-004-B",
+      "description": "Full nested Team Settings renders and saves one exact configured-Agent patch",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:19:30.848Z",
+      "finishedAt": "2026-09-09T14:19:32.312Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "teamRunId": "team-run-browser-1",
+            "patches": [
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/Nested/reviewer",
+                "llmModelIdentifier": "gpt-5.6-luna",
+                "llmConfig": {
+                  "reasoning_effort": "high",
+                  "reasoning_summary": "auto"
+                }
+              }
+            ]
+          }
+        },
+        "renderedMembers": 3,
+        "resumeReads": 1
+      }
+    },
+    "API-E2E-004-C": {
+      "id": "API-E2E-004-C",
+      "description": "Narrow browser viewport keeps the existing Team Settings editor usable without page overflow",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:19:32.312Z",
+      "finishedAt": "2026-09-09T14:19:32.388Z",
+      "details": {
+        "viewportWidth": 390,
+        "documentScrollWidth": 390,
+        "saveRect": {
+          "left": 33,
+          "right": 357,
+          "width": 324,
+          "top": 776.890625,
+          "bottom": 814.890625
+        }
+      }
+    },
+    "API-E2E-004-D": {
+      "id": "API-E2E-004-D",
+      "description": "A supported external activation makes an already-open Agent Save return RUN_ACTIVE and relock",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:19:32.388Z",
+      "finishedAt": "2026-09-09T14:19:32.882Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "agentRunId": "agent-run-browser-1",
+            "llmModelIdentifier": "gpt-5.6-luna",
+            "llmConfig": {
+              "reasoning_effort": "low",
+              "reasoning_summary": "auto"
+            }
+          }
+        },
+        "resumeReadsBeforeSave": 2,
+        "resumeReadsAfterSave": 2
+      }
+    }
+  },
+  "browserEvents": [
+    {
+      "type": "console:debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Initializing server config"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Not in Electron environment. Skipping server initialization."
+    },
+    {
+      "type": "console:info",
+      "text": "<Suspense> is an experimental feature and its API will likely change."
+    },
+    {
+      "type": "console:log",
+      "text": "ServerLoading: Component mounted with status: running"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Checking server health at /rest/health"
+    },
+    {
+      "type": "console:error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    }
+  ],
+  "failures": [],
+  "cleanup": {
+    "context": "closed",
+    "browser": "closed",
+    "devServer": {
+      "status": "terminated",
+      "pid": 70417,
+      "initialExitCode": null,
+      "initialSignalCode": null,
+      "sigtermTarget": "process-group",
+      "exitedAfterSigterm": true,
+      "finalExitCode": null,
+      "finalSignalCode": "SIGTERM",
+      "processGroupExited": true
+    },
+    "devLog": "closed",
+    "temporaryPage": "removed"
+  },
+  "port": 40487,
+  "baseUrl": "http://127.0.0.1:40487",
+  "finishedAt": "2026-09-09T14:19:33.272Z",
+  "result": "Pass"
+}

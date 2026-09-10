@@ -229,14 +229,20 @@ remain `EditableTeamRunFormModel`. The `TeamRunFormModel` union keeps
 `mode: 'editable' | 'existing'` discrimination through every Team and Agent
 node.
 
-Existing nodes share neutral display facts—identity, fixed effective launch
+Existing nodes share neutral display facts—identity, saved effective launch
 configuration, stored workspace display, and comparison-derived state. They do
 not fabricate definition overrides, workspace authoring state, or launch
-commands. Runtime/model/workspace/auto-approve and identity stay locked, while
-current-schema `llmConfig` controls become editable only for a canonically
+commands. Runtime/workspace/auto-approve and identity stay locked, while the
+same-runtime model/settings pair becomes editable only for a canonically
 stopped, unarchived, ownership-free Team. Disclosures remain operable; **Reset**
 and **Run Team** are unavailable. Save emits exact configured-Team/configured-
-Agent model-setting patches through `existingRunModelConfigStore`.
+Agent model/settings pairs through `existingRunModelConfigStore`. Replacement
+requires verified target context >= that scope's fresh saved-model context;
+same-model settings bypass the replacement-capacity comparison only. Every
+intended patch validates before one write; smaller/unknown replacements and
+invalid descendants cannot be silently accepted or omitted. Selecting a new
+model clears old explicit settings and presents the target schema/defaults
+before Save. See [Settings](./settings.md#existing-run-model-configuration).
 
 Historical model configuration is field/value exact. Explicit values that a
 current control can represent stay in that normal control, editable only when
@@ -433,13 +439,20 @@ local `ExistingTeamModelConfigDraft`, then adapts it to
 `ExistingTeamRunFormModel`. `TeamRunConfigForm.vue`,
 `TeamMemberConfigTree.vue`, `TeamScopeConfigEditor.vue`, and
 `MemberOverrideItem.vue` render the same visual hierarchy used for a draft with
-fixed identity/launch fields and conditionally editable model-setting controls.
+fixed identity/runtime/workspace/policy fields and conditionally editable
+model/settings controls.
 The frontend does not consult current definitions for topology/order, infer a
 representative Team default, turn complete snapshots back into definition
 overrides, or import authoring state into the existing-run projector. Explicit
 `llmConfig: null` and `workspaceRootPath: null` remain recorded values. A parent
-model-setting edit propagates only to descendants that shared its starting
-value; divergent or directly edited scopes remain stable.
+model/settings-pair edit follows only original links based on draft-start
+runtime/model/settings equality; divergent and mixed-runtime branches remain
+stable, and explicit direct edits stay sticky for the draft even if later equal
+to the parent. Only configured scopes are targeted, never task executions.
+Save keeps topology, IDs, provider bindings, history, and retained compaction
+state unchanged; normal later member messages consume the saved pairs in their
+same conversations. Indeterminate Save verification uses the existing read/Retry
+lock, not another mutation or rollback.
 
 Logical topology uses canonical AgentTeam addresses. Physical memory resolution
 remains a separate concern based on `rootTeamRunId`, physical ancestor TeamRun

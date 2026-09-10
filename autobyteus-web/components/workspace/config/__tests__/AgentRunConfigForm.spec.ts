@@ -120,7 +120,7 @@ describe('AgentRunConfigForm', () => {
     models,
   })
 
-  it('keeps existing-run identity fixed while allowing stopped model-config events', async () => {
+  it('keeps runtime fixed while forwarding stopped selection-pair events', async () => {
     setProviders([buildProviderRow('OPENAI', 'OpenAI', [{
       modelIdentifier: 'gpt-4', name: 'GPT-4', value: 'gpt-4', canonicalName: 'gpt-4',
       providerId: 'OPENAI', providerName: 'OpenAI', providerType: 'OPENAI', runtime: 'api',
@@ -132,18 +132,19 @@ describe('AgentRunConfigForm', () => {
       workspaceLoadingState: { isLoading: false, error: null, loadedPath: '/workspace' },
       workspaceSelection: { mode: 'new', existingWorkspaceId: null, newWorkspacePath: '/workspace' },
       existingRun: true,
+      originalModelIdentifier: 'gpt-4',
       existingModelConfigEditable: true,
     } })
     const fields = wrapper.findComponent({ name: 'RuntimeModelConfigFields' })
     expect(fields.props()).toEqual(expect.objectContaining({
       runtimeSelectionLocked: true,
-      modelSelectionLocked: true,
+      modelSelectionLocked: false,
       modelConfigDisabled: false,
       modelConfigReadOnly: false,
     }))
-    fields.vm.$emit('update:llmConfig', { effort: 'high' })
+    fields.vm.$emit('selection-change', { llmModelIdentifier: 'gpt-4', llmConfig: { effort: 'high' } }, true)
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('update:llmConfig')).toEqual([[{ effort: 'high' }]])
+    expect(wrapper.emitted('selection-change')).toEqual([[{ llmModelIdentifier: 'gpt-4', llmConfig: { effort: 'high' } }, true]])
     expect((wrapper.get('#auto-execute').element as HTMLButtonElement).disabled).toBe(true)
   })
 

@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ExistingRunModelSelection } from '~/types/agent/ExistingRunModelConfigDraft'
 import { computed } from 'vue'
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { AgentConfigOverride, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
@@ -66,7 +67,7 @@ const emit = defineEmits<{
   (e: 'update-agent', address: AgentTeamAddress, override: AgentConfigOverride | null): void
   (e: 'update:workspace-selection', address: AgentTeamAddress, selection: WorkspaceSelectionState): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
-  (e: 'update-existing-model-config', address: string, config: Record<string, unknown> | null): void
+  (e: 'update-existing-model-config', address: string, config: ExistingRunModelSelection, directlyEdited: boolean): void
   (e: 'schema-state', address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void
 }>()
 const modelConfigFieldErrorsByAddress = computed(() => props.modelConfigFieldErrorsByAddress ?? {})
@@ -84,8 +85,8 @@ const forwardAgentUpdate = (address: AgentTeamAddress, override: AgentConfigOver
 const forwardWorkspaceSelection = (address: AgentTeamAddress, selection: WorkspaceSelectionState) =>
   emit('update:workspace-selection', address, selection)
 const forwardRetryRuntimeCatalog = (runtimeKind: string) => emit('retry-runtime-catalog', runtimeKind)
-const forwardExistingModelConfig = (address: string, config: Record<string, unknown> | null) =>
-  emit('update-existing-model-config', address, config)
+const forwardExistingModelConfig = (address: string, config: ExistingRunModelSelection, directlyEdited: boolean) =>
+  emit('update-existing-model-config', address, config, directlyEdited)
 const forwardSchemaState = (address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }) =>
   emit('schema-state', address, state)
 </script>

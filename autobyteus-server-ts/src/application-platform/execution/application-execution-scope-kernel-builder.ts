@@ -159,7 +159,7 @@ export const buildApplicationExecutionScopeKernel = (
     const teamRunManager = new AgentTeamRunManager({
       memoryDir: input.memoryDir,
       taskExecutionIdentity,
-      modelConfigValidator: input.modelConfigValidator,
+      modelSelectionValidator: input.modelSelectionValidator,
       mixedTeamRunBackendFactory: new MixedTeamRunBackendFactory({
         createTeamManager: (managerInput) =>
           new MixedTeamManager(managerInput.context, {
@@ -264,7 +264,7 @@ const buildRunServices = (
       historyCatalogService,
       workspaceManager: input.workspaceManager,
       tokenUsageReadiness,
-      modelConfigValidator: input.modelConfigValidator,
+      modelSelectionValidator: input.modelSelectionValidator,
     },
   );
   const agentRunService = new AgentRunService(input.memoryDir, {
@@ -320,7 +320,7 @@ const assertBuildInput = (input: ApplicationExecutionScopeBuildInput): void => {
     "workspaceManager",
     "bindingReader",
     "artifactDeliverySink",
-    "modelConfigValidator",
+    "modelSelectionValidator",
     "applicationAgentTools",
   ] as const) {
     if (input[field] == null) {

@@ -152,8 +152,8 @@ describe("AgentRunService fresh definition runtime integration", () => {
     const lifecycleService = new StandaloneAgentRunLifecycleService(memoryDir, {
       agentRunManager: manager,
       workspaceManager: workspaceManager as never,
-      modelConfigValidator: {
-        validate: async ({ llmConfig }) => ({ kind: "valid", config: llmConfig as Readonly<Record<string, unknown>> | null }),
+      modelSelectionValidator: {
+        validate: async ({ selection }) => ({ kind: "valid", selection }),
       },
     });
     return new AgentRunService(memoryDir, {

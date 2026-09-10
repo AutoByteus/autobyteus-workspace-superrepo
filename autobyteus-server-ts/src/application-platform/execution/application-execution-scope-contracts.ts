@@ -22,7 +22,7 @@ import type { PublishedArtifactPublisher } from "../../services/published-artifa
 import type { PublishedArtifactSummary } from "../../services/published-artifacts/published-artifact-types.js";
 import type { WorkspaceManager } from "../../workspaces/workspace-manager.js";
 import type { ContextFilePathEnvironment } from "../../context-files/domain/context-file-path-environment.js";
-import type { RunModelConfigValidator } from "../../llm-management/services/model-config-validation-service.js";
+import type { RunModelSelectionValidator } from "../../llm-management/services/run-model-selection-service.js";
 import type { ApplicationAgentToolCapability } from "../../application-agent-tools/services/application-agent-tool-capability.js";
 
 export type ApplicationExecutionScopeIdentity = `application:${string}`;
@@ -38,7 +38,7 @@ export type ApplicationExecutionScopeBuildInput = Readonly<{
   workspaceManager: WorkspaceManager;
   bindingReader: ApplicationPublishedArtifactBindingReader;
   artifactDeliverySink: ApplicationPublishedArtifactDeliverySink;
-  modelConfigValidator: RunModelConfigValidator;
+  modelSelectionValidator: RunModelSelectionValidator;
   applicationAgentTools: ApplicationAgentToolCapability;
 }>;
 

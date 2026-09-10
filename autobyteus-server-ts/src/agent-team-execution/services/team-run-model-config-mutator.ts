@@ -10,6 +10,7 @@ export type TeamRunModelConfigScopeKind = "CONFIGURED_TEAM" | "CONFIGURED_AGENT"
 export type TeamRunModelConfigPatch = Readonly<{
   scopeKind: TeamRunModelConfigScopeKind;
   scopeAddress: string;
+  llmModelIdentifier: string;
   llmConfig: Readonly<Record<string, unknown>> | null;
 }>;
 
@@ -60,10 +61,11 @@ export const resolveTeamRunModelConfigTargets = (
 
 const replaceLaunchConfig = (
   launchConfiguration: AgentLaunchConfiguration,
-  llmConfig: Readonly<Record<string, unknown>> | null,
+  selection: TeamRunModelConfigPatch,
 ): AgentLaunchConfiguration => ({
   ...launchConfiguration,
-  llmConfig: llmConfig ? structuredClone(llmConfig) : null,
+  llmModelIdentifier: selection.llmModelIdentifier,
+  llmConfig: selection.llmConfig ? structuredClone(selection.llmConfig) : null,
 });
 
 const patchMembers = (
@@ -73,7 +75,7 @@ const patchMembers = (
   const patch = patchByAddress.get(member.address);
   if ("agentRunId" in member) {
     return patch
-      ? { ...member, launchConfiguration: replaceLaunchConfig(member.launchConfiguration, patch.llmConfig) }
+      ? { ...member, launchConfiguration: replaceLaunchConfig(member.launchConfiguration, patch) }
       : member;
   }
   const nextMembers = patchMembers(member.members, patchByAddress);
@@ -81,7 +83,7 @@ const patchMembers = (
     ? {
         ...member,
         ...(patch
-          ? { defaultLaunchConfiguration: replaceLaunchConfig(member.defaultLaunchConfiguration, patch.llmConfig) }
+          ? { defaultLaunchConfiguration: replaceLaunchConfig(member.defaultLaunchConfiguration, patch) }
           : {}),
         members: nextMembers,
       }
@@ -97,7 +99,7 @@ export const applyTeamRunModelConfigPatches = (
   const rootTeam: RootConfiguredTeamExecutionNode = {
     ...tree.rootTeam,
     ...(rootPatch
-      ? { defaultLaunchConfiguration: replaceLaunchConfig(tree.rootTeam.defaultLaunchConfiguration, rootPatch.llmConfig) }
+      ? { defaultLaunchConfiguration: replaceLaunchConfig(tree.rootTeam.defaultLaunchConfiguration, rootPatch) }
       : {}),
     members: patchMembers(tree.rootTeam.members, patchByAddress),
   };

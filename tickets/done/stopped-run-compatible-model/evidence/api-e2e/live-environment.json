@@ -1,0 +1,218 @@
+{
+  "key": "api-model-live-1788963702207",
+  "runtimeRoot": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207",
+  "database": "file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/db/api-model-live-1788963702207.db",
+  "workdir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace",
+  "startedAt": "2026-09-09T14:21:42.209Z",
+  "ownedRuns": [
+    "api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438"
+  ],
+  "events": [
+    "Built server ready; sanitized environment retains supported CLI HOME auth continuity, no provider secret import."
+  ],
+  "cleanup": {
+    "chrome": "owned group 72436 signalled",
+    "nuxt": "owned group 72259 signalled",
+    "server": "stopped",
+    "localData": "owned runtime/database/key removed"
+  },
+  "serverUrl": "http://127.0.0.1:38637",
+  "models": [
+    {
+      "modelIdentifier": "gpt-5.3-codex-spark",
+      "canonicalName": "gpt-5.3-codex-spark",
+      "configSchema": {
+        "parameters": [
+          {
+            "name": "reasoning_effort",
+            "type": "enum",
+            "description": "Controls reasoning depth for Codex turn/start. Higher effort may improve quality but increase latency.",
+            "required": false,
+            "default_value": "high",
+            "enum_values": [
+              "low",
+              "medium",
+              "high",
+              "xhigh"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "modelIdentifier": "gpt-5.5",
+      "canonicalName": "gpt-5.5",
+      "configSchema": {
+        "parameters": [
+          {
+            "name": "reasoning_effort",
+            "type": "enum",
+            "description": "Controls reasoning depth for Codex turn/start. Higher effort may improve quality but increase latency.",
+            "required": false,
+            "default_value": "medium",
+            "enum_values": [
+              "low",
+              "medium",
+              "high",
+              "xhigh"
+            ]
+          },
+          {
+            "name": "service_tier",
+            "label": "Fast mode",
+            "type": "enum",
+            "description": "Enable Codex Fast mode for this model. Default leaves Codex service tier unchanged.",
+            "required": false,
+            "enum_values": [
+              "fast"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "modelIdentifier": "gpt-5.6-luna",
+      "canonicalName": "gpt-5.6-luna",
+      "configSchema": {
+        "parameters": [
+          {
+            "name": "reasoning_effort",
+            "type": "enum",
+            "description": "Controls reasoning depth for Codex turn/start. Higher effort may improve quality but increase latency.",
+            "required": false,
+            "default_value": "medium",
+            "enum_values": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          },
+          {
+            "name": "service_tier",
+            "label": "Fast mode",
+            "type": "enum",
+            "description": "Enable Codex Fast mode for this model. Default leaves Codex service tier unchanged.",
+            "required": false,
+            "enum_values": [
+              "fast"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "modelIdentifier": "gpt-5.6-sol",
+      "canonicalName": "gpt-5.6-sol",
+      "configSchema": {
+        "parameters": [
+          {
+            "name": "reasoning_effort",
+            "type": "enum",
+            "description": "Controls reasoning depth for Codex turn/start. Higher effort may improve quality but increase latency.",
+            "required": false,
+            "default_value": "low",
+            "enum_values": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "name": "service_tier",
+            "label": "Fast mode",
+            "type": "enum",
+            "description": "Enable Codex Fast mode for this model. Default leaves Codex service tier unchanged.",
+            "required": false,
+            "enum_values": [
+              "fast"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "modelIdentifier": "gpt-5.6-terra",
+      "canonicalName": "gpt-5.6-terra",
+      "configSchema": {
+        "parameters": [
+          {
+            "name": "reasoning_effort",
+            "type": "enum",
+            "description": "Controls reasoning depth for Codex turn/start. Higher effort may improve quality but increase latency.",
+            "required": false,
+            "default_value": "medium",
+            "enum_values": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "name": "service_tier",
+            "label": "Fast mode",
+            "type": "enum",
+            "description": "Enable Codex Fast mode for this model. Default leaves Codex service tier unchanged.",
+            "required": false,
+            "enum_values": [
+              "fast"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "modelIdentifier": "gpt-6-astra",
+      "canonicalName": "gpt-6-astra",
+      "configSchema": {
+        "parameters": [
+          {
+            "name": "reasoning_effort",
+            "type": "enum",
+            "description": "Controls reasoning depth for Codex turn/start. Higher effort may improve quality but increase latency.",
+            "required": false,
+            "default_value": "medium",
+            "enum_values": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max",
+              "ultra"
+            ]
+          },
+          {
+            "name": "service_tier",
+            "label": "Fast mode",
+            "type": "enum",
+            "description": "Enable Codex Fast mode for this model. Default leaves Codex service tier unchanged.",
+            "required": false,
+            "enum_values": [
+              "fast"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "initialModel": "gpt-5.3-codex-spark",
+  "definitionId": "api-model-live-1788963702207",
+  "create": {
+    "success": true,
+    "message": "Agent run created successfully.",
+    "runId": "api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438"
+  },
+  "runId": "api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438",
+  "frontendUrl": "http://127.0.0.1:46063",
+  "cdpUrl": "http://127.0.0.1:33153",
+  "ready": true,
+  "readyAt": "2026-09-09T14:22:00.766Z",
+  "finishedAt": "2026-09-09T14:35:52.605Z"
+}

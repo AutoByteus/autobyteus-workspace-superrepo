@@ -12,6 +12,8 @@ const mocks = vi.hoisted(() => ({
   teamResumeConfigByTeamRunId: {} as Record<string, unknown>,
 }))
 
+vi.mock('~/services/runConfigEditing/existingRunModelOptionsClient', () => ({ loadExistingRunModelOptions: vi.fn().mockResolvedValue({}) }))
+
 vi.mock('~/services/runConfigEditing/existingRunModelConfigMutationClient', () => ({
   updateStoppedAgentModelConfig: mocks.updateAgent,
   updateStoppedTeamModelConfigs: mocks.updateTeam,
@@ -180,14 +182,14 @@ describe('existingRunModelConfigStore', () => {
     const payload = agentPayload()
     store.syncAgentCanonical(payload)
     store.setSchemaState('/', { status: 'ready', message: null })
-    store.updateAgentModelConfig({ effort: 'high' })
+    store.updateAgentModelConfig({ llmModelIdentifier: 'model-1', llmConfig: { effort: 'high' } })
     mocks.updateAgent.mockResolvedValue({
       success: false,
       outcome: 'PERSISTENCE_INDETERMINATE',
       message: 'Update outcome is being verified.',
       isActive: false,
       editability: editability(),
-      canonicalLlmConfig: { effort: 'low' },
+      canonicalSelection: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'low' } },
       fieldErrors: [],
     })
     mocks.refreshAgent.mockRejectedValueOnce(new Error('Stored settings could not be refreshed.'))
@@ -200,21 +202,75 @@ describe('existingRunModelConfigStore', () => {
     await store.retryCanonicalRefresh()
     expect(store.reconciliationRequired).toBe(false)
     expect(store.dirty).toBe(false)
-    expect(store.draft).toMatchObject({ canonicalLlmConfig: { effort: 'low' } })
+    expect(store.draft).toMatchObject({ metadata: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'low' } } })
+  })
+
+  it.each([false, true])('verifies an indeterminate Team model Save without resubmission (refresh fails: %s)', async refreshFails => {
+    const store = useExistingRunModelConfigStore()
+    const original = teamPayload()
+    const canonical = teamPayload({ rootEffort: 'high' })
+    canonical.executionTree.root_team.default_launch_configuration.llm_model_identifier = 'larger'
+    store.syncTeamCanonical(original as never)
+    await Promise.resolve()
+    store.modelOptionsByAddress['/'] = { status: 'ready', options: {
+      currentModelIdentifier: 'root-model', currentContextTokens: 128000,
+      replacements: [{ llmModelIdentifier: 'larger', contextTokens: 272000 }], unavailableReason: null,
+    } }
+    store.setSchemaState('/', { status: 'ready', message: null })
+    store.setSchemaState('/member', { status: 'ready', message: null })
+    store.updateTeamScopeModelConfig('/', { llmModelIdentifier: 'larger', llmConfig: { effort: 'high' } })
+    expect(store.canSave).toBe(true)
+    mocks.updateTeam.mockResolvedValue({ success: false, outcome: 'PERSISTENCE_INDETERMINATE',
+      message: 'Update outcome is being verified.', isActive: false, editability: editability(),
+      canonicalExecutionTree: original.executionTree, fieldErrors: [],
+    })
+    const refresh = deferred<ReturnType<typeof teamPayload>>()
+    mocks.refreshTeam.mockReturnValueOnce(refresh.promise)
+    const saving = store.save()
+    await vi.waitFor(() => expect(mocks.refreshTeam).toHaveBeenCalledWith('team-1'))
+    expect(store.reconciliationRequired).toBe(true)
+    expect(store.reconciling).toBe(true)
+    expect(store.canSave).toBe(false)
+    expect(await store.save()).toBe(false)
+    if (refreshFails) {
+      refresh.reject(new Error('Canonical Team verification temporarily unavailable.'))
+      expect(await saving).toBe(false)
+      expect(store.reconciling).toBe(false)
+      expect(store.reconciliationRequired).toBe(true)
+      expect(store.canSave).toBe(false)
+      expect(await store.save()).toBe(false)
+      mocks.refreshTeam.mockResolvedValueOnce(canonical)
+      await store.retryCanonicalRefresh()
+    } else {
+      refresh.resolve(canonical)
+      expect(await saving).toBe(false)
+    }
+    expect(mocks.updateTeam).toHaveBeenCalledTimes(1)
+    expect(mocks.refreshTeam).toHaveBeenCalledTimes(refreshFails ? 2 : 1)
+    expect(store.feedback).toBeNull()
+    expect(store.reconciliationRequired).toBe(false)
+    expect(store.dirty).toBe(false)
+    expect(store.patches).toEqual([])
+    expect(store.draft).toMatchObject({ kind: 'team', executionTree: canonical.executionTree,
+      planner: { scopesByAddress: { '/': {
+        originalSelection: { llmModelIdentifier: 'larger', llmConfig: { effort: 'high' } },
+        draftSelection: { llmModelIdentifier: 'larger', llmConfig: { effort: 'high' } },
+      } } },
+    })
   })
 
   it('fails closed when the server reports that the fixed model or schema is unavailable', async () => {
     const store = useExistingRunModelConfigStore()
     store.syncAgentCanonical(agentPayload())
     store.setSchemaState('/', { status: 'ready', message: null })
-    store.updateAgentModelConfig({ effort: 'high' })
+    store.updateAgentModelConfig({ llmModelIdentifier: 'model-1', llmConfig: { effort: 'high' } })
     mocks.updateAgent.mockResolvedValue({
       success: false,
       outcome: 'MODEL_UNAVAILABLE',
       message: 'Current model options are unavailable.',
       isActive: false,
       editability: editability(),
-      canonicalLlmConfig: { effort: 'low' },
+      canonicalSelection: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'low' } },
       fieldErrors: [],
     })
 
@@ -232,7 +288,7 @@ describe('existingRunModelConfigStore', () => {
     store.syncTeamCanonical(teamPayload() as never)
     store.setSchemaState('/', { status: 'ready', message: null })
     store.setSchemaState('/member', { status: 'unavailable', message: 'Unavailable' })
-    store.updateTeamScopeModelConfig('/', { effort: 'high' })
+    store.updateTeamScopeModelConfig('/', { llmModelIdentifier: 'root-model', llmConfig: { effort: 'high' } })
 
     expect(store.patches.map((patch) => patch.scopeAddress)).toEqual(['/'])
     expect(store.canSave).toBe(false)
@@ -245,27 +301,28 @@ describe('existingRunModelConfigStore', () => {
     const store = useExistingRunModelConfigStore()
     store.syncAgentCanonical(agentPayload())
     store.setSchemaState('/', { status: 'ready', message: null })
-    store.updateAgentModelConfig({ effort: 'high' })
+    store.updateAgentModelConfig({ llmModelIdentifier: 'model-1', llmConfig: { effort: 'high' } })
     mocks.updateAgent.mockResolvedValue({
       success: false,
       outcome: 'RUN_ACTIVE',
       message: 'Another supported workflow resumed this run.',
       isActive: true,
       editability: activeEditability(),
-      canonicalLlmConfig: { effort: 'medium' },
+      canonicalSelection: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'medium' } },
       fieldErrors: [],
     })
 
     await expect(store.save()).resolves.toBe(false)
     expect(mocks.updateAgent).toHaveBeenCalledWith({
       agentRunId: 'run-1',
+      llmModelIdentifier: 'model-1',
       llmConfig: { effort: 'high' },
     })
     expect(mocks.refreshAgent).not.toHaveBeenCalled()
     expect(store.draft).toMatchObject({
       isActive: true,
-      canonicalLlmConfig: { effort: 'low' },
-      draftLlmConfig: { effort: 'high' },
+      metadata: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'medium' } },
+      draftSelection: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'high' } },
       editability: { editable: false, reason: 'RUN_ACTIVE' },
     })
     expect(mocks.resumeConfigByRunId['run-1']).toMatchObject({
@@ -279,8 +336,8 @@ describe('existingRunModelConfigStore', () => {
     await store.loadAgentCanonical('run-1')
     expect(store.draft).toMatchObject({
       isActive: false,
-      canonicalLlmConfig: { effort: 'low' },
-      draftLlmConfig: { effort: 'low' },
+      metadata: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'low' } },
+      draftSelection: { llmModelIdentifier: 'model-1', llmConfig: { effort: 'low' } },
       editability: { editable: true },
     })
   })
@@ -291,7 +348,7 @@ describe('existingRunModelConfigStore', () => {
     store.syncTeamCanonical(canonical as never)
     store.setSchemaState('/', { status: 'ready', message: null })
     store.setSchemaState('/member', { status: 'ready', message: null })
-    store.updateTeamScopeModelConfig('/', { effort: 'high' })
+    store.updateTeamScopeModelConfig('/', { llmModelIdentifier: 'root-model', llmConfig: { effort: 'high' } })
     mocks.updateTeam.mockResolvedValue({
       success: false,
       outcome: 'RUN_ACTIVE',
@@ -308,6 +365,7 @@ describe('existingRunModelConfigStore', () => {
       patches: [{
         scopeKind: 'CONFIGURED_TEAM',
         scopeAddress: '/',
+        llmModelIdentifier: 'root-model',
         llmConfig: { effort: 'high' },
       }],
     })
@@ -315,6 +373,7 @@ describe('existingRunModelConfigStore', () => {
     expect(store.patches).toEqual([{
       scopeKind: 'CONFIGURED_TEAM',
       scopeAddress: '/',
+        llmModelIdentifier: 'root-model',
       llmConfig: { effort: 'high' },
     }])
     expect(store.draft).toMatchObject({ isActive: true, editability: { editable: false } })
@@ -323,4 +382,34 @@ describe('existingRunModelConfigStore', () => {
       executionTree: { root_team: { default_launch_configuration: { llm_config: { effort: 'medium' } } } },
     })
   })
+})
+
+it('saves a model-only change and installs the canonical pair, not the submitted model', async () => {
+  setActivePinia(createPinia())
+  const store = useExistingRunModelConfigStore()
+  store.syncAgentCanonical(agentPayload({ llmConfig: null }))
+  await Promise.resolve()
+  store.modelOptionsByAddress['/'] = { status: 'ready', options: { currentModelIdentifier: 'model-1', currentContextTokens: 128000, replacements: [{ llmModelIdentifier: 'larger', contextTokens: 272000 }], unavailableReason: null } }
+  store.updateAgentModelConfig({ llmModelIdentifier: 'larger', llmConfig: null })
+  store.setSchemaState('/', { status: 'ready', message: null })
+  expect(store.dirty).toBe(true)
+  expect(store.canSave).toBe(true)
+  mocks.updateAgent.mockResolvedValue({ success: true, outcome: 'UPDATED', message: 'Saved', isActive: false,
+    editability: editability(), fieldErrors: [], canonicalSelection: { llmModelIdentifier: 'larger', llmConfig: null } })
+  expect(await store.save()).toBe(true)
+  expect(mocks.updateAgent).toHaveBeenLastCalledWith({ agentRunId: 'run-1', llmModelIdentifier: 'larger', llmConfig: null })
+  expect(store.draft).toMatchObject({ metadata: { llmModelIdentifier: 'larger', llmConfig: null }, draftSelection: { llmModelIdentifier: 'larger', llmConfig: null } })
+  expect(mocks.patchConfigOnly).toHaveBeenLastCalledWith('run-1', { llmModelIdentifier: 'larger', llmConfig: null })
+  expect(store.dirty).toBe(false)
+})
+it('does not let missing replacement metadata block current-model settings', () => {
+  setActivePinia(createPinia())
+  const store = useExistingRunModelConfigStore()
+  store.syncAgentCanonical(agentPayload())
+  store.modelOptionsByAddress['/'] = { status: 'unavailable', options: null }
+  store.updateAgentModelConfig({ llmModelIdentifier: 'model-1', llmConfig: { effort: 'high' } })
+  store.setSchemaState('/', { status: 'ready', message: null })
+  expect(store.canSave).toBe(true)
+  store.updateAgentModelConfig({ llmModelIdentifier: 'unknown', llmConfig: null })
+  expect(store.canSave).toBe(false)
 })

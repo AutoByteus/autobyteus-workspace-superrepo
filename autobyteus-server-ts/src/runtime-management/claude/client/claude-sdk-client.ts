@@ -1,4 +1,6 @@
 import fs from "node:fs";
+import { readClaudeContextCapacities } from "./claude-sdk-context-capacity.js";
+import type { RuntimeModelCapacities } from "../../../llm-management/domain/runtime-model-capacity.js";
 import type { SecretValue } from "autobyteus-ts";
 import type { ModelInfo } from "autobyteus-ts/llm/models.js";
 import {
@@ -232,6 +234,21 @@ export class ClaudeSdkClient {
     }
 
     return [];
+  }
+
+  async resolveContextCapacities(workingDirectory: string, models: readonly string[]): Promise<RuntimeModelCapacities> {
+    return readClaudeContextCapacities(models, async () => {
+      const sdk = await this.loadModuleSafe();
+      const query = this.resolveFunction(sdk, "query");
+      if (!query) throw new Error("Claude SDK query API unavailable.");
+      const env = await this.resolveSpawnEnvironment();
+      return this.createSdkQuery(workingDirectory, () => query({
+        prompt: MODEL_DISCOVERY_PROBE_PROMPT,
+        options: { maxTurns: 0, permissionMode: "plan", cwd: workingDirectory, env,
+          pathToClaudeCodeExecutable: resolveClaudeCodeExecutablePath(),
+          settingSources: getClaudeRuntimeSettingSources(), tools: [], mcpServers: {} },
+      }));
+    });
   }
 
   async getSessionMessages(sessionId: string): Promise<unknown | null> {

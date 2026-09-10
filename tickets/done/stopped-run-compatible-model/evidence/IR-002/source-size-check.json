@@ -1,0 +1,19 @@
+{
+  "revision": "IR-002",
+  "limit": 500,
+  "sourceNonEmptyLines": {
+    "autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts": 474,
+    "autobyteus-web/stores/existingRunModelConfigStore.ts": 454
+  },
+  "manualProductionDeltaAgainstIR001": {
+    "agent-team-run-manager.ts": {
+      "added": 4,
+      "removed": 2
+    },
+    "existingRunModelConfigStore.ts": {
+      "added": 1,
+      "removed": 0
+    }
+  },
+  "newMigrationOrLockOrRollback": false
+}

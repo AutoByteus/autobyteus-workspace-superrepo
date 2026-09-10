@@ -1,0 +1,133 @@
+{
+  "observedAt": "2026-09-09T14:27:39.973996+00:00",
+  "path": "/root/.codex/sessions/2026/09/09/rollout-2026-09-09T14-21-48-01a0868b-deac-7ec0-94ae-b93fb14b6753.jsonl",
+  "providerConversationId": "01a0868b-deac-7ec0-94ae-b93fb14b6753",
+  "localRunId": "api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438",
+  "savedModel": "gpt-5.6-terra",
+  "records": [
+    {
+      "timestamp": "2026-09-09T14:22:55.071Z",
+      "type": "task_started",
+      "turn_id": "01a0868c-e245-7d11-b50e-6d41bc0878ce",
+      "model_context_window": 121600
+    },
+    {
+      "timestamp": "2026-09-09T14:22:56.876Z",
+      "type": "turn_context",
+      "model": "gpt-5.3-codex-spark",
+      "turnId": "01a0868c-e245-7d11-b50e-6d41bc0878ce",
+      "effort": null
+    },
+    {
+      "timestamp": "2026-09-09T14:22:58.899Z",
+      "type": "token_count",
+      "info": {
+        "total_token_usage": {
+          "input_tokens": 10481,
+          "cached_input_tokens": 4352,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 108,
+          "reasoning_output_tokens": 100,
+          "total_tokens": 10589
+        },
+        "last_token_usage": {
+          "input_tokens": 10481,
+          "cached_input_tokens": 4352,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 108,
+          "reasoning_output_tokens": 100,
+          "total_tokens": 10589
+        },
+        "model_context_window": 121600
+      }
+    },
+    {
+      "timestamp": "2026-09-09T14:22:58.903Z",
+      "type": "task_complete",
+      "turn_id": "01a0868c-e245-7d11-b50e-6d41bc0878ce",
+      "last_agent_message": "Remembered"
+    },
+    {
+      "timestamp": "2026-09-09T14:27:08.329Z",
+      "type": "task_started",
+      "turn_id": "01a08690-bf9f-7e72-8a0c-79e720d09c25",
+      "model_context_window": 258400
+    },
+    {
+      "timestamp": "2026-09-09T14:27:16.501Z",
+      "type": "compacted",
+      "payloadKeys": [
+        "message",
+        "replacement_history",
+        "guardian_history",
+        "window_number",
+        "first_window_id",
+        "previous_window_id",
+        "window_id",
+        "compaction_response_id",
+        "latest_token_usage_record"
+      ],
+      "payloadSha256": "31d2771d2669f5ca08962e170c97f6fb5d31b92dc9fcdf78b1b74785b7807123",
+      "retainsTestLabel": true
+    },
+    {
+      "timestamp": "2026-09-09T14:27:16.505Z",
+      "type": "token_count",
+      "info": {
+        "total_token_usage": {
+          "input_tokens": 0,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 0
+        },
+        "last_token_usage": {
+          "input_tokens": 0,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 345
+        },
+        "model_context_window": 121600
+      }
+    },
+    {
+      "timestamp": "2026-09-09T14:27:18.447Z",
+      "type": "turn_context",
+      "model": "gpt-5.6-terra",
+      "turnId": "01a08690-bf9f-7e72-8a0c-79e720d09c25",
+      "effort": null
+    },
+    {
+      "timestamp": "2026-09-09T14:27:21.480Z",
+      "type": "token_count",
+      "info": {
+        "total_token_usage": {
+          "input_tokens": 10767,
+          "cached_input_tokens": 5888,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 12,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 10779
+        },
+        "last_token_usage": {
+          "input_tokens": 10767,
+          "cached_input_tokens": 5888,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 12,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 10779
+        },
+        "model_context_window": 258400
+      }
+    },
+    {
+      "timestamp": "2026-09-09T14:27:21.485Z",
+      "type": "task_complete",
+      "turn_id": "01a08690-bf9f-7e72-8a0c-79e720d09c25",
+      "last_agent_message": "violet-otter-6842"
+    }
+  ]
+}

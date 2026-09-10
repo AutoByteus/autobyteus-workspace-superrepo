@@ -1,0 +1,32 @@
+{
+  "revision": "API-REV-003",
+  "completedAt": "2026-09-10T23:24:59.430074+00:00",
+  "result": "Pass",
+  "finalConfidencePercent": 95,
+  "scorecard": [
+    95,
+    95,
+    95,
+    95,
+    95,
+    95,
+    95
+  ],
+  "priorResult": "Fail",
+  "priorConfidencePercent": 84.3,
+  "roundType": "Reporting/scope Local Fix; no new product execution",
+  "resolvedReportingFinding": "CRF-002",
+  "remainingTicketFailureIds": [],
+  "separateUnresolvedObservationIds": [
+    "API-F001"
+  ],
+  "historicalC16Result": "Fail",
+  "historicalC19Result": "Pass control, not fix",
+  "userConfirmationRelayedBy": "Code Reviewer CRR-004",
+  "userConfirmation": "yesss. so i think our ticket is fine",
+  "broaderValidation": "Not Required for reporting-only delta; prior Required/completed execution retained",
+  "changedProductionPaths": [],
+  "changedDurablePaths": [],
+  "newRuntimeOrSuiteExecution": false,
+  "releaseOrFinalizationCompletedByApi": false
+}

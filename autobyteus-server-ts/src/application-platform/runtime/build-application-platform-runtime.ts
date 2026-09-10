@@ -36,7 +36,7 @@ import type { ModelAvailabilityService } from "../../llm-management/services/mod
 import type { LlmProviderService } from "../../llm-management/llm-providers/services/llm-provider-service.js";
 import type { CodexAppServerClientManager } from "../../runtime-management/codex/client/codex-app-server-client-manager.js";
 import type { ContextFilePathEnvironment } from "../../context-files/domain/context-file-path-environment.js";
-import type { RunModelConfigValidator } from "../../llm-management/services/model-config-validation-service.js";
+import type { RunModelSelectionValidator } from "../../llm-management/services/run-model-selection-service.js";
 import { ApplicationAgentToolCatalog } from "../../application-agent-tools/services/application-agent-tool-catalog.js";
 import { ApplicationAgentToolCallLifecycle } from "../../application-agent-tools/services/application-agent-tool-call-lifecycle.js";
 import { ApplicationAgentToolPayloadValidator } from "../../application-agent-tools/services/application-agent-tool-payload-validator.js";
@@ -60,7 +60,7 @@ export type ApplicationPlatformBuildInput = Readonly<{
   llmProviderService: LlmProviderService;
   codexClientManager: CodexAppServerClientManager;
   requireCurrentModelIdentifier: (modelIdentifier: string) => Promise<void>;
-  modelConfigValidator: RunModelConfigValidator;
+  modelSelectionValidator: RunModelSelectionValidator;
   selectedApplicationIds?: ReadonlySet<string> | null;
   staticAdapterToolNames: ReadonlySet<string>;
 }>;
@@ -108,7 +108,7 @@ export const buildApplicationPlatformRuntime = (
     workspaceManager: input.workspaceManager,
     bindingReader: bindingStore,
     artifactDeliverySink: artifactDeliveryQueue,
-    modelConfigValidator: input.modelConfigValidator,
+    modelSelectionValidator: input.modelSelectionValidator,
     applicationAgentTools: applicationAgentToolAssembly.capability,
     });
   } catch (error) {

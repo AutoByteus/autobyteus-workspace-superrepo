@@ -1,0 +1,46 @@
+{
+  "startedAt": "2026-09-09T14:35:15.722Z",
+  "activeAgent": {
+    "updateStoppedAgentRunModelConfig": {
+      "success": false,
+      "outcome": "RUN_ACTIVE"
+    }
+  },
+  "activeTeam": {
+    "updateStoppedTeamRunModelConfigs": {
+      "success": false,
+      "outcome": "RUN_ACTIVE"
+    }
+  },
+  "stopped": {
+    "terminateAgentRun": {
+      "success": true
+    },
+    "terminateAgentTeamRun": {
+      "success": true
+    }
+  },
+  "archived": {
+    "archiveStoredRun": {
+      "success": true,
+      "message": "Run 'api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438' archived."
+    },
+    "archiveStoredTeamRun": {
+      "success": true,
+      "message": "Team run 'api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c' archived."
+    }
+  },
+  "archivedAgent": {
+    "updateStoppedAgentRunModelConfig": {
+      "success": false,
+      "outcome": "RUN_ARCHIVED"
+    }
+  },
+  "archivedTeam": {
+    "updateStoppedTeamRunModelConfigs": {
+      "success": false,
+      "outcome": "RUN_ARCHIVED"
+    }
+  },
+  "result": "Pass"
+}

@@ -27,14 +27,16 @@
       :llm-model-identifier="node.effectiveConfig.llmModelIdentifier"
       :llm-config="node.effectiveConfig.llmConfig"
       :runtime-selection-locked="true"
-      :model-selection-locked="true"
+      :model-selection-locked="disabled"
+      :original-model-identifier="existingNode.originalModelIdentifier"
+      :model-options="existingNode.modelOptions"
       :model-config-disabled="disabled"
       :model-config-read-only="disabled"
-      :historical-model-config="true"
+      :historical-model-config="node.effectiveConfig.llmModelIdentifier === existingNode.originalModelIdentifier"
       :validation-errors="modelConfigFieldErrors"
       :id-prefix="`existing-${inputIdSuffix}`"
       control-variant="quiet"
-      @update:llm-config="emit('update-existing-model-config', node.address, $event)"
+      @selection-change="(selection, directlyEdited) => !disabled && emit('update-existing-model-config', node.address, selection, directlyEdited)"
       @schema-state="emit('schema-state', node.address, $event)"
     />
 
@@ -136,6 +138,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ExistingRunModelSelection } from '~/types/agent/ExistingRunModelConfigDraft'
 import { computed, ref, watch } from 'vue'
 import type { AgentConfigOverride } from '~/types/agent/TeamRunConfig'
 import type { TeamFormAgentNode } from '~/types/agent/TeamRunFormModel'
@@ -166,7 +169,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:override', memberAddress: string, override: AgentConfigOverride | null): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
-  (e: 'update-existing-model-config', memberAddress: string, config: Record<string, unknown> | null): void
+  (e: 'update-existing-model-config', memberAddress: string, config: ExistingRunModelSelection, directlyEdited: boolean): void
   (e: 'schema-state', address: string, state: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void
 }>()
 const { t } = useLocalization()

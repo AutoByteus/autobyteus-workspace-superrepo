@@ -1229,6 +1229,7 @@ export type Mutation = {
   refreshAgentTeamDefinitionCatalog: Scalars['Boolean']['output'];
   regenerateMemoryHubSourceCredential: MemoryHubCredentialMutationResultGql;
   reloadAgentPackage: Array<AgentPackage>;
+  reloadApplicationPackage: Array<ApplicationPackage>;
   reloadProviderModelCatalog: ProviderModelCatalogSnapshotObject;
   reloadSkillCatalog: SkillCatalogReloadResult;
   reloadToolSchema: ReloadToolSchemaResult;
@@ -1475,6 +1476,11 @@ export type MutationReloadAgentPackageArgs = {
 };
 
 
+export type MutationReloadApplicationPackageArgs = {
+  packageId: Scalars['String']['input'];
+};
+
+
 export type MutationReloadProviderModelCatalogArgs = {
   providerId: Scalars['String']['input'];
   runtimeKind?: InputMaybe<Scalars['String']['input']>;
@@ -1712,6 +1718,7 @@ export type Query = {
   agentDefinition?: Maybe<AgentDefinition>;
   agentDefinitions: Array<AgentDefinition>;
   agentPackages: Array<AgentPackage>;
+  agentRunModelOptions: RunModelOptionsObject;
   agentTeamDefinition?: Maybe<AgentTeamDefinition>;
   agentTeamDefinitions: Array<AgentTeamDefinition>;
   agentTeamTemplates: Array<AgentTeamDefinition>;
@@ -1786,6 +1793,7 @@ export type Query = {
   skillImprovementStrategyCatalog: GraphqlSkillImprovementStrategyCatalog;
   skillSources: Array<SkillSource>;
   skills: Array<Skill>;
+  teamRunModelOptions: Array<TeamScopeModelOptionsObject>;
   tokenUsageAnalytics: TokenUsageAnalyticsResultGraphql;
   tokenUsageTaskStatisticsInPeriod: TokenUsageTaskStatisticsResultGraphql;
   tools: Array<ToolDefinitionDetail>;
@@ -1800,6 +1808,11 @@ export type Query = {
 
 export type QueryAgentDefinitionArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryAgentRunModelOptionsArgs = {
+  agentRunId: Scalars['String']['input'];
 };
 
 
@@ -2034,6 +2047,11 @@ export type QuerySkillFileTreeArgs = {
 };
 
 
+export type QueryTeamRunModelOptionsArgs = {
+  teamRunId: Scalars['String']['input'];
+};
+
+
 export type QueryTokenUsageAnalyticsArgs = {
   input: TokenUsageAnalyticsInputGraphql;
 };
@@ -2199,6 +2217,26 @@ export type RunModelConfigFieldErrorObject = {
   __typename?: 'RunModelConfigFieldErrorObject';
   message: Scalars['String']['output'];
   path: Scalars['String']['output'];
+};
+
+export type RunModelOptionObject = {
+  __typename?: 'RunModelOptionObject';
+  contextTokens: Scalars['Float']['output'];
+  llmModelIdentifier: Scalars['String']['output'];
+};
+
+export type RunModelOptionsObject = {
+  __typename?: 'RunModelOptionsObject';
+  currentContextTokens?: Maybe<Scalars['Float']['output']>;
+  currentModelIdentifier: Scalars['String']['output'];
+  replacements: Array<RunModelOptionObject>;
+  unavailableReason?: Maybe<Scalars['String']['output']>;
+};
+
+export type RunModelSelectionObject = {
+  __typename?: 'RunModelSelectionObject';
+  llmConfig?: Maybe<Scalars['JSON']['output']>;
+  llmModelIdentifier: Scalars['String']['output'];
 };
 
 export type RunProjectionPayload = {
@@ -2469,6 +2507,7 @@ export type TeamRunExecutionCheckpointPayload = {
 
 export type TeamRunModelConfigPatchInput = {
   llmConfig?: InputMaybe<Scalars['JSON']['input']>;
+  llmModelIdentifier: Scalars['String']['input'];
   scopeAddress: Scalars['String']['input'];
   scopeKind: Scalars['String']['input'];
 };
@@ -2489,6 +2528,16 @@ export type TeamScopeLaunchConfigInput = {
   skillAccessMode: SkillAccessModeEnum;
   teamAddress: Scalars['String']['input'];
   workspaceRootPath?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type TeamScopeModelOptionsObject = {
+  __typename?: 'TeamScopeModelOptionsObject';
+  currentContextTokens?: Maybe<Scalars['Float']['output']>;
+  currentModelIdentifier: Scalars['String']['output'];
+  replacements: Array<RunModelOptionObject>;
+  scopeAddress: Scalars['String']['output'];
+  scopeKind: Scalars['String']['output'];
+  unavailableReason?: Maybe<Scalars['String']['output']>;
 };
 
 export type TerminateAgentRunResult = {
@@ -2849,11 +2898,12 @@ export type UpdateSkillInput = {
 export type UpdateStoppedAgentRunModelConfigInput = {
   agentRunId: Scalars['String']['input'];
   llmConfig?: InputMaybe<Scalars['JSON']['input']>;
+  llmModelIdentifier: Scalars['String']['input'];
 };
 
 export type UpdateStoppedAgentRunModelConfigResult = {
   __typename?: 'UpdateStoppedAgentRunModelConfigResult';
-  canonicalLlmConfig?: Maybe<Scalars['JSON']['output']>;
+  canonicalSelection?: Maybe<RunModelSelectionObject>;
   editability: RunModelConfigEditabilityObject;
   fieldErrors: Array<RunModelConfigFieldErrorObject>;
   isActive: Scalars['Boolean']['output'];
@@ -3446,7 +3496,7 @@ export type UpdateStoppedAgentRunModelConfigMutationVariables = Exact<{
 }>;
 
 
-export type UpdateStoppedAgentRunModelConfigMutation = { __typename?: 'Mutation', updateStoppedAgentRunModelConfig: { __typename?: 'UpdateStoppedAgentRunModelConfigResult', success: boolean, outcome: string, message: string, isActive: boolean, canonicalLlmConfig?: any | null, editability: { __typename?: 'RunModelConfigEditabilityObject', editable: boolean, reason?: string | null }, fieldErrors: Array<{ __typename?: 'RunModelConfigFieldErrorObject', path: string, message: string }> } };
+export type UpdateStoppedAgentRunModelConfigMutation = { __typename?: 'Mutation', updateStoppedAgentRunModelConfig: { __typename?: 'UpdateStoppedAgentRunModelConfigResult', success: boolean, outcome: string, message: string, isActive: boolean, editability: { __typename?: 'RunModelConfigEditabilityObject', editable: boolean, reason?: string | null }, canonicalSelection?: { __typename?: 'RunModelSelectionObject', llmModelIdentifier: string, llmConfig?: any | null } | null, fieldErrors: Array<{ __typename?: 'RunModelConfigFieldErrorObject', path: string, message: string }> } };
 
 export type UpdateServerSettingMutationVariables = Exact<{
   key: Scalars['String']['input'];
@@ -3845,6 +3895,22 @@ export type GetAgentRunResumeConfigQueryVariables = Exact<{
 
 
 export type GetAgentRunResumeConfigQuery = { __typename?: 'Query', getAgentRunResumeConfig: { __typename?: 'RunResumeConfigPayload', runId: string, isActive: boolean, metadataConfig: { __typename?: 'RunMetadataConfigObject', agentDefinitionId: string, workspaceRootPath: string, llmModelIdentifier: string, llmConfig?: any | null, autoExecuteTools: boolean, skillAccessMode?: SkillAccessModeEnum | null, runtimeKind: string, runtimeReference: { __typename?: 'RunRuntimeReferenceObject', runtimeKind: string, sessionId?: string | null, threadId?: string | null, metadata?: any | null } }, modelConfigEditability: { __typename?: 'RunModelConfigEditabilityObject', editable: boolean, reason?: string | null } } };
+
+export type RunModelOptionsFieldsFragment = { __typename?: 'RunModelOptionsObject', currentModelIdentifier: string, currentContextTokens?: number | null, unavailableReason?: string | null, replacements: Array<{ __typename?: 'RunModelOptionObject', llmModelIdentifier: string, contextTokens: number }> };
+
+export type AgentRunModelOptionsQueryVariables = Exact<{
+  agentRunId: Scalars['String']['input'];
+}>;
+
+
+export type AgentRunModelOptionsQuery = { __typename?: 'Query', agentRunModelOptions: { __typename?: 'RunModelOptionsObject', currentModelIdentifier: string, currentContextTokens?: number | null, unavailableReason?: string | null, replacements: Array<{ __typename?: 'RunModelOptionObject', llmModelIdentifier: string, contextTokens: number }> } };
+
+export type TeamRunModelOptionsQueryVariables = Exact<{
+  teamRunId: Scalars['String']['input'];
+}>;
+
+
+export type TeamRunModelOptionsQuery = { __typename?: 'Query', teamRunModelOptions: Array<{ __typename?: 'TeamScopeModelOptionsObject', scopeKind: string, scopeAddress: string, currentModelIdentifier: string, currentContextTokens?: number | null, unavailableReason?: string | null, replacements: Array<{ __typename?: 'RunModelOptionObject', llmModelIdentifier: string, contextTokens: number }> }> };
 
 export type GetRuntimeAvailabilitiesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4489,6 +4555,17 @@ export const EventMonitorActiveTracePageFieldsFragmentDoc = gql`
         provider
       }
     }
+  }
+}
+    `;
+export const RunModelOptionsFieldsFragmentDoc = gql`
+    fragment RunModelOptionsFields on RunModelOptionsObject {
+  currentModelIdentifier
+  currentContextTokens
+  unavailableReason
+  replacements {
+    llmModelIdentifier
+    contextTokens
   }
 }
     `;
@@ -6693,7 +6770,10 @@ export const UpdateStoppedAgentRunModelConfigDocument = gql`
       editable
       reason
     }
-    canonicalLlmConfig
+    canonicalSelection {
+      llmModelIdentifier
+      llmConfig
+    }
     fieldErrors {
       path
       message
@@ -8970,6 +9050,74 @@ export function useGetAgentRunResumeConfigLazyQuery(variables?: GetAgentRunResum
   return VueApolloComposable.useLazyQuery<GetAgentRunResumeConfigQuery, GetAgentRunResumeConfigQueryVariables>(GetAgentRunResumeConfigDocument, variables, options);
 }
 export type GetAgentRunResumeConfigQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetAgentRunResumeConfigQuery, GetAgentRunResumeConfigQueryVariables>;
+export const AgentRunModelOptionsDocument = gql`
+    query AgentRunModelOptions($agentRunId: String!) {
+  agentRunModelOptions(agentRunId: $agentRunId) {
+    ...RunModelOptionsFields
+  }
+}
+    ${RunModelOptionsFieldsFragmentDoc}`;
+
+/**
+ * __useAgentRunModelOptionsQuery__
+ *
+ * To run a query within a Vue component, call `useAgentRunModelOptionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAgentRunModelOptionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useAgentRunModelOptionsQuery({
+ *   agentRunId: // value for 'agentRunId'
+ * });
+ */
+export function useAgentRunModelOptionsQuery(variables: AgentRunModelOptionsQueryVariables | VueCompositionApi.Ref<AgentRunModelOptionsQueryVariables> | ReactiveFunction<AgentRunModelOptionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables>(AgentRunModelOptionsDocument, variables, options);
+}
+export function useAgentRunModelOptionsLazyQuery(variables?: AgentRunModelOptionsQueryVariables | VueCompositionApi.Ref<AgentRunModelOptionsQueryVariables> | ReactiveFunction<AgentRunModelOptionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables>(AgentRunModelOptionsDocument, variables, options);
+}
+export type AgentRunModelOptionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<AgentRunModelOptionsQuery, AgentRunModelOptionsQueryVariables>;
+export const TeamRunModelOptionsDocument = gql`
+    query TeamRunModelOptions($teamRunId: String!) {
+  teamRunModelOptions(teamRunId: $teamRunId) {
+    scopeKind
+    scopeAddress
+    currentModelIdentifier
+    currentContextTokens
+    unavailableReason
+    replacements {
+      llmModelIdentifier
+      contextTokens
+    }
+  }
+}
+    `;
+
+/**
+ * __useTeamRunModelOptionsQuery__
+ *
+ * To run a query within a Vue component, call `useTeamRunModelOptionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTeamRunModelOptionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useTeamRunModelOptionsQuery({
+ *   teamRunId: // value for 'teamRunId'
+ * });
+ */
+export function useTeamRunModelOptionsQuery(variables: TeamRunModelOptionsQueryVariables | VueCompositionApi.Ref<TeamRunModelOptionsQueryVariables> | ReactiveFunction<TeamRunModelOptionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables>(TeamRunModelOptionsDocument, variables, options);
+}
+export function useTeamRunModelOptionsLazyQuery(variables?: TeamRunModelOptionsQueryVariables | VueCompositionApi.Ref<TeamRunModelOptionsQueryVariables> | ReactiveFunction<TeamRunModelOptionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables>(TeamRunModelOptionsDocument, variables, options);
+}
+export type TeamRunModelOptionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TeamRunModelOptionsQuery, TeamRunModelOptionsQueryVariables>;
 export const GetRuntimeAvailabilitiesDocument = gql`
     query GetRuntimeAvailabilities {
   runtimeAvailabilities {

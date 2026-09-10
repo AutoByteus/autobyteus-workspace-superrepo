@@ -125,6 +125,7 @@ const autoByteusReasoningModel = async (serverUrl: string): Promise<string> => {
 
 const updateAgent = (serverUrl: string, input: {
   agentRunId: string;
+  llmModelIdentifier: string;
   llmConfig: JsonRecord | null;
 }) => executeGraphql<{
   updateStoppedAgentRunModelConfig: {
@@ -132,7 +133,7 @@ const updateAgent = (serverUrl: string, input: {
     outcome: string;
     isActive: boolean;
     editability: { editable: boolean; reason: string | null };
-    canonicalLlmConfig: JsonRecord | null;
+    canonicalSelection: { llmModelIdentifier: string; llmConfig: JsonRecord | null } | null;
     fieldErrors: Array<{ path: string; message: string }>;
   };
 }>(serverUrl, `
@@ -140,7 +141,7 @@ const updateAgent = (serverUrl: string, input: {
     updateStoppedAgentRunModelConfig(input: $input) {
       success outcome isActive
       editability { editable reason }
-      canonicalLlmConfig
+      canonicalSelection { llmModelIdentifier llmConfig }
       fieldErrors { path message }
     }
   }
@@ -151,6 +152,7 @@ const updateTeam = (serverUrl: string, input: {
   patches: Array<{
     scopeKind: "CONFIGURED_TEAM" | "CONFIGURED_AGENT";
     scopeAddress: string;
+    llmModelIdentifier: string;
     llmConfig: JsonRecord | null;
   }>;
 }) => executeGraphql<{
@@ -313,13 +315,14 @@ describe("stopped run model-config GraphQL lifecycle", () => {
 
     await expect(updateAgent(first.serverUrl, {
       agentRunId: runId,
+      llmModelIdentifier: model,
       llmConfig: UPDATED_CONFIG,
     })).resolves.toMatchObject({
       success: false,
       outcome: "RUN_ACTIVE",
       isActive: true,
       editability: { editable: false, reason: "RUN_ACTIVE" },
-      canonicalLlmConfig: INITIAL_CONFIG,
+      canonicalSelection: { llmModelIdentifier: model, llmConfig: INITIAL_CONFIG },
     });
     expect(fs.readFileSync(metadataPath, "utf8")).toBe(activeFile);
 
@@ -346,36 +349,73 @@ describe("stopped run model-config GraphQL lifecycle", () => {
     });
 
     const stoppedFile = fs.readFileSync(metadataPath, "utf8");
+    // AC-004/007: the current contract requires both fields, even for settings-only Save.
+    // Use raw HTTP so omission is exercised through GraphQL coercion and the resolver.
+    for (const [input, expectedError] of [
+      [{ agentRunId: runId, llmConfig: null }, "llmModelIdentifier"],
+      [{ agentRunId: runId, llmModelIdentifier: model }, null],
+    ] as const) {
+      const response = await fetch(`${first.serverUrl}/graphql`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          query: `mutation RequiredAgentPair($input: UpdateStoppedAgentRunModelConfigInput!) {
+            updateStoppedAgentRunModelConfig(input: $input) { success outcome message }
+          }`,
+          variables: { input },
+        }),
+      });
+      const payload = await response.json();
+      // A missing nullable config is rejected as a failed result;
+      // missing non-null model is rejected by GraphQL before reaching the owner.
+      if (expectedError) expect(JSON.stringify(payload)).toContain(expectedError);
+      else expect(payload.data.updateStoppedAgentRunModelConfig.success).toBe(false);
+      expect(payload.data?.updateStoppedAgentRunModelConfig?.success ?? false).toBe(false);
+      expect(fs.readFileSync(metadataPath, "utf8")).toBe(stoppedFile);
+    }
     await expect(updateAgent(first.serverUrl, {
       agentRunId: runId,
+      llmModelIdentifier: "api-e2e-unavailable-model",
+      llmConfig: null,
+    })).resolves.toMatchObject({
+      success: false,
+      outcome: "MODEL_UNAVAILABLE",
+      canonicalSelection: { llmModelIdentifier: model, llmConfig: INITIAL_CONFIG },
+    });
+    expect(fs.readFileSync(metadataPath, "utf8")).toBe(stoppedFile);
+    await expect(updateAgent(first.serverUrl, {
+      agentRunId: runId,
+      llmModelIdentifier: model,
       llmConfig: INITIAL_CONFIG,
     })).resolves.toMatchObject({
       success: true,
       outcome: "UNCHANGED",
-      canonicalLlmConfig: INITIAL_CONFIG,
+      canonicalSelection: { llmModelIdentifier: model, llmConfig: INITIAL_CONFIG },
     });
     expect(fs.readFileSync(metadataPath, "utf8")).toBe(stoppedFile);
 
     await expect(updateAgent(first.serverUrl, {
       agentRunId: runId,
+      llmModelIdentifier: model,
       llmConfig: { unsupported_setting: true },
     })).resolves.toMatchObject({
       success: false,
       outcome: "VALIDATION_FAILED",
       fieldErrors: [{ path: "llmConfig.unsupported_setting" }],
-      canonicalLlmConfig: INITIAL_CONFIG,
+      canonicalSelection: { llmModelIdentifier: model, llmConfig: INITIAL_CONFIG },
     });
     expect(fs.readFileSync(metadataPath, "utf8")).toBe(stoppedFile);
 
     const beforeUpdate = readJson(metadataPath);
     await expect(updateAgent(first.serverUrl, {
       agentRunId: runId,
+      llmModelIdentifier: model,
       llmConfig: UPDATED_CONFIG,
     })).resolves.toMatchObject({
       success: true,
       outcome: "UPDATED",
       isActive: false,
-      canonicalLlmConfig: UPDATED_CONFIG,
+      canonicalSelection: { llmModelIdentifier: model, llmConfig: UPDATED_CONFIG },
       editability: { editable: true, reason: null },
     });
     const afterUpdate = readJson(metadataPath);
@@ -402,6 +442,7 @@ describe("stopped run model-config GraphQL lifecycle", () => {
     expect(schema.agentInput.inputFields.map(({ name }) => name).sort()).toEqual([
       "agentRunId",
       "llmConfig",
+      "llmModelIdentifier",
     ]);
     expect(schema.teamInput.inputFields.map(({ name }) => name).sort()).toEqual([
       "patches",
@@ -505,11 +546,11 @@ describe("stopped run model-config GraphQL lifecycle", () => {
     );
     const activeFile = fs.readFileSync(treePath, "utf8");
     const patches = [
-      { scopeKind: "CONFIGURED_TEAM" as const, scopeAddress: "/", llmConfig: UPDATED_CONFIG },
-      { scopeKind: "CONFIGURED_TEAM" as const, scopeAddress: "/Nested", llmConfig: UPDATED_CONFIG },
+      { scopeKind: "CONFIGURED_TEAM" as const, scopeAddress: "/", llmModelIdentifier: model, llmConfig: UPDATED_CONFIG },
+      { scopeKind: "CONFIGURED_TEAM" as const, scopeAddress: "/Nested", llmModelIdentifier: model, llmConfig: UPDATED_CONFIG },
       {
         scopeKind: "CONFIGURED_AGENT" as const,
-        scopeAddress: "/Nested/reviewer",
+        scopeAddress: "/Nested/reviewer", llmModelIdentifier: model,
         llmConfig: UPDATED_CONFIG,
       },
     ];
@@ -537,9 +578,32 @@ describe("stopped run model-config GraphQL lifecycle", () => {
     });
 
     const stoppedFile = fs.readFileSync(treePath, "utf8");
+    // AC-004/007 applies to each configured patch, not only standalone commands.
+    for (const patch of [
+      { scopeKind: "CONFIGURED_AGENT", scopeAddress: "/Nested/reviewer", llmConfig: null },
+      { scopeKind: "CONFIGURED_AGENT", scopeAddress: "/Nested/reviewer", llmModelIdentifier: model },
+    ]) {
+      const response = await fetch(`${first.serverUrl}/graphql`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          query: `mutation RequiredTeamPair($input: UpdateStoppedTeamRunModelConfigsInput!) {
+            updateStoppedTeamRunModelConfigs(input: $input) { success outcome }
+          }`,
+          variables: { input: { teamRunId, patches: [patch] } },
+        }),
+      });
+      const payload = await response.json();
+      if (!Object.hasOwn(patch, "llmModelIdentifier")) {
+        expect(JSON.stringify(payload.errors)).toContain("llmModelIdentifier");
+      } else {
+        expect(payload.data.updateStoppedTeamRunModelConfigs.success).toBe(false);
+      }
+      expect(fs.readFileSync(treePath, "utf8")).toBe(stoppedFile);
+    }
     await expect(updateTeam(first.serverUrl, {
       teamRunId,
-      patches: [{ scopeKind: "CONFIGURED_TEAM", scopeAddress: "/", llmConfig: INITIAL_CONFIG }],
+      patches: [{ scopeKind: "CONFIGURED_TEAM", scopeAddress: "/", llmModelIdentifier: model, llmConfig: INITIAL_CONFIG }],
     })).resolves.toMatchObject({ success: true, outcome: "UNCHANGED" });
     expect(fs.readFileSync(treePath, "utf8")).toBe(stoppedFile);
 
@@ -547,7 +611,7 @@ describe("stopped run model-config GraphQL lifecycle", () => {
       teamRunId,
       patches: [{
         scopeKind: "CONFIGURED_AGENT",
-        scopeAddress: "/Nested/reviewer",
+        scopeAddress: "/Nested/reviewer", llmModelIdentifier: model,
         llmConfig: { unsupported_setting: true },
       }],
     })).resolves.toMatchObject({

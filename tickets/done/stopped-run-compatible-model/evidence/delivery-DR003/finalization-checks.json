@@ -1,0 +1,191 @@
+{
+  "observedAt": "2026-09-10T23:31:16.988704+00:00",
+  "stagedNondeletedFileCount": 319,
+  "stagedScope": "Only intended seven docs, three tests and complete archived ticket",
+  "fullStagedWhitespaceExitCode": 2,
+  "rawEvidenceWhitespaceDiagnostics": [
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e-classroom/nuxt.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e-classroom/nuxt.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e-classroom/server.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/affected-integration-final.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/affected-integration.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/affected-integration.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-durable/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-durable/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-retry/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/browser-retry/nuxt-dev.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/graphql-e2e-final.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/graphql-e2e.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-nuxt.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-nuxt.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/live-server.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/native-compaction.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/ownership-integration.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/server-focused.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/api-e2e/web-focused.log",
+      "message": "new blank line at EOF."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/delivery-electron/build.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/delivery-electron/build.log",
+      "message": "trailing whitespace."
+    },
+    {
+      "path": "tickets/done/stopped-run-compatible-model/evidence/delivery-electron/package-checks.log",
+      "message": "trailing whitespace."
+    }
+  ],
+  "disposition": "Retain upstream raw logs and exact durable-tests.diff byte-for-byte for reviewed evidence integrity; whitespace diagnostics are not production/test/doc errors. No global diff-check Pass claimed.",
+  "nonRawSourceTestDocWhitespaceExitCode": 0,
+  "repositoryArtifactHygiene": "Repository artifact hygiene check passed.\nTracked files scanned: 27325\nPath-length threshold: 200\nLongest tracked path: 199 chars: tickets/done/event-monitor-history-transparency/probes/api-e2e/full-stack-runtime/data/logs/app-data-migrations/20260731_remove_external_runtime_working_context_snapshots-2026-08-20T18-45-01-177Z.log"
+}

@@ -138,7 +138,7 @@ boundary for task Agents and task Teams.
 ## Stopped Team Model Configuration
 
 `AgentTeamRunManager.updateStoppedModelConfigs(...)` owns General Process
-updates to persisted Team `llmConfig`. It runs inside the same root transition
+updates to persisted Team model/settings pairs. It runs inside the same root transition
 lane as restore, rechecks that no root remains manager-owned, rejects archived
 or non-cataloged packages, and writes the current V2 execution tree through the
 existing atomic tree store. Save-first therefore makes the new values visible
@@ -146,18 +146,34 @@ to the next restore; restore-first returns `RUN_ACTIVE` without writing.
 
 Each patch targets one exact configured Team or configured Agent address.
 `TeamRunModelConfigMutator` resolves that address in the immutable stored
-topology and replaces only `defaultLaunchConfiguration.llmConfig` or
-`launchConfiguration.llmConfig`. It cannot change runtime/model identity,
+topology and replaces only `llmModelIdentifier` and `llmConfig` in that scope's
+`defaultLaunchConfiguration` or `launchConfiguration`. Both fields are required
+per patch; `llmConfig` may explicitly be null. It cannot change runtime kind,
 workspace, automatic-tool policy, concrete run IDs, provider bindings, task
-nodes, hierarchy, or addresses. Every scope validates against its own fixed
-runtime/model schema before the tree is written.
+nodes, hierarchy, or addresses. Every intended scope validates against its own
+original saved selection and fixed runtime before the single tree write. A
+replacement needs verified target context capacity at least that scope's fresh
+saved-model capacity plus valid target-schema settings. Same-model settings
+skip replacement-capacity comparison only. An incompatible descendant blocks
+the whole Save; it is not silently omitted. See
+[LLM Management](./llm_management.md#persisted-run-model-selection-validation).
 
 The browser may plan bounded propagation from a parent edit, but the server
 receives the resulting exact-scope patches rather than inheritance intent. The
-planner preserves descendants that started divergent or were edited directly,
+planner links descendants using draft-start runtime/model/settings equality.
+Parent pair edits follow only those original links; descendants that started
+divergent or were explicitly edited directly remain unchanged, even if a direct
+edit later equals its parent. Mixed-runtime branches do not link,
 and stopped-run editing exposes no Reset-to-definition action because the V2
 snapshot does not preserve original override provenance. No configuration
 revision, rebase, or cross-client merge protocol is part of this boundary.
+
+Post-write canonical read uncertainty returns `PERSISTENCE_INDETERMINATE` with
+the last known tree; it does not claim a definite failure or issue a rollback
+write. Canonical verification/Retry locks duplicate Save and clears obsolete
+feedback after a successful read. Save does not start members or rewrite their
+history/compaction state. Normal subsequent member messages restore the saved
+pairs within the same local/provider conversations.
 
 Studio checks the separate Application ownership lease before delegating to the
 General root lane. A nonterminal Application binding keeps both Agent and Team

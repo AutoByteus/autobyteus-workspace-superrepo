@@ -1,0 +1,5 @@
+{
+  "when": "When API/E2E validation passes, the carried classification is task_size=Large or architectural_risk=High, and the cumulative evidence package requires proportional test-code review.",
+  "recipient_address": "/software_engineering_team/code_reviewer",
+  "basis": "API-REV-003 Pass95%, Medium/High/Reviewed; proportional no-new-durable-change disposition required, retaining CRR-003; no focused failure-origin reroute or direct low-risk Delivery assignment"
+}

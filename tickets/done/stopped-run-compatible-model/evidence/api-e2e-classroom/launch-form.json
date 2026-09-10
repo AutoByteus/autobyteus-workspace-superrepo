@@ -1,0 +1,10 @@
+{
+  "url": "http://127.0.0.1:42291/workspace",
+  "result": {
+    "body": "Agents\nAgent Teams\nSkills\nMemory\nNodes\nWorkspaces\nTemp Workspace\nSettings\nTeam Definition\nClassroom Simulation Team\nRuntime\nAutoByteus\nCodex App Server\nClaude Agent SDK\n\nSelects the runtime backend used by this team run.\n\nDefault LLM Model (Global)\nOpenAI / GPT-5.6-Luna (default reasoning: medium)\n\nThis model will be used by all members unless overridden.\n\nThinking\n\nUse the model settings below to control thinking.\n\nUse setting\nAdvanced\nReasoning Effort ⓘ\nlow\nmedium\nhigh\nxhigh\nmax\nFast mode ⓘ\nDefault\nfast\nWorkspace Directory\nExisting\nNew\nAuto approve tools\n\nHigh-trust mode for Codex team members: automatically allows tool calls and access/permission requests for this run.\n\nAuto approve tools\nTeam Members Override (2)\nRun Team\nFiles\nTerminal\nActivity\nToken\nArtifacts\nVNC Viewer\nNo file selected\n\nSelect a file from the explorer to view or edit its content.",
+    "runtime": "codex_app_server",
+    "workspace": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290/classroom",
+    "runDisabled": false
+  },
+  "tab_id": "1"
+}

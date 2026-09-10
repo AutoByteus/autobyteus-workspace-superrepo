@@ -198,7 +198,7 @@ describe("Run projection tool-call GraphQL e2e", () => {
           agentRuns: { allocateForAgentDefinition: () => "unused-agent-run" },
           taskTeams: { create: () => "unused-task-team" },
         } as never,
-        modelConfigValidator: { validate: () => undefined } as never,
+        modelSelectionValidator: { validate: () => undefined } as never,
       });
     }
     closeStudioServices = configureE2eStudioApplicationApiServices().close;
