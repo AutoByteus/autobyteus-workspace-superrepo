@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-10T23:07:30.819067+00:00",
+  "checks": {
+    "ownedRuntimeRemoved": true,
+    "ownedDatabaseRemoved": true,
+    "ownedEnvironmentExited": true,
+    "ownedNuxtExited": true,
+    "observersExited": true,
+    "sharedBrowser39StillRunning": true,
+    "sharedServer42StillRunning": true
+  },
+  "secretPatternCounts": {},
+  "tab": "Owned tab1 closed, shared browser not closed",
+  "observerExitNote": "WebSocket observer saved all frames and exited1 on cdp.detach because owned tab already closed; no pending observer/resource. Environment and HTTP observer exit0. Not a production failure.",
+  "intentionalRetention": "Own run snapshot, two classroom files, filtered provider records and exactly2 new original CLI provider transcripts; original linked agent repository not edited."
+}

@@ -1,0 +1,13 @@
+import fs from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import assert from 'node:assert/strict';
+const dir=path.dirname(fileURLToPath(import.meta.url));const e=JSON.parse(await fs.readFile(path.join(dir,'live-environment.json'),'utf8'));
+const gql=async(query,variables={})=>{const r=await fetch(e.serverUrl+'/graphql',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({query,variables})});const p=await r.json();if(p.errors)throw Error(JSON.stringify(p.errors));return p.data};
+const team=async(name,coordinatorMemberName,nodes)=>(await gql(`mutation($input:CreateAgentTeamDefinitionInput!){createAgentTeamDefinition(input:$input){id}}`,{input:{name,description:'Owned nested model switch fixture',instructions:'Respond only when addressed. Remember conversation facts. Do not delegate or use tools.',coordinatorMemberName,nodes}})).createAgentTeamDefinition.id;
+const node=memberName=>({memberName,ref:e.definitionId,refType:'AGENT',refScope:'SHARED'});
+const nested=await team(e.key+'-nested','lead',[node('lead'),node('reviewer')]);
+const root=await team(e.key+'-root','coordinator',[node('coordinator'),{memberName:'Nested',ref:nested,refType:'AGENT_TEAM',refScope:'SHARED'}]);
+const launch={runtimeKind:'codex_app_server',llmModelIdentifier:'gpt-5.6-luna',llmConfig:null,autoExecuteTools:false,skillAccessMode:'PRELOADED_ONLY',workspaceRootPath:e.workdir};
+const result=await gql(`mutation($input:CreateAgentTeamRunInput!){createAgentTeamRun(input:$input){success message teamRunId}}`,{input:{teamDefinitionId:root,teamConfigs:['/','/Nested'].map(teamAddress=>({teamAddress,...launch})),memberConfigs:['/coordinator','/Nested/lead','/Nested/reviewer'].map(memberAddress=>({memberAddress,agentDefinitionId:e.definitionId,...launch}))}});
+assert(result.createAgentTeamRun.success,JSON.stringify(result));const teamRunId=result.createAgentTeamRun.teamRunId;
+const treePath=path.join(e.runtimeRoot,'memory/agent_teams',teamRunId,'team_run_execution_tree.json');
+const tree=JSON.parse(await fs.readFile(treePath,'utf8'));const agents=[];const visit=t=>{for(const m of t.members){if(typeof m.agentRunId==='string')agents.push(m);else visit(m);}};visit(tree.rootTeam);
+const record={createdAt:new Date().toISOString(),teamRunId,treePath,initialTree:tree,agents};await fs.writeFile(path.join(dir,'live-team.json'),JSON.stringify(record,null,2));console.log(JSON.stringify({teamRunId,agents:agents.map(x=>({address:x.memberAddress??x.address,runId:x.agentRunId}))},null,2));

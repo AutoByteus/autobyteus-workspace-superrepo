@@ -455,11 +455,16 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
         ? { llmConfig: initialTree.rootTeam.members[0].launchConfiguration.llmConfig }
         : undefined,
     });
-    expect(validate).toHaveBeenCalledWith(expect.objectContaining({
-      runtimeKind: initialTree.rootTeam.defaultLaunchConfiguration.runtimeKind,
-      llmModelIdentifier: initialTree.rootTeam.defaultLaunchConfiguration.llmModelIdentifier,
-      llmConfig: patch[0].llmConfig,
-    }));
+    expect(validate).toHaveBeenCalledWith({
+      context: expect.objectContaining({
+        runtimeKind: initialTree.rootTeam.defaultLaunchConfiguration.runtimeKind,
+        currentModelIdentifier: initialTree.rootTeam.defaultLaunchConfiguration.llmModelIdentifier,
+      }),
+      selection: expect.objectContaining({
+        llmModelIdentifier: patch[0].llmModelIdentifier,
+        llmConfig: patch[0].llmConfig,
+      }),
+    });
 
     factory.state.active = true;
     const restored = await manager.restoreTeamRun(root.teamRunId);
@@ -501,7 +506,7 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
     const patch = [{
       scopeKind: "CONFIGURED_TEAM" as const,
       scopeAddress: "/",
-      llmModelIdentifier: config.rootTeam.defaultLaunchConfiguration.llmModelIdentifier,
+      llmModelIdentifier: "replacement-model",
       llmConfig: { reasoning_effort: "high", service_tier: "priority" },
     }];
 
@@ -520,7 +525,7 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
       outcome: "UPDATED",
       canonical: {
         rootTeam: {
-          defaultLaunchConfiguration: { llmConfig: patch[0].llmConfig },
+          defaultLaunchConfiguration: { llmModelIdentifier: "replacement-model", llmConfig: patch[0].llmConfig },
         },
       },
     });
@@ -529,6 +534,7 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
       expect.objectContaining({
         rootTeam: expect.objectContaining({
           defaultLaunchConfiguration: expect.objectContaining({
+            llmModelIdentifier: "replacement-model",
             llmConfig: patch[0].llmConfig,
           }),
         }),
@@ -567,8 +573,8 @@ describe("AgentTeamRunManager strict current V2 package integration", () => {
       patches: [{
         scopeKind: "CONFIGURED_TEAM",
         scopeAddress: "/",
-        llmModelIdentifier: config.rootTeam.defaultLaunchConfiguration.llmModelIdentifier,
-      llmConfig: { reasoning_effort: "high", service_tier: "priority" },
+        llmModelIdentifier: "replacement-model",
+        llmConfig: { reasoning_effort: "high", service_tier: "priority" },
       }],
     })).resolves.toMatchObject({
       success: false,

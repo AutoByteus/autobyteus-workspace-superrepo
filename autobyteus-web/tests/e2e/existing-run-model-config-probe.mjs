@@ -274,7 +274,17 @@ const catalogSnapshot = {
   videoModels: [],
 }
 
+// AC-004: selecting a different model must display its schema/defaults, not old settings.
+catalogSnapshot.llmModels.push({ ...clone(catalogSnapshot.llmModels[0]),
+  modelIdentifier: 'browser-larger-model', name: 'Browser Larger Model',
+  value: 'browser-larger-model', canonicalName: 'browser-larger-model',
+  maxContextTokens: 272000, activeContextTokens: 272000,
+})
 const state = {
+  agentModel: 'gpt-5.6-luna',
+  replacementsEnabled: false,
+  teamMutationMode: 'success',
+  failTeamReads: 0,
   agentConfig: modelConfig('low'),
   teamTree: clone(teamTree),
   agentResumeReads: 0,
@@ -293,7 +303,7 @@ const operationResponse = async (operationName, variables) => {
       metadataConfig: {
         agentDefinitionId: 'agent-definition-browser-1',
         workspaceRootPath: '/workspace/browser-probe',
-        llmModelIdentifier: 'gpt-5.6-luna',
+        llmModelIdentifier: state.agentModel,
         llmConfig: clone(state.agentConfig),
         autoExecuteTools: false,
         skillAccessMode: 'PRELOADED_ONLY',
@@ -305,6 +315,7 @@ const operationResponse = async (operationName, variables) => {
   }
   if (operationName === 'GetTeamRunResumeConfig') {
     state.teamResumeReads += 1
+    if (state.failTeamReads > 0) { state.failTeamReads -= 1; return { errors: [{ message: 'Canonical verification temporarily unavailable.' }] } }
     if (state.teamResumeReads === 1) await delay(700)
     return { data: { getTeamRunResumeConfig: {
       teamRunId: 'team-run-browser-1',
@@ -313,8 +324,19 @@ const operationResponse = async (operationName, variables) => {
       modelConfigEditability: { editable: true, reason: null },
     } } }
   }
-  if (operationName === 'AgentRunModelOptions') return { data: { agentRunModelOptions: { __typename: 'RunModelOptionsObject', currentModelIdentifier: 'gpt-5.6-luna', currentContextTokens: null, replacements: [], unavailableReason: 'Fixture has no replacement metadata.' } } }
-  if (operationName === 'TeamRunModelOptions') return { data: { teamRunModelOptions: [] } }
+  const options = (current) => ({ __typename: 'RunModelOptionsObject', currentModelIdentifier: current,
+    currentContextTokens: state.replacementsEnabled ? (current === 'browser-larger-model' ? 272000 : 128000) : null,
+    replacements: state.replacementsEnabled && current !== 'browser-larger-model'
+      ? [{ llmModelIdentifier: 'browser-larger-model', contextTokens: 272000 }] : [],
+    unavailableReason: state.replacementsEnabled ? null : 'Fixture has no replacement metadata.' })
+  if (operationName === 'AgentRunModelOptions') return { data: { agentRunModelOptions: options(state.agentModel) } }
+  if (operationName === 'TeamRunModelOptions') return { data: { teamRunModelOptions: state.replacementsEnabled
+    ? ['/', '/coordinator', '/Nested', '/Nested/lead', '/Nested/reviewer'].map(scopeAddress => {
+      const node = findConfigured(state.teamTree, scopeAddress)
+      const config = node.default_launch_configuration ?? node.launch_configuration
+      return { ...options(config.llm_model_identifier), __typename: 'TeamScopeModelOptionsObject', scopeAddress,
+        scopeKind: node.default_launch_configuration ? 'CONFIGURED_TEAM' : 'CONFIGURED_AGENT' }
+    }) : [] } }
   if (operationName === 'GetProviderModelCatalogSnapshots') return { data: { providerModelCatalogSnapshots: [catalogSnapshot] } }
   if (operationName === 'GetRuntimeAvailabilities') return { data: { runtimeAvailabilities: [{ runtimeKind: 'autobyteus', enabled: true, reason: null }] } }
   if (operationName === 'UpdateStoppedAgentRunModelConfig') {
@@ -327,10 +349,11 @@ const operationResponse = async (operationName, variables) => {
         message: 'A supported external workflow resumed this run.',
         isActive: true,
         editability: { editable: false, reason: 'RUN_ACTIVE' },
-        canonicalSelection: { llmModelIdentifier: 'gpt-5.6-luna', llmConfig: clone(state.agentConfig) },
+        canonicalSelection: { llmModelIdentifier: state.agentModel, llmConfig: clone(state.agentConfig) },
         fieldErrors: [],
       } } }
     }
+    state.agentModel = variables.input.llmModelIdentifier
     state.agentConfig = clone(variables.input.llmConfig)
     return { data: { updateStoppedAgentRunModelConfig: {
       success: true,
@@ -338,11 +361,12 @@ const operationResponse = async (operationName, variables) => {
       message: 'Agent model settings saved.',
       isActive: false,
       editability: { editable: true, reason: null },
-      canonicalSelection: { llmModelIdentifier: 'gpt-5.6-luna', llmConfig: clone(state.agentConfig) },
+      canonicalSelection: { llmModelIdentifier: state.agentModel, llmConfig: clone(state.agentConfig) },
       fieldErrors: [],
     } } }
   }
   if (operationName === 'UpdateStoppedTeamRunModelConfigs') {
+    const previousTree = clone(state.teamTree)
     state.teamMutations.push(clone(variables))
     await delay(250)
     for (const patch of variables.input.patches) {
@@ -351,7 +375,16 @@ const operationResponse = async (operationName, variables) => {
       const configuration = patch.scopeAddress === '/' || target.kind === 'configured_team'
         ? target.default_launch_configuration
         : target.launch_configuration
+      configuration.llm_model_identifier = patch.llmModelIdentifier
       configuration.llm_config = clone(patch.llmConfig)
+    }
+    if (state.teamMutationMode === 'indeterminate') {
+      state.failTeamReads = 1
+      return { data: { updateStoppedTeamRunModelConfigs: {
+        success: false, outcome: 'PERSISTENCE_INDETERMINATE', message: 'Verify the saved outcome before saving again.',
+        isActive: false, editability: { editable: true, reason: null },
+        canonicalExecutionTree: previousTree, fieldErrors: [],
+      } } }
     }
     return { data: { updateStoppedTeamRunModelConfigs: {
       success: true,
@@ -404,6 +437,9 @@ const runScenario = async (id, description, fn) => {
     if (page) {
       try { await page.screenshot({ path: path.join(outputDir, `${id}-failure.png`), fullPage: true }) } catch {}
     }
+  } finally {
+    // Persist each independent case before starting the next long-running journey.
+    await fs.writeFile(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8')
   }
 }
 
@@ -573,6 +609,74 @@ try {
     } }), 'RUN_ACTIVE attempt must remain revision-free and contain the required selection', state.agentMutations.at(-1))
     await page.screenshot({ path: path.join(outputDir, 'API-E2E-004-D-agent-run-active.png'), fullPage: true })
     return { mutation: state.agentMutations.at(-1), resumeReadsBeforeSave, resumeReadsAfterSave: state.agentResumeReads }
+  })
+
+  await runScenario('API-E2E-004-E', 'Compatible Agent replacement uses keyboard selection, target defaults and the complete canonical pair', async () => {
+    state.replacementsEnabled = true
+    state.agentMutationMode = 'success'
+    // Isolate this stopped-subject case from the explicit active lock asserted in D.
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    const runtime = page.locator('#agent-run-runtime-kind')
+    await runtime.waitFor({ state: 'visible' })
+    await waitFor('Agent replacement options', async () => !(await page.locator('[data-test="model-capacity-status"]').count()))
+    assert(await runtime.isDisabled(), 'Replacement must not unlock runtime')
+    const picker = runtime.locator('xpath=../following-sibling::div[1]//button').first()
+    const mutationsBefore = state.agentMutations.length
+    await picker.click()
+    const search = page.getByPlaceholder('Search models...')
+    await search.fill('browser-larger-model')
+    await page.locator('li[role="option"]').first().waitFor({ state: 'visible' })
+    await search.press('ArrowDown')
+    await page.keyboard.press('Enter')
+    const save = page.locator('[data-test="save-existing-model-config"]')
+    await waitFor('replacement dirty Save', async () => await save.isEnabled())
+    assert((await picker.innerText()).includes('browser-larger-model'), 'Picker must display target')
+    assert(await page.locator('#agent-run-reasoning_effort').inputValue() === 'low', 'Target default must replace old explicit effort')
+    await save.click()
+    await waitFor('canonical Agent replacement', async () => state.agentModel === 'browser-larger-model' && await save.isDisabled()
+      && (await page.locator('[role="status"]').allTextContents()).some(text => text.includes('Agent model settings saved.')))
+    assert(state.agentMutations.length === mutationsBefore + 1, 'One Agent replacement mutation')
+    const mutation = state.agentMutations.at(-1)
+    assert(mutation.input.llmModelIdentifier === 'browser-larger-model', 'Save must include target identifier')
+    assert(Object.hasOwn(mutation.input, 'llmConfig'), 'Save must include explicit nullable config')
+    await page.screenshot({ path: path.join(outputDir, 'API-E2E-004-E-agent-replaced.png'), fullPage: true })
+    return { mutation, canonicalModel: state.agentModel, canonicalConfig: state.agentConfig }
+  })
+
+  await runScenario('API-E2E-004-F', 'Team replacement preserves divergent branch and verifies an indeterminate outcome with Retry, never a duplicate Save', async () => {
+    state.teamMutationMode = 'indeterminate'
+    await page.locator('[data-test="show-team"]').click()
+    const runtime = page.locator('#team-scope-root-runtime-kind')
+    await runtime.waitFor({ state: 'visible' })
+    await waitFor('Team replacement options', async () => !(await page.locator('[data-test="model-capacity-status"]').count()))
+    const beforeMutations = state.teamMutations.length
+    const beforeReads = state.teamResumeReads
+    const picker = runtime.locator('xpath=../following-sibling::div[1]//button').first()
+    await picker.click()
+    const search = page.getByPlaceholder('Search models...')
+    await search.fill('browser-larger-model')
+    await page.locator('li[role="option"]').first().waitFor({ state: 'visible' })
+    await search.press('ArrowDown')
+    await page.keyboard.press('Enter')
+    const save = page.locator('[data-test="save-existing-model-config"]')
+    await waitFor('Team replacement Save', async () => await save.isEnabled())
+    await save.click()
+    const retry = page.getByRole('button', {name:'Retry',exact:true})
+    await retry.waitFor({ state: 'visible' })
+    assert(await save.isDisabled() && await picker.isDisabled(), 'Unverified outcome must lock duplicate Save and model control')
+    await retry.click()
+    await waitFor('Team verification resolved', async () => await retry.count() === 0 && await picker.isEnabled())
+    assert(await save.isDisabled(), 'Verified canonical pair must be clean')
+    assert((await picker.innerText()).includes('browser-larger-model'), 'Canonical replacement must be displayed')
+    assert(state.teamMutations.length === beforeMutations + 1, 'Retry must not repeat the mutation')
+    assert(state.teamResumeReads === beforeReads + 2, 'One failed and one successful canonical verification')
+    const patches = state.teamMutations.at(-1).input.patches
+    assert(JSON.stringify(patches.map(p => p.scopeAddress).sort()) === JSON.stringify(['/', '/Nested', '/Nested/lead', '/coordinator'].sort()), 'Only originally linked branches follow root; earlier directly edited reviewer stays divergent', patches)
+    assert(findConfigured(state.teamTree, '/Nested/reviewer').launch_configuration.llm_model_identifier === 'gpt-5.6-luna', 'Divergent reviewer model is retained')
+    assert(!(await page.locator('[role="alert"]').allTextContents()).some(text => text.includes('Verify the saved outcome')), 'Verified feedback must clear obsolete error')
+    await page.setViewportSize({ width: 520, height: 900 })
+    await page.screenshot({ path: path.join(outputDir, 'API-E2E-004-F-team-verified-narrow.png'), fullPage: true })
+    return { mutation: state.teamMutations.at(-1), verificationReads: state.teamResumeReads - beforeReads }
   })
 
   const pageErrors = evidence.browserEvents.filter((event) => event.type === 'pageerror')

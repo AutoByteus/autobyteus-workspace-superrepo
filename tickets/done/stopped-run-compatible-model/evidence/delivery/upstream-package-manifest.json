@@ -1,0 +1,1047 @@
+[
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/api-e2e-coverage-investigation.md",
+    "sha256": "d5845a8fc5faefe90b391395a38099b4149ca60445caa81d13f6dc791be40830",
+    "bytes": 20887
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/api-e2e-execution-coverage-report.md",
+    "sha256": "1358190463b91c0d89e4c9dec5f784ae8ae17e5c3af0fda93100f20ba7752e9d",
+    "bytes": 23705
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/api-e2e-revision-record.md",
+    "sha256": "bf14f179762a86cf0cee8d45d530377728f32fc26cbe1cf07aaa3d8a6d34eb63",
+    "bytes": 4949
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/api-e2e-test-case-ledger.md",
+    "sha256": "03386848e7bbed9fe8f8269ecb1f26c47bcdf60de227d9b5acc36abee283a468",
+    "bytes": 15570
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/api-e2e-test-review-report.md",
+    "sha256": "c1ba276b01e7507b57f601f10ce368636bd0aeeadc6232fecf9396c7b2a460ac",
+    "bytes": 12548
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/architecture-design-revision-record.md",
+    "sha256": "a5184b03a9150296a6c12d4b906838d2e94f61073a91c61bec90ebc0c0dcb9d5",
+    "bytes": 4659
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/architecture-review-revision-record.md",
+    "sha256": "854584eba7d5fb05cce829126727705b3e32b1e031e66fde7f58c24d402a0d95",
+    "bytes": 7957
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/code-review-report.md",
+    "sha256": "d556d75c4c211e18a3a793602caf532c8e39103116cb742630c4eae1d870b17d",
+    "bytes": 39023
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/code-review-revision-record.md",
+    "sha256": "cfb5e530012a55b1a09f554b5f846552240fa3daf2e3add9d6d5f9ccedd7dacb",
+    "bytes": 14587
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/design-review-report.md",
+    "sha256": "cb0089d0e77d00f2d2ddb35ee5a9d3b9586c0eeadeec66ba6f96ac31070bac83",
+    "bytes": 32631
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/design-spec.md",
+    "sha256": "d19612188c267209ec90bac378f2a0f6a0395a00d51b1a66084baa73c87a4491",
+    "bytes": 73984
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/README.md",
+    "sha256": "5a3d20dc59e4f9acefaa57fca122b7e023967ea9b45068f1cb442c662b18b245",
+    "bytes": 5485
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/rendered/existing-run-model-config-evidence.json",
+    "sha256": "01729088ffc31d46c70d9be3c1d7c6a1a122baa071ba4fa074912ca025ce9bf0",
+    "bytes": 6188
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/rendered/initial-stale-feedback.png",
+    "sha256": "2575677ee724f95b4b29049a25bf8005c3ff34a3e230cad620ff9d2775d8fc74",
+    "bytes": 97181
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/rendered/nuxt-dev.log",
+    "sha256": "e33c52ec3615556e14c1392c8325896840d6febb5ce76cedd6b59f9336af3495",
+    "bytes": 2069
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/rendered/team-verification-narrow.png",
+    "sha256": "76e01eebff199a94efc85b67bcfa2c3c12bb72c7154aa689288e511a34931ae6",
+    "bytes": 93025
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/rendered/team-verification-retry.png",
+    "sha256": "f44241a6cbf2c7425c8408146bb4d2f4cc6a23376ae3a162cc9ab7b5f76245e5",
+    "bytes": 98442
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/rendered/team-verified-narrow.png",
+    "sha256": "5384d5a868eeb47dd8f0a05595b8ee4839ed23b493bdfc5395825d1b9a7be387",
+    "bytes": 93466
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/renderer-command.log",
+    "sha256": "02a5f9e8d267cc52c179807349b73323f1170377819eeed318473f7b19428439",
+    "bytes": 247
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/server-build.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/server-focused.log",
+    "sha256": "629067507c8b3dd81d20cb3c39b4a786e30826030508ca3bd8f16da4d59c4968",
+    "bytes": 6736
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/source-size-check.json",
+    "sha256": "f360cfd10af65c18e420261ecfc8d997d946d19b3674d1eded60002cb89d5624",
+    "bytes": 481
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/team-readback-probe-result.json",
+    "sha256": "52a418d220d9c7e9fc1a712bae08804e22392ad9a971e1614204a085894244fc",
+    "bytes": 5007
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/team-readback-probe.log",
+    "sha256": "cde7d061b82ffb1619a742874a02231791397d31186d0af899160f634d095d93",
+    "bytes": 4683
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/team-readback-probe.mjs",
+    "sha256": "2255919515ffd3df3cee377b2ddc6513d0e7a583cc0eaf95a62b3ca14afeea46",
+    "bytes": 5775
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/team-verification-render-inspection.mjs",
+    "sha256": "22d839638c629fc69c395423d2affbb76d0ac589a7c2cf97e898d5a261da9bca",
+    "bytes": 26051
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/IR-002/web-focused.log",
+    "sha256": "b3a904a1a92cd6393caf2ea72c23bcfb82ccb47ad9f01257e6fdbe5b8f2a3678",
+    "bytes": 2223
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/README.md",
+    "sha256": "3c0ea71168ade6bf760bebf37a704218ea789035578aaf43134bbf6a5baf8220",
+    "bytes": 13810
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/affected-integration-final.log",
+    "sha256": "12602430fe63623cb65d5e599501b94c32f19f5b50222d453d900cdef50ec0da",
+    "bytes": 44765
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/affected-integration.log",
+    "sha256": "18696d14305ba63f196b32c05bbc97244df789311caae1a443967849a1920bb6",
+    "bytes": 47477
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/API-E2E-004-A-agent-saved.png",
+    "sha256": "31df6ec99c7305b31b7e14e0e7e821c0da63cbcc65ef9644c00ec93f8908932d",
+    "bytes": 90011
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/API-E2E-004-B-team-saved.png",
+    "sha256": "f8ca81710a35c8fab9f4a154008ce47083cae39749112ede9a304056ea383a0a",
+    "bytes": 323260
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/API-E2E-004-C-team-narrow.png",
+    "sha256": "f3586e3bfe092458170bca5c9e1b5d1c343aa3d53e734177541f0d9f36eb32c6",
+    "bytes": 49830
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/API-E2E-004-D-agent-run-active.png",
+    "sha256": "e7619310aaca5ec65dabb925d9e6c8c0ac0b7097dfb539fc3039a59c06703f5f",
+    "bytes": 89492
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/API-E2E-004-E-failure.png",
+    "sha256": "09e2d5071509697b9b2ec46abbfec4e733a2bb067dab2ef7ddf1b99b2bd6b026",
+    "bytes": 82787
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/API-E2E-004-F-team-verified-narrow.png",
+    "sha256": "7f99b108cb89e532c1f911baee8c09eb3a159fd30c14f185b3e2d455d8544ca8",
+    "bytes": 94234
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/existing-run-model-config-evidence.json",
+    "sha256": "2b6af0a90a44fef99e9fdbfa53b9dd672ae9d1cc1e3e46613134c548e9dd7a79",
+    "bytes": 33137
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable/nuxt-dev.log",
+    "sha256": "2b7157952dc4ad7fc6ec37fb01b7dfb4e24da5e5d4b538e9ee0f481985482b13",
+    "bytes": 2300
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/API-E2E-004-A-agent-saved.png",
+    "sha256": "31df6ec99c7305b31b7e14e0e7e821c0da63cbcc65ef9644c00ec93f8908932d",
+    "bytes": 90011
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/API-E2E-004-B-team-saved.png",
+    "sha256": "e5316a9051a0e0d9e116f491e99d9abb9acd025c582b8a06fb50adfa6782c78b",
+    "bytes": 323009
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/API-E2E-004-C-team-narrow.png",
+    "sha256": "f3586e3bfe092458170bca5c9e1b5d1c343aa3d53e734177541f0d9f36eb32c6",
+    "bytes": 49830
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/API-E2E-004-D-agent-run-active.png",
+    "sha256": "e7619310aaca5ec65dabb925d9e6c8c0ac0b7097dfb539fc3039a59c06703f5f",
+    "bytes": 89492
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/API-E2E-004-E-agent-replaced.png",
+    "sha256": "c37aead5193e60120890b2dac115ec7d7f3c9f1d7862e1bd3b85d098735144fa",
+    "bytes": 91977
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/API-E2E-004-F-team-verified-narrow.png",
+    "sha256": "515d68bf1f70aab3219922d717ac657c2b87daff6c0917086bfa768024341842",
+    "bytes": 94177
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/existing-run-model-config-evidence.json",
+    "sha256": "2374bf775c6c2161228ccc830ea8c9911b22d802bce5b3e6c562772547321b09",
+    "bytes": 12745
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final/nuxt-dev.log",
+    "sha256": "f9d6d0d3783d73c368e257fd9a831e9fa28254c86b652a9cd284d963c1ca95ec",
+    "bytes": 2297
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable-final.log",
+    "sha256": "bd8496f73b34a1adac3c437d6b2a25b535f3568c1f62252bbe510a3730551594",
+    "bytes": 553
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-durable.log",
+    "sha256": "a629eaa50e21cc9e406f2876c4be38a3db21db920fc9ca8085fdab5416d40a9c",
+    "bytes": 1888
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/API-E2E-004-A-agent-saved.png",
+    "sha256": "54a11e10d8c8c0f39d352d6a48144f8777a99633c195968650453c956d7c93fd",
+    "bytes": 90016
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/API-E2E-004-B-team-saved.png",
+    "sha256": "c93eeea7e103f0d3a3b0f3619977bb446e417332c68d5d4fadd0638bba558846",
+    "bytes": 322346
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/API-E2E-004-C-team-narrow.png",
+    "sha256": "f3586e3bfe092458170bca5c9e1b5d1c343aa3d53e734177541f0d9f36eb32c6",
+    "bytes": 49830
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/API-E2E-004-D-agent-run-active.png",
+    "sha256": "e7619310aaca5ec65dabb925d9e6c8c0ac0b7097dfb539fc3039a59c06703f5f",
+    "bytes": 89492
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/existing-run-model-config-evidence.json",
+    "sha256": "0158d1c603fc4363abccd1241ada105f792ba5c85cc50ab031ee87f228855b42",
+    "bytes": 7348
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/nuxt-dev.log",
+    "sha256": "7064cecd4c824b39de04142bd4cef5dee29097a06a99caa59dd4c1a9dde91a7c",
+    "bytes": 2298
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved.log",
+    "sha256": "0ca0daf7180a39b67165e54017c955c14634d32b95e1e41eb56fc5d8c655b7b6",
+    "bytes": 545
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/agent-new-model.png",
+    "sha256": "807f2e5d839b414bf10731caff2445cac31591e5d0fee45829c41e4caa7dd8d2",
+    "bytes": 83806
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/agent-picker.png",
+    "sha256": "c4e0d1077bd91b30f60ffbaa9282f0af706ed575a54f4f187c29a4a35eb09ca0",
+    "bytes": 80490
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/agent-saved.png",
+    "sha256": "3415a32db2e575b7f7990962da688755b1e86fc851063b85af0b1087992a8609",
+    "bytes": 91158
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/existing-run-model-config-evidence.json",
+    "sha256": "e515d5ae430f9a08d1b3c6e3cb59dc52c032702ff8a791a59b335e07336ff81a",
+    "bytes": 6248
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/nuxt-dev.log",
+    "sha256": "3a62fdd340e756738787e29079380fc64352ffa56fea87258a03b96d2aae9740",
+    "bytes": 2063
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/team-narrow.png",
+    "sha256": "6872105ddf58b67459d2eb7f5ce8cfbed54da8c51d7758a32cc565aabfd65208",
+    "bytes": 304233
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement/team-propagated.png",
+    "sha256": "4953655a3ce14f0d6596fd31df4905b3fb333ec5ea24a7d8e602bd28104983e1",
+    "bytes": 297284
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-replacement.log",
+    "sha256": "814f6b5869ba2216518826b12fe6e59c90c838d9bfdc417ef066e04449901bad",
+    "bytes": 259
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-retry/existing-run-model-config-evidence.json",
+    "sha256": "1d498f7af3f8faf852d05395373b2cdcbf6cba0af20e67ca4f4d0270fc1c6f51",
+    "bytes": 6188
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-retry/nuxt-dev.log",
+    "sha256": "4899acae3fcc10b3e0c8a3634b76aa3c6f637c7e9dc557c0d9a56aedd0d995fb",
+    "bytes": 2071
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-retry/team-verification-narrow.png",
+    "sha256": "01473e984b5eaf1370b2297bb7d8602ea435c9218d80218dcf3b0f7cfc6a1572",
+    "bytes": 92907
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-retry/team-verification-retry.png",
+    "sha256": "a41fd9f88b3ab143c9336621faf89710a075dc3dbc834a1fff0a42be380cc214",
+    "bytes": 98326
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-retry/team-verified-narrow.png",
+    "sha256": "427351172512ae1b4563f9bb2ca1e7d2f5a0ff01bd150d74fa13cf38cf4e350a",
+    "bytes": 93405
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-retry.log",
+    "sha256": "b248769535c5c45abfbbb3ab373df76f82217292e705cd21bf4829ca85c9a8a1",
+    "bytes": 253
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/cleanup-and-evidence-audit.json",
+    "sha256": "7ffc1a10aaa07fccff4a36bc4045e3cfd6ea3eaf819bd74f620934e4a17b43d4",
+    "bytes": 611
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/durable-test-source-audit.json",
+    "sha256": "8056ee6d96935d4d9e3b53f679d65171f7eae802b667cbb32048923df4188304",
+    "bytes": 1395
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/durable-tests.diff",
+    "sha256": "c438def3173f99f523d7deaf87821f4de3022d0f2ad6e6f56fa68aeb232de735",
+    "bytes": 19987
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/graphql-e2e-final.log",
+    "sha256": "36e83add06cc025dc6c94f168e9f135562c4140313ddc6e6427f5f26a69e59b3",
+    "bytes": 4420
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/graphql-e2e.log",
+    "sha256": "75403354036b845c86a8077d96551fc46836cc5c9fba67b1f61413021b60f307",
+    "bytes": 4420
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/handoff-reference-files.json",
+    "sha256": "b503b054294a04bb10cb52dff88c9d8b8bce78ec4f6f88cb6ff6b7a403220f6a",
+    "bytes": 15403
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-browser-actions.mjs",
+    "sha256": "2ff784123e99192540c5111a8f494cfa4e1b0f67efe8bf7b18500f14606348a8",
+    "bytes": 6711
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-chrome.log",
+    "sha256": "c729f83ab6a849fe79d25c145ed13b9fefcf1abf44dda2bcedac701c70ac8336",
+    "bytes": 7207
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-environment.json",
+    "sha256": "a4d3d6c68ab55c863e33059c7aa581e51468c9a8a4af772d31a48d3bf0d5f3c4",
+    "bytes": 6871
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-environment.mjs",
+    "sha256": "007f5e2175732e1e0f1a702c8dcf477dfe664c3f864137d414e07f6b6fb88d3f",
+    "bytes": 6068
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-first-save-verify.json",
+    "sha256": "3740025fe728ea78155429202e7b6d2fa97dc3bcb2ab06827f6fbfd0b3c5d54d",
+    "bytes": 1651
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-guards-result.json",
+    "sha256": "46bf719a84409cb9b90b3e6975e19f9102a299f0dcd7de88848c3ca6c36b323a",
+    "bytes": 1050
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-guards.mjs",
+    "sha256": "adebad38d7a8e141fe41d38b90991b1db4e1f388dc812ede233be4921b4bfd62",
+    "bytes": 3039
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-inspect-dom.txt",
+    "sha256": "e220421e179da6f5e8e7ccbffc38944155e5e5df00957a9386b0ad1605dabc58",
+    "bytes": 1510
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-inspect.png",
+    "sha256": "7f55c3b943b8939643d6b4ef263aedbeca0c630482aa6e3795a3a994e48fdb93",
+    "bytes": 128022
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-nuxt.log",
+    "sha256": "28579098e1ea09dfd09cfe30f3224ccfa3d8334d7ffd3bfc268a639ce3180231",
+    "bytes": 2196
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-open-dom.txt",
+    "sha256": "6b5e93a6165f681e67063769c7f12b3fcf4ccb4b21bc6cecfba254c713c79f4c",
+    "bytes": 379
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-open.log",
+    "sha256": "0719ac9038da3e6f99b36e5ebaa9eb5acfccb4d615dd5e52991a7e868da549a2",
+    "bytes": 380
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-open.png",
+    "sha256": "0dd8014e41956a6cbae78bf581c7ac58191711d2f1185871b40d1676e5b0ba48",
+    "bytes": 53557
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-options.json",
+    "sha256": "8aa3fc3d319ee7ea45287c0bd179acfbc3f605ba50463b7f9516ce947b3a488c",
+    "bytes": 721
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-provider-after.json",
+    "sha256": "0d457050da494ed048326cb2a028c4b587072329660a5880fb695a10ba273c10",
+    "bytes": 4007
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-provider-before.json",
+    "sha256": "4b7c48d4a9d7e84fec3a18ec1f6fd73d8a27e5bfac4b2b60a108a3b431e6eeb0",
+    "bytes": 1668
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-provider-compacted.json",
+    "sha256": "3f12433d0c459fda2c6740fa3e222382f3b3948ef4f50f22bd19f0f60751c5fa",
+    "bytes": 5265
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-provider-compacted.log",
+    "sha256": "3f12433d0c459fda2c6740fa3e222382f3b3948ef4f50f22bd19f0f60751c5fa",
+    "bytes": 5265
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-provider-evidence.py",
+    "sha256": "bcd6038cddcb61762f0052eed84985f8ec9fb135f9be8c075bf594dfce231c8a",
+    "bytes": 1639
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-resume-compacted-dom.txt",
+    "sha256": "250ddabc95929b66781f68081c0d654d7a91db6fad5e2894665894b59a7837c5",
+    "bytes": 1126
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-resume-compacted.log",
+    "sha256": "d5648e81699b2fd12251273f70e7cac0923b558147312f039132058ef5853a83",
+    "bytes": 1127
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-resume-compacted.png",
+    "sha256": "9a54e01771adc20e093b38b8207d302cd7413de1150cf6cab25696457847d80e",
+    "bytes": 128990
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-resume-dom.txt",
+    "sha256": "0a97c64383e9544e0e3a2fc37ffe5c282c0e7764be3a8e384d581b7dc93c01c8",
+    "bytes": 1298
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-resume.log",
+    "sha256": "d5f34308ec6079ca6044a912ffa33daa142a8ad9f6d7476a46fd4d1d48741d2b",
+    "bytes": 1299
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-resume.png",
+    "sha256": "ccb4dc23caee4b7ae42dcf673ab83c3259aff07fd3ab5f636b2173e91af264de",
+    "bytes": 144336
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-compacted-dom.txt",
+    "sha256": "4f1ba6031e65c1aed78a000329e9a0b2244294616befa7fcb4daab7fec83ea1b",
+    "bytes": 1784
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-compacted-result.json",
+    "sha256": "98b35a1898fe741b9d037ea9fa0389572274279e16270e004cb5fbb75205d654",
+    "bytes": 4072
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-compacted-start.json",
+    "sha256": "b548abb0f53a7830591b381ae8558f6ca462de61e96260b88c2ca695be309b23",
+    "bytes": 1334
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-compacted.log",
+    "sha256": "427243b0073e9df171ddf534830da591b23b645ebda55fffe1cd4482b73fcca5",
+    "bytes": 1785
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-compacted.png",
+    "sha256": "3b64a8dbb0492f3229b620c8c9da0ee469f26f09d62d89a14e3e78b036100b1e",
+    "bytes": 161097
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-dom.txt",
+    "sha256": "bfeb19880a9e63467ad487941a076df69a63b31e8b7d924df7b9bffa48df4f4b",
+    "bytes": 1517
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-feedback-error.log",
+    "sha256": "fa0d49e2a17247d510944acc4e7848dea291e33d9869bf23bdb7f334dc4846d5",
+    "bytes": 1866
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-harness-error.log",
+    "sha256": "6533850179ba93fbc629873a64d509d20f47288da65a98beaf0d242654042d2a",
+    "bytes": 1927
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-result.json",
+    "sha256": "65b1f86d68760fc3f5ee891aa81b25f29af7d5dc2865c9558913ea71ae7e2929",
+    "bytes": 3496
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-selector-error.log",
+    "sha256": "9d5310ba9f5efaaa4eafcececd1a86e9c5aca61e7f69b7b9f91cf77c7d6a8dfe",
+    "bytes": 1885
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save-start.json",
+    "sha256": "5012ef9531def108c62f100d452872a6310ca5bf821bec58a74a0557e983904e",
+    "bytes": 1136
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save.log",
+    "sha256": "2a86e90b142d9d149ee72c0f5ac46147325ea80792b4f3a9bb7c7d0606f1404a",
+    "bytes": 1518
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-save.png",
+    "sha256": "bc42d985d7d546969b0726439d539991275c5d211956b695cada4b8436f0b132",
+    "bytes": 132786
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-send-first-dom.txt",
+    "sha256": "abdbba3473ea3763d77ae4e73bad359099c80b93612c659beb305a8c9a01efd7",
+    "bytes": 732
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-send-first.log",
+    "sha256": "59897418c9b4f69607c4ebfb986b48173d35b02c233b7ec65620f6c0f5cf1c2d",
+    "bytes": 733
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-send-first.png",
+    "sha256": "3add8c6219bae22591219b9f47ce12d27580a0e9e7e729b17ed1539f8848bec5",
+    "bytes": 83221
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-server.log",
+    "sha256": "322aae8adda4f3d78f508bcc4a0adae06fb49b8942b7bb270928ad0bf61cc4c1",
+    "bytes": 29874
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-settings-compacted.log",
+    "sha256": "62ef1574ae24d9e1e9f0fd95da5dbd04b671575b8ae00f091f098d016aa9bd67",
+    "bytes": 1724
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-settings-dom.txt",
+    "sha256": "d7b40d93d229dc9bae6854bf5936f96c8cc7494fbc2ac02f12f83776cfd95480",
+    "bytes": 1723
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-settings.log",
+    "sha256": "3e7f290dc1dc0468aede91799855da5f36153ecee8c9557b509384abdd7f5092",
+    "bytes": 1419
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-settings.png",
+    "sha256": "0cd8317cdd47752e97a990b338f5fa528192c3d4b1af09acd042db606f4edb71",
+    "bytes": 153145
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-stop-compacted.log",
+    "sha256": "61d6b078d3b725c8d2c99e691ebc9325a1375bd84aacba52893f11a2916de6f2",
+    "bytes": 1408
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-stop-dom.txt",
+    "sha256": "e9a009f47a405a8e6e6f6923a534492aa29606beb2ec1cf8a3e640c71a1dfa82",
+    "bytes": 1301
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-stop-result.json",
+    "sha256": "39da457cfbf7cbfa483ddb6d4cef766a046b6e3605fde5e5e6cafc1363d984d1",
+    "bytes": 129
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-stop.log",
+    "sha256": "2c036325fa7635423580360a2ec910d11d0fe2a0332c13be1e03ebe1c9e907cc",
+    "bytes": 842
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-stop.png",
+    "sha256": "64e913a627e4265d1d6ac05438a929d354c08f1d8510ebfda9f8126cf3afaf3e",
+    "bytes": 144079
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-browser.mjs",
+    "sha256": "9b2eb36c45428b465de92c3c39af7b537fdc11a6c99980dd920244d50d491586",
+    "bytes": 6502
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-first-lead-dom.txt",
+    "sha256": "ca5294e7fdaccaec49a819955791112fe9080ba51fc1b4988a13e693f7ecaaba",
+    "bytes": 680
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-first-lead.log",
+    "sha256": "c8a05c559b8b1a2464b028af1e342cf9fda30aa67f79fd75497997a0aeb6d92f",
+    "bytes": 681
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-first-lead.png",
+    "sha256": "2f20d956f7e3c7ed5e188a6daa5584dfe6de35686ab050b7efc86693423fa64b",
+    "bytes": 83966
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-first-reviewer-dom.txt",
+    "sha256": "679262131c4650791963de4b2ce5a99eb5f183fd37c9678e1e349946e4df3fae",
+    "bytes": 704
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-first-reviewer.log",
+    "sha256": "6c47eff133a74e63c16e97e42f0f8937aa0974a40509819ed95a5842d1dab63e",
+    "bytes": 705
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-first-reviewer.png",
+    "sha256": "3acd402ac8524106363cfb4313b085c2de29c36bac7856aa61ff978953397e84",
+    "bytes": 85776
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-provider-evidence.json",
+    "sha256": "0cb9dbddda9e067fc3372ef94aa7e3ce64fd75a1386eed9f65574dbba73263c6",
+    "bytes": 2622
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-provider-evidence.py",
+    "sha256": "77f95e65d6e932b13fd24533afdf270ba93948eb0353c875fa5dd27aa87ea516",
+    "bytes": 2065
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-resume-lead-dom.txt",
+    "sha256": "6cac1ed3e49cea8259e02c52c23d24a03f67fe9d1ed45b8e738116825d0dd1af",
+    "bytes": 836
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-resume-lead.log",
+    "sha256": "3fb2d9ab0f4bc2cea9e83d89c796e738389a1e1ecd3eee22a7e131c8e2cee369",
+    "bytes": 837
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-resume-lead.png",
+    "sha256": "523f958d4258ee5040cb7141ee36467eb0474ffd29498badae26f44c185cb37c",
+    "bytes": 100458
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-resume-reviewer-dom.txt",
+    "sha256": "84495fc655cb83396e3e18e8cbed10d5c07e24fefff2a2c8f728055b1c11b665",
+    "bytes": 872
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-resume-reviewer.log",
+    "sha256": "aac303e093049c6123795c732451682cd525b883951d4b6a8a21b562d31cbea3",
+    "bytes": 873
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-resume-reviewer.png",
+    "sha256": "c0a1f89943fcf9eb3f6ce2224585ec2ce3fa3352c4c6f43ee76465b69dcddbd4",
+    "bytes": 103052
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-save-lead-dom.txt",
+    "sha256": "cfebeb2cbf5df310798c01983a9fc3511e8114f4345046eb2c7d43ae1d69af47",
+    "bytes": 4105
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-save-lead.png",
+    "sha256": "9966298ba66fd553c6a46a1b2e504c78cfbda9116b1143cf26ce3e4f394d298c",
+    "bytes": 145703
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-save-result.json",
+    "sha256": "9b0470b3213b2af5b1047cc4c48c76d3eb6a858442c1f3ac0fb93a9a3c6afd7d",
+    "bytes": 16286
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-save-start.json",
+    "sha256": "4079a35c7093e5ca8c2a9d271aa3bd5d950692f6d2d376956ff08d4c96af37d5",
+    "bytes": 4912
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-save.log",
+    "sha256": "d7611fa28a8cd0c558737c64d630abe8925493bf465bcbe6e4a5d2ec67c115f8",
+    "bytes": 4106
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-settings-lead-dom.txt",
+    "sha256": "4b3ea66e102cf91b49f37f78181eaec928a4611fbeb19f915120a5a61f074463",
+    "bytes": 4009
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-settings-lead.png",
+    "sha256": "e554beeab4b9ed66d422e879707555fde4b51d187c97e92daa24ec9280f8d569",
+    "bytes": 128327
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-settings.log",
+    "sha256": "96de2666aeeadfae081c22b0ec9e6794bd714551343ece740d391c4244754b73",
+    "bytes": 4010
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-setup.log",
+    "sha256": "08910d1f07fc715fa63c5a3399b28aeef6ed15edf07613e7bf29866352ea8161",
+    "bytes": 1080
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-setup.mjs",
+    "sha256": "808db29e8be8161b3b7c9b63ce65b07421c11e717eb6908e02822513d4a3da1c",
+    "bytes": 2547
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-stop.json",
+    "sha256": "68563baeab0ba2b872deddd7d7db5e013417cd287c5b6cf770c23ba73758daa5",
+    "bytes": 138
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-stop.log",
+    "sha256": "5dd816ca4940d9b3924bd7aab459d492621974d21edc41dabf243f1013a781ef",
+    "bytes": 104
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team.json",
+    "sha256": "a0bb238b424df13e31e40d40ac3186c19a654137eac967b324d497b6bc7fd9b1",
+    "bytes": 6775
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/native-compaction.log",
+    "sha256": "65909a791fa689090bbae94ed411c415370391aa807018f443ae9386f59489b7",
+    "bytes": 6862
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/ownership-integration.log",
+    "sha256": "9e828c2ec6a55b78b6129537e7c7c5811366b6504491700ffea73d99f75a82ee",
+    "bytes": 5971
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/result-summary.json",
+    "sha256": "71fdea10fdfebf1d660fd2a9573c2dcf0a36fdb47cbfe3bd9cdc540cdc69fc56",
+    "bytes": 973
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/server-build.log",
+    "sha256": "4aabf18581fa39e3f5885d7e5f4ab728680a1df83f0a387e225839987c87146b",
+    "bytes": 2864
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/server-focused.log",
+    "sha256": "6d448fbebaf7dd32581f8d84c8e9d5b44dabcf3fe9e0421547a72a2f4dbdd2e4",
+    "bytes": 7430
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/web-focused.log",
+    "sha256": "fac607526fbd428b8a454a7ca425736f0e0c806e1fb13af1459bcf467740e435",
+    "bytes": 5848
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/architecture-runtime-capacity-probe-result.json",
+    "sha256": "047d83c1c6ccab0dd523d737e6f67f9f61f77b98f6e6a84d9710b72d0ff22441",
+    "bytes": 6769
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/architecture-runtime-capacity-probe.mjs",
+    "sha256": "0619f5f5369130d80fd2b8a8ddce745e829d623f0576131f4def4f8548eabf78",
+    "bytes": 3610
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review/README.md",
+    "sha256": "7778213a81ca96230936cdd5b824f1d4ff1d6448c48c64dacdd5aa02ddf29260",
+    "bytes": 4776
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review/server-focused.log",
+    "sha256": "4b37db7fcb9a9f0fb9aa5d2f26fcedae370b440a62f7b72eaa691e713e117e1a",
+    "bytes": 5104
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review/source-audit.json",
+    "sha256": "229c96675844e8e3588d0a80e4691e183048c9530224e3b51e738c5e91e83454",
+    "bytes": 10749
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review/team-readback-probe-result.json",
+    "sha256": "e9b0247f15a210e4d0b96e683d3484d878ce2199c1af9b23ddb63a563858abf8",
+    "bytes": 1621
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review/team-readback-probe.log",
+    "sha256": "e8f609a07be1cdb5aa8e5521b88bed32ba63bef2227497db2dd0f0fa97045ab3",
+    "bytes": 3659
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review/team-readback-probe.mjs",
+    "sha256": "edac54bb1efb6b10a9356eaf9902256b474764b08c718a70945b2cf2aac4339c",
+    "bytes": 5223
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review/web-focused.log",
+    "sha256": "1fc0f1311ad40c6c1ed6461d40e634facef96b41f1e251cc00cdfe90aa1dd67c",
+    "bytes": 2759
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/README.md",
+    "sha256": "f4bde75b93229fcbda2e936c13c5d33a7582674db36617f8c6e3a138c32b5275",
+    "bytes": 5119
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/server-build.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/server-focused.log",
+    "sha256": "a857d6b7f873fe97838ca6b0a64c9020852e0ded3e73c3bfb342343f85a13721",
+    "bytes": 6735
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/source-audit.json",
+    "sha256": "a1a2039f3ac71a903f5dde8d432682afd3ef321a91fe1ff413fcb0eb001da296",
+    "bytes": 569
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/team-readback-probe-result.json",
+    "sha256": "a6d6ba2e7c999b020b3c2172784802d08c2ff9c32f92e1f1c548c5b7188f6a86",
+    "bytes": 5007
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/team-readback-probe.log",
+    "sha256": "452c8d11e73bcd0773e6344973b4711fcab6ca4a3a520f03b701ba1d4610ffa4",
+    "bytes": 4683
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/team-readback-probe.mjs",
+    "sha256": "2255919515ffd3df3cee377b2ddc6513d0e7a583cc0eaf95a62b3ca14afeea46",
+    "bytes": 5775
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-002/web-focused.log",
+    "sha256": "aa8d8bef75d10a98e60393c06730d945759df7573a75cd522e0b3601bc95bc10",
+    "bytes": 2223
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/code-review-CRR-003/scope-audit.json",
+    "sha256": "e1a3f1dac7b8bc63403e6c5c407c161d5aa55e38cea7f7fb07e89fb5c8a6c4cd",
+    "bytes": 1657
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/context-budget-probe-result.json",
+    "sha256": "9a1687edfb093e04db21587513895e9b5956f31c74413b7b687db744136eabe0",
+    "bytes": 2245
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/context-budget-probe.mjs",
+    "sha256": "2fba85b5cd5954a46abc87afcf516737fc72a7f928270728d233189bc5d56306",
+    "bytes": 1967
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/implementation-capacity-probe-result.json",
+    "sha256": "4db01e1f44acc0d16937a130aa9a5cd3b764f38def12522cac8104a4d3cfcb3e",
+    "bytes": 2104
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/implementation-capacity-probe.mjs",
+    "sha256": "eb517161da4096029891ef9a5a442a164f9855c974a65821d2ec7eb558363377",
+    "bytes": 2746
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/implementation-render-inspection.mjs",
+    "sha256": "4b853726c7ecc2e00a052b2cf81fd89568859f79f11a5063f18abbb16c2f4cd9",
+    "bytes": 25670
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/implementation-source-size-check.json",
+    "sha256": "ee01552d733fa5e269a046422dab61308822c6372d2f294ef67c267fdaa461d7",
+    "bytes": 4237
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/README.md",
+    "sha256": "de29108f9c233c8b7d8cf7662583193c0e7c190cc8e022bb8dd3157c513ba692",
+    "bytes": 6271
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/architecture-base-a32b53f.log",
+    "sha256": "cf4dbfc3baeedb5c844accd101240c4489b089901ddab1d85cd6663e0f2eb189",
+    "bytes": 9319
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/architecture-current.log",
+    "sha256": "1a87a1105a5d2b0baa41d91c396f5c90f4c223911c7a2ed83583664d7f018f5c",
+    "bytes": 9950
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/capacity-production-stderr.log",
+    "sha256": "3d40fb1a63858169e773ab814400062267e942a52385a5b95870f181102d85ef",
+    "bytes": 183
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/capacity-production-stdout.log",
+    "sha256": "94d8b1f224f62fc798a0ba6fa9f987b6ebd70c3bc1106ef10a90b9d8bde2bc9f",
+    "bytes": 2142
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/graphql-codegen.log",
+    "sha256": "9a7c0e89117a62ced6402482267f4fa81341d5741f7d4dc49270f0f683d16042",
+    "bytes": 550
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/server-boundaries-initial.log",
+    "sha256": "f3a37585e69ae698e30338920016a073bd5d1e5d46b13b3d01188638d531a700",
+    "bytes": 32517
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/server-commit-final.log",
+    "sha256": "1e52fde86e79f236a235893732e718f45f3d9b683f3e7d388f011dc2ce6ae748",
+    "bytes": 4408
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/server-focused.log",
+    "sha256": "5da40d032ef07ebee31d945c1ef30a06ac0467bf0c22d3550c6ae2caa9e77b1f",
+    "bytes": 6071
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/server-typecheck.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/local-checks/web-focused.log",
+    "sha256": "d2836a548367e66cbb68e4ce10bed330e8da71874169536a2426ea4f7ace077b",
+    "bytes": 5848
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/LOCAL-RENDER-failure.png",
+    "sha256": "7b922c2b0d83b2406e0dae039864c9e86b3d11981e28e9c3de158816344f9745",
+    "bytes": 80949
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/agent-new-model.png",
+    "sha256": "8d48ae0bba9f04ec62406218830d477be147e35ea39f2362b5547ea0eebcc1dc",
+    "bytes": 83801
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/agent-picker.png",
+    "sha256": "622616defc58b8853e1c692ccc80e23e1c83eb4387e6a3b0df864954a0258ce2",
+    "bytes": 80473
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/agent-saved.png",
+    "sha256": "3415a32db2e575b7f7990962da688755b1e86fc851063b85af0b1087992a8609",
+    "bytes": 91158
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/existing-run-model-config-evidence.json",
+    "sha256": "ed3ee1cd17ebea838ee6943d806c61117dbb79c1a92bb69f67bed9e9bbfc4c6a",
+    "bytes": 6248
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/initial-render-failure.json",
+    "sha256": "2f1ffe36a06e0741749a7b319237df73da0d8c889a5a802adf9e0ff83dff930d",
+    "bytes": 25341
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/nuxt-dev.log",
+    "sha256": "a4604347a83cb5ea5c287cdc091b4c24db8c4f2e6f001c6a8ec41aa1ca7c4810",
+    "bytes": 2073
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/team-narrow.png",
+    "sha256": "80d48fb34f1fcab62cff49eab8f09bb1be5859c4aea35b6864a808d4a36dd14d",
+    "bytes": 304171
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/evidence/rendered/team-propagated.png",
+    "sha256": "d22c87bdcc89e9203f1d1efa96c0a38c9602c12a257a12bbe17fa234cb403cd9",
+    "bytes": 301001
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/implementation-handoff.md",
+    "sha256": "53c15604d873133ed689af4468b0e2fffc4c3eb827d040a78931502a1876fcd7",
+    "bytes": 25587
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/implementation-revision-record.md",
+    "sha256": "b5714e36bc1f3ad82d9959a2174bd03feff279f83f7c60b80220ccf33c7b9262",
+    "bytes": 9125
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/investigation-notes.md",
+    "sha256": "cace17bee8d6eed17e296849d2288ed82a92581b8a9f02dae6a3c8825d5c10af",
+    "bytes": 26480
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/requirements-doc.md",
+    "sha256": "43e6cc533f8d58869965eac710cd19b4b0d1dbe99cb124f07a197ed8237645b9",
+    "bytes": 33753
+  },
+  {
+    "path": "tickets/in-progress/stopped-run-compatible-model/requirements-revision-record.md",
+    "sha256": "64fafbf041ff48783633584618f6aed44ee318dd8145ce311c917c49e6f94181",
+    "bytes": 8146
+  }
+]

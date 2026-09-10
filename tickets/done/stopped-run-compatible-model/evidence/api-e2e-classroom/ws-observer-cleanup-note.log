@@ -1,0 +1,1 @@
+Observed after successful WebSocket evidence persistence: cdpSession.detach: Target page, context or browser has been closed. Observer exit1 because owned tab closed before detach. PID exited; no resource leak; cleanup audited separately.

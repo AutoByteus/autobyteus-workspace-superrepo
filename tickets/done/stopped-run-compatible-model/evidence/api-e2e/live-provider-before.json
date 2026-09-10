@@ -1,0 +1,58 @@
+{
+  "path": "/root/.codex/sessions/2026/09/09/rollout-2026-09-09T14-21-48-01a0868b-deac-7ec0-94ae-b93fb14b6753.jsonl",
+  "threadId": "01a0868b-deac-7ec0-94ae-b93fb14b6753",
+  "records": [
+    {
+      "timestamp": "2026-09-09T14:22:55.071Z",
+      "type": "event_msg",
+      "payload": {
+        "type": "task_started",
+        "turn_id": "01a0868c-e245-7d11-b50e-6d41bc0878ce",
+        "model_context_window": 121600
+      }
+    },
+    {
+      "timestamp": "2026-09-09T14:22:56.876Z",
+      "type": "turn_context",
+      "payload": {
+        "turn_id": "01a0868c-e245-7d11-b50e-6d41bc0878ce",
+        "model": "gpt-5.3-codex-spark"
+      }
+    },
+    {
+      "timestamp": "2026-09-09T14:22:58.899Z",
+      "type": "event_msg",
+      "payload": {
+        "type": "token_count",
+        "info": {
+          "total_token_usage": {
+            "input_tokens": 10481,
+            "cached_input_tokens": 4352,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 108,
+            "reasoning_output_tokens": 100,
+            "total_tokens": 10589
+          },
+          "last_token_usage": {
+            "input_tokens": 10481,
+            "cached_input_tokens": 4352,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 108,
+            "reasoning_output_tokens": 100,
+            "total_tokens": 10589
+          },
+          "model_context_window": 121600
+        }
+      }
+    },
+    {
+      "timestamp": "2026-09-09T14:22:58.903Z",
+      "type": "event_msg",
+      "payload": {
+        "type": "task_complete",
+        "turn_id": "01a0868c-e245-7d11-b50e-6d41bc0878ce",
+        "last_agent_message": "Remembered"
+      }
+    }
+  ]
+}

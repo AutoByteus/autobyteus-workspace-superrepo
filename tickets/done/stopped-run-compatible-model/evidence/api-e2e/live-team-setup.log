@@ -1,0 +1,10 @@
+file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-setup.mjs:12
+const tree=JSON.parse(await fs.readFile(treePath,'utf8'));const agents=[];const visit=t=>{for(const m of t.members){if(m.kind==='agent')agents.push(m);else visit(m);}};visit(tree.rootTeam);
+                                                                                                           ^
+
+TypeError: t.members is not iterable
+    at visit (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-setup.mjs:12:108)
+    at visit (file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-setup.mjs:12:157)
+    at file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/live-team-setup.mjs:12:169
+
+Node.js v22.23.2

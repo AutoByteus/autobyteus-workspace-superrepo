@@ -1,0 +1,8 @@
+{
+  "url": "http://127.0.0.1:42291/settings",
+  "result": {
+    "body": "Back to Workspace\nAPI Keys\nToken Statistics\nMessaging\nDisplay\nLanguage\nLocal Tools\nMCP Servers\nApplication Packages\nAgent Packages\nServer Settings\nExtensions\nUpdates\nAgent Packages\n\nLink a local package path or paste a public GitHub repository URL. GitHub packages are installed into app-managed storage, while local paths remain in place.\n\nAgent package imported.\nBuilt-in Storage\nBuilt-in | Shared Agents: 2 | Team-local Agents: 0 | Teams: 0 | Applications: 0\n/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290\nBuilt-in package is platform managed.\nDefault\nautobyteus-agents\nLocal Path | Shared Agents: 8 | Team-local Agents: 54 | Teams: 14 | Applications: 0\n/home/autobyteus/workspace/autobyteus-agents\nLocal folder — reload after external changes.\nLocal Path\nReload\nRemove\nPackage Path Or GitHub URL\nImport Package",
+    "success": "Agent package imported."
+  },
+  "tab_id": "1"
+}

@@ -1,0 +1,58 @@
+{
+  "result": "Pass",
+  "at": "2026-09-10T23:05:01.299351+00:00",
+  "scenario": "Focused student explicit reattempt after switch has visible approval and delivers after UI approve",
+  "approval": [
+    {
+      "at": "2026-09-10T23:02:47.364Z",
+      "direction": "webSocketFrameReceived",
+      "payload": {
+        "type": "TOOL_APPROVAL_REQUESTED",
+        "payload": {
+          "change_sequence": 113,
+          "agent_run_id": "student_68f0238b837845c2a7cb574b2178e557",
+          "invocation_id": "exec-e61e788f-6cac-4338-946b-804cd96b8a0e",
+          "tool_name": "send_message_to",
+          "turn_id": "01a08d8f-1a0a-77b2-951f-af4221ef3fd9",
+          "arguments": {
+            "recipient_address": "/professor",
+            "content": "My completed exercise answer is ready for review in /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290/classroom/classroom-runs/multiplication-lesson/student-answer.md.",
+            "reference_files": [
+              "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290/classroom/classroom-runs/multiplication-lesson/student-answer.md"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "success": [
+    {
+      "at": "2026-09-10T23:03:25.301Z",
+      "direction": "webSocketFrameReceived",
+      "payload": {
+        "type": "TOOL_EXECUTION_SUCCEEDED",
+        "payload": {
+          "change_sequence": 123,
+          "agent_run_id": "student_68f0238b837845c2a7cb574b2178e557",
+          "invocation_id": "exec-e61e788f-6cac-4338-946b-804cd96b8a0e",
+          "tool_name": "send_message_to",
+          "turn_id": "01a08d8f-1a0a-77b2-951f-af4221ef3fd9",
+          "arguments": {
+            "recipient_address": "/professor",
+            "content": "My completed exercise answer is ready for review in /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290/classroom/classroom-runs/multiplication-lesson/student-answer.md.",
+            "reference_files": [
+              "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290/classroom/classroom-runs/multiplication-lesson/student-answer.md"
+            ]
+          },
+          "result": {
+            "accepted": true,
+            "code": "DELIVERED",
+            "message": "Delivered message to /professor.",
+            "target_agent_run_id": "professor_4f3d07980e364d4982061dacaa5c0dc9"
+          }
+        }
+      }
+    }
+  ],
+  "doesNotResolveOriginalBackgroundPendingAttempt": true
+}

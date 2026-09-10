@@ -1,0 +1,40 @@
+
+> autobyteus@1.4.68 dev /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web
+> nuxt dev --host 0.0.0.0 --port 37877
+
+│
+▲  Changing NODE_ENV from production to development, to avoid unintended behavior.
+│
+●  Nuxt 3.21.1 (with Nitro 2.13.1, Vite 7.3.1 and Vue 3.5.28)
+
+ 
+              █▀▀▀▀▀▀▀██▀███▀▀███▀▀▀▀▀▀▀█
+              █ █▀▀▀█ █▄ ▀ ▄▄█ ██ █▀▀▀█ █
+              █ █   █ █▄▄▀▄▀▄▀█▄█ █   █ █
+              █ ▀▀▀▀▀ █ █ █▀▄▀▄▀█ ▀▀▀▀▀ █
+              █▀▀▀▀▀█▀▀▀▀▀█ ▀▄█▄▀█▀█▀█▀██
+              █▀█ ██▀▀█▄ █▀▀▀ ▀█▄▀▀▀▀█ ▀█
+              █▄  ▄▀█▀▀  ▄ █▀▄ ▀█▀ ▀█▀▀ █
+              █ ██ ▀█▀█▀▄ █▄▄▄▀█▀█▀█ █ ▀█
+              █ █▄▀██▀  ▄▀█ ▀██ ▀▀▀▀▄▀█▄█
+              █▀▀▀▀▀▀▀█ █ ▀▀▀ ▄ █▀█   ▀▀█
+              █ █▀▀▀█ █▀▄  ▀▀▄  ▀▀▀  ▀█▄█
+              █ █   █ █ ███▄▀ █▄▀▄▄▄█ ▄ █
+              █ ▀▀▀▀▀ █ █  ▀▀▄▀▄▀    ▀▀ █
+              ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+ 
+  ➜ Local:    http://0.0.0.0:37877/
+  ➜ Network:  http://172.17.0.8:37877/ [QR code]
+
+isElectronBuild false
+[Electron Module] Skipping electron module setup: BUILD_TARGET is not electron
+✔ Vite client built in 40ms
+
+ WARN  Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+✔ Vite server built in 907ms
+[nitro] ✔ Nuxt Nitro server built in 1155ms
+ℹ Vite client warmed up in 1ms
+ ELIFECYCLE  Command failed.

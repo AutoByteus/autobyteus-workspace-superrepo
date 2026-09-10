@@ -1,0 +1,104 @@
+{
+  "at": "2026-09-10T22:57:09.663Z",
+  "status": 200,
+  "operationName": "TeamRunModelOptions",
+  "variables": {
+    "teamRunId": "classroom_simulation_team_e9eca93f43d34342851d79f7563ec58f"
+  },
+  "result": {
+    "data": {
+      "teamRunModelOptions": [
+        {
+          "scopeKind": "CONFIGURED_TEAM",
+          "scopeAddress": "/",
+          "currentModelIdentifier": "gpt-5.6-luna",
+          "currentContextTokens": 272000,
+          "unavailableReason": null,
+          "replacements": [
+            {
+              "llmModelIdentifier": "gpt-6-astra",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.6-sol",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.6-terra",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.5",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            }
+          ],
+          "__typename": "TeamScopeModelOptionsObject"
+        },
+        {
+          "scopeKind": "CONFIGURED_AGENT",
+          "scopeAddress": "/professor",
+          "currentModelIdentifier": "gpt-5.6-luna",
+          "currentContextTokens": 272000,
+          "unavailableReason": null,
+          "replacements": [
+            {
+              "llmModelIdentifier": "gpt-6-astra",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.6-sol",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.6-terra",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.5",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            }
+          ],
+          "__typename": "TeamScopeModelOptionsObject"
+        },
+        {
+          "scopeKind": "CONFIGURED_AGENT",
+          "scopeAddress": "/student",
+          "currentModelIdentifier": "gpt-5.6-luna",
+          "currentContextTokens": 272000,
+          "unavailableReason": null,
+          "replacements": [
+            {
+              "llmModelIdentifier": "gpt-6-astra",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.6-sol",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.6-terra",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            },
+            {
+              "llmModelIdentifier": "gpt-5.5",
+              "contextTokens": 272000,
+              "__typename": "RunModelOptionObject"
+            }
+          ],
+          "__typename": "TeamScopeModelOptionsObject"
+        }
+      ]
+    }
+  }
+}

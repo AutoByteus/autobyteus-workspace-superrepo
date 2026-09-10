@@ -1,0 +1,31 @@
+{
+  "revision": "API-REV-003",
+  "case": "API-C20",
+  "checkedAt": "2026-09-10T23:23:14.505828+00:00",
+  "mode": "retained-evidence",
+  "result": "Pass",
+  "checks": {
+    "all214PreservedFilesUnchanged": true,
+    "trackedFilesUnchangedSinceIntake": true,
+    "indexUnchanged": true,
+    "headUnchanged": true,
+    "threeDurableHashesMatchAPI_REV_001": true,
+    "allThreeScopesLunaBeforeAstraAfter": true,
+    "allThreeScopesKeepCodexRuntime": true,
+    "fixedTreeUnchangedAcrossSave": true,
+    "localHistoryAndWorkspaceUnchangedAcrossSave": true,
+    "providerIDsAndFullTranscriptHashesUnchangedAcrossSave": true,
+    "savedTreeUnchangedThroughBothContinuations": true,
+    "singleStoppedSaveExactThreePatches": true,
+    "bothMembersHaveOriginalLunaAndCompletedAstraTurn": true,
+    "retainedOriginalProviderRecordsCorroborateBothProofs": true,
+    "bothEarlierFactsRetained": true,
+    "historicalResultsRetained": true,
+    "separateIssueEvidenceAndExactUserConfirmationRetained": true,
+    "deliveryAppImageStillMatchesDR002": true
+  },
+  "preservedFileCount": 214,
+  "changedPreservedPaths": [],
+  "newRuntimeOrSuiteExecution": false,
+  "changedProductionOrDurablePaths": []
+}

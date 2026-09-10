@@ -1,0 +1,89 @@
+Agents
+Agent Teams
+Skills
+Memory
+Nodes
+Workspaces
+Temp Workspace
+workspace
+A
+api-model-live-1788963702207
+(1)
+Remember this exact private test label for later in THIS conversation: violet-otter-6842. Reply only "Remembered". Do not use tools.
+now
+Settings
+Agent Configuration
+Agent Definition
+api-model-live-1788963702207
+Runtime
+AutoByteus
+Codex App Server
+Claude Agent SDK
+
+Runtime is fixed. Replacement models must have at least the saved model’s context capacity.
+
+LLM Model
+OpenAI / GPT-5.6-Terra (default reasoning: medium)
+
+Runtime is fixed. Replacement models must have at least the saved model’s context capacity.
+
+Thinking
+
+Use the model settings below to control thinking.
+
+Use setting
+Advanced
+Reasoning Effort ⓘ
+low
+medium
+high
+xhigh
+max
+ultra
+Fast mode ⓘ
+Default
+fast
+Workspace Directory
+Existing
+New
+workspace
+/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+
+Workspace is fixed for existing runs.
+
+Auto approve tools
+
+High-trust mode for Codex: automatically allows tool calls and access/permission requests for this run.
+
+Auto approve tools
+●
+This run is stopped. Saved model settings will be used when it resumes.
+Save
+Files
+Terminal
+Activity
+Token
+Artifacts
+VNC Viewer
+To-Do
+0 Tasks
+Activity
+2 Events
+System instructions
+AutoByteus-supplied · Codex baseInstructions
+Captured Sep 9, 2026, 2:21:48 PM · 251 characters
+AVAILABLE
+Memory compaction
+#d09c25
+
+Provider context compaction boundary recorded
+
+COMPLETED
+Turn
+01a08690-bf9f-7e72-8a0c-79e720d09c25
+Provider
+codex
+Boundary
+codex:01a0868b-deac-7ec0-94ae-b93fb14b6753:01a08690-d452-7963-82b5-14c0beb390ef
+Source
+codex.context_compaction_completed

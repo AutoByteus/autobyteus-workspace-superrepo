@@ -981,13 +981,30 @@ canonical Agent or Team resume configuration whenever Settings is entered. A
 cached history response may relock an in-flight view when activity appears, but
 it cannot unlock a run or replace the Settings-owned network read.
 
-The existing-run surface keeps runtime, model, workspace, automatic-tool policy,
+The existing-run surface keeps runtime, workspace, automatic-tool policy,
 definition identity, provider binding, concrete run IDs, Team topology, and
-addresses fixed. Only current-schema `llmConfig` controls can become editable,
+addresses fixed. A same-runtime model selector and current-schema `llmConfig`
+controls can become editable,
 and only when the canonical response says the run is present, unarchived, and
 inactive. Agent and Team disclosures remain usable while locked so users can
 inspect the persisted hierarchy and model fields. There is no existing-run
-runtime/model selector, workspace editor, launch button, or Reset action.
+runtime selector, workspace editor, launch button, or Reset action.
+
+Replacement choices come from server-owned options for the saved run/scope:
+both current and target context capacities must be verified, and the target
+must be at least as large. Smaller or unknown-capacity replacements are not
+offered; unavailable metadata keeps the saved model visible with an explanation.
+Same-model settings remain available when the normal catalog/schema and
+editability checks pass, even if replacement capacity is unavailable. Save
+revalidates against the fresh saved model, so after an upgrade a smaller former
+model is not automatically eligible. There is no additional output/input-budget,
+tokenizer, or compaction-threshold matching requirement.
+
+Selecting a different model changes one draft pair, clears the former model's
+explicit settings using the existing picker convention, and displays the
+target schema/default controls for review before explicit Save. Merely showing
+a default does not persist it. A model-only change is dirty; settings edits keep
+the selected model. Keyboard selection and existing feedback remain available.
 
 General Process activity and Application ownership are both locks. A normal
 Application binding in `ATTACHED`, `TERMINATING`, or `FAILED` state remains live
@@ -999,10 +1016,14 @@ inconsistent evidence fails closed rather than showing a false editable state.
 `existingRunModelConfigStore` owns one local draft. Leaving the selection or
 Settings discards unsaved values. For a Team,
 `existingTeamModelConfigDraft.ts` starts from the exact V2 execution tree: a
-Team-scope edit propagates only through descendants that still share the same
-starting value, while already-divergent and directly edited branches remain
-unchanged. The mutation sends exact configured-Team/configured-Agent scope
-patches; task nodes and fixed identity are never patch targets. Historical Team
+Team-scope pair edit propagates only through draft-start links based on matching
+runtime, model, and settings. Already-divergent or explicitly directly edited
+branches remain unchanged; direct edits stay sticky for that draft even if they
+later equal the parent. Mixed-runtime branches do not link. The mutation sends
+exact configured-Team/configured-Agent scope pairs; task nodes and fixed
+identity are never patch targets. Every intended scope must pass its own saved
+baseline and target-schema validation; invalid descendants block Save rather
+than disappearing from the patch set. Historical Team
 snapshots do not retain override provenance, so stopped-run editing deliberately
 has no Reset-to-definition behavior.
 
@@ -1010,22 +1031,33 @@ Current schemas control safe editing. Exactly representable persisted values use
 the normal controls. Unsupported, stale, or otherwise unrepresentable explicit
 values remain visible as historical residuals instead of being normalized,
 duplicated, or silently written back. Missing catalog/schema state keeps Save
-locked. The server revalidates every Agent/Team scope against its own fixed
-runtime/model and returns field-addressed validation errors when applicable.
+locked. These residual rules describe the unchanged saved model, not transfer
+of old settings into a replacement. The server revalidates every Agent/Team
+scope against its fixed runtime and selected model, returning field-addressed
+validation errors when applicable.
 
 Save is enabled only for a stopped, editable, schema-ready, changed draft. The
 revision-free mutations are `updateStoppedAgentRunModelConfig` and
-`updateStoppedTeamRunModelConfigs`; a no-op produces no write. Determinate
-responses replace the cached canonical state. If another supported workflow
+`updateStoppedTeamRunModelConfigs`. Each command/patch requires both
+`llmModelIdentifier` and explicitly present nullable `llmConfig`; a whole-pair
+no-op produces no write. Agent results return `canonicalSelection`; Team
+results retain `canonicalExecutionTree`. Determinate responses replace the
+cached canonical state. If another supported workflow
 restores the run first, the response relocks as `RUN_ACTIVE`. A physically
 uncertain result triggers canonical verification and blocks another Save until
-refresh/retry resolves it. There is no optimistic configuration revision,
+refresh/Retry resolves it. A failed verification retains the lock and offers
+Retry; successful verification installs the canonical pair/tree and clears stale
+feedback. Verification retries the read, not the write or a rollback. There is
+no optimistic configuration revision,
 retained-draft rebase, or multi-client merge policy.
 
-A successful Save changes persisted model settings only. It does not hot-mutate
-an active backend. The next eligible restore of the same Agent/Team/provider
-identity consumes the saved `llmConfig`; AutoByteus, Codex, and Claude apply
-their supported schema fields at bootstrap/session construction. Status, error,
+A successful Save changes only the persisted model/settings pair. It does not
+start or hot-mutate a backend, create a conversation, compact history, or reset
+retained compaction state. The next normal message/eligible restore of the same
+Agent/Team/provider identity consumes that pair; runtime adapters apply their
+supported fields at bootstrap/session construction. Ordinary later compaction
+uses the existing algorithm, without promising identical timing across models.
+Status, error,
 validation, success, saving, verification, and retry messages use the existing
 accessible announcement and focus boundaries.
 

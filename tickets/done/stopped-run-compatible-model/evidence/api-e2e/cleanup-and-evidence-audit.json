@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-09-09T14:43:32.990015+00:00",
+  "ownedCleanupChecks": {
+    "runtimeRemoved": true,
+    "databaseRemoved": true,
+    "fixturePageRemoved": true,
+    "pid71672Exited": true,
+    "pid71686Exited": true,
+    "pid72259Exited": true,
+    "pid72436Exited": true
+  },
+  "potentialSecretPatternCounts": {},
+  "secretScanScope": "Only this evidence directory; heuristic, not universal secret detector. No credentials intentionally recorded.",
+  "providerRecords": "Exactly 3 newly created live test session transcripts retained in CLI-owned history; shared CLI auth/config/database not reset."
+}

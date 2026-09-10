@@ -1,0 +1,748 @@
+{
+  "startedAt": "2026-09-09T14:37:22.836Z",
+  "platform": "linux-arm64",
+  "node": "v22.23.2",
+  "browserExecutable": "/usr/bin/chromium",
+  "webDir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web",
+  "fixturePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/fixtures/existing-run-model-config.page.vue",
+  "installedPagePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/pages/api-e2e-existing-run-model-config.vue",
+  "routePath": "/api-e2e-existing-run-model-config",
+  "graphqlOperations": [
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetRuntimeAvailabilities",
+      "variables": {}
+    },
+    {
+      "operationName": "GetProviderModelCatalogSnapshots",
+      "variables": {
+        "runtimeKind": "autobyteus"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedAgentRunModelConfig",
+      "variables": {
+        "input": {
+          "agentRunId": "agent-run-browser-1",
+          "llmModelIdentifier": "gpt-5.6-luna",
+          "llmConfig": {
+            "reasoning_effort": "high",
+            "reasoning_summary": "auto"
+          }
+        }
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedTeamRunModelConfigs",
+      "variables": {
+        "input": {
+          "teamRunId": "team-run-browser-1",
+          "patches": [
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/reviewer",
+              "llmModelIdentifier": "gpt-5.6-luna",
+              "llmConfig": {
+                "reasoning_effort": "high",
+                "reasoning_summary": "auto"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedAgentRunModelConfig",
+      "variables": {
+        "input": {
+          "agentRunId": "agent-run-browser-1",
+          "llmModelIdentifier": "gpt-5.6-luna",
+          "llmConfig": {
+            "reasoning_effort": "low",
+            "reasoning_summary": "auto"
+          }
+        }
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedTeamRunModelConfigs",
+      "variables": {
+        "input": {
+          "teamRunId": "team-run-browser-1",
+          "patches": [
+            {
+              "scopeKind": "CONFIGURED_TEAM",
+              "scopeAddress": "/",
+              "llmModelIdentifier": "browser-larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/coordinator",
+              "llmModelIdentifier": "browser-larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_TEAM",
+              "scopeAddress": "/Nested",
+              "llmModelIdentifier": "browser-larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/lead",
+              "llmModelIdentifier": "browser-larger-model",
+              "llmConfig": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    }
+  ],
+  "scenarios": {
+    "API-E2E-004-A": {
+      "id": "API-E2E-004-A",
+      "description": "Agent Settings loads network-fresh, locks runtime identity, and saves a same-model selection",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:37:31.549Z",
+      "finishedAt": "2026-09-09T14:37:34.724Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "agentRunId": "agent-run-browser-1",
+            "llmModelIdentifier": "gpt-5.6-luna",
+            "llmConfig": {
+              "reasoning_effort": "high",
+              "reasoning_summary": "auto"
+            }
+          }
+        },
+        "resumeReads": 1
+      }
+    },
+    "API-E2E-004-B": {
+      "id": "API-E2E-004-B",
+      "description": "Full nested Team Settings renders and saves one exact configured-Agent patch",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:37:34.725Z",
+      "finishedAt": "2026-09-09T14:37:36.174Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "teamRunId": "team-run-browser-1",
+            "patches": [
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/Nested/reviewer",
+                "llmModelIdentifier": "gpt-5.6-luna",
+                "llmConfig": {
+                  "reasoning_effort": "high",
+                  "reasoning_summary": "auto"
+                }
+              }
+            ]
+          }
+        },
+        "renderedMembers": 3,
+        "resumeReads": 1
+      }
+    },
+    "API-E2E-004-C": {
+      "id": "API-E2E-004-C",
+      "description": "Narrow browser viewport keeps the existing Team Settings editor usable without page overflow",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:37:36.176Z",
+      "finishedAt": "2026-09-09T14:37:36.249Z",
+      "details": {
+        "viewportWidth": 390,
+        "documentScrollWidth": 390,
+        "saveRect": {
+          "left": 33,
+          "right": 357,
+          "width": 324,
+          "top": 776.890625,
+          "bottom": 814.890625
+        }
+      }
+    },
+    "API-E2E-004-D": {
+      "id": "API-E2E-004-D",
+      "description": "A supported external activation makes an already-open Agent Save return RUN_ACTIVE and relock",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:37:36.249Z",
+      "finishedAt": "2026-09-09T14:37:36.735Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "agentRunId": "agent-run-browser-1",
+            "llmModelIdentifier": "gpt-5.6-luna",
+            "llmConfig": {
+              "reasoning_effort": "low",
+              "reasoning_summary": "auto"
+            }
+          }
+        },
+        "resumeReadsBeforeSave": 2,
+        "resumeReadsAfterSave": 2
+      }
+    },
+    "API-E2E-004-E": {
+      "id": "API-E2E-004-E",
+      "description": "Compatible Agent replacement uses keyboard selection, target defaults and the complete canonical pair",
+      "status": "Fail",
+      "startedAt": "2026-09-09T14:37:36.736Z",
+      "finishedAt": "2026-09-09T14:38:06.864Z",
+      "failure": {
+        "id": "API-E2E-004-E",
+        "description": "Compatible Agent replacement uses keyboard selection, target defaults and the complete canonical pair",
+        "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-runtime-kind').locator('../following-sibling::div[1]//button').first()\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" aria-controls=\"v-12\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors duration-200 focus:outline-none border border-transparent bg-blue-50/40 text-gray-900 ring-1 ring-inset ring-blue-100/80 hover:bg-blue-50/70 hover:ring-blue-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/50 cursor-not-allowed opacity-50\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+        "browserState": {
+          "bodyText": "Stopped run model-settings fixture\n\nActual Settings editor with deterministic GraphQL boundaries.\n\nAgent settings\nTeam settings\nAgent Definition\nBrowser Probe Agent\nRuntime\nAutoByteus\n\nRuntime is fixed. Replacement models must have at least the saved model’s context capacity.\n\nLLM Model\nOpenAI / gpt-5.6-luna\n\nRuntime is fixed. Replacement models must have at least the saved model’s context capacity.\n\nThinking\n\nUse the model settings below to control thinking.\n\nUse setting\nAdvanced\nReasoning Effort\nlow\nhigh\nReasoning Summary\nnone\nauto\nWorkspace Directory\nExisting\nNew\nSelect a workspace...\n\nWorkspace is fixed for existing runs.\n\nAuto approve tools\n\nHigh-trust mode for Codex: automatically allows tool calls and access/permission requests for this run.\n\nAuto approve tools\n🔒\nStop this run before changing model settings.\nSave",
+          "catalogByRuntimeKind": {
+            "autobyteus": {
+              "runtimeKind": "autobyteus",
+              "currentRequestId": 1,
+              "state": "ready",
+              "hasSuccessfulPayload": true,
+              "providersById": {
+                "OPENAI": {
+                  "__typename": "ProviderModelCatalogSnapshotObject",
+                  "runtimeKind": "autobyteus",
+                  "ownerProvider": {
+                    "__typename": "CatalogProviderObject",
+                    "id": "OPENAI",
+                    "name": "OpenAI",
+                    "providerType": "OPENAI",
+                    "isCustom": false,
+                    "baseUrl": null,
+                    "catalogMode": "STATIC"
+                  },
+                  "sources": [
+                    {
+                      "__typename": "ModelSourceStatusObject",
+                      "modelKind": "LLM",
+                      "state": "READY",
+                      "modelCount": 1,
+                      "successfulUnitCount": 1,
+                      "failedUnitCount": 0,
+                      "safeMessage": null
+                    }
+                  ],
+                  "llmModels": [
+                    {
+                      "__typename": "ModelDetail",
+                      "modelIdentifier": "gpt-5.6-luna",
+                      "name": "GPT-5.6 Luna",
+                      "description": "Deterministic browser fixture model.",
+                      "value": "gpt-5.6-luna",
+                      "canonicalName": "gpt-5.6-luna",
+                      "providerId": "OPENAI",
+                      "providerName": "OpenAI",
+                      "providerType": "OPENAI",
+                      "runtime": "autobyteus",
+                      "hostUrl": null,
+                      "configSchema": {
+                        "type": "object",
+                        "properties": {
+                          "reasoning_effort": {
+                            "type": "string",
+                            "title": "Reasoning Effort",
+                            "enum": [
+                              "low",
+                              "high"
+                            ],
+                            "default": "low"
+                          },
+                          "reasoning_summary": {
+                            "type": "string",
+                            "title": "Reasoning Summary",
+                            "enum": [
+                              "none",
+                              "auto"
+                            ],
+                            "default": "auto"
+                          }
+                        }
+                      },
+                      "maxContextTokens": 128000,
+                      "activeContextTokens": 128000,
+                      "maxInputTokens": 120000,
+                      "maxOutputTokens": 8000,
+                      "metadataProvenance": null
+                    },
+                    {
+                      "__typename": "ModelDetail",
+                      "modelIdentifier": "browser-larger-model",
+                      "name": "Browser Larger Model",
+                      "description": "Deterministic browser fixture model.",
+                      "value": "browser-larger-model",
+                      "canonicalName": "browser-larger-model",
+                      "providerId": "OPENAI",
+                      "providerName": "OpenAI",
+                      "providerType": "OPENAI",
+                      "runtime": "autobyteus",
+                      "hostUrl": null,
+                      "configSchema": {
+                        "type": "object",
+                        "properties": {
+                          "reasoning_effort": {
+                            "type": "string",
+                            "title": "Reasoning Effort",
+                            "enum": [
+                              "low",
+                              "high"
+                            ],
+                            "default": "low"
+                          },
+                          "reasoning_summary": {
+                            "type": "string",
+                            "title": "Reasoning Summary",
+                            "enum": [
+                              "none",
+                              "auto"
+                            ],
+                            "default": "auto"
+                          }
+                        }
+                      },
+                      "maxContextTokens": 272000,
+                      "activeContextTokens": 272000,
+                      "maxInputTokens": 120000,
+                      "maxOutputTokens": 8000,
+                      "metadataProvenance": null
+                    }
+                  ],
+                  "audioModels": [],
+                  "imageModels": [],
+                  "videoModels": []
+                }
+              },
+              "errorMessage": null
+            }
+          },
+          "draftState": {
+            "draft": {
+              "kind": "agent",
+              "runId": "agent-run-browser-1",
+              "isActive": true,
+              "editability": {
+                "editable": false,
+                "reason": "RUN_ACTIVE"
+              },
+              "metadata": {
+                "agentDefinitionId": "agent-definition-browser-1",
+                "workspaceRootPath": "/workspace/browser-probe",
+                "llmModelIdentifier": "gpt-5.6-luna",
+                "llmConfig": {
+                  "reasoning_effort": "high",
+                  "reasoning_summary": "auto"
+                },
+                "autoExecuteTools": false,
+                "skillAccessMode": "PRELOADED_ONLY",
+                "runtimeKind": "autobyteus",
+                "runtimeReference": {
+                  "runtimeKind": "autobyteus",
+                  "sessionId": null,
+                  "threadId": null,
+                  "metadata": null
+                }
+              },
+              "draftSelection": {
+                "llmModelIdentifier": "gpt-5.6-luna",
+                "llmConfig": {
+                  "reasoning_effort": "high",
+                  "reasoning_summary": "auto"
+                }
+              }
+            },
+            "schemaStateByAddress": {
+              "/": {
+                "status": "ready",
+                "message": null
+              }
+            },
+            "feedback": null
+          }
+        },
+        "stack": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-runtime-kind').locator('../following-sibling::div[1]//button').first()\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" aria-controls=\"v-12\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors duration-200 focus:outline-none border border-transparent bg-blue-50/40 text-gray-900 ring-1 ring-inset ring-blue-100/80 hover:bg-blue-50/70 hover:ring-blue-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/50 cursor-not-allowed opacity-50\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs:627:18\n    at async runScenario (/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs:411:21)\n    at async file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs:614:3"
+      }
+    },
+    "API-E2E-004-F": {
+      "id": "API-E2E-004-F",
+      "description": "Team replacement preserves divergent branch and verifies an indeterminate outcome with Retry, never a duplicate Save",
+      "status": "Pass",
+      "startedAt": "2026-09-09T14:38:06.934Z",
+      "finishedAt": "2026-09-09T14:38:07.646Z",
+      "details": {
+        "mutation": {
+          "input": {
+            "teamRunId": "team-run-browser-1",
+            "patches": [
+              {
+                "scopeKind": "CONFIGURED_TEAM",
+                "scopeAddress": "/",
+                "llmModelIdentifier": "browser-larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/coordinator",
+                "llmModelIdentifier": "browser-larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_TEAM",
+                "scopeAddress": "/Nested",
+                "llmModelIdentifier": "browser-larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/Nested/lead",
+                "llmModelIdentifier": "browser-larger-model",
+                "llmConfig": null
+              }
+            ]
+          }
+        },
+        "verificationReads": 2
+      }
+    }
+  },
+  "browserEvents": [
+    {
+      "type": "console:debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Initializing server config"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Not in Electron environment. Skipping server initialization."
+    },
+    {
+      "type": "console:info",
+      "text": "<Suspense> is an experimental feature and its API will likely change."
+    },
+    {
+      "type": "console:log",
+      "text": "ServerLoading: Component mounted with status: running"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Checking server health at /rest/health"
+    },
+    {
+      "type": "console:error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+    },
+    {
+      "type": "console:log",
+      "text": "Download the Apollo DevTools for a better development experience: %s https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm"
+    }
+  ],
+  "failures": [
+    {
+      "id": "API-E2E-004-E",
+      "description": "Compatible Agent replacement uses keyboard selection, target defaults and the complete canonical pair",
+      "message": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-runtime-kind').locator('../following-sibling::div[1]//button').first()\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" aria-controls=\"v-12\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors duration-200 focus:outline-none border border-transparent bg-blue-50/40 text-gray-900 ring-1 ring-inset ring-blue-100/80 hover:bg-blue-50/70 hover:ring-blue-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/50 cursor-not-allowed opacity-50\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+      "browserState": {
+        "bodyText": "Stopped run model-settings fixture\n\nActual Settings editor with deterministic GraphQL boundaries.\n\nAgent settings\nTeam settings\nAgent Definition\nBrowser Probe Agent\nRuntime\nAutoByteus\n\nRuntime is fixed. Replacement models must have at least the saved model’s context capacity.\n\nLLM Model\nOpenAI / gpt-5.6-luna\n\nRuntime is fixed. Replacement models must have at least the saved model’s context capacity.\n\nThinking\n\nUse the model settings below to control thinking.\n\nUse setting\nAdvanced\nReasoning Effort\nlow\nhigh\nReasoning Summary\nnone\nauto\nWorkspace Directory\nExisting\nNew\nSelect a workspace...\n\nWorkspace is fixed for existing runs.\n\nAuto approve tools\n\nHigh-trust mode for Codex: automatically allows tool calls and access/permission requests for this run.\n\nAuto approve tools\n🔒\nStop this run before changing model settings.\nSave",
+        "catalogByRuntimeKind": {
+          "autobyteus": {
+            "runtimeKind": "autobyteus",
+            "currentRequestId": 1,
+            "state": "ready",
+            "hasSuccessfulPayload": true,
+            "providersById": {
+              "OPENAI": {
+                "__typename": "ProviderModelCatalogSnapshotObject",
+                "runtimeKind": "autobyteus",
+                "ownerProvider": {
+                  "__typename": "CatalogProviderObject",
+                  "id": "OPENAI",
+                  "name": "OpenAI",
+                  "providerType": "OPENAI",
+                  "isCustom": false,
+                  "baseUrl": null,
+                  "catalogMode": "STATIC"
+                },
+                "sources": [
+                  {
+                    "__typename": "ModelSourceStatusObject",
+                    "modelKind": "LLM",
+                    "state": "READY",
+                    "modelCount": 1,
+                    "successfulUnitCount": 1,
+                    "failedUnitCount": 0,
+                    "safeMessage": null
+                  }
+                ],
+                "llmModels": [
+                  {
+                    "__typename": "ModelDetail",
+                    "modelIdentifier": "gpt-5.6-luna",
+                    "name": "GPT-5.6 Luna",
+                    "description": "Deterministic browser fixture model.",
+                    "value": "gpt-5.6-luna",
+                    "canonicalName": "gpt-5.6-luna",
+                    "providerId": "OPENAI",
+                    "providerName": "OpenAI",
+                    "providerType": "OPENAI",
+                    "runtime": "autobyteus",
+                    "hostUrl": null,
+                    "configSchema": {
+                      "type": "object",
+                      "properties": {
+                        "reasoning_effort": {
+                          "type": "string",
+                          "title": "Reasoning Effort",
+                          "enum": [
+                            "low",
+                            "high"
+                          ],
+                          "default": "low"
+                        },
+                        "reasoning_summary": {
+                          "type": "string",
+                          "title": "Reasoning Summary",
+                          "enum": [
+                            "none",
+                            "auto"
+                          ],
+                          "default": "auto"
+                        }
+                      }
+                    },
+                    "maxContextTokens": 128000,
+                    "activeContextTokens": 128000,
+                    "maxInputTokens": 120000,
+                    "maxOutputTokens": 8000,
+                    "metadataProvenance": null
+                  },
+                  {
+                    "__typename": "ModelDetail",
+                    "modelIdentifier": "browser-larger-model",
+                    "name": "Browser Larger Model",
+                    "description": "Deterministic browser fixture model.",
+                    "value": "browser-larger-model",
+                    "canonicalName": "browser-larger-model",
+                    "providerId": "OPENAI",
+                    "providerName": "OpenAI",
+                    "providerType": "OPENAI",
+                    "runtime": "autobyteus",
+                    "hostUrl": null,
+                    "configSchema": {
+                      "type": "object",
+                      "properties": {
+                        "reasoning_effort": {
+                          "type": "string",
+                          "title": "Reasoning Effort",
+                          "enum": [
+                            "low",
+                            "high"
+                          ],
+                          "default": "low"
+                        },
+                        "reasoning_summary": {
+                          "type": "string",
+                          "title": "Reasoning Summary",
+                          "enum": [
+                            "none",
+                            "auto"
+                          ],
+                          "default": "auto"
+                        }
+                      }
+                    },
+                    "maxContextTokens": 272000,
+                    "activeContextTokens": 272000,
+                    "maxInputTokens": 120000,
+                    "maxOutputTokens": 8000,
+                    "metadataProvenance": null
+                  }
+                ],
+                "audioModels": [],
+                "imageModels": [],
+                "videoModels": []
+              }
+            },
+            "errorMessage": null
+          }
+        },
+        "draftState": {
+          "draft": {
+            "kind": "agent",
+            "runId": "agent-run-browser-1",
+            "isActive": true,
+            "editability": {
+              "editable": false,
+              "reason": "RUN_ACTIVE"
+            },
+            "metadata": {
+              "agentDefinitionId": "agent-definition-browser-1",
+              "workspaceRootPath": "/workspace/browser-probe",
+              "llmModelIdentifier": "gpt-5.6-luna",
+              "llmConfig": {
+                "reasoning_effort": "high",
+                "reasoning_summary": "auto"
+              },
+              "autoExecuteTools": false,
+              "skillAccessMode": "PRELOADED_ONLY",
+              "runtimeKind": "autobyteus",
+              "runtimeReference": {
+                "runtimeKind": "autobyteus",
+                "sessionId": null,
+                "threadId": null,
+                "metadata": null
+              }
+            },
+            "draftSelection": {
+              "llmModelIdentifier": "gpt-5.6-luna",
+              "llmConfig": {
+                "reasoning_effort": "high",
+                "reasoning_summary": "auto"
+              }
+            }
+          },
+          "schemaStateByAddress": {
+            "/": {
+              "status": "ready",
+              "message": null
+            }
+          },
+          "feedback": null
+        }
+      },
+      "stack": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#agent-run-runtime-kind').locator('../following-sibling::div[1]//button').first()\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"button\" aria-controls=\"v-12\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors duration-200 focus:outline-none border border-transparent bg-blue-50/40 text-gray-900 ring-1 ring-inset ring-blue-100/80 hover:bg-blue-50/70 hover:ring-blue-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/50 cursor-not-allowed opacity-50\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not enabled\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs:627:18\n    at async runScenario (/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs:411:21)\n    at async file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs:614:3"
+    }
+  ],
+  "cleanup": {
+    "context": "closed",
+    "browser": "closed",
+    "devServer": {
+      "status": "terminated",
+      "pid": 84433,
+      "initialExitCode": null,
+      "initialSignalCode": null,
+      "sigtermTarget": "process-group",
+      "exitedAfterSigterm": true,
+      "finalExitCode": null,
+      "finalSignalCode": "SIGTERM",
+      "processGroupExited": true
+    },
+    "devLog": "closed",
+    "temporaryPage": "removed"
+  },
+  "port": 38101,
+  "baseUrl": "http://127.0.0.1:38101",
+  "finishedAt": "2026-09-09T14:38:08.125Z",
+  "result": "Fail"
+}

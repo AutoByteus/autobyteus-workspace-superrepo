@@ -1,0 +1,33 @@
+{
+  "observedAt": "2026-09-09T14:49:33.657149+00:00",
+  "baseHead": "5f7a9b47e228e25529f5bd0acf80ea3a2142d303",
+  "productionSourceChangedByApiStage": false,
+  "commitByApiStage": null,
+  "paths": [
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/e2e/run-history/stopped-run-model-config-graphql.e2e.test.ts",
+      "sha256": "0ac2bbf8a92d0f21435ee6611f33fc3d867ef11bebb677d4a8f178cbabe1ab37",
+      "lines": 673
+    },
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/integration/agent-team-execution/agent-team-run-manager.integration.test.ts",
+      "sha256": "c9260586563a630de4eac8b36547b2bb7b8d1dbf392e6771b03865de05df3581",
+      "lines": 586
+    },
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs",
+      "sha256": "5403766af60da6bdc37670dec73b74735d218586e4c6f06bb692c8fabc66b887",
+      "lines": 711
+    }
+  ],
+  "removedPaths": [],
+  "diffCheck": {
+    "exit": 0,
+    "output": ""
+  },
+  "browserSyntaxCheck": {
+    "exit": 0,
+    "output": ""
+  },
+  "notes": "Only these 3 durable test paths belong to API stage; upstream reviewer changes and untracked SDK dist excluded. Integration final change since C10 is indentation only."
+}
