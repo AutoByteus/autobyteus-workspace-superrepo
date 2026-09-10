@@ -11,3 +11,6 @@
 Initial DR-003 commands: `git fetch origin personal`, `git log --oneline HEAD..origin/personal` (empty), `git merge --no-edit origin/personal` (Already up to date). Base remains a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27. No executable rerun required for unchanged reviewed candidate; no new confidence score awarded by Delivery.
 
 Archive moves only this ticket from tickets/in-progress to tickets/done. Upstream reports/logs/manifests retain historical absolute provenance paths; resolve ticket-local references under the archived final ticket path. No upstream failure history is rewritten. Final repository result and cleanup evidence will be recorded after commands complete.
+
+## Completed Repository Gates
+`repository-finalization.json` records ticket commit/push, target refresh/no-ff merge/push, recovered TLS transport attempt and safe cleanup. Merge tree exactly equals finalized ticket tree. `finalization-checks.json` distinguishes raw-evidence whitespace diagnostics from passing source/test/doc and repository hygiene checks. All incoming upstream files remain archived/byte-preserved except Delivery-owned canonical reports intentionally superseded with prior snapshots retained. Final containing-record commit/push receipt is external with preserved build and referenced in canonical reports, avoiding self-referential commit hashes.

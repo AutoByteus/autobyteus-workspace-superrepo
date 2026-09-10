@@ -1,0 +1,22 @@
+{
+  "observedAt": "2026-09-10T23:35:43.786508+00:00",
+  "deliveryRevision": "DR-003",
+  "result": "Delivery Completed \u2014 repository integration/push/cleanup gates satisfied; final record synchronization follows",
+  "ticketCommit": "65023a08a8acc1bb9ad9ec6291bc2168ed89bd3a",
+  "ticketPush": "Completed \u2014 remote branch verified",
+  "target": "origin/personal",
+  "mergeCommit": "e9ccdfc4e81059b03c1f95136f16d6cf5c898ecc",
+  "targetPush": "Completed \u2014 ls-remote confirms merge SHA",
+  "mergeTreeMatchesTicketTree": true,
+  "firstTicketPush": "Failed with curl65/GnuTLS non-proper termination; no success inferred from trailing Everything up-to-date",
+  "recovery": "Per-command http.postBuffer=52428800 and http.version=HTTP/1.1 retry succeeded; no persistent Git config change or force-push",
+  "worktreeRemoved": true,
+  "worktreePrune": "Completed, no other stale entries reported",
+  "localTicketBranchDeleted": true,
+  "remoteTicketBranch": "Retained at ticket commit for audit; removal Not required",
+  "artifactPreservation": "artifact-preservation.json",
+  "testRerun": "Not required: no newer base/source/test changes; merged tree byte-identical at Git tree level",
+  "releasePublicationDeploymentRollout": "Not required; not requested",
+  "userVerification": "user-verification.json",
+  "finalRecordCommitReceipt": "/home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR003/repository-final-state.json"
+}
