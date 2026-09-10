@@ -14,7 +14,9 @@ import type {
 import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView'
 import { toAgentPresentationProjectionMessage } from '~/services/agentStreaming/teamStreamDtoAdapters'
 import { dispatchAgentStreamMessage } from '~/services/agentStreaming/agentStreamMessageProjector'
+import { applyOfflineOrTerminalCleanup } from '~/services/runStatus/agentRuntimeStatusState'
 import { projectAgentOrgTeamTasks } from './agentOrgTeamPresentation'
+import { projectSettledAgentOrgTask } from './agentOrgTaskSettlementProjection'
 import {
   assertAgentOrgCommunicationMessagesCorrelated,
   createAgentOrgCommunicationPerspectiveIndex,
@@ -209,13 +211,19 @@ export class AgentOrgExecutionContext {
       if (this.validateTaskEvent(event.event) === 'checkpoint_required') {
         return 'checkpoint_required'
       }
-      const records = [...this.view.task_records.records]
-      const index = records.findIndex((record) => record.taskId === event.event.task.taskId)
-      if (index >= 0) records[index] = event.event.task
-      else records.push(event.event.task)
-      this.view = {
-        ...this.view,
-        task_records: { ...this.view.task_records, records },
+      const settlement = event.event.kind === 'settled'
+        ? this.projectTaskSettlement(event.event.task, event.event.settledAt)
+        : null
+      if (settlement) this.view = settlement.view
+      else {
+        const records = [...this.view.task_records.records]
+        const index = records.findIndex((record) => record.taskId === event.event.task.taskId)
+        if (index >= 0) records[index] = event.event.task
+        else records.push(event.event.task)
+        this.view = {
+          ...this.view,
+          task_records: { ...this.view.task_records, records },
+        }
       }
     } else {
       try {
@@ -389,6 +397,25 @@ export class AgentOrgExecutionContext {
         && left.taskExecution.agentRunId === right.taskExecution.agentRunId
       : 'teamRunId' in right.taskExecution
         && left.taskExecution.teamRunId === right.taskExecution.teamRunId
+  }
+
+  private projectTaskSettlement(task: TaskRecord, settledAt: string) {
+    let settlement: ReturnType<typeof projectSettledAgentOrgTask>
+    try {
+      settlement = projectSettledAgentOrgTask({
+        view: this.view,
+        task,
+        settledAt,
+      })
+    } catch {
+      this.correlationFailure(`AgentOrg task '${task.taskId}' settlement projection mismatch.`)
+    }
+    const contexts = settlement.terminalAgentRunIds.map((agentRunId) => this.contexts.get(agentRunId))
+    if (contexts.some((context) => !context)) {
+      this.correlationFailure(`AgentOrg task '${task.taskId}' settlement context mismatch.`)
+    }
+    contexts.forEach((context) => applyOfflineOrTerminalCleanup(context!))
+    return settlement
   }
 
   private correlationFailure(message: string): never {
