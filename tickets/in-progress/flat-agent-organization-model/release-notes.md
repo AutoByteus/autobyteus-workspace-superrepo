@@ -1,5 +1,14 @@
 # AORG-FLAT-TEAM-001 Release Notes (Draft)
 
+> **DR-007 HOLD (2026-09-11):** This older draft is superseded for delivery by
+> RER-026 / IR-034 / CRR-050 / API-REV-019 / CRR-051. The required latest-base
+> merge is blocked by 17 conflicts, so the draft below is historical, not the
+> current integrated release/package state. API-REV-019's current upstream
+> AppImage hash is `dfceecd28aa4902865ba3559b5a2193a09d290b272562ac0ac33f734638aa9c3`;
+> no DR-007 rebuild or launch is claimed. Refresh these notes after
+> reconciliation to include IR-033 exact mutation inputs and IR-034 terminal
+> Offline projection, with the evidence limits in the current delivery report.
+
 ## Agent Organizations And Flat Teams
 
 - Agent Teams remain reusable flat groups of direct Agents with one direct-Agent coordinator; Agent Orgs combine direct Agents and reusable flat Teams without an Org coordinator.

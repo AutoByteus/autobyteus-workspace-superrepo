@@ -219,8 +219,7 @@ describe('AgentOrgExecutionContext', () => {
         messageId: 'message-cross-scope',
         direction: 'sent',
         counterpartAgentRunId: 'agent-member',
-        counterpartAddress: '/team/member',
-        counterpartLabel: 'member',
+        counterpart: { kind: 'configured', address: '/team/member', label: 'member' },
         referenceFiles: [expect.objectContaining({ path: '/workspace/result.md' })],
       }),
     ])
@@ -233,15 +232,15 @@ describe('AgentOrgExecutionContext', () => {
     expect(mountedTarget.collaborationMessages.listMessages()).toEqual([
       expect.objectContaining({
         messageId: 'message-cross-team', direction: 'sent',
-        counterpartAddress: '/other/member',
+        counterpart: { kind: 'configured', address: '/other/member', label: 'member' },
       }),
       expect.objectContaining({
         messageId: 'message-mounted-team', direction: 'received',
-        counterpartAddress: '/team/coordinator',
+        counterpart: { kind: 'configured', address: '/team/coordinator', label: 'coordinator' },
       }),
       expect.objectContaining({
         messageId: 'message-cross-scope', direction: 'received',
-        counterpartAddress: '/direct',
+        counterpart: { kind: 'configured', address: '/direct', label: 'direct' },
       }),
     ])
 
@@ -253,7 +252,7 @@ describe('AgentOrgExecutionContext', () => {
     expect(otherTarget.collaborationMessages.listMessages()).toEqual([
       expect.objectContaining({
         messageId: 'message-cross-team', direction: 'received',
-        counterpartAddress: '/team/member', counterpartLabel: 'member',
+        counterpart: { kind: 'configured', address: '/team/member', label: 'member' },
       }),
     ])
   })
@@ -276,16 +275,24 @@ describe('AgentOrgExecutionContext', () => {
       expect.objectContaining({
         messageId: 'message-1',
         direction: 'received',
-        counterpartAddress: '/direct',
+        counterpart: { kind: 'configured', address: '/direct', label: 'direct' },
       }),
     ])
     const currentTarget = context.activeTarget()
-    expect(currentTarget && 'collaborationMessages' in currentTarget
-      ? currentTarget.collaborationMessages
-      : null).toBe(messages)
+    if (!currentTarget || !('collaborationMessages' in currentTarget)) throw new Error('Expected retained member target.')
+    expect(currentTarget.collaborationMessages).toMatchObject({
+      rootKind: 'agent_org', rootRunId: 'org-run', focusedAgentRunId: 'agent-member',
+    })
+    const second = communication('agent-coordinator', 'agent-member')
+    second.message.messageId = 'message-2'
+    context.applyEvent(6, second)
+    expect(rows.value.map((row) => row.messageId)).toEqual(['message-1', 'message-2'])
+    expect(currentTarget.collaborationMessages.listMessages()).toEqual(rows.value)
+    expect(context.selectedAddress).toBe('/team/member')
+    expect(context.changeSequence).toBe(6)
   })
 
-  it('excludes known task-involved communication and rejects unknown snapshot endpoints', () => {
+  it('includes exact task participants without leaking to their configured source and rejects uncorrelated identities', () => {
     const snapshot = view()
     snapshot.execution_tree.rootOrg.taskExecutions.push({
       address: '/team/member', agentRunId: 'agent-task-fresh', platformAgentRunId: null,
@@ -294,14 +301,22 @@ describe('AgentOrgExecutionContext', () => {
       address: '/team', teamRunId: 'task-team-fresh',
       members: [{
         address: '/team/member', agentRunId: 'agent-task-team-member', platformAgentRunId: null,
+      }, {
+        address: '/team/coordinator', agentRunId: 'agent-task-team-coordinator', platformAgentRunId: null,
       }],
       taskExecutions: [], startedAt: '2026-09-01T00:00:01.500Z', settledAt: null,
     })
+    snapshot.task_records.records.push(task(), task({
+      taskId: 'task-team', recipientAddress: '/team', taskExecution: { teamRunId: 'task-team-fresh' },
+    }))
     snapshot.agent_statuses.push({
       member_address: '/team/member', agent_run_id: 'agent-task-fresh', status: 'idle',
       trigger: null, tool_name: null, error_message: null, error_details: null,
     }, {
       member_address: '/team/member', agent_run_id: 'agent-task-team-member', status: 'idle',
+      trigger: null, tool_name: null, error_message: null, error_details: null,
+    }, {
+      member_address: '/team/coordinator', agent_run_id: 'agent-task-team-coordinator', status: 'idle',
       trigger: null, tool_name: null, error_message: null, error_details: null,
     })
     snapshot.communication_messages.messages.push({
@@ -329,13 +344,47 @@ describe('AgentOrgExecutionContext', () => {
       agentRunId: 'agent-task-team-member', memberAddress: parseAgentTeamAddress('/team/member'),
       context: agentContext('agent-task-team-member', 'Task Team Member'),
     }
-    const { context } = build(snapshot, [taskEntry, taskTeamEntry])
+    const entries = [taskEntry, taskTeamEntry, {
+      agentRunId: 'agent-task-team-coordinator', memberAddress: parseAgentTeamAddress('/team/coordinator'),
+      context: agentContext('agent-task-team-coordinator', 'Task Team Coordinator'),
+    }]
+    const { context } = build(snapshot, entries)
     context.select('/direct')
     const target = context.activeTarget()
     if (!target || !('collaborationMessages' in target)) {
       throw new Error('Expected a configured AgentOrg target.')
     }
-    expect(target.collaborationMessages.listMessages()).toEqual([])
+    const taskIdentity = {
+      kind: 'task', address: '/team/member', label: 'member',
+      taskId: 'task-1', hostRunId: 'org-run', executionRunId: 'agent-task-fresh',
+    }
+    const taskTeamIdentity = {
+      kind: 'task', address: '/team/member', label: 'member',
+      taskId: 'task-team', hostRunId: 'task-team-fresh', executionRunId: 'task-team-fresh',
+    }
+    expect(target.collaborationMessages.listMessages()).toEqual([
+      expect.objectContaining({ messageId: 'message-from-task-team-member', direction: 'received',
+        counterpartAgentRunId: 'agent-task-team-member', counterpart: taskTeamIdentity }),
+      expect.objectContaining({ messageId: 'message-to-task-team-member', direction: 'sent',
+        counterpartAgentRunId: 'agent-task-team-member', counterpart: taskTeamIdentity }),
+      expect.objectContaining({ messageId: 'message-from-task', direction: 'received',
+        counterpartAgentRunId: 'agent-task-fresh', counterpart: taskIdentity }),
+      expect.objectContaining({ messageId: 'message-to-task', direction: 'sent',
+        counterpartAgentRunId: 'agent-task-fresh', counterpart: taskIdentity }),
+    ])
+    context.select({ kind: 'agent_execution', agentRunId: 'agent-task-fresh' })
+    const taskTarget = context.activeTarget()
+    if (!taskTarget || !('collaborationMessages' in taskTarget)) throw new Error('Expected exact task target.')
+    expect(taskTarget.context.state.runId).toBe('agent-task-fresh')
+    expect(taskTarget.collaborationMessages.listMessages()).toEqual([
+      expect.objectContaining({ messageId: 'message-from-task', direction: 'sent', counterpartAgentRunId: 'agent-direct' }),
+      expect.objectContaining({ messageId: 'message-to-task', direction: 'received', counterpartAgentRunId: 'agent-direct' }),
+    ])
+    context.select('/team/member')
+    const configuredSource = context.activeTarget()
+    if (!configuredSource || !('collaborationMessages' in configuredSource)) throw new Error('Expected configured source.')
+    expect(configuredSource.context.state.runId).toBe('agent-member')
+    expect(configuredSource.collaborationMessages.listMessages()).toEqual([])
 
     const corrupt = structuredClone(snapshot)
     corrupt.communication_messages.messages.push({
@@ -343,7 +392,10 @@ describe('AgentOrgExecutionContext', () => {
       content: 'Unknown', messageType: 'agent_message', referenceFiles: [],
       createdAt: '2026-09-01T00:00:04.000Z',
     })
-    expect(() => build(corrupt, [taskEntry, taskTeamEntry])).toThrow(/not a correlated execution/)
+    expect(() => build(corrupt, entries)).toThrow("AgentRun 'missing-run' is not a retained Org execution.")
+    const missingRecord = structuredClone(snapshot)
+    missingRecord.task_records.records = []
+    expect(() => build(missingRecord, entries)).toThrow("Task execution 'agent-task-fresh' has no exact record.")
   })
 
   it('rejects a Team coordinator that is not that Team\'s direct Agent', () => {
@@ -352,7 +404,7 @@ describe('AgentOrgExecutionContext', () => {
     if (!('teamRunId' in team)) throw new Error('Expected Team fixture.')
     team.coordinatorAddress = '/direct'
 
-    expect(() => build(snapshot)).toThrow(/coordinator is not one of its direct Agent members/)
+    expect(() => build(snapshot)).toThrow("Team 'team-run' has no unique exact coordinator.")
   })
 
   it('accepts correlated task and communication events without changing their valid path', () => {

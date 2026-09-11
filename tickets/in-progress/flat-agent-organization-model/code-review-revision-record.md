@@ -55,6 +55,15 @@
 | `CRR-049` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-018 four-finding cumulative failure | `Pass — cumulative source` | `Fail — mixed failure dispositions; implementation Local Fix blocks` | `CR-FIND-030`; `API-FIND-023–026` |
 | `CRR-050` | `code-review-report.md` | Implementation Review / IR-034 exact terminal task live projection | `Fail — mixed failure dispositions; implementation Local Fix blocks` | `Pass — cumulative source` | `CR-FIND-030`; `API-FIND-023` resolved at source boundary |
 | `CRR-051` | `api-e2e-test-review-report.md` | Successful API/E2E Test-Code Review / API-REV-019 | `Pass — cumulative source` | `Not Applicable — no durable test change` | `None`; API-FIND-023–026 dispositions consumed |
+| `CRR-052` | `code-review-report.md` | Implementation Review / IR-035 latest-base DR-007 integration | source CRR-050 Pass; test CRR-051 N/A | `Fail — Local Fix (API/E2E fixture only)` | `CR-FIND-031`; prior `CR-FIND-001–030` preserved |
+| `CRR-053` | `code-review-report.md` | User clarification / correction owner for IR-035 integration package | CRR-052 Fail, wrongly assigned downstream | `Fail — Local Fix (Implementation package reconciliation)` | `CR-FIND-031` unchanged |
+| `CRR-054` | `code-review-report.md` | Implementation Review / IR-036 retained probe reconciliation | CRR-053 Fail — Local Fix | `Pass — cumulative integrated source` | `CR-FIND-031` resolved |
+
+| CRR-055 | code-review-report.md | API/E2E Failure-Origin / API20 | CRR054 Pass | Fail — implementation Local Fix | CR-FIND-032 / API-FIND-027 |
+| CRR-056 | code-review-report.md | API21 same-artifact confirmation | CRR055 Fail | Fail — same Local Fix confirmed | CR-FIND-032; original delay Not Reproduced |
+| CRR-057 | code-review-report.md | Implementation Review / IR037 cumulative correction | CRR056 Fail | Pass — cumulative source | CR-FIND-032 resolved at source boundary |
+| CRR-058 | code-review-report.md | Implementation Review / IR038 RER028 cumulative task parity | CRR057 source Pass; API23 historical adjudication | Pass — cumulative integrated source | No new finding; prior resolutions preserved; configured-only premise superseded |
+| CRR-059 | api-e2e-test-review-report.md | Successful API/E2E Test-Code Review / API24 | CRR058 source Pass; CRR051 prior proportional N/A | Pass — five durable test updates | None |
 
 ## Revision Entries
 
@@ -1579,3 +1588,219 @@ New findings:
 - Evidence limits retained: successful FIFO passage inferred from exact durable mutations during matching MCP HTTP intervals; no separate JSON-RPC ingress/request-ID or FIFO executor-start logging. Root/nested Org controls predate access logging. Historical stall cause remains unproven, rather than attributed to source. Browser exhaustion followed by normal history/Restore is not in-place automatic recovery; native-shell launch/multi-node deployment not claimed.
 - Recommended recipient: successful post-API/E2E rule from `get_handoff_rules`, expected `/software_engineering_team/delivery_engineer`.
 - Remaining risks/uncertainty: no current critical validation remainder per API-REV-019; Delivery must consume the explicit evidence limits and corrected-attempt precedence, synchronize documentation, and perform its own finalization/release responsibilities. No Delivery completion is claimed.
+
+
+### CRR-052 — integrated source preserved; registered stopped-model browser fixture needs flat-topology reconciliation
+
+- Canonical report updated: `code-review-report.md`; separate `api-e2e-test-review-report.md` remains the historical CRR-051 result, not a new merged-artifact test review.
+- Entry point / round / date: Implementation Review / 52 / 2026-09-11.
+- Trigger: Implementation IR-035 after Delivery DR-007 mandatory latest-base integration; 17 conflicts plus automatic merges reviewed.
+- Authority: RER-026; cumulative AD-REV-018; ARCH-REV-016 Pass; incoming approved stopped-run-compatible-model RER-004/design under current AORG flat topology.
+- Implementation: cumulative IR-001–035. Source merge `d2b257d7979e16aa9245d71f2edf8c14c042866c`; artifact `ddf4268eed82a9b5a554db38c3bf878a60f1588a`; parents `7c1ef261933eeb7b9912cb30f599ebf34864d31e` / `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`.
+- API/E2E: API-REV-019 Pass 95.4% on IR-034 only; no merged-artifact executable pass. Delivery: DR-007 remains pending renewed gates.
+- Prior authoritative results: CRR-050 cumulative source Pass, CRR-051 proportional test review Not Applicable.
+- Current authoritative result: **Fail — Local Fix, API/E2E-owned durable browser fixture only**. No new application-source defect, Design Impact or Requirement Gap found; no implementation source change requested.
+- Review change/rationale: complete production integration preserves flat composition, private Org/lifecycle authority, coherent stopped model/config pairs, known-capacity selection, all-scope save/read-back, Org fresh-launch admission and locked shared forms. However the still-registered `existing-run-model-config-probe.mjs` retains configured `/Nested` data/selectors/patch assertions removed by the current product contract. Implementation disclosed and did not credit it; its temporary flat rendering fixture does not repair the durable probe.
+- Scenario/material premise: production basis remains confirmed; CR-SCN-080–086 / CR-CAND-154–163 trace approved workflows and current test-readiness contract. CR-CAND-161 promotes only the test defect. AR-PREM-007 remains confirmed. Synthetic nesting cannot justify production compatibility or restored nesting.
+
+#### Prior Finding Resolution
+
+| Finding | Prior status | Current status | Related revisions | Verification |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-030 / API-FIND-023` | source and live correction accepted | Preserved, not reopened | IR-034; CRR-050/051; API-REV-019; IR-035 | context/terminal projector authorities have no merge delta; affected current tests pass; prior live limits retained |
+| `CR-FIND-019–022`, `CR-FIND-025/026` | resolved | Preserved | earlier exact context/readiness/runtime choice/navigation/locked gear rounds; IR-035 | shared event changes preserve exact Org schema-state ownership and runtime Retry/abandon; current locked direct/mounted tests and inspected narrow screenshot |
+| `CR-FIND-027–029` | resolved | Preserved | atomic writer, structural status traversal, Apollo mutation normalization rounds | corresponding owners unchanged by merge; current cumulative evidence and source equality |
+| Other `CR-FIND-001–018`, `023/024` | resolved | Preserved | cumulative chain through CRR-050 | current flat topology, strict streaming/recovery, localization and prior owner checks; no applicable reintroduction |
+| `API-FIND-025` | API-owned locator corrected | Remains historical correction, no product patch | CRR-049–051; API-REV-019 | exact-row Stop result retained; no contrary current evidence |
+| `API-FIND-024/026` | valid-path Pass, historical stalls Not Reproduced | Unchanged disposition; original source cause unproven | CRR-049–051; API-REV-019 | evidence limitations preserved; no retry/replay/timeout/source attribution |
+
+- New finding: **CR-FIND-031**, P2 test-readiness, API/E2E-owned Local Fix. Correct maintained browser probe to root/direct configured Agents while preserving the substantive model/save/verification checks.
+- Score: **9.36/10 (93.6/100)**; all application categories >=9.3, API/E2E readiness 8.8 due solely to CR-FIND-031. Average does not override failure. Large/High unchanged.
+- Independent validation: web 29 files/298 tests; prepared isolated server 66/349; guards/audit zero findings; diff/ancestry/preservation. First server attempt's missing generated SDK and one default source-scan timeout retained; same default-timeout full rerun passed after rebuilding only prerequisite, no code/test changes. Reviewer-generated dist removed. Logs: `/tmp/aorg-crr052-web.log`, `/tmp/aorg-crr052-server.log`, `/tmp/aorg-crr052-server-prepared.log`, `/tmp/aorg-crr052-prerequisite.log`, `/tmp/aorg-crr052-guards.log`, `/tmp/aorg-crr052-integrity.log`.
+- Inventory: 47 current merge implementation files max477, zero >500 / >220 merge signal; cumulative 438 current files zero >500. Historical larger deltas reviewed by owner with prior resolution evidence, not treated as new oversized files. Tests have no source-size threshold.
+- Recommended recipient: exact API/E2E-owned Local Fix recipient from `get_handoff_rules`. No implementation-owned rework requested. Correct fixture and renew complete API/E2E on the integrated artifact; return durable test changes for proportional review and explicit finding closure before Delivery. If production changes, source review is required again.
+- Remaining uncertainty: real integrated provider/save/resume and cumulative journeys still require executable renewal; old API19 results are not substituted. No native-shell/release/deployment completion or original stall cause is claimed. Other-owner files preserved.
+
+- Actual routing outcome: called `get_handoff_rules` after completing CRR-052. No condition covers implementation-review Fail for an uncorrected API/E2E-owned stale fixture; API-owned failure rules target different entry points and the completed-fix rule does not apply. **No message sent / no handoff claimed**, following the instruction to finish normally when no rule matches. Recommended correction owner remains API/E2E; no product/design reclassification is invented to force a route.
+
+
+### CRR-053 — return IR-035's incomplete test reconciliation to Implementation
+
+- Canonical report updated: `code-review-report.md`; entry point Implementation Review, round 53, 2026-09-11.
+- Trigger: user correctly requested returning the stale integrated test to Implementation Engineer for update.
+- Authority unchanged: RER-026 / cumulative AD-REV-018 / ARCH-REV-016 Pass; incoming stopped-run-compatible-model RER-004 under current flat topology.
+- Implementation unchanged: IR-035, source merge `d2b257d7979e16aa9245d71f2edf8c14c042866c`, artifact/HEAD `ddf4268eed82a9b5a554db38c3bf878a60f1588a`.
+- Relevant API/E2E: API-REV-019 remains historical IR-034 evidence only. Relevant Delivery: DR-007.
+- Prior result: CRR-052 Fail — Local Fix, mistakenly attributed to downstream API/E2E because the file was a test. No handoff was sent under that attribution.
+- Current result: **Fail — Local Fix, implementation-owned incomplete integration-package reconciliation**. Production-source assessment still has no new defect; CR-FIND-031's test update remains necessary.
+- Reason for ownership correction: the registered probe arrived in Implementation's integrated package, including +117/-9 from the protected Delivery checkpoint, and still expects removed configured nesting. No API/E2E revision on this merged artifact introduced it. The correction belongs with completion of IR-035's merge reconciliation before executable coverage, rather than being reassigned solely by file extension. API/E2E continues to own independent validation after source Pass. The earlier apparent routing gap is withdrawn for this corrected attribution.
+- Supported scenario/material-premise basis: unchanged CR-SCN-086 / CR-CAND-161; current flat topology and coherent stopped-model Save remain the contract. This change establishes no new product workflow, schema, permission, retry or compatibility mechanism.
+
+#### Prior Finding Resolution
+
+| Finding | Prior status | Current status | Related revisions | Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-031` | Open; incorrectly assigned to API/E2E | Open; return to Implementation for integration-test reconciliation | IR-035; CRR-052/053 | unchanged retained nested fixture and assertions; protected-checkpoint diff; current root/direct-Agent draft/schema; user ownership clarification |
+| `CR-FIND-001–030` | Resolutions preserved | Unchanged | cumulative through CRR-052 | no source/artifact change; carry verified CRR-052 evidence |
+
+- Score/classification: unchanged 9.36/10 (93.6/100), readiness 8.8; Large/High. No new finding ID, source test run, or changed evidence confidence is claimed.
+- Required action: Implementation updates the retained probe to strict flat Team V2 (fixture/options/selectors/assertions), retains compatible model/pair/linkage/direct-edit/verification/keyboard/narrow checks, runs it and affected regressions, and returns an implementation handoff for independent re-review. No production nesting, UI redesign, weakened schema or arbitrary retry/timeout is requested.
+- Recommended recipient: exact Implementation Engineer from the matching source-review implementation-owned Local Fix/packaging-defect rule after `get_handoff_rules`.
+- Remaining work: corrected package source re-review, then complete renewed merged-artifact API/E2E; Delivery remains pending. Other-owner files and prior observation limits remain preserved.
+
+
+### CRR-054 — retained flat-Team probe corrected; cumulative integrated source passes
+
+- Canonical report: `code-review-report.md`; Implementation Review, round 54, 2026-09-11. This is not successful post-API/E2E test-code review; the separate CRR-051 test report remains historical.
+- Trigger: IR-036 correction of CRR-053 / CR-FIND-031 following DR-007 integration. Ownership correction in CRR-053 was respected; Implementation returned the corrected package.
+- Authority: RER-026 / cumulative AD-REV-018 / ARCH-REV-016 Pass; incoming stopped-run-compatible-model RER-004/design under current flat Team topology.
+- Implementation: cumulative IR-001–036; test-source `d231a77d5aad5875c7aec4569b1acbb3d2c6ff89`; artifact `174e96a47dd3f6078207dec0d0a4546b8ded1772`. Production is unchanged IR-035 merge `d2b257d7979e16aa9245d71f2edf8c14c042866c`; source comparison from prior artifact `ddf4268eed82a9b5a554db38c3bf878a60f1588a` shows only the probe plus two implementation artifacts.
+- API/Delivery context: API-REV-019 Pass 95.4% remains IR-034-only evidence; DR-007 awaits current independent executable validation and Delivery work.
+- Prior result: CRR-053 Fail — implementation-package Local Fix. Current result: **Pass — cumulative integrated source**.
+- Change/rationale: corrected probe removes all configured nesting and recursive fixture lookup, uses direct root/member option scopes and exact member patches, preserves A–F, and strengthens independent-edit/full canonical-pair assertions. Production review and unchanged-source evidence from CRR-052/053 remain applicable. Current cumulative scorecard, structure, cleanup and size checks are retained/revalidated rather than silently inferred from missing records.
+- Scenario/premise basis: unchanged CR-SCN-080–086 and AR-PREM-007. CR-CAND-161 is rejected as a current finding after correction; CR-CAND-164/165 reject coverage-loss/parser-overclaim concerns on direct evidence; CR-CAND-166 retains only the downstream real-system validation obligation. The shared DTO parser checks transport shape and alone does not prohibit configured nesting; actual current-flat fixture/option/editor assertions establish this test's topology. No new product scenario or source machinery is prescribed.
+
+#### Prior Finding Resolution
+
+| Finding | Prior status | Current status | Related revisions | Verification evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-031` | Open — implementation retained-test reconciliation | **Resolved** | CRR-052/053; IR-036; CRR-054 | direct members and no nested editor; exact reviewer save; root/coordinator replacement plus independently edited lead, divergent reviewer preserved; current registered probe independently 6/6 Pass; related 39/39 |
+| `CR-FIND-001–030` | Resolutions preserved | Unchanged / preserved | through CRR-053 | zero production delta; retained 66/349 server, 29/298 web and architecture/build/guard evidence still applies; current scope check |
+| Historical `API-FIND-024/026`, `API-FIND-025` | Not Reproduced stalls / corrected locator | Unchanged dispositions | API-REV-019; DR-007 evidence limits | no new original-cause, JSON-RPC/FIFO timestamps or live recovery claims |
+
+- Independent checks: corrected registered Chromium command all six A–F Pass (`/tmp/aorg-crr054-probe.log`, `/tmp/aorg-crr054-probe/existing-run-model-config-evidence.json`); focused 5 files/39 Pass (`/tmp/aorg-crr054-focused.log`); syntax, guards and zero-finding audit (`/tmp/aorg-crr054-guards.log`); exact ancestry/diff/registration/retired-fixture/preservation checks (`/tmp/aorg-crr054-integrity.log`).
+- Setup/cleanup: two absent SDK dist prerequisites built then removed; current probe browser/context/dev process group and temporary route cleaned. Before reviewer artifact update, all 2,093 starting dirty/untracked hashes matched; after update only the two reviewer-owned reports may differ. Production/test files not edited by Reviewer.
+- Evidence limits: real components/store with deterministic GraphQL is not real server/provider/persistence API/E2E. Fixture-only health HTTP500 and aborted icon request remain recorded; no pageerror/harness failure. Implementation's first wrong-root-selector B failure and dependent F failure remain historical, corrected without timeout/source changes. Narrow screenshot directly inspected.
+- Score: readiness 8.8 -> 9.3 after closing the concrete fixture gap; other category scores unchanged. Overall **9.41/10 (94.1/100)**, every category >=9.3. No source size threshold applied to test; production inventory unchanged (47 current merge files max477; cumulative 438 current, no >500).
+- Recommended recipient: primary implementation-review Pass recipient returned by `get_handoff_rules`, API/E2E Engineer, for the **full renewed cumulative merged-artifact matrix**. Previous API results are not substituted; no new AppImage/native-shell/user verification/Delivery/release readiness claimed.
+
+
+### CRR-055 — API20 root task publishers remain buffered after release
+
+- Canonical report: code-review-report.md; API/E2E Failure-Origin Review, round 55, 2026-09-11.
+- Trigger: API-REV-020 Fail / 76.0%, API-FIND-027, unchanged artifact 174e96a47dd3f6078207dec0d0a4546b8ded1772.
+- Authority: RER-026 / cumulative AD-REV-018 / ARCH-REV-016 Pass; incoming stopped-run-compatible-model flat authority and established task-monitor R-004/R-013/AC-017 retained.
+- Implementation: cumulative IR-001–036; production IR-035 d2b257d7979e16aa9245d71f2edf8c14c042866c; test source d231a77d5aad5875c7aec4569b1acbb3d2c6ff89. Delivery DR-007 pending. No post-review application-source delta.
+- Prior: CRR-054 source Pass 9.41/10. Current: **Fail — Local Fix, implementation-owned server event publication**.
+- New **CR-FIND-032 / P1**, correlated API-FIND-027: prepareRootTaskTeam's unconditional retained.push never becomes live after its single drain. Recursive managers inherit it. Direct live callback retention reaches count-before 569. Root Agent prepareTask repeats the same confirmed defect.
+- Supported basis: CR-SCN-087/089 normal root Team/Agent work/live monitor; CR-SCN-088 explicitly supported accept-before-provider-finishes edge under BEH-009/DS-022. CR-CAND-167–172 promote publication/idle-trigger loss only and hold complete original delay attribution.
+- Settlement qualification: formal four-update cycle succeeds; original task lacks settledAt until later sweep. First unsuccessful guard unlogged. No full original-cause, provider stall, extra queue, timeout/retry or shutdown redesign attributed.
+- Review gap: earlier review accepted initial durable release but missed the permanently preparation-only callback. Source-detectable under existing Team gate contract. Only affected runtime-fidelity/readiness rationale reopened; no full scorecard or new numerical score.
+
+#### Prior finding resolution
+
+| Finding | Prior status | Current status | Evidence / related revisions |
+| --- | --- | --- | --- |
+| CR-FIND-031 | Resolved | Preserved | IR-036 / CRR-054; current registered probe pass |
+| CR-FIND-030 / API-FIND-023 | Resolved | Preserved | frontend terminal projection unchanged; missing upstream events distinct |
+| CR-FIND-028 / API-FIND-020 | Resolved | Preserved | unique snapshots pass in current scenario |
+| Other CR-FIND-001–029 | Resolutions retained | Not reopened | no contrary bounded evidence |
+| API-FIND-021/024/026 | Historical origins unproven, later valid controls passed | No reassignment | current tools complete; do not conflate event publication with ingress |
+| CR-FIND-032 / API-FIND-027 | New | Open — Implementation Local Fix | concrete permanent callbacks, recursive inheritance, live trace and independent probe |
+
+- Probe: /tmp/aorg-crr055-publication-probe.cjs and .log; exact-source transpilation with injected factories and real identity validation. Initial event drains/work starts once; later Team parent/child 0/4 and root Agent 0/3 events forwarded. Local mechanism only; API20 independently establishes live path. No production/test/generated-source changes.
+- Correction: existing durability boundary must become live after ordered activation/drain; preserve abort/no-work/exact scope; both root branches need post-release regressions. Preserve existing non-waiting FIFO/idle sweep and strict settlement/teardown. Prove no-unrelated-work settlement; if still delayed capture first guard.
+- Four API-owned durable test updates deferred to successful proportional review, not N/A now.
+- Limits retained: staged logpoints; 985 observations/45 MCP pairs/153 queue starts; changed-only status samples; one main restart/two shutdowns; no first detached exit-code/native-shell claim. Current independent passes do not overwrite failure.
+- Preservation: 3,434 starting dirty/untracked hashes; only two reviewer reports may change; /tmp/aorg-crr055-integrity.log.
+- Large/High unchanged. Recommended exact Implementation recipient under completed failure-origin Local Fix rule; then fresh source review/full API/E2E before Delivery. No speculative machinery.
+
+
+### CRR-056 — same-artifact confirmation separates live publication from settlement
+
+- Entry point/result: API/E2E Failure-Origin Review evidence update, 2026-09-11; **Fail — Local Fix**, same implementation-owned CR-FIND-032 / API-FIND-027.
+- Trigger: API-REV-021 user-requested focused repeat, Fail / 76.0%, ledger 453–473. API20 remains retained full same-artifact matrix, not newly executed.
+- Authority unchanged RER-026 / AD-REV-018 / ARCH-REV-016 Pass; cumulative IR-001–036; Large/High; Delivery DR-007 pending.
+- Tested artifact 174e96a47dd3f6078207dec0d0a4546b8ded1772; production IR035 d2b257d7979e16aa9245d71f2edf8c14c042866c; IR036 test d231a77d5aad5875c7aec4569b1acbb3d2c6ff89. Private retained server 4041/4041 hashes match API20; copied renderer/fresh data. Shared in-progress correction was NOT tested or reviewed.
+- Prior CRR-055 Fail retained; CRR-054 Pass remains superseded. No new numerical score/full source audit.
+- Evidence: parent idle at 05:37:43.723 stays buffered and all 53 subsequent polls stay Running (364 total successes/0 errors). Root/recursive formal windows retain 96/108 callbacks including 47/53 Running, while exact target browser presentation events are 0/0, other-Agent events 95/56 and complete snapshots 0/0. Recursive polls 926/926, no Running.
+- Both formal four-update cycles succeed, eight MCP/HTTP 200 results; child/parent settle normally. **Original API20 settlement delay Not Reproduced**; current first guard sees no open child/provider work. Original unobserved guard remains unknown.
+- CR-SCN-087–089 and CR-CAND-167–172 retained. CR-CAND-173 rejects weak “Running seen + eventual Offline = continuous live stream” inference; current evidence shows stale Running and separate terminal projection can pass that check. No new product scenario/machinery.
+- Prior-finding status: CR-FIND-032 remains Open/same owner; CR-FIND-031 and earlier resolutions preserved. Root-Agent sibling source proof retained, no API21 browser sibling claim. Historical API-FIND-021/024/026 origins not reassigned.
+- Evidence limits: task history rows display-only, not selected task-center proof; passive points installed before current tasks, stdout is sole observation capture; shared fix excluded; API20/full matrix not rerun; native shell/Delivery not claimed.
+- No new durable tests; API20's four test changes still await successful proportional review. No reviewer source/test edit or runtime rerun.
+- Canonical report updated; evidence under api-e2e-evidence/API-REV-021/live/API-FIND-027-confirmation.md, final/correlated-confirmation.json and final/cleanup-result.json. Read-evidence hashes preserved at /tmp/aorg-crr056-integrity.log. No blanket shared-worktree immutability claim during Implementation work.
+- Recommended exact Implementation handoff under completed implementation-defect failure-origin rule: evidence-only clarification to ongoing CR-FIND-032 correction, not duplicate assignment. Preserve no timer/retry/replay requirement; await corrected source, then full cumulative API/E2E before Delivery.
+
+
+### CRR-057 — cumulative source passes after Org-root task publishers become live
+
+- Canonical report: code-review-report.md; Implementation Review, round 57, 2026-09-11. Separate API/E2E test-review report remains historical.
+- Trigger: IR-037 completed Local Fix for CRR-055/056 / CR-FIND-032 / API-FIND-027.
+- Authority unchanged: RER-026 / cumulative AD-REV-018 / ARCH-REV-016 Pass; approved Product/status/overrides/task-monitor supplements and incoming stopped-model flat behavior.
+- Cumulative implementation IR-001–037; source 61c98faa3f5c0ba3f5fbdf89b9ada97b5a458d7e (functional b86de852cc26632caa0fa385e053d225612fd413); artifact 6ef456e0a3fd568e732bafbd79c5f9abb2aed1f4. IR035 merged base and IR036 probe preserved.
+- API20/21 Fail / 76.0% remain old-artifact evidence; DR-007 remains downstream. No fixed-package live validation claimed.
+- Prior result CRR-056 Fail; current **Pass — cumulative integrated source**, Large/High, score **9.41/10 / 94.1**, all categories >=9.3.
+- Correction verified: existing Team-local gate extracted unchanged to root-neutral services; both Org-root publishers release to live after original adapter durable activation order. Reentrant FIFO drain, preparation abort/rejection and one work release preserved. Recursive flat factory callbacks now forward without alternate task/status/persistence authority.
+- Source review gap from CRR055/056 is closed by tracing actual concrete owners beyond initial release and requiring fresh strict wire events. No automatic reinstatement of old source Pass.
+- Basis: CR-SPINE-041–050 and CR-SCN-080–090; former candidates167/171 resolved; candidates174–177 reject duplicated-authority/order/retirement/cumulative-regression concerns on current code/tests. Historic candidate168 original delay cause remains unestablished, not a premise for new machinery or a current source blocker.
+
+#### Prior finding resolution
+
+| Finding | Prior status | Current status | Verification |
+| --- | --- | --- | --- |
+| CR-FIND-032 / API-FIND-027 | Open implementation publication defect | Resolved at source boundary; real API confirmation pending | both concrete publishers; identical extracted gate; 9 new owner/strict-stream/own-idle settlement tests |
+| CR-FIND-031 | Resolved by IR036 | Preserved | registered flat probe source unchanged, retained CRR054 6/6; current stopped-model web/backend tests |
+| CR-FIND-030 / API-FIND-023 | Resolved terminal web projection | Preserved | unchanged context/terminal projection; current web cohort and strict server retirement pass |
+| CR-FIND-028 / API-FIND-020 | Resolved structural status enumeration | Preserved | unique-snapshot/reselect/frozen-scope tests; inactive child identity retained correctly |
+| CR-FIND-027/029 | Resolved atomic writer / Apollo serialization | Preserved | unchanged owners, current cumulative writer/history/authoring tests |
+| CR-FIND-019–026 | Resolved reactivity/UX/readiness/navigation/localization/recovery | Preserved | unchanged frontend source; current 29/298 plus guards/audit; strict stream tests |
+| CR-FIND-001–018 | Prior cumulative resolutions | Preserved | no contrary owner delta; current root/task/composition/durability cohorts and baseline comparison |
+| API-FIND-021/024/026; API20 delay | Historical origins unproven; later normal controls pass | No new attribution | API21 formal cycles settled normally; controlled DS022 test is not a reconstruction of API20's first guard |
+
+- Independent current checks: **74 server files/386 tests Pass**, **29 web files/298 tests Pass**; boundary guards and zero-finding localization audit. Logs/path lists: /tmp/aorg-crr057-server.log, /tmp/aorg-crr057-server-paths.txt, /tmp/aorg-crr057-web.log, /tmp/aorg-crr052-web-paths.txt, /tmp/aorg-crr057-guards.log.
+- Built two initially absent SDK prerequisites before tests; removed only those afterward. No timeout/source/test changes by Reviewer. Current production server build/bootstrap log inspected from Implementation, not rerun.
+- Cumulative size inventory:439 current production files/40 removed, max500, none>500; four changed files38/223/193/186 effective lines, none>220 delta. Gate class body verified identical to prior Team-local implementation. /tmp/aorg-crr057-cumulative-source-inventory.json.
+- Preservation: all3,621 initial hashes matched before reviewer artifact update; only two reviewer-owned reports may change afterward. Source/HEAD/base ancestry/no unmerged entries/diff verified; /tmp/aorg-crr057-integrity.log. API20's four dirty test edits, API/Delivery evidence/docs and external repositories untouched.
+- No new frontend render required: no template/style/interaction delta. Current server tests double only configured/provider execution and use real strict stores/adapter/FIFO/stream; not actual browser/provider. No AppImage/native-shell/user verification/release readiness inferred.
+- Next recipient: exact primary source-Pass API/E2E route returned by get_handoff_rules. Require full renewed merged-artifact matrix with fresh exact live-transition proof, then proportional review of API-owned durable test changes after successful execution; Delivery remains gated.
+
+
+### CRR-058 — RER-028 task-inclusive presentation and exact retained inspection pass source review
+
+- Entry point/result: **Implementation Review / Pass — cumulative integrated source**, round 58, 2026-09-11. Canonical `code-review-report.md`; separate successful-test report unchanged.
+- Authority: **RER-028@fadfb3c000d57df7efe42ed0e503d86057c0d713 / AD-REV-019@27ca03ef1f06ab826e2373c80bc8b81f3cc69f37 / ARCH-REV-017 Pass@ffcdb2dc3b4d2db94455de9b1b4d701498f5591e**; cumulative approved Product/status/overrides/task-monitor and incoming stopped-model supplements.
+- Trigger: IR-038 completed implementation reconciliation; cumulative IR001–038. Source **22809caca4a313e8079581a2a1b5b2e4eb2555f7**, artifact **6e2745680cd3529ab6787de07df252e92854247c**. IR035 merge/IR036 probe/IR037 gate remain ancestors. Large/High unchanged (focused Medium/High).
+- Prior completed source CRR057 Pass; API22 full execution and API23 RER027 adjudication retained only on their old artifact/scope. API23 is not new execution. AAV001 interruption did not create a completed extra CRR or inferred Pass. DR007 remains pending.
+- Score **9.41/10 / 94.1**, all ten categories >= 9.3; mandatory 24 structural checks and changed/cumulative source inventory complete. No new finding, design/requirement gap, source blocker or unsupported mechanism.
+- RER028 intentionally supersedes configured-only presentation/old AR-FIND008 restriction. BEH001–018 confirmed against current requirements; BEH017/018 now include all admitted ordinary task directions, exact task relevance/read-only inspection and genuine accepted system input. Historical accepted provider input is not filtered/deleted.
+- Current spines CR-SPINE051–054; scenarios CR-SCN091–096 (SCN018–020) plus retained080–090; candidates178–188. Index extraction justified by approved ownership contract; no speculative source-binding, resurrection, notification replay or historical-delay mechanism required.
+
+#### Prior finding / premise resolution
+
+| Finding or premise | Prior state | Current state | Verification |
+| --- | --- | --- | --- |
+| CR-FIND-032 / API-FIND-027 | Source corrected IR037; API22 real publisher proof | Preserved | Both concrete gates unchanged; current post-release/strict stream/own-idle settlement tests pass. No refocus/stale Running inference. |
+| CR-FIND-031 | Resolved retained flat probe integration | Preserved | IR036 registered probe source retained; current flat model/config backend/frontend cohorts. |
+| CR-FIND-030 / API-FIND-023 | Resolved terminal live projection | Preserved and extended to exact retained task selection | Strict settled scope removal/current context cleanup stays; selection remains same exact AgentRun, now explicitly read-only. |
+| CR-FIND-028 / API-FIND-020 | Resolved duplicate status enumeration | Preserved | Structural root traversal, strict snapshots/reselect/frozen ownership remain in current server suite. |
+| CR-FIND-027 / CR-FIND-029 | Resolved atomic writer / Apollo input serialization | Preserved | Current atomic write/summary tests and authoring store/component regressions; no unrelated source delta. |
+| CR-FIND-019 | Resolved same-observable-identity defect | Preserved | Current real context/stream/Pinia no-refocus regression; context remains shallow-reactive with one retained view and derived index. |
+| CR-FIND-020–026 | Resolved launch/UI/navigation/locale/recovery | Preserved | Current cumulative config/history/component/stream cohorts, two guards, zero literal audit; source traces retain exact locked gear/Back/New. |
+| CR-FIND-001–018 | Earlier cumulative resolutions | Preserved except explicit new authority supersession | Current native topology/task/durability/config/migration owner comparisons and cumulative tests; no contradictory source evidence. |
+| Former configured-only ordinary-message exclusion / AR-PREM-007 consequence | Applicable under RER026, clarified RER027 | Superseded by approved RER028, not a regression to restore | All admitted task counterparts now intentionally visible; source-template task-binding fallback removed. |
+| AAV001 blanket retained-input exclusion | Historical ambiguous assertion, RER027 adjudicated | Not a current blocker or filter requirement | RER028/AD019 clear; inspection preserves genuine history. |
+| API20 original settlement delay; API021/024/026 historical stalls | Original complete origins unestablished; later controls pass | No new attribution | API21 delay Not Reproduced; current controlled DS022 test is not reconstruction of old first guard. |
+
+- New source verifies sole sidecar/root event/exact receiver/release for ordinary messages; exact retained index and actual nullable task/provider/host identity; independent shared Tasks/Messages; task record versus accepted/rejected system input; manager-owned strict no-activation inspection and explicit empty/unavailable distinction.
+- Independent current commands/logs: **server87 files/463 tests**, **web48/402**, **core1/9** Pass; `/tmp/aorg-crr058-server.log`, `-web.log`, `-core.log`, server/web path lists. Both guards/zero-finding audit at `/tmp/aorg-crr058-guards.log`. No reviewer timeout/source/test change.
+- Current production server build/sanitized bootstrap and Nuxt16-route production build inspected from IR038 logs, not rerun. Frontend standalone typecheck unavailable; no pass claimed. Implementation deterministic Nuxt/shared-component screenshots inspected (narrow Tasks, desktop settled task); not real provider/server browser acceptance.
+- Size audit:54 changed current production files, max446 nonempty; context+94/-247 is approved index/facet extraction. Cumulative456 current/42 retired,max500,none > 500. Tests not subject to source limits. `/tmp/aorg-crr058-source-inventory.json`, `-cumulative-source-inventory.json`.
+- Preservation:4917 initial dirty/untracked hashes match before reviewer edits; only two reviewer reports changed afterward,4915 other-owner files unchanged. Four API20 tests and all API/Delivery raw evidence remain unstaged. Built then removed only two initially absent SDK prerequisites. `/tmp/aorg-crr058-integrity.log`; exact HEAD/ancestry/no-unmerged/diff-check pass.
+- Required next recipient: exact source-Pass API/E2E destination from current handoff rules, full renewed cumulative merged-artifact matrix under RER028. Carry complete upstream/implementation/review/API/Delivery evidence and old limitations; no historical substitution or configured-only exclusion proof. Four API-owned durable test changes remain pending proportional review after successful execution. DR007/AppImage/native-shell/user verification/docs/release not approved.
+
+
+### CRR-059 — successful API24 five-file proportional test-code review
+
+- Entry point/result: **Successful API/E2E Test-Code Review / Pass**, 2026-09-11. Canonical `api-e2e-test-review-report.md`; original implementation report remains **CRR-058 Pass**, byte-unchanged. No implementation scorecard reopened.
+- Trigger: **API-REV-024 Pass / 95.9%** fresh full cumulative executable validation, categories96/97/96/98/95/95/94, broader validation Required/completed; no current critical required case unresolved. API confidence consumed, not rescored.
+- Authority: RER-028 / AD-REV-019 / ARCH-REV-017 Pass / cumulative IR001–038, Large/High. Exact source `22809caca4a313e8079581a2a1b5b2e4eb2555f7`; unchanged artifact `6e2745680cd3529ab6787de07df252e92854247c`. DR007 remains pending.
+- Prior proportional CRR051 N/A applied to API19 only. Four carried API20 durable edits now explicitly reviewed, plus API24 rootExecutionViewState update: **5 Updated, +126/-227, no file deletion**. No N/A shortcut or new test finding.
+- Reviewed files: server `tests/e2e/agent-definitions/agent-definitions-graphql.e2e.test.ts`, `tests/e2e/helpers/studio-application-api-services.ts`, `tests/e2e/run-history/run-projection-toolcalls-graphql.e2e.test.ts`, `tests/e2e/run-history/stopped-run-model-config-graphql.e2e.test.ts`; web `services/rootExecution/__tests__/rootExecutionViewState.spec.ts`.
+- Findings/dispositions: forbidden positive configured-nesting case removal is authorized by REQ002; six valid Agent/flat Team-local assertions remain. Complete helper dependencies fail explicitly when unprovided; constructor scaffold matches flat owner. Stopped flat root/coordinator/reviewer batch preserves untouched lead/tree, active rejection and restart; invalid second patch prevents any first-patch write. Current task DTO fixture has exact task records/coordinator; task-inclusive perspectives distinguish source IDs, unknown/missing identities reject. Held computed facet observes two sequenced events without refocus, replacing incidental wrapper-object equality without weakening CR-FIND019.
+- All eight proportional checks Pass. No source-size threshold, forced test split, full API rerun or numerical source score applied. No new source/test/build change by Reviewer.
+- Current execution evidence read: server117/634 including changed suites6/6,6/6,2/2; web155/996 including rootExecutionViewState13/13. Exact current five-file diff and hashes match API24 final evidence. No rerun needed to judge these assertions.
+- API24 real evidence and limits preserved: full task-inclusive live/restored direction matrix; exact retained identity/Tasks; 8cycles/32updates; 18real accepted notifications vs controlled rejection; automatic success vs separate exhaustion. Recursive initial prompt needed normal interrupt/clarification; passive timing overhead; client-unquiesced second-startup assertion corrected by exact third startup; historical original delay/first guard not reconstructed. No native-shell/new AppImage/user verification/release/Brief provider-user claim.
+- Prior unresolved test-review findings: None. CR-FIND032 publication and earlier source resolutions remain as CRR058/API24 evidence; no source origin reattributed during test review.
+- Preservation: 6,206 starting dirty/untracked hashes; only two reviewer result/history files updated. Source CRR058 report, all five API-owned tests and API/Delivery data untouched, no staging/commit. `/tmp/aorg-crr059-scope.log` and `-integrity.log` record exact diff/hash/HEAD/no-unmerged checks.
+- Next: current successful post-API/E2E durable-test review handoff rule to exact Delivery recipient with full upstream/current executable package and all five reviewed tests. DR007 docs/integration/packaging/native/user/finalization remains Delivery-owned, not completed here.
