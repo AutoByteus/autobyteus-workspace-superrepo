@@ -3,13 +3,11 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture: `AD-REV-020`, canonical `design-spec.md`
-- Approved requirements: `RER-029@0f5014405eb028123afb37013b722acb2d12fe22`
-- Prior review: AD-REV-019 / ARCH-REV-017 Pass; implementation IR-038,
-  CRR-058/059, API-REV-024 and DR-008 precede this authoring-only delta.
-- Source evidence: preserved checkpoint `14a94fc45`, RER-029 at `0f5014405`;
-  architecture-package-authoring-investigation.md. Earlier pins below remain
-  round-specific historical evidence; no corrected task/UI gap is reopened.
+- Architecture: `AD-REV-021`, canonical `design-spec.md`
+- Approved requirements: `RER-031@3b8c18a28af7674619a797a92a208dabfa851f54`
+- Prior review: AD-REV-020 / ARCH-REV-018 Pass; current inspected source
+  IR-039 checkpoint `932c81b22`. RER-031 resolves UI-CLEAN-001; earlier
+  source/validation pins below remain historical, not new execution claims.
 - Date: 2026-09-11
 - Result: `Design Self-Validation Pass — independent Architecture Review required`
 - 50 design walkthroughs; no source, browser, provider or API/E2E execution
@@ -130,7 +128,7 @@ already implemented correction is still absent.
 | AgentOrg and AgentTeam config authority stays separate | Org root/team/agent sparse maps and existing Org launch payload remain Org-owned; shared components import neither store and never compute server-effective configuration | Pass |
 | Form projection is complete or blocked | Missing Team/member/coordinator/address correlation produces an exact diagnostic and disabled Run; no `flatMap` omission, browser repair, synthetic member, or partial launch view | Pass |
 | Effective launch configuration is singular | Org Team/Agent edits enter one canonical patch map; owned runtime/model without owned config carries `llmConfig:null`; preview, request, server resolution and snapshot must agree | Pass |
-| Workspace/history owners are route-stable and non-overlapping | Mixed read owner loads/strictly projects/groups/orders stable-keyed rows; the one always-mounted panel/`useWorkspaceHistoryTreeState` instance owns expansion/reveal/highlight/scroll continuity; Agent Orgs is a sibling directly below Teams; route changes never swap either owner | Pass |
+| Workspace/history owners are route-stable and non-overlapping | Mixed read owner loads/strictly projects/groups/orders stable-keyed rows; the one always-mounted panel/`useWorkspaceHistoryTreeState` instance owns expansion/reveal/highlight/scroll continuity; Org is a sibling directly below Teams; route changes never swap either owner | Pass |
 | Workspace default is root-only and real | Fresh untouched Team/Org root may select the actual available Temp default; descendants inherit or use exact supported override; no hard-coded path or focus | Pass |
 | Settlement never waits for a non-quiescent execution | The existing one root FIFO and existing terminal sweep remain; exact handles offer non-waiting quiescence preparation, return deferred immediately while a turn/approval is live, and rely on the existing Agent idle/offline resweep | Pass |
 | Root shutdown fences input/provider starts before task drains | Team and Org stabilize and freeze their complete direct/mounted/task/prepared scope, then every AgentRun closes admission, cancels pre-forward work or tracks and interrupts provider-started work through terminal state before task command/settlement drain | Pass |
@@ -215,6 +213,9 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-048 | SCN-004/022; AC-033 | Skip-version ordering, unchanged historical intermediate, retry and independent status | DS-032–033 | Pass |
 | VAL-049 | AC-022/033; ORG-CASE-049–055/062–063 | Physical owned child inventory, external zero writes and truthful diagnostics | DS-031–033 | Pass |
 | VAL-050 | AC-032/033; forward-only convention | Complete source cut, failure truth and no runtime/UI expansion | DS-031–033 | Pass |
+| VAL-051 | REQ-034/036; AC-034; SCN-018 | Compact Messages defaults with exact on-demand identity and unchanged accepted rows | DS-034a/r | Pass |
+| VAL-052 | REQ-035; AC-034; SCN-019 | Task detail without strip, exact Agent/Team participant navigation and retained references | DS-034b/r | Pass |
+| VAL-053 | REQ-031; AC-026; SCN-015 | Exact Org history heading with unchanged sibling order and UI state | DS-034c | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1018,13 +1019,13 @@ package-family rename. It does not infer logical topology from directory depth.
   Org topology/focus/stream; subject stores own lifecycle commands; router owns
   center route only.
 - **State checks:** all existing categories/rows remain; `Teams` still contains
-  only standalone Team roots; `Agent Orgs` appears directly below `Teams` and
+  only standalone Team roots; `Org` appears directly below `Teams` and
   contains Org roots; mounted Teams stay Org children; exact Agent status and
   Team aggregate status remain; expansion, selection and scroll survive route
   transitions unless the user changes them. Org paths join the exact normalized
   Workspace projection; a catalog-missing path remains history-visible and a
   legacy/null path remains in the localized read-only `No Workspace` group. An
-  Org-only workspace is non-empty and still renders `Agent Orgs` at the sibling
+  Org-only workspace is non-empty and still renders `Org` at the sibling
   position immediately after the Teams position.
 - **Owner-separation check:** replacing a successful history family slice with
   new row objects carrying the same stable keys changes data but does not reset
@@ -1108,7 +1109,7 @@ package-family rename. It does not infer logical topology from directory depth.
   AgentOrgRunHistoryCatalogService -> shared AgentOrgRunHistorySummaryWriter
   first write -> atomic current index -> accepted
   ACK -> injected callback -> newest-generation strict Org history query ->
-  existing Agent Orgs row`.
+  existing Org row`.
 - **Normalization check:** inputs with internal newlines/tabs/multiple spaces are
   collapsed and trimmed by the exported Team helper; <=100 characters stay
   exact and >100 uses the first 97 plus `...`. Empty compacted content performs
@@ -1554,6 +1555,69 @@ package-family rename. It does not infer logical topology from directory depth.
   current-browser validations remain required before a new delivery result.
 
 
+### VAL-051 — Compact Messages Without Losing Task-Origin Communication
+
+- **Supported trigger:** user reads accepted configured/task messages and selects
+  content/references live and after settlement/Restore, including same-name
+  counterparts in separate fresh executions. Authority: REQ-034/036, AC-034.
+- **Spine:** unchanged root communication view -> selected-participant facet ->
+  compact list -> selected detail/reference -> optional identity disclosure.
+- **Expected:** sender/receiver direction/name, time, content and references
+  remain. No permanent address, Task badge or run suffix in the left list.
+  Configured-to-task, task-to-configured and task-to-task ordinary messages stay;
+  no formal task record is synthesized as a message. IDs/eligibility/count/order
+  are not affected by removing markup.
+- **On demand:** inspect existing exact address/AgentRun plus task/host context
+  through a keyboard/touch-operable detail-header control, not hover alone.
+  Default detail is closed; changing message/reference/subject closes it, while
+  an update to the same selected item does not unnecessarily reset it. Two equal
+  labels remain distinct rows keyed by their real message IDs. References keep
+  existing IDs/content routes and do not open identity or navigate a participant.
+- **Boundary/result:** same source row/facet, no API/schema/filter/history change;
+  rendered checks required on Team/Org desktop/narrow. Design walkthrough Pass,
+  not executable validation.
+
+### VAL-052 — Familiar Task Detail With Exact Inline Navigation
+
+- **Supported trigger:** read assignment, submission, revision, accept and
+  interruption for task Agent and fresh task Team; inspect delegator and each
+  assigned member, including settled history and repeated same-address tasks.
+- **Spine:** exact selected root/task record -> existing adapter with named
+  direction links/group -> shared detail -> explicit inline name action ->
+  existing root-tagged inspection -> correct live/retained Agent workspace.
+- **Expected:** no top participant name/ID strip. Existing heading/status/
+  direction/time/Markdown and reference viewer remain. Agent names open exact
+  recorded AgentRuns; task-Team name reveals only that fresh Team's participant
+  links, including non-coordinator members. Assignment/review and submission
+  direction references remain correctly oriented; interruption stays system text.
+- **Identity:** on-demand detail is keyboard/touch accessible and uses existing
+  exact metadata. No label/address-based target lookup, first-member or configured
+  source fallback. Missing historical identity produces non-actionable text,
+  never an invented recipient. System item inspection uses its actual task's
+  assignment endpoints rather than creating a system Agent.
+- **Retention/state:** settled member links remain inspectable through the
+  existing read-only path; no task restart/Restore side effect. Subject/item
+  change closes disclosure, live same-item updates retain content selection.
+  Reference click opens only the reference, no participant navigation. Test
+  standalone Team plus Org direct/mounted/task delegators on desktop/narrow.
+- **Boundary/result:** pure detail emits typed links, section retains navigation,
+  root facets keep data; no task policy/store/wire change. Design walkthrough Pass.
+
+### VAL-053 — Org History Label Only
+
+- **Supported trigger:** user with mixed Agent/Team/Org history opens config,
+  runs, focuses, switches subjects, and inspects stopped history (SCN-015).
+- **Spine:** same history/grouping data -> same Workspace collection renderer ->
+  changed localized label -> same tree-state/selection/action behavior.
+- **Expected:** exact English `Org` under `Teams` (existing uppercase styling
+  may render `ORG`); localized maps stay synchronized. Existing main navigation
+  `Agent Orgs`, definition/run titles, category key/order and stable tree keys
+  remain. No remount, lost scroll/expansion/selection or root-kind inference.
+- **Boundary/result:** localized copy only, current empty/no-workspace behavior
+  and runtime unchanged; focused localization/history component test and rendered
+  desktop/narrow check required. Design walkthrough Pass.
+
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -1753,7 +1817,7 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 | Route-selected `AgentOrgRunHistoryPanel` / duplicate left history owner | Yes | always-mounted unified Workspace panel; Org row concerns extracted and old panel deleted |
 | `agentOrgRunStore.history` / `historyError` / `fetchHistory` parallel read cache | Yes | strict AgentOrg slice moves to `runHistoryStore`; Org store retains commands only and callers request unified refresh |
 | Collaboration-history Team branch ingested beside Workspace Team history | Rejected | the unified reader filters only `root_subject_kind:'agent_org'` from that query, so standalone Team roots appear once |
-| AgentOrg roots under Teams or mounted Teams as history roots | Rejected | explicit ordered Agent Orgs sibling category and tagged hierarchy projection |
+| AgentOrg roots under Teams or mounted Teams as history roots | Rejected | explicit ordered Org sibling category and tagged hierarchy projection |
 | Hard-coded or Org-specific Temp Workspace default | Rejected | shared catalog-backed root-only Team/Org selector policy |
 | Mounted Team/Agent independently auto-selects default or workspace changes focus | Rejected | descendants project root/exact Team override; focus remains separate/null |
 | Provider/local teardown awaited indefinitely by root task mutation FIFO | Yes | nullable non-waiting quiescence preparation defers before any blocking teardown |
@@ -1871,6 +1935,14 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 
 ## Self-Validation Conclusion
 
+AD-REV-021 adds VAL-051–053 under approved RER-031. The supported cleanup has
+one coherent UI owner at each boundary, keeps all accepted data and exact
+navigation, and needs no migration or backend change. Fifty-three indexed design
+walkthroughs now exist; only the three new cases and affected UI assertions were
+re-walked for this round. No prior source/API pass is upgraded by this document.
+AD-REV-020/ARCH-REV-018 authoring authority remains unchanged; the following
+conclusions are prior-round history, not a renewed approval hold on AD-REV-020.
+
 AD-REV-020 adds five passing design walkthroughs (VAL-046–050) for approved
 RER-029. One strict current definition shape per family, migration-only previous
 format knowledge, independent definition conversion/status and unchanged runtime
@@ -1961,3 +2033,17 @@ required after that review. Delivery readiness is not claimed.
   bodies unchanged; no literal schemaVersion key in current target examples/types;
   upstream files unchanged; git diff --check passed. These are document checks,
   not executable validation.
+
+## AD-REV-021 Artifact Consistency Checks
+
+- Executed document checks passed: four architecture artifacts have consistent
+  Markdown table/fence shapes; VAL-001–053 have exactly 53 unique detailed
+  walkthroughs and matching index rows; AD-REV-021 has one index/body.
+- Earlier AD-REV-001–020 bodies remain unchanged. The four canonical upstream
+  artifacts have no diff against approved RER-031 commit 3b8c18a28.
+- Current category references use Org; the preserved main-navigation name is
+  explicitly unchanged. DS-029's former prominent Messages badge directive is
+  superseded by DS-034 rather than left as competing presentation authority.
+- git diff --check passed. No application source, test, runtime or other-owner
+  report was changed. The read-only comparison and design walkthroughs are not
+  a rendered browser, implementation, API/E2E or delivery pass.

@@ -4,7 +4,8 @@
 - Inquiry: UI-CLEAN-001; not a completed AD revision.
 - Workspace: /home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model
 - Branch: requirements/flat-agent-organization-model.
-- Current requirements: RER-029@0f5014405eb028123afb37013b722acb2d12fe22.
+- Inquiry requirements: RER-029@0f5014405eb028123afb37013b722acb2d12fe22.
+- Resolution authority: RER-031@3b8c18a28af7674619a797a92a208dabfa851f54.
 - Last completed design: AD-REV-020@a83fa7541e8648a5472493f214a3ba8ed14af6b6;
   ARCH-REV-018 Pass. Inspected source HEAD: 932c81b2261ffcc21ac540b0f25522ecfa1cb29a.
 
@@ -43,26 +44,26 @@
   synchronization; this is not a missing user decision or an invitation to
   redesign the history surface.
 
-## Disposition And Next Action
+## Resolution — Approved RER-031 / AD-REV-021
 
-Bounded Requirement Gap: canonical heading copy conflicts with the user's
-already-approved replacement. Requirements Engineering should reconcile that
-literal and its investigation/revision references, retaining all ordering,
-history, category and identity behavior. Approval is supplied above; no new
-Product gate is requested. Task-strip cleanup remains Architecture-owned under
-the existing familiar-task-detail requirements and direct user confirmation.
+RER-031@3b8c18a28af7674619a797a92a208dabfa851f54 includes the heading-only
+RER-030 and explicitly approves all three presentation corrections: exact Org
+history copy, compact Messages without permanent address/Task-ID additions,
+and familiar task detail without the top participant strip. Exact identity stays
+inspectable on demand; no accepted task-origin messages are filtered. No new
+Product artifact or outstanding user decision remains.
 
-After synchronization, combine these presentation-only adjustments in the next
-architecture impact revision, with focused validation of uncluttered detail,
-exact live/retained navigation, Team regression, and unchanged history order.
-Expected focused scope is Small/Low; final classification/routing follows the
-completed design. AD-REV-020's authoring transition is unaffected. No source,
-test, upstream artifact, runtime or other-owner evidence was changed by this
-inquiry. No implementation or delivery pass is claimed.
+DS-034 in design-spec.md is the completed AD-REV-021 technical correction;
+VAL-051–053 self-validate messages, task participant navigation/retention and
+history copy. Focused Small/Low; cumulative Large/High remains. Existing
+AD-REV-020 authoring transition, runtime/task/message records and policies remain
+unchanged. This inquiry is evidence/navigation only, not a competing UI spec.
+Only architecture-owned artifacts change; no source/tests/upstream/delivery edits
+or new executable pass. Independent review receives the cumulative package.
 
 ## User Evidence
 
-Separate follow-up question (analysis only): the `Task · ed1f8a` badge inside
+Follow-up investigation (subsequently resolved by RER-031): the `Task · ed1f8a` badge inside
 Messages is not a task record. `CollaborationMessagesPanel.vue:53–57` renders it
 when the message counterpart is task-scoped; the suffix is the counterpart
 AgentRun ID, not task ID. `agentOrgCommunicationPerspective.ts` projects only
@@ -70,9 +71,12 @@ the root communication message array, then annotates the counterpart using the
 retained execution index. DS-029 deliberately added this identity badge.
 REQ-034 requires ordinary accepted task-Agent communication to remain in
 Messages; REQ-036 keeps formal assignment/submission/review records separate.
-Do not interpret the user's question as authorization to hide task-origin
-messages. A less prominent identity presentation can be considered separately;
-no badge-removal or message-eligibility change is approved by this inquiry.
+The user's subsequent direction is to keep the message presentation pure.
+Include removal of the prominent Task/run-suffix badge from the default message
+row in the presentation cleanup. Keep sender/receiver, content, time and
+references; exact execution provenance stays inspectable on demand. This does
+not hide task-origin messages or change message eligibility, identity, history,
+or the separation of formal task records from ordinary communication.
 
 - Task-strip screenshot: /home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/software_engineering_team_570be46d520142849ac61785be03dca1/architecture_designer_6b8b3019214246e086957b3f395901bb/context_files/ctx_1b892b545fae__image.png
 - Heading screenshot: /home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/software_engineering_team_570be46d520142849ac61785be03dca1/architecture_designer_6b8b3019214246e086957b3f395901bb/context_files/ctx_5c796264f166__image.png

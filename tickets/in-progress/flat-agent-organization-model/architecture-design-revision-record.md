@@ -28,6 +28,7 @@ does not revise intended behavior.
 | AD-REV-018 | Architecture Reviewer `ARCH-REV-015` / endpoint-eligibility recovery round | `AR-FIND-008`; retained `API-FIND-019`; `REQ-034`; `AC-029`; `SCN-018` | `Architecture Revision — Both-Endpoint Configured Message Eligibility` | `Architecture Design Complete`; only configured→configured receives the new member event/Messages projection while all three task-involved exact-ID directions preserve prior delivery/sidecar behavior; 40-case self-validation tightened; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-019 | Requirements Engineer approved RER-028 / user task-workflow parity correction | API-FIND-019; AAV-001 retained-history interpretation; REQ-034–036; AC-029–031; SCN-018–020 | `Architecture Revision — Task-Inclusive Messages, Participant Tasks And Retained Execution Views` | `Architecture Design Complete`; superseded configured gate removed; exact participant facets/selection/history and truthful system input; 45-case design self-validation; focused Medium/High, cumulative Large/High; independent Architecture Review selected |
 | AD-REV-020 | Approved RER-029 authoring simplification; Delivery DR-008 re-entry | PKG-AUTH-001 | Architecture Revision — Field-Free Team/Org Definition Authoring And Owned Transition | Architecture Design Complete; focused Medium/High, cumulative task_size=Large / architectural_risk=High; self-validation 50 cases; independent Architecture Review selected |
+| AD-REV-021 | User-approved UI cleanup; approved RER-031 including RER-030 | UI-CLEAN-001; REQ-031/034/035; AC-026/034 | Architecture Revision — Compact Messages, Inline Task Navigation And Org History Heading | Architecture Design Complete; focused Small/Low, cumulative task_size=Large / architectural_risk=High; 53-case design inventory; independent Architecture Review selected |
 
 ## Revision Entries
 
@@ -1675,3 +1676,42 @@ does not revise intended behavior.
   deterministic file/runner/authoring and rendered validation are in VAL-046–050.
   Fresh source/API review and Delivery build/user verification must follow;
   no release, finalization or terminal Requirements handoff is claimed here.
+
+### AD-REV-021 — Compact Message/Task Presentation And Org Heading
+
+- Date: 2026-09-11. Trigger: user screenshots and explicit cleanup approval,
+  reconciled by Requirements as RER-031@3b8c18a28af7674619a797a92a208dabfa851f54
+  (includes heading-only RER-030). UI-CLEAN-001 is resolved at Requirements;
+  no Product decision or gate remains. Inquiry a9c841510/f8d51ac2b was not AD-021.
+- Prior design/review: AD-REV-020@a83fa7541e8648a5472493f214a3ba8ed14af6b6 /
+  ARCH-REV-018 Pass@dc831aa5acec2796ec14bdd0f9f8b0847f857f66. Current source
+  inspected at IR-039 checkpoint 932c81b22. Its authoring transition is unchanged.
+- Result: Architecture Design Complete; focused design walkthrough Pass;
+  independent review pending, no source/test/browser/delivery result claimed.
+- Authority: REQ-031/034/035/036; AC-026/034; SCN-015/018/019. Preserve ordinary
+  task-origin communication, formal task records and notification distinction,
+  exact identity/retention, category order and existing root state/ownership.
+- DS-034: remove permanent list address/Task-ID badge and top task participant
+  strip; preserve the original message/task content and reference components.
+  Use closed identity detail in existing right headers; move task navigation to
+  named endpoints, with exact task-Team member links exposed on demand. Keep
+  labels display-only, detail pure, and navigation at the existing section/root
+  boundary. No new generic popup/store/API or lifecycle/DTO persistence changes.
+- Change history collection localized copy to exact Org only; do not rename
+  main navigation, root types, run titles or category keys. Reconcile current
+  DS-025/category mappings and supersede DS-029's prominent identity badge rule.
+- Affected artifacts: design spec status/evidence/DS-034 and current mapping;
+  self-validation VAL-051–053 plus heading assertions; this revision record;
+  cleanup inquiry resolution. Earlier revision bodies remain unchanged.
+- Classification: focused Small/Low, a local presentation/copy cleanup absorbed
+  by existing read facets, adapters and components. Cumulative Large/High remains
+  the parent package's reviewed classification; apply the revised-package rule
+  for independent Architecture Review, scoped proportionately to this delta.
+- Downstream: implement within existing components/projections, delete obsolete
+  strip markup and unused flat link projection, run focused component/adapter/
+  localization and desktop/narrow checks; preserve normal source/API/Delivery
+  ownership. No whole-package prior pass is retracted from this copy change.
+- Residual risks: hidden or wrong same-name participant, losing task-Team member
+  access after settlement, hover-only identity on narrow screens, or title-driven
+  state reset. VAL-051–053 specify positive/negative checks. No remaining material
+  decision; no migration, schema, provider, task-policy or authoring-scope change.
