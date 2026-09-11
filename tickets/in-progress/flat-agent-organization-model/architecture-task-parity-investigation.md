@@ -1,0 +1,141 @@
+# Task Workflow Parity — Read-Only Architecture Comparison
+
+- Stable package: `AORG-FLAT-TEAM-001`.
+- Date: 2026-09-11.
+- Trigger: the user asks whether a direct Agent in an Org can delegate to a
+  mounted Team, creating a fresh task Team, and inspect the same task/messages
+  experience as the earlier nested-Team implementation.
+- Earlier immutable Team baseline: `5fb16658e7bd2aefd750f99eb596a17382e161ac`.
+  This is the previously pinned `origin/personal` experience, not the currently
+  advanced ref (`5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`).
+- Current inspected task-worktree HEAD:
+  `22a2d9eba959310b8bbc3eb96c0f767608786b69`; source artifact remains
+  `6ef456e0a3fd568e732bafbd79c5f9abb2aed1f4` with subsequent documentation only.
+- Requirements authority: RER-027; completed design/review: AD-REV-018 /
+  ARCH-REV-016 Pass. AAV-001 is resolved and is not reopened by this comparison.
+- Outcome: requested source comparison, with a separate architecture-owned
+  direct-delegator Tasks presentation gap identified. This is not a completed
+  design revision, implementation assignment, browser validation, or delivery
+  result. No source/test/requirements/design-spec change was made.
+
+## Supported scenario and three distinct presentation paths
+
+The user supplies an ordinary task-delegation scenario: an Org contains direct
+Agent A and a configured flat Team T. A delegates work to T. The system creates
+a fresh task-Team execution with fresh runtime identities, not another
+configured Team and not reuse of T's already-mounted execution as the assignee.
+The task remains in A's exact owning Org runtime scope. The user selects A to
+inspect its delegated work and accepted messages/results. After acceptance and
+settlement, the task leaves active execution while retained task records and
+accepted A conversation input remain inspectable.
+
+Do not conflate these three paths:
+
+1. **Task lifecycle:** delegation tool -> owning root task engine -> fresh task
+   preparation/commit -> task sidecar/event -> selected participant's Tasks
+   list/detail with assignment, submissions, reviews, references and status.
+2. **Task result notification:** assignee `submit_task_result` -> durable task
+   submission -> system input to the exact original delegator -> its normal
+   processing/conversation/history. A saved result is not proof that its
+   notification was delivered; an unsuccessful notification is reported.
+3. **Ordinary task communication:** an executing task Agent's `send_message_to`
+   -> root message authority -> accepted receiver input -> conversation event
+   and selected-participant Messages perspective. This is separate from formal
+   task submission and the Tasks list.
+
+## Earlier Team evidence
+
+Paths below are read with `git show 5fb16658:<path>`; no checkout or mutation.
+
+- `autobyteus-server-ts/src/agent-team-execution/task-delegation/task-delegation-service.ts:134-190,318-324`:
+  resolves the target and exact host, materializes a fresh task Agent/Team,
+  commits activation, and returns the fresh Agent or Team coordinator run ID.
+- Same file `333-385`: stores submission/review records, notifies the original
+  delegator through a separate task system-input path, and schedules settlement
+  after acceptance. `443-477` finishes settlement and unregisters terminated
+  task execution handles without erasing the task record.
+- `autobyteus-web/components/workspace/team/TeamOverviewPanel.vue:42-62,84-110`:
+  displays both Messages and Tasks using the focused Agent's identity.
+- `autobyteus-web/utils/teamDelegatedTaskEntries.ts:126-136`:
+  task visibility includes the delegator, a task Agent assignee, and Agents
+  inside the fresh task Team. Task list/detail is not a raw message ledger.
+- `autobyteus-server-ts/src/services/team-communication/team-communication-message-append-plan.ts:75-95`:
+  accepted durable messages publish both root communication and receiver input;
+  this publication has no configured-pair-only gate.
+- `autobyteus-web/utils/teamCommunication/teamCommunicationPerspective.ts:12-46`:
+  filters by exact selected sender/receiver and resolves the counterpart through
+  the task-inclusive execution view, rather than excluding task endpoints.
+
+## Current Org comparison
+
+### Preserved backend task creation and result path
+
+`autobyteus-server-ts/src/agent-org-execution/services/agent-org-task-lifecycle-adapter.ts:62-113`
+resolves the configured source, takes the originating Agent's exact host,
+materializes fresh task identities, and prepares a root-hosted task Team for a
+direct Org Agent or a Team-hosted task for an Agent inside a mounted Team.
+
+`autobyteus-server-ts/src/agent-collaboration/execution/task/root-task-lifecycle-engine.ts:174-192,335-338`
+stores the formal submission and separately delivers a system notification to
+the exact delegator, with an explicit warning if notification is not accepted.
+These match the relevant earlier workflow. This read does not claim the whole
+workflow passed current browser testing.
+
+### Direct originating Agent has no right-side Tasks section
+
+The current source establishes a deterministic composition gap:
+
+- `autobyteus-web/types/workspace/activeAgentWorkspaceTarget.ts`: the direct Org
+  Agent target has `collaborationMessages`, but no delegated-task view; task
+  presentation remains part of `TeamWorkspaceContextView`.
+- `autobyteus-web/services/agentOrgExecution/agentOrgExecutionContext.ts:142-186,426-455`:
+  direct Agent targets receive Messages only. Mounted-Team targets additionally
+  receive `teamView`, which supplies `listDelegatedTaskEntries`.
+- `autobyteus-web/components/layout/RightSideTabs.vue:110-116`: `activeTeamView`
+  is null for a direct Org Agent.
+- `autobyteus-web/components/workspace/collaboration/CollaborationOverviewPanel.vue:9-20,40`:
+  Tasks is guarded by `v-if="team"`; task entries come only from that Team view.
+- `autobyteus-web/services/agentOrgExecution/agentOrgTeamPresentation.ts:117-143`:
+  the current task projector also requires a configured Team and builds its
+  delegator identity lookup only from that Team's configured members.
+
+Thus, successful task creation does not imply A can inspect it in the requested
+right-side Tasks surface. This is a frontend ownership/composition gap, not a
+reason to create a fake Team parent or a second task store. It is traceable to
+DS-028's direct-target Messages-only composition and the file mapping in
+`design-spec.md`, as well as VAL-040's direct-versus-mounted composition note.
+Architecture owns correcting that design boundary; implementation should not
+be told to guess a new UI or treat a direct Agent as a Team.
+
+### Ordinary live task-message visibility remains deliberately narrower
+
+AD-REV-018 and the current Org endpoint classifier/communication projector
+permit only configured-to-configured pairs in the added live receiver event
+and configured Messages view. The earlier Team behavior is broader. This
+restriction does not suppress formal task-sidecar submissions or authorize
+deletion of accepted input from retained conversation history.
+
+RER-027 resolved retained history only; it did not authorize expansion of the
+scoped live view. The user's desired full task-workflow parity and the current
+scoped exclusion must not be described as already equivalent. Before changing
+that live-view boundary, reconcile it with Requirements Engineering; component
+and identity ownership remain Architecture's responsibility, not Product UI
+invention. No such design or requirements change is made by this read-only
+comparison.
+
+## Conclusions for the user discussion
+
+- The user's delegation example is the same supported product workflow that
+  existed with nested configured Teams; changing the root to AgentOrg does not
+  require different task controls or message presentation.
+- Fresh task execution must remain distinct from its configured source Team.
+- The task itself, formal task submissions/reviews, system result notifications,
+  ordinary task messages, and retained conversation are related but distinct
+  records/paths. A blanket claim that task results are excluded is incorrect.
+- Two separate presentation discrepancies are now explicit: direct Org
+  delegators lack the Tasks composition, and task ordinary messages are excluded
+  from the scoped live communication view. Task-Agent and task-Team participant
+  navigation must also be traced in a subsequent parity design/validation round;
+  this investigation does not claim its completeness.
+- No new runtime/persistence architecture is inferred from the UI gap. No
+  implementation or new AD revision is authorized by this investigation alone.
