@@ -1,0 +1,21 @@
+{
+  "observedAt": "2026-09-11T00:38:37.897969+00:00",
+  "assets": [
+    {
+      "name": "AutoByteus_personal_android-1.4.69-release.apk",
+      "bytes": 1846691,
+      "sha256": "2383cb290e34ec9d3f8187ef1f336c2104a56ccac22f0a7da440d576cfcabf80",
+      "matchesPublishedChecksum": true
+    },
+    {
+      "name": "autobyteus-message-gateway-1.4.69-node-generic.tar.gz",
+      "bytes": 47741164,
+      "sha256": "3e7a86d308dd98504c928c9733a133c94eb2aab91351274c4a636ad5724788b7",
+      "matchesPublishedChecksum": true
+    }
+  ],
+  "gatewayPackageVersion": "1.4.69",
+  "gatewayManifestMatchesTaggedSource": true,
+  "apkContainsAndroidManifest": true,
+  "runtimeExecution": "Not performed; checksum/structure verification only; signed Android build is CI-owned"
+}

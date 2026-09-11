@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-09-11T00:46:22.126353+00:00",
+  "runID": 34546876341,
+  "firstAttempt": "failure",
+  "firstFailure": "Build And Test iOS App / Generate, build, and run implementation checks; xcodebuild exit65; testFakeNodeOpensAndRestoresWithFakeMobileMarker WebView/marker missing on restore at lines66/68",
+  "testflightFirstAttempt": "Skipped, not uploaded",
+  "iosSourcesAndWorkflowChangedSincePreviousRelease": false,
+  "retryCommand": "gh run rerun 34546876341 --failed",
+  "retryConfirmed": {
+    "run_attempt": 2,
+    "status": "queued",
+    "updated_at": "2026-09-11T00:46:01Z"
+  },
+  "justification": "One unchanged-tag failed-jobs retry to check reproducibility of simulator restore assertion. No assertion/timeout/source edits and no failure waiver. Unchanged input does not establish cause or preexisting status.",
+  "currentOverallOutcome": "Pending; not Delivery Completed",
+  "retainFailure": true
+}

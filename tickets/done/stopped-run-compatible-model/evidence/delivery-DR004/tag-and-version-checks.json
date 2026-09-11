@@ -1,0 +1,22 @@
+{
+  "releaseTag": "v1.4.69",
+  "releaseSHA": "17d4f2327329cee3509062fd823b8e049f563682",
+  "annotatedTagSHA": "0042ad4cddc24ed2ea8cda6b1c5251555ae4c283",
+  "packageVersions": {
+    "autobyteus-web/package.json": "1.4.69",
+    "autobyteus-message-gateway/package.json": "1.4.69"
+  },
+  "changedReleaseCommitFiles": [
+    ".github/release-notes/release-notes.md",
+    "autobyteus-message-gateway/package.json",
+    "autobyteus-server-ts/src/managed-capabilities/messaging-gateway/release-manifest.json",
+    "autobyteus-web/package.json"
+  ],
+  "curatedNotesEqual": true,
+  "releaseNotesSHA256": "47944474275e0adb9670479412af390ab302a4cb01424f977370baecd519cbdf",
+  "helperExitCode": "0",
+  "remoteRefs": "17d4f2327329cee3509062fd823b8e049f563682\trefs/heads/personal\n0042ad4cddc24ed2ea8cda6b1c5251555ae4c283\trefs/tags/v1.4.69\n17d4f2327329cee3509062fd823b8e049f563682\trefs/tags/v1.4.69^{}\n",
+  "hygiene": "Pass 27333 tracked files",
+  "managedManifest": "Pass v1.4.69",
+  "newFunctionalChange": "None: version/notes/managed artifact locations only"
+}

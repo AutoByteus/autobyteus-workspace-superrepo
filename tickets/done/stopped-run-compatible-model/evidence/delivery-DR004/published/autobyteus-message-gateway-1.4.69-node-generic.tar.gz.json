@@ -1,0 +1,12 @@
+{
+  "packageName": "autobyteus-message-gateway",
+  "packageVersion": "1.4.69",
+  "artifactVersion": "1.4.69",
+  "platformKey": "node-generic",
+  "archiveType": "tar.gz",
+  "archiveFileName": "autobyteus-message-gateway-1.4.69-node-generic.tar.gz",
+  "sha256": "3e7a86d308dd98504c928c9733a133c94eb2aab91351274c4a636ad5724788b7",
+  "entrypoint": "dist/index.js",
+  "packageRoot": ".",
+  "generatedAt": "2026-09-11T00:33:52.519Z"
+}

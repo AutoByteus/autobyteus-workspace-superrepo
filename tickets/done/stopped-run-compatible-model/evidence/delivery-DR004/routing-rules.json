@@ -1,0 +1,32 @@
+{
+  "returnedRules": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"handoffs\":[{\"when\":\"When Delivery Engineer classifies the outcome as Delivery Completed after explicit user verification, repository finalization, and every applicable release, publication, deployment, rollout, and safe-cleanup step is Completed or truthfully Not required. Include the complete cumulative package, final validation evidence, delivery and finalization artifacts, user-verification reference, final branch/commit/merge/push state, release or deployment outcome, and durable artifact paths for Requirements Engineer to verify and return.\",\"recipient_address\":\"/requirements_engineer\"},{\"when\":\"When delivery discovers a code or packaging Local Fix that must be corrected by implementation before finalization can continue.\",\"recipient_address\":\"/software_engineering_team/implementation_engineer\"},{\"when\":\"When delivery discovers a Design Impact, Requirement Gap, or Unclear issue, or final handoff is blocked by a non-deployment issue that requires upstream classification.\",\"recipient_address\":\"/software_engineering_team/architecture_designer\"}]}"
+      }
+    ],
+    "structuredContent": {
+      "handoffs": [
+        {
+          "when": "When Delivery Engineer classifies the outcome as Delivery Completed after explicit user verification, repository finalization, and every applicable release, publication, deployment, rollout, and safe-cleanup step is Completed or truthfully Not required. Include the complete cumulative package, final validation evidence, delivery and finalization artifacts, user-verification reference, final branch/commit/merge/push state, release or deployment outcome, and durable artifact paths for Requirements Engineer to verify and return.",
+          "recipient_address": "/requirements_engineer"
+        },
+        {
+          "when": "When delivery discovers a code or packaging Local Fix that must be corrected by implementation before finalization can continue.",
+          "recipient_address": "/software_engineering_team/implementation_engineer"
+        },
+        {
+          "when": "When delivery discovers a Design Impact, Requirement Gap, or Unclear issue, or final handoff is blocked by a non-deployment issue that requires upstream classification.",
+          "recipient_address": "/software_engineering_team/architecture_designer"
+        }
+      ]
+    }
+  },
+  "selectedRule": {
+    "when": "When Delivery Engineer classifies the outcome as Delivery Completed after explicit user verification, repository finalization, and every applicable release, publication, deployment, rollout, and safe-cleanup step is Completed or truthfully Not required. Include the complete cumulative package, final validation evidence, delivery and finalization artifacts, user-verification reference, final branch/commit/merge/push state, release or deployment outcome, and durable artifact paths for Requirements Engineer to verify and return.",
+    "recipient_address": "/requirements_engineer"
+  },
+  "outcome": "Delivery Completed",
+  "dispatch": "Not yet sent; actual tool receipt is authoritative"
+}

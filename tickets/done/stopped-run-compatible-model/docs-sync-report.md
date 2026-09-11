@@ -62,3 +62,8 @@ Repository finalization and cleanup completed after explicit user confirmation. 
 - Seven canonical behavior docs remain accurate; no new behavior/API/architecture documentation change is needed.
 - Archived release notes are now curated functional notes for v1.4.69, using the root release template. Prior candidate/local-build/acceptance notes and reports remain byte-preserved in evidence/delivery-DR004.
 - Release helper will copy those notes into .github/release-notes/release-notes.md. Publication and build verification remain pending, not assumed successful.
+
+### DR-004 Final Release Result (2026-09-11T01:13:42.081979+00:00)
+- **Delivery Completed**: stable v1.4.69 published via README helper; curated archived/tagged/published notes match. No further canonical behavior-doc change needed.
+- Current release report and handoff now supersede DR-003 no-release scope; prior artifacts are preserved. All required platform publishing gates Pass and output checks Pass; exact evidence under evidence/delivery-DR004.
+- iOS initial failure/retry and explicit user non-blocking exception retained separately; final attempt2 Pass. No broader functional/provider/security claim introduced.

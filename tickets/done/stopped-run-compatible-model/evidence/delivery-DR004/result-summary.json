@@ -1,0 +1,58 @@
+{
+  "observedAt": "2026-09-11T01:13:42.081979+00:00",
+  "result": "Delivery Completed",
+  "revision": "DR-004",
+  "tag": "v1.4.69",
+  "releaseSHA": "17d4f2327329cee3509062fd823b8e049f563682",
+  "releaseURL": "https://github.com/AutoByteus/autobyteus-workspace/releases/tag/v1.4.69",
+  "requiredWorkflowResults": [
+    {
+      "name": "Desktop Release",
+      "id": 34546876308,
+      "url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876308",
+      "attempt": 1,
+      "conclusion": "success",
+      "required": true
+    },
+    {
+      "name": "Server Docker Release",
+      "id": 34546876309,
+      "url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876309",
+      "attempt": 1,
+      "conclusion": "success",
+      "required": true
+    },
+    {
+      "name": "Release Messaging Gateway",
+      "id": 34546876311,
+      "url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876311",
+      "attempt": 1,
+      "conclusion": "success",
+      "required": true
+    },
+    {
+      "name": "Android APK Release",
+      "id": 34546876312,
+      "url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876312",
+      "attempt": 1,
+      "conclusion": "success",
+      "required": true
+    },
+    {
+      "name": "iOS App Store Connect Release",
+      "id": 34546876341,
+      "url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876341",
+      "attempt": 2,
+      "conclusion": "success",
+      "required": false
+    }
+  ],
+  "iosHistory": "Attempt1 failed restore assertions; unchanged failed-jobs attempt2 passed including TestFlight upload. User explicitly made iOS non-blocking before retry result. No causal attribution or failure deletion.",
+  "releaseAssets": 21,
+  "dockerDigest": "sha256:488b9ba8b51abce1aa622036f28ff5f1849ec52bf67c595889257ed9a09beefb",
+  "actualInstalledDeployment": "Not required; no existing containers/apps upgraded",
+  "publicAppStoreRelease": "Not required/not performed; only App Store Connect/TestFlight upload",
+  "newWorktreeOrBranch": "Not required; documented helper runs on already-finalized personal",
+  "priorCleanup": "DR-003 retained, no additional task cleanup required",
+  "terminalDispatch": "Eligible; confirm only from actual send_message_to receipt"
+}

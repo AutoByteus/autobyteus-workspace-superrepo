@@ -1,0 +1,21 @@
+{
+  "observedAt": "2026-09-11T01:14:54.581305+00:00",
+  "releaseSHA": "17d4f2327329cee3509062fd823b8e049f563682",
+  "upstreamRefreshedBeforeFinalEvidenceCommit": true,
+  "sourceAndTestUnchanged": true,
+  "finalReleaseCommitScope": [
+    ".github/release-notes/release-notes.md",
+    "autobyteus-web/package.json",
+    "autobyteus-message-gateway/package.json",
+    "autobyteus-server-ts/src/managed-capabilities/messaging-gateway/release-manifest.json"
+  ],
+  "nonRawStagedWhitespaceCheck": "Pass",
+  "rawWhitespaceDiagnostics": {
+    "tickets/done/stopped-run-compatible-model/evidence/delivery-DR004/ios-failure.log": 657,
+    "tickets/done/stopped-run-compatible-model/evidence/delivery-DR004/release-helper.log": 4
+  },
+  "rawLogPolicy": "657 iOS CI log diagnostics and 4 helper log diagnostics retained byte-for-byte; no source/test/docs/script whitespace issue. Initial audit stopped to identify helper log diagnostics before explicit raw-evidence accounting.",
+  "artifactHygiene": "Repository artifact hygiene check passed.\nTracked files scanned: 27369\nPath-length threshold: 200\nLongest tracked path: 199 chars: tickets/done/event-monitor-history-transparency/probes/api-e2e/full-stack-runtime/data/logs/app-data-migrations/20260731_remove_external_runtime_working_context_snapshots-2026-08-20T18-45-01-177Z.log\n",
+  "stagingPolicy": "Explicit paths: five delivery files and bounded DR004 evidence; no binaries/generated caches/no broad git add",
+  "postCommitReceipt": "/home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR004/repository-final-state.json"
+}

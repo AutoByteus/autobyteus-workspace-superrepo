@@ -11,6 +11,8 @@ Canonical docs-sync report, handoff summary and release-deployment report are th
 
 | DR-003 | CRR-005/API-REV-003 plus explicit user confirmation | DR-002 user-verification hold | Delivery Completed | Current docs/handoff/release reports; archived package; finalization and preservation evidence |
 
+| DR-004 | User requests a new release; later makes iOS non-blocking | DR-003 Delivery Completed, release not required | Delivery Completed — v1.4.69 published | Current docs/handoff/release reports and notes, package index, evidence/delivery-DR004 |
+
 ## Revision Entries
 ### DR-001 — Initial current-base documentation and verification hold
 - Date/trigger: 2026-09-09; Code Reviewer delivered the cumulative validated package, CRR-003 Pass.
@@ -56,3 +58,20 @@ Canonical docs-sync report, handoff summary and release-deployment report are th
 - Separate API-F001/C16 remains unresolved outside ticket; C19 is control, not fix; CRF-002 resolved. No unresolved ticket findings. API/provider/full-suite/typecheck/GUI/cross-platform limits retained; no new confidence rescore.
 - Terminal return: **Eligible; dispatch confirmation belongs to the actual send_message_to receipt**. `get_handoff_rules` selected the single Delivery Completed rule and exact recipient `/requirements_engineer`; `evidence/delivery-DR003/routing-rules.json` preserves the response. Final record synchronization and tool-confirmed dispatch follow. No message success asserted before tool confirmation.
 - Why revision recorded: user acceptance and actual repository/cleanup gates replace the DR-002 hold, while preserving prior rounds and separate symptom scope. No remaining delivery blocker.
+
+### DR-004 — Authorized Stable v1.4.69 Publication
+- Completed result recorded at 2026-09-11T01:13:42.081979+00:00; new user trigger “lets do a new release thanks”, after DR-003 explicit ticket acceptance/finalization.
+- Prior authoritative result **DR-003 Delivery Completed — no release requested then**; historical record retained, not retroactively changed.
+- Current authoritative result **Delivery Completed**. Medium/High/Reviewed and all requirements/design/source/API/review authorities unchanged.
+- Integration: fetched origin/personal before edits, unchanged f3de2f67f; ff-only Already up to date. No new source/test/base integration or renewed user verification needed; fresh tagged CI checks actual release packages. Final fetch also matches release SHA.
+- Docs sync Pass/no new long-lived behavior impact. Archived release notes recast as functional release notes, prior bytes retained; root curated/tagged/public notes equal. Current handoff-summary and release-deployment-report supersede no-release scope.
+- README helper exit0; release commit17d4f2327329cee3509062fd823b8e049f563682 / annotatedv1.4.69, both versions and managed manifest synchronized, personal/tag pushes independently verified. No hand-built tag or duplicate new-tag workflow dispatch.
+- Desktop five-platform build/publish, Android signed APK, gateway runtime, Docker amd64/arm64 versioned/latest publication **Pass**. Published21assets and metadata/actual downloaded checksums verified; Docker registry digests match. CI jobs/exact results in evidence/delivery-DR004.
+- iOS attempt1 simulator restore assertion failure/exit65 retained; one unchanged-tag failed-jobs attempt2 **Pass**, including TestFlight upload/cleanup. User twice explicitly made iOS non-blocking before retry outcome. Scope exception is not test evidence, root cause/fix not inferred, no further retry. App Store public release Not required/not performed.
+- Delivery-local published-metadata checker initially assumed Windows size; corrected only that checker to record unadvertised size while retaining artifact/digest checks, final Pass. Original diagnostic preserved.
+- Repository ticket archive/merge/push/cleanup remain complete from DR-003. Release runs on finalized personal as documented; no new task worktree/branch/local runtime started, downloaded release bytes retained outside Git, no existing deployment/shared data changed. No migration/rollout installation required.
+- Final containing-record SHA/push/clean state receipt is external at /home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR004/repository-final-state.json and in terminal handoff.
+- Terminal return **Eligible — confirmation only through actual send_message_to receipt**, not yet asserted Sent here. Completed-result rules govern the single exact recipient.
+- Why revision: explicit later release request changes conditional publication applicability; actual publication must not be inferred from prior DR-003 repository completion.
+- Remaining blockers **None**. API-F001 remains a separate unresolved observation; provider/full-suite/GUI/installed-upgrade and public App Store limits retained. Published tag immutable; any regression requires coordinated reviewed rollback/hotfix, never conversation-history edits.
+- Completed-result `get_handoff_rules` selects **Delivery Completed -> /requirements_engineer**, single exact recipient; persisted rules/selection in `evidence/delivery-DR004/routing-rules.json`.
