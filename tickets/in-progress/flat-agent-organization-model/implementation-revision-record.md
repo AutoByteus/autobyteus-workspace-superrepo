@@ -46,6 +46,8 @@
 
 | IR-039 | Architecture Reviewer ARCH-REV018 / approved RER029 | PKG-AUTH001 resolved by approval; no new CR-FIND | Architecture reconciliation; Large/High | RER029; AD-REV020; ARCH-REV018; prior CRR058/059; API24; DR008 | Strict field-free Team/Org authoring and scoped owned-definition startup transition; ready for cumulative source review. |
 
+| IR-040 | Architecture Reviewer ARCH-REV019 / approved RER031 incl RER030 | UI-CLEAN001; no new CR-FIND | Architecture reconciliation; Large/High | AD-REV021; ARCH-REV019; prior CRR060; API25 ongoing/API24 historical; DR008 | Compact Messages/task detail and Org history copy; exact retained endpoints preserved; ready for cumulative source review. |
+
 ## Revision Entries
 
 ### IR-001 — AgentOrg execution-root extraction design impact
@@ -955,3 +957,20 @@
 - Source health:14 surviving changed production files, max454nonempty, no >500 or >220 changed-line source signal after rename tracking; distinct family structures, historical code only under migration, no backend runtime/provider/lifecycle/frontend layout change. New frontend rendered check N/A (nonvisual backend/storage boundary).
 - Preservation:6223 starting other-owner hashes unchanged; Delivery module/docs/reports and API raw evidence untouched. Removed only own generated SDK/dist/devkit scratch/Brief pack outputs. No raw DB/env/key files committed. External owner updates and Delivery documentation/sample build sync remain their owners' work.
 - Next route: `get_handoff_rules` selected completed Large-or-High implementation ready for independent source review; exact recipient `/software_engineering_team/code_reviewer`. Renewed full cumulative API/E2E and fresh Delivery build/user verification required; prior API24/DR008 are not authoring-delta acceptance.
+
+
+### IR-040 — Compact collaboration presentation with exact participant links
+- Trigger: ARCH-REV019 Pass, RER031@3b8c18a28af7674619a797a92a208dabfa851f54 including RER030; AD-REV021@22d191ea4a9d066aec24faf017a25e090d1b4763/reviewbe6b20f4a988eabbeb797a70af1b9cb0091c2f64. UI-CLEAN001, no new CR-FIND.
+- Prior authoritative result: IR039 source4c3d218adf9a3203310923b823ceac2a5dd74ffe/artifact932c81b2261ffcc21ac540b0f25522ecfa1cb29a; CRR060 Pass94.1/100. API25 in progress, no pass inferred; API24/CRR059/DR008 remain scoped history.
+- Current result: source7d967d411f806429bb9c6bbdcf8bb382f35b266e; implementation/local checks complete and ready for fresh cumulative source review. Current code/implementation-handoff authoritative.
+- Classification: focused Small/Low, cumulative Large/High confirmed. No Design Impact, Requirement Gap or Product gate.
+- Behaviors: BEH014/017/018, REQ031/034–036, AC026/034, SCN015/018/019; DS034a/b/c/r, VAL051–053.
+- Delta: history label Org/组织 only; remove Messages permanent address/Task suffix and Tasks top strip. Exact identity moves to closed right-header disclosure; Agent names emit exact links, fresh Team names expose all retained members. Existing Org/Team adapters supply typed directions; system interruption uses assignment endpoints without fake Agent; references stay separate.
+- Owners: item emits -> pane forwards -> section navigates. Same-item live updates retain disclosure; subject/item/reference changes reset. Obsolete strip participants removed; runtime taskParticipants/relevance retained. No query/store/cache/backend/API/schema/lifecycle/migration change.
+- RER029 authoring/startup migration untouched. Task-inclusive input/history, same-address identity, strict checkpoint/recovery, root lifecycle/FIFO/fences, title eligibility and CR-FIND019 no-refocus remain.
+- Local validation: final web39files/296tests; overlapping focused16/93; guards/literal audit0; existing SDK prerequisite + production Nuxt build/prerender16routes. Initial missing SDK and focused reset/fixture failures retained; final checks pass without bypass/timeout changes.
+- Render:20 English/zh-CN desktop/narrow states with keyboard/touch, compact defaults, reference/reversed submission/all-member and direct/mounted/task/standalone scopes; no final pageerror/overflow. Synthetic actual-component/context fixture, not new provider/server/native acceptance. System/fallback/repeated-name/exact dispatch are component/adapter cases.
+- Source health:7 executable files <=276nonempty, no >220 changed-line signal; locale data separate. Eighteen source/test/catalog paths. No wrapper/parallel renderer/legacy strip.
+- Preservation:8484 starting other-owner hashes unchanged; Delivery/source-review/API files and raw data not staged/reset/edited. Own temporary route/process and generated SDK prerequisite cleaned; no raw DB/env evidence committed.
+- Evidence: implementation-evidence/IR-040/local-checks.md, source-files.json, source-limits.txt, preservation.txt, render/evidence.json.
+- Next: current get_handoff_rules selected the completed Large-or-High implementation ready-for-independent-source-review rule; exact recipient /software_engineering_team/code_reviewer. Then renewed current-artifact cumulative API/E2E and Delivery package/user verification. No current downstream pass.
