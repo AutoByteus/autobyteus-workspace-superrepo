@@ -2,227 +2,204 @@
 
 ## Review Round Meta
 
-- Stable package: `AORG-FLAT-TEAM-001`.
-- Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` — approved `RER-029@0f5014405eb028123afb37013b722acb2d12fe22`.
+- Stable package: `AORG-FLAT-TEAM-001 / UI-CLEAN-001`.
+- Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` — approved `RER-031@3b8c18a28af7674619a797a92a208dabfa851f54`, including RER-030.
 - Upstream Investigation Notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`.
 - Upstream Requirements Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`.
-- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` — `AD-REV-020@a83fa7541e8648a5472493f214a3ba8ed14af6b6`.
-- Supplemental Task Artifacts Reviewed: `agent-org-contract.md`, `architecture-package-authoring-investigation.md`, `architecture-design-self-validation.md`; retained task-parity/assertion supplements and Product RV-012/status/override authorities; canonical production migration convention; current IR-038 / CRR-058–059 / API-REV-024 / DR-008 provenance.
+- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` — `AD-REV-021@22d191ea4a9d066aec24faf017a25e090d1b4763`.
+- Supplemental Task Artifacts Reviewed: UI-cleanup investigation and its three supplied screenshots; current contract and self-validation; retained package-authoring, task-parity and assertion supplements; cumulative Product RV-012/status/override/baseline authorities.
 - Architecture Design Revision Record Reviewed: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`.
-- Relevant Architecture Design Revision IDs: AD-REV-020; retained cumulative AD-REV-001–019 except explicitly superseded authored-version policy.
+- Relevant Architecture Design Revision IDs: AD-REV-021 / DS-034; cumulative AD-REV-001–020 except explicitly superseded heading/always-visible presentation instructions.
 - Architecture Review Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`.
-- Current Architecture Review Revision ID: `ARCH-REV-018`.
-- Current Review Round: 18.
-- Trigger: user-approved both-file authoring simplification after PKG-AUTH-001 / DR-008 re-entry.
-- Prior Review Round Reviewed: ARCH-REV-017 Pass on AD-REV-019 under RER-028.
-- Latest Authoritative Round: ARCH-REV-018.
-- Current-State Evidence Basis: source checkpoint `14a94fc45de8bcab271e996eb7d6e8440f0d3ac5`; current Team/Org codecs and providers, admission/result/GraphQL, Org-owned index, source registry, application bundle consumer, old family migration, registry/runner, both startup compositions, ordinary definition transaction and atomic file writer. Independently read the two repository Team config shapes and queried the two sampled migration databases using SQLite `mode=ro`; no production writes or migration execution.
-- Review boundary: source-informed architecture review. Prior unaffected structural evidence is retained, not claimed as freshly executed source/provider/browser validation. Only the two review artifacts are changed.
+- Current Architecture Review Revision ID: `ARCH-REV-019`.
+- Current Review Round: 19.
+- Trigger: approved exact Org heading, compact Messages list and uncluttered task detail.
+- Prior Review Round Reviewed: ARCH-REV-018 Pass on AD-REV-020.
+- Latest Authoritative Round: ARCH-REV-019.
+- Current-State Evidence Basis: IR-039 checkpoint `932c81b2261ffcc21ac540b0f25522ecfa1cb29a`; current shared Messages/task components, task presentation types, Team/Org adapters, retained Org index, communication projector and history/localization sources. Immutable Team baseline `5fb16658e7bd2aefd750f99eb596a17382e161ac` and local `origin/personal@5645b49d6` are identical for the compared message panel/task section/item-detail files. Current task item-detail differs from that baseline only in its type import. Supplied screenshots `ctx_1b892b545fae__image.png`, `ctx_5c796264f166__image.png`, `ctx_a706ba1e68a4__image.png` were visually inspected.
+- Scope: proportionate source-informed design review of the Small/Low delta; prior unaffected structural evidence is retained. No implementation, fresh browser/API/provider run or delivery result is claimed.
 
 ## Routing Classification Review
 
-- Task size (`Small`/`Medium`/`Large`): `Large` cumulative; focused `Medium`.
-- Architectural risk (`Low`/`High`): `High`.
-- Classification rationale reviewed: authored public contract, serializers/admission/diagnostics and existing stored-definition transition cross several owners. Completed and pending migration states require distinct ordering. Small sampled counts do not reduce the structural risk.
-- Independent Architecture Review required by the classification: `Yes`.
+- Task size (`Small`/`Medium`/`Large`): `Large` cumulative; focused delta `Small`.
+- Architectural risk (`Low`/`High`): `High` cumulative; focused delta `Low`.
+- Classification rationale reviewed: copy/local disclosure and UI-only navigation projection fit existing owners. Parent package remains structurally Large/High and unfinalized; its selected revised-impact route permits this bounded independent review. Old record counts do not make the delta High.
+- Independent Architecture Review required by the classification: `Yes`, cumulative route.
 - Classification evidence or correction required: None.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
 - Overall Basis Status (`Confirmed`/`Contradicted`/`Blocked`): `Confirmed`.
-- Approved requirements / intended behavior understood: RER-029 explicitly removes the authored field from BOTH Team and Org. This is a change to the formerly approved contract, not proof the former implementation was defective.
-- Relevant existing behavior and evidence confirmed: both current strict codecs require/emit numeric versions; their providers, bundle reader, admission and Org-owned index consume them. The old family migration produces those numeric targets, while runPending skips completed records. Independent read-only probes confirmed both sampled family records SUCCEEDED and the two repository Team files version 2. The data-root refType sample is an older shape, not an otherwise-current field-free config.
-- Scope guardrail confirmed: current family validation remains strict; other required/null/default fields and Team/Org meaning stay. External projects/managed copies are read-only. Definition authoring is separate from saved runtime schemas.
-- Approved change, preserved behavior, and outside scope understood: Yes; no new package export API, runtime migration, optional-field expansion, compatibility parser or Product flow is authorized.
-- Every prospective blocking Design Impact finding is traceable to approved authority: Yes; none remains.
+- Approved requirements / intended behavior understood: RER-031 explicitly approves all three corrections and supersedes RER-030's earlier undecided badge boundary. No Product decision remains.
+- Relevant existing behavior and evidence confirmed: the task suffix/address come from counterpart metadata on the root communication array, not formal task records. The top task participant strip is separate added markup. The original task body/header and Team message list supply the accepted baseline. Exact links already exist in root adapters/retained indexes.
+- Scope guardrail confirmed: simplify default presentation, not data or message eligibility. Preserve exact identity, relevant task membership, retained inspection, state, references and existing main navigation/domain names.
+- Approved change, preserved behavior, and outside scope understood: Yes. No new store/dashboard, backend/API/schema, lifecycle, task policy or migration.
+- Every prospective blocking Design Impact finding is traceable to approved authority: Yes; no new blocker.
 - Remaining material ambiguity: None.
 
 | Behavior ID | Kind | Design Alignment With Approved Intent (`Pass`/`Fail`) | Approved Trigger / Contract And Current-State Evidence (`Pass`/`Fail`/`Unclear`) | Target Outcome / Path / Spine Coherence (`Pass`/`Fail`/`Unclear`) | Status (`Confirmed`/`Needs Correction`/`Unclear`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| BEH-001 / BEH-010 | Approved authoring change | Pass | Pass | Pass | Confirmed | REQ-026; AC-021/032; SCN-021: both configs omit schemaVersion and reject it as an extra key; all other rules stay. |
-| BEH-007 / BEH-010 | Operational preservation | Pass | Pass | Pass | Confirmed | REQ-012/013/027; AC-022/033; SCN-022: preserve owned definitions through startup, external no-write, per-item availability. |
-| BEH-008 | Preserved durable boundary | Pass | Pass | Pass | Confirmed | Runtime Team V2 / Org V1, sidecars, journals and migration records retain their versions; no completed runtime replay. |
-| BEH-002–006 / BEH-009 / BEH-011–018 | Retained cumulative | Pass | Pass | Pass | Confirmed | Launch/focus, task-inclusive presentation, exact retained identity, accepted-input truth, one-FIFO/fence and Product decisions unchanged. |
+| BEH-014 / REQ-031 | Heading-only change | Pass | Pass | Pass | Confirmed | AC-026 / SCN-015: exact singular Org below Teams; main navigation, keys, grouping and state unchanged. |
+| BEH-017 / REQ-034/036 | Compact ordinary Messages | Pass | Pass | Pass | Confirmed | AC-034 / SCN-018–019: remove extra list decorations, retain every real configured/task message and on-demand exact identity. |
+| BEH-018 / REQ-035/036 | Task detail/navigation | Pass | Pass | Pass | Confirmed | AC-034 / SCN-019: remove strip, retain content/status/direction/time/references and all exact participant destinations. |
+| Other cumulative behaviors | Preserved | Pass | Pass | Pass | Confirmed | RER-029 authoring, task eligibility/retention, root lifecycle and Product scope are not reopened. |
 
 ## Supplemental Artifact Coherence Verdict
 
 | Artifact | Purpose And Scope Are Clear? (`Pass`/`Fail`) | Linked To Relevant Core Artifacts? (`Pass`/`Fail`) | Internally Complete? (`Pass`/`Fail`) | Consistent With Related Core Artifacts? (`Pass`/`Fail`) | Status And Approval Applicability Are Clear? (`Pass`/`Fail`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| Requirements / contract / canonical inventory | Pass | Pass | Pass | Pass | Pass | RER-029 supersession is explicit; PKG-AUTH-001 resolved. |
-| Package-authoring investigation | Pass | Pass | Pass | Pass | Pass | Separates historical inquiry, current approval, bounded source/data samples and limits. |
-| Self-validation / architecture revision | Pass | Pass | Pass | Pass | Pass | VAL-046–050 cover the changed contract; 50 indexed walkthroughs are design evidence only. |
-| Task-parity / assertion / Product supplements | Pass | Pass | Pass | Pass | Pass | Retain ARCH-REV-017 scope; no new Product gate; VIS-015 override slice remains superseded by VIS-OVR-001–006. |
-| Downstream reports / DR-008 | Pass | Pass | Pass | Pass | Pass | Existing passes and native candidate cover RER-028, not the new authoring contract. |
-
-Historical counts, earlier contract labels and inquiry statuses are retained as chronology, not current cutover inventory or competing authoring authority.
+| Requirements/contract/canonical inventory | Pass | Pass | Pass | Pass | Pass | RER-031 controls; older inventory inquiry labels are chronological, not current policy. |
+| UI-cleanup investigation and screenshots | Pass | Pass | Pass | Pass | Pass | Explains ordinary-message badge versus formal task records and records approval. |
+| Design/self-validation/revision | Pass | Pass | Pass | Pass | Pass | DS-034 and VAL-051–053 agree; old DS-029 badge mandate and current heading maps updated. |
+| Cumulative Product and earlier supplements | Pass | Pass | Pass | Pass | Pass | RER-031 governs only this slice; status/overrides and authoring/task authority unchanged. VIS-015 remains historical for overrides. |
 
 ## Task Design Health Assessment Verdict
 
 | Assessment Area | Result (`Pass`/`Fail`) | Evidence | Required Action |
 | --- | --- | --- | --- |
-| Assessment is present for the current task posture | Pass | DS-031–033 and AD-REV-020 health/risk assessment. | None. |
-| Root-cause classification is explicit and evidence-backed | Pass | Approved behavior change; field coupling confirmed in actual codec/provider/admission/migration callers. | None. |
-| Refactor needed now / no refactor needed / deferred decision is explicit | Pass | Tighten current family types and diagnostics; isolate historical definition validation; retain services/runner. | None. |
-| Refactor decision is supported by concrete design or residual-risk rationale | Pass | New ordered definition pass is necessary for completed-entry skips; no generic registry/manager or runtime redesign. | None. |
+| Assessment is present for current posture | Pass | DS-034 local refactor posture; source lines and pinned baseline. | None. |
+| Root cause is explicit and evidence-backed | Pass | Excess markup/projection decoration, not task-record leakage or backend limitation. | None. |
+| Refactor decision is explicit | Pass | Delete metadata rows/strip; move inspection/navigation into existing detail headers/names. | None. |
+| Refactor is concrete and proportionate | Pass | Both adapters, named endpoint variants, pure detail events, section routing and localization mapped. | None. |
 
 ## Spine Inventory Verdict
 
 | Spine ID | Scope | Spine Is Readable? (`Pass`/`Fail`) | Narrative Is Clear? (`Pass`/`Fail`) | Facade Vs Governing Owner Is Clear? (`Pass`/`Fail`/`N/A`) | Main Domain Subject Naming Is Clear? (`Pass`/`Fail`) | Ownership Is Clear? (`Pass`/`Fail`) | Off-Spine Concerns Stay Off Main Line? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| DS-031a | Author/form -> DefinitionService -> codec/semantic validation -> provider transaction -> canonical reload | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-031b/c | Register/copy/import -> source registry -> admission/provider -> dependency-closed catalog/diagnostic | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-032 | Startup -> runner -> prior attempt/skip -> owned definition pass -> current admission/new work | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-032 local | Physical inventory -> existing journal recovery -> classify -> remove one key -> atomic write/reread | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-033 return | Item outcomes -> runner summary/log/recovery -> per-definition availability | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| DS-000–030 | Unchanged cumulative domain/runtime/task/UI/history spines from ARCH-REV-017 | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-034a | Selected message -> existing facet -> compact list/detail/reference -> identity disclosure | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-034b | Task record -> exact named direction/group -> detail selection -> section/root inspect -> live/retained Agent | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-034c | History read/grouping -> existing collection -> localized Org heading -> same state/actions | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-034r | Existing publication -> same context/facet -> keyed rendering; scope change closes disclosure | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-000–033 | Retained cumulative spines from ARCH-REV-018, except explicit display/copy supersession | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 
 ## Boundary Encapsulation Verdict
 
 | Boundary / Owner | Authoritative Public Entry Point Is Clear? (`Pass`/`Fail`) | Internal Owned Mechanisms Stay Internal? (`Pass`/`Fail`) | Caller Bypass Risk Is Controlled? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Team/Org DefinitionService and provider | Pass | Pass | Pass | Pass | Service owns semantics, provider bytes/revision, current codec family grammar. |
-| PackageService / registry / admission | Pass | Pass | Pass | Pass | Registration validates package structure, not every contained definition; no installer normalization. |
-| Migration runner / definitions | Pass | Pass | Pass | Pass | Runner owns scheduling/status/log/restart; old migration owns old topology, new migration owns one-key transition. |
-| Ordinary authoring recovery | Pass | Pass | Pass | Pass | DS-032 calls existing transaction read/recovery only for preexisting save residue; conversion writes use the atomic writer, not a new aggregate transaction. |
+| Messages facet / panel | Pass | Pass | Pass | Pass | Facet retains records/identity; panel owns selected-item/local disclosure rendering only. |
+| Team/Org task adapters | Pass | Pass | Pass | Pass | Resolve recorded execution IDs and actual fresh-Team membership; labels are display only. |
+| Task detail / pane / section | Pass | Pass | Pass | Pass | Detail emits exact Agent-link selection; pane forwards; section owns root-tagged navigation. |
+| History renderer/localization | Pass | Pass | Pass | Pass | Only label changes; read/tree-state/selection owners retained. |
 
 ## Dependency Direction / Forbidden Shortcut Verdict
 
 | Owner / Boundary | Allowed Dependencies Are Clear? (`Pass`/`Fail`) | Forbidden Shortcuts Are Explicit? (`Pass`/`Fail`) | Direction Is Coherent With Ownership? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Normal services/providers/admission -> current codecs | Pass | Pass | Pass | Pass | No historical helper imports or retry-old-on-read. |
-| Migrations -> historical validator/current codec/physical writer | Pass | Pass | Pass | Pass | Historical key removal stays inside registered migration callers. |
-| New definition inventory -> known owned physical paths | Pass | Pass | Pass | Pass | Cannot use normal parent decoding to discover prior-version owned Teams. |
-| Registration/application packages | Pass | Pass | Pass | Pass | Source descriptors, not writability or origin of a runtime run, decide mutation authority. |
+| Task record/index -> UI-only endpoint projection | Pass | Pass | Pass | Pass | No display-name/address lookup, configured-source substitution or first-member selection. |
+| Detail -> emitted link -> existing section action | Pass | Pass | Pass | Pass | No router or subject-store import into pure detail. |
+| Message row -> local identity disclosure | Pass | Pass | Pass | Pass | No eligibility mutation, content parsing or second cache/query. |
+| Localization -> existing heading renderer | Pass | Pass | Pass | Pass | No global Org rename or label-derived root identity. |
 
 ## Interface Boundary Verdict
 
 | Interface / API / Query / Command / Method | Subject Is Clear? (`Pass`/`Fail`) | Responsibility Is Singular? (`Pass`/`Fail`) | Identity Shape Is Explicit? (`Pass`/`Fail`) | Generic Boundary Risk (`Low`/`Medium`/`High`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- | --- |
-| parse/buildAgentTeamDefinitionConfig | Pass | Pass | Pass | Low | Pass |
-| parse/buildAgentOrgDefinitionConfig | Pass | Pass | Pass | Low | Pass |
-| DefinitionAdmissionResult / GraphQL diagnostic | Pass | Pass | Pass | Low | Pass |
-| Migration-only prior numeric validators | Pass | Pass | Pass | Low | Pass |
-| Existing DefinitionPackageTransaction.read / AtomicRunPackageFileCommitWriter.write | Pass | Pass | Pass | Low | Pass |
+| Named Agent endpoint with exact agentRunId/address | Pass | Pass | Pass | Low | Pass |
+| Named task-Team group with teamRunId/participant links | Pass | Pass | Pass | Low | Pass |
+| Item-detail exact Agent-link selection event | Pass | Pass | Pass | Low | Pass |
+| Existing selectParticipant/root-tagged inspect | Pass | Pass | Pass | Low | Pass |
+| Existing Messages row and history collection key | Pass | Pass | Pass | Low | Pass |
 
-The authored diagnostic API deliberately drops expectedSchemaVersion and version-specific failure code; it does not change runtime subject/version discriminators. Historical validators return original non-version JSON values, not normalized domain output.
+A collective task-Team name opens its exact member choices rather than pretending to be an Agent. System interruption stays system text; on-demand identity comes from the selected task assignment endpoints. Genuinely unavailable historical targets remain non-actionable, not fabricated.
 
 ## Existing Capability / Subsystem Reuse Verdict
 
 | Need / Concern | Existing Capability Area Was Checked? (`Pass`/`Fail`) | Reuse / Extension Decision Is Sound? (`Pass`/`Fail`) | New Support Piece Is Justified? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Strict current family serialization | Pass | Pass | N/A | Pass | Rename existing codecs and move all consumers together. |
-| Startup transition/status/retry | Pass | Pass | Pass | Pass | One additional definition migration, not a new framework or reset of a completed entry. |
-| Single-file publication / ordinary save residue | Pass | Pass | N/A | Pass | Reuse physical writer and established transaction recovery with migration-local validation. |
-| Catalog/dependency availability | Pass | Pass | N/A | Pass | Existing per-definition gate remains; no aggregate startup blocker. |
+| Messages list/detail/reference | Pass | Pass | N/A | Pass | Keep accepted shared components; remove decorations, use local/native disclosure. |
+| Task detail and exact inspection | Pass | Pass | N/A | Pass | Existing record adapters, participant link type and section routing are sufficient. |
+| History heading | Pass | Pass | N/A | Pass | Existing locale key/collection; no new category or wrapper. |
 
 ## Subsystem / Capability-Area Allocation Verdict
 
 | Subsystem / Capability Area | Ownership Allocation Is Clear? (`Pass`/`Fail`) | Reuse / Extend / Create-New Decision Is Sound? (`Pass`/`Fail`) | Supports The Right Spine Owners? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Definition families and admission | Pass | Pass | Pass | Pass | Current grammar/writes/diagnostics under existing owners. |
-| app-data-migrations | Pass | Pass | Pass | Pass | Own prior numeric interpretation, physical inventory and ordered transformation. |
-| Application repository definitions | Pass | Pass | Pass | Pass | Implementation/build change only. |
-| Runtime/task/UI subsystems | Pass | Pass | Pass | Pass | No focused mechanism change; retained structural review applies. |
+| Existing root read facets/adapters | Pass | Pass | Pass | Pass | Data identity/relevance stay owned; only UI projection links change. |
+| Shared collaboration and Team-named detail components | Pass | Pass | Pass | Pass | Presentation/selection only; no runtime authority from file naming. |
+| Localization/history rendering | Pass | Pass | Pass | Pass | Exact copy with existing state/grouping. |
+| Server/runtime/persistence | Pass | Pass | Pass | Pass | No delta; retain earlier structural verdicts. |
 
 ## Reusable Owned Structures Verdict
 
 | Repeated Structure / Logic | Extraction Need Was Evaluated? (`Pass`/`Fail`) | Shared File Choice Is Sound? (`Pass`/`Fail`/`N/A`) | Ownership Of Shared Structure Is Clear? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Separate Team/Org config shapes | Pass | Pass | Pass | Pass | No optional-coordinator all-purpose config type. |
-| Migration-only prior numeric definition validator | Pass | Pass | Pass | Pass | Shared by old/new migrations, not normal business code. |
-| Admission diagnostics | Pass | Pass | Pass | Pass | One current-family/source/reason/action shape; remove redundant numeric expectation. |
-| Runner and file/transaction mechanisms | Pass | Pass | Pass | Pass | Reuse without new migration journal, ledger or coordination owner. |
+| CollaborationTaskParticipantLink/named direction | Pass | Pass | Pass | Pass | Reuse exact links in closed Agent/group variants, no generic identity framework. |
+| Task detail section/pane/item chain | Pass | Pass | Pass | Pass | Share presentation and event forwarding; keep root adapters separate. |
+| Disclosure state | Pass | Pass | Pass | Pass | Local to header, not a shared persisted/global controller. |
 
 ## Shared Structure / Data Model Tightness Verdict
 
 | Shared Structure / Type / Schema | One Clear Meaning Per Field? (`Pass`/`Fail`) | Redundant Attributes Removed? (`Pass`/`Fail`) | Overlapping Representation Risk Is Controlled? (`Pass`/`Fail`) | Shared Core Vs Specialized Variant / Composition Decision Is Sound? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Current Team config and members | Pass | Pass | Pass | Pass | Pass | No schemaVersion or member refType; same exact coordinator/values. |
-| Current Org config and members | Pass | Pass | Pass | Pass | Pass | No schemaVersion/coordinator; meaningful member refType remains. |
-| Prior versioned migration candidate | Pass | Pass | Pass | Pass | Pass | Remove only own version key and preserve other JSON values; no normal rebuilt-domain normalization. |
-| Saved execution/sidecar/journal data | Pass | Pass | Pass | Pass | Pass | Version fields have a different persisted meaning and are untouched. |
+| Named endpoint Agent/group variants | Pass | Pass | Pass | Pass | Pass | Actual recorded identity, no duplicate strip-only projection after migration of callers. |
+| Messages counterpart identity | Pass | Pass | Pass | Pass | Pass | Existing task/configured metadata retained but not permanent list decoration. |
+| System/fallback and assignment endpoints | Pass | Pass | Pass | Pass | Pass | Do not fabricate a system Agent or infer a target from a label. |
+| Runtime/task/wire records | Pass | Pass | Pass | Pass | Pass | Unchanged; UI type tightening does not change storage meaning. |
 
 ## File Responsibility Mapping Verdict
 
 | File | Responsibility Is Singular And Clear? (`Pass`/`Fail`) | Responsibility Matches The Intended Owner/Boundary? (`Pass`/`Fail`) | Responsibilities Were Re-Tightened After Shared-Structure Extraction? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| agent-team-definition-config.ts / agent-org-definition-config.ts | Pass | Pass | Pass | Pass | Renamed current parse/build types and errors; old normal exports removed. |
-| File providers / Org-owned index / file-application-bundle-provider.ts | Pass | Pass | Pass | Pass | Consume same current codec; keep actual source and writer authority. |
-| definition-admission-result/service.ts / GraphQL definition-admission.ts | Pass | Pass | Pass | Pass | One coherent current-family diagnostic cut. |
-| legacy/collaboration-definition-versioned-config.ts | Pass | Pass | Pass | Pass | Exact prior numeric validation only. |
-| New authoring-shape migration / registry / old family migration | Pass | Pass | Pass | Pass | Distinct new pass and fixed historical targets; old retry recognizes terminal field-free outputs. |
-| Existing transaction / atomic writer | Pass | Pass | Pass | Pass | Recovery of normal authoring versus one-key migration publication remain distinct. |
-| Two application configs / fixtures / docs | Pass | Pass | Pass | Pass | Source/build only; historical evidence is not rewritten. |
+| CollaborationMessagesPanel.vue | Pass | Pass | Pass | Pass | Compact list; selected detail identity; existing reference/content behavior. |
+| CollaborationDelegatedTasksSection.vue | Pass | Pass | Pass | Pass | Remove strip; keep exact navigation dispatch. |
+| TeamDelegatedTaskDetailPane.vue / TeamDelegatedTaskItemDetail.vue | Pass | Pass | Pass | Pass | Pure inline actions/disclosure and event forwarding. |
+| collaborationTaskPresentation.ts / Team and Org task adapters | Pass | Pass | Pass | Pass | Tight endpoint links/groups and original direction semantics. |
+| English/Chinese workspace locale maps and existing tests | Pass | Pass | Pass | Pass | One heading key plus localized disclosure accessibility; no global rename. |
 
 ## Subsystem / Folder / File Placement Verdict
 
 | Path / Item | Target Placement Is Clear? (`Pass`/`Fail`) | Folder Matches Owning Boundary? (`Pass`/`Fail`) | Mixed-Layer Or Over-Split Risk (`Low`/`Medium`/`High`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Family providers/current codecs | Pass | Pass | Low | Pass | Remain subject-owned with versionless names. |
-| Migration historical validator/new registered pass | Pass | Pass | Low | Pass | Under app-data-migrations; no runtime import. |
-| collaboration-definition-admission/providers/definition-package-transaction.ts | Pass | Pass | Low | Pass | Existing neutral authoring utility; DS-032 uses read/recovery, not migration commit. |
-| Application configs/fixtures | Pass | Pass | Low | Pass | Implementation-owned source retained in its repository. |
+| Existing shared components/types/root adapters | Pass | Pass | Low | Pass | No new wrapper directory or generic capability. |
+| Existing locale maps/history renderer | Pass | Pass | Low | Pass | Presentation owner remains stable. |
+| Retained cumulative placement | Pass | Pass | Low | Pass | No backend or persisted ownership move. |
 
 ## Removal / Decommission Completeness Verdict
 
 | Item / Area | Redundant / Obsolete Piece To Remove Is Named? (`Pass`/`Fail`) | Replacement Owner / Structure Is Clear? (`Pass`/`Fail`/`N/A`) | Removal / Decommission Scope Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Authored schemaVersion/constants/versioned type and file names | Pass | Pass | Pass | Pass | Remove current field/exports without aliases; runtime versions remain. |
-| expectedSchemaVersion / DEFINITION_SCHEMA_VERSION_UNSUPPORTED | Pass | Pass | Pass | Pass | Remove diagnostic field/code and update query/generated/test consumers. |
-| Old migration imports of normal versioned codecs | Pass | Pass | Pass | Pass | Replace with migration-local prior-target validation and terminal-current checks. |
-| Version literals in current application/roundtrip fixtures | Pass | Pass | Pass | Pass | Update source fixtures, not immutable historical evidence. |
-| Retained earlier task/UI removal obligations | Pass | Pass | Pass | Pass | Unchanged under ARCH-REV-017; no configured-only policy restoration. |
+| Permanent Messages address and Task/run-suffix rows | Pass | Pass | Pass | Pass | Delete markup, retain source metadata and actual ordinary messages. |
+| Always-visible detail address/participant strip | Pass | Pass | Pass | Pass | Replace with initially closed detail-header identity and inline names. |
+| DelegatedTaskEntry.participants strip-only field | Pass | Pass | Pass | Pass | Remove after named direction/assignment links carry all destinations; keep runtime taskParticipants. |
+| Former prominent-badge/current Agent Orgs heading mandate | Pass | Pass | Pass | Pass | Explicit DS-034 supersession and current category-map changes. |
 
 ## Legacy / Backward-Compatibility Verdict
 
 | Area | Compatibility Wrapper / Dual-Path / Legacy Retention Exists? (`Yes`/`No`) | Clean-Cut Removal Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- |
-| Normal authored config path | No | Pass | Pass | Strict one-shape family admission rejects version-bearing input; no strip/fallback. |
-| Migration-only prior numeric and older refType decoding | Yes | Pass | Pass | Required isolated transition knowledge; not runtime compatibility. Fixed old target remains. |
-| Current-field-free check in old migration | No | Pass | Pass | Idempotent terminal-input recognition, not a normal dual parser. |
-| External old formats | No | Pass | Pass | Unchanged source with actionable unavailable result; separate-owner update. |
+| Compact versus decorated rendering | No | Pass | Pass | One target; no old/new flag or compatibility wrapper. |
+| Unavailable historical identity | No | Pass | Pass | Existing truthful non-actionable display, not name-based repair or guessed navigation. |
+| Prior migration-only legacy boundaries | Yes | Pass | Pass | Retained approved DS-031–033 and earlier migration isolation, untouched by UI cleanup. |
 
 ## Persisted-Data Transition Verdict (When Applicable)
 
 | Area / Stored Subject | Approved Decision | Representative Reader / Semantic / Invariant Evidence Is Sufficient? (`Pass`/`Fail`) | Direct Use, Rebuild, Or Migration Choice Is Proportionate? (`Pass`/`Fail`) | Migration Safety Is Complete If Required? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Otherwise-current versioned writable definitions | Migration Required | Pass | Pass | Pass | Pass | RER-029 rejects the extra key. New ordered pass is required when old family record is already complete. |
-| Current field-free definitions | Directly Usable — No Migration | Pass | Pass | N/A | Pass | Strict validate/zero config write; existing normal-save recovery is separate when residue exists. |
-| Earlier refType / one-level family definitions | Retain prior migration, then new pass | Pass | Pass | Pass | Pass | Fixed historical numeric outputs, migration-only validation, terminal-current retry; incomplete inputs fail intact. |
-| Repository application definitions | Source/build conversion | Pass | Pass | N/A | Pass | Two confirmed samples updated in source; deployed startup does not mutate bundles. |
-| External roots and managed downloads | External Dependency — no in-ticket migration | Pass | Pass | N/A | Pass | No ownership inferred from physical writability; dependent availability remains scoped. |
-| Team V2/Org V1, sidecars, history, journals | Not Affected by this delta | Pass | Pass | N/A | Pass | No version/schema/bytes change and no completed runtime replay solely for authoring. |
-
-Read-only evidence independently confirmed the two repository version-2 configs and family SUCCEEDED records in `/home/autobyteus/data/db/production.db` and DR-008's disposable server-data DB. Their summary-migration outcomes differ and remain separate. The observed data-root unversioned refType config is unsupported by this new one-key pass; it neither authorizes resetting an old record nor proves its lifecycle origin. Actual owned inventory, not these sample counts, governs cutover.
-
-New pass has registry order after the old family attempt but no unrelated runtime-success prerequisite. It independently validates direct data-root Team/Org and one physical Org-owned Team level, including unreferenced children and normal journal canonical paths. Missing optional roots are empty; real scan/read failure is not. Only committed write plus strict reread/equality counts migrated. Any required failure wins as FAILED; no new warning outcome. The old family no-warning and summary unique-evidence warning policies are unchanged.
+| Message/task records, sidecars, provider history | Not Affected | Pass | Pass | N/A | Pass | Same exact records/IDs/eligibility; no content or provenance deletion. |
+| UI-only endpoint links/disclosure | In-memory projection only | Pass | Pass | N/A | Pass | Derive from existing retained index/record; local state not serialized. |
+| Authoring/runtime migrations | Retain ARCH-REV-018 decisions | Pass | Pass | Pass | Pass | RER-029 field-free transition and runtime families unchanged. |
 
 ## Change / Refactor Safety Verdict
 
 | Area | Sequence Is Realistic? (`Pass`/`Fail`) | Temporary Seams Are Explicit? (`Pass`/`Fail`) | Cleanup / Removal Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- |
-| Current codec/provider/admission/diagnostic source cut | Pass | Pass | Pass | Pass |
-| Freeze historical validation and retain old targets | Pass | Pass | Pass | Pass |
-| Register independent new definition pass after old attempt | Pass | Pass | Pass | Pass |
-| Recover normal journals, inventory owned children, one-key transform | Pass | Pass | Pass | Pass |
-| Repository fixtures/docs, real file/runner tests, fresh delivery candidate | Pass | Pass | Pass | Pass |
+| Tighten UI endpoint variants and both adapters | Pass | Pass | Pass | Pass |
+| Move controls and delete obsolete markup/flat field | Pass | Pass | Pass | Pass |
+| Localize exact heading and accessible disclosure | Pass | Pass | Pass | Pass |
+| Focused component/adapter and desktop/narrow checks | Pass | Pass | Pass | Pass |
 
 ## Example Adequacy Verdict
 
 | Topic / Area | Example Was Needed? (`Yes`/`No`) | Example Is Present And Clear? (`Pass`/`Fail`/`N/A`) | Bad / Avoided Shape Is Explained When Helpful? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Field-free Team and Org exact key sets | Yes | Pass | Pass | Pass | DS-031 / VAL-046 include non-version negatives and complete roundtrip. |
-| Completed versus pending/failed old family migration | Yes | Pass | Pass | Pass | DS-032 / VAL-047–048 distinguish skip, fixed intermediate, retry and independent status. |
-| Versioned Org parent plus owned/unreferenced child Team | Yes | Pass | Pass | Pass | VAL-049 avoids current-decoder-dependent inventory. |
-| Current no-op, failed item, external and repository cohorts | Yes | Pass | Pass | Pass | DS-033 / VAL-049–050 give truthful outcome/write boundaries. |
+| Ordinary task message with Task badge | Yes | Pass | Pass | Pass | Screenshot and actual communication projector prove this is metadata, not a formal task record. |
+| Repeated same-name task Agent/Team members | Yes | Pass | Pass | Pass | VAL-051–052 preserve distinct row IDs and all exact live/settled links. |
+| Assignment/review/submission/system/reference | Yes | Pass | Pass | Pass | Direction reversal, system text and reference-only selection explicitly retained. |
+| Heading-only route/locale/state change | Yes | Pass | Pass | Pass | VAL-053 preserves category order/main nav/keys/scroll/selection. |
 
 ## Material Premise Validation (Only When Needed)
 
-No additional speculative premise or new recovery protocol is needed. The behavior basis already supplies supported normal authoring/import (SCN-021) and operational upgrade/relaunch (SCN-022).
-
-The existing ordinary-save recovery is grounded in the exposed Team/Org edit/save path: DefinitionService -> provider -> DefinitionPackageTransaction.commit can leave its existing journal during the governing interruption/relaunch category -> later startup -> migration-owned prior/current package validation via the same transaction read/recovery -> canonical package conversion. DS-032 reuses that established owner; it does not infer a need for a migration journal from generic filesystem failure. No arbitrary corruption, hostile writer, permission bypass or manual migration-status-reset scenario drives this result.
-
-Completed-record behavior is observed in the runner and sampled databases, not inferred from the proposed new pass. Physical child discovery follows supported Org-owned packages and current index behavior, not speculative recursive topology.
+None additional. The approved normal actions are reading accepted messages/tasks, selecting participants/references, inspecting settled history and switching Workspace subjects. The current UI, communication projector, task records and retained indexes establish those paths; VAL-051–053 exercise them. The visible Task badge is counterpart provenance, not evidence that formal task records entered Messages. No new filter or recovery mechanism is justified by that appearance.
 
 ## Unresolved Approved-Behavior Or Current-State Gaps
 
@@ -230,15 +207,15 @@ None.
 
 ## Review Decision
 
-`Pass` — cumulative RER-029 / AD-REV-020 is ready for implementation reconciliation at the design boundary. The two authored shapes become field-free consistently; the transition is migration-owned, bounded and usable on both completed and pending prior installations. Current admission remains strict, external ownership is preserved, and runtime contracts remain unchanged.
+`Pass` — DS-034 is actionable and proportionate. The cleanup changes default visibility and exact heading copy without changing message/task content, relevance, persisted identity or lifecycle. Existing root adapters retain exact execution identity and the section retains navigation ownership; on-demand group choices preserve every former participant-strip destination.
 
 ## Findings
 
-None. PKG-AUTH-001 is resolved by explicit Requirements approval. Prior findings remain resolved or expressly superseded as recorded in ARCH-REV-018; no new finding ID is created.
+None. UI-CLEAN-001 is resolved under approved RER-031; no new finding ID. Prior findings and explicit scope supersessions remain as recorded in ARCH-REV-019.
 
 ## Classification
 
-No unresolved finding. Focused `Medium / High`; cumulative `task_size=Large / architectural_risk=High`. No Requirement Gap or Product gate.
+No unresolved finding. Focused `Small / Low`; cumulative `task_size=Large / architectural_risk=High`. No Requirement Gap or Product gate.
 
 ## Recommended Recipient
 
@@ -246,16 +223,16 @@ No unresolved finding. Focused `Medium / High`; cumulative `task_size=Large / ar
 
 ## Residual Risks
 
-- Update every current parser/builder/provider/bundle/admission/diagnostic/test consumer together. No old normal export, numeric diagnostic placeholder or silently stripped authored field.
-- Prove completed/pending/failed old migration cases through the real registry/runner and disposable files: order is not a prerequisite on unrelated runtime success; completed entries must not be reset. Retry must recognize field-free flat/prospective-child/cleanup outputs without reinserting a version.
-- Validate physical owned inventory independently of parent decoding, including unreferenced children and preexisting ordinary authoring journals. Reuse only transaction read/recovery; do not use its commit path as a new migration transaction. Older generic map wording about no migration use should be read against this explicit DS-032 recovery exception and refreshed at the next documentation touch.
-- Prove one-key semantic equality, strict reread/committed outcomes, current-config byte/mtime no-op, unchanged Markdown/assets/runtime hashes and external zero writes. Scan errors must not become an empty successful inventory.
-- Keep the new migration SUCCEEDED/FAILED only, old family failures and summary warnings distinct, and availability scoped to exact invalid definitions/dependents rather than aggregate startup.
-- Existing task/UI/source/API passes remain valid only for their recorded scope. Produce new authoring/diagnostic/file-runner evidence and a fresh Delivery candidate; preserve task-inclusive behavior and CR-FIND-019 regression obligations. No new prototype is required.
-- Downstream-owned dirty Delivery documentation/evidence was not edited, staged or claimed. This design review does not assert implementation, executable validation, user verification or release readiness.
+- Remove metadata markup, not message rows/identity fields. Keep exact IDs for keys, selection and references; do not infer task records or filter content from the badge.
+- Move all task Agent/group destinations before deleting the flat strip projection. Test both adapters, task-Team non-coordinator members, repeated same-address tasks, correct reversed submission direction, interruption assignment identities and retained read-only inspection.
+- Keep disclosure initially closed, keyboard/touch accessible, and scoped to root/focused Agent/item/reference. Same-item live updates must not repeatedly reset it; no metadata controls may reappear in the left Messages list.
+- Preserve reference-only viewing, readable narrow layouts and original header/body/status/time presentation. Verify standalone Team and Org direct/mounted/task paths, without broadening provider/backend scope for a static-copy check.
+- Change only the history locale key to English Org (existing style renders ORG) and Chinese 组织. Preserve main-navigation Agent Orgs and all category keys/order/state/actions; no global replacement.
+- Preserve RER-029/AD-REV-020 authoring transition and prior task-inclusive/runtime decisions. Existing downstream results keep only their recorded scope; source and rendered validation remain downstream, with broader cumulative execution determined by its owner.
+- Downstream dirty source-bound documentation, reports, build outputs and evidence were preserved. No upstream/source/tests were edited; no implementation, API/E2E or Delivery readiness is claimed.
 
 ## Latest Authoritative Result
 
-- Review Decision: `Pass` (`ARCH-REV-018`).
+- Review Decision: `Pass` (`ARCH-REV-019`).
 - Material-Premise Gate (`Pass`/`Fail`/`Blocked`): `Pass`.
-- Notes: Supersedes ARCH-REV-017 as the latest independent architecture review, preserving its still-applicable evidence. RER-029 changes authored versions only. Implementation reconciliation, applicable source review, renewed executable validation and Delivery remain downstream.
+- Notes: Latest independent result for cumulative RER-031 / AD-REV-021. Retains ARCH-REV-018 evidence outside the bounded UI slice; implementation reconciliation and applicable validation remain required.

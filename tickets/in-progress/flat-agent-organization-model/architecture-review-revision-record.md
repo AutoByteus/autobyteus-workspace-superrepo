@@ -25,6 +25,7 @@ concise chronological architecture-review history.
 | ARCH-REV-016 | Round 16 / `AD-REV-018` both-endpoint configured-message eligibility recovery | `AD-REV-018` | Fail — Design Impact | Pass | `AR-FIND-008` |
 | ARCH-REV-017 | Round 17 / approved `RER-028` task-workflow parity and `AD-REV-019` | `AD-REV-019` | Pass (former scoped authority) | Pass | `AR-FIND-008` superseded by RER-028; no new finding |
 | ARCH-REV-018 | Round 18 / approved `RER-029` field-free Team/Org authoring | `AD-REV-020` | Pass | Pass | `PKG-AUTH-001` resolved; prior findings retained/superseded; no new finding |
+| ARCH-REV-019 | Round 19 / approved `RER-031` compact message/task UI and exact Org heading | `AD-REV-021` | Pass | Pass | `UI-CLEAN-001` resolved; no new finding |
 
 ## Revision Entries
 
@@ -475,3 +476,31 @@ None.
 - Material classification changes: Focused Medium/High; cumulative Large/High. Review remains Pass on the expanded approved authoring contract, not by extrapolating DR-008 or earlier API results. No Requirement Gap or Product gate.
 - Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
 - Remaining risks: coherent source/diagnostic cut; real runner ordering and completed-entry skip; prior/current prospective outputs on retry; physical owned/journal inventory; original non-version values and byte/no-write guarantees; external ownership and per-item failures. Existing transaction read/recovery is a narrow exception to older generic no-migration-use wording, not authorization to create migration journals or call commit. Renew file/runner/authoring/source/API validation and Delivery evidence. No source/runtime/release completion is claimed.
+
+
+### ARCH-REV-019 — Compact presentation with exact participant access pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 19; RER-031 including RER-030 and UI-CLEAN-001 approved three bounded presentation changes.
+- Triggering role, report path, and finding IDs: Architecture Designer; `architecture-ui-cleanup-investigation.md`, `architecture-design-revision-record.md` AD-REV-021; no open architecture finding.
+- Relevant architecture design revision IDs: `AD-REV-021@22d191ea4a9d066aec24faf017a25e090d1b4763`, retained cumulative AD-REV-001–020 except explicit presentation/copy supersession.
+- Requirements authority: `RER-031@3b8c18a28af7674619a797a92a208dabfa851f54`.
+- Prior authoritative decision: `Pass` (ARCH-REV-018 on AD-REV-020).
+- Current authoritative decision: `Pass`.
+- What changed: Compared actual UI/projectors/adapters and three user screenshots against the immutable earlier Team baseline. The Task badge describes an ordinary message counterpart; no filtering is warranted. DS-034 removes default address/badge/strip markup, preserves exact metadata in existing facets, supplies exact Agent/group navigation in the UI-only named direction projection, keeps detail pure and navigation section-owned, and exposes every task-Team member on demand including retained executions. History copy alone becomes Org under Teams. VAL-051–053 cover identity/navigation/reference/state/locale/desktop/narrow constraints. No backend, task-policy, schema, lifecycle or migration change is needed.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `UI-CLEAN-001` | Approved presentation inquiry/re-entry | Resolved at design boundary | RER-031; DS-034; VAL-051–053 | All three changes explicit, old badge mandate and current heading maps reconciled; no message filtering. |
+| `PKG-AUTH-001` / `AR-FIND-001` | Approved field-free design; earlier ownership/transition resolution retained | Unchanged | ARCH-REV-018; DS-031–033 | UI-only diff leaves field-free admission/transition and external ownership intact. |
+| `AR-FIND-002`–`AR-FIND-007` | Resolved | Remain resolved | Prior review history and cumulative design | No handoff, migration status, lifecycle/FIFO/fence or history ownership change. |
+| `AR-FIND-008` / `AAV-001` | Former configured-only policy superseded; retained history preserved | Unchanged | RER-028; DS-028–030/034 | Every actual ordinary task message remains; exact retained identity is hidden by default, not removed. |
+| Prior `ADI`/`IDI` and Product impacts | Resolved at respective design boundaries | Retained | Cumulative design/supplements | Accepted surfaces reused without runtime ownership leakage or Product gate. |
+| `CR-FIND-019` | Separate implementation regression obligation | Retained | Prior source/review records | Not absorbed into presentation cleanup. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: Focused Small/Low; cumulative Large/High remains. No new high-risk lifecycle premise is inferred from this UI change. Existing source/API/Delivery results retain their recorded scope.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
+- Remaining risks: deleting metadata rather than data, exact all-member/settled navigation, same-name targets, system/reference distinction, disclosure accessibility and scope resets, and heading-only state invariance. Implement and validate the focused component/adapter/localization and desktop/narrow paths through normal downstream ownership; no executable or delivery completion is claimed.
