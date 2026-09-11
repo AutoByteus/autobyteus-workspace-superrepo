@@ -1,14 +1,23 @@
 ## What's New
 
-- Replaced the current Gemini Flash model with Gemini 3.8 Flash (`gemini-3.8-flash`) across the built-in catalog and supported Gemini runtime modes.
+- Change the model for a stopped Agent or configured Team from Settings, then continue the same conversation with its existing history and context.
+- Choose a replacement within the current runtime with verified equal-or-larger context capacity. Review the new model's settings and defaults before explicitly saving.
 
 ## Improvements
 
-- Updated Gemini 3.8 requests to use `low`, `medium`, or `high` thinking levels with `medium` as the default while retaining optional thought summaries.
-- Added verified 1,048,576-token input/context and 65,536-token output limits.
-- Added introductory pricing through 2026-12-31 and the standard pricing schedule effective 2027-01-01, selected by token-usage observation time.
+- Team model changes apply to originally linked scopes while preserving independently configured or directly edited members.
+- Model and settings are saved together. Saving does not start a run, reset history, or alter retained compaction state.
+- Settings-only edits for the same model remain available without a replacement-capacity comparison.
+
+## Fixes
+
+- If a Team Save cannot confirm its persisted result, Settings now requires canonical verification or Retry before another Save, preventing duplicate changes.
 
 ## Compatibility Notes
 
-- Removed Gemini 3.7 Flash from the current selectable catalog without an alias. Saved configurations that still select 3.7 must be explicitly updated to 3.8.
-- Historical Gemini 3.7 run and token-usage records remain unchanged.
+- Runtime changes and smaller or unknown-capacity replacement models are not supported. Existing active, archived, and Application-managed run restrictions remain in place.
+- Keep frontend and backend versions aligned: stopped-run Save now requires the model identifier and settings together.
+
+## Known Limitation
+
+- A separately observed Team handoff approval issue remains unresolved; this release does not claim to fix it.
