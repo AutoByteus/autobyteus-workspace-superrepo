@@ -51,7 +51,7 @@ describe('Team task lifecycle catalogs', () => {
 });
 
 it('localizes compact identity disclosure and changes only the Org history collection label', () => {
-  expect(enWorkspaceMessages['workspace.agentOrg.history.collectionLabel']).toBe('Org');
+  expect(enWorkspaceMessages['workspace.agentOrg.history.collectionLabel']).toBe('Orgs');
   expect(enShellMessages['shell.navigation.agentOrgs']).toBe('Agent Orgs');
   expect(zhCnWorkspaceMessages['workspace.agentOrg.history.collectionLabel']).toBe('组织');
   for (const key of ['details', 'address', 'agentRun', 'task', 'hostRun', 'executionRun', 'teamRun']) {

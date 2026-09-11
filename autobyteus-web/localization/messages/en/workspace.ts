@@ -55,7 +55,7 @@ const messages = {
   "workspace.collaboration.identity.hostRun": "Host run",
   "workspace.collaboration.identity.executionRun": "Execution run",
   "workspace.collaboration.identity.teamRun": "Team run",
-  "workspace.agentOrg.history.collectionLabel": "Org",
+  "workspace.agentOrg.history.collectionLabel": "Orgs",
   "workspace.agentOrg.history.stopLabel": "Stop Agent Org",
   "workspace.agentOrg.history.workspaces": "Workspaces",
   "workspace.agentOrg.history.running": "Running",

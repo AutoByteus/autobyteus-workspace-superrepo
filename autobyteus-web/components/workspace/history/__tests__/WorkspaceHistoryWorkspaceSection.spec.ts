@@ -228,16 +228,16 @@ const mountSubject = (options: {
 };
 
 describe('WorkspaceHistoryWorkspaceSection current execution rows', () => {
-  it('renders Org directly after standalone Teams and delegates exact root/member actions', async () => {
+  it('renders Orgs directly after standalone Teams and delegates exact root/member actions', async () => {
     const group = agentOrgDefinitionGroup()
     const { wrapper, actions, state } = mountSubject({ agentOrgDefinitions: [group] })
     const text = wrapper.text()
     expect(text.indexOf('Teams')).toBeGreaterThanOrEqual(0)
-    expect(text.indexOf('Org')).toBeGreaterThan(text.indexOf('Teams'))
+    expect(text.indexOf('Orgs')).toBeGreaterThan(text.indexOf('Teams'))
     expect(wrapper.findAll('[data-test="workspace-team-row-team-run-1"]')).toHaveLength(1)
     const collection = wrapper.get('[data-test="workspace-agent-orgs"]')
     const heading = collection.get('div.uppercase')
-    expect(heading.text()).toBe('Org')
+    expect(heading.text()).toBe('Orgs')
     const teamElement = wrapper.get('[data-test="workspace-team-row-team-run-1"]').element
     const orgElement = wrapper.get('[data-test="agent-org-team-row-mounted-team-run"]').element
     const oldProps = wrapper.props()
@@ -251,7 +251,7 @@ describe('WorkspaceHistoryWorkspaceSection current execution rows', () => {
     expect(state.toggleAgentOrgTeam).not.toHaveBeenCalled()
     await localizationRuntime.setPreference('en')
     await wrapper.vm.$nextTick()
-    expect(heading.text()).toBe('Org')
+    expect(heading.text()).toBe('Orgs')
     expect(wrapper.text()).not.toContain('Restore')
 
     await wrapper.get('[data-test="agent-org-team-row-mounted-team-run"]').trigger('click')
