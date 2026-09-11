@@ -244,8 +244,11 @@ watch(
   { immediate: true },
 );
 
-watch(storeCurrentRequirement, (newValFromStore) => {
-  syncInternalRequirement(newValFromStore);
+watch(storeCurrentRequirement, () => {
+  // A failed send can restore its draft before newer textarea edits debounce.
+  // Commit those exact-context edits first rather than replacing them on screen.
+  flushDebouncedUpdateStore();
+  syncInternalRequirement(activeContextStore.activeAgentContext?.requirement ?? '');
 });
 
 const syncPendingLocalAcknowledgement = () => {
@@ -266,8 +269,11 @@ const syncPendingLocalAcknowledgement = () => {
 watch(submissionPending, (pending) => {
   if (pending) {
     syncPendingLocalAcknowledgement();
+  } else {
+    // Failure handling must see newer text before deciding to restore attachments.
+    flushDebouncedUpdateStore();
   }
-});
+}, { flush: 'sync' });
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLTextAreaElement;

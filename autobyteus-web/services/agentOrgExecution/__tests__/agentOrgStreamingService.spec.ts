@@ -113,6 +113,7 @@ const snapshot = {
 const candidate = (selectedAddress: string | null = null, changeSequence = 4) => ({
   phase: 'live', changeSequence, selectedAddress, selection: selectedAddress ? { kind: 'agent_execution', agentRunId: 'agent-run' } : null,
   select: vi.fn(), setActive: vi.fn(), applyEvent: vi.fn(), requireReopen: vi.fn(),
+  listAgentContextEntries: () => [], getAgentContext: () => null,
 }) as unknown as AgentOrgExecutionContext
 
 describe('AgentOrgStreamingService', () => {
@@ -486,7 +487,13 @@ describe('AgentOrgStreamingService', () => {
   })
 
   it('notifies history only after an accepted external SEND_MESSAGE ACK without exposing message text', async () => {
-    const context = candidate()
+    const context = new AgentOrgExecutionContext({
+      orgRunId: 'org-run', view: snapshot.payload.root_org as any,
+      transport: { interactionFor: () => ({ send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn() }) },
+      entries: [{ agentRunId: 'agent-run', memberAddress: '/direct' as any,
+        context: new AgentContext({ agentDefinitionId: 'agent-def', agentDefinitionName: 'Direct' } as any,
+          new AgentRunState('agent-run', { id: 'agent-run', messages: [], createdAt: '', updatedAt: '' } as any)) }],
+    })
     mocks.hydrate.mockResolvedValue(context)
     const onAcceptedExternalUserMessage = vi.fn()
     const service = new AgentOrgStreamingService({

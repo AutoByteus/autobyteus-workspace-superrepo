@@ -4,8 +4,9 @@ import {
   type CollaborationStreamClientMessage,
   type CollaborationStreamServerMessage,
 } from '@autobyteus/collaboration-stream-contracts'
-import { shallowReactive } from 'vue'
+import { shallowReactive, watch } from 'vue'
 import type { ContextFilePath } from '~/types/conversation'
+import { beginLocalUserSubmission, failLocalSubmission } from '~/services/runSubmission/localUserSubmission'
 import type { AgentInteractionPort } from '~/types/workspace/activeAgentWorkspaceTarget'
 import { useWindowNodeContextStore } from '~/stores/windowNodeContextStore'
 import { getActiveRemoteAccessCredential } from '~/utils/remoteAccess/authorizedTransport'
@@ -153,18 +154,43 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     if (!target) throw new Error('AgentOrg interaction requires an exact AgentRun ID.')
     return Object.freeze({
       send: async (content: string, contextPaths: readonly ContextFilePath[]) => {
+        const org = this.requireReadyContext()
+        const context = org.getAgentContext(target)
+        if (!context || !org.index.requireAgent(target).live) throw new Error('AgentOrg send target is not live.')
+        if (context.submissionPending) throw new Error('AgentOrg member submission is already pending.')
+        const attachments = contextPaths.map((attachment) => ({ ...attachment }))
         const messageId = crypto.randomUUID()
-        await this.command({
-          type: 'SEND_MESSAGE',
-          payload: {
-            ...this.commandRoot(target),
-            content,
-            context_file_paths: contextPaths.map(attachmentLocator),
-            image_urls: [],
-            message_id: messageId,
-            dedupe_key: `member_input:${this.options.orgRunId}:${target}:${messageId}`,
-          },
+        const dedupeKey = `member_input:${this.options.orgRunId}:${target}:${messageId}`
+        const submission = beginLocalUserSubmission(context, {
+          text: content, attachments, navigationTarget: null,
         })
+        Object.assign(submission.message, { messageId, dedupeKey })
+        let draftEdited = false
+        const stopWatching = watch(() => [context.requirement, context.contextFilePaths], () => {
+          draftEdited = true
+        }, { deep: true, flush: 'sync' })
+        try {
+          await this.command({
+            type: 'SEND_MESSAGE',
+            payload: {
+              ...this.commandRoot(target),
+              content,
+              context_file_paths: attachments.map(attachmentLocator),
+              image_urls: [],
+              message_id: messageId,
+              dedupe_key: dedupeKey,
+            },
+          })
+        } catch (error) {
+          failLocalSubmission(submission, error)
+          if (!draftEdited) {
+            context.requirement = content
+            context.contextFilePaths = attachments
+          }
+          throw error
+        } finally {
+          stopWatching()
+        }
       },
       interrupt: () => this.command({
         type: 'INTERRUPT_GENERATION',
@@ -190,12 +216,17 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     }
   }
 
-  private command(message: CollaborationStreamClientMessage): Promise<void> {
-    const socket = this.socket
-    if (!socket || socket.readyState !== WebSocket.OPEN
+  private requireReadyContext(): AgentOrgExecutionContext {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN
       || this.streamPhase !== 'ready' || this.context?.phase !== 'live') {
-      return Promise.reject(new Error('AgentOrg interaction stream is not ready.'))
+      throw new Error('AgentOrg interaction stream is not ready.')
     }
+    return this.context
+  }
+
+  private async command(message: CollaborationStreamClientMessage): Promise<void> {
+    this.requireReadyContext()
+    const socket = this.socket!
     return new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
         this.pending.delete(message.payload.command_id)
@@ -208,7 +239,13 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
         reject,
         timeout,
       }))
-      socket.send(JSON.stringify(message))
+      try {
+        socket.send(JSON.stringify(message))
+      } catch (cause) {
+        clearTimeout(timeout)
+        this.pending.delete(message.payload.command_id)
+        reject(cause)
+      }
     })
   }
 
@@ -255,6 +292,13 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
       // leaves top-level task-record replacements invisible until another UI
       // action happens to invalidate the consumer.
       const candidate = shallowReactive(hydratedCandidate)
+      // A verified replacement owns runtime truth, not the user's unsent draft.
+      for (const entry of candidate.listAgentContextEntries()) {
+        const previous = this.context?.getAgentContext(entry.agentRunId)
+        if (!previous) continue
+        entry.context.requirement = previous.requirement
+        entry.context.contextFilePaths = previous.contextFilePaths.map((attachment) => ({ ...attachment }))
+      }
       if (previousFocus) candidate.select(previousFocus)
       this.context = candidate
       this.recoveryCheckpoint = null

@@ -9,7 +9,8 @@ import { resolveFirstUserMessageSummary } from '~/utils/runTreeSummary';
 export interface BeginLocalUserSubmissionOptions {
   text: string;
   attachments: ContextAttachment[];
-  navigationTarget: LocalUserSubmissionNavigationTarget;
+  // Null keeps local composer/conversation effects without optimistic history navigation.
+  navigationTarget: LocalUserSubmissionNavigationTarget | null;
 }
 
 export type LocalUserSubmissionNavigationTarget =
@@ -23,7 +24,8 @@ export type LocalUserSubmissionNavigationTarget =
 export interface LocalUserSubmissionHandle {
   context: AgentContext;
   message: UserMessage;
-  navigationTarget: LocalUserSubmissionNavigationTarget;
+  // Null keeps local composer/conversation effects without optimistic history navigation.
+  navigationTarget: LocalUserSubmissionNavigationTarget | null;
 }
 
 const nowIso = (): string => new Date().toISOString();
@@ -37,9 +39,10 @@ const toErrorMessage = (error: unknown): string => {
 
 const applyLocalSubmissionNavigation = (
   context: AgentContext,
-  target: LocalUserSubmissionNavigationTarget,
+  target: LocalUserSubmissionNavigationTarget | null,
   occurredAt: string,
 ): void => {
+  if (!target) return;
   const currentStatus = context.state.currentStatus;
   const summary = resolveFirstUserMessageSummary(context.state.conversation) ?? undefined;
   useRunHistoryStore().applyRunNavigationEffect(
