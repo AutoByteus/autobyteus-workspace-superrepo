@@ -125,31 +125,35 @@ export const useActiveContextStore = defineStore('activeContext', () => {
       const context = team?.view.getFocusedAgentContext() ?? null;
       if (!team || !context) return null;
       const teamView = standaloneTeamView(team);
-      return Object.freeze({
-        kind: 'standalone_team_member', access: 'live', context, team: teamView,
+      const target = {
+        kind: 'standalone_team_member' as const, context, team: teamView,
         collaborationMessages: standaloneTeamMessagesView(team),
         collaborationTasks: standaloneTeamTasksView(team),
-        interaction: Object.freeze({
-          send: async (content: string, paths: readonly ContextFilePath[]) => {
-            await agentTeamRunStore.sendMessageToFocusedMember(content, [...paths]);
-          },
-          interrupt: async () => { await agentTeamRunStore.interruptFocusedMemberGeneration({
-            teamRunId: team.view.getRootTeamRunId(), agentRunId: context.state.runId,
-          }); },
-          decideTool: async (
-            invocationId: string,
-            approved: boolean,
-            reason: string | null,
-            target?: ToolApprovalTarget | null,
-          ) => {
-            await agentTeamRunStore.postToolExecutionApproval(invocationId, approved, reason, target);
-          },
-        }),
         browse: Object.freeze({
-          kind: 'teamMember', teamRunId: team.view.getRootTeamRunId(),
+          kind: 'teamMember' as const, teamRunId: team.view.getRootTeamRunId(),
           memberAddress: team.view.getFocusedMemberAddress(), agentRunId: context.state.runId,
         }),
-      });
+      };
+      return team.view.getFocusedAgentAccess() === 'read_only'
+        ? Object.freeze({ ...target, access: 'read_only' })
+        : Object.freeze({ ...target, access: 'live',
+          interaction: Object.freeze({
+            send: async (content: string, paths: readonly ContextFilePath[]) => {
+              await agentTeamRunStore.sendMessageToFocusedMember(content, [...paths]);
+            },
+            interrupt: async () => { await agentTeamRunStore.interruptFocusedMemberGeneration({
+              teamRunId: team.view.getRootTeamRunId(), agentRunId: context.state.runId,
+            }); },
+            decideTool: async (
+              invocationId: string,
+              approved: boolean,
+              reason: string | null,
+              target?: ToolApprovalTarget | null,
+            ) => {
+              await agentTeamRunStore.postToolExecutionApproval(invocationId, approved, reason, target);
+            },
+          }),
+        });
     }
     return null;
   });

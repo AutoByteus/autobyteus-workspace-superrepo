@@ -32,14 +32,14 @@ export const inspectMountedTeamMember = async (input: {
       throw new Error(`Team context '${teamRunId}' is not mounted.`);
     }
     if (!team.view.hasAgentRun(agentRunId)) {
-      throw new Error(`AgentRun '${agentRunId}' is not visible in the mounted Team yet.`);
+      throw new Error(`AgentRun '${agentRunId}' is not retained in the mounted Team.`);
     }
     await ensureAuthoritativeTeamMemberProjection({ team, agentRunId });
     if (contexts.getTeamContextById(teamRunId) !== team) {
       throw new Error(`Team context '${teamRunId}' changed before selection commit.`);
     }
     const memberAddress = team.view.getMemberAddress(agentRunId);
-    const focus = team.view.focusAgent(agentRunId);
+    const focus = team.view.focusAgentForInspection(agentRunId);
     if (!memberAddress || focus.disposition === 'rejected'
       || team.view.getFocusedAgentRunId() !== agentRunId) {
       throw new Error(focus.disposition === 'rejected'

@@ -30,9 +30,8 @@ const exactMountedContext = (
   }
   const agent = team.view.getAgentContext(agentRunId);
   const location = team.view.getAgentExecutionLocation(agentRunId);
-  const visible = team.view.listNavigationRows().some((row) => row.agentRunId === agentRunId);
-  if (!agent || agent.state.runId !== agentRunId || !location || !visible) {
-    throw new Error(`AgentRun '${agentRunId}' is not a visible member of Team '${rootTeamRunId}'.`);
+  if (!agent || agent.state.runId !== agentRunId || !location || location.agentRunId !== agentRunId) {
+    throw new Error(`AgentRun '${agentRunId}' is not a retained member of Team '${rootTeamRunId}'.`);
   }
   return agent;
 };

@@ -43,12 +43,14 @@ export interface TeamExecutionViewState {
   getFocusedAgentRunId(): string;
   getFocusedMemberAddress(): AgentTeamAddress;
   getFocusedAgentContext(): AgentContext | null;
+  getFocusedAgentAccess(): 'live' | 'read_only';
   getFocusedNavigationRow(): TeamExecutionNavigationRow | null;
   getAgentContext(agentRunId: string): AgentContext | null;
   getAgentExecutionLocation(agentRunId: string): TeamAgentExecutionLocation | null;
   getMemberAddress(agentRunId: string): AgentTeamAddress | null;
   hasAgentRun(agentRunId: string): boolean;
   focusAgent(agentRunId: string): MutationResult;
+  focusAgentForInspection(agentRunId: string): MutationResult;
   listAgentContextEntries(): readonly TeamAgentContextEntry[];
   listNavigationRows(): readonly TeamExecutionNavigationRow[];
   listTaskHistoryRows(): readonly TeamTaskHistoryRow[];
@@ -106,6 +108,7 @@ export const createTeamExecutionViewState = (
   const streamRecoveryRequired = ref(false);
   const rootActive = ref(input.rootActive);
   const focusedAgentRunId = ref(requiredId(input.initialFocusedAgentRunId, 'initialFocusedAgentRunId'));
+  const retainedInspection = ref(false);
   const contexts = shallowReactive(new Map<string, AgentContext>());
   const locations = shallowRef<ReadonlyMap<string, TeamAgentExecutionLocation>>(new Map());
 
@@ -202,7 +205,29 @@ export const createTeamExecutionViewState = (
     contexts,
     purpose: navigationPurpose(),
   });
+  const inspectionRows = () => projectNavigationRows({
+    tree: tree.value, tasks: tasks.value, contexts, purpose: 'HISTORICAL_INSPECTION',
+  });
+  const isRetainedAgent = (id: string): boolean => !collectLiveAgentExecutionLocations(tree.value)
+    .some((location) => location.agentRunId === id);
+  const focusAgent = (agentRunId: string, inspect = false): MutationResult => {
+    const id = agentRunId.trim();
+    if (!contexts.has(id)) return { disposition: 'rejected', code: 'TEAM_AGENT_RUN_NOT_FOUND', message: `AgentRun '${id}' is not part of this Team execution.` };
+    const rows = inspect ? inspectionRows() : navigationRows();
+    if (!rows.some((row) => row.agentRunId === id)) {
+      return { disposition: 'rejected', code: 'TEAM_AGENT_RUN_NOT_VISIBLE', message: `AgentRun '${id}' is not available for this selection.` };
+    }
+    const retained = inspect && isRetainedAgent(id);
+    if (focusedAgentRunId.value === id && retainedInspection.value === retained) return { disposition: 'unchanged' };
+    retainedInspection.value = retained;
+    focusedAgentRunId.value = id;
+    return { disposition: 'applied' };
+  };
   const repairFocus = (): void => {
+    // Explicit retained inspection is distinct from ordinary live navigation.
+    // A live task selected before settlement still repairs to a live member.
+    if (retainedInspection.value && inspectionRows().some((row) => row.agentRunId === focusedAgentRunId.value)) return;
+    retainedInspection.value = false;
     const rows = navigationRows();
     if (rows.some((row) => row.agentRunId === focusedAgentRunId.value)) return;
     const coordinatorAddress = tree.value.root_team.coordinator_address;
@@ -380,23 +405,16 @@ export const createTeamExecutionViewState = (
     getFocusedAgentRunId: () => focusedAgentRunId.value,
     getFocusedMemberAddress: () => locations.value.get(focusedAgentRunId.value)!.memberAddress,
     getFocusedAgentContext: () => contexts.get(focusedAgentRunId.value) ?? null,
-    getFocusedNavigationRow: () => navigationRows().find(
+    getFocusedAgentAccess: () => isRetainedAgent(focusedAgentRunId.value) ? 'read_only' : 'live',
+    getFocusedNavigationRow: () => inspectionRows().find(
       (row) => row.agentRunId === focusedAgentRunId.value,
     ) ?? null,
     getAgentContext: (agentRunId) => contexts.get(agentRunId.trim()) ?? null,
     getAgentExecutionLocation: (agentRunId) => locations.value.get(agentRunId.trim()) ?? null,
     getMemberAddress: (agentRunId) => locations.value.get(agentRunId.trim())?.memberAddress ?? null,
     hasAgentRun: (agentRunId) => contexts.has(agentRunId.trim()),
-    focusAgent: (agentRunId) => {
-      const id = agentRunId.trim();
-      if (!contexts.has(id)) return { disposition: 'rejected', code: 'TEAM_AGENT_RUN_NOT_FOUND', message: `AgentRun '${id}' is not part of this Team execution.` };
-      if (!navigationRows().some((row) => row.agentRunId === id)) {
-        return { disposition: 'rejected', code: 'TEAM_AGENT_RUN_NOT_VISIBLE', message: `AgentRun '${id}' is not live.` };
-      }
-      if (focusedAgentRunId.value === id) return { disposition: 'unchanged' };
-      focusedAgentRunId.value = id;
-      return { disposition: 'applied' };
-    },
+    focusAgent: (agentRunId) => focusAgent(agentRunId),
+    focusAgentForInspection: (agentRunId) => focusAgent(agentRunId, true),
     listAgentContextEntries: () => Object.freeze([...contexts].map(([agentRunId, agentContext]) => Object.freeze({
       agentRunId, memberAddress: locations.value.get(agentRunId)!.memberAddress, agentContext,
     }))),

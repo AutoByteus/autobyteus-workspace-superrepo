@@ -99,7 +99,7 @@ export const reopenTeamRunAfterStreamLoss = async (
     agentRunId: preferredAgentRunId,
   });
   const context = hydrated.hydratedContext;
-  const focus = context.view.focusAgent(preferredAgentRunId);
+  const focus = context.view.focusAgentForInspection(preferredAgentRunId);
   if (focus.disposition === 'rejected') throw new Error(focus.message);
   await runStore.replaceFailedTeamStream({
     rootTeamRunId: input.teamRunId,

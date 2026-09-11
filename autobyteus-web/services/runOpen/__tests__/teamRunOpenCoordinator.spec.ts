@@ -296,6 +296,23 @@ describe('openTeamRun current exact execution identity', () => {
     expect(result).toMatchObject({ focusedAgentRunId: 'run-b', focusedMemberAddress: '/member-b' })
   })
 
+  it('preserves exact settled task inspection when replacing a failed active-root stream', async () => {
+    const record = testTaskRecord({ taskId: 'retained', delegatorAgentRunId: 'run-a', recipientAddress: '/member-b',
+      target: { agentRunId: 'retained-task' }, status: 'accepted' })
+    const candidate = makeTeam({ focus: 'retained-task', active: true, tasks: [record], taskExecutions: [{
+      kind: 'task_agent', address: '/member-b', agent_run_id: 'retained-task', platform_agent_run_id: null,
+      started_at: '2026-09-01T00:02:00.000Z', settled_at: '2026-09-01T00:05:00.000Z',
+    }] })
+    getTeamContextByIdMock.mockReturnValue(makeTeam())
+    hydrateTeamRunContextForStreamRecoveryMock.mockResolvedValue({ ...hydration(candidate), expectedBaseChangeSequence: 12 })
+    await expect(reopenTeamRunAfterStreamLoss({ teamRunId: ROOT, agentRunId: 'retained-task',
+      resolveWorkspaceMetadataByRootPath: vi.fn() })).resolves.toMatchObject({ focusedAgentRunId: 'retained-task' })
+    expect(candidate.view.getFocusedAgentAccess()).toBe('read_only')
+    expect(candidate.view.listNavigationRows().some(row => row.agentRunId === 'retained-task')).toBe(false)
+    expect(candidate.view.isRootTeamActive()).toBe(true)
+    expect(replaceFailedTeamStreamMock).toHaveBeenCalledTimes(1)
+  })
+
   it('preserves selection when candidate replacement fails', async () => {
     const failed = makeTeam({ focus: 'run-a' })
     const candidate = makeTeam({ focus: 'run-b' })
