@@ -1,5 +1,10 @@
 # Task Workflow Parity — Read-Only Architecture Comparison
 
+**Current disposition (AD-REV-019):** Requirements re-entry RER-028 approved the
+parity correction. The gap below is historical and closed at Requirements;
+DS-028–030 now specify the architecture response, pending independent review.
+No implementation or expanded validation pass is implied.
+
 - Stable package: `AORG-FLAT-TEAM-001`.
 - Date: 2026-09-11.
 - Trigger: the user asks whether a direct Agent in an Org can delegate to a
@@ -150,7 +155,7 @@ delegate to a referenced Team, creating a fresh task Team, and inspect its tasks
 and task messages with the familiar presentation. Changing the containing root
 does not justify excluding task communication.
 
-**Current outcome: Requirement Gap — user-directed correction of the scoped
+**Historical outcome before RER-028: Requirement Gap — user-directed correction of the scoped
 task-presentation boundary.** RER-027 explicitly retained the configured-only
 live event/Messages restriction while resolving retained history. That
 restriction conflicts with the user's now-explicit task-message parity request.
@@ -192,3 +197,37 @@ themselves require a different user-facing task workflow.
   has been implemented or validated. No cumulative pass or delivery readiness
   is claimed. Source, tests, upstream artifacts and other owners' dirty files
   remain untouched.
+
+
+## AD-REV-019 — Architecture Response To Approved RER-028
+
+RER-028 (`fadfb3c0`) is the current authority and expressly supersedes RER-026/027
+configured-only event/Messages behavior. `design-spec.md` DS-028–030 and
+`architecture-design-self-validation.md` VAL-038–045 now own the technical answer:
+
+- Remove the configured-pair gate and task-message filtering. Preserve one Org
+  communication authority, exact-ID admission, ordered receiver publication and
+  truthful retained provider input.
+- Extract participant Tasks as a separate root read facet; reuse established
+  Team components/semantics without manufacturing a Team parent for direct A.
+- Add exact task selection and one retained view index; correlate task IDs,
+  actual run/provider/physical identity and captured source configuration.
+- Distinguish saved task records, ordinary messages and actual accepted system
+  input; rejected notification stays warning, never an invented delivered input.
+- Retain settled task identity/history through readonly inspection in the same
+  Org context; do not activate/restore a task merely to read it.
+
+Additional read-only source evidence during this round:
+
+| File / path (under server or web as named) | Observed boundary | Design response |
+| --- | --- | --- |
+| server `agent-org-execution/services/agent-org-execution-tree-location-service.ts`; `run-history/services/agent-org-member-run-view-projection-service.ts` | Exact task directory is found, but metadata uses the configured source's platform binding | Actual task node owns binding/location; source owns only frozen launch/definition fields |
+| web `agentOrgContextHydration.ts` | Task seeds use placeholder definition/root defaults; fetch failure becomes null | Resolve captured source precisely; distinguish unavailable projection from genuine empty history |
+| web `WorkspaceAgentOrgHistoryCollection.vue`; `agentOrgExecutionContext.ts`; `agentOrgStreamingService.ts` | Task rows nonselectable; authoritative/pending/recovery focus uses address | Exact execution selection through route/action/context; no source fallback |
+| web `CollaborationOverviewPanel.vue`; `agentOrgTeamPresentation.ts`; `teamDelegatedTaskEntries.ts` | Tasks requires Team context/local mapping and shared row misnames Org identity as teamRunId | Independent Tasks facet, exact participant projector and root-tagged row types |
+| server `root-task-lifecycle-input.ts`; `root-task-lifecycle-engine.ts`; `configured-agent-execution-handle.ts`; shared presentation adapter | Task commit and notification acceptance are separate; accepted SYSTEM currently passes generic user-member builder | Mark task provenance in known input builders and publish one existing system-input presentation only after acceptance |
+| server `agent-org-run-manager.ts`; `agent-org-execution-view-projector.ts` | Manager owns stores/transition scope; active-only view constructor requires run | Service-owned readonly inspection with strict existing DTO projection, no fake live object or second store |
+
+The prior four-file Team comparison is retained. No source, tests, browser or
+provider was run/changed for this architecture round. The design remains
+`Architecture Design Complete` pending independent review, not a delivery result.

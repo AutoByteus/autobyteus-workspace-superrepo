@@ -26,6 +26,7 @@ does not revise intended behavior.
 | AD-REV-016 | Architecture Reviewer `ARCH-REV-013` / migration-status coherence recovery round | `AR-FIND-007`; `BEH-016`; `REQ-033`; `AC-028`; `DEC-020` | `Architecture Revision — Migration-Specific Terminal Status Authority` | `Architecture Design Complete`; family migration retains no-warning failure rules while summary migration retains bounded valid-empty warnings; no mechanism or behavior change; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-017 | API/E2E `API-FIND-019`, explicit user AgentTeam-parity confirmation, and Requirements Engineer approved `RER-026` | `API-FIND-019`; `BEH-017`; `REQ-034`; `AC-029`; `SCN-018`; `QR-012`; `DEC-021` | `Architecture Revision — AgentOrg Communication Observability Parity` | `Architecture Design Complete`; exact post-durable receiver event plus owning-root selected-member Messages facet over the existing sidecar; self-validation expanded to 40 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-018 | Architecture Reviewer `ARCH-REV-015` / endpoint-eligibility recovery round | `AR-FIND-008`; retained `API-FIND-019`; `REQ-034`; `AC-029`; `SCN-018` | `Architecture Revision — Both-Endpoint Configured Message Eligibility` | `Architecture Design Complete`; only configured→configured receives the new member event/Messages projection while all three task-involved exact-ID directions preserve prior delivery/sidecar behavior; 40-case self-validation tightened; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
+| AD-REV-019 | Requirements Engineer approved RER-028 / user task-workflow parity correction | API-FIND-019; AAV-001 retained-history interpretation; REQ-034–036; AC-029–031; SCN-018–020 | `Architecture Revision — Task-Inclusive Messages, Participant Tasks And Retained Execution Views` | `Architecture Design Complete`; superseded configured gate removed; exact participant facets/selection/history and truthful system input; 45-case design self-validation; focused Medium/High, cumulative Large/High; independent Architecture Review selected |
 
 ## Revision Entries
 
@@ -1533,3 +1534,81 @@ does not revise intended behavior.
   presentation; the design now names one owner and a deterministic matrix to
   prevent that. Architecture claims no implementation, executable validation,
   or delivery completion.
+
+### AD-REV-019 — Task-Inclusive Messages, Participant Tasks And Retained Execution Views
+
+- Date: 2026-09-11.
+- Triggering role/report/round: Requirements Engineer's approved re-entry
+  `RER-028@fadfb3c000d57df7efe42ed0e503d86057c0d713`, following the user's
+  explicit earlier-Team task-workflow parity correction and read-only comparison
+  in `architecture-task-parity-investigation.md`. API-REV-022's AAV-001 retained
+  history observation remains factual and resolved, not a newly attributed bug.
+- Prior completed design/review: AD-REV-018 at `36f76ebbdb23b7ee235f94ab38968cf2adefbe00`
+  / ARCH-REV-016 Pass at `6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`.
+  That configured-only event/facet restriction was approved under RER-026;
+  RER-028 expressly supersedes it. Earlier entries are historical authority only.
+- Current result: `Architecture Design Complete`, canonical `design-spec.md`
+  AD-REV-019; `Design Self-Validation Pass` for 45 design walkthroughs, pending
+  independent Architecture Review. No executable or delivery pass is claimed.
+- Approved IDs: REQ-034–036, AC-029–031, SCN-018–020, BEH-009/017/018;
+  REQ-015 retained task lifecycle; AAV-001 retained-history interpretation.
+- Exact change / why required: current `6ef456e0` (IR-037/CRR-057) correctly
+  owns task execution/sidecars but hides task messages, attaches Tasks to Team
+  view, cannot select exact task rows, and borrows source configuration/binding
+  incorrectly for task hydration. Earlier Team `5fb16658` and local
+  origin/personal `5645b49d` supply the accepted workflow comparator.
+- DS-028 now resolves both exact committed endpoints and publishes one ordinary
+  receiver input for every supported configured/task combination, incl fresh
+  task-Team Agents. Preserve one sidecar and root-before-receiver-before-release
+  order. Remove configured-pair predicate/no-op/task-set filtering entirely.
+- DS-029 separates participant Tasks from genuine Team roster/header. One Org
+  context owns a retained immutable execution-view index, exact AgentRun/TeamRun
+  selection, Tasks/Messages facets and coherent candidate swaps. Relevant tasks
+  are exact delegator/assigned Agent/members of assigned fresh Team, not shared
+  source definition or root membership. Reuse the existing Team UI sections,
+  detail/reference/header/navigation and responsive composition.
+- DS-030 separates task record commit from genuine notification acceptance.
+  Existing task input builders mark provenance/suppression; the shared accepted-
+  input adapter publishes the existing system presentation once, not a fake
+  human message, and never infers delivery from Tasks. Failed notify retains
+  committed result plus warning. No ordinary message row is synthesized.
+- Exact history: actual task node supplies run/platform binding and physical
+  host; captured source supplies config only. Settled active rows disappear but
+  retained identities/records/input remain. Add one read-only Org inspection
+  query through service/manager using existing strict view DTO and per-root
+  transition serialization, not a live root constructor or repair/Restore.
+  Selected settled/inactive task targets are explicitly readonly. No task is
+  reactivated to read it; no provider-input filtering/backfill is introduced.
+- Persisted-data/contract decision: `Directly Usable — No Migration`. Existing
+  tree/task/message/trace schemas, exact command routing/admission, reference
+  routes, acknowledgement and root lifecycle/task FIFO/fence algorithms stay.
+  New readonly query and tightened internal presentation/selection types are
+  explicit interface changes, not new durable authority or delivery policy.
+- Design-spec sections aligned: status/readiness/current evidence/classification;
+  DS-028–030 spines and concrete workflow example; focus/target contract;
+  behavior/scenario, ownership/dependency/interface, file/removal, transition,
+  sequencing/risk and downstream guidance. Old active configured-only guidance
+  is removed rather than left as a competing implementation path.
+- Supplements: self-validation VAL-038–040 revised to all accepted endpoint
+  pairs; VAL-041–045 added for exact Tasks relevance, concurrent same-address
+  executions, accepted/failed system input, retained history and shared Team UI.
+  Task-parity investigation receives design resolution; assertion-validity
+  record links the later authority while preserving AAV-001's completed outcome.
+  No new supplement file; upstream requirements/Product artifacts unchanged.
+- Classification: focused `Medium / High` within existing collaboration owners
+  (event eligibility, task read facets, exact identity/read API and shared UI
+  composition); cumulative `task_size=Large`, `architectural_risk=High` because
+  parent architecture remains structural. File/content count alone is not the
+  reason. Selected route: independent Architecture Review, dynamically resolved.
+- Downstream impact: reviewer verifies supported task paths end-to-end and no
+  false Team owner/identity. After pass, implementation must reconcile current
+  source, remove obsolete assertions and return for full source review and
+  expanded deterministic/rendered/API validation. Old configured-only passes
+  prove only their recorded scope. Do not claim API-FIND-019 fully validated or
+  delivery-ready from this design result.
+- Residual risks and controls: same-address task confusion, missing participant
+  Tasks, duplicate system input, failed-notify fabrication, task history read
+  using source provider ID, or accidental activation on inspection. Exact owner,
+  correlation and negative-path tests are specified in VAL-038–045. No remaining
+  Requirement Gap or Product UI decision. All unrelated source/tests and dirty
+  downstream artifacts are preserved and excluded from the architecture commit.

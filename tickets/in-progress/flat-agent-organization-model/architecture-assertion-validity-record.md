@@ -1,5 +1,11 @@
 # Architecture Assertion-Validity Record
 
+**Later authority note:** AAV-001's retained-provider-history answer below remains
+resolved. RER-028 separately supersedes its RER-026/027 configured-only live
+scope; AD-REV-019 now designs task-inclusive events/Tasks/Messages. The no-new-AD
+statement in the completed assertion-only round is historical, not a restriction
+on this later user-approved parity revision.
+
 ## AAV-001 — Task-origin provider history versus configured communication presentation
 
 - Date: 2026-09-11.
