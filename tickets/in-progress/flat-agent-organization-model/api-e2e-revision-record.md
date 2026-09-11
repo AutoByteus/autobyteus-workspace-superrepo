@@ -23,6 +23,9 @@ The latest `api-e2e-coverage-investigation.md` and
 | API-REV-014 | Code Reviewer CRR-042 / IR-031 communication-observability renewal | RER-026; AD-REV-018; ARCH-REV-016; IR-031; CRR-042; API-FIND-019 | Pass / 98.4% for API-REV-013 scope, then reopened | Fail / 87.0% |
 | API-REV-015 | Code Reviewer CRR-044 / IR-032 status-traversal and cumulative renewal | RER-026; AD-REV-018; ARCH-REV-016; IR-032; CRR-044; API-FIND-020 | Fail / 87.0% | Fail / 92.0% |
 | API-REV-016 | Code Reviewer CRR-045 / same-artifact correlated runtime rerun | RER-026; AD-REV-018; ARCH-REV-016; IR-032; CRR-044/045; API-FIND-021 | Fail / 92.0% | Pass / 97.6% |
+| API-REV-017 | User-requested fresh full-ticket rerun | RER-026; AD-REV-018; ARCH-REV-016; IR-032; CRR-044/045/046 | Pass / 97.6% | Fail / 80.3% |
+| API-REV-018 | Code Reviewer CRR-048 / IR-033 fresh cumulative rerun | RER-026; AD-REV-018; ARCH-REV-016; IR-033; CRR-048; API-FIND-022 | Fail / 80.3% | Fail / 87.4% |
+| API-REV-019 | Code Reviewer CRR-050 / IR-034 complete fresh cumulative retest, resumed after user reboot | RER-026; AD-REV-018; ARCH-REV-016; IR-034; CRR-050 | Fail / 87.4% | Pass / 95.4% |
 
 ## Revision Entries
 
@@ -1003,3 +1006,124 @@ None. API-REV-010 passed its IR-028 artifact; API-REV-011 validates the newly ch
 - Durable test-code review: `Not Applicable` — no repository-resident test changed.
 - Recommended recipient: `/software_engineering_team/code_reviewer` for the reviewed-route successful result.
 - Remaining bounded risk: unchanged Electron-only shell behavior was not relaunched, and passive correlation is evidence-only rather than a repository browser suite; neither is material to the directly proven provider/MCP/FIFO/durability/browser path.
+
+### API-REV-017 — User-requested fresh full-ticket rerun stops on normal AgentOrg edit
+
+- Triggering role/request: user explicitly requested an inventory-complete fresh rerun of the whole Large/High ticket, with every case recorded immediately in the canonical ledger.
+- Related authority: `RER-026`; cumulative `AD-REV-018 / DS-028`; `ARCH-REV-016 / Pass`; `IR-032`; `CRR-044 / cumulative Pass`; `CRR-045–046` retained.
+- Tested source/artifact: `8f9f9ce3f7f4ab9312813de8faf5b651578a7310 / 43ef19f2de69b2c16133577dac40471f75ebd913` under integrated HEAD `6bca86cac41c3171b35eba3c38b7543da3fde62d`; no application-source delta exists after the reviewed artifact.
+- Prior result/confidence: `API-REV-016 / Pass / 97.6%`; not inferred into this round.
+- Why recorded: the user requested a complete fresh matrix rather than a targeted delta rerun, and that execution found a new critical normal-authoring failure.
+- Durable coverage changed: `None`. API/E2E added only evidence, plan/ledger and report artifacts under `api-e2e-evidence/API-REV-017/`.
+
+#### Repository and package evidence
+
+- server production build/bootstrap: Pass;
+- exact current-ticket server: `59 files / 289 tests` Pass;
+- Brief Studio: `3 files / 8 tests` Pass;
+- relevant web: `130 files / 816 tests` Pass;
+- selected Electron boundary: `9 files / 39 tests` Pass;
+- web/localization guards and zero-finding literal audit: Pass;
+- Nuxt production build/prerender: 3,815 modules / 16 routes Pass;
+- Linux arm64 AppImage: 524,007,419 bytes, SHA-256 `2cd8ef75a0413eab254f15f76327797253b3a225b6a54a6bb4a1051dc242be41`, exact packaged/repository server hash equality;
+- normal imported package, both Team/Org definition families, exact detail/read-only/source-immutability, invalid/degraded admission, and all explicit submit/review tool inventories: Pass or explicitly checkpointed in the ledger;
+- normal server-owned flat Team create/edit/persistence/revision and native en/zh-CN handoff labels: Pass.
+
+The broad 167-file discovery sweep's non-ticket/stale failures remain separately adjudicated; they are not claimed as passes and are unrelated to the new exact live failure.
+
+#### New finding — API-FIND-022
+
+`AUTH-ORG-001` fails `REQ-018`, `REQ-023`, `AC-017` and `AC-018`:
+
+- Actual AutoByteus `open_tab` created one server-owned `API17 Authored Org Ω` using the normal zh-CN authoring surface.
+- The Org persisted a direct Agent, reusable flat Team, no coordinator, and exact Org-owned `/aorg_e2e_concierge -> /api17_authored_team` handoff.
+- The next normal visible-description edit sent both hydrated member objects with Apollo-injected `__typename: "AgentOrgMember"`.
+- GraphQL rejected both values because `AgentOrgMemberInput` does not define `__typename`.
+- The form displayed the exact error; revision and both persisted definition files remained unchanged, so no partial write occurred.
+- Source correlation shows `AgentOrgExperience.vue` spreads hydrated GraphQL members into `visibleInput.members` and `agentOrgDefinitionStore.ts` forwards them unchanged.
+
+Preliminary classification: **implementation-owned frontend input-normalization/serialization defect**, subject to Code Reviewer focused failure-origin review. GraphQL validation must not be weakened; no retry, replay, compatibility or recovery mechanism is proposed.
+
+Evidence:
+
+- `api-e2e-evidence/API-REV-017/live/API-FIND-022-agentorg-edit-sends-graphql-typename.md`
+- `API-FIND-022-update-request-response.json`
+- `API-FIND-022-agentorg-edit-typename-error.png`
+- `API-FIND-022-source-and-persistence.log`
+- `AUTH-ORG-001-after-create.json`
+- `AUTH-ORG-001-after-visible-edit.json`
+
+#### Held scope and cleanup
+
+The critical fail-fast gate left live completion of `PKG-005`, `AUTH-ORG-002`, all fresh configuration/Team/Org/message/task/API/persistence/final-history/summary/Restore/recovery/restart/final-migration/final-responsive/status cases `Not Tested`. Historical results were not substituted. The canonical ledger records every completed checkpoint and the exact held list at sequences 127–148.
+
+Cleanup is complete: tabs empty; server SIGTERM clean; renderer/ports/processes closed; copied secrets and generated shared outputs removed; package hashes `18/18`; source/artifact/no-application-delta and `git diff --check` pass; Delivery-owned dirty hashes remain exact.
+
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, and `api-e2e-evidence/API-REV-017/`.
+- Current result/confidence: **`Fail / 80.3%`**.
+- New or remaining finding: `API-FIND-022`.
+- Broader validation: `Required; partially executed and stopped by critical failure`.
+- Recommended route: dynamic handoff to the returned accountable recipient for focused failure-origin review.
+- Delivery readiness: not claimed.
+
+### API-REV-018 — IR-033 fixes AgentOrg edit; complete fresh rerun finds four live/runtime failures
+
+- Triggering role/report/round: Code Reviewer `CRR-048 / cumulative Pass`; API/E2E round 19; the user required a complete whole-ticket retest with immediate case ledgering.
+- Triggering scenario: prior `API-FIND-022 / AUTH-ORG-001`, followed by the entire `REQ-001–034`, `AC-001–029`, `SCN-001–018`, `QR-001–012` matrix.
+- Related revisions: `RER-026`; cumulative `AD-REV-018 / DS-028`; `ARCH-REV-016 / Pass`; `IR-033`; `CRR-048`.
+- Tested source/artifact/HEAD: `161483fcb980c6bbe1b14b1d97cb582c40b7e929 / a967ba9391a003eb14376bede3faaddba4335cc1 / a967ba9391a003eb14376bede3faaddba4335cc1`.
+- Why recorded: IR-033 corrected the prior real Apollo edit failure. The reviewed Large/High package and explicit user request required a new full cumulative real package/provider/browser/API/restart/migration run, not a delta-only inference.
+- Durable coverage changed: **None**. API/E2E added evidence-only plans, scripts, logs, request/response captures and screenshots under `api-e2e-evidence/API-REV-018/`.
+- Environment delta: current built backend on 8598, production renderer 3598, actual AutoByteus `open_tab`, normal immutable package import, real Codex App Server / `gpt-5.6-sol`, Agent Tools MCP, isolated SQLite/files/workspaces, and auxiliary current processes on 8704–8709.
+
+#### Prior Failure Resolution
+
+| Prior finding | Previous classification | Current resolution | Evidence |
+| --- | --- | --- | --- |
+| `API-FIND-022` | implementation-owned AgentOrg update serialization leaked Apollo `__typename` | **Resolved / Pass.** Normal create -> Apollo query -> visible edit -> strict GraphQL update sent only `memberName/ref/refType/refScope`; revision, files and reopen were exact. Hidden durable fields and partial-update omission also passed. | `API-REV-018/live/AUTH-ORG-001.json`; `AUTH-ORG-002.json`; screenshots/native definition files |
+
+#### Cumulative Execution
+
+- Repository: server build/bootstrap Pass; exact server **59 files / 289 tests**; web **141 / 857**; Electron **9 / 39**; both guards and zero-finding localization audit; Nuxt build/prerender 16 routes; Brief Studio 22-file pack; Linux arm64 AppImage/provenance Pass.
+- Package/admission: actual Settings import of four Agents/two flat Teams/two AgentOrgs; both catalogs/details/read-only/tool inventories; 18/18 immutable hashes; six exact invalid-package diagnostics with valid catalog/degraded GraphQL isolation.
+- Authoring/config: Team and Org create/edit/reopen; exact authored names/addresses/When; en/zh-CN selectors; hidden preservation; Temp Workspace and root/Team/exact-Agent overrides; failure/Retry/default abandonment/no stale payload.
+- Runtime: real standalone Team and full Org launches/focus/config; four configured message directions; formal direct/standalone/mounted/root/recursive task paths; monitor/history/summary/strict API/persistence; responsive 390x844 focus; automatic recovery exhaustion; Stop/restart/Restore/provider continuation; binding negatives; derived-write containment; migration and shutdown.
+- User-directed continuation after failures completed all remaining safe independent cases. The dependent task-to-task message exclusion is explicitly **Not Tested** because the root task runtime's prior supported message tool remained unresolved.
+
+#### New Findings
+
+1. `API-FIND-023`: an accepted, settled direct task Agent remains visibly Running for more than 30 seconds even though the tree is settled and checkpoint has no open work; reload makes it Offline. Preliminary origin is Unclear within server publication versus web live projection.
+2. `API-FIND-024`: a supported nested task-Team `submit_task_result` has one provider tool-start but no result or durable update after 600 seconds. Local MCP/FIFO admission is unproven; runtime/execution origin is Unclear.
+3. `API-FIND-025`: normal Stop on exact active Mixed Org terminates the different Direct Org while Mixed stays active. Preliminary origin is implementation/UI current-root ownership Local Fix.
+4. `API-FIND-026`: configured-to-root-task-Team delivery/exclusion passes, but the task coordinator's task-to-configured `send_message_to` substitutes a nonexistent reference and has no result/durable delivery after 465 seconds. MCP ingress is unproven; runtime/execution origin is Unclear. Dependent task-to-task direction is Not Tested.
+
+No timeout, retry, replay, compatibility or alternate recovery/lifecycle machinery is proposed. Code Review must classify failure origin from the retained evidence.
+
+#### Result And Cleanup
+
+- Canonical artifacts updated: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-test-case-ledger.md`, `api-e2e-revision-record.md`, `api-e2e-evidence/API-REV-018/case-reconciliation.md` and finding evidence.
+- Prior result/confidence: `API-REV-017 / Fail / 80.3%`.
+- Current result/confidence: **`Fail / 87.4%`**.
+- New/remaining finding IDs: `API-FIND-023`, `API-FIND-024`, `API-FIND-025`, `API-FIND-026`.
+- Broader validation: `Required and completed`; it increased direct integration evidence and exposed the four failures.
+- Cleanup: complete. Tabs/processes/ports/secrets/generated prerequisites cleared; fixture 18/18; exact source/artifact/application boundary and ten other-owner hashes pass; `git diff --check` passes.
+- Recommended recipient: dynamic failure-rule recipient, expected `/software_engineering_team/code_reviewer`, for focused failure-origin review.
+- Delivery readiness: not claimed.
+
+### API-REV-019 — IR-034 complete cumulative retest; live settlement and task/message controls pass
+
+- Completed: 2026-09-11. Authority: RER-026 / AD-REV-018 / ARCH-REV-016 Pass / IR-034 / CRR-050; Large / High / Reviewed.
+- Source/artifact: `2221322710a6a1f5dae06a74135bca008aef88a6 / a5eae9ce3889e6100302a85da54e5b1a02c25176`.
+- Prior: API-REV-018 Fail /87.4%. Current: **Pass /95.4%**; all categories>=95%; no current finding or critical Not Tested remainder.
+- API-FIND-023 resolved: direct/root/recursive task settlement projects Offline live without reload, durable settledAt and unique healthy remaining statuses.
+- API-FIND-025 resolved as API/E2E locator correction: exact row Stop targets only selected root. No implementation defect inferred from the old global locator.
+- API-FIND-024/026: historical stalls Not Reproduced / runtime-only; clean auto-approved root/nested tasks and all valid-reference configured/task, task/configured, task/task directions pass. Current standalone initial/revision/same-task resubmit/accept completes with provider, exact MCP HTTP, durable and provider-result correlation. API-FIND-021 also not reproduced. FIFO passage is inferred from committed records inside request intervals; no separate JSON-RPC ingress/FIFO-start logpoint claimed.
+- Current repository: server59/289, web141/859, Electron9/39; additional migration/summary/gate3/28; guards/audit zero findings; server/Nuxt builds; Brief Studio22 files; AppImage provenance all Pass.
+- Full renewed runtime: actual Settings import of4 Agents/2 Teams/2 Orgs; authoring/Apollo projection/hidden fields/en+zh-CN; config/equality/Retry/default; real Codex Team/Org/task/message/monitor/status; strict API/WS active/stopped negatives; summaries; unified history; exact locked gear/Back/New; responsive390x844; write-failure containment; migration; shutdown/restart; missing/unreadable Restore rejection.
+- User container reboot: evidence/data survived; owned environment reconstructed; normal inactive history→Restore and real continuation repeated for Team/Direct/Mixed. Conversational provider identity retained; system-only replacements durably committed; no historical Pass substituted.
+- Recovery: six legal4000 browser closes across initial+five bounded attempts, one exhaustion notice, no InvalidAccessError/permanent Connecting/ manual Reconnect. Normal history/Restore later healthy and clear; no in-place automatic success claimed for the exhausted instance.
+- Recording corrections: raw harness failures preserved with adjudications; canonical stale API18 body replaced; repository-only89.1% assessment explicitly reconstructed rather than backdated. Full details at API19/case-reconciliation.md.
+- Durable coverage changed: **None** (added/updated/removed); proportional Code Reviewer test-review decision expected Not Applicable.
+- Cleanup completed: owned tabs/processes/ports/provider descendants absent,15 secret/config copies and5 generated prerequisites removed; fixture18/18 and other-owner10/10 hashes, exact artifact/source/no production-test delta and diff check Pass.
+- Canonical investigation, execution report, revision record and ledger updated. Evidence: `api-e2e-evidence/API-REV-019/`; ledger218–271; full scope in case-reconciliation.md.
+- Broader validation: Required and completed. Next: dynamic Pass handoff to Code Reviewer. Delivery completion is not claimed.

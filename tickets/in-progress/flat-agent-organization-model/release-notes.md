@@ -2,33 +2,33 @@
 
 ## Agent Organizations And Flat Teams
 
-- Agent Teams are reusable flat groups of direct Agents with one direct Agent coordinator.
-- Agent Orgs combine direct Agents with reusable flat Teams without inventing an Org coordinator.
-- A new AgentOrg run shows `New - <AgentOrg name>` until its first accepted non-empty user message reaches an exact configured direct Agent or an Agent inside a mounted Team.
-- That first message becomes the stable history title using the same whitespace compaction and 100-character limit as Team history. Later messages, task-scoped recipients, internal/task/system/control traffic, and rejected or failed sends do not replace it.
-- The active Workspaces row refreshes from authoritative persisted history after acceptance without page reload or optimistic submitted-text projection.
-- Existing empty AgentOrg titles are recovered at startup only when one uniquely earliest qualifying configured-member trace can be proven; ambiguous or absent evidence safely keeps the `New` fallback.
-- A failed derived history-index write no longer risks an unhandled promise rejection or server termination. The accepted Agent message remains accepted, later same-path persistence remains available, and no replay/relabel is introduced.
-- The familiar **Workspaces** hierarchy remains available throughout AgentOrg configuration, active work, focus changes, Restore, and stopped history. **Agent Orgs** remains a distinct sibling directly below **Teams**.
-- Fresh AgentOrg configurations select the real **Temp Workspace (Default)** when available; exact URL/center/highlight, locked member configuration, same-monitor **Back**, and distinct **New** behavior remain intact.
-- Member overrides retain the approved collapsed Team hierarchy, exact inheritance/customization state, and coordinator identity.
-- AgentOrg recovery remains automatic-only and bounded; standalone Teams and Agent Orgs retain separate durable families for history, Restore, Stop, tasks, messaging, and provider identity.
+- Agent Teams remain reusable flat groups of direct Agents with one direct-Agent coordinator; Agent Orgs combine direct Agents and reusable flat Teams without an Org coordinator.
+- A durably accepted same-Org message between configured Agents now appears exactly once as inbound member input in the receiving Agent's center event monitor.
+- Every selected configured Agent in an AgentOrg—direct or mounted-Team-hosted—has the shared right-side **Messages** experience over the owning Org, with truthful sent/received direction, exact complete-Org counterpart identity, content, time, and references.
+- Direct-to-direct, direct-to-mounted, mounted-to-direct, and mounted-to-mounted configured communication is covered. Messages involving task-scoped endpoints remain excluded from configured-member center/Messages presentation.
+- AgentOrg status snapshots traverse each structural Team root once and delegate recursive task descendants to that Team, preventing duplicate AgentRun status identities while preserving the flat directory for routing, settlement, and whole-Org shutdown.
+- Existing first-message AgentOrg titles, unified **Workspaces**, exact focus/configuration, automatic-only recovery, Task review/acceptance, history/Restore/provider continuation, terminal Stop, and migration behavior remain intact.
+- The historical standalone-Team `submit_task_result` stall was not reproduced on the unchanged artifact. Correlated validation crossed local MCP ingress, Team FIFO, durable commit, HTTP/provider completion, revision/resubmission/acceptance, clean restart/Restore, and provider continuation; no timeout, retry, replay, or product-source change was introduced.
 - Existing supported fixed-depth data migrates to Team V2 and AgentOrg V1. Incompatible external packages require publication by their owning repositories.
 
 ## Validation
 
-- Cumulative source review: `CRR-040 / Pass`.
-- API/E2E: `API-REV-013 / Pass`, `98.4%`; broader validation completed and no current finding remains.
-- Proportional durable test-code review: `CRR-041 / Not Applicable` because API/E2E changed no durable test or production source.
-- Delivery confirmed the latest base was already integrated, passed the exact atomic-writer/AgentOrg stream regression (`2` files / `11` tests), completed the guarded ARM64 Electron build, and launched the actual package with a healthy embedded server and visible window.
+- Cumulative source review: `CRR-044 / Pass`, `9.4/10`.
+- Focused runtime origin review: `CRR-045`; no source finding.
+- API/E2E: `API-REV-016 / Pass`, `97.6%`; all planned and held paths completed, `API-FIND-021` resolved for validation, no current finding.
+- Proportional durable test-code review: `CRR-046 / Not Applicable` because API-REV-016 changed no repository-resident durable test or production source.
+- Delivery confirmed the latest base was already integrated and built the guarded ARM64 Electron package for actual user verification.
 
 ## User-Verification Build
 
-- Package source/checkpoint: `759a2b470f4826db4bb4bb6c9788f4c490cf97b2`.
+- Package source/checkpoint: `6bca86cac41c3171b35eba3c38b7543da3fde62d` plus Delivery-owned documentation/evidence, which does not change the binary.
 - AppImage: `AutoByteus_enterprise_linux-arm64-1.4.68.AppImage`.
-- SHA-256: `2e23ff1a10d74b0743620d311a36a095c77d14ad82670099fe0fa53564c834aa`.
-- Status: running for renewed explicit user verification; this draft is not released.
+- Size: `524007444` bytes; SHA-256: `85b082299b25b1c5279ca9e9bf433920cbe5fb1331b63685e6c2f02a175aaf5d`.
+- Status: running for explicit user verification; this draft is not released.
 
 ## Compatibility Note
 
-Definitions in separately maintained external packages remain unavailable until their owners publish Team V2 / AgentOrg V1-compatible packages. Compatible definitions and server/history functions remain available; there is no legacy runtime fallback.
+Definitions in separately maintained external packages remain unavailable until
+their owners publish Team V2 / AgentOrg V1-compatible packages. Compatible
+definitions and server/history functions remain available; there is no legacy
+runtime fallback.

@@ -50,6 +50,11 @@
 | `CRR-044` | `code-review-report.md` | Implementation Review / IR-032 structural status-traversal correction and fresh cumulative review | `Fail — Local Fix` | `Pass — cumulative source` | `CR-FIND-028`; `API-FIND-020` resolved at source boundary |
 | `CRR-045` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-015 standalone Team submit stall | `Pass — cumulative source` | `Fail — API/E2E runtime/evidence rerun; no source attribution` | `API-FIND-021`; no new `CR-FIND-*` |
 | `CRR-046` | `api-e2e-test-review-report.md` | Successful API/E2E Test-Code Review / API-REV-016 | `Fail — API/E2E runtime/evidence rerun; no source attribution` | `Not Applicable — no durable test change` | `None`; `API-FIND-021` Not Reproduced |
+| `CRR-047` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-017 AgentOrg edit input metadata | `Not Applicable — no durable test change` | `Fail — Local Fix` | `CR-FIND-029`; `API-FIND-022` |
+| `CRR-048` | `code-review-report.md` | Implementation Review / IR-033 exact AgentOrg mutation-member projection | `Fail — Local Fix` | `Pass — cumulative source` | `CR-FIND-029`; `API-FIND-022` resolved at source boundary |
+| `CRR-049` | `code-review-report.md` | API/E2E Failure-Origin Review / API-REV-018 four-finding cumulative failure | `Pass — cumulative source` | `Fail — mixed failure dispositions; implementation Local Fix blocks` | `CR-FIND-030`; `API-FIND-023–026` |
+| `CRR-050` | `code-review-report.md` | Implementation Review / IR-034 exact terminal task live projection | `Fail — mixed failure dispositions; implementation Local Fix blocks` | `Pass — cumulative source` | `CR-FIND-030`; `API-FIND-023` resolved at source boundary |
+| `CRR-051` | `api-e2e-test-review-report.md` | Successful API/E2E Test-Code Review / API-REV-019 | `Pass — cumulative source` | `Not Applicable — no durable test change` | `None`; API-FIND-023–026 dispositions consumed |
 
 ## Revision Entries
 
@@ -1408,3 +1413,169 @@ New findings:
 - Review accountability: worktree test-source status and canonical API records agree that the Inspector/browser scripts and correlation logs are evidence-only. The successful workflow was not redundantly rerun.
 - Recommended recipient: exact successful post-API/E2E recipient returned by `get_handoff_rules`, expected `/software_engineering_team/delivery_engineer`.
 - Remaining risks or uncertainty: API/E2E records no current finding. Delivery retains ownership of documentation synchronization, integration/user verification, finalization, and applicable release/deployment work.
+
+
+### CRR-047 — normal AgentOrg edit forwards Apollo response metadata into GraphQL input
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `API/E2E Failure-Origin Review`, round `47`
+- Triggering role, report path, and finding/scenario IDs: API/E2E Engineer / `api-e2e-execution-coverage-report.md`; `API-REV-017 / Fail / 80.3%`; `AUTH-ORG-001`; `API-FIND-022`; `CR-FIND-029`; `CR-SCN-072/073`; `CR-CAND-125–130`
+- Relevant requirements revision IDs: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`, especially `REQ-018`, `REQ-023`, `AC-013`, `AC-017`, `AC-018`, `SCN-006`, `SCN-008`
+- Relevant architecture design/review IDs: cumulative `AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00`; `ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`
+- Relevant implementation/source-review IDs: cumulative `IR-001–032`; reviewed source `8f9f9ce3f7f4ab9312813de8faf5b651578a7310`; reviewed artifact `43ef19f2de69b2c16133577dac40471f75ebd913`; integrated HEAD `6bca86cac41c3171b35eba3c38b7543da3fde62d` with no later application-source delta; `CRR-044 / Pass — cumulative source / 9.4`
+- Relevant API/E2E revision IDs: `API-REV-017 / Fail`; repository and authoring prerequisites passed; mixed Org create passed; normal visible edit failed; downstream fresh matrix is Not Tested under critical fail-fast
+- Prior authoritative result: `CRR-046 / Not Applicable — no durable test change`, following `API-REV-016 / Pass`
+- Current authoritative result: `Fail — implementation-owned frontend Local Fix`
+- What changed in the review result and why: a normal production AgentOrg create with one direct Agent, one referenced Team and one Org-owned handoff succeeded. The immediate visible-description edit hydrated those members from Apollo, shallow-spread `__typename: "AgentOrgMember"` through the form and update input, and forwarded it unchanged to `UpdateAgentOrgDefinition`. Strict GraphQL input coercion rejected both members; the form showed the error and no persistent state changed. The server is correct; the bounded defect is the missing client result-to-input projection.
+- Supported product scenario / material-premise basis changes: none. `CR-SCN-072` is a Supported Normal Scenario grounded independently in `REQ-018/023`, `AC-013/017/018`, and `SCN-006/008`. `CR-SCN-073` records the strict GraphQL input/no-partial-write contract. `CR-CAND-125` is promoted because the exact production path, request, source, and persistence consequence agree. `CR-CAND-126–130` reject server weakening, retry/compatibility/generic stripping, invalid-scenario/setup attribution, upstream impact, and a post-review application-source change.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-003` | Resolved | Remains resolved; related metadata gap is separate | `IR-003`; `CRR-003`; `CRR-047` | edit continues to omit hidden durable fields; API-REV-017 proves no partial write; CR-FIND-029 concerns undeclared metadata inside `members` |
+| `API-FIND-021` | Not Reproduced / resolved for validation | Remains historical / not reopened | `API-REV-015/016`; `CRR-045/046` | unrelated task-submission path |
+| `CR-FIND-028 / API-FIND-020` | Resolved and cumulatively validated | No reopening attributed | `IR-032`; `CRR-044`; `API-REV-015/016` | no contrary source/runtime evidence; fresh API-REV-017 runtime slice was held and is not inferred passed |
+| `CR-FIND-029 / API-FIND-022` | New | Open — implementation Local Fix | `API-REV-017`; `CR-SCN-072`; `CR-CAND-125` | Apollo-shaped request contains two `__typename` fields; GraphQL rejects both; query-to-mutation source path preserves them |
+
+- Material score or classification changes: focused review has no scorecard. `CRR-044 / 9.4` remains historical source scoring but is superseded for current delivery readiness by this failure. Classification remains Large/High; failure is a bounded frontend `Local Fix`, not Design Impact or Requirement Gap.
+- Review accountability: this is a real prior source-review gap. CRR-003 and later cumulative reviews accepted the exact visible-update path using a plain fixture without Apollo metadata. The shallow-spread chain, unchanged mutation forwarding, runtime/type mismatch, and established Agent Team cleaning precedent were source-detectable and should have been caught.
+- Required correction: explicitly construct each mutation member from the four declared input fields at one existing frontend owner. Preserve hidden-field omission, exact order/identity/handoffs, referenced-Team isolation, strict GraphQL validation, and atomic no-write failure behavior. Do not add retry, compatibility, cache mutation, server relaxation, or broad generic stripping machinery.
+- Required regression: an Apollo-shaped fetched/edit fixture with `__typename` on a direct Agent and referenced Team must prove the normal visible update sends only allowed fields. Renewed cumulative source review and the full fresh API/E2E matrix are mandatory.
+- Recommended recipient: exact implementation-owned Local Fix recipient returned by `get_handoff_rules`, expected `/software_engineering_team/implementation_engineer`.
+- Remaining risks or uncertainty: the critical fail-fast gate left the complete downstream runtime/history/recovery/restart/migration/responsive/status matrix Not Tested on the integrated artifact. No historical Pass may substitute for that renewed execution.
+
+
+### CRR-048 — IR-033 restores the strict AgentOrg result-to-input boundary
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review`, skill-reloaded fresh cumulative round `48`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md` / `IR-033`; `CRR-047`; `CR-FIND-029`; `API-FIND-022`; `CR-SCN-072/073`; `CR-CAND-131–138`
+- Relevant requirements revision IDs: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`, especially `REQ-018`, `REQ-023`, `AC-013`, `AC-017`, `AC-018`, `SCN-006`, `SCN-008`
+- Relevant architecture design revision IDs: cumulative `AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00`
+- Relevant architecture-review revision IDs: `ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`
+- Relevant implementation revision IDs: cumulative `IR-001–033`; source `161483fcb980c6bbe1b14b1d97cb582c40b7e929`; artifact / HEAD `a967ba9391a003eb14376bede3faaddba4335cc1`
+- Relevant source-review revision IDs: prior `CRR-047 / Fail — implementation-owned frontend Local Fix`; current `CRR-048`
+- Relevant API/E2E revision IDs: `API-REV-017 / Fail / 80.3%`; AUTH-ORG-001 create passed and edit established the corrected production path; complete fresh rerun pending
+- Relevant delivery revision IDs: `DR-006` artifacts remain downstream-owned and finalization is superseded pending renewed validation
+- Prior authoritative result: `CRR-047 / Fail — implementation-owned frontend Local Fix`
+- Current authoritative result: `Pass — cumulative source; advance to renewed API/E2E`
+- What changed in the review result and why: IR-033 makes `agentOrgDefinitionStore` the single result-to-mutation member boundary. `toMutationMembers()` constructs a new ordered object containing only `memberName`, `ref`, `refType`, and `refScope` for create and member-bearing update; partial updates that omit members still omit them. Apollo metadata remains accurately modeled on response objects but cannot reach strict mutation variables. The component/store objects are not mutated, handoffs and hidden-field omission remain unchanged, and no server/schema/persistence behavior is relaxed.
+- Supported product scenario / material-premise basis changes: none. `CR-SCN-072` remains the approved normal mixed-Org edit; `CR-SCN-073` preserves strict invalid-input/no-partial-write behavior. `CR-CAND-131–136/138` were investigated and rejected as current findings because the exact projection, ownership, immutability, omission, current-schema and production-shaped coverage evidence satisfy the supported contracts. `CR-CAND-137` is promoted only as the required downstream real-system validation, not as a source defect.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-029 / API-FIND-022` | Open — implementation Local Fix | Resolved at source-review boundary | `CRR-047`; `IR-033`; `CRR-048` | exact four-field store projection for create/member-bearing update; partial omission preserved; actual-store mounted component regression; reviewer `3 files / 7 tests` |
+| `CR-FIND-003` | Resolved | Remains resolved / strengthened | `IR-003`; `CRR-003`; `IR-033` | hidden durable fields remain absent from visible update variables while exact members/handoffs remain |
+| `CR-FIND-001–028` | Resolved | Remain resolved / preserved | through `CRR-044`; cumulative `IR-033` | IR-033 own source diff is one 75-line store; fresh cumulative inventory has zero >500 files; affected `135/135`, build and guards pass |
+| `API-FIND-021` | Not Reproduced / resolved for validation | Remains historical / not reopened | `API-REV-015/016`; `CRR-045/046` | no related source change |
+
+- New or remaining finding IDs: `None`
+- Material score or classification changes: result changes from `Fail — Local Fix` to `Pass — cumulative source`; `9.5/10 (94.9/100)`, every category at least `9.2`. Cumulative classification remains Large/High.
+- Independent evidence: Code Reviewer reloaded the skill/design principles and reviewed the complete authority/revision chain; inspected source/callers/diff/tests and prior finding; reran the exact `3 files / 7 tests`; confirmed the implementation `23 files / 135 tests`, guards/audit and production build evidence; verified own diff/ancestry and a fresh cumulative `443`-record source inventory with zero files over 500 effective lines.
+- Review accountability: CRR-047's prior review gap was directly addressed rather than hidden. The new regressions use Apollo-shaped direct-Agent and referenced-Team response members through the real Pinia store and mounted production component, replacing the prior plain-fixture blind spot at the affected boundary.
+- Recommended recipient: exact implementation-pass recipient returned by `get_handoff_rules`, expected `/software_engineering_team/api_e2e_engineer`.
+- Remaining risks or uncertainty: API/E2E must replay the real AUTH-ORG-001 query/edit/GraphQL/persistence/reopen path and then execute every API-REV-017 fail-fast-held case cumulatively. Delivery remains gated on that result and proportional durable test-code review when applicable.
+
+
+### CRR-049 — terminal task status source defect separated from runtime and test-evidence failures
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `API/E2E Failure-Origin Review`, round `49`
+- Triggering role, report path, and finding/scenario IDs: API/E2E Engineer / `api-e2e-execution-coverage-report.md`; `API-REV-018 / Fail / 87.4%`; `API-FIND-023–026`; `CR-FIND-030`; `CR-SCN-074–077`; `CR-CAND-139–145`
+- Relevant requirements revision IDs: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`; especially `BEH-009`, `REQ-015`, `REQ-028`, `REQ-031`, `REQ-034`, `AC-010`, `AC-023`, `AC-026`, `AC-029`
+- Relevant architecture design revision IDs: cumulative `AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00`; `DS-019`, `DS-021`, `DS-022`, `DS-025`, `DS-028`
+- Relevant architecture-review revision IDs: `ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`
+- Relevant implementation revision IDs: cumulative `IR-001–033`; source `161483fcb980c6bbe1b14b1d97cb582c40b7e929`; artifact/HEAD `a967ba9391a003eb14376bede3faaddba4335cc1`
+- Relevant source-review revision IDs: prior `CRR-048 / Pass — cumulative source`; current `CRR-049`
+- Relevant API/E2E revision IDs: `API-REV-017 / Fail`; `API-REV-018 / Fail`; prior `API-FIND-022` resolved; new `API-FIND-023–026`
+- Relevant delivery revision IDs: `DR-006` remains downstream-owned and superseded pending correction/validation
+- Prior authoritative result: `CRR-048 / Pass — cumulative source / 9.5`
+- Current authoritative result: `Fail — implementation-owned frontend Local Fix`, with distinct held/API-owned dispositions for the other observations
+- What changed in the review result and why: API-REV-018 proved that a durably accepted/settled direct task Agent with no open work remains visibly Running until reload. Source tracing confirms the server intentionally publishes the settled task event while suppressing a post-removal Agent status event, but the web accepts that task event by updating only task records; the unified live row therefore retains the old AgentContext status. Separately, API-FIND-025's script used a global first-match Stop selector, so it terminated the first active Direct row exactly as current source dictates rather than exercising the claimed Mixed-row action. API-FIND-024 lacks local MCP/FIFO evidence, and API-FIND-026 substituted an invalid reference and likewise lacks ingress evidence.
+- Supported product scenario / material-premise basis changes: none. `CR-SCN-074–077` map the already-approved task settlement, nested task-Team, exact root Stop, and task-to-configured message scenarios. `CR-CAND-139` is promoted as a source defect; `CR-CAND-143` is promoted as an API/E2E correction; source attribution for `CR-CAND-141/144` is held; status-event re-enablement, claimed wrong-root source behavior, and invalid-reference recovery are rejected.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-029 / API-FIND-022` | Resolved at source-review boundary | Resolved in real production execution | `IR-033`; `CRR-048`; `API-REV-018` | normal Apollo query -> visible edit -> strict GraphQL update -> exact persisted/reopened definition passed |
+| `API-FIND-021` | Not Reproduced / runtime-only historical evidence | Remains historical; not reopened as a source defect | `CRR-045/046`; `API-REV-016`; `CRR-049` | API-FIND-024 has a similar incomplete provider-start boundary, but receives its own held investigation rather than inferred attribution |
+| `CR-FIND-001–029` | Resolved | Remain resolved except the new independent `CR-FIND-030` | through `CRR-048`; `API-REV-018` | no evidence reopens their exact prior causes; API-REV-018 directly passes the corrected CR-FIND-029 path |
+
+- New or remaining finding IDs: `CR-FIND-030 / API-FIND-023` is open. `API-FIND-024` and valid-path `API-FIND-026` are held for evidence; `API-FIND-025` is an API/E2E locator correction, not a product finding.
+- Material score or classification changes: failure-origin review has no scorecard. CRR-048's `9.5` remains historical but is superseded for delivery readiness. Overall blocking classification is implementation-owned `Local Fix`; no Design Impact or Requirement Gap.
+- Review accountability: `CR-FIND-030` is a prior source-review gap. The interaction between IR-014's correct terminal status-event retirement and IR-027's live AgentContext history-row status authority was source-detectable and should have been covered in CRR-034 and later cumulative reviews. The other three observations are not implementation review gaps on current evidence.
+- Required correction: reconcile terminal task application with the exact current execution-tree/status authority so a retained task Agent row becomes terminal/offline without reload, while preserving strict event retirement, root/sequence/identity, automatic recovery, task history, and single-root ownership. Do not add polling, optimistic/fabricated status, independent Team/task state, or manual reconnect.
+- Required downstream evidence: production-shaped source regression for settled-event live status, fresh cumulative source review, then cumulative API/E2E. API/E2E must use an exact-root-scoped Stop locator, correlate nested submit and valid-reference task-to-configured calls across local MCP/FIFO/durability, and execute the held task-to-task direction.
+- Recommended recipient: exact implementation-owned Local Fix recipient returned by `get_handoff_rules`, expected `/software_engineering_team/implementation_engineer`.
+- Remaining risks or uncertainty: API-FIND-024 and valid-path API-FIND-026 cannot be source-attributed without local boundary evidence. Delivery remains blocked until the implementation fix and renewed cumulative execution pass.
+
+
+### CRR-050 — IR-034 restores exact terminal task state in the live AgentOrg hierarchy
+
+- Canonical review report updated: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md`
+- Review entry point and round: `Implementation Review`, skill-reloaded fresh cumulative round `50`
+- Triggering role, report path, and finding/scenario IDs: Implementation Engineer / `implementation-handoff.md` / `IR-034`; `CRR-049`; `CR-FIND-030`; `API-FIND-023`; `CR-SCN-074/078/079`; `CR-CAND-146–153`
+- Relevant requirements revision IDs: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`; `BEH-009`, `REQ-015`, `REQ-028`, `REQ-031`, `AC-010`, `AC-023`, `AC-026`
+- Relevant architecture design revision IDs: cumulative `AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00`; `DS-005`, `DS-016`, `DS-018`, `DS-021`, `DS-022`, `DS-025`
+- Relevant architecture-review revision IDs: `ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`
+- Relevant implementation revision IDs: cumulative `IR-001–034`; source `2221322710a6a1f5dae06a74135bca008aef88a6`; artifact/HEAD `a5eae9ce3889e6100302a85da54e5b1a02c25176`
+- Relevant source-review revision IDs: prior `CRR-049 / Fail — implementation Local Fix`; current `CRR-050`
+- Relevant API/E2E revision IDs: `API-REV-018 / Fail`; `API-FIND-023` corrected at source boundary; `API-FIND-024/026` remain held and `API-FIND-025` remains API/E2E-owned
+- Relevant delivery revision IDs: `DR-006` remains downstream-owned and superseded pending renewed validation
+- Prior authoritative result: `CRR-049 / Fail — implementation-owned frontend Local Fix`
+- Current authoritative result: `Pass — cumulative source; advance to renewed API/E2E`
+- What changed in the review result and why: IR-034 keeps `AgentOrgExecutionContext` as the sole live event/current-view authority. An exact settled task event now projects the complete current view: exactly one task execution receives the authoritative `settledAt`, exactly one task record is replaced, only that terminal task scope's status snapshots are removed, and all retained AgentContexts in that scope receive the canonical Offline cleanup. The existing unified row therefore changes Running to Offline without reload. Any projection/context mismatch enters the existing strict reopen boundary.
+- Supported product scenario / material-premise basis changes: none. `CR-SCN-074` remains the normal accepted-task/visible-terminal-status scenario. `CR-SCN-079` applies the same approved behavior to a complete task-Team scope, and `CR-SCN-078` records the existing explicit strict-event mismatch contract. `CR-CAND-146–152` are rejected as current findings based on exact source/tests; `CR-CAND-153` is promoted only as the required downstream execution, not a source defect.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `CR-FIND-030 / API-FIND-023` | Open — implementation Local Fix | Resolved at source-review boundary | `CRR-049`; `IR-034`; `CRR-050` | exact complete-view settlement projection; canonical retained-context cleanup; direct unified-row and task-Team regressions; reviewer `3 files / 30 tests` and server retirement `1/1` |
+| `CR-FIND-029 / API-FIND-022` | Resolved in real execution | Remains resolved | `IR-033`; `CRR-048`; `API-REV-018`; `CRR-050` | IR-034 does not touch definition mutation source; cumulative affected web `23 files / 137 tests` passes |
+| `CR-FIND-001–028` | Resolved | Remain resolved / preserved | through `CRR-044`; cumulative `IR-034` | fresh cumulative source inventory has zero current files above 500 effective lines; affected suites/build/guards pass; no contrary exact evidence |
+| `API-FIND-024` | Held for Evidence | Remains held; no source attribution | `API-REV-018`; `CRR-049/050` | IR-034 adds no provider/MCP/FIFO change; local-ingress evidence remains required |
+| `API-FIND-025` | API/E2E unscoped locator | Remains API/E2E-owned | `API-REV-018`; `CRR-049/050` | no Stop source changed; exact-root row action remains intact |
+| `API-FIND-026` | Valid-path origin held; invalid observed reference rejected | Remains held; no source attribution | `API-REV-018`; `CRR-049/050` | no communication/router change; valid-reference local-ingress evidence remains required |
+
+- New or remaining finding IDs: `None` at source-review boundary.
+- Material score or classification changes: result changes from `Fail — Local Fix` to `Pass — cumulative source`; `9.5/10 (94.5/100)`, every category at least `9.2`. Cumulative classification remains Large/High.
+- Independent evidence: Code Reviewer reloaded the skill/design principles and relevant reachability example; reviewed the authority/revision chain, IR-034 diff, current source, codecs, status owner, tests and logs; reran the exact `3 files / 30 tests`, cumulative affected `23 / 137`, and preserved server retirement `1/1`; verified diff/ancestry and a fresh cumulative `437`-record production-source inventory with zero files over 500 effective non-empty lines.
+- Review accountability: CRR-049's prior source-review gap is directly closed by a regression through the real strict context and unified history projector, not only a helper test. The implementation correctly leaves API-FIND-024–026 untouched rather than inventing unsupported machinery.
+- Recommended recipient: exact implementation-pass recipient returned by `get_handoff_rules`, expected `/software_engineering_team/api_e2e_engineer`.
+- Remaining risks or uncertainty: API/E2E must prove the direct and task-Team Running-to-Offline transition in the real browser without reload; correct the exact-root Stop locator; correlate valid API-FIND-024/026 calls through local MCP/FIFO/durability; and execute the held task-to-task direction. Delivery remains gated.
+
+
+### CRR-051 — API-REV-019 passes; no durable API/E2E test-code delta
+
+- Canonical review report updated: `api-e2e-test-review-report.md` in this ticket; `code-review-report.md` remains unchanged at CRR-050.
+- Review entry point and round: Successful API/E2E Test-Code Review, round 51 (seventh proportional review), completed 2026-09-11.
+- Triggering role/report: API/E2E Engineer / `api-e2e-execution-coverage-report.md`; full renewed API-REV-019 matrix.
+- Relevant requirements revision: approved `RER-026`.
+- Relevant architecture design/review revisions: cumulative `AD-REV-018`; `ARCH-REV-016 / Pass`.
+- Relevant implementation/source-review revisions: `IR-034 / CRR-050 Pass`; source `2221322710a6a1f5dae06a74135bca008aef88a6`; exact artifact/HEAD `a5eae9ce3889e6100302a85da54e5b1a02c25176`.
+- Relevant API/E2E revisions: `API-REV-018 Fail` historical; current `API-REV-019 Pass / 95.4%`, all seven categories at least 95%, broader validation completed.
+- Relevant delivery revision: prior `DR-006`, retained for Delivery re-entry; no current Delivery approval inferred.
+- Prior authoritative result: source `CRR-050 / Pass`; previous separate test review `CRR-046 / Not Applicable`.
+- Current authoritative result: `Not Applicable — no durable API/E2E test file added, updated or removed`.
+- Change and rationale: independently verified exact HEAD/source ancestry, tracked/staged/untracked scope and API-REV-019 final integrity; changes are documentation/review/execution evidence only. No test assertion requires review or execution. Scope evidence: `/tmp/aorg-crr051-scope.log`.
+- Supported scenario/material-premise changes: none; the approved journeys remain unchanged. No temporary harness is treated as a new product contract.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| Test-review findings | None | None | CRR-046; CRR-051 | No durable test change. |
+| `CR-FIND-030 / API-FIND-023` | Source correction accepted; live renewal pending | Resolved in current executable validation | IR-034; CRR-050; API-REV-019 | Live direct-task/task-Team terminal Offline, durable settledAt, retained focus and healthy status set; direct adjudication records initializing-to-Offline. |
+| `API-FIND-025` | API-owned unscoped locator | Corrected and validated | CRR-049/050; API-REV-019 | Exact Mixed-row Stop mutation; other roots unchanged. |
+| `API-FIND-024/026` | Held for valid-path runtime evidence | Current valid-path Pass; historical stalls Not Reproduced | CRR-049/050; API-REV-019 | Successful nested/parent submit and all task-involved message directions; no source cause or fix inferred. |
+
+- New/remaining test-review finding IDs: None.
+- Material score/classification changes: none; cumulative Large/High reviewed route retained. CRR-050 source score remains unchanged; API confidence is consumed, not recalculated.
+- Evidence limits retained: successful FIFO passage inferred from exact durable mutations during matching MCP HTTP intervals; no separate JSON-RPC ingress/request-ID or FIFO executor-start logging. Root/nested Org controls predate access logging. Historical stall cause remains unproven, rather than attributed to source. Browser exhaustion followed by normal history/Restore is not in-place automatic recovery; native-shell launch/multi-node deployment not claimed.
+- Recommended recipient: successful post-API/E2E rule from `get_handoff_rules`, expected `/software_engineering_team/delivery_engineer`.
+- Remaining risks/uncertainty: no current critical validation remainder per API-REV-019; Delivery must consume the explicit evidence limits and corrected-attempt precedence, synchronize documentation, and perform its own finalization/release responsibilities. No Delivery completion is claimed.

@@ -3,61 +3,56 @@
 ## Scope
 
 - Ticket: `AORG-FLAT-TEAM-001` (`flat-agent-organization-model`)
-- Current chain: `RER-025`, `AD-REV-016`, `ARCH-REV-014 / Pass`, `IR-030`, `CRR-040 / Pass`, `API-REV-013 / Pass`, `CRR-041 / Not Applicable`
-- Task size / architectural risk: `Large` / `High`
-- Selected route: architecture design → architecture review → implementation → cumulative source review → API/E2E → proportional durable test-code review → delivery
-- Production source / reviewed artifact: `d741874e9a35367d0c64b57a8e7e4cd15e0e93c5` / `e3b3a840052cdb6cb8c552b3bf9d66ee233fc3bb`
-- Delivery safety checkpoint and integrated package HEAD: `759a2b470f4826db4bb4bb6c9788f4c490cf97b2`
-- Latest integrated base: `origin/personal@a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27`
-- Current delivery revision: `DR-005`
+- Delivery revision: `DR-006`
+- Current chain: `RER-026 / AD-REV-018 / ARCH-REV-016 Pass / IR-032 / CRR-044 Pass / CRR-045 runtime-only disposition / API-REV-016 Pass / CRR-046 Not Applicable`
+- Classification: `Large` task / `High` architectural risk; reviewed architecture route
+- Integrated source: production source `8f9f9ce3f7f4ab9312813de8faf5b651578a7310`, reviewed artifact `43ef19f2de69b2c16133577dac40471f75ebd913`, Delivery safety checkpoint `6bca86cac41c3171b35eba3c38b7543da3fde62d`
+- Current state: `Awaiting Explicit User Verification`
 
-## Why Docs Were Updated
+## Long-Lived Documentation Updated
 
-RER-025 and IR-029/030 extend the durable AgentOrg history contract. The first successfully accepted non-empty external message to an exact configured direct or mounted-Team Agent becomes the stable AgentOrg history title, with Team-identical compaction and no optimistic browser ownership. A conservative startup migration reconciles only uniquely provable empty legacy rows. IR-030 also corrects the shared per-path atomic JSON settlement queue so a caller-visible write failure cannot escape as an unhandled rejection, terminate the server, retain stale ownership, or poison a later same-path write. These are durable runtime, persistence, recovery, and presentation rules rather than ticket-only detail.
+| Document | Durable change |
+| --- | --- |
+| `autobyteus-server-ts/docs/modules/agent_orgs.md` | Records AgentOrg's single root communication authority, configured-pair receiver presentation after durability, task-endpoint presentation exclusions, and single structural status-root traversal. |
+| `autobyteus-web/docs/agent_orgs.md` | Records the shared owning-Org Messages experience for every configured direct/mounted Agent, truthful complete-Org perspectives/references, exact-once receiver-center input, and unique recursive status projection. |
+| `autobyteus-web/docs/agent_execution_architecture.md` | Replaces obsolete `TeamOverviewPanel` ownership with root-neutral `CollaborationOverviewPanel` / `CollaborationMessagesContextView` ownership and documents the strict AgentOrg perspective index without a second store or ledger. |
 
-## Long-Lived Documentation Result
+The existing server AgentOrg/run-history and frontend AgentOrg/execution docs
+continue to own the cumulative Team V2 / AgentOrg V1, first-message summary,
+unified Workspaces, exact focus/configuration, automatic recovery, task,
+Restore/Stop, persistence, migration, and atomic-settlement contracts. No new
+public API, durable file shape, migration, provider, route, or Electron-shell
+contract was introduced by RER-026/IR-032.
 
-| Doc Path | Result | Current Durable Truth |
-| --- | --- | --- |
-| `README.md` | Reviewed; accurate | Root setup and packaged Electron guidance remain authoritative. Delivery used the documented ARM64 build path and integrated backend contract. |
-| `autobyteus-web/README.md` | Reviewed; accurate | `build:electron:linux:arm64`, `electron-dist`, integrated server, and port `29695` behavior match the delivered package. |
-| `autobyteus-server-ts/docs/modules/agent_orgs.md` | Updated | Added configured-recipient qualification, Team-identical first-message summary normalization/stability, failure isolation, handled atomic settlement, and conservative startup migration. |
-| `autobyteus-server-ts/docs/modules/run_history.md` | Updated | Added AgentOrg history ownership, first-write catalog/writer contract, per-path queue settlement behavior, unified family query, and startup-only trace reconciliation. |
-| `autobyteus-web/docs/agent_orgs.md` | Updated | Added `New - <name>` fallback, durable first-message title, authoritative network-only family refresh, monotonic response ownership, and exclusion rules. |
-| `autobyteus-web/docs/agent_execution_architecture.md` | Updated | Added AgentOrg-specific stable title and accepted-ACK refresh flow without optimistic submitted-text projection. |
-| Root/server/web flat-Team, AgentOrg, navigation, recovery, and packaging docs | Reviewed; prior ticket updates remain accurate | RER-024 unified Workspaces/default/focus behavior and the earlier Team V2 / AgentOrg V1 contracts remain unchanged. |
+## Requirements-To-Docs Trace
 
-## Durable Knowledge Promoted
-
-| Topic | Implemented Truth | Evidence | Canonical Destination |
+| Behavior | Final truth | Evidence | Durable location |
 | --- | --- | --- | --- |
-| Qualifying first message | Only an accepted external `SEND_MESSAGE` to an exact configured direct or mounted-Team Agent qualifies; task-scoped, internal, control, rejected, failed, and empty messages do not | RER-025 / REQ-033 / AC-028; IR-030; API-REV-013 | Server AgentOrg and run-history docs; frontend AgentOrg/execution docs |
-| Stable title | Collapse whitespace, trim, preserve up to 100 characters, or use 97 plus `...`; first non-empty summary never changes | DS-027; repository and live direct/mounted/concurrency evidence | Server and frontend docs |
-| Authoritative live refresh | After accepted ACK, query only the AgentOrg history family with newest-generation ownership; never patch submitted text optimistically | IR-030; API-REV-013 live evidence | Frontend AgentOrg/execution docs |
-| Historical recovery | Startup-only migration backfills only one uniquely earliest provenance-qualified configured-member trace; ambiguity preserves empty fallback with bounded warning | AD-REV-016; API-REV-013 migration evidence | Server AgentOrg and run-history docs |
-| Atomic failure containment | Caller receives the original write rejection while a distinct handled settlement tail owns queue release; later same-path writes remain ordered and available | IR-030; CRR-040; API-REV-013 LIVE-003B | Server AgentOrg and run-history docs |
-| Prior flat model/navigation | Team V2/Org V1 ownership, unified Workspaces, exact selection/configuration, automatic-only recovery, tasks, Stop/Restore, and provider durability remain unchanged | cumulative chain through API-REV-013 | Existing canonical docs |
+| `BEH-017 / REQ-034 / AC-029 / SCN-018` | One durably accepted same-Org message between two configured Agents produces one receiver `MEMBER_INPUT_MESSAGE`; selected sender/receiver Messages show exact direction, counterpart, content, time, and references across direct/mounted placements. | AD-REV-018 / DS-028; IR-031 retained by IR-032; CRR-044; API-REV-015 retained execution | Server/web AgentOrg and web execution-architecture docs |
+| Task endpoint boundary | A message involving a task-scoped sender or receiver does not enter the configured-member receiver/perspective presentation. | RER-026; DS-028; strict server/web projection | Server/web AgentOrg docs |
+| Single status traversal | Org status projection begins only at structural roots and delegates descendants to each TeamRun exactly once; the flat Team directory remains lookup/lifecycle authority. | IR-032; CRR-044; API-REV-015 retained LIVE execution | Server AgentOrg and web AgentOrg docs |
+| Runtime stall disposition | API-FIND-021 was not reproduced; unchanged production crossed provider, local MCP, FIFO, durable commit, HTTP result, acceptance, restart/Restore, and continuation. No product/source change or retry/replay mechanism follows. | CRR-045; API-REV-016; CRR-046 | Delivery artifacts only; no durable product-doc contract changed |
 
 ## Removed Or Replaced Understanding
 
-| Obsolete Understanding | Current Truth |
+| Obsolete understanding | Current truth |
 | --- | --- |
-| AgentOrg rows stay `New - <name>` after conversation | The first qualifying accepted configured-Agent message becomes the stable durable title. |
-| The browser may derive the title from submitted text | The browser only requests an authoritative Org-family history refresh after accepted ACK. |
-| Any user-looking trace is safe for migration backfill | Recovery requires one uniquely earliest provenance-qualified configured-member trace; ambiguous or absent evidence remains empty. |
-| A caught atomic write rejection is sufficient queue containment | The stored per-path promise must be a separately handled settlement tail whose exact identity owns cleanup. |
+| Only standalone/mounted Team selection owns a collaboration Messages surface. | Every configured Agent selected inside an AgentOrg receives the same root-neutral Messages presentation over the owning Org. |
+| A mounted Team's local membership is sufficient to resolve an Org message counterpart. | AgentOrg perspectives index all configured direct and mounted Agents in the complete fixed-depth Org. |
+| `TeamOverviewPanel` owns Messages/Tasks presentation. | `CollaborationOverviewPanel` and `CollaborationMessagesContextView` are root-neutral; Team Tasks remain conditional on an actual Team task context. |
+| Every flat registered TeamRun may be used as a recursive Org status root. | Only structural roots are traversed; each TeamRun owns recursion below itself. |
 
 ## Validation
 
-- Latest-base refresh: `origin/personal` was fetched; it was already the merge base with zero base-only commits. Safety checkpoint `759a2b470...` preserved the reviewed/downstream state; the merge command returned `Already up to date`.
-- Focused delivery smoke: exact IR-030 cohort passed (`2` files / `11` tests).
-- Upstream cumulative validation: `API-REV-013 / Pass` at `98.4%`; broader validation completed; no current finding. `CRR-041` correctly recorded no durable API/E2E test-code change.
-- Repository-standard ARM64 Electron build: passed all guards, zero-finding localization audit, server build/bootstrap/deploy, Nuxt/mobile/Electron generation, native rebuild, and AppImage packaging.
-- Documentation checks: `git diff --check`, Markdown fence balance, changed relative-link validation, and stale-current-model scans passed. The unrelated pre-existing `autobyteus-web/AGENTS.md -> docs/prompt_engineering.md` broken link remains recorded and was not introduced by this ticket.
-- Evidence: `delivery-evidence/dr-005/integration-result.log`, `post-integration-focused-server.log`, `electron-linux-arm64-build.log`, and `docs-validation.log`.
-- Docs sync result: `Pass`.
-- Overall Delivery state: `Awaiting Explicit User Verification`.
+- Latest-base refresh: `origin/personal@a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27` was already an ancestor. `git merge --no-edit origin/personal` returned `Already up to date`; divergence was base `0`, ticket `133` at the DR-006 refresh.
+- Because no base commit was integrated, an additional merge-triggered source rerun was not required. Upstream exact-artifact evidence remains authoritative: `CRR-044 / Pass`, `API-REV-016 / Pass / 97.6%`, and `CRR-046 / Not Applicable` with no current finding.
+- The repository-standard ARM64 Electron build is the Delivery package gate and runs the web/localization boundaries, zero-finding literal audit, shared/server build/bootstrap, Nuxt generation, Electron transpilation, native rebuild, and AppImage packaging.
+- Documentation validation covers `git diff --check`, Markdown fence balance, relative links in changed docs, and stale component/current-chain scans. Exact results are recorded under `delivery-evidence/dr-006/`.
+- Docs sync result: `Pass`; the recorded validation commands completed successfully.
 
 ## Bounded External Follow-Up
 
-The separately maintained external definition repositories remain read-only dependencies to this ticket. Their incompatible pre-Team-V2 definitions remain unavailable until their owners publish target schemas; compatible definitions, current server-owned history, and the delivered implementation remain valid. No external source was rewritten.
+Separately maintained external definition repositories remain outside this
+ticket. Pre-Team-V2 definitions remain unavailable until their owners publish
+compatible packages. Electron-shell-only behavior was unchanged by IR-032, but
+Delivery builds and launches the actual current ARM64 package for verification.

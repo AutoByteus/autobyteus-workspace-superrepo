@@ -118,6 +118,18 @@ client commands are `SEND_MESSAGE`, `INTERRUPT_GENERATION`,
 `APPROVE_TOOL`, and `DENY_TOOL`. Unknown roots, stale run IDs, incomplete
 task lineage, and cross-root targets fail closed.
 
+The AgentOrg communication sidecar remains the single root message authority.
+After an inter-Agent append is durable, the root stream publishes that message.
+When both correlated endpoints are configured Org members (direct Agents or
+Agents in directly mounted Teams), the same commit also presents exactly one
+`MEMBER_INPUT_MESSAGE` to the receiving Agent before releasing its reserved
+input. The presentation preserves the canonical sender address, content,
+reference context, parent message id, origin, and committed time. Messages with
+a task Agent or task-Team Agent endpoint remain valid root communication where
+otherwise admitted, but do not become configured-member center presentation.
+Rejected, failed, self-targeted, cross-root, or uncommitted sends publish no
+receiver input event.
+
 ## Tasks, Status, And Lifecycle
 
 - Direct Org Agents and mounted-Team Agents can message and delegate through
@@ -125,6 +137,12 @@ task lineage, and cross-root targets fail closed.
 - Task Agents and task Teams are transient execution projections with durable
   task records; they do not alter configured topology.
 - Each Agent owns its exact five-state runtime status.
+- Status snapshots start only from structural Org execution roots: direct Org
+  Agent handles, directly mounted configured TeamRuns, and unsettled root-hosted
+  task TeamRuns. Each TeamRun recursively projects its own descendants. The flat
+  Team execution directory remains an exact lookup/lifecycle index and is not
+  walked as a second set of recursive roots, preventing duplicate Agent status
+  identities for nested task Teams.
 - A mounted Team row may show a presentation-only aggregate over its descendant
   Agent statuses with precedence
   `running > initializing > error > idle > offline`. The aggregate is not a

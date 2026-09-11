@@ -404,9 +404,13 @@ keyboard focus. Selected execution rows keep a straight 2px indigo inset rule,
 `#eef2ff` background, and zero corner radius so selection does not erase the
 tree grammar or node role.
 
-`TeamOverviewPanel` owns the local Messages/Tasks accordion state. Messages
-remains the default for a selected team run with no delegated task entries, but
-the panel opens Tasks automatically when the selected team run already has
+`CollaborationOverviewPanel` is the root-neutral owner of the local
+Messages/Tasks accordion state. A `CollaborationMessagesContextView` supplies
+the owning Team or AgentOrg label, selected configured member, projected
+messages, and reference loader; the panel does not infer root identity from the
+component placement. Messages remains the default for a selected collaboration
+root with no delegated task entries, but the panel opens Tasks automatically
+when the selected team run already has
 persisted delegated task entries or when a new delegated-task identity appears
 while the same run is mounted. The auto-open signature is derived from the same
 `deriveDelegatedTaskEntries(...)` entries consumed by
@@ -414,8 +418,10 @@ while the same run is mounted. The auto-open signature is derived from the same
 identity when available, so unrelated messages or refreshes do not open Tasks. A
 user may still collapse Tasks for the same task set; the panel reopens only for
 a different delegated-task signature or a selected-run change to a run that has
-delegated tasks. When the selected team run changes and there are no delegated
-tasks, the panel opens Messages.
+delegated tasks. When the selected root/member changes and there are no delegated
+tasks, the panel opens Messages. Standalone Team and AgentOrg workspaces compose
+the same Messages presentation; Team Tasks remain available only where a Team
+task context exists.
 
 `TeamDelegatedTasksSection` derives entries from persisted task-delegation
 records in `taskDelegationStore`, filtered by the focused sender/receiver
@@ -1350,13 +1356,21 @@ A key architectural pattern is the **Sidecar Store Pattern** for runtime data. I
     - Owns the run-scoped projection for touched files and generated outputs.
     - Tracks latest-visible discoverability so desktop and mobile Artifacts surfaces can select/refresh the newest row after the user opens them, without stealing focus from other tabs.
     - Keeps transient `write_file` buffers only until committed previews are fetched from the server-backed run preview route.
-2.  **Team Communication (`TeamCommunicationStore`)**:
+2.  **Root Collaboration Communication**:
     - Listens to derived `TEAM_COMMUNICATION_MESSAGE` live payloads plus team reopen hydration from `getTeamCommunicationMessages(teamRunId)`.
     - Owns the canonical team-level address-first message projection and child `referenceFiles` declared by explicit `send_message_to.reference_files` on `recipient_address` deliveries.
     - Exposes focused-member sent/received message perspectives by comparing the focused `TeamExecutionAddress` with each message's `senderAddress` and `receiverAddress`, grouped by counterpart address label.
     - Keeps reference files under their parent message in the Team tab instead of inserting them into `RunFileChangesStore` or the Artifacts tab.
     - Opens reference content by persisted message identity (`teamRunId + messageId + referenceId`) through `/team-runs/:teamRunId/team-communication/messages/:messageId/references/:referenceId/content`.
     - Does not parse chat text in the frontend and does not make raw paths in `InterAgentMessageSegment` clickable.
+    - AgentOrg contexts retain their own strict root-sidecar payload and build a
+      `CollaborationMessagesContextView` with
+      `agentOrgCommunicationPerspective.ts`. The index correlates every
+      configured direct/mounted AgentRun plus task-scoped AgentRun, rejects
+      unknown or duplicate identity, excludes any message with a task endpoint
+      from configured-member presentation, and resolves counterpart identity
+      across the complete fixed-depth Org. AgentOrg references open through the
+      AgentOrg-rooted message route; no Team store or second ledger is created.
 3.  **Activity (`AgentActivityStore`)**:
     - Tracks run activities as a discriminated `RunActivity` history. Tool calls, file writes, and terminal commands are `kind: 'tool'`; compaction lifecycle/boundary rows are `kind: 'compaction'`; exact run-scoped instruction captures are `kind: 'system_instruction'`.
     - Is updated through shared tool Activity projection from eligible live transcript segment events and lifecycle events, through `compactionActivityProjection.ts` for live `COMPACTION_STATUS` payloads, and through `systemInstructionActivityHandler.ts` for live/replayed exact instruction facts.

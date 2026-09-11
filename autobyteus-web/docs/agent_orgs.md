@@ -121,6 +121,22 @@ A mounted Team uses the same Team workspace panel and task/communication
 presentation as a standalone Team. Its live task monitor continues to update
 without requiring focus-away/refocus.
 
+Every selected configured Org Agent, whether direct or inside a mounted Team,
+has one right-side collaboration surface identified with the owning AgentOrg.
+Its **Messages** section uses the shared Team interaction language and projects
+only root messages in which the selected Agent is sender or receiver. Rows show
+truthful sent/received direction, the exact counterpart across the complete Org,
+content, time, and message-owned references. Direct-to-direct,
+direct-to-mounted, mounted-to-direct, and mounted-to-mounted configured pairs
+therefore use the same surface; messages involving a task-scoped endpoint are
+excluded from this configured-member perspective.
+
+The receiver's center event monitor also receives exactly one inbound member
+input after a configured-pair message is durably accepted. Live updates and
+rehydration use the same root-owned message identities, so reconnect, history,
+and Restore do not invent a second Team-owned copy. Reference content stays on
+the AgentOrg-rooted message route.
+
 The left **Workspaces** hierarchy remains mounted across configuration, active,
 focused, and stopped/history states. Within each Workspace it retains the
 existing Agent and **Teams** groups and places **Agent Orgs** as the distinct
@@ -154,6 +170,9 @@ does not own polling, lifecycle, focus, readiness, or command authority.
 
 Task Agents and task Teams are transient execution projections. They can be
 nested by task delegation without changing the fixed configured Org topology.
+Status projection walks each structural Team root once and lets that Team own
+recursive descendants; the flat Team directory is not reused as recursive
+status roots, so nested task-Team Agent statuses remain unique.
 
 ## History, Restore, And Stop
 
