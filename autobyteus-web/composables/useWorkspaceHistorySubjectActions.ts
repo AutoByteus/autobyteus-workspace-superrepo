@@ -21,7 +21,16 @@ export const useWorkspaceHistorySubjectActions = () => {
   const selection = useAgentSelectionStore()
 
   const execute = async (command: WorkspaceHistorySubjectAction): Promise<void> => {
-    const run = historyStore.agentOrgHistory.find((item) => item.rootRunId === command.rootRunId)
+    let run = historyStore.agentOrgHistory.find((item) => item.rootRunId === command.rootRunId)
+    if (!run) {
+      // Exact participant links can be used before the history drawer mounts.
+      // Resolve through the same strict read owner, not through live-context inference.
+      await historyStore.refreshAgentOrgHistory()
+      if (historyStore.historyFamilyErrors.agentOrg) {
+        throw new Error(historyStore.historyFamilyErrors.agentOrg)
+      }
+      run = historyStore.agentOrgHistory.find((item) => item.rootRunId === command.rootRunId)
+    }
     if (!run) throw new Error(`AgentOrg history run '${command.rootRunId}' is unavailable.`)
     const definitionId = run.executionTree.rootOrg.orgDefinitionId
 
