@@ -3,9 +3,8 @@ import type { AgentOrgDefinition } from "../../agent-org-definition/domain/agent
 import type { DefinitionSourceClass } from "./definition-source-descriptor.js";
 
 export type RootSubjectKind = "agent_team" | "agent_org";
-export type DefinitionExpectedFamily = "agent_team_v2" | "agent_org_v1";
+export type DefinitionExpectedFamily = "agent_team" | "agent_org";
 export type DefinitionAdmissionDiagnosticCode =
-  | "DEFINITION_SCHEMA_VERSION_UNSUPPORTED"
   | "DEFINITION_FAMILY_MISMATCH"
   | "DEFINITION_CONTRACT_INVALID"
   | "DEFINITION_REFERENCE_UNRESOLVED"
@@ -26,7 +25,6 @@ export type UnavailableDefinitionAdmissionResult = Readonly<{
   definitionPath: string;
   definitionId?: string;
   expectedFamily: DefinitionExpectedFamily;
-  expectedSchemaVersion: 2 | 1;
   code: DefinitionAdmissionDiagnosticCode;
   reason: string;
   dependencyChain: readonly string[];

@@ -20,12 +20,11 @@ const temporaryRoot = async (): Promise<string> => {
 };
 const markdown = (subject: 'team' | 'org', name: string): string => `---\nname: ${name}\ndescription: Test\n---\n\n${subject} instructions`;
 const teamConfig = (agentId = 'agent-1') => ({
-  schemaVersion: 2, coordinatorMemberName: 'coordinator',
+  coordinatorMemberName: 'coordinator',
   members: [{ memberName: 'coordinator', ref: agentId, refScope: 'shared' }],
   handoffs: [], avatarUrl: null, defaultLaunchConfig: null,
 });
 const orgConfig = (teamId = 'team-1', refScope = 'shared') => ({
-  schemaVersion: 1,
   members: [{ memberName: 'team', ref: teamId, refType: 'agent_team', refScope }],
   handoffs: [], avatarUrl: null, defaultLaunchConfig: null,
 });
@@ -69,13 +68,27 @@ const build = (input: {
 };
 
 describe('DefinitionAdmissionService', () => {
-  it('admits only exact Team V2 and Org V1 targets with resolved dependencies', async () => {
+  it('admits only exact current field-free Team and Org targets with resolved dependencies', async () => {
     const dataRoot = await temporaryRoot();
     await writePackage(dataRoot, 'agent-teams', 'team-1', teamConfig());
     await writePackage(dataRoot, 'agent-orgs', 'org-1', orgConfig());
     const { service } = build({ dataRoot, team: teamDefinition(), org: orgDefinition() });
     expect((await service.requireAvailable('agent_team', 'team-1')).definition.id).toBe('team-1');
     expect((await service.requireAvailable('agent_org', 'org-1')).definition.id).toBe('org-1');
+  });
+
+  it.each(['agent_team', 'agent_org'] as const)('reports current %s family/path/key/action without a numeric diagnostic', async (subjectKind) => {
+    const dataRoot = await temporaryRoot(), externalRoot = await temporaryRoot();
+    const isTeam = subjectKind === 'agent_team';
+    const packagePath = await writePackage(externalRoot, isTeam ? 'agent-teams' : 'agent-orgs', 'versioned',
+      { ...(isTeam ? teamConfig() : orgConfig()), schemaVersion: isTeam ? 2 : 1 });
+    const configPath = path.join(packagePath, isTeam ? 'team-config.json' : 'org-config.json'), before = await fs.readFile(configPath);
+    const { service } = build({ dataRoot, externalRoots: [externalRoot] });
+    const result = (await service.scan()).find((r) => r.definitionId === 'versioned');
+    expect(result).toMatchObject({ status: 'unavailable', expectedFamily: subjectKind, definitionPath: packagePath,
+      code: 'DEFINITION_CONTRACT_INVALID', reason: expect.stringContaining('Unsupported keys: schemaVersion'),
+      ownerAction: expect.stringContaining('current definition format') });
+    expect(result).not.toHaveProperty('expectedSchemaVersion'); expect(await fs.readFile(configPath)).toEqual(before);
   });
 
   it('marks every same-identity physical package unavailable without selecting a precedence winner', async () => {
@@ -98,7 +111,8 @@ describe('DefinitionAdmissionService', () => {
     const before = { bytes: await fs.readFile(configPath, 'base64'), stats: await fs.stat(configPath) };
     const { service } = build({ dataRoot, externalRoots: [externalRoot], team: null });
     const result = (await service.scan()).find((item) => item.definitionId === 'legacy');
-    expect(result).toMatchObject({ status: 'unavailable', sourceClass: 'external_read_only' });
+    expect(result).toMatchObject({ status: 'unavailable', sourceClass: 'external_read_only', expectedFamily: 'agent_team', code: 'DEFINITION_CONTRACT_INVALID' });
+    expect(result).not.toHaveProperty('expectedSchemaVersion');
     const after = { bytes: await fs.readFile(configPath, 'base64'), stats: await fs.stat(configPath) };
     expect(after.bytes).toBe(before.bytes);
     expect({ size: after.stats.size, mtimeMs: after.stats.mtimeMs, ino: after.stats.ino })

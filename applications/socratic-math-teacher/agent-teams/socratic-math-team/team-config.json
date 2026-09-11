@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 2,
   "coordinatorMemberName": "tutor",
   "members": [
     { "memberName": "tutor", "ref": "socratic-math-tutor", "refScope": "team_local" }

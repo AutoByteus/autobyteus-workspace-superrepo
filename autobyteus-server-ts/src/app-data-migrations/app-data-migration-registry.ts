@@ -1,3 +1,4 @@
+import { CollaborationDefinitionAuthoringShapeAppDataMigration } from "./migrations/collaboration-definition-authoring-shape-app-data-migration.js";
 import { appConfigProvider } from "../config/app-config-provider.js";
 import type { AppDataMigrationDefinition } from "./domain/app-data-migration-types.js";
 import { RunHistoryIndexV2AppDataMigration } from "./migrations/run-history-index-v2-migration.js";
@@ -45,6 +46,7 @@ export class AppDataMigrationRegistry {
       new AgentOrgFlatTeamFamiliesV1AppDataMigration(
         appConfigProvider.config.getMemoryDir(),
       ),
+      new CollaborationDefinitionAuthoringShapeAppDataMigration(),
       new RemoveExternalRuntimeWorkingContextSnapshotsMigration(
         appConfigProvider.config.getMemoryDir(),
       ),

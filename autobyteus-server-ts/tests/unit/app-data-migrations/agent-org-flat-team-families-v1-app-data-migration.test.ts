@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AppConfig } from "../../../src/config/app-config.js";
 import { AgentMemoryLayout } from "../../../src/agent-memory/store/agent-memory-layout.js";
 import { AgentOrgFlatTeamFamiliesV1AppDataMigration } from "../../../src/app-data-migrations/migrations/agent-org-flat-team-families-v1/agent-org-flat-team-families-v1-app-data-migration.js";
@@ -116,11 +116,13 @@ const writeLegacyOrgDefinition = async (env: Awaited<ReturnType<typeof createEnv
   ], "lead");
   await fs.mkdir(path.join(source, "agent-teams", "delivery"), { recursive: true });
   await fs.writeFile(path.join(source, "team-config.json"), json(root));
-  await fs.writeFile(path.join(source, "team.md"), "# Software Org\n\nCoordinate delivery.\n");
+  await fs.writeFile(path.join(source, "team.md"), "---\nname: Software Org\ndescription: Delivery\n---\n\nCoordinate delivery.\n");
   await fs.writeFile(path.join(source, "agent-teams", "delivery", "team-config.json"), json(delivery));
+  await fs.writeFile(path.join(source, "agent-teams", "delivery", "team.md"), "---\nname: Delivery\ndescription: Work\n---\n");
   if (invalidLaterChild) {
     await fs.mkdir(path.join(source, "agent-teams", "quality"), { recursive: true });
     await fs.writeFile(path.join(source, "agent-teams", "quality", "team-config.json"), json(quality));
+    await fs.writeFile(path.join(source, "agent-teams", "quality", "team.md"), "---\nname: Quality\ndescription: Work\n---\n");
   }
   return source;
 };
@@ -212,8 +214,60 @@ describe("AgentOrg flat-Team family startup migration", () => {
     const retry = await env.migration().execute();
     const target = path.join(env.orgDefinitions, "software-org");
     expect(retry.status).toBe("SUCCEEDED");
-    expect(await fs.readFile(path.join(target, "org.md"), "utf8")).toBe("# Software Org\n\nCoordinate delivery.\n");
+    expect(await fs.readFile(path.join(target, "org.md"), "utf8")).toBe("---\nname: Software Org\ndescription: Delivery\n---\n\nCoordinate delivery.\n");
     await expect(fs.access(source)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it.each([false, true])("validates terminal field-free prospective output before retry (non-version conflict=%s)", async (conflict) => {
+    const env = await createEnvironment(), source = await writeLegacyOrgDefinition(env);
+    const physical = new AtomicRunPackageFileCommitWriter();
+    const interrupted = { write: async (input: Parameters<AtomicRunPackageFileCommitWriter["write"]>[0]) => {
+      const result = await physical.write(input);
+      if (input.filePath.endsWith("org-config.json")) throw new Error("stopped after prospective publication");
+      return result;
+    } } as AtomicRunPackageFileCommitWriter;
+    expect((await env.migration(interrupted).execute()).status).toBe("FAILED");
+    const configs = [path.join(source, "org-config.json"), path.join(source, "agent-teams/delivery/team-config.json")];
+    for (const file of configs) {
+      const raw = JSON.parse(await fs.readFile(file, "utf8")); delete raw.schemaVersion;
+      if (conflict && file.endsWith("org-config.json")) raw.avatarUrl = "different-but-valid";
+      await fs.writeFile(file, json(raw));
+    }
+    const before = await Promise.all(configs.map((file) => fs.readFile(file)));
+    const writer = new AtomicRunPackageFileCommitWriter(), spy = vi.spyOn(writer, "write");
+    const result = await env.migration(writer).execute();
+    expect(result.status).toBe(conflict ? "FAILED" : "SUCCEEDED"); expect(spy).not.toHaveBeenCalled();
+    const directory = conflict ? source : path.join(env.orgDefinitions, "software-org");
+    for (let i = 0; i < configs.length; i++) expect(await fs.readFile(path.join(directory, path.relative(source, configs[i]!)))).toEqual(before[i]);
+    if (conflict) expect(result.summary.details.some((d) => d.message.includes("does not match the exact target"))).toBe(true);
+  });
+
+  it("skips terminal flat configs and recovers a canonical ordinary journal without recreating numeric authoring", async () => {
+    const env = await createEnvironment(), canonical = path.join(env.teamDefinitions, "flat");
+    const stage = `${canonical}.stage.1.fixture`, backup = `${canonical}.backup.1.fixture`;
+    await fs.mkdir(stage);
+    const config = { coordinatorMemberName: "lead", members: [{ memberName: "lead", ref: "lead", refScope: "shared" }], handoffs: [], avatarUrl: null, defaultLaunchConfig: null };
+    await fs.writeFile(path.join(stage, "team-config.json"), json(config));
+    await fs.writeFile(path.join(stage, "team.md"), "---\nname: Flat\ndescription: Flat\n---\n");
+    await fs.writeFile(`${canonical}.definition-transaction.json`, json({ schemaVersion: 1, canonicalPath: canonical, stagePath: stage, backupPath: backup }));
+    const writer = new AtomicRunPackageFileCommitWriter(), spy = vi.spyOn(writer, "write");
+    expect((await env.migration(writer).execute()).status).toBe("SUCCEEDED"); expect(spy).not.toHaveBeenCalled();
+    expect(JSON.parse(await fs.readFile(path.join(canonical, "team-config.json"), "utf8"))).toEqual(config);
+    expect(await fs.readdir(env.teamDefinitions)).toEqual(["flat"]);
+  });
+
+  it.each([1, null])("cleans interrupted Org family retirement with version %s without rewriting its current config", async (version) => {
+    const env = await createEnvironment(), source = await writeLegacyOrgDefinition(env);
+    expect((await env.migration().execute()).status).toBe("SUCCEEDED");
+    const dir = path.join(env.orgDefinitions, "software-org"), file = path.join(dir, "org-config.json");
+    if (version === null) { const config = JSON.parse(await fs.readFile(file, "utf8")); delete config.schemaVersion; await fs.writeFile(file, json(config)); }
+    const before = await fs.readFile(file);
+    await fs.writeFile(path.join(dir, "team-config.json"), "retired"); await fs.writeFile(path.join(dir, "team.md"), "retired");
+    const writer = new AtomicRunPackageFileCommitWriter(), spy = vi.spyOn(writer, "write");
+    expect((await env.migration(writer).execute()).status).toBe("SUCCEEDED"); expect(spy).not.toHaveBeenCalled();
+    expect(await fs.readFile(file)).toEqual(before);
+    await expect(fs.access(path.join(dir, "team-config.json"))).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(fs.access(path.join(dir, "team.md"))).rejects.toMatchObject({ code: "ENOENT" });
   });
 
   it("keeps a native flat Team V2 package a strict zero-write cohort", async () => {

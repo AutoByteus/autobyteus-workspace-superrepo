@@ -9,34 +9,31 @@ import type {
   AgentOrgMemberRefScope,
 } from "../domain/agent-org-definition.js";
 
-export const AGENT_ORG_DEFINITION_CONFIG_SCHEMA_VERSION = 1 as const;
-
-export type AgentOrgDefinitionConfigMemberV1 = Readonly<{
+export type AgentOrgDefinitionConfigMember = Readonly<{
   memberName: string;
   ref: string;
   refType: "agent" | "agent_team";
   refScope: AgentOrgMemberRefScope;
 }>;
 
-export type AgentOrgDefinitionConfigFileV1 = Readonly<{
-  schemaVersion: 1;
-  members: readonly AgentOrgDefinitionConfigMemberV1[];
+export type AgentOrgDefinitionConfigFile = Readonly<{
+  members: readonly AgentOrgDefinitionConfigMember[];
   handoffs: readonly CollaborationHandoff[];
   avatarUrl: string | null;
   defaultLaunchConfig: DefaultLaunchConfig | null;
 }>;
 
-export class AgentOrgDefinitionConfigV1ParseError extends Error {
+export class AgentOrgDefinitionConfigParseError extends Error {
   readonly code = "DEFINITION_CONTRACT_INVALID";
 
   constructor(message: string) {
     super(message);
-    this.name = "AgentOrgDefinitionConfigV1ParseError";
+    this.name = "AgentOrgDefinitionConfigParseError";
   }
 }
 
 const fail = (message: string): never => {
-  throw new AgentOrgDefinitionConfigV1ParseError(message);
+  throw new AgentOrgDefinitionConfigParseError(message);
 };
 
 const asRecord = (value: unknown, label: string): Record<string, unknown> => {
@@ -54,7 +51,7 @@ const exactKeys = (
   const actual = Object.keys(value).sort();
   const target = [...expected].sort();
   if (actual.length !== target.length || actual.some((key, index) => key !== target[index])) {
-    fail(`${label} must contain exactly ${target.join(", ")}.`);
+    fail(`${label} must contain exactly ${target.join(", ")}. Unsupported keys: ${actual.filter((key) => !target.includes(key)).join(", ") || "none"}. Missing keys: ${target.filter((key) => !actual.includes(key)).join(", ") || "none"}.`);
   }
 };
 
@@ -86,7 +83,7 @@ const launchConfig = (value: unknown): DefaultLaunchConfig | null => {
   };
 };
 
-const member = (value: unknown, index: number): AgentOrgDefinitionConfigMemberV1 => {
+const member = (value: unknown, index: number): AgentOrgDefinitionConfigMember => {
   const label = `members[${index}]`;
   const candidate = asRecord(value, label);
   exactKeys(candidate, ["memberName", "ref", "refType", "refScope"], label);
@@ -108,18 +105,16 @@ const member = (value: unknown, index: number): AgentOrgDefinitionConfigMemberV1
   });
 };
 
-export const parseAgentOrgDefinitionConfigV1 = (
+export const parseAgentOrgDefinitionConfig = (
   value: unknown,
-): AgentOrgDefinitionConfigFileV1 => {
-  const candidate = asRecord(value, "AgentOrg Definition Config V1");
+): AgentOrgDefinitionConfigFile => {
+  const candidate = asRecord(value, "AgentOrg Definition Config");
   exactKeys(candidate, [
-    "schemaVersion",
     "members",
     "handoffs",
     "avatarUrl",
     "defaultLaunchConfig",
-  ], "AgentOrg Definition Config V1");
-  if (candidate.schemaVersion !== 1) fail("AgentOrg Definition Config schemaVersion must be numeric 1.");
+  ], "AgentOrg Definition Config");
   if (!Array.isArray(candidate.members)) fail("members must be an array.");
   const candidateMembers = candidate.members as unknown[];
   if (candidate.avatarUrl !== null) requiredString(candidate.avatarUrl, "avatarUrl");
@@ -131,7 +126,7 @@ export const parseAgentOrgDefinitionConfigV1 = (
     folded.add(key);
   }
   return Object.freeze({
-    schemaVersion: 1,
+
     members: Object.freeze(members),
     handoffs: Object.freeze(normalizeCollaborationHandoffs(candidate.handoffs)),
     avatarUrl: candidate.avatarUrl as string | null,
@@ -139,10 +134,9 @@ export const parseAgentOrgDefinitionConfigV1 = (
   });
 };
 
-export const buildAgentOrgDefinitionConfigV1 = (
+export const buildAgentOrgDefinitionConfig = (
   definition: AgentOrgDefinition,
-): AgentOrgDefinitionConfigFileV1 => parseAgentOrgDefinitionConfigV1({
-  schemaVersion: 1,
+): AgentOrgDefinitionConfigFile => parseAgentOrgDefinitionConfig({
   members: definition.members.map((item) => ({
     memberName: item.memberName,
     ref: item.ref,

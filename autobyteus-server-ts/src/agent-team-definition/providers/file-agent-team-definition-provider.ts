@@ -11,10 +11,10 @@ import {
   getGeneralProcessApplicationBundleService,
 } from "../../application-bundles/services/application-bundle-service.js";
 import {
-  AgentTeamDefinitionConfigV2ParseError,
-  buildAgentTeamDefinitionConfigV2,
-  parseAgentTeamDefinitionConfigV2,
-} from "./agent-team-definition-config-v2.js";
+  AgentTeamDefinitionConfigParseError,
+  buildAgentTeamDefinitionConfig,
+  parseAgentTeamDefinitionConfig,
+} from "./agent-team-definition-config.js";
 import {
   ensureWritableTeamSourcePaths,
   findTeamSourcePaths,
@@ -80,7 +80,7 @@ export class FileAgentTeamDefinitionProvider {
 
   private async validatePackage(packagePath: string): Promise<void> {
     parseTeamMd(await fs.readFile(path.join(packagePath, "team.md"), "utf8"), path.join(packagePath, "team.md"));
-    parseAgentTeamDefinitionConfigV2(await readJsonFile<unknown>(path.join(packagePath, "team-config.json"), null));
+    parseAgentTeamDefinitionConfig(await readJsonFile<unknown>(path.join(packagePath, "team-config.json"), null));
   }
 
   private async readDefinition(source: ResolvedTeamSourcePaths): Promise<AgentTeamDefinition | null> {
@@ -88,7 +88,7 @@ export class FileAgentTeamDefinitionProvider {
       const mdContent = await fs.readFile(source.mdPath, "utf8");
       const configContent = await fs.readFile(source.configPath, "utf8");
       const parsed = parseTeamMd(mdContent, source.mdPath);
-      const config = parseAgentTeamDefinitionConfigV2(JSON.parse(configContent));
+      const config = parseAgentTeamDefinitionConfig(JSON.parse(configContent));
       return new AgentTeamDefinition({
         id: getCanonicalTeamDefinitionIdFromSourcePaths(source),
         name: parsed.name,
@@ -123,7 +123,7 @@ export class FileAgentTeamDefinitionProvider {
         description: definition.description,
         category: definition.category,
       }, definition.instructions),
-      "team-config.json": `${JSON.stringify(buildAgentTeamDefinitionConfigV2(definition), null, 2)}\n`,
+      "team-config.json": `${JSON.stringify(buildAgentTeamDefinitionConfig(definition), null, 2)}\n`,
     };
   }
 
@@ -176,8 +176,8 @@ export class FileAgentTeamDefinitionProvider {
         const definition = await this.readDefinition(source);
         if (definition?.id) { definitions.push(definition); seen.add(definition.id); }
       } catch (error) {
-        if (error instanceof TeamMdParseError || error instanceof AgentTeamDefinitionConfigV2ParseError || error instanceof SyntaxError) {
-          logger.warn(`DEFINITION_CONTRACT_INVALID: skipped Team '${id}' at '${source.configPath}'; expected Team Definition Config V2: ${(error as Error).message}`);
+        if (error instanceof TeamMdParseError || error instanceof AgentTeamDefinitionConfigParseError || error instanceof SyntaxError) {
+          logger.warn(`DEFINITION_CONTRACT_INVALID: skipped Team '${id}' at '${source.configPath}'; expected current Team Definition Config: ${(error as Error).message}`);
           continue;
         }
         throw error;

@@ -153,7 +153,6 @@ test('standalone pack requires complete Team-scope defaults in addition to Agent
   }, null, 2)}\n`, 'utf8');
   const teamConfigPath = path.join(teamRoot, 'team-config.json');
   const teamConfig = {
-    schemaVersion: 2,
     coordinatorMemberName: 'lead',
     members: [{
       memberName: 'lead',

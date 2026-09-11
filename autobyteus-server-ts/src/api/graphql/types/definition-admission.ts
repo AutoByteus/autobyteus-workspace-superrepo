@@ -9,7 +9,6 @@ export class DefinitionAdmissionDiagnostic {
   @Field(() => String) definitionPath!: string;
   @Field(() => String, { nullable: true }) definitionId?: string;
   @Field(() => String) expectedFamily!: string;
-  @Field(() => Number) expectedSchemaVersion!: number;
   @Field(() => String) code!: string;
   @Field(() => String) reason!: string;
   @Field(() => [String]) dependencyChain!: string[];

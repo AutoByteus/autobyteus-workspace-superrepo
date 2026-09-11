@@ -234,7 +234,6 @@ describe("FileApplicationBundleProvider", () => {
       path.join(bundleRoot, "agent-teams", "sample-team", "team-config.json"),
       JSON.stringify(
         {
-          schemaVersion: 2,
           coordinatorMemberName: "lead",
           defaultLaunchConfig: options?.teamDefaultLaunchConfig ?? {
             runtimeKind: "autobyteus",

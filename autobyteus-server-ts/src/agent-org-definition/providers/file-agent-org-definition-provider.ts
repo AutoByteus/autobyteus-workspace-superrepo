@@ -12,10 +12,10 @@ import {
 import { AgentOrgDefinition, AgentOrgMember } from "../domain/agent-org-definition.js";
 import { parseOrgMd, serializeOrgMd, OrgMdParseError } from "../utils/org-md-parser.js";
 import {
-  AgentOrgDefinitionConfigV1ParseError,
-  buildAgentOrgDefinitionConfigV1,
-  parseAgentOrgDefinitionConfigV1,
-} from "./agent-org-definition-config-v1.js";
+  AgentOrgDefinitionConfigParseError,
+  buildAgentOrgDefinitionConfig,
+  parseAgentOrgDefinitionConfig,
+} from "./agent-org-definition-config.js";
 
 const FILES = ["org.md", "org-config.json"] as const;
 const hashFiles = (files: Readonly<Record<string, string>>): string => {
@@ -60,7 +60,7 @@ export class FileAgentOrgDefinitionProvider {
   }
   private async validatePackage(packagePath: string): Promise<void> {
     parseOrgMd(await fs.readFile(path.join(packagePath, "org.md"), "utf8"), path.join(packagePath, "org.md"));
-    parseAgentOrgDefinitionConfigV1(JSON.parse(await fs.readFile(path.join(packagePath, "org-config.json"), "utf8")));
+    parseAgentOrgDefinitionConfig(JSON.parse(await fs.readFile(path.join(packagePath, "org-config.json"), "utf8")));
   }
   private files(definition: AgentOrgDefinition): Readonly<Record<string, string>> {
     return {
@@ -68,7 +68,7 @@ export class FileAgentOrgDefinitionProvider {
         name: definition.name, description: definition.description,
         category: definition.category ?? undefined, instructions: definition.instructions,
       }),
-      "org-config.json": `${JSON.stringify(buildAgentOrgDefinitionConfigV1(definition), null, 2)}\n`,
+      "org-config.json": `${JSON.stringify(buildAgentOrgDefinitionConfig(definition), null, 2)}\n`,
     };
   }
   private async read(source: Source): Promise<AgentOrgDefinition | null> {
@@ -76,7 +76,7 @@ export class FileAgentOrgDefinitionProvider {
       const md = await fs.readFile(source.mdPath, "utf8");
       const json = await fs.readFile(source.configPath, "utf8");
       const authored = parseOrgMd(md, source.mdPath);
-      const config = parseAgentOrgDefinitionConfigV1(JSON.parse(json));
+      const config = parseAgentOrgDefinitionConfig(JSON.parse(json));
       return new AgentOrgDefinition({
         id: source.id, name: authored.name, description: authored.description,
         category: authored.category, instructions: authored.instructions,
@@ -106,8 +106,8 @@ export class FileAgentOrgDefinitionProvider {
           const definition = await this.read(this.source(root, entry.name));
           if (definition) { output.push(definition); seen.add(entry.name); }
         } catch (error) {
-          if (error instanceof OrgMdParseError || error instanceof AgentOrgDefinitionConfigV1ParseError || error instanceof SyntaxError) {
-            console.warn(`DEFINITION_CONTRACT_INVALID: skipped AgentOrg '${entry.name}' at '${root}'; expected Org Definition Config V1: ${(error as Error).message}`);
+          if (error instanceof OrgMdParseError || error instanceof AgentOrgDefinitionConfigParseError || error instanceof SyntaxError) {
+            console.warn(`DEFINITION_CONTRACT_INVALID: skipped AgentOrg '${entry.name}' at '${root}'; expected current Org Definition Config: ${(error as Error).message}`);
             continue;
           }
           throw error;

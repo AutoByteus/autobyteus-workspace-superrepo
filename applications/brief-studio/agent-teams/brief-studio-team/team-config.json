@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 2,
   "coordinatorMemberName": "researcher",
   "members": [
     { "memberName": "researcher", "ref": "researcher", "refScope": "team_local" },

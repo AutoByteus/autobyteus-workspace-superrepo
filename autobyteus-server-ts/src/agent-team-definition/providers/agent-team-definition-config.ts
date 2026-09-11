@@ -9,34 +9,31 @@ import {
   type CollaborationHandoff,
 } from "../../agent-collaboration/domain/collaboration-handoff.js";
 
-export const AGENT_TEAM_DEFINITION_CONFIG_SCHEMA_VERSION = 2 as const;
-
-export type AgentTeamDefinitionConfigMemberV2 = Readonly<{
+export type AgentTeamDefinitionConfigMember = Readonly<{
   memberName: string;
   ref: string;
   refScope: TeamMemberRefScope;
 }>;
 
-export type AgentTeamDefinitionConfigFileV2 = Readonly<{
-  schemaVersion: 2;
+export type AgentTeamDefinitionConfigFile = Readonly<{
   coordinatorMemberName: string;
-  members: readonly AgentTeamDefinitionConfigMemberV2[];
+  members: readonly AgentTeamDefinitionConfigMember[];
   handoffs: readonly CollaborationHandoff[];
   avatarUrl: string | null;
   defaultLaunchConfig: DefaultLaunchConfig | null;
 }>;
 
-export class AgentTeamDefinitionConfigV2ParseError extends Error {
+export class AgentTeamDefinitionConfigParseError extends Error {
   readonly code = "DEFINITION_CONTRACT_INVALID";
 
   constructor(message: string) {
     super(message);
-    this.name = "AgentTeamDefinitionConfigV2ParseError";
+    this.name = "AgentTeamDefinitionConfigParseError";
   }
 }
 
 const fail = (message: string): never => {
-  throw new AgentTeamDefinitionConfigV2ParseError(message);
+  throw new AgentTeamDefinitionConfigParseError(message);
 };
 
 const asRecord = (value: unknown, label: string): Record<string, unknown> => {
@@ -54,7 +51,7 @@ const assertExactKeys = (
   const actual = Object.keys(value).sort();
   const target = [...expected].sort();
   if (actual.length !== target.length || actual.some((key, index) => key !== target[index])) {
-    fail(`${label} must contain exactly ${target.join(", ")}.`);
+    fail(`${label} must contain exactly ${target.join(", ")}. Unsupported keys: ${actual.filter((key) => !target.includes(key)).join(", ") || "none"}. Missing keys: ${target.filter((key) => !actual.includes(key)).join(", ") || "none"}.`);
   }
 };
 
@@ -92,7 +89,7 @@ const parseDefaultLaunchConfig = (value: unknown): DefaultLaunchConfig | null =>
   };
 };
 
-const parseMember = (value: unknown, index: number): AgentTeamDefinitionConfigMemberV2 => {
+const parseMember = (value: unknown, index: number): AgentTeamDefinitionConfigMember => {
   const label = `members[${index}]`;
   const candidate = asRecord(value, label);
   assertExactKeys(candidate, ["memberName", "ref", "refScope"], label);
@@ -107,26 +104,21 @@ const parseMember = (value: unknown, index: number): AgentTeamDefinitionConfigMe
   });
 };
 
-export const parseAgentTeamDefinitionConfigV2 = (
+export const parseAgentTeamDefinitionConfig = (
   value: unknown,
-): AgentTeamDefinitionConfigFileV2 => {
-  const candidate = asRecord(value, "AgentTeam Definition Config V2");
+): AgentTeamDefinitionConfigFile => {
+  const candidate = asRecord(value, "AgentTeam Definition Config");
   assertExactKeys(candidate, [
-    "schemaVersion",
     "coordinatorMemberName",
     "members",
     "handoffs",
     "avatarUrl",
     "defaultLaunchConfig",
-  ], "AgentTeam Definition Config V2");
-  if (candidate.schemaVersion !== AGENT_TEAM_DEFINITION_CONFIG_SCHEMA_VERSION) {
-    fail("AgentTeam Definition Config schemaVersion must be numeric 2.");
-  }
+  ], "AgentTeam Definition Config");
   if (!Array.isArray(candidate.members)) fail("members must be an array.");
   const candidateMembers = candidate.members as unknown[];
   if (candidate.avatarUrl !== null) requiredString(candidate.avatarUrl, "avatarUrl");
-  const parsed: AgentTeamDefinitionConfigFileV2 = {
-    schemaVersion: 2,
+  const parsed: AgentTeamDefinitionConfigFile = {
     coordinatorMemberName: requiredString(candidate.coordinatorMemberName, "coordinatorMemberName"),
     members: candidateMembers.map(parseMember),
     handoffs: normalizeCollaborationHandoffs(candidate.handoffs),
@@ -152,10 +144,9 @@ export const parseAgentTeamDefinitionConfigV2 = (
   });
 };
 
-export const buildAgentTeamDefinitionConfigV2 = (
+export const buildAgentTeamDefinitionConfig = (
   definition: AgentTeamDefinition,
-): AgentTeamDefinitionConfigFileV2 => parseAgentTeamDefinitionConfigV2({
-  schemaVersion: 2,
+): AgentTeamDefinitionConfigFile => parseAgentTeamDefinitionConfig({
   coordinatorMemberName: definition.coordinatorMemberName,
   members: definition.nodes.map((member) => ({
     memberName: member.memberName,

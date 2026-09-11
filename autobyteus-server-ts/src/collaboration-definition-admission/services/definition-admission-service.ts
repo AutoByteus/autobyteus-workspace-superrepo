@@ -2,11 +2,11 @@ import fs from "node:fs/promises";
 import type { AgentDefinitionService } from "../../agent-definition/services/agent-definition-service.js";
 import { CollaborationHandoffCompiler } from "../../agent-collaboration/definition/collaboration-handoff-compiler.js";
 import type { AgentOrgDefinition } from "../../agent-org-definition/domain/agent-org-definition.js";
-import { parseAgentOrgDefinitionConfigV1 } from "../../agent-org-definition/providers/agent-org-definition-config-v1.js";
+import { parseAgentOrgDefinitionConfig } from "../../agent-org-definition/providers/agent-org-definition-config.js";
 import type { AgentOrgDefinitionService } from "../../agent-org-definition/services/agent-org-definition-service.js";
 import { AgentOrgDefinitionResolver } from "../../agent-org-definition/services/agent-org-definition-resolver.js";
 import type { AgentTeamDefinition } from "../../agent-team-definition/domain/agent-team-definition.js";
-import { parseAgentTeamDefinitionConfigV2 } from "../../agent-team-definition/providers/agent-team-definition-config-v2.js";
+import { parseAgentTeamDefinitionConfig } from "../../agent-team-definition/providers/agent-team-definition-config.js";
 import type { AgentTeamDefinitionService } from "../../agent-team-definition/services/agent-team-definition-service.js";
 import { assertValidFlatTeamDefinition } from "../../agent-team-definition/services/flat-team-definition-validator.js";
 import type { AvailableDefinitionAdmissionResult, DefinitionAdmissionResult, RootSubjectKind, UnavailableDefinitionAdmissionResult } from "../domain/definition-admission-result.js";
@@ -117,8 +117,8 @@ export class DefinitionAdmissionService {
   private async decode(source: RegisteredDefinitionSource): Promise<AvailableDefinitionAdmissionResult | UnavailableDefinitionAdmissionResult> {
     try {
       const raw = JSON.parse(await fs.readFile(source.configPath, "utf8")) as unknown;
-      if (source.subjectKind === "agent_team") parseAgentTeamDefinitionConfigV2(raw);
-      else parseAgentOrgDefinitionConfigV1(raw);
+      if (source.subjectKind === "agent_team") parseAgentTeamDefinitionConfig(raw);
+      else parseAgentOrgDefinitionConfig(raw);
       await fs.access(source.markdownPath);
       const definition = source.subjectKind === "agent_team"
         ? await this.dependencies.teams.getFreshDefinitionById(source.definitionId)
@@ -131,7 +131,7 @@ export class DefinitionAdmissionService {
         : source.configPath.replace(/org-config\.json$/, "team-config.json");
       const familyMismatch = (error as NodeJS.ErrnoException | null)?.code === "ENOENT"
         && await fs.access(siblingFamilyFile).then(() => true).catch(() => false);
-      const code = familyMismatch ? "DEFINITION_FAMILY_MISMATCH" : schemaCode(error);
+      const code = familyMismatch ? "DEFINITION_FAMILY_MISMATCH" : "DEFINITION_CONTRACT_INVALID";
       return this.unavailable(source, code, message(error));
     }
   }
@@ -162,22 +162,17 @@ export class DefinitionAdmissionService {
       definitionPath: source.descriptor.definitionPath,
       definitionId: source.definitionId,
       subjectKind: source.subjectKind,
-      expectedFamily: source.subjectKind === "agent_team" ? "agent_team_v2" : "agent_org_v1",
-      expectedSchemaVersion: source.subjectKind === "agent_team" ? 2 : 1,
+      expectedFamily: source.subjectKind === "agent_team" ? "agent_team" : "agent_org",
       code,
       reason,
       dependencyChain: Object.freeze([...dependencyChain]),
       ownerAction: source.descriptor.sourceClass === "external_read_only"
-        ? "Update this package in its owning external project to the exact target definition family/version."
-        : "Correct the owned package to the exact target definition family/version and restart the server.",
+        ? "Update this package in its owning external project to the current definition format."
+        : "Correct the owned package to the current definition format and restart the server.",
     });
   }
 }
 
 const key = (kind: RootSubjectKind, id: string): string => `${kind}:${id}`;
 const message = (error: unknown): string => error instanceof Error ? error.message : String(error);
-const schemaCode = (error: unknown): UnavailableDefinitionAdmissionResult["code"] => {
-  const text = message(error);
-  return /schemaVersion/.test(text) ? "DEFINITION_SCHEMA_VERSION_UNSUPPORTED" : "DEFINITION_CONTRACT_INVALID";
-};
 const coded = (code: string, text: string): Error => Object.assign(new Error(text), { code });
