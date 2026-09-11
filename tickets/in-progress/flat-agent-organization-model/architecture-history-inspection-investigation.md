@@ -90,3 +90,50 @@ Screenshot directory:
 
 Files: ctx_6f27f0dafc4c__image.png; ctx_224155d0014a__image.png;
 ctx_575becb8b204__image.png; ctx_f7211ebc5911__image.png.
+
+## Related Terminate-To-Configuration Finding — HIST-INSPECT-002
+
+The user additionally reports that terminating the selected Org replaces the
+event monitor with the new-Org launch form, unlike Team termination. Read-only
+source inspection at 00c3aeea7f6cb4fc22ee57e8c47c9a993f249aa4 confirms why:
+
+- `autobyteus-web/composables/useWorkspaceHistorySubjectActions.ts:37-49`
+  awaits successful root termination, disconnects/removes the Org context, then
+  replaces the current matching active route with `mode: configuration`. The
+  replacement keeps only the definition ID and drops the run/member identity.
+- `autobyteus-web/stores/agentOrgContextsStore.ts:49-62` removes the disconnected
+  run's context and pending focus. Thus retaining just the old center route
+  without providing stopped history would not be sufficient either.
+- `autobyteus-web/components/layout/WorkspaceAdaptiveLayout.vue:18-19,185-187`
+  displays AgentOrgRunConfigPanel for that configuration route instead of the
+  retained execution workspace.
+- `autobyteus-web/components/workspace/config/AgentOrgRunConfigPanel.vue:109-113,343-394`
+  calls launch only through runOrg, wired to the Run button. Mounting the form
+  fetches definitions/workspaces and applies defaults; it does not create an Org
+  runtime. The observed screen therefore suggests a new run but does not itself
+  start one. This differs from HIST-INSPECT-001's actual restore-on-click.
+- `autobyteus-web/stores/agentTeamRunStore.ts:200-218` terminates, disconnects,
+  marks the existing context/history inactive and cleans up Agent runtime status
+  without removing the selected Team context or navigating to launch. This method
+  is byte-identical to local origin/personal at the pinned comparison revision.
+  `useWorkspaceHistoryMutations.ts:59-75` adds pending/error handling, not a new
+  route. The selected conversation is retained rather than replaced by a form.
+- `useWorkspaceHistorySubjectActions.spec.ts:125-142` explicitly expects the
+  Org stop-to-configuration redirect. This assertion protects the divergence;
+  it is not independent evidence of intended Team-equivalent behavior.
+
+Include this in the same history/lifecycle recovery: successful stop of the
+selected Org should retain the same run and exact selected Agent's conversation
+with truthful stopped/Offline status; stop of another root must not hijack the
+current workspace. Terminate is not New Run. New configuration remains an
+explicit user action; later deliberate continuation remains distinct from
+history inspection. Preserve stop failure/pending handling and root ownership.
+Provide the stopped inspection context safely rather than merely removing the
+redirect and leaving the center without data, or retaining stale live ports.
+
+This is another implementation divergence requiring coordinated presentation
+boundary correction, not a request to alter backend termination, invent a new
+Product screen, or restart the stopped Org. Add selected direct/mounted/task
+conversation retention, no create/restore mutation, other-root selection, and
+failed-stop checks to recovery validation. No source/test change or live
+termination was performed in this investigation; no fix/pass is claimed.
