@@ -1,82 +1,46 @@
-# Implementation Handoff — AORG-FLAT-TEAM-001 / IR-040 / UI-CLEAN-001
+# Implementation Handoff — AORG-FLAT-TEAM-001 / IR-041 / UI-CLEAN-001
 
 ## Upstream Artifact Package
-- **Architecture Design route**; approved **RER-031@3b8c18a28af7674619a797a92a208dabfa851f54** includes RER030. **AD-REV-021@22d191ea4a9d066aec24faf017a25e090d1b4763**, **ARCH-REV-019 Pass@be6b20f4a988eabbeb797a70af1b9cb0091c2f64**.
-- Workspace: /home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model; branch requirements/flat-agent-organization-model. Canonical ticket directory: tickets/in-progress/flat-agent-organization-model.
-- Requirements/routing: requirements-doc.md, investigation-notes.md, requirements-revision-record.md. Architecture: design-spec.md, architecture-design-revision-record.md, architecture-design-self-validation.md, design-review-report.md, architecture-review-revision-record.md. None are route-inapplicable.
-- Supplements: agent-org-contract.md, architecture-ui-cleanup-investigation.md, architecture-package-authoring-investigation.md, architecture-task-parity-investigation.md, architecture-assertion-validity-record.md; server docs/design/production_data_migration_conventions.md.
-- Product authority: /home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/AORG-FLAT-TEAM-001/ RV012 UI spec/decision/manifest and still-relevant VIS001–020; AORG-FLAT-TEAM-STATUS-001; AORG-TEAM-OVERRIDES-001 VIS-OVR001–006 supersede VIS015. BASELINE-PROMOTION-001 is clean-entry/provenance supplement, not the whole experience. DS034/user approval governs this bounded cleanup; no new Product gate.
+- Architecture-approved copy re-entry: **RER-032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a**, **AD-REV-022@17b0b3cc5dca03c7e4016cf54516c4441a16df35**. Explicit user approval changes only the singular history heading to **Orgs**. RER031/AD021 **ARCH-REV019 Pass@be6b20f4a988eabbeb797a70af1b9cb0091c2f64** remains applicable to the cumulative parent. New architecture review: **N/A — not applicable to the approved copy-only delta**, not a missing review or package hold.
+- Workspace: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`; branch `requirements/flat-agent-organization-model`. Ticket: `tickets/in-progress/flat-agent-organization-model`.
+- Requirements/routing: requirements-doc.md, investigation-notes.md, requirements-revision-record.md. Architecture: design-spec.md, architecture-design-revision-record.md, architecture-design-self-validation.md, design-review-report.md, architecture-review-revision-record.md. These cumulative architecture artifacts remain applicable.
+- Supplements: agent-org-contract.md; architecture-ui-cleanup-investigation.md, architecture-package-authoring-investigation.md, architecture-task-parity-investigation.md, architecture-assertion-validity-record.md; server docs/design/production_data_migration_conventions.md.
+- Product authorities remain RV012, AORG-FLAT-TEAM-STATUS-001, AORG-TEAM-OVERRIDES-001 and BASELINE-PROMOTION-001 in `/home/autobyteus/workspace/autobyteus-web-prototype/tickets/done/`; specs, decision records and visual manifests apply cumulatively. VIS-OVR001–006 supersede VIS015. RER032 supersedes only RER031's singular history literal; DS034 compact Messages/task detail stays approved.
 - Retained integration supplements: tickets/done/stopped-run-compatible-model/requirements-doc.md and design-spec.md; tickets/done/task-agent-monitor-visibility/requirements.md.
-- Trigger: ARCH-REV019 implementation reconciliation / UI-CLEAN001, no new CR-FIND.
-- Prior source: IR039@4c3d218adf9a3203310923b823ceac2a5dd74ffe, artifact932c81b2261ffcc21ac540b0f25522ecfa1cb29a. **CRR060 Pass94.1/100** read in current reviewer report. API25 is in progress, not a completed pass. API24/CRR059 and DR008 remain scoped historical RER028 evidence; no later outcome inferred.
+- Prior source: **IR040@7d967d411f806429bb9c6bbdcf8bb382f35b266e**, artifact **06d020da35bff3a3e745cf4c4b33c30d1e00a104**. Current reviewer report records **CRR061 Pass94.1/100** for that artifact, not this change. No new CR-FIND. API25 ongoing; historical API24/CRR059/DR008 are scoped prior evidence, not current acceptance.
 
-## Current Implementation Summary
-**Implementation and local validation complete; ready for independent fresh cumulative source review.**
-- Rework / **IR-040**; production+test source **7d967d411f806429bb9c6bbdcf8bb382f35b266e**, 18 files. Current code/this handoff are authoritative; cumulative history remains in implementation-revision-record.md.
-- Main navigation remains Agent Orgs; only the Workspace category label becomes **Org / 组织** (uppercase styling displays ORG).
-- Accepted Messages retain all configured/task endpoint rows and references. Permanent list address/Task suffix decoration and right-detail address strip are removed; exact identity is disclosed through a closed, accessible right-header control.
-- The top Tasks participant strip is removed. Compact direction names carry exact Agent links or an exact fresh task-Team group. Every retained actual member remains reachable, including non-coordinators; submission reverses the same endpoints, system interruption stays system text, references remain separate.
-- Existing section owns navigation; item and pane emit/forward a typed link. Local disclosures reset on subject/item/reference changes, not same-item live updates. No new store, cache, query or lifecycle owner.
-- RER029/AD020 field-free authoring/startup migration are unchanged, as are RER028 task-inclusive input/history, strict recovery and earlier lifecycle/FIFO/fence contracts.
+## Current Result And Classification
+**IR-041 implementation and local validation complete; cumulative package ready for independent source review.**
+- Source **88fa0c3ff55d9d6a87a27df094b369ea62d1595c**: one English locale-data value and three affected copy-assertion files, seven insertions/seven deletions from HEAD. Current code and this handoff are authoritative; IR001–041 revision history remains intact.
+- Focused **task_size=Small / architectural_risk=Low**, confirmed as approved AD022. Cumulative parent **task_size=Large / architectural_risk=High** retained, with its existing source/API/Delivery gates. This is not a parent downgrade or a second task.
+- Independent source review remains applicable. Current get_handoff_rules selected “When implementation is complete and the carried classification is task_size=Large or architectural_risk=High, implementation-scoped validation is complete, and the cumulative implementation package is ready for independent source review.” Exact recipient: `/software_engineering_team/code_reviewer`.
+- Implementation self-check: exact production diff is only Org -> Orgs under the existing key; Chinese, CSS, renderers, read/state/route owners and runtime are byte-unchanged. No Design Impact, Requirement Gap, Product gate or new mechanism. Lightweight direct-route review: N/A — cumulative selected source review remains independent.
 
-## Routing Classification
-- **task_size=Large / architectural_risk=High — confirmed** cumulatively. Focused DS034 is Small/Low: display-only projection/local interaction, no durable/backend/runtime change.
-- Independent **Code Review** remains applicable before renewed cumulative API/E2E. The current get_handoff_rules selected the completed Large-or-High implementation / validation-complete / ready-for-independent-source-review rule; exact recipient /software_engineering_team/code_reviewer.
-- Lightweight direct-route review: **N/A**. Implementation self-check completed, not independent source review.
-- No Design Impact, Requirement Gap, Product gap, migration deviation or speculative recovery mechanism.
-
-## Reviewed Behavior Implementation Trace
-| IDs / spine | Actual implementation and meaningful outcome | Local evidence |
+## Behavior Trace And Clean Cut
+| Behavior / spine | Current outcome | Evidence |
 | --- | --- | --- |
-| BEH014; REQ031; AC026/034; SCN015; DS034c | Existing history grouping -> unchanged WorkspaceAgentOrgHistoryCollection -> same locale key, Org/组织 only | Exact catalog/heading/order; locale rerender preserves row element identities/state object and does not invoke expansion/actions. Root/tree/scroll owners untouched. |
-| BEH017; REQ034; SCN018; DS034a/r | Existing Messages facet -> CollaborationMessagesPanel list/detail/reference -> closed detail identity | No list metadata/control or eligibility filter. Exact address/AgentRun/task/host/execution disclosed. Scalar watch sources retain same-item updates; subject/item/reference changes close detail. |
-| BEH018; REQ035/036; AC034; SCN019; DS034b | Org index or Team view -> existing task adapter -> exact named endpoint -> ItemDetail -> DetailPane -> section -> existing root-tagged inspection/navigation | Agent/all fresh Team members, repeated same-name tasks, retained/non-coordinator destination, reversed submission, system assignment disclosure, reference separation. |
-| BEH017/018; DS028–030/034r | Existing publication -> reactive context/facet -> shared Tasks | Stream/context unchanged. Service-to-Pinia no-refocus, parity, strict recovery/inspection and Team stream regressions pass in affected cumulative cohort. |
-| BEH010; RER029 DS031–033; remaining cumulative contracts | Existing field-free codecs/provider/admission/startup transitions and flat Team/Org runtime | Source unchanged from IR039. No new server/provider/migration acceptance claimed in this UI round; renewed cumulative API/E2E remains required. |
+| BEH014; REQ031; AC026; SCN015; DS034c / VAL053 | Workspaces grouping -> unchanged history collection -> existing localization key -> **Orgs** / uppercase **ORGS**, directly below Teams | Catalog parity assertions and actual WorkspaceHistoryWorkspaceSection composition; locale switching preserves row identities, state and expansion; desktop/narrow inspection. |
+| DS034a/b/r; BEH017/018; REQ034–036 | IR040 compact Messages/task detail, exact retained participant links, all-member Team disclosure and reference separation unchanged | IR040 source/evidence and CRR061 remain scoped baseline; no new tests/build/provider results implied. |
+| RER029 DS031–033; RER028 DS028–030; cumulative Team/Org owners | Authored-format transition, task-inclusive input/history/inspection, no-refocus context, root lifecycle/FIFO/fences/title/recovery unchanged | No executable production source change in IR041. Renewed downstream cumulative matrix remains owned by API/E2E. |
 
-## Key Files / Ownership
-Relative to the worktree:
-- autobyteus-web/components/workspace/collaboration/CollaborationMessagesPanel.vue: compact list, right-header identity/local reset.
-- CollaborationDelegatedTasksSection.vue in the same directory: strip deletion, typed detail event to existing exact-root navigation.
-- components/workspace/team/TeamDelegatedTaskDetailPane.vue and TeamDelegatedTaskItemDetail.vue: keyed local detail, compact endpoint actions/all-member disclosure; existing lifecycle/body/reference presentation.
-- types/workspace/collaborationTaskPresentation.ts: tight UI-only named Agent/group/unavailable variants and system assignment metadata; obsolete strip-only entry participants removed.
-- services/agentOrgExecution/agentOrgTaskPresentation.ts and utils/teamDelegatedTaskEntries.ts: exact recorded run IDs from existing retained index/view, never label/address matching, first-member or configured substitution.
-- Existing en/zh-CN workspace catalogs: one history label plus seven identity labels; main navigation unchanged.
-- New CompactTaskNavigation.spec.ts plus existing component/adapter/history/catalog tests. Exact list: implementation-evidence/IR-040/source-files.json.
+- Changed production path: `autobyteus-web/localization/messages/en/workspace.ts`, only `workspace.agentOrg.history.collectionLabel`.
+- Updated tests: `localization/messages/__tests__/teamTaskLifecycleCatalog.spec.ts`, `flatTeamAgentOrgCatalog.spec.ts`; `components/workspace/history/__tests__/WorkspaceHistoryWorkspaceSection.spec.ts` under autobyteus-web.
+- Main navigation **Agent Orgs**, right Team/Org tab, Chinese **组织**, domain/API names, category order/key/membership/selection/expansion/scroll/actions unchanged. No global rename, wrapper, alias, second owner or obsolete literal path retained in affected assertions.
+- One existing locale data line; no executable file growth or >220 changed-line signal. Tests outside production source-size cap. Persisted data: **Not Affected**; no backend/schema/migration/runtime/lifecycle delta.
 
-## Design Health / Clean Cut / Source Limits
-- DS034 **local refactor now** removes excess presentation within existing owners; no new dashboard. Implementation matches the reviewed assessment; no escalation.
-- Seven changed executable implementation files, maximum **276 effective nonempty lines**; no >500 file or >220 changed-line signal. Two existing locale data catalogs are data, not expanded executable owners. See source-limits.txt.
-- No compatibility wrapper, parser, duplicate identity cache, backend/API/stream/queue/lifecycle change. Strip-only DelegatedTaskEntry.participants and its callers removed; runtime taskParticipants/relevance retained.
-- Item detail imports no router/runtime store; section owns navigation. Reference selection never selects a participant. Unavailable historical labels remain non-actionable, not fabricated targets.
-- Shared design principles reapplied; no obsolete production route or manual recovery affordance introduced.
+## Local Implementation Validation
+Current commands/results: `implementation-evidence/IR-041/local-checks.md`.
+- **3 files /14 tests pass**: both affected catalog suites and the history section suite. Covers English/Chinese parity, untouched navigation copy, Teams/Orgs order, row element/state preservation and exact-root actions.
+- Web boundary guard, localization boundary guard and mandatory literal audit pass; **zero unresolved findings**. Existing module-type warning is nonfatal.
+- **4 Chromium render states**, en/zh, 1440×900 and 390×844. Exact English ORGS below Teams; Chinese unchanged; no pageerror/horizontal overflow. Locale switches retain exact row DOM/selection/expanded tree; keyboard Space/touch collapse and reopen remain functional. Direct visual inspection finds matched heading style/spacing with no layout correction needed.
+- Fixture uses actual history collection and strict synthetic tree/local state in supported Nuxt dev renderer; Teams sibling/locale controls are fixture chrome. Durable section test covers the real sibling composition. This is not full-route/server/provider/stream/native-shell/API-E2E proof. Own temporary route/dev process removed; safe fixture/screenshots retained.
+- No full production build/provider turn repeated for one data literal. IR040 production Nuxt16-route build, cumulative39files/296tests and 20 rendered states remain historical evidence under `implementation-evidence/IR-040/`; not relabeled as IR041 execution. No typecheck/new package claim.
 
-## Persisted Data Transition
-**Not Affected — DS034.** Same IDs, sidecars, histories, model config, messages, tasks and field-free authoring. No serialization, migration/backfill, runtime inference, lifecycle/policy or eligibility change. RER029 migration and earlier Team V2/Org V1 separation remain as approved.
+## Preservation And Attribution
+- **9,110** starting dirty/untracked paths hashed; **9,109 unchanged**. Sole overlap is the exact authorized catalog assertion in `flatTeamAgentOrgCatalog.spec.ts`.
+- That assertion already contained another owner's uncommitted `Agent Orgs/智能体组织 -> Org/组织` correction. Its precise baseline diff is retained in `implementation-evidence/IR-041/preexisting-catalog.diff`. This round changes only Org -> Orgs on that line, retaining the Chinese correction, and incorporates the reconciled assertion in the source commit. It is not claimed as wholly new test authorship.
+- Other-owner source-bound docs, source-review/API/Delivery reports and raw evidence were neither edited nor staged/reset. No raw DB/env/key files or existing package committed/published. See preservation.txt.
+- External definition publication, native shell/user verification and Delivery remain their owners' work. Prior API20/21 unknown-delay limits and later scoped reports are preserved, not reinterpreted by a copy change.
 
-## Local Implementation Checks
-Commands/logs: implementation-evidence/IR-040/local-checks.md.
-- Final affected cumulative frontend cohort **39 files /296 tests pass**, including new tests and context/stream/history/navigation/Team focus-send obligations.
-- Earlier final focused subset **16/93 pass**; overlapping checks not additive.
-- Web/localization guards and mandatory literal audit pass with **zero unresolved findings**.
-- Existing SDK prerequisite build and production Nuxt build/prerender pass, **16 routes**, no fixture route. Production build is not a full repository typecheck.
-- Initial build lacked the generated application SDK entry; built existing prerequisite and reran unchanged command successfully. Original failure log retained; no source/dependency workaround.
-- Earlier focused tests caught a local same-item reset defect and obsolete strip expectations. Scalar watch sources/exact-link fixtures corrected these; failed logs preserved. Existing fixture/KaTeX, Browserslist and chunk-size warnings remain nonfatal.
-
-## Frontend Rendered-Result Check
-- Read user screenshots, approved DS034/UI specs and pinned original Team header/list. Used normal Nuxt dev renderer on owned port43140 and Chromium with actual shared components/Org context/index/facets, synthetic retained data and bounded reference responses.
-- **20 final desktop1440×900 / narrow390×844 states**, English/zh-CN: compact Messages/Tasks, identity, all-member task-Team detail, reversed submission/reference, direct/mounted/task participants and standalone Team. Keyboard Enter/Space and touch taps; no final page overflow/pageerrors.
-- Directly inspected screenshots and polished duplicate-label/header wrapping: identity control stays with metadata, timestamp wraps together at constrained width, IDs wrap only in optional detail.
-- System interruption/fallback, repeated same-name identity and exact navigation dispatch are deterministic component/adapter checks. Fixture is not provider/real-stream/full-route/native validation; fixture switches and isolated history-state inputs are scaffolding, not product UI or history integration proof.
-- Evidence: implementation-evidence/IR-040/render/evidence.json, scripts/fixture/screenshots. Own temporary route/dev process removed before build; unrelated desktop/browser untouched.
-
-## Preservation / Environment / Limitations
-- **8,484 starting other-owner dirty/untracked SHA-256 values unchanged.** Module/docs, API/source-review/Delivery reports, raw evidence and existing packages were not staged/reset/edited/claimed. Only IR040 source/tests/catalogs and implementation artifacts are included.
-- Own generated SDK prerequisite removed after build; frontend output remains generated/unstaged, not an Electron package. Build reproduction must build that existing prerequisite first.
-- External definition publication remains separately owned. No native-shell, deployment, fresh package, user acceptance or Delivery completion claim.
-- Prior API20/21 settlement-delay limits and later scoped histories remain intact. This UI round does not establish unknown origins. API25 remains ongoing under its owner's report.
-
-## Downstream Coverage And Handoff
-Request **fresh full cumulative source review**, not only UI delta. Check DS034 exact endpoints, all-member/retained access, compact defaults, reference/reset boundaries and heading-only invariance while preserving IR001–039.
-After source Pass, API/E2E owns renewed current-artifact coverage, including ongoing RER029 authoring/migration and RER028 task parity; prior scoped passes are not substitutes. Static UI copy alone requires no new provider turn, but no broader matrix waiver is claimed.
-Delivery still owns fresh integration/package/user verification and terminal handoff. No successful current source/API/E2E/Delivery result is inferred.
+## Downstream Handoff
+Return the cumulative package for current independent source review; preserve CRR061 as historical IR040 Pass. Existing source/API/Delivery gates remain in force; broader API/E2E and fresh Delivery package/user verification are not waived or claimed complete. Static copy alone requires no new provider turn. Current downstream results: **N/A — pending**.

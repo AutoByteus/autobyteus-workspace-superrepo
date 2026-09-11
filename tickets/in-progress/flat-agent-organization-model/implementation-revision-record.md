@@ -47,6 +47,7 @@
 | IR-039 | Architecture Reviewer ARCH-REV018 / approved RER029 | PKG-AUTH001 resolved by approval; no new CR-FIND | Architecture reconciliation; Large/High | RER029; AD-REV020; ARCH-REV018; prior CRR058/059; API24; DR008 | Strict field-free Team/Org authoring and scoped owned-definition startup transition; ready for cumulative source review. |
 
 | IR-040 | Architecture Reviewer ARCH-REV019 / approved RER031 incl RER030 | UI-CLEAN001; no new CR-FIND | Architecture reconciliation; Large/High | AD-REV021; ARCH-REV019; prior CRR060; API25 ongoing/API24 historical; DR008 | Compact Messages/task detail and Org history copy; exact retained endpoints preserved; ready for cumulative source review. |
+| IR-041 | User-approved Architecture Designer AD-REV022 / RER032 copy re-entry | UI-CLEAN001; no new CR-FIND | Focused Small/Low; cumulative Large/High | AD-REV022; retained ARCH-REV019; CRR061 prior; API25 ongoing/DR008 historical | Exact Orgs heading and affected copy assertions; local checks/render pass, cumulative source review next. |
 
 ## Revision Entries
 
@@ -974,3 +975,17 @@
 - Preservation:8484 starting other-owner hashes unchanged; Delivery/source-review/API files and raw data not staged/reset/edited. Own temporary route/process and generated SDK prerequisite cleaned; no raw DB/env evidence committed.
 - Evidence: implementation-evidence/IR-040/local-checks.md, source-files.json, source-limits.txt, preservation.txt, render/evidence.json.
 - Next: current get_handoff_rules selected the completed Large-or-High implementation ready-for-independent-source-review rule; exact recipient /software_engineering_team/code_reviewer. Then renewed current-artifact cumulative API/E2E and Delivery package/user verification. No current downstream pass.
+
+
+### IR-041 — Plural Orgs history heading
+- Trigger: explicit user request relayed by Architecture Designer, synchronized RER032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a / AD-REV022@17b0b3cc5dca03c7e4016cf54516c4441a16df35; resumed after user pause. No new finding or duplicate task. ARCH-REV019 retained; new architecture review N/A for approved copy-only change.
+- Prior result: IR040 source7d967d411f806429bb9c6bbdcf8bb382f35b266e / artifact06d020da35bff3a3e745cf4c4b33c30d1e00a104; CRR061 report records Pass94.1/100. API25 ongoing, earlier API24/CRR059/DR008 scoped; no current downstream outcome inferred.
+- Current result: source88fa0c3ff55d9d6a87a27df094b369ea62d1595c, implementation/local validation complete; current code/implementation-handoff authoritative. Fresh source review/current API/Delivery results pending.
+- Classification: focused Small/Low confirmed, cumulative Large/High retained with active source/API/Delivery gates. No Design Impact, Requirement Gap, Product gap or runtime ownership change.
+- Behavior: BEH014, REQ031, AC026, SCN015, DS034c, VAL053. Only English workspace.agentOrg.history.collectionLabel becomes Orgs/ORGS. Chinese组织, navigation/domain/API/right tab, category position/membership/selection/expansion/scroll/actions and the rest of IR040 remain unchanged.
+- Delta: one English locale value plus three copy-assertion files. No executable production growth, >220-line delta, fallback or alias; persistence Not Affected, no migration/backend/runtime change.
+- Current local checks:3files/14tests pass; both boundary guards and zero-finding localization audit. Four actual-collection Chromium en/zh desktop/narrow states, row/selection/expansion continuity, keyboard/touch, no errors/overflow. Synthetic isolated render, not full route/provider/API/native acceptance; temporary route/process removed.
+- Proportionate scope: no repeated full build or provider turn for one-word data change; IR040 build16routes/cumulative39/296/render20 retained as prior evidence, not current runs.
+- Preservation:9110 starting paths hashed,9109 unchanged; exact authorized assertion overlap disclosed in preexisting-catalog.diff. Prior other-owner Org/组织 assertion retained and narrowly pluralized, not claimed as wholly authored here. All other docs/API/review/Delivery/raw files untouched/unstaged. No raw secret/runtime package publication.
+- Evidence: implementation-evidence/IR-041/local-checks.md, focused.log, guards.log, preservation.txt, preexisting-catalog.diff, render/evidence.json and safe screenshots.
+- Next: get_handoff_rules selected the completed Large-or-High implementation, validated and ready-for-independent-source-review rule; exact recipient /software_engineering_team/code_reviewer. Then existing API/Delivery gates. No downstream pass claimed.
