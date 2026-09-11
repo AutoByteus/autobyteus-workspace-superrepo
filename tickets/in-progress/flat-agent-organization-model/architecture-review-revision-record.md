@@ -23,6 +23,7 @@ concise chronological architecture-review history.
 | ARCH-REV-014 | Round 14 / `AD-REV-016` migration-status coherence and traceability recovery | `AD-REV-016` | Fail — Design Impact | Pass | `AR-FIND-007` |
 | ARCH-REV-015 | Round 15 / post-pass `API-FIND-019`, approved `RER-026`, and `AD-REV-017` AgentOrg communication-observability recovery | `AD-REV-017` | Pass | Fail — Design Impact | `AR-FIND-008` |
 | ARCH-REV-016 | Round 16 / `AD-REV-018` both-endpoint configured-message eligibility recovery | `AD-REV-018` | Fail — Design Impact | Pass | `AR-FIND-008` |
+| ARCH-REV-017 | Round 17 / approved `RER-028` task-workflow parity and `AD-REV-019` | `AD-REV-019` | Pass (former scoped authority) | Pass | `AR-FIND-008` superseded by RER-028; no new finding |
 
 ## Revision Entries
 
@@ -418,3 +419,30 @@ None.
 - Material classification changes: The authoritative review changes from `Fail / Design Impact` to `Pass`. AD-REV-018 is `Small / Low` in isolation; the cumulative package remains `Large / High` and proceeds through reviewed Implementation reconciliation, source review and API/E2E. No Requirement Gap or Product UI gap exists.
 - Recommended recipient: Primary `/software_engineering_team/implementation_engineer`; informational `/software_engineering_team/architecture_designer` after successful primary handoff.
 - Remaining risks or uncertainty: Implementation must avoid receiver-only/address-shape inference and prove configured→configured, configured→task, task→configured and task→task for both task kinds; preserve one sidecar/root event and exact-ID delivery, emit the new receiver event only for configured pairs, keep web projection aligned, and retain reconnect/restore and standalone Team behavior. These are controlled implementation/validation risks, not open architecture decisions.
+
+
+### ARCH-REV-017 — Task-inclusive workflow and retained exact-execution design pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`
+- Review round and trigger: Round 17; the user approved RER-028 after comparison with earlier Team task behavior; AD-REV-019 replaces the former configured-only event/Messages rule and corrects participant Tasks, exact task selection, accepted system input and retained inspection.
+- Triggering role, report path, and finding IDs: Architecture Designer; `architecture-design-revision-record.md` AD-REV-019, `architecture-task-parity-investigation.md` and resolved AAV-001 in `architecture-assertion-validity-record.md`; API-FIND-019 scope expansion; no new architecture finding.
+- Relevant architecture design revision IDs: `AD-REV-019@27ca03ef1f06ab826e2373c80bc8b81f3cc69f37`; retained cumulative AD-REV-001–018 except explicit supersession.
+- Requirements authority: `RER-028@fadfb3c000d57df7efe42ed0e503d86057c0d713`.
+- Prior authoritative decision: `Pass` (`ARCH-REV-016`, former RER-026 configured-only scope; not expanded parity proof).
+- Current authoritative decision: `Pass`.
+- What changed: Verified current source and immutable Team comparison, then reviewed DS-028–030 end-to-end. All admitted ordinary endpoint pairs receive one post-durable exact receiver presentation and participant Messages; source/task kind is not a new permission gate. Independent root Tasks facet reuses established UI with exact delegator/assigned-Agent/fresh-Team-member relevance. One retained browser index and exact run-ID selection distinguish repeated tasks from their captured source; actual node owns platform/physical identity. Saved task results and separate accepted/rejected system input remain distinct; existing suppression gives one system presentation only after acceptance. Service/manager-owned readonly inspection reuses strict current stores/DTO/transition scope without repair or activation. VAL-038–045, ownership/interface/file/removal maps and no-migration decision are coherent. These are design conclusions, not executable evidence.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `AR-FIND-008` | Resolved by AD-REV-018 / ARCH-REV-016 under RER-026 | Prior resolution preserved historically; configured-only corrective restriction superseded, not reopened | RER-028; AD-REV-019 DS-028; VAL-038–040 | Approved behavior now includes task-involved accepted ordinary messages. Predicate/no-op and task filter are explicitly removed; prior AR-PREM-007 proves a supported positive path. |
+| `AR-FIND-001`–`AR-FIND-007` | Resolved in prior rounds | Remain resolved | Cumulative AD-REV-003–019 | Definition ownership/admission, handoff order, convention-aligned migration, runtime composition, one-FIFO/fence, history ownership and migration-specific status authority remain unchanged. |
+| `ADI-006`, `IDI-001`, `ADI-007`, `API-FIND-007` / `CR-FIND-011`, `API-FIND-008` / `CR-CAND-020`, `CR-FIND-020` | Resolved at earlier design boundaries | Retained | DS-000–027 and prior review record | No new generic root, mounted-Team lifecycle, configured nesting or superseded settlement machinery is introduced. Shared presentation reuse is extended without merging runtime owners. |
+| `AAV-001` | Resolved by RER-027 | Retained-history answer remains resolved; later live-scope restriction superseded separately | RER-028; assertion record later-authority note; DS-028–030 / VAL-044 | Real accepted provider input remains history; no blanket task filter, fabricated receipt or settled-task reactivation. |
+| `CR-FIND-019` | Implemented; regression obligation | Remains implementation regression obligation | Earlier source/review records and cumulative design | Not absorbed or reversed by task-workflow projection. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: Focused AD-REV-019 `Medium / High`; cumulative `Large / High`. Review remains Pass on the newly approved behavior, not an extrapolation of old task-exclusion validation. No Requirement Gap or Product gate.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
+- Remaining risks: exact same-address task selection/provider identity; relevance without descendant-task leakage; retained post-commit presentation versus provider-event retirement; accepted/rejected system-input truth and duplication; strict read/empty distinction and no activation; standalone Team and responsive UI regression. Old API passes retain only their recorded scope. Implement and run renewed full-source/executable review; do not claim delivery readiness from this architecture pass.
