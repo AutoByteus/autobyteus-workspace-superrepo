@@ -8,10 +8,15 @@
 - Inspected artifact: `6ef456e0a3fd568e732bafbd79c5f9abb2aed1f4`, branch
   `requirements/flat-agent-organization-model`, isolated task worktree
   `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`.
-- Approved requirements: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`.
+- Requirements at inquiry: `RER-026@16b560f82c1edda24e17a1330edc5c820a1328b6`.
+- Current authority: user-confirmed
+  `RER-027@c7d435ee661525e1e85fbd5b032817fc6703c8be`.
 - Completed design/review: `AD-REV-018@36f76ebbdb23b7ee235f94ab38968cf2adefbe00`
   / `ARCH-REV-016@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577` Pass.
-- Outcome: **Requirement Gap — bounded interpretation of an exclusion**.
+- Current outcome: **Resolved — assertion-validity clarification only**.
+  The resolution below supersedes the original inquiry's pending decision and
+  hold. The original inquiry is retained as evidence, not an open gap.
+- Original outcome: **Requirement Gap — bounded interpretation of an exclusion**.
   This is not source-defect attribution, a proposed fix, an API/E2E result,
   or a completed architecture-design revision. AD-REV-018 remains unchanged.
 
@@ -96,3 +101,63 @@ No new Product prototype is requested by this record.
 - Requirements, design, source, tests, and downstream-owned dirty evidence are
   unchanged by this record. No AD-REV-019 is created because no architecture
   design round has been completed.
+
+### Resolution — RER-027 authoritative answer (2026-09-11)
+
+Requirements Engineering returned explicit user confirmation after a read-only
+comparison with the earlier AgentTeam implementation. Canonical authority is
+`requirements-doc.md` REQ-015/034, AC-010/029, SCN-005/018 and DEC-022;
+`investigation-notes.md` records both the source comparison and the distinction
+between ordinary task messages and task-result system notifications.
+
+**AAV-001 option 1 is authoritative.** Truthful retained provider input history
+is outside the configured-member event/Messages exclusion. Accepted task
+messages/results remain in the original Agent's normal conversation/history
+after settlement and Restore. Settled task executions leave the active tree;
+showing their retained input does not reactivate them or create configured
+membership or a mounted-Team root.
+
+The scoped validation disposition is:
+
+| Observation or proposed assertion | Disposition under RER-027 |
+| --- | --- |
+| Task-involved accepted delivery has no new configured-member `MEMBER_INPUT_MESSAGE` and no configured Org Messages row | Supported exclusion; preserve the existing live-event/facet evidence as such. |
+| Genuine accepted task input is visible in the receiver's ordinary retained provider conversation after Restore | Permitted and required retained-history behavior; not evidence that a prohibited new configured-member event was emitted. |
+| Every task-origin packet must be absent everywhere in the restored center | Unsupported assertion; do not count it as a source failure or convert it to a passing assertion. |
+| Retained task messages/results remain inspectable after the task settles, without bringing it back into the active tree | Supported preserved behavior; API/E2E owns evidence and coverage, not this clarification record. |
+| A stored task submission by itself proves its result notification reached the delegator | Unsupported inference; preserve actual accepted input, never fabricate a missing notification. |
+
+Configured-to-configured exact-once event/row, identity/reference,
+live/reconnect/Restore and unrelated-participant exclusions remain unchanged.
+Rejected or uncommitted sends still cannot fabricate accepted messages. A
+provider `user` role is not proof of external-human provenance and does not
+make task input eligible for REQ-033's first-user-message history summary.
+
+**Earlier Team comparison correction:** the immutable Team baseline
+`5fb16658e7bd2aefd750f99eb596a17382e161ac` publishes accepted receiver input
+without a configured-pair gate and resolves Messages identities using
+task-inclusive execution locations, as documented by Requirements Engineering.
+Do not describe Org's configured-only event/facet restriction as full Team
+task-presentation parity. RER-027 confirms retained task history and settlement;
+it does not expand Org's scoped live event/Messages population. The existing
+shared presentation language and configured-pair parity remain valid.
+
+**Architecture impact check:** DS-028's both-endpoint classifier, single root
+sidecar and separate retained conversation hydration already accommodate this
+answer. VAL-040's event/facet matrix is unchanged; its general exclusion and
+live/restored equivalence language is scoped to those configured-member
+consequences, not blanket equality with the entire provider conversation.
+No new design mechanism, source/test edit, filter, migration, recovery,
+retention/routing/command/schema change, or Product gate is authorized. This
+record is the clarification supplement to AD-REV-018, not a new design round.
+AD-REV-018 / ARCH-REV-016 remain the completed design/review authorities;
+no AD-REV-019 or independent re-review is needed for this assertion-only return.
+
+Cumulative `task_size=Large` / `architectural_risk=High` remains unchanged;
+the bounded disposition adds zero implementation scope. Only the AAV-001
+assertion hold is released. Return the answer to the requesting API/E2E owner
+so independent validation and cleanup can continue under the clarified scope.
+API/E2E retains ownership of report/coverage disposition. No source-defect
+finding, strengthened assertion pass, cumulative execution pass, or delivery
+readiness follows from this answer. All unrelated holds/findings remain with
+their existing owners.
