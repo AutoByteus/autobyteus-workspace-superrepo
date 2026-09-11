@@ -43,4 +43,3 @@ export class TaskAgentDurabilityEventGate {
     this.retainedEvents.length = 0;
   }
 }
-
