@@ -185,27 +185,35 @@ describe('Org shared composer -> exact interaction -> correlated stream', () => 
     expect(socket.sent[0].payload.target_agent_run_id).toBe('agent-director')
   })
 
-  it('preserves not-yet-debounced newer textarea edits on rejection', async () => {
+  it('commits newer textarea edits before rejection restoration', async () => {
     const { context } = await open()
     context.contextFilePaths = [attachment()]
     await wrapper!.find('textarea').setValue('first')
     await wrapper!.find('button[title="Send message"]').trigger('click')
     await wrapper!.find('textarea').setValue('newer unsaved text')
-    // Deliberately do not wait for the 750ms draft debounce.
-    expect(context.requirement).toBe('')
+    expect(context.requirement).toBe('newer unsaved text')
     ack('rejected'); await flushPromises()
     expect(wrapper!.find('textarea').element.value).toBe('newer unsaved text')
     expect(context.requirement).toBe('newer unsaved text')
     expect(context.contextFilePaths).toEqual([])
   })
 
-  it('does not restore a deliberately cleared newer draft on rejection', async () => {
-    const { active, context } = await open()
-    context.requirement = 'first'
-    const outcome = active.send().catch((error) => error)
-    context.requirement = 'new'; context.requirement = ''
-    ack('rejected'); await outcome
+  it('preserves an actual typed-then-cleared draft and empty attachments when the prior send is rejected', async () => {
+    const { context } = await open()
+    context.contextFilePaths = [attachment()]
+    await wrapper!.find('textarea').setValue('first message')
+    await wrapper!.find('button[title="Send message"]').trigger('click')
+    await wrapper!.find('textarea').setValue('a newer draft')
+    await wrapper!.find('textarea').setValue('')
+    ack('rejected'); await flushPromises()
+    expect(context.submissionPending).toBe(false)
     expect(context.requirement).toBe('')
+    expect(wrapper!.find('textarea').element.value).toBe('')
+    expect(wrapper!.find('button[title="Send message"]').attributes('disabled')).toBeDefined()
+    expect(context.contextFilePaths).toEqual([])
+    expect(socket.sent).toHaveLength(1)
+    expect(mocks.historyRefresh).not.toHaveBeenCalled()
+    expect(mocks.navigation).not.toHaveBeenCalled()
   })
 
   it('rejects an already disconnected send without consuming its draft', async () => {
@@ -277,6 +285,50 @@ describe('Org shared composer -> exact interaction -> correlated stream', () => 
     expect(replacement.getAgentContext('agent-director')!.conversation.messages).toEqual([])
     expect(socket.sent).toEqual([])
     expect(mocks.historyRefresh).not.toHaveBeenCalled()
+  })
+
+  it('preserves actual textarea edits while a verified same-Agent replacement is held', async () => {
+    const { org, active, context } = await open()
+    const initialSocket = socket
+    let releaseProjection!: () => void
+    let projectionStarted = false
+    const heldProjection = new Promise<void>((resolve) => { releaseProjection = resolve })
+    mocks.query.mockImplementation(async ({ query, variables }: any) => {
+      if (query.definitions[0].name.value === 'GetAgentOrgExecutionCheckpoint') {
+        return { data: { getAgentOrgExecutionCheckpoint: { orgRunId: 'org-run', changeSequence: sequence, hasOpenExecutionWork: false } } }
+      }
+      projectionStarted = true
+      await heldProjection
+      return { data: { getAgentOrgMemberRunProjection: { agentRunId: variables.agentRunId, memberAddress: variables.memberAddress,
+        conversation: [], activities: [], hasEarlierActiveTraceEvents: false } } }
+    })
+    socket.close()
+    await vi.waitFor(() => expect(Socket.instances).toHaveLength(2))
+    socket = Socket.instances[1]!
+    socket.emit({ type: 'CONNECTED', payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', session_id: 'held-recovery' } })
+    socket.emit({ type: 'ROOT_EXECUTION_VIEW_SNAPSHOT', payload: {
+      root_subject_kind: 'agent_org', root_run_id: 'org-run', schema_version: 1, root_org: taskBearingView(),
+    } })
+    await vi.waitFor(() => expect(projectionStarted).toBe(true))
+    expect(active.activeAgentContext).toBe(context)
+    context.contextFilePaths = [attachment('unsent')]
+    await wrapper!.find('textarea').setValue('still composing my next message')
+    releaseProjection()
+    await vi.waitFor(() => expect(useAgentOrgContextsStore().contextFor('org-run')).not.toBe(org))
+    await flushPromises()
+    const current = active.activeAgentContext!
+    expect(current).not.toBe(context)
+    expect(current.state.runId).toBe('agent-director')
+    expect(current.requirement).toBe('still composing my next message')
+    expect(wrapper!.find('textarea').element.value).toBe('still composing my next message')
+    expect(current.contextFilePaths).toEqual([attachment('unsent')])
+    expect(current.submissionPending).toBe(false)
+    expect(current.conversation.messages).toEqual([])
+    expect(useAgentOrgContextsStore().contextFor('org-run')!.phase).toBe('live')
+    expect(initialSocket.sent).toEqual([])
+    expect(socket.sent).toEqual([])
+    expect(mocks.historyRefresh).not.toHaveBeenCalled()
+    expect(mocks.navigation).not.toHaveBeenCalled()
   })
 
   it('releases the exact pending submission on disconnect without touching the newly focused draft', async () => {

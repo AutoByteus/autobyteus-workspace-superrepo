@@ -13,7 +13,6 @@
         }"
         :placeholder="$t('agentInput.components.agentInput.AgentUserInputTextArea.type_a_message')"
         @keydown="handleKeyDown"
-        @blur="handleBlur"
         :disabled="!activeContextStore.activeAgentContext"
         @dragover.prevent
         @drop.prevent="handleDrop"
@@ -162,50 +161,6 @@ const recordingDurationLabel = computed(() => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 });
 
-// Enhanced Debounce function
-function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  delay: number
-): { call: (...args: Parameters<T>) => void; cancel: () => void; flush: () => void; } {
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  let lastArgs: Parameters<T> | undefined;
-
-  const call = (...args: Parameters<T>) => {
-    lastArgs = args;
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(() => {
-      if (lastArgs) {
-        func(...lastArgs);
-      }
-      timeoutId = null;
-      lastArgs = undefined;
-    }, delay);
-  };
-
-  const cancel = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      timeoutId = null;
-      lastArgs = undefined;
-    }
-  };
-
-  const flush = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      timeoutId = null;
-      if (lastArgs) {
-        func(...lastArgs);
-        lastArgs = undefined;
-      }
-    }
-  };
-
-  return { call, cancel, flush };
-}
-
 const adjustTextareaHeight = () => {
   if (textarea.value) {
     textarea.value.style.height = 'auto';
@@ -226,29 +181,16 @@ const syncInternalRequirement = (nextRequirement: string) => {
   nextTick(adjustTextareaHeight);
 };
 
-const { call: debouncedUpdateStore, cancel: cancelDebouncedUpdateStore, flush: flushDebouncedUpdateStore } =
-  debounce(({ context, text }: { context: AgentContext | null; text: string }) => {
-    if (context && text !== context.requirement) {
-      activeContextStore.updateRequirementForContext(context, text);
-    }
-  }, 750);
-
 watch(
   () => activeContextStore.activeAgentContext,
-  (activeContext, previousContext) => {
-    if (previousContext && previousContext !== activeContext) {
-      flushDebouncedUpdateStore();
-    }
+  (activeContext) => {
     syncInternalRequirement(activeContext?.requirement ?? '');
   },
   { immediate: true },
 );
 
-watch(storeCurrentRequirement, () => {
-  // A failed send can restore its draft before newer textarea edits debounce.
-  // Commit those exact-context edits first rather than replacing them on screen.
-  flushDebouncedUpdateStore();
-  syncInternalRequirement(activeContextStore.activeAgentContext?.requirement ?? '');
+watch(storeCurrentRequirement, (requirement) => {
+  syncInternalRequirement(requirement);
 });
 
 const syncPendingLocalAcknowledgement = () => {
@@ -261,7 +203,6 @@ const syncPendingLocalAcknowledgement = () => {
     return;
   }
 
-  cancelDebouncedUpdateStore();
   syncInternalRequirement(activeContext.requirement);
   pendingLocalAcknowledgementContext = null;
 };
@@ -269,9 +210,6 @@ const syncPendingLocalAcknowledgement = () => {
 watch(submissionPending, (pending) => {
   if (pending) {
     syncPendingLocalAcknowledgement();
-  } else {
-    // Failure handling must see newer text before deciding to restore attachments.
-    flushDebouncedUpdateStore();
   }
 }, { flush: 'sync' });
 
@@ -279,26 +217,12 @@ const handleInput = (event: Event) => {
   const target = event.target as HTMLTextAreaElement;
   internalRequirement.value = target.value;
   nextTick(adjustTextareaHeight);
-  debouncedUpdateStore({
-    context: activeContextStore.activeAgentContext,
-    text: internalRequirement.value,
-  });
-};
-
-const syncStoreImmediately = () => {
-  const activeContext = activeContextStore.activeAgentContext;
-  cancelDebouncedUpdateStore();
-  if (activeContext && internalRequirement.value !== activeContext.requirement) {
-    activeContextStore.updateRequirementForContext(activeContext, internalRequirement.value);
-  }
-};
-
-const handleBlur = () => {
-  flushDebouncedUpdateStore();
+  // The exact AgentContext owns every unsent edit, including deliberate clearing.
+  // Do not buffer local-only state past submission or verified context replacement.
+  activeContextStore.updateRequirementForContext(activeContextStore.activeAgentContext, target.value);
 };
 
 const handleSend = async () => {
-  syncStoreImmediately();
   let submittedContext: AgentContext | null = null;
   try {
     if (props.beforeSend) {
@@ -463,7 +387,6 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  flushDebouncedUpdateStore();
   void voiceInputStore.cancelOperationForSource('composer');
   stopRecordingTimer();
   window.removeEventListener('resize', handleResize);
