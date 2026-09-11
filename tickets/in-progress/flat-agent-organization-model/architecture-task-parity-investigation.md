@@ -13,7 +13,7 @@
   `6ef456e0a3fd568e732bafbd79c5f9abb2aed1f4` with subsequent documentation only.
 - Requirements authority: RER-027; completed design/review: AD-REV-018 /
   ARCH-REV-016 Pass. AAV-001 is resolved and is not reopened by this comparison.
-- Outcome: requested source comparison, with a separate architecture-owned
+- Original outcome: requested source comparison, with a separate architecture-owned
   direct-delegator Tasks presentation gap identified. This is not a completed
   design revision, implementation assignment, browser validation, or delivery
   result. No source/test/requirements/design-spec change was made.
@@ -139,3 +139,56 @@ comparison.
   this investigation does not claim its completeness.
 - No new runtime/persistence architecture is inferred from the UI gap. No
   implementation or new AD revision is authorized by this investigation alone.
+
+## User-directed Requirements re-entry — 2026-09-11
+
+After receiving this source comparison, the user explicitly requested routing
+to Requirements Engineering because the current requirement changes the earlier
+task-message experience without justification. Their intended workflow is to
+carry the earlier Team task experience into AgentOrg: an originating Agent can
+delegate to a referenced Team, creating a fresh task Team, and inspect its tasks
+and task messages with the familiar presentation. Changing the containing root
+does not justify excluding task communication.
+
+**Current outcome: Requirement Gap — user-directed correction of the scoped
+task-presentation boundary.** RER-027 explicitly retained the configured-only
+live event/Messages restriction while resolving retained history. That
+restriction conflicts with the user's now-explicit task-message parity request.
+AAV-001's history interpretation remains resolved; this is a distinct request,
+not retraction of its valid exclusion-assertion disposition.
+
+Requirements Engineering should reconcile the canonical task communication and
+selected-participant presentation requirements against the supported earlier
+workflow and this user direction. Cover task Agents and task Teams, ordinary
+accepted task messages, formal task submissions/reviews and accepted result
+notifications, the original delegator's Tasks view, and retained history after
+settlement/Restore. Keep these separate record/acceptance paths explicit; do not
+infer a delivered notification from a saved submission. The earlier participant
+filter and task-inclusive identity lookup provide comparison evidence, not a
+requirement to copy their implementation.
+
+The direct Org delegator's missing Tasks section is an architecture-owned
+composition gap under the intended workflow. Requirements does not need to
+prescribe components, ports, filters, storage or a new visual design to fix it.
+Architecture will own the technical revision after the canonical behavioral
+correction returns. No Product prototype is requested by this re-entry.
+
+Preserve the already-approved root model: coordinator-free AgentOrg with direct
+Agents and referenced flat Teams; fresh task-scoped executions under their exact
+host; no configured Team nesting, synthetic coordinator/Team, second task/message
+ledger, or independent mounted-Team lifecycle. Preserve settled-task history
+without restarting the task. Root-model differences are real, but do not by
+themselves require a different user-facing task workflow.
+
+- Current cumulative classification remains `task_size=Large` /
+  `architectural_risk=High`; no new implementation scope is assigned here.
+- Last completed design/review remains AD-REV-018 / ARCH-REV-016 Pass. No new
+  design round is completed and no AD-REV-019 is created by this handoff.
+- Next action: Requirements Engineer records/reconciles the user's explicit
+  parity direction and returns the approved cumulative package to Architecture
+  for technical design, self-validation and applicable independent review.
+- Existing API/E2E evidence and the RER-027 assertion disposition remain valid
+  for their recorded scope; they are not proof that this expanded task parity
+  has been implemented or validated. No cumulative pass or delivery readiness
+  is claimed. Source, tests, upstream artifacts and other owners' dirty files
+  remain untouched.
