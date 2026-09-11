@@ -13,142 +13,133 @@
 - Architecture design revision record and self-validation: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md`.
 - Independent architecture review: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md` (`ARCH-REV-016 / Pass@6ce3dbc3c1a38b7212f9dd77a12b7ef362e98577`).
 - Product authority: approved `RV-012 / VIS-001–VIS-020`, `AORG-FLAT-TEAM-STATUS-001`, and `AORG-TEAM-OVERRIDES-001`; `BASELINE-PROMOTION-001` remains clean-entry evidence only.
-- Triggering rework: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` and `code-review-revision-record.md` (`CRR-049 / Fail — Local Fix / CR-FIND-030`), after `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-execution-coverage-report.md` and `api-e2e-revision-record.md` (`API-REV-018 / Fail / API-FIND-023–026`).
-- Direct failure evidence: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-018/live/API-FIND-023-settled-task-status-stale-live.md`.
-- Delivery state: `DR-006` is superseded for finalization by the current source correction. Delivery/API-E2E-owned dirty documents and evidence predate IR-034 and remain preserved, unstaged, unmodified, and unclaimed by Implementation.
+- Triggering rework: Delivery DR-007 / Blocked — Local Fix; `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-007/integration-recovery.md`, `conflict-paths.txt`, and `conflicts.patch`.
+- Prior validated package: IR-034 source `2221322710a6a1f5dae06a74135bca008aef88a6`, artifact `a5eae9ce3889e6100302a85da54e5b1a02c25176`; CRR-050 Pass, API-REV-019 Pass (95.4%), CRR-051 Not Applicable. Those passes apply to that artifact, not this integration.
+- Latest base: `origin/personal@5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`, including the approved `tickets/done/stopped-run-compatible-model/` requirements/design/implementation and v1.4.69 delivery.
+- Delivery protection checkpoint: `7c1ef261933eeb7b9912cb30f599ebf34864d31e`. The five DR-007 blocker documents and all pre-existing untracked evidence remain untouched and unstaged.
 
 ## Current Implementation Summary
 
-`IR-034` resolves `CR-FIND-030 / API-FIND-023` on production source commit `2221322710a6a1f5dae06a74135bca008aef88a6`.
+IR-035 reconciles the mandatory latest-base integration on source merge commit `d2b257d7979e16aa9245d71f2edf8c14c042866c`, with parents `7c1ef261933eeb7b9912cb30f599ebf34864d31e` and `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`. The base is now an ancestor with zero base-only commits. All 17 conflicts are resolved; no merge remains in progress.
 
-1. The existing strict `AgentOrgExecutionContext` remains the single live event/current-context authority. When it accepts an exact settled task event, it now projects the event through the current complete Org view instead of changing only `task_records`.
-2. One narrow pure settlement projector locates exactly one task execution, marks that execution's existing `settledAt`, replaces exactly one matching task record, removes exactly the terminal task scope's Agent statuses, and validates the complete resulting view with the existing strict codecs.
-3. The same authoritative application advances every retained task-scope `AgentContext` through the canonical offline/terminal cleanup owner. Consequently, the always-mounted unified hierarchy observes `Offline` immediately from its existing live-context status source, without focus mutation, reload, polling, or a second cache.
-4. Direct task Agents and complete task Team scopes, including recursive task Team members, follow the same exact projection. Any tree, record, or retained-context mismatch uses the existing strict correlation failure and checkpoint recovery behavior.
-5. Server-side IR-014 status-event retirement is unchanged: the server still publishes the settled task event and does not emit a now-invalid teardown `AGENT_STATUS` after durable task removal.
-6. API-FIND-024 and API-FIND-026 remain held for API/E2E-owned ingress/FIFO evidence, and API-FIND-025 remains an API/E2E locator correction. IR-034 adds no speculative runtime, Stop, retry, replay, timeout, or recovery behavior for them.
-7. All cumulative Team V2 / AgentOrg V1 definition, migration, runtime, task, history, communication, recovery, shutdown, configuration, localization, unified-workspace, and standalone-Team behavior remains unchanged.
+1. The cumulative flat Agent-only Team / fixed-depth coordinator-free AgentOrg architecture remains current. The merge retains FlatTeamExecutionFactory, sender-bound member contexts, exact active-root registration, private Org scope/persistence, and root shutdown ordering.
+2. The incoming RunModelSelectionService/Validator replaces the retired config-only validator through General Process, Application kernel/runtime, standalone host, Team manager, and Org launch composition. Org launch validates every effective root/Team/Agent model and schema with its exact workspace; launch does not incorrectly invoke stopped-model replacement-capacity comparison.
+3. Stopped standalone Agent/Team model saves retain the incoming coherent model/settings pair, runtime-specific nondecreasing capacity validation, all-scope-before-write admission, exact lifecycle serialization, canonical write/read-back verification, and indeterminate-outcome refresh. Current Team model-option and patch projections enumerate only the root and direct configured Agents; task executions and fixed identities are not patch targets.
+4. Shared forms preserve the incoming ExistingRunModelSelection and directly-edited propagation, together with the current exact Org schema readiness, failed-runtime-choice Retry/abandon lifecycle, compact disclosures, and sparse Org overrides. Obsolete configured-Team recursion is removed from the existing standalone Team draft/form projection.
+5. Active direct and mounted Org Agent settings remain locked, preserve the exact saved model, and retain Back and distinct New behavior. Rendering exposed a misleading capacity-loading notice on a locked Org panel; the shared control now suppresses replacement-capacity notices when model selection is locked. No lookup or new owner is added.
+6. IR-034's strict terminal-task projection, IR-031 communication, prior recovery/task/shutdown/migration/localization/unified-history corrections, and external read-only ownership remain preserved.
+7. Incoming v1.4.69 release/version files are incorporated only as base history. This round does not release, push, build an AppImage, launch Electron, finalize Delivery, or claim fresh API/E2E success.
 
-- Implementation cycle: `Rework`.
+- Implementation cycle / revision: `Rework / IR-035`.
 - Implementation revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`.
-- Current implementation revision ID: `IR-034`.
-- Related architecture design revisions: cumulative `AD-REV-018`.
-- Related architecture-review revisions: `ARCH-REV-016 / Pass`.
-- Related code-review revisions: `CRR-048 / Pass`, `CRR-049 / Fail — Local Fix`.
-- Related API/E2E revisions: `API-REV-018 / Fail`.
-- Related delivery revisions: `DR-006` (existing downstream state; not modified).
-- Triggering finding IDs: `CR-FIND-030`, `API-FIND-023`.
-- Current result: `Implementation Complete — cumulative Large/High package ready for independent source review`.
+- Related architecture / review: cumulative `AD-REV-018 / ARCH-REV-016 Pass`.
+- Related source review / API/E2E: `CRR-050 Pass / API-REV-019 Pass / CRR-051 Not Applicable` on the pre-merge artifact; renewed gates pending.
+- Related Delivery: `DR-007 / Blocked — Local Fix`.
+- Triggering finding IDs: DR-007's 17 integration conflicts; no new CR-FIND assigned.
+- Current result: `Implementation Complete — cumulative package ready for independent source review`.
 
 ## Routing Classification (Mandatory)
 
-- Task size: `Large` (the IR-034 correction is bounded, while the cumulative ticket remains Large).
-- Architecture risk: `High` (the cumulative package retains strict persistence, migration, runtime identity, task, stream recovery, and root-lifecycle boundaries).
-- Requirements routing assessment path: approved architecture route in `RER-026`.
-- Classification confirmed or changed: `Confirmed`.
-- Evidence and rationale: IR-034 changes one existing frontend event/current-context authority, adds one pure exact settlement projection, and extends focused tests. It adds no API/schema, backend, persistence, migration, runtime queue, recovery owner, lifecycle owner, cache, compatibility path, or Product behavior.
-- Selected route: `Code Review`, subject to the exact result returned by `get_handoff_rules`.
-- Lightweight implementation self-review for direct route: `Not Applicable — architecture-routed Large/High package`.
-- New Design Impact, Requirement Gap, Product gap, or escalation trigger: `None`.
+- Task size: `Large`; architectural risk: `High`; classification `Confirmed`.
+- Requirements routing assessment: approved architecture route in RER-026; no downgrade for a bounded integration correction.
+- Rationale: preserve two already-approved behavior sets across runtime composition, stopped-run persistence and exact frontend config state. No constructibility gap, ownership expansion, Requirement Gap, Product gap, or Design Impact was found.
+- Selected route: `get_handoff_rules` selected the completed Delivery Local Fix / Large-or-High source-review rule; exact recipient `/software_engineering_team/code_reviewer`.
+- Direct-route lightweight self-review: `Not Applicable`.
 
 ## Reviewed Behavior Implementation Trace
 
-| Behavior / Finding | Required Or Preserved Outcome | Implemented Production Path | Result |
-| --- | --- | --- | --- |
-| `BEH-009`, `REQ-015`, `AC-010`, `DS-022`, `CR-FIND-030` | Accepted/settled task state becomes terminal in the retained live hierarchy without reload. | strict settled event -> `AgentOrgExecutionContext.applyEvent` -> `projectSettledAgentOrgTask` -> exact view/tree/status replacement -> canonical AgentContext terminal cleanup -> existing `projectAgentOrgHistoryRows`. | Implemented for direct task Agents and task Team scopes; context stays live and error-free. |
-| `REQ-028`, `REQ-031`, `AC-023`, `AC-026`, `DS-021`, `DS-025` | Unified live history uses current authoritative truth and retains durable terminal history. | Exact execution receives `settledAt`; task record is replaced; terminal status entries are removed; retained task Agent contexts become `Offline`. | Implemented; no focus/refocus, reload, or alternate state source. |
-| `IR-014`, strict stream admission/recovery | Do not re-enable invalid teardown status publication or weaken correlation. | Server settlement/status-retirement source remains unchanged; projected complete view is strict-codec validated and mismatches invoke existing reopen-required recovery. | Preserved; server retirement regression passes. |
-| `API-FIND-024/026` held; `API-FIND-025` API/E2E-owned | Do not infer implementation behavior without evidence or patch around an invalid locator. | No production or test changes for these observations. | Preserved for renewed API/E2E investigation. |
-| Cumulative `BEH-001–017`, `REQ-001–034`, prior `CR-FIND-001–029` | Preserve all reviewed definition, runtime, migration, task, communication, history, UI, and lifecycle behavior. | Existing Team V2 / AgentOrg V1 and root-neutral owners remain authoritative. | No cumulative behavior was intentionally changed. |
+| Behavior / requirement | Actual path | Result |
+| --- | --- | --- |
+| Cumulative flat-Team / Org boundaries, REQ-001–003, DS-001–003 | GeneralProcessRunSupervisor; ApplicationExecutionScopeKernelBuilder; AgentTeamRunManager; existing FlatTeamExecutionFactory and active-root directory | Incoming mixed-manager hunks were not restored. Runtime composition and lifecycle/ownership tests pass. |
+| REQ-024 / DS-019; exact launch overrides and readiness | AgentOrgRunService → current Org planner/resolver → RunModelSelectionService; RuntimeModelConfigFields / MemberOverrideItem / shared tree/editor chain | Root, mounted Team, direct Agent, mounted Agent and workspace validation retained. Invalid schema fails before allocation/activation. No Org model-edit API introduced. |
+| Incoming stopped-run-compatible-model REQ-001–008 | Agent/Team lifecycle owner → RunModelSelectionService → existing durable writer/read-back; StudioRunModelConfigService | Exact model/config pair preserved, no partial validation write, compatible same-runtime choices, unchanged conversation identity and next-restore config. |
+| Incoming stopped-run-compatible-model REQ-005/006 under current flat Team topology | existingTeamModelConfigDraft / existingTeamRunFormModel → TeamRunConfigForm → existingRunModelConfigStore | Root/direct-Agent linked propagation, direct-edit isolation, saved-baseline options, canonical verification/Retry; no configured nesting or task targets. |
+| DS-017/019 exact active Org settings, REQ-029 shared surface | AgentOrgMemberRunConfigPanel → locked AgentRunConfigForm | Direct and mounted identities, saved model, fixed workspace/runtime, and Back retained; no perpetual capacity-loading notice on a locked form. |
+| REQ-015/028/031/034 and previous CR-FIND-019/030 | Existing strict Org context/stream, terminal-task projection, shared task monitor, unified history | No production delta in those authorities; cumulative focused context/history/task/status/stream regressions pass. |
 
 ## Key Files Or Areas
 
-- Strict current-context owner: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/services/agentOrgExecution/agentOrgExecutionContext.ts`.
-- Exact pure terminal projection: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/services/agentOrgExecution/agentOrgTaskSettlementProjection.ts`.
-- Production-shaped hydration/event/history regression: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/services/agentOrgExecution/__tests__/agentOrgContextHydration.spec.ts`.
-- Preserved server event-retirement regression: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/tests/unit/agent-org-execution/agent-org-task-settlement-event-retirement.test.ts` (unchanged).
-- Existing unified hierarchy projection: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/utils/agentOrgHistoryRows.ts` (unchanged).
+- Server composition: `src/agent-execution/runtime/general-process-run-supervisor.ts`; `src/application-platform/execution/application-execution-scope-kernel-builder.ts`; Application runtime and Studio/standalone host composition.
+- Server model ownership: `src/agent-team-execution/services/agent-team-run-manager.ts`, `team-run-model-config-mutator.ts`; `src/agent-org-execution/services/agent-org-run-service.ts`; `src/run-history/services/studio-run-model-config-service.ts`; incoming shared model selection/capacity services.
+- Frontend: RuntimeModelConfigFields, MemberOverrideItem, TeamMemberConfigTree, TeamScopeConfigEditor, TeamRunConfigForm, AgentOrgMemberRunConfigPanel, and existing-run draft/form projections.
+- Durable regressions: new `agent-org-run-service-model-selection.test.ts`; flat Team option projection, save/restore/read-back tests; current form fixture and direct/mounted locked-panel checks.
+- Conflicting long-lived Team/history docs reconciled; the five Delivery-owned blocker records were not edited.
 
-## Important Assumptions
+## Important Assumptions And Known Risks
 
-- A strictly admitted settled event carries the exact task identity and authoritative `settledAt`; the current strict view contains exactly one corresponding task record and one live task-execution root until that event is applied.
-- Every Agent in that still-live task scope has one retained `AgentContext`, as guaranteed by strict hydration/current-context admission. Those contexts remain retained for terminal history presentation after their live status entries are removed.
-- `Offline` is the existing canonical terminal/no-live-runtime status used by checkpoint hydration and unified history; applying it from an authoritative settled event is terminal projection, not optimistic status fabrication.
-
-## Known Risks
-
-- Independent cumulative source review and renewed complete API/E2E remain mandatory before Delivery can resume.
-- Implementation-scoped tests exercise the real strict event reducer and unified row projector but do not replace the real Chromium settlement replay; API/E2E must rerun API-FIND-023 without reload.
-- API-FIND-024 and API-FIND-026 still require passive local-ingress/FIFO correlation, and API-FIND-025 requires an exact row-scoped locator, under API/E2E ownership.
-- A repository-wide Nuxt typecheck is not currently a clean gate: with an 8 GB heap it reports `6,414` existing errors across shared server imports and broad legacy/e2e fixtures; none names the three IR-034 changed files. The production Nuxt build and focused/cumulative tests pass.
+- Incoming standalone stopped-run model selection is approved base behavior, not authorization to edit active/mounted Org roots, nest configured Teams, or change Org persistence/lifecycle.
+- Model/schema/capacity provider boundaries were tested with deterministic evidence locally; renewed API/E2E must prove the supported live-provider journeys on this merged source.
+- Source review must inspect the complete cumulative ticket and cleanly merged call sites, not only the 17 textual conflicts.
+- The inherited standalone renderer probe `autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs` still contains an older nested configured-Team fixture. It was not used as acceptance evidence; API/E2E should reconcile that fixture to strict flat Team V2 before using that probe. Local rendering used a temporary current-flat fixture and actual components instead.
 
 ## Task Design Health Assessment Implementation Check
 
-- Reviewed change posture: bounded frontend current-context Local Fix.
-- Reviewed root-cause classification: the settled task event advanced only the task-record projection while the unified live hierarchy continued reading a retained pre-settlement AgentContext status.
-- Reviewed refactor decision: `No Refactor Needed`; extend the one existing strict event owner with one pure exact projection.
-- Implementation matched the reviewed assessment: `Yes`.
-- If challenged, routed as Design Impact: `N/A`.
-- Evidence / notes: no server status event was restored, no view-level dedupe or permissive fallback was introduced, and no independent task/Team state authority was created.
+- Reviewed posture / root cause: `Local Fix — latest-base integration`.
+- Refactor decision: bounded reconciliation of existing owners, not a new subsystem.
+- Implementation matches approved architecture: `Yes`.
+- Design Impact escalation: `N/A`; no second model/config authority, lifecycle owner, recovery lane, or public generic root introduced.
 
 ## Legacy / Compatibility Removal Check
 
-- Backward-compatibility mechanisms introduced: `None`.
-- Legacy old behavior retained in scope: `No`; task-record-only terminal application is replaced.
-- Dead/obsolete paths removed in scope: `Yes`; no parallel or dormant projection/recovery path was introduced.
-- Shared structures remain tight: `Yes`; the helper accepts and returns the existing strict Org view/task shapes.
-- Canonical shared design guidance reapplied: `Yes`.
-- Source guardrails: `agentOrgExecutionContext.ts` is `453` effective non-empty lines and `agentOrgTaskSettlementProjection.ts` is `90`; both remain under `500`. The production delta is below the `>220` split signal.
+- Backward compatibility wrappers / fallback decoding introduced: `None`.
+- Retired model-config validator imports/call sites: replaced, including the Org facade missed by incoming base changes.
+- MixedTeamManager/MixedTeamRunBackendFactory production wiring and configured-Team recursion: not reintroduced; flat current projections replace obsolete recursion.
+- Shared structures remain tight: `Yes`; one existing model selection pair and exact address readiness chain.
+- Shared design principles reapplied: `Yes`.
+- Size check: 43 changed production TS/Vue files in this merge; maximum 477 effective nonempty lines; no >500 file. No >220 production changed-line delta. Source-only diff check passes. Incoming already-committed historical logs contain whitespace; they were not rewritten.
 
-## Persisted Data Transition Check (When Applicable)
+## Persisted Data Transition Check
 
-- Approved decision: `Not Affected`.
-- Design-spec decision reference: cumulative `AD-REV-018`; IR-034 introduces no persistence transition.
-- Implementation follows the approved decision: `Yes`.
-- Schema/file/path/bytes or migration changed: `No`.
-- Existing durable `settledAt`, task record, Team V2, and AgentOrg V1 data: consumed unchanged.
+- Integration decision: `Directly Usable — No Migration` for incoming model selection, using existing model/config fields in current packages.
+- Existing cumulative migration requirements remain implemented under their registered startup owners; no migration source, ID, prerequisites, result matrix, or legacy decoder changed this round.
+- Exact Team V2 / Org V1 separation and native Team V2 migration zero-write cohort remain unchanged.
+- Selected stopped model/config writes use existing current writers and read-back outcomes. No file/version/sidecar/journal/retry scheme added.
 - Deviation: `None`.
 
 ## Environment Or Dependency Notes
 
-- `pnpm` was invoked through Corepack per the frontend README.
-- The production Nuxt build required the existing shared `@autobyteus/application-sdk-contracts` and `@autobyteus/application-backend-sdk` build prerequisites. Their generated untracked `dist/` directories were removed after validation.
-- External `autobyteus-agents` and `autobyteus-private-agents` remain read-only and untouched.
-- Delivery/API/E2E-owned modified reports/docs and untracked evidence were not staged, reset, edited, or claimed.
+- Nested pnpm calls use the temporary Corepack shim `/tmp/aorg-ir035-bin/pnpm`; no repository package-manager configuration changed.
+- Server and shared prerequisites build successfully; final Nuxt build/prerender succeeds.
+- Broad server checks initially exposed an inherited `GEMINI_SETUP_MODE` in a test expecting an unconfigured environment. Clearing only Gemini selection/project/location environment for that test passed without source changes. Final cohort is run with those environment values unset.
+- External definition repositories remain read-only and untouched.
+- All 2,091 pre-existing dirty/untracked path hashes match the starting snapshot; none were staged. This includes raw runtime evidence/DB/env/key files. Protection manifest: `/tmp/aorg-ir035-preservation.json`; audit: `/tmp/aorg-ir035-integration-audit.log`.
+- Generated shared SDK dist output is build-only and not staged. No prior AppImage is labeled as integrated.
 
 ## Local Implementation Checks Run
 
-These are implementation-scoped checks, not downstream API/E2E sign-off.
+These are implementation-scoped checks, not independent API/E2E sign-off.
 
-- Exact context/stream/unified-history cohort: `3` files / `30` tests passed (`/tmp/aorg-ir034-web-focused.log`).
-- Cumulative AgentOrg authoring, configuration, context, stream, history, projection, and localization cohort: `23` files / `137` tests passed (`/tmp/aorg-ir034-web-cumulative.log`).
-- Preserved server settlement/status-retirement regression: `1` file / `1` test passed (`/tmp/aorg-ir034-server-retirement.log`).
-- `guard:web-boundary`, `guard:localization-boundary`, and `audit:localization-literals`: passed, with zero unresolved localization findings (`/tmp/aorg-ir034-web-guards.log`).
-- Shared SDK prerequisites plus Nuxt production build/prerender: passed; `3,816` client modules and `16` routes (`/tmp/aorg-ir034-web-build.log`).
-- Repository-wide Nuxt typecheck attempt: completed with `6,414` existing broad-repository errors and no changed-file diagnostic (`/tmp/aorg-ir034-web-typecheck-8gb.log`); the default 4 GB attempt exhausted its heap (`/tmp/aorg-ir034-web-typecheck.log`).
-- `git diff --check`: passed.
-- Changed production file-size check: passed (`453` and `90` effective non-empty lines).
+- Server final combined composition, flat-Team lifecycle/save, complete Org scope/tasks/status/termination, model selection and ownership cohort: 66 files / 349 tests passed (`/tmp/aorg-ir035-server-final.log`).
+- Additional provider-capacity, standalone-host, GraphQL resolver and clean-environment Gemini checks: 4 files / 27 tests passed (`/tmp/aorg-ir035-server-provider-additional.log`).
+- New Org complete-scope model validation + flat Team option projection: 2 files / 11 tests passed (`/tmp/aorg-ir035-server-model-parity.log`).
+- Final cumulative frontend config/Org/context/stream/history/authoring cohort: 29 files / 298 tests passed (`/tmp/aorg-ir035-web-final.log`).
+- Server production build and sanitized built-module/bootstrap: passed (`/tmp/aorg-ir035-server-build.log`).
+- Final Nuxt production build and 16-route prerender: passed (`/tmp/aorg-ir035-web-build.log`).
+- Web boundary guard, localization guard, mandatory localization audit: passed; zero unresolved findings (`/tmp/aorg-ir035-guards.log`).
+- Current source diff check, source-size inventory, exact base ancestry, unmerged-entry check and preservation hash audit: passed.
+- Early focused failures were fixture/harness reconciliation issues (obsolete nested configured-Team fixture, spy map callback argument shape, duplicate test override); the corrected focused/combined runs supersede them. The first broad unsanitized run was 65 passed / 1 failed file, 348 passed / 1 failed test, due to the inherited Gemini mode above.
+- No repository-wide typecheck pass or packaged/native-shell validation is claimed.
 
-## Frontend Rendered-Result Check (When Applicable)
+## Frontend Rendered-Result Check
 
-- Affected journey: watch an active AgentOrg direct-task row through accepted settlement while keeping the same unified Workspaces hierarchy and focus.
-- Approved references reviewed: `BEH-009`, `REQ-015`, `REQ-028`, `REQ-031`, `AC-010`, `AC-023`, `AC-026`, `DS-021/022/025`; the approved AgentOrg status supplement; and the API-FIND-023 browser evidence.
-- Existing surfaces reviewed: the strict AgentOrg execution context, canonical Agent runtime status owner, and always-mounted unified AgentOrg history-row projector.
-- Rendered interaction used: the production-shaped regression hydrates the real strict context, begins with the task Agent `Running`, projects the actual retained unified row, applies the real accepted/settled event, and projects the same row again without selection mutation or reload.
-- States inspected: live Running before settlement; exact task record and tree terminal state; removed live status entry; retained AgentContext and unified row Offline; unchanged live context phase and no recovery error. A task Team scope additionally proves every nested Agent becomes Offline.
-- Visual or interaction issues found and corrected: the stale Running interaction state is corrected. No template, CSS, copy, layout, focus, responsive, or accessibility source changed, so no visual composition adjustment was required.
-- Limitation: this implementation loop does not claim the real browser/system replay; API/E2E must rerun the production task settlement and verify the row converges without reload.
+- References: accepted RV-012 shared Team/Org surfaces and AORG-TEAM-OVERRIDES-001; incoming approved stopped-run model selection requirements. Shared component structure, compact disclosures and locked settings presentation remain unchanged.
+- Surface: normal Nuxt dev renderer, real ExistingRunConfigEditor/Pinia/GraphQL client and shared forms, deterministic transport responses, current strict flat Team V2 fixture; real AgentOrgMemberRunConfigPanel for both exact member kinds.
+- Viewports: 1440×900 and 390×844. Inspected model replacement, all three linked Agent patches, disabled Save while verification is required, one read-only Retry, successful canonical refresh, collapsed/expanded member disclosure, fixed runtime/workspace/tool policy, active Org model lock, exact IDs, and keyboard Back emission.
+- Found/corrected: locked Org panel falsely displayed “Checking replacement model context capacities...” without any lookup. The shared locked-state gate now suppresses that notice; the final render and regression confirm it.
+- Final result: both implementation inspection scenarios pass, no browser page errors, no horizontal overflow; temporary route/server/browser removed.
+- Evidence: `/tmp/aorg-ir035-render/existing-run-model-config-evidence.json`, `inspect.mjs`, `team-verification-retry.png`, `team-members-narrow.png`, `org-direct-locked-desktop.png`, and `org-mounted-locked-narrow.png`.
+- Limits: synthetic workspace/catalog transport in a component inspection route, not full production shell/navigation or real-provider acceptance. Workspace picker availability reflects the fixture, not a real workspace catalog. Independent renewed browser/API coverage remains required.
 
 ## Downstream Coverage Hints / Suggested Scenarios
 
-1. Rerun the exact `API-FIND-023` journey: keep the direct task Agent row visible and selected as applicable, accept/settle it, and assert the same retained row changes from Running to Offline without refocus or reload.
-2. Verify durable task status remains accepted, the exact execution has its original authoritative `settledAt`, no invalid post-removal Agent status event appears, and the Org stream stays live.
-3. Repeat for a task Team and recursive task Team descendants; assert every Agent in the terminal task scope becomes Offline while unrelated configured/root/task Agents keep their exact statuses.
-4. Reconnect and restore the same Org and prove the strict checkpoint matches the already-projected terminal result with no duplicate/missing identity or sequence recovery regression.
-5. Retain the IR-014 server regression: task settled event is emitted, post-removal teardown status is retired, and the root does not fail-stop.
-6. Separately correct the exact-row Stop locator for API-FIND-025 and gather local MCP/FIFO evidence for API-FIND-024/026 before assigning source origin; do not use IR-034 as evidence for those observations.
-7. Resume the complete cumulative API-REV-018 matrix after source Pass rather than substituting historical or delta-only evidence.
+1. Fresh full cumulative source review of both merge parents and integrated current owners, including automatic merges.
+2. Renew the full API-REV-019-equivalent matrix on this exact artifact, not historical substitution.
+3. Exercise stopped standalone Agent and flat Team compatible model saves, direct-Agent override propagation, incompatible/unknown capacities, exact pair read-back, and normal same-conversation restore. Verify active/Application-owned locks and save-first/restore-first behavior.
+4. Verify Org root/Team/direct/mounted-Agent launch schema readiness and runtime catalog Retry/abandon; locked exact live member gear → Back; New remains a separate fresh draft action.
+5. Retain terminal task Offline without reload, mounted task monitor progression without refocus, four-direction communication, unique task-Team status traversal, strict automatic recovery and complete-root shutdown checks.
+6. Preserve API-REV-019 evidence limits: queue passage inferred inside HTTP intervals (no independent JSON-RPC/FIFO-start timestamps); early root/nested controls predate logging; direct-task sample initializing→Offline rather than independent Running→Offline; later history/Restore after exhaustion is not in-place automatic recovery; API-FIND-025 locator-only; API-FIND-024/026 Not Reproduced with no source attribution or retry/replay/timeout authorization.
+7. Preserve external-definition publication scope, unchanged Electron-shell-only limits, no native-shell manual launch/multi-node deployment claim, and previous harness/scoring corrections. Delivery must build a fresh integrated package before pending user verification.
 
 ## API / E2E / Executable Coverage Investigation And Execution Still Required
 
-Yes. IR-034 reports implementation-scoped checks only. The cumulative Large/High package requires independent cumulative source review first, followed by the complete renewed API/E2E matrix and Delivery according to their owning stages and dynamic handoff rules.
+Yes. Independent cumulative source review must pass first, followed by renewed cumulative API/E2E and Delivery through each stage's dynamic rules. No new API/E2E confidence, delivery readiness, package provenance, user verification, release, deployment, or Requirements return is claimed.
