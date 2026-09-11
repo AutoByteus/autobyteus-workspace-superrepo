@@ -1,5 +1,5 @@
 import type { RootExecutionPhysicalScope } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
-import type { CollaborationAgentExecutionEvent } from "../../agent-collaboration/execution/domain/collaboration-agent-execution-event.js";
+import { TaskAgentDurabilityEventGate } from "../../agent-collaboration/execution/services/task-agent-durability-event-gate.js";
 import type { FlatTeamExecutionCallbacks } from "../../agent-team-execution/local/flat-team-execution-callbacks.js";
 import { FlatTeamExecutionFactory, type PreparedFlatTeamExecution } from "../../agent-team-execution/local/flat-team-execution-factory.js";
 import type { TeamRun } from "../../agent-team-execution/domain/team-run.js";
@@ -98,10 +98,10 @@ export class AgentOrgTeamExecutionDirectory {
     physicalScope: RootExecutionPhysicalScope;
     callbacks: FlatTeamExecutionCallbacks;
   }>): Promise<PreparedTaskExecution> {
-    const retained: Array<Readonly<{ identity: Parameters<FlatTeamExecutionCallbacks["publishAgentEvent"]>[0]; event: CollaborationAgentExecutionEvent }>> = [];
+    const eventGate = new TaskAgentDurabilityEventGate(input.callbacks.publishAgentEvent);
     const callbacks: FlatTeamExecutionCallbacks = Object.freeze({
       ...input.callbacks,
-      publishAgentEvent: (identity, event) => retained.push(Object.freeze({ identity, event })),
+      publishAgentEvent: eventGate.publish,
     });
     const prepared = await this.factory.materialize({
       physicalScope: input.physicalScope,
@@ -111,9 +111,10 @@ export class AgentOrgTeamExecutionDirectory {
       activationMode: "fresh",
       callbacks,
       prepareConfiguredAgents: true,
-    });
+    }).catch((error) => { eventGate.abort(); throw error; });
     const coordinator = input.task.teamNode.children.find((child) => child.kind === "agent" && child.address === input.task.teamNode.coordinatorAddress);
     if (!coordinator || coordinator.kind !== "agent") {
+      eventGate.abort();
       await prepared.abort();
       throw new Error(`Task TeamRun '${input.task.teamRunId}' has no exact coordinator.`);
     }
@@ -135,15 +136,18 @@ export class AgentOrgTeamExecutionDirectory {
         if (state !== "sealed") throw new Error(`Task TeamRun '${input.task.teamRunId}' is not sealed.`);
         prepared.commitAfterDurability();
         state = "committed";
+        let released = false;
         return Object.freeze({ releaseWork: () => {
-          retained.splice(0).forEach(({ identity, event }) => input.callbacks.publishAgentEvent(identity, event));
+          if (released) return;
+          released = true;
+          if (!eventGate.releaseToLive()) return;
           queueMicrotask(() => { void prepared.teamRun.postMessage(input.task.message, coordinator.agentRunId); });
         } });
       },
       abort: async () => {
         if (state === "committed" || state === "aborted") return;
         state = "aborted";
-        retained.length = 0;
+        eventGate.abort();
         await prepared.abort();
       },
     });

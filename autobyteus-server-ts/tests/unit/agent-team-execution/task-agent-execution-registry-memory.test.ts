@@ -5,9 +5,9 @@ import { AgentMemoryLayout } from "../../../src/agent-memory/store/agent-memory-
 import { AgentRunEventType, type AgentRunEvent } from "../../../src/agent-execution/domain/agent-run-event.js";
 import { appConfigProvider } from "../../../src/config/app-config-provider.js";
 import {
-  TaskAgentDurabilityEventGate,
   TaskAgentExecutionRegistry,
 } from "../../../src/agent-team-execution/local/registries/task-agent-execution-registry.js";
+import { TaskAgentDurabilityEventGate } from "../../../src/agent-collaboration/execution/services/task-agent-durability-event-gate.js";
 import { FlatAgentExecutionContext, FlatTeamExecutionContext } from "../../../src/agent-team-execution/local/flat-team-execution-context.js";
 import { TeamRunContext } from "../../../src/agent-team-execution/domain/team-run-context.js";
 import {

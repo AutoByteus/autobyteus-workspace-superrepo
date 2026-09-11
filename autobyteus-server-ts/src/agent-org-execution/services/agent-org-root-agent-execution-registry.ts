@@ -8,7 +8,7 @@ import { ConfiguredAgentExecutionFactory } from "../../agent-collaboration/execu
 import type { ConfiguredAgentExecutionHandle, PreparedConfiguredAgentActivation } from "../../agent-collaboration/execution/backends/configured-agent-execution-handle.js";
 import type { RootedAgentMemoryLocator } from "../../agent-collaboration/execution/services/rooted-agent-memory-locator.js";
 import { createCollaborationMemberExecutionIdentity, type RootExecutionIdentity } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
-import type { CollaborationAgentExecutionEvent } from "../../agent-collaboration/execution/domain/collaboration-agent-execution-event.js";
+import { TaskAgentDurabilityEventGate } from "../../agent-collaboration/execution/services/task-agent-durability-event-gate.js";
 import type { FlatTeamExecutionCallbacks } from "../../agent-team-execution/local/flat-team-execution-callbacks.js";
 import type { PreparedTaskExecution } from "../../agent-team-execution/domain/prepared-task-execution.js";
 import type { PreparedTaskSettlement } from "../../agent-team-execution/domain/prepared-task-settlement.js";
@@ -85,20 +85,20 @@ export class AgentOrgRootAgentExecutionRegistry {
 
   async prepareTask(input: PrepareTaskAgentInput): Promise<PreparedTaskExecution> {
     if (!this.materializationOpen) throw new Error("AgentOrg root task Agent materialization is closed.");
-    const retained: Array<Readonly<{ identity: Parameters<FlatTeamExecutionCallbacks["publishAgentEvent"]>[0]; event: CollaborationAgentExecutionEvent }>> = [];
+    const eventGate = new TaskAgentDurabilityEventGate(this.options.callbacks.publishAgentEvent);
     const callbacks: FlatTeamExecutionCallbacks = Object.freeze({
       ...this.options.callbacks,
-      publishAgentEvent: (identity, event) => retained.push(Object.freeze({ identity, event })),
+      publishAgentEvent: eventGate.publish,
     });
     const handle = await this.createHandle(
       Object.freeze({ ...input.sourceNode, agentRunId: input.agentRunId, platformAgentRunId: null }),
       "fresh",
       callbacks,
-    );
+    ).catch((error) => { eventGate.abort(); throw error; });
     this.reserve(input.agentRunId, handle);
     let activation: PreparedConfiguredAgentActivation;
     try { activation = await handle.prepareConfiguredActivation(); }
-    catch (error) { this.prepared.delete(input.agentRunId); handle.dispose(); throw error; }
+    catch (error) { eventGate.abort(); this.prepared.delete(input.agentRunId); handle.dispose(); throw error; }
     let state: "preparing" | "sealed" | "committed" | "aborted" = "preparing";
     return Object.freeze({
       binding: Object.freeze({ kind: "agent", address: input.address, agentRunId: input.agentRunId }),
@@ -114,8 +114,11 @@ export class AgentOrgRootAgentExecutionRegistry {
         this.prepared.delete(input.agentRunId);
         this.active.set(input.agentRunId, handle);
         state = "committed";
+        let released = false;
         return Object.freeze({ releaseWork: () => {
-          retained.splice(0).forEach(({ identity, event }) => this.options.callbacks.publishAgentEvent(identity, event));
+          if (released) return;
+          released = true;
+          if (!eventGate.releaseToLive()) return;
           queueMicrotask(() => { void handle.postMessage(input.message); });
         } });
       },
@@ -123,7 +126,7 @@ export class AgentOrgRootAgentExecutionRegistry {
         if (state === "committed" || state === "aborted") return;
         state = "aborted";
         this.prepared.delete(input.agentRunId);
-        retained.length = 0;
+        eventGate.abort();
         try { await activation.abort(); } finally { handle.dispose(); }
       },
     });
