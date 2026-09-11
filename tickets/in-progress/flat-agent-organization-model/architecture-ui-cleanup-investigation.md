@@ -62,5 +62,17 @@ inquiry. No implementation or delivery pass is claimed.
 
 ## User Evidence
 
+Separate follow-up question (analysis only): the `Task · ed1f8a` badge inside
+Messages is not a task record. `CollaborationMessagesPanel.vue:53–57` renders it
+when the message counterpart is task-scoped; the suffix is the counterpart
+AgentRun ID, not task ID. `agentOrgCommunicationPerspective.ts` projects only
+the root communication message array, then annotates the counterpart using the
+retained execution index. DS-029 deliberately added this identity badge.
+REQ-034 requires ordinary accepted task-Agent communication to remain in
+Messages; REQ-036 keeps formal assignment/submission/review records separate.
+Do not interpret the user's question as authorization to hide task-origin
+messages. A less prominent identity presentation can be considered separately;
+no badge-removal or message-eligibility change is approved by this inquiry.
+
 - Task-strip screenshot: /home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/software_engineering_team_570be46d520142849ac61785be03dca1/architecture_designer_6b8b3019214246e086957b3f395901bb/context_files/ctx_1b892b545fae__image.png
 - Heading screenshot: /home/autobyteus/data/memory/agent_teams/software_development_department_d2b93633ad6b4d969e6e0d776dda7721/software_engineering_team_570be46d520142849ac61785be03dca1/architecture_designer_6b8b3019214246e086957b3f395901bb/context_files/ctx_5c796264f166__image.png
