@@ -37,6 +37,7 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 | RER-029 | PKG-AUTH-001 and explicit user removal of schemaVersion from both definition configs | Approved Architecture-Ready RER-028 | Approved Architecture-Ready RER-029 | BEH-010; REQ-012/026/027; AC-021/032/033; SCN-021/022; DEC-024; ORG-CASE-049–055/062–063 | Field-free authored Team/Org configs with strict current-shape admission; runtime versions and external ownership unchanged. |
 | RER-030 | UI-CLEAN-001 explicit singular history heading request | Approved Architecture-Ready RER-029 | Approved Architecture-Ready RER-030 | BEH-014; UC-016; REQ-031; AC-026; SCN-015; DEC-017 | Replace only Workspaces/history category Agent Orgs with exact Org below Teams; all other behavior retained. |
 | RER-031 | Subsequent explicit user pure-message presentation direction | Approved Architecture-Ready RER-030 | Approved Architecture-Ready RER-031 | REQ-034/035; AC-034; retained REQ-031/AC-026 | Familiar Team Messages/task detail; omit added default identity decoration, preserve exact identity on demand and actual task-origin messages. |
+| RER-032 | User selects plural Orgs alongside Teams | Approved Architecture-Ready RER-031 | Approved Architecture-Ready RER-032 | BEH-014; UC-016; REQ-031; AC-026; SCN-015; DEC-017 | One-word history heading correction; all RER-031 cleanup and other behavior unchanged. |
 
 ## Revision Entries
 
@@ -518,3 +519,12 @@ The latest `requirements-doc.md` and `investigation-notes.md` remain authoritati
 - Supersession/preservation: the RER-030 historical no-badge-removal-approval statement is superseded by subsequent explicit user direction. No message filtering/content mutation, task-policy change, lifecycle/persistence change, source-definition identity fallback or removal of exact navigation. REQ-036, RER-029 authoring, runtime contracts and exact Org heading remain unchanged.
 - Artifacts/readiness: three canonical Requirements artifacts updated; contract/source/tests/architecture/Product/other-owner evidence untouched. Ready and approved; focused preliminary Small/Low, cumulative Large/High; Architecture owns bounded realization and proportionate routing. No whole-package hold/failure or delivery readiness is claimed.
 - Next action: hand off cumulative RER-031 with committed RER-030 copy and current presentation decision to Architecture Designer under dynamic rules.
+
+### RER-032 — Plural Orgs History Heading
+
+- Trigger/approval: 2026-09-11, Architecture relays the user's explicit “why not use Plural Orgs” and agrees to Orgs alongside unchanged Teams. This supersedes the previous singular literal only; no new Product decision is required.
+- Canonical delta: BEH-014, UC-016, REQ-031, AC-026, SCN-015, DEC-017 and current summaries say exact plural Orgs for the Workspaces/history category directly below Teams. Main-navigation/domain/API names, order/membership, rows/history state, exact identity/navigation and all RER-031 message/task cleanup remain unchanged.
+- Evidence/state: current English collection label and locale tests retain singular Org at IR-040 HEAD 06d020da35bff3a3e745cf4c4b33c30d1e00a104. AD-REV-021@22d191ea4a9d066aec24faf017a25e090d1b4763 and ARCH-REV-019 Pass@be6b20f4a988eabbeb797a70af1b9cb0091c2f64 are now present under the previous literal; no review verdict is changed by Requirements.
+- Artifacts: only requirements-doc.md, investigation-notes.md and this revision record change. Contract/source/tests/architecture/Product/other-owner evidence untouched; prior revision narratives remain historical.
+- Readiness/routing: Approved Architecture-Ready; focused preliminary Small/Low, cumulative Large/High. Return for coherent architecture copy synchronization and proportionate routing, not direct implementation or Product redesign. No whole-package hold/failure or new executable/delivery pass is inferred.
+- Next action: hand off the committed cumulative package to Architecture Designer using dynamic rules.
