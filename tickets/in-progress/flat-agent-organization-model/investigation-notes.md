@@ -9,11 +9,13 @@
 - Base or reference revision: `personal@80e2bd195c42ea3ced778dbc051d4d00edaef16f`
 - Bootstrap result: Dedicated clean requirements worktree created and verified.
 - Bootstrap blocker: `N/A`
-- Current requirements revision ID: `RER-030`
-- Investigation status: Complete for RER-030 / UI-CLEAN-001. Exact Workspaces/history copy is now singular Org, directly below Teams. This is already-approved copy synchronization only; no Product gate, task-policy change, source/test edit or whole-package validation/delivery verdict.
-- Resumption snapshot: dedicated branch `requirements/flat-agent-organization-model`, HEAD `f8d51ac2b63330bca9d4ef718faff4f91fedf14f`; source checkpoint `932c81b2261ffcc21ac540b0f25522ecfa1cb29a`; completed AD-REV-020 / ARCH-REV-018 Pass. Other owners' dirty source documentation/reports/builds/evidence remain untouched. Only three Requirements artifacts change; agent-org-contract.md is unchanged.
+- Current requirements revision ID: `RER-031`
+- Investigation status: Complete for RER-031 / UI-CLEAN-001. User now explicitly requests familiar Team message-list presentation without extra default badge/ID/address decoration, preserving exact identity on demand and actual message semantics. RER-030 exact Org heading remains. No Product gate, source/test change or whole-package validation/delivery verdict.
+- Resumption snapshot: dedicated branch `requirements/flat-agent-organization-model`, Requirements commit `f36481de431f9c112ae177228c4718b184275f81` (RER-030 copy synchronization, not yet handed off when clarification arrived). Completed AD-REV-020 / ARCH-REV-018 Pass; Architecture cleanup note has subsequent owner edits. Other owners' dirty artifacts are preserved. Only three Requirements artifacts change; contract remains unchanged.
 
 ## Initial Request And Clarifications
+
+- RER-031 direct user direction (2026-09-11): after the badge explanation, the user asks to keep message presentation as earlier AgentTeams and add no extra stuff in the message left panel. This now authorizes hiding the prominent task-provenance/run-suffix badge and extra default identity decoration. It supersedes the earlier RER-030 “question only” interpretation, not message eligibility or formal-task separation.
 
 - RER-030 user direction (2026-09-11): UI-CLEAN-001 records the explicit history-heading request for exact singular `Org`, directly below `Teams`. Historical entries below that quote `Agent Orgs` retain the earlier evidence only; RER-030 supersedes that literal, not their continuity or category behavior.
 
@@ -321,6 +323,8 @@ owned-definition inventory/transition assessment and applicable review.
 
 ### RER-030 — UI-CLEAN-001 History Heading Copy (2026-09-11)
 
+Historical scope note: badge removal was not authorized at this point; RER-031 below records the subsequent explicit approval.
+
 - Supported scenario: user inspects the existing unified Workspaces/history tree, including Team and AgentOrg runs. The requested category is the exact singular `Org` directly below `Teams`. Opening configuration, active/history navigation and earlier rows must behave exactly as before; main navigation/domain/API names are not renamed.
 - Approval/evidence: Architecture inquiry `architecture-ui-cleanup-investigation.md` at `a9c841510` plus `f8d51ac2b63330bca9d4ef718faff4f91fedf14f` records direct user approval and explicitly excludes a new Product gate. Requirements inspected the supplied heading screenshot `ctx_5c796264f166__image.png`: it shows the existing AGENT ORGS category below TEAMS; the requested replacement comes from the user's explicit instruction, not inference from the image.
 - Read-only current source: `autobyteus-web/components/workspace/history/WorkspaceAgentOrgHistoryCollection.vue:1–5` renders a localized category label only when groups exist. `WorkspaceHistoryWorkspaceSection.vue:178–182,309` places that collection after Team rows. Its test `__tests__/WorkspaceHistoryWorkspaceSection.spec.ts:230–235` explicitly asserts the older Agent Orgs literal after Teams. These establish a copy mismatch, not an ordering/ownership defect or proof of a new runtime pass.
@@ -328,6 +332,15 @@ owned-definition inventory/transition assessment and applicable review.
 - Separate Messages badge question: read-only `CollaborationMessagesPanel.vue:53–57` labels task-scoped counterpart provenance with a suffix of counterpartAgentRunId. It is not a task lifecycle record. No instruction to remove that badge, hide ordinary accepted task-origin messages or reinterpret REQ-034/036 is inferred.
 - Scope/traceability: only the current heading copy changes across BEH-014, UC-016, REQ-031, AC-026, SCN-015, DEC-017 and related summaries. Exact singular Org, not Orgs; same category placement/membership/history rows/state and ownership. Unversioned authored Team/Org config authority and runtime file versions remain unchanged. Historical revision/source entries remain historical evidence.
 - Outcome: Approved Architecture-Ready, no missing approval. Focused copy delta preliminary Small/Low; cumulative package Large/High. Return to the existing Architecture cleanup for proportionate design/review decisions. No source/test/Product changes, new browser/API pass or whole-package validation/delivery hold/failure is claimed. Contract unchanged because it contains no conflicting heading literal.
+
+
+### RER-031 — Familiar Message Presentation, Identity On Demand (2026-09-11)
+
+- User/scenario basis: inspect accepted sent/received Messages and their references, including configured and task counterparts; keep the earlier Team experience rather than additional decoration on Org rows. The user directly says no extra additions in the message left panel. Architecture's subsequent clarification separately records removing the prominent Task/run-suffix badge while preserving identity on demand. Task-detail strip cleanup was already approved; formal task and ordinary-message semantics do not change.
+- Read-only baseline: `git show 5fb16658:autobyteus-web/components/workspace/team/TeamCommunicationPanel.vue`, lines 15–80, shows a compact direction/title/counterpart/time/content summary and references, without the added permanent address line or Task/run-suffix badge. Its compact counterpart functions at lines 184–200 use readable To/From labels. The file has no diff against the locally inspected origin/personal reference. This is source comparison, not a fresh browser validation.
+- Current comparison: `CollaborationMessagesPanel.vue:15–80` has an extra metadata row, address line and task-provenance badge at lines 53–57, using the counterpart AgentRun suffix. The accepted user direction removes extra default decoration rather than changing the underlying communication record or which messages qualify. `CollaborationDelegatedTasksSection.vue:75–83` separately adds the participant name/ID strip; its exact navigation must survive the approved presentation cleanup.
+- Canonical result: REQ-034/035 now explicitly require familiar compact Messages and task detail, no added prominent Task/run-suffix badges/permanent extra identity lines or task-detail strip, and exact identity/provenance inspectable on demand with exact navigation. AC-034 covers display/reference/identity checks on existing SCN-018/019 journeys across configured/task participants and live/retained desktop/narrow views. Preserve accepted content, sender/receiver, direction/time/references, message eligibility, task lifecycle records and REQ-036 separation. Do not infer filtering, deletion, source-definition fallback or reactivation.
+- Authority/limits: current RER-031 supersedes only the RER-030 statement that badge removal was not yet approved. RER-030 exact singular Org heading and RER-029 authoring/runtime boundaries remain. No Product invention, backend policy change or component/on-demand-interaction prescription. Architecture owns the concrete presentation correction and proportionate validation route; no full-package hold or new pass is claimed.
 
 
 ## Structural And Payload Surface Inventory
@@ -424,7 +437,7 @@ owned-definition inventory/transition assessment and applicable review.
 
 ## Product Design Request Context
 
-- Product Design request in the current input: `None for RER-030 — already-approved heading copy only; no new Product or visual redesign gate. Prior Product authority remains for unchanged behavior.`
+- Product Design request in the current input: `None for RER-031 — explicitly approved reuse of earlier Team presentation and on-demand identity, not a new Product design gate.`
 - Most recent fulfilled Product request, in the user's own terms: Make AgentOrg mounted-Team configuration preserve the already fine-tuned AgentTeam launch hierarchy instead of using a separate, denser override interaction.
 - IDs involved in that fulfilled Product request: `BEH-004`, `BEH-006`, `BEH-012`; `REQ-004`, `REQ-019`, `REQ-024`, `REQ-029`; `AC-002`, `AC-014`, `AC-019`, `AC-024`; `SCN-009`, `SCN-013`; `ORG-CASE-043`–`ORG-CASE-048`, `ORG-CASE-059`–`ORG-CASE-061`.
 - Fulfilled Product decision: Replace only the superseded `VIS-015` mounted-Team hierarchy with the selected AgentTeam-parity interaction: outer Member overrides collapsed, independently collapsed Team scopes, explicit exact-scope inheritance/customization, and on-demand Team/member controls. Preserve the rest of the approved AgentOrg journey.
@@ -585,7 +598,7 @@ owned-definition inventory/transition assessment and applicable review.
 - Verify separate server-owned definition conversion, external target-only admission, server runtime family transition, API/persistence/frontend surfaces, and permanent rejection of deeper configured input.
 - Preserve current root-scoped logical addressing and coordinator targeting. Apply `RER-013`'s explicit change to launch semantics: AgentOrg activation has no recipient/focus, and exact focus is supplied afterward for recipient-requiring interactions.
 - Do not introduce cross-process or shared-member placement semantics under this simplification request without a separate approved requirement.
-- Product Design and RER-027 settled-history authority remain. RER-028 explicitly replaces the configured-only live message/view restriction and adds full relevant-participant Tasks visibility and distinct formal-result/notification outcomes. AD-REV-020 / ARCH-REV-018 Pass is now the completed design/review for RER-029; RER-030 changes only the history heading copy.
+- Product Design and RER-027 settled-history authority remain. RER-028 explicitly replaces the configured-only live message/view restriction and adds full relevant-participant Tasks visibility and distinct formal-result/notification outcomes. AD-REV-020 / ARCH-REV-018 Pass is now the completed design/review for RER-029; RER-030/031 cover only the approved history copy and familiar message/task-detail presentation.
 - Preserve native flat Team packages in place. Convert only one-level organization-like roots to AgentOrg V1 after complete validation and atomic canonical commit; mixed readers must discriminate root kind and fail closed on family/payload mismatch.
 - Reconcile approved AgentOrg configuration inheritance, full-scope launch/no-focus lifecycle, post-launch targeting, handoff authoring/API/error/atomic-save implications, responsive/accessibility requirements, and truthful runtime/history hierarchy through Architecture Designer; do not treat the prototype's local fixtures or the requirements information as a target component architecture.
 - Do not write or claim delivery for the public/private external definition repositories. Publish the exact target definition contract and fail incompatible external admission visibly; the separate owners restore new-run availability by updating their projects.
@@ -601,3 +614,5 @@ owned-definition inventory/transition assessment and applicable review.
 - Carry `CR-FIND-019` separately as an Implementation Local Fix when the focused Product/architecture path returns; the later full source review and cumulative API/E2E must assess both corrections together.
 
 - RER-029 workspace hygiene: writes were limited to the four canonical Requirements artifacts. Other-owner documentation and build/evidence state changed concurrently during this round; Requirements neither staged nor rewrote those paths. An initial whole-other-diff hash is therefore not used as proof of unchanged concurrent work.
+
+- RER-031 downstream boundary: combine the committed Org heading with the subsequently approved removal of prominent Task/run-suffix and extra identity decoration; no ordinary accepted task message is excluded. Preserve exact on-demand identity and existing participant/reference navigation.
