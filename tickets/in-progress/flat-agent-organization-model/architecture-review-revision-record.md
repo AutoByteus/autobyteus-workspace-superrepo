@@ -24,6 +24,7 @@ concise chronological architecture-review history.
 | ARCH-REV-015 | Round 15 / post-pass `API-FIND-019`, approved `RER-026`, and `AD-REV-017` AgentOrg communication-observability recovery | `AD-REV-017` | Pass | Fail — Design Impact | `AR-FIND-008` |
 | ARCH-REV-016 | Round 16 / `AD-REV-018` both-endpoint configured-message eligibility recovery | `AD-REV-018` | Fail — Design Impact | Pass | `AR-FIND-008` |
 | ARCH-REV-017 | Round 17 / approved `RER-028` task-workflow parity and `AD-REV-019` | `AD-REV-019` | Pass (former scoped authority) | Pass | `AR-FIND-008` superseded by RER-028; no new finding |
+| ARCH-REV-018 | Round 18 / approved `RER-029` field-free Team/Org authoring | `AD-REV-020` | Pass | Pass | `PKG-AUTH-001` resolved; prior findings retained/superseded; no new finding |
 
 ## Revision Entries
 
@@ -446,3 +447,31 @@ None.
 - Material classification changes: Focused AD-REV-019 `Medium / High`; cumulative `Large / High`. Review remains Pass on the newly approved behavior, not an extrapolation of old task-exclusion validation. No Requirement Gap or Product gate.
 - Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
 - Remaining risks: exact same-address task selection/provider identity; relevance without descendant-task leakage; retained post-commit presentation versus provider-event retirement; accepted/rejected system-input truth and duplication; strict read/empty distinction and no activation; standalone Team and responsive UI regression. Old API passes retain only their recorded scope. Implement and run renewed full-source/executable review; do not claim delivery readiness from this architecture pass.
+
+
+### ARCH-REV-018 — Field-free authored definitions and ordered transition pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 18; explicit user approval of field removal from both authored config families, RER-029 / PKG-AUTH-001 / DR-008 re-entry and completed AD-REV-020.
+- Triggering role, report path, and finding IDs: Architecture Designer; `architecture-design-revision-record.md` AD-REV-020 and `architecture-package-authoring-investigation.md`; PKG-AUTH-001 Requirements inquiry, no new architecture finding.
+- Relevant architecture design revision IDs: `AD-REV-020@a83fa7541e8648a5472493f214a3ba8ed14af6b6`, cumulative retained AD-REV-001–019.
+- Requirements authority: `RER-029@0f5014405eb028123afb37013b722acb2d12fe22`.
+- Prior authoritative decision: `Pass` (ARCH-REV-017 on RER-028 / AD-REV-019).
+- Current authoritative decision: `Pass`.
+- What changed: Independently confirmed normal codecs/writers/admission require numeric versions, the runner skips successful entries, and the normal Org index hides prior-version parents' owned children. Source and read-only config/DB probes substantiate the transition. DS-031 removes the field and obsolete diagnostic expectation coherently. DS-032 preserves fixed historical targets inside migrations, registers an ordered independent definition-only pass, physically inventories owned roots/children, reuses existing ordinary authoring recovery, transforms only one key and strictly rereads. DS-033 scopes failures and preserves migration-specific status policies. Current field-free configs are zero-write skips, repository configs are source/build updates, external sources remain read-only, runtime data is unchanged. VAL-046–050 and ownership/file/transition maps make the design actionable; no executable pass is inferred.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `PKG-AUTH-001` | Requirement Gap inquiry | Resolved by explicit upstream approval and completed design | RER-029; AD-REV-020 DS-031–033 | Both files explicitly covered; no other field/default or runtime version removed. |
+| `AR-FIND-001` | Resolved under earlier definition contract | Ownership/transition resolution retained; numeric authored requirement expressly superseded | RER-029; DS-031–033 | One current codec per family, owned-only transition and external dependency diagnostics remain. |
+| `AR-FIND-002`–`AR-FIND-007` | Resolved | Remain resolved | Prior ARCH-REV entries; cumulative AD-REV-020 | Handoff order, migration outcome distinctions, one-FIFO/fence and history ownership unchanged. |
+| `AR-FIND-008` | Historically resolved; restriction superseded by RER-028 | Unchanged supersession | ARCH-REV-017; retained DS-028–030 | Task-inclusive ordinary messages and exact retained identity are not narrowed by authoring changes. |
+| `AAV-001`, prior `ADI`/`IDI` and Product impacts | Resolved or retained under ARCH-REV-017 | Remain applicable | Cumulative design and supplements | No task/history input filter, generic root, extra lifecycle or Product change introduced. |
+| `CR-FIND-019` | Separate implementation regression obligation | Retained | Prior source/review records | Not absorbed into the authoring transition. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: Focused Medium/High; cumulative Large/High. Review remains Pass on the expanded approved authoring contract, not by extrapolating DR-008 or earlier API results. No Requirement Gap or Product gate.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
+- Remaining risks: coherent source/diagnostic cut; real runner ordering and completed-entry skip; prior/current prospective outputs on retry; physical owned/journal inventory; original non-version values and byte/no-write guarantees; external ownership and per-item failures. Existing transaction read/recovery is a narrow exception to older generic no-migration-use wording, not authorization to create migration journals or call commit. Renew file/runner/authoring/source/API validation and Delivery evidence. No source/runtime/release completion is claimed.
