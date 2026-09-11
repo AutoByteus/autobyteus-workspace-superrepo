@@ -1,5 +1,8 @@
 # Package Authoring — Explicit Version Field Inquiry
 
+**Current status:** Approved RER-029 closes the inquiry; see the AD-REV-020
+resolution below. The original request remains chronological evidence.
+
 ## PKG-AUTH-001 — User-requested simplification
 
 - Date: 2026-09-11.
@@ -73,3 +76,84 @@ Unrelated Delivery-owned dirty documentation/builds/evidence were preserved.
 Only this Architecture-owned inquiry is persisted for the Requirements handoff.
 The requested authoring correction is pending upstream reconciliation; no
 change to the running product or expanded validation pass is claimed.
+
+## Approved Re-entry And AD-REV-020 Design Resolution
+
+**Current disposition:** RER-029 at
+`0f5014405eb028123afb37013b722acb2d12fe22` explicitly approves removal from
+both files. PKG-AUTH-001's Requirements question is closed. The earlier
+Team-only/open recommendation paragraphs above are retained historical inquiry
+context, not current scope. AD-REV-020 / DS-031–033 specify the response, pending
+independent Architecture Review. No engineering pass is implied.
+
+### Additional read-only evidence, 2026-09-11
+
+Source is the unchanged reviewed IR-038 artifact preserved at `14a94fc45`;
+subsequent `7ef792130` and `0f5014405` are inquiry/Requirements-only commits.
+Current workspace/branch confirmed with git status, log and rev-parse. Other
+owners' dirty delivery docs/reports/evidence are present and not staged here.
+
+- Normal `agent-team-definition-config-v2.ts` and
+  `agent-org-definition-config-v1.ts` own exact key sets and build functions.
+  Their file providers serialize all definitions through these builders.
+- `agent-org-owned-definition-source-index.ts:43–52` parses the parent Org
+  before enumerating its owned sources. A migration cannot rely on the new
+  normal parser's source index to find Teams inside prior-version parents.
+- `collaboration-definition-admission/services/definition-admission-service.ts`
+  validates raw config before subject services and dependencies; its result and
+  `api/graphql/types/definition-admission.ts` expose expectedSchemaVersion.
+  These require a coherent field-free current-family diagnostic, not just a
+  serializer edit. `file-application-bundle-provider.ts` directly validates Team
+  configs and must use the same current codec.
+- `agent-packages/services/agent-package-service.ts` imports linked local or
+  GitHub source roots through registration/cache refresh. Its
+  `utils/package-root-summary.ts` validates physical package structure; it is
+  not a second semantic config parser. No separate export command is added by
+  this design. Current provider bytes and existing supported file/package
+  roundtrip paths must remain consistent.
+- `app-data-migration-runner.ts:56–77` skips SUCCEEDED and warning-success
+  migrations. Registry orders the family migration after Team Run V2.
+  `agent-org-flat-team-families-v1-app-data-migration.ts:87–101` emits numeric
+  definition versions; its later execution-tree envelope is separate. Old
+  definition validation must be migration-local when the normal codec changes.
+- Both executable startup compositions invoke runPending before exposing
+  current services. They permit bounded failures and rely on strict current
+  per-item admission; no blanket new capability gate is needed for this delta.
+- `DefinitionPackageTransaction` already owns ordinary save journal recovery
+  through read/commit, with a supplied package validator. The design reuses that
+  recovery for any preexisting normal transaction before a migration file write;
+  it creates no migration journal or new recovery state.
+
+### Bounded physical/record inventory
+
+Read-only Python Path/glob/JSON and sqlite3 `mode=ro` probes (no writes):
+
+| Source | Observed facts | Interpretation |
+| --- | --- | --- |
+| `applications/brief-studio/agent-teams/brief-studio-team/team-config.json` | version 2, two members | Repository-owned source/build removal; not runtime mutation |
+| `applications/socratic-math-teacher/agent-teams/socratic-math-team/team-config.json` | version 2, one member | Same source/build cohort |
+| `/home/autobyteus/data/agent-teams/classroomsimulation/team-config.json` | no version; two refType:agent members; SHA256 prefix 3f246e7135ac | Older shape exists, not an otherwise-current unversioned config; no inference it is admitted/launchable |
+| `/home/autobyteus/data` direct Team/Org/Org-owned Team definition globs | One config found | Bounded actual path sample, not a universal deployed cutover inventory |
+| `/tmp/autobyteus-dr008-user-test-20260911/server-data` and `/root/.autobyteus/server-data` same globs | Zero configs found | Empty writable sample roots do not prove absence of registered external packages |
+| DR-008 `agent-package` source root | Two Org configs version 1 and two Team configs version 2 | Registered test package evidence, not writable data-root migration authority; preserve other-owner fixtures |
+| `/home/autobyteus/data/db/production.db` migration status | Team tree migrations and 20260901 family SUCCEEDED; 20260905 summary SUCCEEDED_WITH_WARNINGS | Distinct state records; no manual resets or assumption old family will rerun |
+| DR-008 server-data `db/production.db` migration status | Team tree migrations, family and summary SUCCEEDED | Same completed-entry skip consequence; DB query does not validate a new authoring implementation |
+
+No external public/private project was mutated or reclassified as server-owned.
+The coexistence of an older data-root config and a completed family status does
+not establish why that file is there or authorize status reset/runtime replay.
+An unsupported source is reported intact by the new pass. Cutover enumerates
+actual owned paths under the configured data root; captured counts are not a
+hard-coded migration cohort. No secret data/provider traces were read for this
+probe and no running Delivery app was stopped or reconfigured.
+
+### Result and self-validation boundary
+
+AD-REV-020 isolates exact prior version validation within migrations, keeps
+20260901 historical outputs fixed, adds one ordered definition-only pass for
+already-completed installations, and uses zero-write current-field-free skips.
+Both current family codecs and diagnostics become version-free; runtime/schema
+versions and task/UI behavior stay unchanged. Self-validation VAL-046–050 covers
+actual authoring/roundtrip, strict rejections, migration ordering, owned child
+inventory, external zero writes, retry/status and no runtime rewrite. Real
+source/file/runner/browser tests and fresh Delivery remain downstream work.

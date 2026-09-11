@@ -27,6 +27,7 @@ does not revise intended behavior.
 | AD-REV-017 | API/E2E `API-FIND-019`, explicit user AgentTeam-parity confirmation, and Requirements Engineer approved `RER-026` | `API-FIND-019`; `BEH-017`; `REQ-034`; `AC-029`; `SCN-018`; `QR-012`; `DEC-021` | `Architecture Revision — AgentOrg Communication Observability Parity` | `Architecture Design Complete`; exact post-durable receiver event plus owning-root selected-member Messages facet over the existing sidecar; self-validation expanded to 40 cases; focused delta `Medium/High`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-018 | Architecture Reviewer `ARCH-REV-015` / endpoint-eligibility recovery round | `AR-FIND-008`; retained `API-FIND-019`; `REQ-034`; `AC-029`; `SCN-018` | `Architecture Revision — Both-Endpoint Configured Message Eligibility` | `Architecture Design Complete`; only configured→configured receives the new member event/Messages projection while all three task-involved exact-ID directions preserve prior delivery/sidecar behavior; 40-case self-validation tightened; focused delta `Small/Low`, cumulative `task_size=Large` / `architectural_risk=High`; another Architecture Review selected |
 | AD-REV-019 | Requirements Engineer approved RER-028 / user task-workflow parity correction | API-FIND-019; AAV-001 retained-history interpretation; REQ-034–036; AC-029–031; SCN-018–020 | `Architecture Revision — Task-Inclusive Messages, Participant Tasks And Retained Execution Views` | `Architecture Design Complete`; superseded configured gate removed; exact participant facets/selection/history and truthful system input; 45-case design self-validation; focused Medium/High, cumulative Large/High; independent Architecture Review selected |
+| AD-REV-020 | Approved RER-029 authoring simplification; Delivery DR-008 re-entry | PKG-AUTH-001 | Architecture Revision — Field-Free Team/Org Definition Authoring And Owned Transition | Architecture Design Complete; focused Medium/High, cumulative task_size=Large / architectural_risk=High; self-validation 50 cases; independent Architecture Review selected |
 
 ## Revision Entries
 
@@ -1612,3 +1613,65 @@ does not revise intended behavior.
   correlation and negative-path tests are specified in VAL-038–045. No remaining
   Requirement Gap or Product UI decision. All unrelated source/tests and dirty
   downstream artifacts are preserved and excluded from the architecture commit.
+
+### AD-REV-020 — Field-Free Team/Org Authoring And Definition-Only Transition
+
+- Date: 2026-09-11.
+- Trigger: explicit user removal of schemaVersion from both authored config
+  files, approved RER-029@0f5014405eb028123afb37013b722acb2d12fe22,
+  PKG-AUTH-001 and Delivery DR-008's bounded re-entry.
+- Prior authority: AD-REV-019@27ca03ef1f06ab826e2373c80bc8b81f3cc69f37 /
+  ARCH-REV-017 Pass@ffcdb2dc3b4d2db94455de9b1b4d701498f5591e; IR-038,
+  CRR-058/059 and API-REV-024. Current source preserved by 14a94fc45. No failure
+  against the former numeric authoring contract is inferred. DR-008 is prior
+  native validation only, not acceptance of RER-029.
+- Current result: Architecture Design Complete; Design Self-Validation Pass;
+  pending independent Architecture Review, with no source/test/delivery claim.
+- Governing IDs: BEH-010; REQ-012/013/026/027; AC-021/022/032/033;
+  SCN-021/022; DEC-024; ORG-CASE-049–055/062–063. All other required fields,
+  runtime/tree/sidecar versions, task/UI behavior and source ownership remain.
+- DS-031: one strict current family shape, no authored schemaVersion or normal
+  normalization. Rename/tighten current codecs/types without versioned aliases;
+  move all providers, Org-owned indexing, bundle validation and admission together.
+  Diagnostics name current family/shape and remove expected numeric version.
+  Existing create/update/domain inputs and runtime APIs do not gain new fields.
+- DS-032: prior version-bearing otherwise-current owned definitions require
+  migration because current admission rejects that key. Current field-free
+  definitions are zero-write skips; repository files are build-time changes;
+  external registered sources remain read-only and individually diagnosed.
+  Physical migration inventory includes Org-owned Teams even if parent config
+  cannot pass the normal current decoder. Do not recurse into configured Teams
+  or infer mutation ownership from an installed path being writable.
+- Keep existing 20260901 historical targets fixed under migration-local numeric
+  validators and add terminal-current no-op checks for retry. Add ordered
+  20260911_collaboration_definition_authoring_shape through the existing runner;
+  do not reset/replay completed runtime work. No runtime-success prerequisite
+  suppresses independently valid definition work; new pass validates its own
+  complete inventory and reports unfinished/unsupported definition items.
+- One-key transformation uses existing atomic file writer and strict reread,
+  preserving all other JSON values, IDs, Markdown and package assets. Existing
+  ordinary-authoring transaction recovery is reused when present, not replaced
+  with a new migration journal/backup/recovery protocol.
+- DS-033: new definition migration SUCCEEDED only for complete converted/skipped
+  current inventory; required source/read/write/validation failure is FAILED,
+  per-definition/dependency admission only. No warning for an authored version
+  still present, and no change to the summary migration's bounded warning policy.
+  Ordinary restart uses existing runner/status/log conventions.
+- Artifact alignment: design status/current evidence, target types/examples,
+  admission diagnostics, behavior/transition/ownership/interface/file/removal
+  maps, risk/guidance and new DS-031–033; self-validation VAL-046–050; inquiry
+  resolution plus bounded read-only physical/record inventory. Historical
+  AD-REV-001–019 entries remain unchanged. Requirements/Product and downstream
+  source/evidence are preserved and excluded from the architecture commit.
+- Classification: focused Medium/High (stored-definition contract/admission,
+  diagnostics and startup transition), cumulative Large/High remains because
+  parent feature is structural. No new Product decision, requirement gap or
+  material open architecture decision remains. Independent review must check
+  both authored families, transition ordering/ownership, no runtime replay and
+  one current normal codec. Dynamic rules determine the exact next recipient.
+- Residual implementation risks: field injection from an old builder/importer,
+  hidden Org-owned sources, obsolete numeric diagnostic clients, historical
+  migration import breakage, global failure gating or external writes. Required
+  deterministic file/runner/authoring and rendered validation are in VAL-046–050.
+  Fresh source/API review and Delivery build/user verification must follow;
+  no release, finalization or terminal Requirements handoff is claimed here.
