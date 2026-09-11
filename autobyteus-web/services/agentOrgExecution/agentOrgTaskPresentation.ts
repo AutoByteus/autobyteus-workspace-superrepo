@@ -1,8 +1,8 @@
 import type { AgentOrgExecutionViewDto } from '@autobyteus/collaboration-stream-contracts'
-import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { AgentOrgExecutionViewIndex } from './agentOrgExecutionViewIndex'
 import { memberAddressBasename } from '~/types/agent/AgentTeamAddress'
 import type {
+  CollaborationTaskParticipantLink,
   DelegatedTaskDirection,
   DelegatedTaskEntry,
   DelegatedTaskLifecycleItem,
@@ -12,9 +12,11 @@ import { projectAgentOrgReference } from './agentOrgReferenceProjection'
 
 type TaskRecord = AgentOrgExecutionViewDto['task_records']['records'][number]
 
-const named = (address: string): DelegatedTaskParticipant => ({
-  kind: 'named',
-  label: memberAddressBasename(address),
+const agentLink = (agent: Readonly<{ agentRunId: string; address: string }>): CollaborationTaskParticipantLink => ({
+  agentRunId: agent.agentRunId, address: agent.address, label: memberAddressBasename(agent.address),
+})
+const namedAgent = (link: CollaborationTaskParticipantLink): DelegatedTaskParticipant => ({
+  kind: 'named', label: link.label, targetKind: 'agent', link,
 })
 const directed = (from: DelegatedTaskParticipant, to: DelegatedTaskParticipant): DelegatedTaskDirection => ({
   kind: 'directed',
@@ -33,10 +35,9 @@ const displayStatus = (task: TaskRecord): DelegatedTaskEntry['displayStatus'] =>
 
 const lifecycle = (
   task: TaskRecord,
-  delegatorAddress: AgentTeamAddress,
+  delegator: DelegatedTaskParticipant,
+  recipient: DelegatedTaskParticipant,
 ): readonly [DelegatedTaskLifecycleItem, ...DelegatedTaskLifecycleItem[]] => {
-  const delegator = named(delegatorAddress)
-  const recipient = named(task.recipientAddress)
   const assignment = directed(delegator, recipient)
   const response = directed(recipient, delegator)
   const items: DelegatedTaskLifecycleItem[] = [{
@@ -107,7 +108,7 @@ const lifecycle = (
       itemKey: `task:${task.taskId}:interruption:${update.interruptionId}`,
       createdAt: update.createdAt,
       content: update.reason,
-      direction: { kind: 'system' },
+      direction: { kind: 'system', assignment: { from: delegator, to: recipient } },
       referenceFiles: [],
     })
   }
@@ -123,7 +124,11 @@ export const projectAgentOrgTasks = (input: Readonly<{
   return input.view.task_records.records.flatMap((task): DelegatedTaskEntry[] => {
     const targetAgentRunId = 'agentRunId' in task.taskExecution ? task.taskExecution.agentRunId : null
     if (!input.index.isRelevant(task, input.focusedAgentRunId)) return []
-    const delegatorAddress = input.index.requireAgent(task.delegatorAgentRunId).address
+    const delegator = namedAgent(agentLink(input.index.requireAgent(task.delegatorAgentRunId)))
+    const recipient: DelegatedTaskParticipant = 'agentRunId' in task.taskExecution
+      ? namedAgent(agentLink(input.index.requireAgent(task.taskExecution.agentRunId)))
+      : { kind: 'named', label: memberAddressBasename(task.recipientAddress), targetKind: 'task_team',
+        teamRunId: task.taskExecution.teamRunId, participants: input.index.taskParticipants(task).map(agentLink) }
     const runId = targetAgentRunId
       ?? ('teamRunId' in task.taskExecution ? task.taskExecution.teamRunId : '')
     if (!runId) return []
@@ -131,13 +136,11 @@ export const projectAgentOrgTasks = (input: Readonly<{
       kind: targetAgentRunId ? 'task_agent' : 'task_team',
       entryKey: `task:${task.taskId}`,
       root: { kind: 'agent_org', runId: input.orgRunId },
-      participants: [input.index.requireAgent(task.delegatorAgentRunId), ...input.index.taskParticipants(task)]
-        .map((agent) => ({ agentRunId: agent.agentRunId, address: agent.address, label: memberAddressBasename(agent.address) })),
       taskId: task.taskId,
       runId,
       displayStatus: displayStatus(task),
       lastActivityAt: task.updates.at(-1)?.createdAt ?? task.createdAt,
-      lifecycleItems: lifecycle(task, delegatorAddress),
+      lifecycleItems: lifecycle(task, delegator, recipient),
     }]
   })
 }

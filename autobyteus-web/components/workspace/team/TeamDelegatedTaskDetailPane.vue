@@ -10,7 +10,9 @@
 
     <TeamDelegatedTaskItemDetail
       v-else-if="selectedEntry && selectedItem"
+      :key="`${selectedEntry.entryKey}:${selectedItem.itemKey}`"
       :item="selectedItem"
+      @select-participant="$emit('select-participant', $event)"
       :display-status="selectedEntry.displayStatus"
     />
 
@@ -22,9 +24,11 @@
 
 <script setup lang="ts">
 import type { TeamReferenceFile } from '~/types/teamReferenceFile';
-import type { DelegatedTaskEntry, DelegatedTaskLifecycleItem } from '~/types/workspace/collaborationTaskPresentation';
+import type { CollaborationTaskParticipantLink, DelegatedTaskEntry, DelegatedTaskLifecycleItem } from '~/types/workspace/collaborationTaskPresentation';
 import TeamDelegatedTaskItemDetail from '~/components/workspace/team/TeamDelegatedTaskItemDetail.vue';
 import TeamTaskReferenceViewer from '~/components/workspace/team/TeamTaskReferenceViewer.vue';
+
+defineEmits<{ (e: 'select-participant', participant: CollaborationTaskParticipantLink): void }>();
 
 withDefaults(defineProps<{
   selectedEntry: DelegatedTaskEntry | null;

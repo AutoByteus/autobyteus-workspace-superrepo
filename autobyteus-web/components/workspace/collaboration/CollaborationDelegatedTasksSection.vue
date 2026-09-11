@@ -71,17 +71,9 @@
           @mousedown="startResize"
         />
 
-        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
-          <nav v-if="selectedEntry" class="flex flex-wrap gap-2 border-b border-slate-100 p-2">
-            <button v-for="participant in selectedEntry.participants" :key="participant.agentRunId"
-              type="button" class="truncate rounded px-2 py-1 text-xs text-indigo-700 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-500"
-              :title="`${participant.address} · ${participant.agentRunId}`"
-              :aria-label="`${participant.label} · ${participant.address} · ${participant.agentRunId}`"
-              @click="selectParticipant(participant.agentRunId, participant.address)">
-              {{ participant.label }} · {{ participant.agentRunId.slice(-6) }}
-            </button>
-          </nav>
         <TeamDelegatedTaskDetailPane
+          :key="scopeKey"
+          @select-participant="selectParticipant"
           :selected-entry="selectedEntry"
           :selected-item="selectedItem"
           :selected-reference="selectedReference"
@@ -90,7 +82,6 @@
             ? tasks.taskReferenceContentPath(selectedEntry.taskId, selectedReference.referenceId)
             : ''"
         />
-        </div>
       </div>
     </div>
   </section>
@@ -105,6 +96,7 @@ import { Icon } from '@iconify/vue';
 import type { CollaborationTasksContextView } from '~/types/workspace/collaborationTasksContextView';
 import { useHorizontalSplitResize } from '~/composables/useHorizontalSplitResize';
 import {
+  type CollaborationTaskParticipantLink,
   type DelegatedTaskEntry,
   type DelegatedTaskItemLocator,
   type DelegatedTaskLifecycleItem,
@@ -126,7 +118,7 @@ defineEmits<{
 
 const router = useRouter();
 const subjectActions = useWorkspaceHistorySubjectActions();
-const selectParticipant = async (agentRunId: string, memberAddress: string) => {
+const selectParticipant = async ({ agentRunId, address: memberAddress }: CollaborationTaskParticipantLink) => {
   const root = selectedEntry.value?.root;
   if (!root) return;
   if (root.kind === 'agent_org') {

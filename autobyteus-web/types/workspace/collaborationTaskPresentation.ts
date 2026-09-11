@@ -10,7 +10,11 @@ export interface CollaborationTaskHeadingPresentation {
 }
 
 export type DelegatedTaskParticipant =
-  | Readonly<{ kind: 'named'; label: string }>
+  | (Readonly<{ kind: 'named'; label: string }> & (
+    | Readonly<{ targetKind: 'agent'; link: CollaborationTaskParticipantLink }>
+    | Readonly<{ targetKind: 'task_team'; teamRunId: string; participants: readonly CollaborationTaskParticipantLink[] }>
+    | Readonly<{ targetKind: 'unavailable' }>
+  ))
   | Readonly<{ kind: 'delegator_fallback' }>
   | Readonly<{ kind: 'assignee_fallback' }>;
 
@@ -20,7 +24,7 @@ export type DelegatedTaskDirection =
     from: DelegatedTaskParticipant;
     to: DelegatedTaskParticipant;
   }>
-  | Readonly<{ kind: 'system' }>;
+  | Readonly<{ kind: 'system'; assignment: Readonly<{ from: DelegatedTaskParticipant; to: DelegatedTaskParticipant }> }>;
 
 interface DelegatedTaskLifecycleItemBase<TContent extends string | null = string> {
   readonly itemKey: string;
@@ -62,7 +66,6 @@ export interface DelegatedTaskEntry {
   readonly kind: DelegatedTaskEntryKind;
   readonly entryKey: string;
   readonly root: Readonly<{ kind: 'agent_team' | 'agent_org'; runId: string }>;
-  readonly participants: readonly CollaborationTaskParticipantLink[];
   readonly taskId: string;
   readonly runId: string;
   readonly displayStatus: DelegatedTaskDisplayStatus;

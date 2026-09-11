@@ -47,14 +47,6 @@
                   <p class="mt-0.5 truncate text-xs text-gray-500">
                     {{ counterpartMetadata(message) }}
                   </p>
-                  <p class="truncate font-mono text-xs text-gray-400" :title="message.counterpart.address">
-                    {{ message.counterpart.address }}
-                  </p>
-                  <span v-if="message.counterpart.kind === 'task'" class="rounded-full bg-indigo-100 px-2 py-0.5 text-[0.6875rem] text-indigo-700"
-                    :title="`${message.counterpart.taskId} · ${message.counterpart.hostRunId} · ${message.counterpartAgentRunId}`"
-                    :aria-label="`${$t('workspace.task_monitor.task')} · ${message.counterpart.taskId} · ${message.counterpartAgentRunId}`">
-                    {{ $t('workspace.task_monitor.task') }} · {{ message.counterpartAgentRunId.slice(-6) }}
-                  </span>
                   <p class="mt-1 line-clamp-2 whitespace-pre-line text-sm leading-5 text-gray-600">
                     {{ message.content }}
                   </p>
@@ -101,9 +93,8 @@
         </div>
         <div v-else-if="selectedMessage" class="h-full overflow-y-auto p-4">
           <div class="mb-3">
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0 flex-1">
-              <div class="flex min-w-0 items-center gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+              <div class="flex min-w-0 max-w-full items-center gap-2">
                 <Icon
                   :icon="directionIcon(selectedMessage)"
                   class="h-4 w-4 shrink-0"
@@ -118,13 +109,23 @@
                   />
                   <span class="truncate">{{ counterpartName(selectedMessage) }}</span>
                 </span>
-              </div>
+                <button type="button" class="shrink-0 rounded p-1 text-gray-400 hover:text-gray-700 focus-visible:ring-2 focus-visible:ring-blue-500"
+                  :aria-label="t('workspace.collaboration.identity.details')" :aria-expanded="identityOpen" :aria-controls="identityId"
+                  data-test="message-identity-toggle" @click="identityOpen = !identityOpen">
+                  <Icon icon="heroicons:information-circle" class="h-4 w-4" aria-hidden="true" />
+                </button>
               </div>
               <span class="shrink-0 text-xs text-gray-400">{{ formatTimestamp(selectedMessage.createdAt) }}</span>
             </div>
-            <p class="ml-6 mt-0.5 break-all font-mono text-xs text-gray-400">
-              {{ selectedMessage.counterpart.address }}
-            </p>
+            <div v-if="identityOpen" :id="identityId" class="mt-2 space-y-1 break-all rounded bg-gray-50 p-2 text-xs text-gray-600" data-test="message-identity-detail">
+              <p>{{ t('workspace.collaboration.identity.address') }}: {{ selectedMessage.counterpart.address }}</p>
+              <p>{{ t('workspace.collaboration.identity.agentRun') }}: {{ selectedMessage.counterpartAgentRunId }}</p>
+              <template v-if="selectedMessage.counterpart.kind === 'task'">
+                <p>{{ t('workspace.collaboration.identity.task') }}: {{ selectedMessage.counterpart.taskId }}</p>
+                <p>{{ t('workspace.collaboration.identity.hostRun') }}: {{ selectedMessage.counterpart.hostRunId }}</p>
+                <p>{{ t('workspace.collaboration.identity.executionRun') }}: {{ selectedMessage.counterpart.executionRunId }}</p>
+              </template>
+            </div>
           </div>
           <MarkdownRenderer
             :content="selectedMessage.content"
@@ -141,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, useId } from 'vue';
 import { Icon } from '@iconify/vue';
 import { useLocalization } from '~/composables/useLocalization';
 import { useHorizontalSplitResize } from '~/composables/useHorizontalSplitResize';
@@ -162,6 +163,8 @@ const props = defineProps<{
 }>();
 
 const { t } = useLocalization();
+const identityOpen = ref(false);
+const identityId = useId();
 const selectedMessageId = ref<string | null>(null);
 const selectedReferenceId = ref<string | null>(null);
 const selectedType = ref<'message' | 'reference'>('message');
@@ -184,6 +187,10 @@ const selectedMessage = computed(() =>
 const selectedReference = computed(() =>
   selectedMessage.value?.referenceFiles.find((reference) => reference.referenceId === selectedReferenceId.value) || null,
 );
+
+watch([() => props.messages.rootKind, () => props.messages.rootRunId, () => props.messages.focusedAgentRunId,
+  () => props.messages.focusedMemberAddress, selectedMessageId, selectedReferenceId, selectedType],
+() => { identityOpen.value = false; });
 
 const compactMessageLabel = (message: CollaborationMessagePerspectiveRow): string => {
   const normalized = (message.messageType || 'agent_message').trim();

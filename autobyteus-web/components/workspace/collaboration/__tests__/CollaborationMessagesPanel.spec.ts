@@ -56,10 +56,10 @@ describe('CollaborationMessagesPanel current AgentRun perspective', () => {
     expect(rows).toHaveLength(2);
     expect(rows[0].text()).toContain('Assignment');
     expect(rows[0].text()).toContain('from reviewer');
-    expect(rows[0].text()).toContain('/reviewer');
+    expect(rows[0].text()).not.toContain('/reviewer');
     expect(rows[1].text()).toContain('Handoff');
     expect(rows[1].text()).toContain('to reviewer');
-    expect(rows[1].text()).toContain('/reviewer');
+    expect(rows[1].text()).not.toContain('/reviewer');
     expect(wrapper.get('[data-test="team-communication-message-markdown"]').text()).toContain('The task review is complete.');
     expect(wrapper.text()).not.toContain('task-reviewer-run');
   });
@@ -76,4 +76,39 @@ describe('CollaborationMessagesPanel current AgentRun perspective', () => {
     await wrapper.get('[data-test="team-communication-reference-row"]').trigger('click');
     expect(wrapper.get('[data-test="reference-viewer"]').text()).toBe('team-runs/team-1/team-communication/messages/message-sent/references/ref-1/content:ref-1');
   });
+});
+
+it('keeps identity out of the list and reveals exact task provenance only on demand in the right detail', async () => {
+  const wrapper = mountSubject();
+  const list = wrapper.get('[data-test="team-communication-left-list"]');
+  expect(list.find('[data-test="message-identity-toggle"]').exists()).toBe(false);
+  expect(list.text()).not.toContain('/reviewer');
+  expect(list.text()).not.toContain('Task ·');
+  const button = wrapper.get('[data-test="message-identity-toggle"]');
+  expect(button.attributes('aria-expanded')).toBe('false');
+  expect(button.attributes('aria-label')).toBe('Participant details');
+  await button.trigger('click');
+  const detail = wrapper.get('[data-test="message-identity-detail"]');
+  expect(detail.attributes('id')).toBe(button.attributes('aria-controls'));
+  expect(detail.text()).toContain('/reviewer');
+  expect(detail.text()).toContain('task-reviewer-run');
+  expect(detail.text()).toContain('task-1');
+  expect(detail.text()).toContain('team-1');
+  await wrapper.get('[data-test="team-communication-reference-row"]').trigger('click');
+  expect(wrapper.find('[data-test="message-identity-detail"]').exists()).toBe(false);
+  await wrapper.findAll('[data-test="team-communication-message-summary"]')[0].trigger('click');
+  expect(wrapper.get('[data-test="message-identity-toggle"]').attributes('aria-expanded')).toBe('false');
+});
+
+it('closes identity on exact subject/item changes but preserves it across same-item live updates', async () => {
+  const wrapper = mountSubject();
+  await wrapper.get('[data-test="message-identity-toggle"]').trigger('click');
+  const original = wrapper.props('messages');
+  await wrapper.setProps({ messages: { ...original, listMessages: () => original.listMessages().map((m) => ({ ...m, content: `${m.content} updated` })) } });
+  expect(wrapper.get('[data-test="message-identity-toggle"]').attributes('aria-expanded')).toBe('true');
+  await wrapper.setProps({ messages: { ...original, rootKind: 'agent_org', rootRunId: 'exact-other-root' } });
+  expect(wrapper.get('[data-test="message-identity-toggle"]').attributes('aria-expanded')).toBe('false');
+  await wrapper.get('[data-test="message-identity-toggle"]').trigger('click');
+  await wrapper.findAll('[data-test="team-communication-message-summary"]')[1].trigger('click');
+  expect(wrapper.get('[data-test="message-identity-toggle"]').attributes('aria-expanded')).toBe('false');
 });

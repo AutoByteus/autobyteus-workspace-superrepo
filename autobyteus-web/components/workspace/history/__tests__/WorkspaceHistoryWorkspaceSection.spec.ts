@@ -1,3 +1,4 @@
+import { localizationRuntime } from '~/localization/runtime/localizationRuntime';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { reactive, ref } from 'vue';
@@ -227,14 +228,30 @@ const mountSubject = (options: {
 };
 
 describe('WorkspaceHistoryWorkspaceSection current execution rows', () => {
-  it('renders Agent Orgs directly after standalone Teams and delegates exact root/member actions', async () => {
+  it('renders Org directly after standalone Teams and delegates exact root/member actions', async () => {
     const group = agentOrgDefinitionGroup()
     const { wrapper, actions, state } = mountSubject({ agentOrgDefinitions: [group] })
     const text = wrapper.text()
     expect(text.indexOf('Teams')).toBeGreaterThanOrEqual(0)
-    expect(text.indexOf('Agent Orgs')).toBeGreaterThan(text.indexOf('Teams'))
+    expect(text.indexOf('Org')).toBeGreaterThan(text.indexOf('Teams'))
     expect(wrapper.findAll('[data-test="workspace-team-row-team-run-1"]')).toHaveLength(1)
-    expect(wrapper.find('[data-test="workspace-agent-orgs"]').exists()).toBe(true)
+    const collection = wrapper.get('[data-test="workspace-agent-orgs"]')
+    const heading = collection.get('div.uppercase')
+    expect(heading.text()).toBe('Org')
+    const teamElement = wrapper.get('[data-test="workspace-team-row-team-run-1"]').element
+    const orgElement = wrapper.get('[data-test="agent-org-team-row-mounted-team-run"]').element
+    const oldProps = wrapper.props()
+    await localizationRuntime.setPreference('zh-CN')
+    await wrapper.vm.$nextTick()
+    expect(heading.text()).toBe('组织')
+    expect(wrapper.get('[data-test="workspace-team-row-team-run-1"]').element).toBe(teamElement)
+    expect(wrapper.get('[data-test="agent-org-team-row-mounted-team-run"]').element).toBe(orgElement)
+    expect(wrapper.props().state).toBe(oldProps.state)
+    expect(state.toggleAgentOrgRun).not.toHaveBeenCalled()
+    expect(state.toggleAgentOrgTeam).not.toHaveBeenCalled()
+    await localizationRuntime.setPreference('en')
+    await wrapper.vm.$nextTick()
+    expect(heading.text()).toBe('Org')
     expect(wrapper.text()).not.toContain('Restore')
 
     await wrapper.get('[data-test="agent-org-team-row-mounted-team-run"]').trigger('click')

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { computed, shallowReactive } from 'vue'
+import { projectAgentOrgTasks } from '../agentOrgTaskPresentation'
 import { AgentOrgExecutionViewIndex } from '../agentOrgExecutionViewIndex'
 import { projectAgentOrgCommunicationPerspective } from '../agentOrgCommunicationPerspective'
 import { hydrateAgentOrgExecutionContext } from '../agentOrgContextHydration'
@@ -39,6 +40,18 @@ describe('task-inclusive exact Org presentation', () => {
     for (const unrelated of ['agent-lead-configured', 'agent-task-lead-second', 'descendant-run']) expect(index.isRelevant(task, unrelated)).toBe(false)
     expect(index.isRelevant(view.task_records.records[3]!, 'agent-task-lead')).toBe(true)
     expect(index.coordinator('team-second').agentRunId).toBe('agent-task-lead-second')
+    const entries = projectAgentOrgTasks({ orgRunId: 'org-run', view, index, focusedAgentRunId: 'agent-director' })
+    const direction = entries.find(entry => entry.taskId === task.taskId)!.lifecycleItems[0].direction
+    expect(direction).toEqual({ kind: 'directed',
+      from: { kind: 'named', label: 'director', targetKind: 'agent',
+        link: { label: 'director', address: '/director', agentRunId: 'agent-director' } },
+      to: { kind: 'named', label: 'team', targetKind: 'task_team', teamRunId: 'team-task', participants: [
+        { label: 'lead', address: '/team/lead', agentRunId: 'agent-task-lead' },
+        { label: 'worker', address: '/team/worker', agentRunId: 'agent-task-worker' },
+      ] },
+    })
+    expect(entries.map(entry => entry.taskId)).not.toContain('child-task')
+
     expect(index.requireAgent('descendant-run')).toMatchObject({ execution: { platformAgentRunId: 'actual-child' },
       source: { agentDefinitionId: 'definition-agent-worker-configured' }, task: { taskId: 'child-task' }, host: { runId: 'team-task' } })
   })

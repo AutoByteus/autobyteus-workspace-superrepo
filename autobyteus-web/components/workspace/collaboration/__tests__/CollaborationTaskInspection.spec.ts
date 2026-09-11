@@ -29,8 +29,9 @@ describe('shared participant Tasks inspection', () => {
       template: '<CollaborationOverviewPanel :messages="target.collaborationMessages" :tasks="target.collaborationTasks" />' })
     const wrapper = mount(Harness, { global: { mocks: { $t: (key: string, params?: any) => localizationRuntime.translate(key, params) } } })
     expect(wrapper.get('[data-test="team-delegated-tasks-header"]').text()).toContain('2 tasks')
-    const taskLink = wrapper.get('nav button[title="/worker · agent-worker-task"]')
-    expect(taskLink.attributes('aria-label')).toContain('agent-worker-task')
+    const taskLink = wrapper.get('[data-test="task-direction-agent"][title="/worker · agent-worker-task"]')
+    expect(taskLink.attributes('title')).toContain('agent-worker-task')
+    expect(wrapper.find('nav').exists()).toBe(false)
     await taskLink.trigger('click'); await flushPromises()
     expect(mocks.execute).toHaveBeenCalledWith({ rootSubjectKind: 'agent_org', rootRunId: 'org-run', action: 'inspect',
       agentRunId: 'agent-worker-task', memberAddress: '/worker' })
