@@ -30,6 +30,7 @@ does not revise intended behavior.
 | AD-REV-020 | Approved RER-029 authoring simplification; Delivery DR-008 re-entry | PKG-AUTH-001 | Architecture Revision — Field-Free Team/Org Definition Authoring And Owned Transition | Architecture Design Complete; focused Medium/High, cumulative task_size=Large / architectural_risk=High; self-validation 50 cases; independent Architecture Review selected |
 | AD-REV-021 | User-approved UI cleanup; approved RER-031 including RER-030 | UI-CLEAN-001; REQ-031/034/035; AC-026/034 | Architecture Revision — Compact Messages, Inline Task Navigation And Org History Heading | Architecture Design Complete; focused Small/Low, cumulative task_size=Large / architectural_risk=High; 53-case design inventory; independent Architecture Review selected |
 | AD-REV-022 | Approved RER-032 plural history-label clarification | UI-CLEAN-001; REQ-031; AC-026 | Architecture Revision — Orgs Literal Synchronization Only | Architecture Design Complete; current copy-only task_size=Small / architectural_risk=Low, direct Implementation re-entry; parent Large/High review remains passed; VAL-053 updated |
+| AD-REV-023 | User DR-009 restart/stop comparison and explicit design-update instruction | HIST-INSPECT-001/002 | Architecture Revision — Observational History, Deliberate Continuation And Retained Stop | Architecture Design Complete; focused Medium/High, cumulative Large/High; 58-case self-validation; independent Architecture Review selected |
 
 ## Revision Entries
 
@@ -1742,3 +1743,54 @@ does not revise intended behavior.
 - Remaining risk: accidental broad rename or changing keys/state while updating
   display text. Restrict to history collectionLabel and its exact expectations;
   keep Chinese organization label unchanged. No open behavior/design decision.
+
+### AD-REV-023 — Observational History, Deliberate Continuation And Retained Stop
+
+- Date: 2026-09-11. Trigger: user DR-009 restart/history screenshots and terminate
+  comparison, followed by explicit “please do” design-update instruction.
+  HIST-INSPECT-001/002 are recorded in architecture-history-inspection-investigation.md.
+  Prior inquiry commits 09a0570a2/c3f0e5716 were investigations, not AD revisions.
+- Authority: approved RER-032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a;
+  REQ-004/016/019/025/031/034–036, AC-011/026/029–031, SCN-012/015/018–020.
+  No requirement or Product decision remains. Earlier inspected Team baseline
+  5fb16658e / local origin/personal 5645b49d6 independently establishes the path.
+- Prior design: AD-REV-022@17b0b3cc5dca03c7e4016cf54516c4441a16df35; last
+  independent architectural baseline AD-REV-021 / ARCH-REV-019 Pass. Current
+  evidence at 00c3aeea7; IR-044@25436ef4d composer fix remains in scope to preserve.
+- Result: Architecture Design Complete; design self-validation Pass; independent
+  review pending. No source/test/provider/browser/delivery pass claimed.
+- DS-035: configured and task history reads share existing strict inspection;
+  no restore on selection/mount/reconnect. Exact inactive configured Agents have
+  explicit continuable send-only capability, not live access; retained task
+  executions remain read-only. No new screen or resume button is introduced.
+- DS-036: one existing Org context-store submission boundary captures exact
+  identity and consumes the draft once, then restores only for deliberate Send,
+  awaits strict stream readiness and submits the correlated payload once.
+  Relocate IR-044 local-submission logic from transport, preserving null history
+  side effects, failure/newer-draft behavior and echo dedupe. One bounded
+  continuation latch, no new runtime coordinator/queue/job/persisted state.
+- DS-037: confirmed stop retires transport, keeps selected root/Agent and
+  conversation, publishes historical Offline, and reads final retained state.
+  Remove destructive close/selection reset and configuration redirect. Failed
+  stop does not fabricate inactivity; background stop cannot steal focus.
+- Ownership: context store owns browser operations/publication, context owns
+  exact projection/facets, streaming owns protocol/readiness/correlation, run
+  command store owns API calls, server root owns runtime lifecycle, history
+  store owns its single data slice, router/panel retain selection/tree state.
+- Data: Not Affected; current strict stores/readers remain. No migration replay,
+  schema/version/sidecar change, root activation-cohort change, task-policy or
+  Agent shutdown-fence alteration. No permanent compatibility branch.
+- Artifacts: design status/current impact, DS-035–037 spines/owners/interfaces/
+  file mapping/removal/transition/risk, corrected DS-029 access language,
+  VAL-054–058 and affected audits, this record, inquiry resolution. Prior
+  AD-REV-001–022 narratives and all upstream/other-owner artifacts are preserved.
+- Classification: focused Medium/High, cumulative task_size=Large and
+  architectural_risk=High. Risk is changed browser lifecycle intent and async
+  exact-context publication, not volume. Select independent revised-impact
+  review. Only after Pass should Implementation receive the correction; normal
+  source review, executable validation and Delivery build/user verification follow.
+- Residual implementation risks: accidental restore watcher; draft loss or
+  duplicate echo during snapshot replacement; readiness failure after successful
+  restore; stale active badge/port after stop; route completion steals focus.
+  VAL-054–058 bound these with normal UI scenarios and deterministic barriers.
+  No remaining material design question; no successful terminal package handoff.

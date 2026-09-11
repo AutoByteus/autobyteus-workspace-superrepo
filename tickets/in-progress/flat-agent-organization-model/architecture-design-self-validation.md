@@ -3,14 +3,15 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture: `AD-REV-022`, canonical `design-spec.md`
+- Architecture: `AD-REV-023`, canonical `design-spec.md`
 - Approved requirements: `RER-032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a`
-- Prior review: AD-REV-021 / ARCH-REV-019 Pass; inspected IR-040 source
-  06d020da3. Current change is the RER-032 English heading literal only.
+- Prior review: AD-REV-021 / ARCH-REV-019 Pass; AD-REV-022 copy-only direct route.
+  Current evidence: 00c3aeea7; HIST-INSPECT-001/002; preserve IR-044 composer fix.
 - Date: 2026-09-11
-- Result: `Design Self-Validation Pass — Small/Low copy-only Implementation re-entry`
-- 53 design walkthroughs in the cumulative inventory; VAL-053 re-walked for this copy-only round; no source, browser, provider or API/E2E execution
-  performed/claimed in this round. Prior scoped tests remain historical evidence.
+- Result: `Design Self-Validation Pass — History/Continuation/Stop; Independent Review Pending`
+- 58 design walkthroughs in the cumulative inventory; VAL-054–058 added and
+  VAL-032/033/042/044 ownership/access boundaries re-walked. No source, browser,
+  provider or API/E2E execution in this round. Prior tests keep recorded scope.
 - Product: no new gate. Existing approved packages remain normative elsewhere.
 
 ## Purpose And Method
@@ -44,7 +45,7 @@ already implemented correction is still absent.
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed ARCH-REV-017 Pass on AD-REV-019; earlier findings retained as historical evidence)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed structural ARCH-REV-019 Pass on AD-REV-021; AD-REV-022 was copy-only/direct; earlier findings retain historical scope)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -215,6 +216,11 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-051 | REQ-034/036; AC-034; SCN-018 | Compact Messages defaults with exact on-demand identity and unchanged accepted rows | DS-034a/r | Pass |
 | VAL-052 | REQ-035; AC-034; SCN-019 | Task detail without strip, exact Agent/Team participant navigation and retained references | DS-034b/r | Pass |
 | VAL-053 | REQ-031; AC-026; SCN-015 | Exact Orgs history heading with unchanged sibling order and UI state | DS-034c | Pass |
+| VAL-054 | SCN-012/015/018/019; user restart finding | History selection without activation | DS-035 | Pass |
+| VAL-055 | REQ-016/031/034–036; Team continuation baseline | Deliberate exact continuation, preserved draft and one echo | DS-036 | Pass |
+| VAL-056 | SCN-015/018/019; user terminate finding | Stop retains conversation without new configuration | DS-037 | Pass |
+| VAL-057 | Existing command/recovery contracts | Failure truth and bounded pending conflicts | DS-036l/037r | Pass |
+| VAL-058 | Shared surfaces and exact state ownership | Publication/status generations, desktop/narrow and Team regression | DS-035–037 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1617,6 +1623,104 @@ package-family rename. It does not infer logical topology from directory depth.
   desktop/narrow check required. Design walkthrough Pass.
 
 
+### VAL-054 — Restart History Selection Is Observational
+
+- **Basis:** user DR-009 restart screenshots; SCN-012/015/018/019 and existing
+  Team history behavior at pinned origin/personal. Supported normal scenario.
+- **Spine:** root/member/Team/task click -> typed action -> context-store inspection
+  -> existing server read boundary -> strict projections -> selected conversation.
+- **Walk:** with server restarted and Org absent from active registry, open root,
+  configured direct Agent, mounted Team/coordinator and another mounted Agent.
+  Read retained conversations, Messages/Tasks and references without any restore
+  or create mutation, provider preparation or runtime registry publication.
+- **State:** inactive configured targets are continuable, not live; per-Agent and
+  mounted-Team signals remain Offline. Retained tasks are read-only and exact.
+  Active-query results attach to an already active root, never create one.
+- **Boundary:** mode/row status and stream reconnection are not activation intent.
+  Source definition is not consulted to substitute identities. No config form or
+  current-focus fallback. Preserve left-tree expansion/scroll.
+- **Result:** design walkthrough Pass; executable no-activation assertions needed.
+
+### VAL-055 — Deliberate Continuation Is One Exact Submission
+
+- **Basis:** user explicitly distinguishes reading history from sending again;
+  pinned Team inactive-send restore; existing REQ-016/031/034–036. Normal scenario.
+- **Spine:** configured inactive target Send -> context-store submission -> root
+  restore -> correlated ready snapshot -> prepared exact transport command -> ACK
+  and one canonical conversation echo. Server full-scope restore is unchanged.
+- **Walk:** direct and mounted configured targets consume captured text/references
+  once via the preserved IR-044 helper logic. Root continuation is pending; second
+  conflicting operation is busy, not queued. Await existing stream readiness,
+  not arbitrary delay, then send only the original AgentRun ID/payload.
+- **Focus/edit barrier:** pause readiness, select Agent B or another root and type
+  a new draft; fully validated candidate commit retains matching AgentContext
+  identity and merges only the pending correlated local message. Draft edits
+  before the textarea debounce expires remain attached to the right context.
+  Completion does not focus A again or navigate back from another root.
+- **Return:** prepared transport cannot begin a second local submission; one
+  messageId/dedupeKey reconciles echo. Accepted ACK refreshes authoritative title;
+  no optimistic Org title or Team navigation effect. No task continuation port.
+- **Result:** Pass at design boundary; real send/restore and Vue tests required.
+
+### VAL-056 — Successful Termination Preserves Exact Conversation
+
+- **Basis:** user's terminate-to-launch finding; earlier/current Team stop path;
+  SCN-015/018/019 and root-only stop ownership. Supported normal scenario.
+- **Spine:** root Stop -> context-store operation -> existing termination owner ->
+  confirmed inactive -> retired transport/historical context -> same conversation.
+- **Walk:** focus direct Agent, mounted Agent and retained task in separate runs;
+  stop the root. Preserve root/Agent identity, conversation and panel/tree state;
+  runtime status becomes Offline and active-only controls disappear. Configured
+  targets can deliberately continue; settled/task history remains read-only.
+- **Return:** strict stopped inspection reconciles final Tasks/Messages; read
+  failure leaves last-known content and visible error, not empty center, guessed
+  final task state or configuration. No create/restore call follows Stop.
+- **Navigation:** stop another root while viewing B; B is not displaced. A user
+  switching roots during stop is not navigated back by its completion. Same-root
+  active/history mode switch cannot dispose the retained context.
+- **Result:** design walkthrough Pass; terminate and rendered retention checks needed.
+
+### VAL-057 — Failure Truth And Pending Operation Boundaries
+
+- **Basis:** existing command rejection/recovery behavior exercised through normal
+  visible Send/Stop actions, not an invented recovery workflow.
+- **Restore failure:** fail the local pending submission without pretending the
+  root was activated or the input accepted. Preserve newer edits and other Agent
+  drafts; restore untouched submitted input for explicit user retry.
+- **Restore succeeded, readiness failed:** root may be active. Keep recovery/error
+  truth and verify via existing inspection/checkpoint; no second automatic restore,
+  provider rollback or auto-SEND_MESSAGE. ACK timeout/disconnect likewise never
+  authorizes replay of the prepared payload.
+- **Stop failure:** clear pending to existing error; do not mark inactive or go to
+  launch. Independently received authoritative inactive evidence still applies.
+- **Pending conflicts:** one root continuation/stop latch is local to the context
+  owner, released in finally; duplicate/conflicting UI commands are busy/rejected
+  without consuming their drafts. Ordinary independent live Agent sends are not
+  forced through a new root FIFO. Server transition/admission policies are unchanged.
+- **Result:** design walkthrough Pass; controlled failure/readiness assertions needed.
+
+### VAL-058 — Publication, Status And Shared-Surface Regression
+
+- **Basis:** same supported restart/stop/Send journeys, on desktop and narrow;
+  current snapshot/recovery, activity slice and input debounce implementation.
+- **Owners:** context store commits one validated candidate and retained composer
+  identities; context owns exact facets; transport owns ready/ACK/generations;
+  history store owns one activity slice; router/panel own selection/display state.
+- **Stale barriers:** stop retires generation before inactive publication; late
+  socket/snapshot/recovery callbacks cannot reopen it. Confirmed activity fact
+  invalidates an older in-flight history response; failed refresh does not make a
+  stopped root green. Later authoritative new activity may legitimately change it.
+- **Interaction:** no raw stream send bypass, no fake live capability for offline
+  input, no read-only task Send/approval/interrupt. Same-root mode changes do not
+  cancel the pending continuation. Leaving root during operation defers only
+  transport disposal; completion never steals navigation.
+- **Control:** original Team history open, send-to-resume and stop-to-conversation
+  remain unchanged. Preserve IR-044 live Org draft clear/rejection tests, first
+  message title, task retention, compact UI/Orgs heading and current schemas.
+- **Result:** design walkthrough Pass. This is not an expanded API/Delivery pass;
+  browser/provider validation must observe network/runtime effects and rendered
+  context, not only mocked route assertions or dot colors.
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -1641,7 +1745,9 @@ package-family rename. It does not infer logical topology from directory depth.
 | GeneralProcessRunSupervisor | subject managers/services | local Team/Agent handles | Pass |
 | Team/Org subject callback | CollaborationAgentPresentationAdapter then subject serializer | raw AgentRun payload published directly or component formatter | Pass |
 | RootExecutionViewStore | AgentOrgContextsStore / subject context boundary | duplicate Org tree/focus/events and direct Org socket command | Pass |
-| AgentOrgExecutionContext | one strict root view/retained index; exact selection; Tasks/Messages facets; atomic active/history candidate | Team store/root, second cache, kind restriction, address-only task identity, delivery fabrication | Pass |
+| AgentOrgExecutionContext | one strict root view/retained index; exact selection; Tasks/Messages facets; historical projection transition | Pinia/router/transport command imports, Team store/root, second cache, address-only task identity, delivery fabrication | Pass |
+| AgentOrgContextsStore | command adapter, stream readiness/prepared transport and validated context commit; one submission boundary | server internals, duplicate runtime lifecycle, raw send bypass, restore on browse, route authority | Pass |
+| AgentOrgStreamingService | exact prepared transport, ACK/correlation and validated snapshot readiness | local-submission begin, UI draft owner, router, restore policy or destructive history cleanup | Pass |
 | Agent/Team workspace surface | ActiveAgentWorkspaceTarget and explicit action/view ports | subject store, GraphQL client, socket or raw event | Pass |
 | Mounted Team presentation adapter | TeamWorkspaceContextView | Team lifecycle/persistence/registration/termination | Pass |
 | Unified Workspace history panel | Mixed tagged read model + typed subject action port | route-selected Org panel, concrete all-subject stores, focused member lifecycle or mounted-Team stop | Pass |
@@ -1665,7 +1771,7 @@ package-family rename. It does not infer logical topology from directory depth.
 | AgentOrg summary migration | strict current Org tree/location/trace/sidecar readers + shared stateless summary writer | normal runtime reader/import, manager/catalog construction, positive inference from sidecars, Team rows, task directories or alternate index | Pass |
 | RootCommunicationEngine | Org-private communication adapter | AgentOrgRun/index/publisher/browser presentation internals | Pass |
 | AgentOrg communication adapter | Kind-blind callback carrying the committed message's two endpoint IDs plus receiver input to the AgentOrgRun-owned classifier after durability | endpoint classification/address lookup, receiver-only gate, second record/schema, browser state, Team root or task-recipient normalization | Pass |
-| AgentOrgExecutionContext | one strict root view/retained index; exact selection; Tasks/Messages facets; atomic active/history candidate | Team store/root, second cache, kind restriction, address-only task identity, delivery fabrication | Pass |
+| AgentOrgExecutionContext | one strict root view/retained index; exact selection; Tasks/Messages facets; historical projection transition | Pinia/router/transport command imports, Team store/root, second cache, address-only task identity, delivery fabrication | Pass |
 | Shared Agent/Team/right Messages surfaces | ActiveAgentWorkspaceTarget + CollaborationMessagesContextView | subject stores/sockets, Team-kind inference, lifecycle or same-Team filtering | Pass |
 
 ## Dependency-Direction Audit
@@ -1934,6 +2040,18 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 
 ## Self-Validation Conclusion
 
+Current AD-REV-023 resolves HIST-INSPECT-001/002 at the design boundary with
+DS-035–037 and five new passing design walkthroughs. History does not activate;
+Send deliberately restores eligible configured targets; Stop retains conversation.
+The prior configured-selection restore exception is removed. One context-store
+browser boundary owns submission/publication and preserves IR-044 behavior; server
+runtime/commands, strict schemas, task policies and persisted stores are unchanged.
+Focused Medium/High, cumulative Large/High; independent review pending. The 58
+walkthroughs are design evidence, not a source/API/browser/Delivery pass. No open
+material Requirements/Product/Architecture decision remains. Below is prior
+round conclusion history, not competing current routing authority.
+
+
 AD-REV-022 re-walks VAL-053 with approved RER-032: exact `Orgs` beneath
 `Teams`, same localization key/renderer and unchanged selection/order/state.
 VAL-051/052 and the remaining reviewed mechanism are unchanged. This copy-only
@@ -2064,3 +2182,22 @@ required after that review. Delivery readiness is not claimed.
 - Document table/fence/ID and diff-whitespace checks pass; prior AD-REV-001–021
   revision bodies and upstream RER-032 files are preserved. No source/test edit
   or fresh executable/browser/API/Delivery result is claimed by Architecture.
+
+## AD-REV-023 Coherence Checks
+
+- DS-035–037 cover source-to-target behavior, ownership, narrow capability and
+  readiness interfaces, removal, sequence, no-migration decision and residual risk.
+- VAL-054–058 include real supported restart/read/Send/Stop triggers, exact
+  identities, failure truth, asynchronous publication and rendered regressions.
+- Prior configured-selection restore exception is superseded; inactive configured
+  continuable and retained-task read-only access are explicitly distinct.
+- Executed checks passed: table/fence shapes across all four modified architecture
+  artifacts; 58 unique detailed VAL walkthroughs and matching index rows; one
+  AD-REV-023 index/body; prior AD-REV-001–022 bodies byte-for-byte unchanged;
+  git diff --check. Four canonical Requirements artifacts have no diff against
+  RER-032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a.
+- Coherence scan aligned the earlier root-stop active-focus-cleanup sentence,
+  current access union, browser/transport ownership audit and route action map.
+  The separate right-panel Org tab remains unchanged; Orgs is the history category.
+- Requirements/Product and concurrent source/test/Code Review/Delivery work were
+  not edited or staged. These document checks are not executable validation.

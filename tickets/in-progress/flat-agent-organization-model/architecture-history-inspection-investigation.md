@@ -137,3 +137,16 @@ Product screen, or restart the stopped Org. Add selected direct/mounted/task
 conversation retention, no create/restore mutation, other-root selection, and
 failed-stop checks to recovery validation. No source/test change or live
 termination was performed in this investigation; no fix/pass is claimed.
+
+## Completed Design Resolution — AD-REV-023
+
+The user explicitly requested the design update after both investigations.
+DS-035–037 in design-spec.md now remove configured restore-on-click and the
+terminate-to-configuration redirect, and complete deliberate Send continuation
+plus exact retained conversation/status publication. VAL-054–058 cover the
+supported positive/negative paths. The context store owns browser operations,
+not backend lifecycle; the IR-044 composer correction is preserved. No upstream
+artifact/schema/migration/task-policy change. Focused Medium/High, cumulative
+Large/High; independent review is the next gate. Earlier “not a completed design”
+statements describe the investigation stage, not the current design authority.
+This resolution does not claim source implementation or executable validation.
