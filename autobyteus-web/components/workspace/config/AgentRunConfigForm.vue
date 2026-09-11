@@ -14,21 +14,22 @@
       :disabled="!existingRun && isFormReadOnly"
       :read-only="!existingRun && isFormReadOnly"
       :runtime-selection-locked="runtimeSelectionLocked"
-      :model-selection-locked="existingRun || isFormReadOnly"
+      :model-selection-locked="existingRun ? modelConfigReadOnly : isFormReadOnly"
+      :original-model-identifier="existingRun ? originalModelIdentifier : undefined"
+      :model-options="modelOptions"
       :model-config-disabled="modelConfigReadOnly"
       :model-config-read-only="modelConfigReadOnly"
       :runtime-help-text="existingRun ? $t('workspace.runModelConfig.fixedIdentity') : $t('workspace.components.workspace.config.AgentRunConfigForm.selects_the_runtime_backend_used_for')"
       :model-label="$t('workspace.components.workspace.config.AgentRunConfigForm.llm_model')"
       :model-help-text="existingRun ? $t('workspace.runModelConfig.fixedIdentity') : $t('workspace.components.workspace.config.AgentRunConfigForm.select_a_model')"
       :advanced-initially-expanded="existingRun"
-      :historical-model-config="existingRun"
+      :historical-model-config="existingRun && config.llmModelIdentifier === originalModelIdentifier"
       :missing-historical-config="missingHistoricalConfig"
       :validation-errors="modelConfigFieldErrors"
       id-prefix="agent-run"
       control-variant="quiet"
-      @update:runtime-kind="updateRuntimeKind"
-      @update:llm-model-identifier="updateLlmModelIdentifier"
-      @update:llm-config="updateLlmConfig"
+      v-on="existingRun ? { 'selection-change': updateSelection } : {
+        'update:runtimeKind': updateRuntimeKind, 'update:llmModelIdentifier': updateLlmModelIdentifier, 'update:llmConfig': updateLlmConfig }"
       @schema-state="emit('schema-state', $event)"
     />
 
@@ -95,6 +96,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { ExistingRunModelSelection, ExistingRunModelOptionsState } from '~/types/agent/ExistingRunModelConfigDraft'
 import type { AgentDefinition } from '~/stores/agentDefinitionStore'
 import type { AgentRunConfig } from '~/types/agent/AgentRunConfig'
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
@@ -116,6 +118,8 @@ const props = defineProps<{
   workspaceLocked?: boolean;
   runtimeLocked?: boolean;
   existingRun?: boolean;
+  originalModelIdentifier?: string;
+  modelOptions?: ExistingRunModelOptionsState;
   existingModelConfigEditable?: boolean;
   existingModelConfigReason?: string | null;
   saving?: boolean;
@@ -124,7 +128,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:workspaceSelection', selection: WorkspaceSelectionState): void;
-  (e: 'update:llmConfig', value: Record<string, unknown> | null): void;
+  (e: 'selection-change', value: ExistingRunModelSelection, directlyEdited: boolean): void;
   (e: 'schema-state', value: { status: 'loading' | 'ready' | 'invalid' | 'unavailable'; message: string | null }): void;
 }>();
 const { t } = useLocalization()
@@ -163,10 +167,13 @@ const updateLlmModelIdentifier = (value: string) => {
   props.config.llmModelIdentifier = value
 }
 
+const updateSelection = (selection: ExistingRunModelSelection, directlyEdited: boolean) => {
+  if (existingRun.value && !modelConfigReadOnly.value) emit('selection-change', selection, directlyEdited)
+}
+
 const updateLlmConfig = (value: Record<string, unknown> | null) => {
   if (modelConfigReadOnly.value) return
-  if (existingRun.value) emit('update:llmConfig', value)
-  else props.config.llmConfig = value
+  if (!existingRun.value) props.config.llmConfig = value
 }
 
 const handleWorkspaceSelectionChange = (selection: WorkspaceSelectionState) => {

@@ -1,0 +1,56 @@
+{
+  "observedAt": "2026-09-11T01:11:49.977863+00:00",
+  "repository": "autobyteus/autobyteus-server",
+  "checks": [
+    {
+      "tag": "1.4.69",
+      "digest": "sha256:488b9ba8b51abce1aa622036f28ff5f1849ec52bf67c595889257ed9a09beefb",
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "children": [
+        {
+          "digest": "sha256:321b45ec295d61c78b7a3ad0ff8f41dd78f39ee273b9b880ed485e4fd617612e",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        {
+          "digest": "sha256:6b38f4e02bf1e1ce4c84a20ad9acf29a8423bef548d2940fe6afbc8cee86e122",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          }
+        }
+      ]
+    },
+    {
+      "tag": "latest",
+      "digest": "sha256:488b9ba8b51abce1aa622036f28ff5f1849ec52bf67c595889257ed9a09beefb",
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "children": [
+        {
+          "digest": "sha256:321b45ec295d61c78b7a3ad0ff8f41dd78f39ee273b9b880ed485e4fd617612e",
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        {
+          "digest": "sha256:6b38f4e02bf1e1ce4c84a20ad9acf29a8423bef548d2940fe6afbc8cee86e122",
+          "platform": {
+            "architecture": "arm64",
+            "os": "linux"
+          }
+        }
+      ]
+    }
+  ],
+  "stableLatestMatchesVersionedDigest": true,
+  "verification": "Anonymous Docker Registry v2 manifest/index GET; content digest checked from actual bytes. No container launched and no existing deployment upgraded."
+}

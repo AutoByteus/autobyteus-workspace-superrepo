@@ -1,0 +1,133 @@
+{
+  "observedAt": "2026-09-09T01:36:10.079Z",
+  "observations": [
+    {
+      "finalization": "committed",
+      "physicalOutcome": "committed",
+      "writes": 1,
+      "persistedModel": "new",
+      "response": {
+        "success": false,
+        "outcome": "PERSISTENCE_INDETERMINATE",
+        "message": "Update outcome is being verified. Refresh the Team configuration before saving again.",
+        "isActive": false,
+        "editability": {
+          "editable": true,
+          "reason": null
+        },
+        "canonicalExecutionTree": {
+          "schema_version": 2,
+          "created_at": "2026-09-08T00:00:00.000Z",
+          "archived_at": null,
+          "application_binding": null,
+          "handoffs": [],
+          "root_team": {
+            "address": "/",
+            "team_definition_id": "review-definition",
+            "team_definition_name": "Review fixture",
+            "team_run_id": "review-root",
+            "coordinator_address": "/member",
+            "default_launch_configuration": {
+              "runtime_kind": "codex_app_server",
+              "llm_model_identifier": "old",
+              "llm_config": null,
+              "auto_execute_tools": true,
+              "skill_access_mode": "PRELOADED_ONLY",
+              "workspace_root_path": "/tmp/crr-team-readback-4G7Vep"
+            },
+            "members": [
+              {
+                "kind": "configured_agent",
+                "address": "/member",
+                "agent_definition_id": "review-agent",
+                "role": null,
+                "description": null,
+                "agent_run_id": "review-member",
+                "platform_agent_run_id": "retained-provider-id",
+                "launch_configuration": {
+                  "runtime_kind": "codex_app_server",
+                  "llm_model_identifier": "old",
+                  "llm_config": null,
+                  "auto_execute_tools": true,
+                  "skill_access_mode": "PRELOADED_ONLY",
+                  "workspace_root_path": "/tmp/crr-team-readback-4G7Vep"
+                }
+              }
+            ],
+            "task_executions": []
+          }
+        },
+        "fieldErrors": []
+      },
+      "expectedOutcome": "PERSISTENCE_INDETERMINATE",
+      "expectedCanonicalVerification": true,
+      "storeWillReconcile": true,
+      "regressionAssertions": "Pass",
+      "note": "Freshly built owner/Studio/resolver method plus physical writer; Web store and renderer checks are separate local evidence."
+    },
+    {
+      "finalization": "renamed_finalization_indeterminate",
+      "physicalOutcome": "renamed_finalization_indeterminate",
+      "writes": 1,
+      "persistedModel": "new",
+      "response": {
+        "success": false,
+        "outcome": "PERSISTENCE_INDETERMINATE",
+        "message": "Update outcome is being verified. Refresh the Team configuration before saving again.",
+        "isActive": false,
+        "editability": {
+          "editable": true,
+          "reason": null
+        },
+        "canonicalExecutionTree": {
+          "schema_version": 2,
+          "created_at": "2026-09-08T00:00:00.000Z",
+          "archived_at": null,
+          "application_binding": null,
+          "handoffs": [],
+          "root_team": {
+            "address": "/",
+            "team_definition_id": "review-definition",
+            "team_definition_name": "Review fixture",
+            "team_run_id": "review-root",
+            "coordinator_address": "/member",
+            "default_launch_configuration": {
+              "runtime_kind": "codex_app_server",
+              "llm_model_identifier": "old",
+              "llm_config": null,
+              "auto_execute_tools": true,
+              "skill_access_mode": "PRELOADED_ONLY",
+              "workspace_root_path": "/tmp/crr-team-readback-VNIpiR"
+            },
+            "members": [
+              {
+                "kind": "configured_agent",
+                "address": "/member",
+                "agent_definition_id": "review-agent",
+                "role": null,
+                "description": null,
+                "agent_run_id": "review-member",
+                "platform_agent_run_id": "retained-provider-id",
+                "launch_configuration": {
+                  "runtime_kind": "codex_app_server",
+                  "llm_model_identifier": "old",
+                  "llm_config": null,
+                  "auto_execute_tools": true,
+                  "skill_access_mode": "PRELOADED_ONLY",
+                  "workspace_root_path": "/tmp/crr-team-readback-VNIpiR"
+                }
+              }
+            ],
+            "task_executions": []
+          }
+        },
+        "fieldErrors": []
+      },
+      "expectedOutcome": "PERSISTENCE_INDETERMINATE",
+      "expectedCanonicalVerification": true,
+      "storeWillReconcile": true,
+      "regressionAssertions": "Pass",
+      "note": "Freshly built owner/Studio/resolver method plus physical writer; Web store and renderer checks are separate local evidence."
+    }
+  ]
+}

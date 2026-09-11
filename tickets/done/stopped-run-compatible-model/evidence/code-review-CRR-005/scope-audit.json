@@ -1,0 +1,26 @@
+{
+  "revision": "CRR-005",
+  "observedAt": "2026-09-10T23:27:44.811720+00:00",
+  "currentResult": "Not Applicable",
+  "newDurableDelta": [],
+  "unchangedReviewedTests": [
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/e2e/run-history/stopped-run-model-config-graphql.e2e.test.ts",
+      "sha256": "0ac2bbf8a92d0f21435ee6611f33fc3d867ef11bebb677d4a8f178cbabe1ab37",
+      "matchesCrr003": true
+    },
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/integration/agent-team-execution/agent-team-run-manager.integration.test.ts",
+      "sha256": "c9260586563a630de4eac8b36547b2bb7b8d1dbf392e6771b03865de05df3581",
+      "matchesCrr003": true
+    },
+    {
+      "path": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs",
+      "sha256": "5403766af60da6bdc37670dec73b74735d218586e4c6f06bb692c8fabc66b887",
+      "matchesCrr003": true
+    }
+  ],
+  "codeReviewReportSha256": "b63c6681cfdd56727040aaa1e18cb58350482d4fa01440c0466ea723bf9059b2",
+  "sourceReportChangedThisRound": false,
+  "runtimeTestsExecutedByReviewer": false
+}

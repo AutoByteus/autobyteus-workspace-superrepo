@@ -175,20 +175,50 @@ remain nullable and `CURATED_ONLY`. The GraphQL contract intentionally does not
 expose raw `/models` payloads or API keys. Custom resolution never inspects the
 endpoint URL and does not perform alias, suffix, family, or fuzzy matching.
 
-### Persisted Run Model-Configuration Validation
+### Persisted Run Model-Selection Validation
 
-`ModelConfigValidationService` is the server authority for stopped existing-run
-`llmConfig` updates. It resolves the exact persisted runtime kind and model
-identifier through `ModelCatalogService`, normalizes either supported catalog
-schema representation, and validates only submitted current-schema keys. It
+`RunModelSelectionService` replaces the former fixed-model
+`ModelConfigValidationService` as the server authority for stopped existing-run
+`llmModelIdentifier` + `llmConfig` selections. It resolves the selected exact
+identifier through `ModelCatalogService` using the saved runtime and workspace.
+The extracted `model-config-schema-validation.ts` retains the schema algorithm:
+it normalizes either supported catalog schema representation and validates only
+submitted current-schema keys. It
 returns distinct model-unavailable, schema-unavailable, and field-validation
 results; it does not guess a replacement model, silently drop an unsupported
 key, or write a rendered default merely because the UI displayed it.
 
-The validation boundary is shared by standalone and Team stopped updates. Team
-patches validate independently against every target scope's fixed runtime/model.
-Only validated `llmConfig` reaches persistence; runtime/model selection remains
-immutable for an existing run.
+Replacement requires verified positive finite safe-integer context capacities
+for both the fresh saved model and target, with target >= saved capacity. A
+subsequent Save compares against the newly saved model, not the original launch
+model or a stale picker choice. Smaller or unknown comparisons return
+field-addressed validation failure. Same-model settings bypass capacity lookup
+and comparison, retaining ordinary model/schema availability and validation.
+No extra input-budget, output-reservation, tokenizer, threshold, or compaction-
+ratio equality gate is imposed.
+
+`RuntimeModelCapacityService` delegates evidence acquisition by saved runtime:
+
+| Runtime | Capacity evidence and uncertainty boundary |
+| --- | --- |
+| AutoByteus | Exact catalog metadata with live or static-definition provenance; verified positive active context when supplied and no greater than the evidenced maximum, otherwise verified maximum context. Unknown or inferred provenance is not proof. |
+| Codex | Existing client for saved cwd; current `model/list`, effective `config/read`, and actual launch command/environment locate the matching runtime catalog. Default cache requires matching CLI version and freshness (five minutes); exact slug and positive `context_window` are required. An effective context override must fit the catalog-evidenced ceiling. Unsupported provenance, wrong home/profile, malformed/stale metadata, or unverified custom endpoint yields unknown, not a guessed model-name limit. |
+| Claude | Bounded metadata-only SDK control using production runtime settings/auth/cwd, zero turns and no saved session binding. Exact supported alias, resolved model, and `getContextUsage().rawMaxTokens` must agree. Missing APIs, timeout, or inconsistent identity yields unknown; controls close on completion. |
+
+This evidence is selection-specific, not new global catalog enrichment or a
+compaction-budget override. Reads may be shared inside one request for equal
+runtime/workspace contexts, never reused as Save authority across requests.
+`agentRunModelOptions` and configured-scope `teamRunModelOptions` expose eligible
+replacements and current-capacity/availability facts through the Studio subject
+owner. Choices are advisory; lifecycle owners reread canonical state and
+revalidate on Save. Missing capacity leaves the saved model visible and does
+not newly disable otherwise valid same-model settings.
+
+Standalone and Team updates share this boundary. Every intended Team patch
+validates against its own original saved selection before any tree write. Only
+normalized pairs reach persistence; runtime kind remains fixed. No legacy
+settings-only command adapter is retained. Metadata feasibility alone is not
+proof of actual same-conversation inference for every provider/model/version.
 
 Runtime application remains bootstrap/session owned. AutoByteus receives the
 persisted config during LLM creation, Codex maps `reasoning_effort` and
@@ -197,7 +227,10 @@ persisted config during LLM creation, Codex maps `reasoning_effort` and
 `effort` query options while retaining the same Claude session UUID. Catalog
 capabilities expose Claude thinking and effort fields only when the installed
 SDK model descriptor supports them. Editing never hot-mutates an already-live
-backend; an eligible later restore consumes the saved configuration.
+backend; an eligible later restore consumes the saved model/settings pair in
+the same provider conversation. Save does not rewrite history or compacted
+state. Ordinary later compaction retains its runtime-owned algorithm, but model
+budgets and future timing can differ.
 
 ### Claude Agent SDK Model Descriptions
 

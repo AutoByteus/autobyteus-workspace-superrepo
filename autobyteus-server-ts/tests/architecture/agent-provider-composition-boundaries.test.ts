@@ -108,7 +108,7 @@ const AGENT_TEAM_MANAGER_FIELDS = [
   "memoryDir",
   "mixedTeamRunBackendFactory",
   "taskExecutionIdentity",
-  "modelConfigValidator",
+  "modelSelectionValidator",
 ] as const;
 const AGENT_RUN_SERVICE_TESTS = [
   "autobyteus-server-ts/tests/integration/agent-execution/agent-run-manager.memory-layout.real.integration.test.ts",
@@ -141,6 +141,7 @@ const MIXED_HANDLE_TESTS = [
   "autobyteus-server-ts/tests/unit/agent-team-execution/mixed-agent-member-handle-termination.test.ts",
 ];
 const AGENT_TEAM_MANAGER_CONSTRUCTION_TESTS = [
+  "autobyteus-server-ts/tests/unit/agent-team-execution/team-run-model-selection-save.test.ts",
   "autobyteus-server-ts/tests/integration/agent-team-execution/agent-team-run-manager.integration.test.ts",
   "autobyteus-server-ts/tests/integration/agent-team-execution/team-agent-tools-mcp-lifecycle.integration.test.ts",
   "autobyteus-server-ts/tests/unit/agent-team-execution/agent-team-run-manager-lifecycle.test.ts",
@@ -530,7 +531,7 @@ describe("agent provider composition boundaries", () => {
     ]);
     for (const relativePath of production) {
       const source = read(join(ROOT, relativePath));
-      for (const required of ["memoryDir", "flatTeamExecutionFactory", "taskExecutionIdentity", "modelConfigValidator", "memberExecutionContextBuilder"]) {
+      for (const required of ["memoryDir", "flatTeamExecutionFactory", "taskExecutionIdentity", "modelSelectionValidator", "memberExecutionContextBuilder"]) {
         expect(source, `${relativePath}:${required}`).toContain(required);
       }
     }
@@ -579,20 +580,20 @@ describe("agent provider composition boundaries", () => {
       "autobyteus-server-ts/src/standalone-application-host/start-standalone-application-host.ts",
     ];
     expect(typescriptFiles(SRC)
-      .filter((path) => directNewOccurrences(path, "ModelConfigValidationService").length > 0)
+      .filter((path) => directNewOccurrences(path, "RunModelSelectionService").length > 0)
       .map(relativeRoot)
       .sort()).toEqual([...hosts].sort());
     for (const relativePath of hosts) {
       const path = join(ROOT, relativePath);
       const sourceFile = parse(path);
-      const constructions = directNewOccurrences(path, "ModelConfigValidationService");
+      const constructions = directNewOccurrences(path, "RunModelSelectionService");
       expect(constructions, relativePath).toHaveLength(1);
       expect(
         isExplicitNarrowInitializer(constructions[0]?.arguments?.[0]?.getText(sourceFile) ?? null),
         `${relativePath}:catalog`,
       ).toBe(true);
       const source = read(path);
-      expect(occurrences(source, "modelConfigValidator,"), relativePath).toBeGreaterThanOrEqual(2);
+      expect(occurrences(source, "modelSelectionValidator,"), relativePath).toBeGreaterThanOrEqual(2);
     }
 
     const expectedRoots = [
@@ -609,12 +610,12 @@ describe("agent provider composition boundaries", () => {
       const sourceFile = parse(path);
       for (const occurrence of directNewOccurrences(path, "StandaloneAgentRunLifecycleService")) {
         expect(isExplicitNarrowInitializer(objectPropertyInitializer(
-          occurrence.arguments?.[1], "modelConfigValidator", sourceFile,
-        )), `${relativePath}:modelConfigValidator`).toBe(true);
+          occurrence.arguments?.[1], "modelSelectionValidator", sourceFile,
+        )), `${relativePath}:modelSelectionValidator`).toBe(true);
       }
     }
     for (const relativePath of [
-      "autobyteus-server-ts/src/llm-management/services/model-config-validation-service.ts",
+      "autobyteus-server-ts/src/llm-management/services/run-model-selection-service.ts",
       "autobyteus-server-ts/src/agent-execution/services/standalone-agent-run-lifecycle-service.ts",
       "autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts",
       ...expectedRoots,

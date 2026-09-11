@@ -1,8 +1,10 @@
+import { RunModelSelectionObject, RunModelOptionsObject } from "./run-model-config.js";
 import {
   Arg,
   Field,
   InputType,
   Mutation,
+  Query,
   ObjectType,
   registerEnumType,
   Resolver,
@@ -123,6 +125,9 @@ export class UpdateStoppedAgentRunModelConfigInput {
   @Field(() => String)
   agentRunId!: string;
 
+  @Field(() => String)
+  llmModelIdentifier!: string;
+
   @Field(() => GraphQLJSON, { nullable: true })
   llmConfig!: Record<string, unknown> | null;
 }
@@ -144,8 +149,8 @@ export class UpdateStoppedAgentRunModelConfigResult {
   @Field(() => RunModelConfigEditabilityObject)
   editability!: RunModelConfigEditabilityObject;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  canonicalLlmConfig?: Record<string, unknown> | null;
+  @Field(() => RunModelSelectionObject, { nullable: true })
+  canonicalSelection!: RunModelSelectionObject | null;
 
   @Field(() => [RunModelConfigFieldErrorObject])
   fieldErrors!: RunModelConfigFieldErrorObject[];
@@ -298,6 +303,11 @@ export class AgentRunResolver {
     }
   }
 
+  @Query(() => RunModelOptionsObject)
+  agentRunModelOptions(@Arg("agentRunId", () => String) agentRunId: string): Promise<RunModelOptionsObject> {
+    return this.runModelConfigService.agentRunModelOptions(agentRunId);
+  }
+
   @Mutation(() => UpdateStoppedAgentRunModelConfigResult)
   async updateStoppedAgentRunModelConfig(
     @Arg("input", () => UpdateStoppedAgentRunModelConfigInput)
@@ -309,6 +319,7 @@ export class AgentRunResolver {
       }
       const result = await this.runModelConfigService.updateStoppedAgentRunModelConfig({
         agentRunId: input.agentRunId,
+        llmModelIdentifier: input.llmModelIdentifier,
         llmConfig: input.llmConfig,
       });
       return {
@@ -317,7 +328,7 @@ export class AgentRunResolver {
         message: result.message,
         isActive: result.isActive,
         editability: result.editability,
-        canonicalLlmConfig: result.canonical?.llmConfig ?? null,
+        canonicalSelection: result.canonical ? { llmModelIdentifier: result.canonical.llmModelIdentifier, llmConfig: result.canonical.llmConfig } : null,
         fieldErrors: [...result.fieldErrors],
       };
     } catch (error) {
@@ -328,7 +339,7 @@ export class AgentRunResolver {
         message: "Model settings could not be updated.",
         isActive: false,
         editability: { editable: false, reason: "INTERNAL_ERROR" },
-        canonicalLlmConfig: null,
+        canonicalSelection: null,
         fieldErrors: [],
       };
     }

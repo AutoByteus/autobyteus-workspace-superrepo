@@ -1,0 +1,100 @@
+{
+  "observedAt": "2026-09-09T15:04:43.484426+00:00",
+  "result": "Pass",
+  "head": "5f7a9b47e228e25529f5bd0acf80ea3a2142d303",
+  "branch": "requirements/stopped-run-compatible-model",
+  "trackedBase": "a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27",
+  "newBaseCommitsToIntegrate": 0,
+  "durableTests": [
+    {
+      "path": "autobyteus-server-ts/tests/e2e/run-history/stopped-run-model-config-graphql.e2e.test.ts",
+      "sha256": "0ac2bbf8a92d0f21435ee6611f33fc3d867ef11bebb677d4a8f178cbabe1ab37",
+      "matchesCRR003": true
+    },
+    {
+      "path": "autobyteus-server-ts/tests/integration/agent-team-execution/agent-team-run-manager.integration.test.ts",
+      "sha256": "c9260586563a630de4eac8b36547b2bb7b8d1dbf392e6771b03865de05df3581",
+      "matchesCRR003": true
+    },
+    {
+      "path": "autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs",
+      "sha256": "5403766af60da6bdc37670dec73b74735d218586e4c6f06bb692c8fabc66b887",
+      "matchesCRR003": true
+    }
+  ],
+  "durableDiffMatchesApi": true,
+  "durableDiffSha256": "c438def3173f99f523d7deaf87821f4de3022d0f2ad6e6f56fa68aeb232de735",
+  "sourceReviewReportUnchangedFromCRR003": true,
+  "noProductionSourceEditsSinceReviewedHEAD": true,
+  "docs": [
+    {
+      "path": "autobyteus-server-ts/docs/modules/agent_execution.md",
+      "sha256": "9b8ffd1c11b455552846385946c15207a9d63115fb26aed0b152a2f27acf47ce"
+    },
+    {
+      "path": "autobyteus-server-ts/docs/modules/agent_team_execution.md",
+      "sha256": "d6b7f0f5831aa8c169467db750e81c22ef6027eb88b71dd6e5f01fb04a07b5c6"
+    },
+    {
+      "path": "autobyteus-server-ts/docs/modules/llm_management.md",
+      "sha256": "6ef96b2bb233340b3efe2cd11bae5cacd7f6addc87a001f813741111149e4c4f"
+    },
+    {
+      "path": "autobyteus-server-ts/docs/modules/run_history.md",
+      "sha256": "68f1710168d17a22d8f4cdf8050fe9e4fbc08f4d9e0e4c94a3c3f6d85c6df801"
+    },
+    {
+      "path": "autobyteus-web/docs/agent_execution_architecture.md",
+      "sha256": "82ac59735aa9854212c1c1bb506c3a86292a48c7796132b76dd5102f9e58f0d1"
+    },
+    {
+      "path": "autobyteus-web/docs/agent_teams.md",
+      "sha256": "047459f189a25b701b90cf596e4d5eeae1a7daeeafdf257a10ddad343c700fb9"
+    },
+    {
+      "path": "autobyteus-web/docs/settings.md",
+      "sha256": "7b091ba80e3b920f8fb3277c08ca944df19d375295a65d029514557c32590e24"
+    }
+  ],
+  "newLocalDocLinks": [
+    {
+      "source": "autobyteus-server-ts/docs/modules/agent_execution.md",
+      "target": "./llm_management.md#persisted-run-model-selection-validation",
+      "result": "Pass"
+    },
+    {
+      "source": "autobyteus-server-ts/docs/modules/agent_team_execution.md",
+      "target": "./llm_management.md#persisted-run-model-selection-validation",
+      "result": "Pass"
+    },
+    {
+      "source": "autobyteus-server-ts/docs/modules/run_history.md",
+      "target": "./llm_management.md#persisted-run-model-selection-validation",
+      "result": "Pass"
+    },
+    {
+      "source": "autobyteus-web/docs/agent_execution_architecture.md",
+      "target": "./settings.md#existing-run-model-configuration",
+      "result": "Pass"
+    },
+    {
+      "source": "autobyteus-web/docs/agent_execution_architecture.md",
+      "target": "../../autobyteus-server-ts/docs/modules/llm_management.md#persisted-run-model-selection-validation",
+      "result": "Pass"
+    },
+    {
+      "source": "autobyteus-web/docs/agent_teams.md",
+      "target": "./settings.md#existing-run-model-configuration",
+      "result": "Pass"
+    }
+  ],
+  "upstreamManifestFileCount": 209,
+  "diffCheck": "Pass",
+  "excludedGeneratedDirectories": [
+    "autobyteus-application-backend-sdk/dist/",
+    "autobyteus-application-sdk-contracts/dist/"
+  ],
+  "testRerun": "Not needed: no new base commits or source/test delivery changes; API-REV-001 and CRR-003 remain applicable.",
+  "userVerification": "Not yet received",
+  "repositoryFinalization": "Not performed"
+}

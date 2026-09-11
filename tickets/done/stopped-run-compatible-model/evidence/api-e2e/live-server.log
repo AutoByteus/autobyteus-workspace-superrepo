@@ -1,0 +1,345 @@
+Platform detection: Windows=false
+App root directory: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts
+App data directory: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207
+AppConfig instance created.
+Config file path: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/.env
+Loading environment from: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/.env
+[dotenv@17.3.1] injecting env (4) from tests/.tmp/api-model-live-1788963702207/.env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+Environment variables loaded successfully
+Server public base URL configured to: http://127.0.0.1:38637
+=== Starting logging configuration ===
+Logging config file is ignored in Node.js: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/logging_config.ini
+============================================================
+SERVER PUBLIC URL: http://127.0.0.1:38637
+APP ROOT DIRECTORY: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts
+APP DATA DIRECTORY: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207
+DB DIRECTORY: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/db
+LOGS DIRECTORY: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/logs
+DOWNLOAD DIRECTORY: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/download
+MEMORY DIRECTORY: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory
+============================================================
+AppConfig initialization completed successfully
+AgentFactory (Singleton) initialized.
+Running Prisma migrations...
+Using Prisma engine overrides from cache: /root/.cache/prisma/master/605197351a3c8bdd595af2d2a9bc3025bca48ea2/linux-arm64-openssl-3.0.x (query=libquery-engine, schema=schema-engine)
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "api-model-live-1788963702207.db" at "file:/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/db/api-model-live-1788963702207.db"
+
+SQLite database api-model-live-1788963702207.db created at file:/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/db/api-model-live-1788963702207.db
+
+24 migrations found in prisma/migrations
+
+Applying migration `20260203074245_init`
+Applying migration `20260208094000_add_external_channel_tables`
+Applying migration `20260209174500_add_channel_message_receipt_turn_id`
+Applying migration `20260209213000_remove_agent_conversation_tables`
+Applying migration `20260210101500_add_agent_avatar`
+Applying migration `20260210192000_add_agent_team_avatar`
+Applying migration `20260211214500_add_sync_columns_and_tombstones`
+Applying migration `20260212070000_remove_workflow_definition`
+Applying migration `20260309103000_add_channel_binding_launch_preset`
+Applying migration `20260310153000_add_channel_binding_team_definition_id`
+Applying migration `20260331102000_remove_channel_bindings_table`
+Applying migration `20260331130000_receipt_lifecycle_and_remove_channel_idempotency`
+Applying migration `20260517090000_add_app_data_migration_records`
+Applying migration `20260624090000_add_token_usage_ledger_events`
+Applying migration `20260625193000_token_usage_component_pricing_explainability`
+Applying migration `20260629120000_add_token_usage_display_fields`
+Applying migration `20260702093000_token_usage_execution_address`
+Applying migration `20260726090000_add_secret_vault`
+Applying migration `20260730090000_add_token_usage_provider_name`
+Applying migration `20260801090000_token_usage_member_display_name`
+Applying migration `20260814090000_team_run_execution_tree_v1`
+Applying migration `20260819090000_add_token_usage_run_records`
+Applying migration `20260820090000_redesign_app_data_migration_summary`
+Applying migration `20260822090000_add_token_usage_analytics`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260203074245_init/
+    └─ migration.sql
+  └─ 20260208094000_add_external_channel_tables/
+    └─ migration.sql
+  └─ 20260209174500_add_channel_message_receipt_turn_id/
+    └─ migration.sql
+  └─ 20260209213000_remove_agent_conversation_tables/
+    └─ migration.sql
+  └─ 20260210101500_add_agent_avatar/
+    └─ migration.sql
+  └─ 20260210192000_add_agent_team_avatar/
+    └─ migration.sql
+  └─ 20260211214500_add_sync_columns_and_tombstones/
+    └─ migration.sql
+  └─ 20260212070000_remove_workflow_definition/
+    └─ migration.sql
+  └─ 20260309103000_add_channel_binding_launch_preset/
+    └─ migration.sql
+  └─ 20260310153000_add_channel_binding_team_definition_id/
+    └─ migration.sql
+  └─ 20260331102000_remove_channel_bindings_table/
+    └─ migration.sql
+  └─ 20260331130000_receipt_lifecycle_and_remove_channel_idempotency/
+    └─ migration.sql
+  └─ 20260517090000_add_app_data_migration_records/
+    └─ migration.sql
+  └─ 20260624090000_add_token_usage_ledger_events/
+    └─ migration.sql
+  └─ 20260625193000_token_usage_component_pricing_explainability/
+    └─ migration.sql
+  └─ 20260629120000_add_token_usage_display_fields/
+    └─ migration.sql
+  └─ 20260702093000_token_usage_execution_address/
+    └─ migration.sql
+  └─ 20260726090000_add_secret_vault/
+    └─ migration.sql
+  └─ 20260730090000_add_token_usage_provider_name/
+    └─ migration.sql
+  └─ 20260801090000_token_usage_member_display_name/
+    └─ migration.sql
+  └─ 20260814090000_team_run_execution_tree_v1/
+    └─ migration.sql
+  └─ 20260819090000_add_token_usage_run_records/
+    └─ migration.sql
+  └─ 20260820090000_redesign_app_data_migration_summary/
+    └─ migration.sql
+  └─ 20260822090000_add_token_usage_analytics/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+Database migrations completed successfully.
+(node:71686) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+prisma:info Starting a sqlite pool with 21 connections.
+Initialized server settings service with 20 predefined settings
+CachedAgentDefinitionProvider initialized with a full in-memory cache strategy.
+[2026-09-09T14:21:47.736Z] [INFO] [agent-team-definition.cache] CachedAgentTeamDefinitionProvider initialized with a full in-memory cache strategy.
+AgentRunManager initialized.
+AgentRunManager initialized.
+Loading workspace packages to trigger registration...
+Successfully loaded workspace packages.
+Creating temp workspace at: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/temp_workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/temp_workspace.
+Initialized TempWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/temp_workspace with fixed ID 'temp_ws_default'
+Temp workspace created and cached with ID: temp_ws_default
+Registering agent customization processors...
+Input processor definition 'WorkspacePathSanitizationProcessor' (class: 'WorkspacePathSanitizationProcessor') registered successfully.
+Registered input processor 'WorkspacePathSanitizationProcessor'.
+Input processor definition 'UserInputContextBuildingProcessor' (class: 'UserInputContextBuildingProcessor') registered successfully.
+Registered input processor 'UserInputContextBuildingProcessor'.
+LLM response processor definition 'MediaUrlTransformerProcessor' (class: 'MediaUrlTransformerProcessor') registered successfully.
+Registered LLM response processor 'MediaUrlTransformerProcessor'.
+Tool invocation preprocessor definition 'MediaInputPathNormalizationPreprocessor' registered.
+Registered tool invocation preprocessor 'MediaInputPathNormalizationPreprocessor'.
+Agent customization processor registration complete.
+Successfully registered tool definition: 'read_file'
+Successfully registered tool definition: 'write_file'
+Successfully registered tool definition: 'edit_file'
+Successfully registered tool definition: 'run_bash'
+Successfully registered tool definition: 'start_background_process'
+Successfully registered tool definition: 'get_background_processes'
+Successfully registered tool definition: 'get_process_output'
+Successfully registered tool definition: 'stop_background_process'
+Successfully registered tool definition: 'search_web'
+Successfully registered tool definition: 'read_media_file'
+Successfully registered tool definition: 'download_media'
+Successfully registered tool definition: 'read_url'
+Registered required tool unit: Core Tools
+Successfully registered tool definition: 'delegate_task'
+Successfully registered tool definition: 'submit_task_result'
+Successfully registered tool definition: 'review_task_result'
+Successfully registered tool definition: 'generate_image'
+Successfully registered tool definition: 'edit_image'
+Successfully registered tool definition: 'generate_speech'
+Successfully registered tool definition: 'generate_video'
+Registered required tool unit: Task Delegation Tools
+Registered required tool unit: Media Tools
+Successfully registered tool definition: 'publish_artifacts'
+Registered required tool unit: Published Artifact Tools
+Registered required tool unit: Browser Tools
+Successfully registered tool definition: 'send_message_to'
+Successfully registered tool definition: 'get_handoff_rules'
+Registered required tool unit: Agent Communication Tools
+Overwriting existing tool definition for name: 'search_web'
+Successfully registered tool definition: 'search_web'
+Registered required tool unit: Search Tools
+Server setting 'AUTOBYTEUS_RETROSPECTIVE_SKILL_IMPROVER_AGENT_DEFINITION_ID' updated
+Initialized 'AUTOBYTEUS_RETROSPECTIVE_SKILL_IMPROVER_AGENT_DEFINITION_ID' with 'autobyteus-retrospective-skill-improver'.
+Populating agent definition cache for the first time...
+Agent definition cache populated with 2 items.
+Populating agent definition cache for the first time...
+[2026-09-09T14:21:48.015Z] [INFO] [agent-team-definition.cache] Populating agent team definition cache for the first time...
+[2026-09-09T14:21:48.016Z] [INFO] [agent-team-definition.cache] Agent team definition cache populated with 0 items.
+Agent definition cache populated with 2 items.
+{"level":30,"time":1788963708024,"pid":71686,"hostname":"17de3252c4f7","msg":"Server listening at http://127.0.0.1:33933"}
+{"level":30,"time":1788963708067,"pid":71686,"hostname":"17de3252c4f7","msg":"Server listening at http://127.0.0.1:38637"}
+[2026-09-09T14:21:48.067Z] [INFO] [server.runtime] Server listening on 127.0.0.1:38637
+[2026-09-09T14:21:48.070Z] [INFO] [server.runtime] Server internal base URL configured to: http://127.0.0.1:38637
+Scheduling Studio-only non-critical startup tasks...
+Background cache pre-loading process has started.
+CachedMcpServerConfigProvider initialized with a full in-memory cache strategy.
+Populating MCP server config cache for the first time...
+Running MCP tool registration background task...
+Loading and registering all MCP server configurations from file...
+Background task 'Memory Sync Worker' completed successfully.
+MCP server config cache populated with 0 items.
+Found 0 total MCP server configs.
+Synchronized cached configurations with the core MCP config service.
+Pre-loaded 0 MCP server configs into cache.
+Finished loading and registering all MCP server configurations.
+Background task 'MCP Tool Registration' completed successfully.
+Pre-loaded 28 LLM models into cache.
+Pre-loaded 7 image models into cache.
+Pre-loaded 4 audio models into cache.
+Background application cache pre-loading completed.
+Background task 'Cache Pre-loading' completed successfully.
+In-memory cache: Added new agent definition with ID api-model-live-1788963702207.
+Agent Definition created successfully with ID: api-model-live-1788963702207
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Created and registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+Published codex_app_server agent run 'api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438'.
+Agent websocket attached for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created agent session 06ba9e70-9a84-44f2-9636-2a0abe890ce2 for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Agent WebSocket connected: session=06ba9e70-9a84-44f2-9636-2a0abe890ce2, run=api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created terminal session 3920f42a-27d3-4310-9541-a7f167488115 using backend PtySession for target /root
+Terminal WebSocket connected: 3920f42a-27d3-4310-9541-a7f167488115
+Terminal websocket attached for cwd /root
+Created terminal session dfa659ee-87ba-461d-ac91-ce3e373289f3 using backend PtySession for target /root
+Terminal WebSocket connected: dfa659ee-87ba-461d-ac91-ce3e373289f3
+Terminal websocket attached for cwd /root
+Agent websocket attached for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created agent session 212b7dac-a8e8-4ace-82e4-d7ee9164f6b1 for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Agent WebSocket connected: session=212b7dac-a8e8-4ace-82e4-d7ee9164f6b1, run=api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+Published codex_app_server agent run 'api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438'.
+Created terminal session 7727cc2f-11f8-4077-b5e7-4079742e3aaa using backend PtySession for target /root
+Terminal WebSocket connected: 7727cc2f-11f8-4077-b5e7-4079742e3aaa
+Terminal websocket attached for cwd /root
+Agent websocket attached for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created agent session d89d1047-7b1e-481a-818a-d071612ac3ac for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Agent WebSocket connected: session=d89d1047-7b1e-481a-818a-d071612ac3ac, run=api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+Published codex_app_server agent run 'api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438'.
+[2026-09-09T14:29:37.783Z] [INFO] [agent-team-definition.cache] In-memory cache: Added new agent team definition with ID api-model-live-1788963702207-nested.
+Agent Team Definition created successfully with ID: api-model-live-1788963702207-nested
+[2026-09-09T14:29:37.799Z] [INFO] [agent-team-definition.cache] In-memory cache: Added new agent team definition with ID api-model-live-1788963702207-root.
+Agent Team Definition created successfully with ID: api-model-live-1788963702207-root
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed/raw_traces_active.jsonl
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a/raw_traces_active.jsonl
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca/raw_traces_active.jsonl
+Agent team websocket attached for team run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Created agent session 7bd33e61-d66a-4fe6-97cc-ccc5fc35e958 for run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Agent Team WebSocket connected: session=7bd33e61-d66a-4fe6-97cc-ccc5fc35e958, run=api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a/raw_traces_active.jsonl
+Created terminal session ac2d05f7-c7c9-46d4-bafc-15efdbac2c74 using backend PtySession for target /root
+Terminal WebSocket connected: ac2d05f7-c7c9-46d4-bafc-15efdbac2c74
+Terminal websocket attached for cwd /root
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+Agent websocket attached for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created agent session 1b59530f-1015-45ca-bba7-771c244cdd5e for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Agent WebSocket connected: session=1b59530f-1015-45ca-bba7-771c244cdd5e, run=api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Published codex_app_server agent run 'api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a'.
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed/raw_traces_active.jsonl
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca/raw_traces_active.jsonl
+Agent team websocket attached for team run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Created agent session 1cb433d4-6c0a-4895-a803-b7fe8c9be09b for run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Agent Team WebSocket connected: session=1cb433d4-6c0a-4895-a803-b7fe8c9be09b, run=api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_nested_f417cfb6ddd14dcbbfa6ced9367689f1/api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca/raw_traces_active.jsonl
+Created terminal session 3bfe3ba1-24bc-40c5-9f4d-7da7bb5d44a4 using backend PtySession for target /root
+Terminal WebSocket connected: 3bfe3ba1-24bc-40c5-9f4d-7da7bb5d44a4
+Terminal websocket attached for cwd /root
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+Agent websocket attached for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created agent session 5afcd891-5a76-4ef7-bee2-e8bc84f21071 for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Agent WebSocket connected: session=5afcd891-5a76-4ef7-bee2-e8bc84f21071, run=api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Published codex_app_server agent run 'api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca'.
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed/raw_traces_active.jsonl
+Created terminal session 8173438a-3bfa-4d3a-a325-e304015c6d9f using backend PtySession for target /root
+Terminal WebSocket connected: 8173438a-3bfa-4d3a-a325-e304015c6d9f
+Terminal websocket attached for cwd /root
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed/raw_traces_active.jsonl
+Agent team websocket attached for team run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Created agent session 2f06faac-15f5-4d97-be91-b9ece96d1afc for run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Agent Team WebSocket connected: session=2f06faac-15f5-4d97-be91-b9ece96d1afc, run=api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Agent websocket attached for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created agent session 47c8b6df-ae03-4972-ba94-7c6c54301d28 for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Agent WebSocket connected: session=47c8b6df-ae03-4972-ba94-7c6c54301d28, run=api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+[CodexClientThreadRouter] app-server message was not routed {
+  kind: 'notification',
+  method: 'deprecationNotice',
+  requestId: undefined,
+  threadCount: 2,
+  paramKeys: [ 'summary', 'details' ]
+}
+Published codex_app_server agent run 'api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a'.
+Memory file missing: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agent_teams/api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c/api_model_live_1788963702207_9c502a4f88b14cbfbf8822dd0acbf7ed/raw_traces_active.jsonl
+Agent team websocket attached for team run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Created agent session 614d37dc-2448-4289-a766-3f9c96dc5326 for run api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Agent Team WebSocket connected: session=614d37dc-2448-4289-a766-3f9c96dc5326, run=api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c
+Created terminal session 9ed28f1b-59b7-4bcc-9af8-c99c4eeb2fa6 using backend PtySession for target /root
+Terminal WebSocket connected: 9ed28f1b-59b7-4bcc-9af8-c99c4eeb2fa6
+Terminal websocket attached for cwd /root
+Creating new workspace for rootPath: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+Created metadata-only FileSystemWorkspace at /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace.
+Reusing registered workspace ID: agent_ws_c91fb2ce028c496340f3e77ead3e688165394cc55b42550a2b841ea9f7328950
+[CodexClientThreadRouter] app-server message was not routed {
+  kind: 'notification',
+  method: 'deprecationNotice',
+  requestId: undefined,
+  threadCount: 3,
+  paramKeys: [ 'summary', 'details' ]
+}
+Published codex_app_server agent run 'api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca'.
+Agent websocket attached for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Created agent session e12fc13a-61aa-48f7-8f04-d80886654c22 for run api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Agent WebSocket connected: session=e12fc13a-61aa-48f7-8f04-d80886654c22, run=api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438
+Closed agent session 2f06faac-15f5-4d97-be91-b9ece96d1afc
+Closed agent session 5afcd891-5a76-4ef7-bee2-e8bc84f21071
+Agent WebSocket disconnected: 5afcd891-5a76-4ef7-bee2-e8bc84f21071
+Closed agent session 47c8b6df-ae03-4972-ba94-7c6c54301d28
+Agent WebSocket disconnected: 47c8b6df-ae03-4972-ba94-7c6c54301d28
+Closed agent session 614d37dc-2448-4289-a766-3f9c96dc5326
+Closed agent session 1b59530f-1015-45ca-bba7-771c244cdd5e
+Agent WebSocket disconnected: 1b59530f-1015-45ca-bba7-771c244cdd5e
+Closed agent session e12fc13a-61aa-48f7-8f04-d80886654c22
+Agent WebSocket disconnected: e12fc13a-61aa-48f7-8f04-d80886654c22
+Closed agent session 06ba9e70-9a84-44f2-9636-2a0abe890ce2
+Agent WebSocket disconnected: 06ba9e70-9a84-44f2-9636-2a0abe890ce2
+Closed agent session d89d1047-7b1e-481a-818a-d071612ac3ac
+Agent WebSocket disconnected: d89d1047-7b1e-481a-818a-d071612ac3ac
+Closed agent session 212b7dac-a8e8-4ace-82e4-d7ee9164f6b1
+Agent WebSocket disconnected: 212b7dac-a8e8-4ace-82e4-d7ee9164f6b1
+Closed agent session 7bd33e61-d66a-4fe6-97cc-ccc5fc35e958
+Closed agent session 1cb433d4-6c0a-4895-a803-b7fe8c9be09b
+Closed PTY session 9ed28f1b-59b7-4bcc-9af8-c99c4eeb2fa6
+Terminal WebSocket disconnected: 9ed28f1b-59b7-4bcc-9af8-c99c4eeb2fa6
+Closed PTY session 3bfe3ba1-24bc-40c5-9f4d-7da7bb5d44a4
+Closed PTY session dfa659ee-87ba-461d-ac91-ce3e373289f3
+Closed PTY session 3920f42a-27d3-4310-9541-a7f167488115
+Closed PTY session 8173438a-3bfa-4d3a-a325-e304015c6d9f
+Closed PTY session 7727cc2f-11f8-4077-b5e7-4079742e3aaa
+Closed PTY session ac2d05f7-c7c9-46d4-bafc-15efdbac2c74
+Terminal WebSocket disconnected: ac2d05f7-c7c9-46d4-bafc-15efdbac2c74
+Terminal WebSocket disconnected: 7727cc2f-11f8-4077-b5e7-4079742e3aaa
+Terminal WebSocket disconnected: 8173438a-3bfa-4d3a-a325-e304015c6d9f
+Terminal WebSocket disconnected: 3920f42a-27d3-4310-9541-a7f167488115
+Terminal WebSocket disconnected: dfa659ee-87ba-461d-ac91-ce3e373289f3
+Terminal WebSocket disconnected: 3bfe3ba1-24bc-40c5-9f4d-7da7bb5d44a4

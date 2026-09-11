@@ -1,0 +1,58 @@
+Agents
+Agent Teams
+Skills
+Memory
+Nodes
+Workspaces
+Temp Workspace
+workspace
+A
+api-model-live-1788963702207
+(1)
+TEAMS
+A
+api-model-live-1788963702207-root
+(1)
+Remember my private lead label: lead-amber-7291. Reply only "Remembered lead". Do not use tools o...
+now
+C
+coordinator
+now
+Nested
+now
+Settings
+L
+lead
+Idle
+You
+Remember my private lead label: lead-amber-7291. Reply only "Remembered lead". Do not use tools or delegate.
+L
+lead
+
+Remembered lead
+
+You
+What was my exact private lead label earlier? Reply with the label then | continued. Do not use tools or delegate.
+L
+lead
+
+lead-amber-7291 | continued
+
+Context Files (0)
+(drag, paste, or upload)
+Files
+Team
+Terminal
+Activity
+Token
+Artifacts
+VNC Viewer
+Messages
+0 Messages
+
+No team messages yet
+
+Accepted inter-agent messages will appear here with their reference files.
+
+Tasks
+0 tasks

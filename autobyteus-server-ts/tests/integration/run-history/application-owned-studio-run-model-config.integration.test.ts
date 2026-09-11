@@ -237,6 +237,7 @@ describe("Application-owned Studio run-model configuration integration", () => {
     } as never);
 
     const studioFor = (gate: ApplicationOrchestrationStartupGate) => new StudioRunModelConfigService({
+      modelSelectionService: { listOptions: vi.fn() },
       applicationRunOwnership: new ApplicationRunOwnershipService({
         startupGate: gate,
         lookupStore,
@@ -335,10 +336,10 @@ describe("Application-owned Studio run-model configuration integration", () => {
         : binding.runtime.teamRunId;
       const generalUpdate = subject === "AGENT" ? harness.generalAgentUpdate : harness.generalTeamUpdate;
       const updateInput = subject === "AGENT"
-        ? { agentRunId: runId, llmConfig: { reasoning_effort: "high" } }
+        ? { agentRunId: runId, llmModelIdentifier: "model-1", llmConfig: { reasoning_effort: "high" } }
         : {
             teamRunId: runId,
-            patches: [{ scopeKind: "CONFIGURED_AGENT" as const, scopeAddress: "/coordinator", llmConfig: null }],
+            patches: [{ scopeKind: "CONFIGURED_AGENT" as const, scopeAddress: "/coordinator", llmModelIdentifier: "model-1", llmConfig: null }],
           };
       const read = (studio: StudioRunModelConfigService) => subject === "AGENT"
         ? studio.getAgentRunResumeConfig(runId)
@@ -453,7 +454,7 @@ describe("Application-owned Studio run-model configuration integration", () => {
     const failedGate = new ApplicationOrchestrationStartupGate();
     const studio = harness.studioFor(failedGate);
     const pendingUpdate = studio.updateStoppedAgentRunModelConfig({
-      agentRunId: binding.runtime.agentRunId,
+      agentRunId: binding.runtime.agentRunId, llmModelIdentifier: "model-1",
       llmConfig: null,
     });
     await expect(failedGate.runStartupRecovery(async () => {

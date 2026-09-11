@@ -86,10 +86,10 @@ const harness = (input: {
     agentRunManager: agentRunManager as never,
     historyCatalogService: historyCatalogService as never,
     workspaceManager: workspaceManager as never,
-    modelConfigValidator: {
-      validate: input.validateModelConfig ?? vi.fn(async ({ llmConfig }) => ({
+    modelSelectionValidator: {
+      validate: input.validateModelConfig ?? vi.fn(async ({ selection }) => ({
         kind: "valid" as const,
-        config: llmConfig,
+        selection,
       })),
     },
   });
@@ -146,14 +146,14 @@ describe("StandaloneAgentRunLifecycleService", () => {
         historyCatalogService: {},
         workspaceManager: {},
         tokenUsageReadiness: {},
-        modelConfigValidator: { validate: vi.fn() },
+        modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
       };
-      if (value === "omitted") delete deps.modelConfigValidator;
-      else deps.modelConfigValidator = value;
+      if (value === "omitted") delete deps.modelSelectionValidator;
+      else deps.modelSelectionValidator = value;
       expect(() => Reflect.construct(
         StandaloneAgentRunLifecycleService,
         ["/unused", deps],
-      )).toThrow("modelConfigValidator is required.");
+      )).toThrow("modelSelectionValidator is required.");
     },
   );
 
@@ -338,6 +338,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
       llmConfig: { effort: "low" },
     });
     const updated = metadata({
+      llmModelIdentifier: "sonnet",
       startedAt: "2026-08-17T20:05:00.000Z",
       llmConfig: { effort: "high" },
     });
@@ -347,7 +348,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
     }));
     const validateModelConfig = vi.fn(async () => ({
       kind: "valid" as const,
-      config: { effort: "high" },
+      selection: { llmModelIdentifier: "sonnet", llmConfig: { effort: "high" } },
     }));
     const current = harness({
       metadataStates: [{ kind: "present", metadata: stopped }],
@@ -357,6 +358,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
 
     await expect(current.service.updateStoppedModelConfig({
       agentRunId: RUN_ID,
+      llmModelIdentifier: "sonnet",
       llmConfig: { effort: "high" },
     })).resolves.toMatchObject({
       success: true,
@@ -365,12 +367,12 @@ describe("StandaloneAgentRunLifecycleService", () => {
       editability: { editable: true },
     });
     expect(validateModelConfig).toHaveBeenCalledWith({
-      runtimeKind: RuntimeKind.CLAUDE_AGENT_SDK,
-      llmModelIdentifier: "haiku",
-      llmConfig: { effort: "high" },
+      context: { runtimeKind: RuntimeKind.CLAUDE_AGENT_SDK, currentModelIdentifier: "haiku", workspaceRootPath: stopped.workspaceRootPath },
+      selection: { llmModelIdentifier: "sonnet", llmConfig: { effort: "high" } },
     });
     expect(commitRunModelConfig).toHaveBeenCalledWith({
       runId: RUN_ID,
+      llmModelIdentifier: "sonnet",
       llmConfig: { effort: "high" },
     });
   });
@@ -388,6 +390,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
 
     await expect(current.service.updateStoppedModelConfig({
       agentRunId: RUN_ID,
+      llmModelIdentifier: "sonnet",
       llmConfig: { effort: "high" },
     })).resolves.toMatchObject({
       success: false,
@@ -406,6 +409,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
       llmConfig: { effort: "low" },
     });
     const updated = metadata({
+      llmModelIdentifier: "sonnet",
       startedAt: "2026-08-17T20:05:00.000Z",
       platformAgentRunId: CLAUDE_SESSION_ID,
       llmConfig: { effort: "high" },
@@ -414,7 +418,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
     const validationBarrier = new Promise<void>((resolve) => { releaseValidation = resolve; });
     const validateModelConfig = vi.fn(async () => {
       await validationBarrier;
-      return { kind: "valid" as const, config: { effort: "high" } };
+      return { kind: "valid" as const, selection: { llmModelIdentifier: "sonnet", llmConfig: { effort: "high" } } };
     });
     const commitRunModelConfig = vi.fn(async () => ({
       kind: "committed" as const,
@@ -433,6 +437,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
 
     const save = current.service.updateStoppedModelConfig({
       agentRunId: RUN_ID,
+      llmModelIdentifier: "sonnet",
       llmConfig: { effort: "high" },
     });
     await vi.waitFor(() => expect(validateModelConfig).toHaveBeenCalledOnce());
@@ -446,7 +451,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
     expect(commitRunModelConfig).toHaveBeenCalledOnce();
     expect(current.agentRunManager.prepareRestoreAgentRunFromPlatformState).toHaveBeenCalledWith({
       runId: RUN_ID,
-      config: expect.objectContaining({ llmConfig: { effort: "high" } }),
+      config: expect.objectContaining({ llmModelIdentifier: "sonnet", llmConfig: { effort: "high" } }),
       platformAgentRunId: CLAUDE_SESSION_ID,
     });
   });
@@ -458,6 +463,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
       llmConfig: { effort: "low" },
     });
     const updated = metadata({
+      llmModelIdentifier: "sonnet",
       startedAt: "2026-08-17T20:05:00.000Z",
       platformAgentRunId: CLAUDE_SESSION_ID,
       llmConfig: { effort: "high" },
@@ -466,7 +472,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
     const validationBarrier = new Promise<void>((resolve) => { releaseValidation = resolve; });
     const validateModelConfig = vi.fn(async () => {
       await validationBarrier;
-      return { kind: "valid" as const, config: { effort: "high" } };
+      return { kind: "valid" as const, selection: { llmModelIdentifier: "sonnet", llmConfig: { effort: "high" } } };
     });
     const commitRunModelConfig = vi.fn(async () => ({
       kind: "committed" as const,
@@ -491,6 +497,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
 
     const save = current.service.updateStoppedModelConfig({
       agentRunId: RUN_ID,
+      llmModelIdentifier: "sonnet",
       llmConfig: { effort: "high" },
     });
     await vi.waitFor(() => expect(validateModelConfig).toHaveBeenCalledOnce());
@@ -511,7 +518,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
     });
     expect(current.agentRunManager.prepareRestoreAgentRunFromPlatformState).toHaveBeenCalledWith({
       runId: RUN_ID,
-      config: expect.objectContaining({ llmConfig: { effort: "high" } }),
+      config: expect.objectContaining({ llmModelIdentifier: "sonnet", llmConfig: { effort: "high" } }),
       platformAgentRunId: CLAUDE_SESSION_ID,
     });
     expect(activeRun.postUserMessage).toHaveBeenCalledOnce();
@@ -551,6 +558,7 @@ describe("StandaloneAgentRunLifecycleService", () => {
 
     await expect(current.service.updateStoppedModelConfig({
       agentRunId: RUN_ID,
+      llmModelIdentifier: "sonnet",
       llmConfig: { effort: "high" },
     })).resolves.toMatchObject({
       success: false,

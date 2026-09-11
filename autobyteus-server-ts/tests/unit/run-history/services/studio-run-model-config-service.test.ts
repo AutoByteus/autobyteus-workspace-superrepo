@@ -56,13 +56,16 @@ const harness = () => {
   const getTeamRunResumeConfig = vi.fn(async () => teamResume);
   const updateStoppedModelConfig = vi.fn(async () => ({ subject: "agent-general" }));
   const updateStoppedModelConfigs = vi.fn(async () => ({ subject: "team-general" }));
+  const listOptionsMany = vi.fn(async (contexts) => contexts.map(context => ({ currentModelIdentifier: context.currentModelIdentifier, currentContextTokens: 128000, replacements: [], unavailableReason: null })));
   return {
+    listOptionsMany,
     hasLiveRunOwnership,
     getAgentRunResumeConfig,
     getTeamRunResumeConfig,
     updateStoppedModelConfig,
     updateStoppedModelConfigs,
     service: new StudioRunModelConfigService({
+      modelSelectionService: { listOptions: vi.fn(), listOptionsMany },
       applicationRunOwnership: { hasLiveRunOwnership },
       agentResumeConfigService: { getAgentRunResumeConfig },
       teamResumeConfigService: { getTeamRunResumeConfig },
@@ -74,6 +77,19 @@ const harness = () => {
 
 describe("StudioRunModelConfigService", () => {
   beforeEach(() => vi.restoreAllMocks());
+
+  it("projects exactly root and direct configured Agent model-option contexts from flat Team V2", async () => {
+    const h = harness();
+    const options = await h.service.teamRunModelOptions("team-run-1");
+    expect(options.map(({ scopeKind, scopeAddress }) => ({ scopeKind, scopeAddress }))).toEqual([
+      { scopeKind: "CONFIGURED_TEAM", scopeAddress: "/" },
+      { scopeKind: "CONFIGURED_AGENT", scopeAddress: "/coordinator" },
+    ]);
+    expect(h.listOptionsMany).toHaveBeenCalledWith([
+      expect.objectContaining({ currentModelIdentifier: teamTree.rootTeam.defaultLaunchConfiguration.llmModelIdentifier }),
+      expect.objectContaining({ currentModelIdentifier: teamTree.rootTeam.members[0].launchConfiguration.llmModelIdentifier }),
+    ]);
+  });
 
   it("overlays Application-owned Agent and Team reads with the existing active lock", async () => {
     const agent = harness();
@@ -110,7 +126,7 @@ describe("StudioRunModelConfigService", () => {
   it("rejects Application-owned Agent and Team updates with canonical state and zero General write", async () => {
     const agent = harness();
     agent.hasLiveRunOwnership.mockResolvedValue(true);
-    const agentInput = { agentRunId: "agent-run-1", llmConfig: { reasoning_effort: "high" } };
+    const agentInput = { agentRunId: "agent-run-1", llmModelIdentifier: "model-1", llmConfig: { reasoning_effort: "high" } };
     await expect(agent.service.updateStoppedAgentRunModelConfig(agentInput)).resolves.toMatchObject({
       success: false,
       outcome: "RUN_ACTIVE",
@@ -124,7 +140,7 @@ describe("StudioRunModelConfigService", () => {
     team.hasLiveRunOwnership.mockResolvedValue(true);
     const teamInput = {
       teamRunId: "team-run-1",
-      patches: [{ scopeKind: "CONFIGURED_TEAM" as const, scopeAddress: "/", llmConfig: null }],
+      patches: [{ scopeKind: "CONFIGURED_TEAM" as const, scopeAddress: "/", llmModelIdentifier: "model-1", llmConfig: null }],
     };
     await expect(team.service.updateStoppedTeamRunModelConfigs(teamInput)).resolves.toMatchObject({
       success: false,
@@ -137,7 +153,7 @@ describe("StudioRunModelConfigService", () => {
 
   it("delegates exact updates to unchanged General facades only after release", async () => {
     const agent = harness();
-    const agentInput = { agentRunId: "agent-run-1", llmConfig: null };
+    const agentInput = { agentRunId: "agent-run-1", llmModelIdentifier: "model-1", llmConfig: null };
     await expect(agent.service.updateStoppedAgentRunModelConfig(agentInput))
       .resolves.toEqual({ subject: "agent-general" });
     expect(agent.updateStoppedModelConfig).toHaveBeenCalledWith(agentInput);
@@ -145,7 +161,7 @@ describe("StudioRunModelConfigService", () => {
     const team = harness();
     const teamInput = {
       teamRunId: "team-run-1",
-      patches: [{ scopeKind: "CONFIGURED_AGENT" as const, scopeAddress: "/coordinator", llmConfig: null }],
+      patches: [{ scopeKind: "CONFIGURED_AGENT" as const, scopeAddress: "/coordinator", llmModelIdentifier: "model-1", llmConfig: null }],
     };
     await expect(team.service.updateStoppedTeamRunModelConfigs(teamInput))
       .resolves.toEqual({ subject: "team-general" });
@@ -161,7 +177,7 @@ describe("StudioRunModelConfigService", () => {
     const agent = harness();
     agent.hasLiveRunOwnership.mockRejectedValue(new Error("binding database unavailable"));
     await expect(agent.service.updateStoppedAgentRunModelConfig({
-      agentRunId: "agent-run-1",
+      agentRunId: "agent-run-1", llmModelIdentifier: "model-1",
       llmConfig: null,
     })).resolves.toMatchObject({
       success: false,

@@ -1,0 +1,20 @@
+{
+  "observedAt": "2026-09-11T00:46:56.026318+00:00",
+  "userStatement": "no worries for ios, because ios is not even used yet to be honest",
+  "interpretation": "User explicitly removes iOS from the required completion gates for this release; no further iOS recovery is required.",
+  "retainedStatus": "Attempt1 failed simulator WebView/marker assertions; TestFlight upload skipped. One failed-jobs retry was already requested before the scope decision; capture its actual result, do not relabel either attempt.",
+  "notClaimed": [
+    "iOS defect fixed",
+    "iOS failure caused by this ticket",
+    "iOS publicly released",
+    "failure converted to Pass"
+  ],
+  "requiredReleaseGates": [
+    "Desktop Release",
+    "Server Docker Release",
+    "Release Messaging Gateway",
+    "Android APK Release"
+  ],
+  "runtimeUserDataChange": "None",
+  "userReconfirmation": "no worries about the ios failure all good"
+}

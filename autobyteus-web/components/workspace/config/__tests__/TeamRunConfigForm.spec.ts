@@ -10,7 +10,7 @@ import type { EditableRuntimeCatalogOperationState } from '~/types/agent/Editabl
 import { projectEditableTeamRunFormModel } from '~/utils/editableTeamRunFormModel'
 import { projectExistingTeamRunFormModel } from '~/services/runConfigEditing/existingTeamRunFormModel'
 import { createExistingTeamModelConfigDraft } from '~/services/runConfigEditing/existingTeamModelConfigDraft'
-import { buildTestTeamContext, testAgentNode, testSubTeamNode } from '~/test-support/currentTeamTestFixtures'
+import { buildTestTeamContext, testAgentNode } from '~/test-support/currentTeamTestFixtures'
 
 vi.mock('~/composables/useLocalization', () => ({
   useLocalization: () => ({
@@ -73,7 +73,7 @@ const existingModel = () => {
   const tree = buildTestTeamContext({
   teamRunId: 'stored-root-run',
   teamDefinitionId: 'classroom-def',
-  teamDefinitionName: 'Nested Classroom',
+  teamDefinitionName: 'Classroom',
   coordinatorAddress: '/teacher',
   rootChildren: [
     testAgentNode('/teacher', {
@@ -81,13 +81,11 @@ const existingModel = () => {
       llmConfig: { reasoning_effort: 'high' }, autoExecuteTools: false,
       skillAccessMode: 'PRELOADED_ONLY', workspaceRootPath: '/workspace/root',
     }),
-    testSubTeamNode('/StudentStudyGroup', [
-      testAgentNode('/StudentStudyGroup/student_one', {
-        runtimeKind: 'claude_agent_sdk', llmModelIdentifier: 'historical-student-model',
-        llmConfig: { temperature: 0.2 }, workspaceRootPath: '/workspace/student',
-      }),
-      testAgentNode('/StudentStudyGroup/student_two'),
-    ], { teamDefinitionId: 'study-def', displayName: 'StudentStudyGroup' }),
+    testAgentNode('/student_one', {
+      runtimeKind: 'claude_agent_sdk', llmModelIdentifier: 'historical-student-model',
+      llmConfig: { temperature: 0.2 }, workspaceRootPath: '/workspace/student',
+    }),
+    testAgentNode('/student_two'),
   ],
   workspaceRootPath: '/workspace/root',
   }).view.getExecutionTree()
@@ -205,9 +203,9 @@ describe('TeamRunConfigForm launch and existing-run presentation', () => {
       }),
     }))
     const members = tree.props('memberNodes') as any[]
-    expect(members.map((node) => node.address)).toEqual(['/teacher', '/StudentStudyGroup'])
-    expect(members[1].children[0]).toEqual(expect.objectContaining({
-      mode: 'existing', address: '/StudentStudyGroup/student_one',
+    expect(members.map((node) => node.address)).toEqual(['/teacher', '/student_one', '/student_two'])
+    expect(members[1]).toEqual(expect.objectContaining({
+      mode: 'existing', address: '/student_one',
       effectiveConfig: expect.objectContaining({
         runtimeKind: 'claude_agent_sdk', llmModelIdentifier: 'historical-student-model',
         llmConfig: { temperature: 0.2 }, workspaceRootPath: '/workspace/student',
@@ -229,12 +227,12 @@ describe('TeamRunConfigForm launch and existing-run presentation', () => {
     tree.vm.$emit('reset-team', '/StudentStudyGroup')
     tree.vm.$emit('update-agent', '/teacher', { autoExecuteTools: true })
     tree.vm.$emit('retry-runtime-catalog', 'codex_app_server')
-    root.vm.$emit('update-existing-model-config', '/', { reasoning_effort: 'low' })
+    root.vm.$emit('update-existing-model-config', '/', { llmModelIdentifier: 'model', llmConfig: { reasoning_effort: 'low' } }, true)
     await wrapper.vm.$nextTick()
 
     expect(wrapper.emitted('edit-config')).toBeUndefined()
     expect(wrapper.emitted('update:workspaceSelection')).toBeUndefined()
     expect(wrapper.emitted('retry-runtime-catalog')).toBeUndefined()
-    expect(wrapper.emitted('update-existing-model-config')).toEqual([["/", { reasoning_effort: 'low' }]])
+    expect(wrapper.emitted('update-existing-model-config')).toEqual([["/", { llmModelIdentifier: 'model', llmConfig: { reasoning_effort: 'low' } }, true]])
   })
 })

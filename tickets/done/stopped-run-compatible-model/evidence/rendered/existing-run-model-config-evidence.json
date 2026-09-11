@@ -1,0 +1,215 @@
+{
+  "startedAt": "2026-09-08T09:02:20.320Z",
+  "platform": "linux-arm64",
+  "node": "v22.23.2",
+  "browserExecutable": "/usr/bin/chromium",
+  "webDir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web",
+  "fixturePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/tests/e2e/fixtures/existing-run-model-config.page.vue",
+  "installedPagePath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/pages/api-e2e-existing-run-model-config.vue",
+  "routePath": "/api-e2e-existing-run-model-config",
+  "graphqlOperations": [
+    {
+      "operationName": "GetAgentRunResumeConfig",
+      "variables": {
+        "runId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetRuntimeAvailabilities",
+      "variables": {}
+    },
+    {
+      "operationName": "GetProviderModelCatalogSnapshots",
+      "variables": {
+        "runtimeKind": "autobyteus"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedAgentRunModelConfig",
+      "variables": {
+        "input": {
+          "agentRunId": "agent-run-browser-1",
+          "llmModelIdentifier": "larger-model",
+          "llmConfig": null
+        }
+      }
+    },
+    {
+      "operationName": "AgentRunModelOptions",
+      "variables": {
+        "agentRunId": "agent-run-browser-1"
+      }
+    },
+    {
+      "operationName": "GetTeamRunResumeConfig",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    },
+    {
+      "operationName": "UpdateStoppedTeamRunModelConfigs",
+      "variables": {
+        "input": {
+          "teamRunId": "team-run-browser-1",
+          "patches": [
+            {
+              "scopeKind": "CONFIGURED_TEAM",
+              "scopeAddress": "/",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/coordinator",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_TEAM",
+              "scopeAddress": "/Nested",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/lead",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            },
+            {
+              "scopeKind": "CONFIGURED_AGENT",
+              "scopeAddress": "/Nested/reviewer",
+              "llmModelIdentifier": "larger-model",
+              "llmConfig": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operationName": "TeamRunModelOptions",
+      "variables": {
+        "teamRunId": "team-run-browser-1"
+      }
+    }
+  ],
+  "scenarios": {
+    "LOCAL-RENDER": {
+      "id": "LOCAL-RENDER",
+      "description": "Implementation interaction/visual inspection; deterministic transport, no API/E2E acceptance",
+      "status": "Pass",
+      "startedAt": "2026-09-08T09:02:41.031Z",
+      "finishedAt": "2026-09-08T09:02:48.834Z",
+      "details": {
+        "agentMutation": {
+          "input": {
+            "agentRunId": "agent-run-browser-1",
+            "llmModelIdentifier": "larger-model",
+            "llmConfig": null
+          }
+        },
+        "teamMutation": {
+          "input": {
+            "teamRunId": "team-run-browser-1",
+            "patches": [
+              {
+                "scopeKind": "CONFIGURED_TEAM",
+                "scopeAddress": "/",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/coordinator",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_TEAM",
+                "scopeAddress": "/Nested",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/Nested/lead",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              },
+              {
+                "scopeKind": "CONFIGURED_AGENT",
+                "scopeAddress": "/Nested/reviewer",
+                "llmModelIdentifier": "larger-model",
+                "llmConfig": null
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "browserEvents": [
+    {
+      "type": "console:debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "console:debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Initializing server config"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Not in Electron environment. Skipping server initialization."
+    },
+    {
+      "type": "console:info",
+      "text": "<Suspense> is an experimental feature and its API will likely change."
+    },
+    {
+      "type": "console:log",
+      "text": "ServerLoading: Component mounted with status: running"
+    },
+    {
+      "type": "console:log",
+      "text": "serverStore: Checking server health at /rest/health"
+    }
+  ],
+  "failures": [],
+  "cleanup": {
+    "context": "closed",
+    "browser": "closed",
+    "devServer": {
+      "status": "terminated",
+      "pid": 40770,
+      "initialExitCode": null,
+      "initialSignalCode": null,
+      "sigtermTarget": "process-group",
+      "exitedAfterSigterm": true,
+      "finalExitCode": null,
+      "finalSignalCode": "SIGTERM",
+      "processGroupExited": true
+    },
+    "devLog": "closed",
+    "temporaryPage": "removed"
+  },
+  "port": 33853,
+  "baseUrl": "http://127.0.0.1:33853",
+  "finishedAt": "2026-09-08T09:02:49.241Z",
+  "result": "Pass"
+}

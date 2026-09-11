@@ -1,0 +1,179 @@
+
+ RUN  v4.0.18 /tmp/stopped-model-baseline-BHu2p0/autobyteus-server-ts
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "autobyteus-server-test.db" at "file:/tmp/stopped-model-baseline-BHu2p0/autobyteus-server-ts/tests/.tmp/autobyteus-server-test.db"
+
+Applying migration `20260203074245_init`
+Applying migration `20260208094000_add_external_channel_tables`
+Applying migration `20260209174500_add_channel_message_receipt_turn_id`
+Applying migration `20260209213000_remove_agent_conversation_tables`
+Applying migration `20260210101500_add_agent_avatar`
+Applying migration `20260210192000_add_agent_team_avatar`
+Applying migration `20260211214500_add_sync_columns_and_tombstones`
+Applying migration `20260212070000_remove_workflow_definition`
+Applying migration `20260309103000_add_channel_binding_launch_preset`
+Applying migration `20260310153000_add_channel_binding_team_definition_id`
+Applying migration `20260331102000_remove_channel_bindings_table`
+Applying migration `20260331130000_receipt_lifecycle_and_remove_channel_idempotency`
+Applying migration `20260517090000_add_app_data_migration_records`
+Applying migration `20260624090000_add_token_usage_ledger_events`
+Applying migration `20260625193000_token_usage_component_pricing_explainability`
+Applying migration `20260629120000_add_token_usage_display_fields`
+Applying migration `20260702093000_token_usage_execution_address`
+Applying migration `20260726090000_add_secret_vault`
+Applying migration `20260730090000_add_token_usage_provider_name`
+Applying migration `20260801090000_token_usage_member_display_name`
+Applying migration `20260814090000_team_run_execution_tree_v1`
+Applying migration `20260819090000_add_token_usage_run_records`
+Applying migration `20260820090000_redesign_app_data_migration_summary`
+Applying migration `20260822090000_add_token_usage_analytics`
+
+Database reset successful
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260203074245_init/
+    └─ migration.sql
+  └─ 20260208094000_add_external_channel_tables/
+    └─ migration.sql
+  └─ 20260209174500_add_channel_message_receipt_turn_id/
+    └─ migration.sql
+  └─ 20260209213000_remove_agent_conversation_tables/
+    └─ migration.sql
+  └─ 20260210101500_add_agent_avatar/
+    └─ migration.sql
+  └─ 20260210192000_add_agent_team_avatar/
+    └─ migration.sql
+  └─ 20260211214500_add_sync_columns_and_tombstones/
+    └─ migration.sql
+  └─ 20260212070000_remove_workflow_definition/
+    └─ migration.sql
+  └─ 20260309103000_add_channel_binding_launch_preset/
+    └─ migration.sql
+  └─ 20260310153000_add_channel_binding_team_definition_id/
+    └─ migration.sql
+  └─ 20260331102000_remove_channel_bindings_table/
+    └─ migration.sql
+  └─ 20260331130000_receipt_lifecycle_and_remove_channel_idempotency/
+    └─ migration.sql
+  └─ 20260517090000_add_app_data_migration_records/
+    └─ migration.sql
+  └─ 20260624090000_add_token_usage_ledger_events/
+    └─ migration.sql
+  └─ 20260625193000_token_usage_component_pricing_explainability/
+    └─ migration.sql
+  └─ 20260629120000_add_token_usage_display_fields/
+    └─ migration.sql
+  └─ 20260702093000_token_usage_execution_address/
+    └─ migration.sql
+  └─ 20260726090000_add_secret_vault/
+    └─ migration.sql
+  └─ 20260730090000_add_token_usage_provider_name/
+    └─ migration.sql
+  └─ 20260801090000_token_usage_member_display_name/
+    └─ migration.sql
+  └─ 20260814090000_team_run_execution_tree_v1/
+    └─ migration.sql
+  └─ 20260819090000_add_token_usage_run_records/
+    └─ migration.sql
+  └─ 20260820090000_redesign_app_data_migration_summary/
+    └─ migration.sql
+  └─ 20260822090000_add_token_usage_analytics/
+    └─ migration.sql
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts (14 tests | 3 failed) 13799ms
+     ✓ keeps each supported root on one exact workspace, builder, Host, and authority family 3ms
+     ✓ keeps application capability injection tight on the tokenless run-session foundation 1ms
+     ✓ closes retired symbols and provider-specific construction below supported roots 271ms
+     ✓ keeps activation provider-local and deactivation at the AgentRun resource owner 1ms
+     ✓ keeps the application kernel private to its builder and owning scope 45ms
+     × fails closed on the exact direct-constructor test sets and narrow fixture property 2469ms
+     × keeps AgentTeamRunManager creation explicit and process access lookup-only 284ms
+     ✓ binds exactly two production Mixed Team factories to complete root families 27ms
+     × closes complete Agent manager and AgentRun construction to exact roots and fixtures 4805ms
+     ✓ selects one host validator and propagates it to the two exact lifecycle roots  1617ms
+     ✓ carries one explicit task-identity pair through every Team and task constructor  2653ms
+     ✓ keeps context translation provider-neutral and all path authority explicit  1591ms
+     ✓ creates one frozen context path value per host and shares it across both roots 21ms
+     ✓ rejects synthetic omission, null, undefined, casts, ambient getters, and broad substitutes 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > fails closed on the exact direct-constructor test sets and narrow fixture property
+AssertionError: expected [ …(11) ] to deeply equal [ …(9) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,9 @@
+  [
++   "autobyteus-server-ts/tests/e2e/agent/standalone-error-termination-lifecycle.e2e.test.ts",
+    "autobyteus-server-ts/tests/e2e/memory/codex-live-memory-persistence.e2e.test.ts",
++   "autobyteus-server-ts/tests/e2e/run-history/run-projection-toolcalls-graphql.e2e.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-manager.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-manager.memory-layout.real.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-prompt-fallback.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/autobyteus-agent-run-backend-factory.lmstudio.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/codex-agent-run-backend-factory.integration.test.ts",
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:590:56
+    588|       }
+    589|     }
+    590|     expect([...actual.get("AgentRunManager")!].sort()).toEqual([...AGE…
+       |                                                        ^
+    591|     expect([...actual.get("MixedTeamRunBackendFactory")!].sort())
+    592|       .toEqual([...MIXED_BACKEND_FACTORY_TESTS].sort());
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > keeps AgentTeamRunManager creation explicit and process access lookup-only
+AssertionError: autobyteus-server-ts/tests/e2e/run-history/run-projection-toolcalls-graphql.e2e.test.ts:initialize:complete input: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:616:11
+    614|           ),
+    615|           `${relativePath}:${occurrence.kind}:complete input`,
+    616|         ).toBe(true);
+       |           ^
+    617|       }
+    618|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/architecture/agent-provider-composition-boundaries.test.ts > agent provider composition boundaries > closes complete Agent manager and AgentRun construction to exact roots and fixtures
+AssertionError: expected [ …(10) ] to deeply equal [ …(9) ]
+
+- Expected
++ Received
+
+@@ -1,6 +1,7 @@
+  [
++   "autobyteus-server-ts/tests/e2e/agent/standalone-error-termination-lifecycle.e2e.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-manager.memory-layout.real.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-prompt-fallback.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-execution/agent-run-service.integration.test.ts",
+    "autobyteus-server-ts/tests/integration/run-history/memory-layout-and-projection.integration.test.ts",
+    "autobyteus-server-ts/tests/unit/agent-execution/agent-run-create-service.test.ts",
+
+ ❯ tests/architecture/agent-provider-composition-boundaries.test.ts:764:32
+    762|       .map(relativeRoot)
+    763|       .sort();
+    764|     expect(directServiceTests).toEqual([...AGENT_RUN_SERVICE_TESTS].so…
+       |                                ^
+    765|     for (const relativePath of [...productionServiceRoots, ...directSe…
+    766|       const path = join(ROOT, relativePath);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 11 passed (14)
+   Start at  09:03:16
+   Duration  16.05s (transform 245ms, setup 39ms, import 600ms, tests 13.80s, environment 0ms)

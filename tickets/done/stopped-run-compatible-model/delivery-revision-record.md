@@ -1,0 +1,77 @@
+# Delivery Revision Record — stopped-run-compatible-model
+
+Canonical docs-sync report, handoff summary and release-deployment report are the current authorities; entries below preserve completed round history. No prior delivery result inferred from missing records.
+
+## Revision Index
+| Revision | Entry Point / Trigger | Prior Result | Current Result | Canonical Artifacts |
+| --- | --- | --- | --- | --- |
+| DR-001 | CRR-003 proportional test-review Pass after API-REV-001 | N/A | Blocked — integration/docs complete, user verification pending | `docs-sync-report.md`, `handoff-summary.md`, `release-notes.md`, `release-deployment-report.md` |
+
+| DR-002 | User asks to read README and build Electron for testing | DR-001 verification hold | Blocked — local build/checks Pass, user verification pending | `docs-sync-report.md`, `handoff-summary.md`, `release-notes.md`, `release-deployment-report.md`; `evidence/delivery-electron/` |
+
+| DR-003 | CRR-005/API-REV-003 plus explicit user confirmation | DR-002 user-verification hold | Delivery Completed | Current docs/handoff/release reports; archived package; finalization and preservation evidence |
+
+| DR-004 | User requests a new release; later makes iOS non-blocking | DR-003 Delivery Completed, release not required | Delivery Completed — v1.4.69 published | Current docs/handoff/release reports and notes, package index, evidence/delivery-DR004 |
+
+## Revision Entries
+### DR-001 — Initial current-base documentation and verification hold
+- Date/trigger: 2026-09-09; Code Reviewer delivered the cumulative validated package, CRR-003 Pass.
+- Authority: RER-004 Approved; AD-REV-001; ARCH-REV-002 Pass; IR-002; source CRR-002 Pass; API-REV-001 Pass; proportional CRR-003 Pass. Medium/High/Reviewed unchanged; Product/Prototype/UI-UX N/A — not applicable.
+- Prior authoritative delivery result: **N/A**.
+- Current authoritative result: **Blocked — explicit user verification pending**, not Delivery Completed. Initial integration and docs subphase completed successfully.
+- Docs report: `docs-sync-report.md` — seven long-lived docs updated for coherent selection, capacity authority, fixed runtime, same-model exception, propagation, canonical verification and same-conversation continuity.
+- Handoff summary: `handoff-summary.md` — updated only after current-base check, with cumulative package, candidate identity, executable evidence/limits and user verification instructions.
+- Release/deployment report: `release-deployment-report.md` — repository steps gated; no release requested, version/tag/deployment Not required in current scope; cleanup pending safe finalization. Candidate `release-notes.md` prepared, not published.
+- Integration/check: fetched `origin/personal`, unchanged at `a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27`; merge Already up to date; no new base commits, checkpoint or runtime rerun needed. HEAD `5f7a9b47e228e25529f5bd0acf80ea3a2142d303` plus exact reviewed test/artifact delta and delivery docs. Audit pins three test hashes/diff, unchanged source-review report/production, seven docs and 209 upstream artifacts.
+- User verification/finalization: **Not received / not performed**. Ticket remains in-progress; no commit/push/final merge/archive/release or task-worktree removal by Delivery. Requirements approval and specialist acceptance are not substituted for user verification.
+- Terminal return: **Not yet eligible**; message/reference **N/A — not sent**.
+- Why recorded: first completed delivery-stage round must preserve a real baseline even though the mandatory user gate blocks overall completion. Later acceptance/finalization requires an appended DR entry, not rewriting this hold as prior success.
+- Next action: request explicit user verification; Delivery retains ownership. Evaluate current handoff rules, but do not invent an upstream defect or send terminal success during this hold.
+- Remaining blockers/risks: user signal; subsequent target-refresh/finalization/cleanup gates. Retain API provider/platform/full-build limits and known pristine-base failures. No rollback/write retry/history conversion/migration authorized.
+- Completed-round rule evaluation: **No matching rule** for the normal user-verification hold; `get_handoff_rules` response retained in `evidence/delivery/routing-rules.json`. No recipient selected, no message sent. Delivery retains the next action.
+
+### DR-002 — README Electron Build For User Verification
+- Date/trigger: 2026-09-10; user explicitly requested a local Electron build so they can test. This is not user acceptance or release authorization.
+- Prior authoritative result: **DR-001 Blocked — user verification pending**.
+- Current authoritative result: **Blocked — user verification pending; requested local build and package checks Pass**. Carried Medium/High/Reviewed and all upstream authority revisions unchanged.
+- Base integration: fetched origin/personal again, unchanged at approved a32b53f6320222c9bf3c7f3a4a3c50fbd1e44f27; merge Already up to date. HEAD remains 5f7a9b47e228e25529f5bd0acf80ea3a2142d303 plus reviewed tests/reports and docs. No new base/source or checkpoint.
+- Executed README `pnpm build:electron:linux`, **exit 0**, native Linux ARM64, existing package 1.4.68 / Electron 42.4.1. AppImage, unpacked app and staged backend deliberately retained; no publish/version bump/tag.
+- Verification: ARM64 executable and updater metadata Pass; bundled server under packaged Electron runtime initializes isolated database and reaches HTTP health, then exits cleanly. Owned temp root removed. GUI not launched and no functional desktop/user acceptance claimed.
+- Artifact/hash/source/logs: `evidence/delivery-electron/build-result.json`, `build.log`, `package-checks.log`, README; AppImage SHA-256 9ee0b9d410554741d83c52fdc67b2de0c6ee96bc3c40ee04ca34a2edbe931881. Three durable test/seven doc hashes unchanged; selected compiled backend modules match. No source/test fix or upstream classification needed.
+- Docs sync: `docs-sync-report.md` Pass unchanged canonical docs; round addendum records no new procedure impact. `handoff-summary.md` and `release-deployment-report.md` authoritative with artifact/launch paths and narrowed current test limits; `release-notes.md` marks local unpublished build.
+- User verification/finalization: **Not received / not performed**. Ticket in-progress; no commit/push/target merge/archive or ticket cleanup. Build authorization is not finalization authorization.
+- Terminal return: **Not yet eligible**; message/reference **N/A — not sent**. Completed-round `get_handoff_rules` evaluated: no rule matches the normal user-verification hold; no code/packaging fix or upstream issue exists. Exact response: `evidence/delivery-electron/routing-rules.json`. No message sent; Delivery retains ownership.
+- Why recorded: new user-requested build result adds package evidence beyond DR-001/API history and must not rewrite the initial no-packaging result as earlier success.
+- Remaining scope: graphical desktop/user testing, final target refresh/finalization/cleanup gates; provider-matrix/full-suite/typecheck/cross-platform limits retained. New unowned api-e2e-classroom evidence left untouched and not attributed to Delivery.
+
+### DR-003 — Accepted Ticket Finalized And Safely Archived
+- Completed at: 2026-09-10T23:35:43.786508+00:00; trigger CRR-005 no-new-delta gate satisfied / API-REV-003 ticket Pass95%, plus user “yesss. so i think our ticket is fine”.
+- Prior authoritative result: **DR-002 Blocked — user verification pending**, retained above.
+- Current authoritative result: **Delivery Completed**. Medium/High/Reviewed; RER-004, AD-REV-001, ARCH-REV-002, IR-002, source CRR-002 and cumulative CRR-003 unchanged; CRR-004 separate-issue disposition, API-REV-003 and CRR-005 current.
+- User verification: explicit ticket acceptance recorded with provenance in `evidence/delivery-DR003/user-verification.json`; no unsupported claim of Electron GUI acceptance or API-F001 fix.
+- Docs/handoff/release: current canonical reports updated with final archived package and limits; seven long-lived docs unchanged since DR-001. Prior report snapshots retained under `evidence/delivery-DR003/prior-delivery/`.
+- Integration: latest remote base unchanged; no checkpoint/re-integration/runtime rerun or renewed verification needed. Current reviewed source/test hashes stable.
+- Repository finalization: ticket commit 65023a08a8acc1bb9ad9ec6291bc2168ed89bd3a, branch push confirmed; clean personal target refreshed; no-ff merge e9ccdfc4e81059b03c1f95136f16d6cf5c898ecc; target push confirmed. First TLS push failed then bounded per-command transport retry succeeded; no force/persistent setting change. Final containing-record commit/push receipt is stored with preserved artifact and exact SHA is included in terminal handoff.
+- Ticket archived before commit under `/home/autobyteus/workspace/autobyteus-workspace/tickets/done/stopped-run-compatible-model`. Dedicated worktree removed, prune completed, local ticket branch deleted. Remote branch retained for audit (removal Not required).
+- Artifact safety: full Electron distribution copied to `/home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR003/electron-dist`;32538 entries/modes/symlinks verified; exact AppImage SHA retained. Private ignored local generated-state backup retained; no shared state cleanup. Historical ticket evidence and failures preserved, plus original screenshot and pinned Classroom inputs.
+- Release/version/tag/deployment/rollout: **Not required**, not requested; DR-002 local build remains Completed, not a published release. Approved data transition No Migration; no data rewrite.
+- Separate API-F001/C16 remains unresolved outside ticket; C19 is control, not fix; CRF-002 resolved. No unresolved ticket findings. API/provider/full-suite/typecheck/GUI/cross-platform limits retained; no new confidence rescore.
+- Terminal return: **Eligible; dispatch confirmation belongs to the actual send_message_to receipt**. `get_handoff_rules` selected the single Delivery Completed rule and exact recipient `/requirements_engineer`; `evidence/delivery-DR003/routing-rules.json` preserves the response. Final record synchronization and tool-confirmed dispatch follow. No message success asserted before tool confirmation.
+- Why revision recorded: user acceptance and actual repository/cleanup gates replace the DR-002 hold, while preserving prior rounds and separate symptom scope. No remaining delivery blocker.
+
+### DR-004 — Authorized Stable v1.4.69 Publication
+- Completed result recorded at 2026-09-11T01:13:42.081979+00:00; new user trigger “lets do a new release thanks”, after DR-003 explicit ticket acceptance/finalization.
+- Prior authoritative result **DR-003 Delivery Completed — no release requested then**; historical record retained, not retroactively changed.
+- Current authoritative result **Delivery Completed**. Medium/High/Reviewed and all requirements/design/source/API/review authorities unchanged.
+- Integration: fetched origin/personal before edits, unchanged f3de2f67f; ff-only Already up to date. No new source/test/base integration or renewed user verification needed; fresh tagged CI checks actual release packages. Final fetch also matches release SHA.
+- Docs sync Pass/no new long-lived behavior impact. Archived release notes recast as functional release notes, prior bytes retained; root curated/tagged/public notes equal. Current handoff-summary and release-deployment-report supersede no-release scope.
+- README helper exit0; release commit17d4f2327329cee3509062fd823b8e049f563682 / annotatedv1.4.69, both versions and managed manifest synchronized, personal/tag pushes independently verified. No hand-built tag or duplicate new-tag workflow dispatch.
+- Desktop five-platform build/publish, Android signed APK, gateway runtime, Docker amd64/arm64 versioned/latest publication **Pass**. Published21assets and metadata/actual downloaded checksums verified; Docker registry digests match. CI jobs/exact results in evidence/delivery-DR004.
+- iOS attempt1 simulator restore assertion failure/exit65 retained; one unchanged-tag failed-jobs attempt2 **Pass**, including TestFlight upload/cleanup. User twice explicitly made iOS non-blocking before retry outcome. Scope exception is not test evidence, root cause/fix not inferred, no further retry. App Store public release Not required/not performed.
+- Delivery-local published-metadata checker initially assumed Windows size; corrected only that checker to record unadvertised size while retaining artifact/digest checks, final Pass. Original diagnostic preserved.
+- Repository ticket archive/merge/push/cleanup remain complete from DR-003. Release runs on finalized personal as documented; no new task worktree/branch/local runtime started, downloaded release bytes retained outside Git, no existing deployment/shared data changed. No migration/rollout installation required.
+- Final containing-record SHA/push/clean state receipt is external at /home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR004/repository-final-state.json and in terminal handoff.
+- Terminal return **Eligible — confirmation only through actual send_message_to receipt**, not yet asserted Sent here. Completed-result rules govern the single exact recipient.
+- Why revision: explicit later release request changes conditional publication applicability; actual publication must not be inferred from prior DR-003 repository completion.
+- Remaining blockers **None**. API-F001 remains a separate unresolved observation; provider/full-suite/GUI/installed-upgrade and public App Store limits retained. Published tag immutable; any regression requires coordinated reviewed rollback/hotfix, never conversation-history edits.
+- Completed-result `get_handoff_rules` selects **Delivery Completed -> /requirements_engineer**, single exact recipient; persisted rules/selection in `evidence/delivery-DR004/routing-rules.json`.

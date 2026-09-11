@@ -1,3 +1,4 @@
+import type { ExistingRunModelOptionsState } from './ExistingRunModelConfigDraft'
 import type { AgentTeamAddress } from './AgentTeamAddress'
 import type { TeamAgentDisplayFields, TeamScopeDisplayFields } from './TeamRunFormDisplay'
 
@@ -10,12 +11,16 @@ export type ExistingWorkspaceDisplay = Readonly<{
 
 export type ExistingTeamScopeFormModel = TeamScopeDisplayFields & Readonly<{
   mode: 'existing'
+  originalModelIdentifier: string
+  modelOptions?: ExistingRunModelOptionsState
   storedWorkspace: ExistingWorkspaceDisplay | null
   directlyEdited: boolean
 }>
 
 export type ExistingTeamFormAgentNode = TeamAgentDisplayFields & Readonly<{
   mode: 'existing'
+  originalModelIdentifier: string
+  modelOptions?: ExistingRunModelOptionsState
   storedWorkspace: ExistingWorkspaceDisplay | null
   directlyEdited: boolean
 }>

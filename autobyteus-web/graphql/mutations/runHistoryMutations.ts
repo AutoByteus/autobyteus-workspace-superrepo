@@ -47,7 +47,7 @@ export const UpdateStoppedAgentRunModelConfig = gql`
         editable
         reason
       }
-      canonicalLlmConfig
+      canonicalSelection { llmModelIdentifier llmConfig }
       fieldErrors {
         path
         message

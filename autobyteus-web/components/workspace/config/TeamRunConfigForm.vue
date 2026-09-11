@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { ExistingRunModelSelection } from '~/types/agent/ExistingRunModelConfigDraft'
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { AgentConfigOverride, TeamScopeConfigOverride } from '~/types/agent/TeamRunConfig'
 import type { TeamLaunchConfigEdit } from '~/types/agent/TeamLaunchDraft'
@@ -71,7 +72,7 @@ const emit = defineEmits<{
   (e: 'update:workspaceSelection', address: AgentTeamAddress, selection: WorkspaceSelectionState): void
   (e: 'edit-config', edit: TeamLaunchConfigEdit): void
   (e: 'retry-runtime-catalog', runtimeKind: string): void
-  (e: 'update-existing-model-config', address: string, config: Record<string, unknown> | null): void
+  (e: 'update-existing-model-config', address: string, config: ExistingRunModelSelection, directlyEdited: boolean): void
   (e: 'schema-state', address: string, state: RuntimeModelConfigSchemaState): void
 }>()
 const { t } = useLocalization()
@@ -113,8 +114,8 @@ const forwardWorkspaceSelection = (address: AgentTeamAddress, selection: Workspa
 const retryRuntimeCatalog = (runtimeKind: string) => {
   if (model.value.mode === 'editable' && !isFormReadOnly.value) emit('retry-runtime-catalog', runtimeKind)
 }
-const forwardExistingModelConfig = (address: string, config: Record<string, unknown> | null) => {
-  if (model.value.mode === 'existing' && !isFormReadOnly.value) emit('update-existing-model-config', address, config)
+const forwardExistingModelConfig = (address: string, config: ExistingRunModelSelection, directlyEdited: boolean) => {
+  if (model.value.mode === 'existing' && !isFormReadOnly.value) emit('update-existing-model-config', address, config, directlyEdited)
 }
 const forwardSchemaState = (address: string, state: RuntimeModelConfigSchemaState) => {
   if (model.value.mode === 'existing') emit('schema-state', address, state)

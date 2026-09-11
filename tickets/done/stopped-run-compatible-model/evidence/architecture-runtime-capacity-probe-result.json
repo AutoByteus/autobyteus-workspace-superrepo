@@ -1,0 +1,252 @@
+{
+  "observedAt": "2026-09-08T08:13:33.637Z",
+  "scope": "metadata-only; not product acceptance",
+  "codex": {
+    "version": "codex-cli 0.153.4",
+    "cachePath": "/root/.codex/models_cache.json",
+    "cacheVersion": "0.153.4",
+    "fetchedAt": "2026-09-08T08:12:43.151037260Z",
+    "configuredContextWindow": null,
+    "rows": [
+      {
+        "model": "gpt-6-astra",
+        "catalogKeys": [
+          "id",
+          "model",
+          "upgrade",
+          "upgradeInfo",
+          "availabilityNux",
+          "displayName",
+          "description",
+          "modelSpecialty",
+          "hidden",
+          "supportedReasoningEfforts",
+          "defaultReasoningEffort",
+          "inputModalities",
+          "supportsPersonality",
+          "multiAgentVersion",
+          "additionalSpeedTiers",
+          "serviceTiers",
+          "defaultServiceTier",
+          "isDefault"
+        ],
+        "cachedContextWindow": 272000,
+        "cachedMaxContextWindow": 872000,
+        "effectiveContextWindowPercent": 95
+      },
+      {
+        "model": "gpt-5.6-sol",
+        "catalogKeys": [
+          "id",
+          "model",
+          "upgrade",
+          "upgradeInfo",
+          "availabilityNux",
+          "displayName",
+          "description",
+          "modelSpecialty",
+          "hidden",
+          "supportedReasoningEfforts",
+          "defaultReasoningEffort",
+          "inputModalities",
+          "supportsPersonality",
+          "multiAgentVersion",
+          "additionalSpeedTiers",
+          "serviceTiers",
+          "defaultServiceTier",
+          "isDefault"
+        ],
+        "cachedContextWindow": 272000,
+        "cachedMaxContextWindow": 872000,
+        "effectiveContextWindowPercent": 95
+      },
+      {
+        "model": "gpt-5.6-terra",
+        "catalogKeys": [
+          "id",
+          "model",
+          "upgrade",
+          "upgradeInfo",
+          "availabilityNux",
+          "displayName",
+          "description",
+          "modelSpecialty",
+          "hidden",
+          "supportedReasoningEfforts",
+          "defaultReasoningEffort",
+          "inputModalities",
+          "supportsPersonality",
+          "multiAgentVersion",
+          "additionalSpeedTiers",
+          "serviceTiers",
+          "defaultServiceTier",
+          "isDefault"
+        ],
+        "cachedContextWindow": 272000,
+        "cachedMaxContextWindow": 872000,
+        "effectiveContextWindowPercent": 95
+      },
+      {
+        "model": "gpt-5.6-luna",
+        "catalogKeys": [
+          "id",
+          "model",
+          "upgrade",
+          "upgradeInfo",
+          "availabilityNux",
+          "displayName",
+          "description",
+          "modelSpecialty",
+          "hidden",
+          "supportedReasoningEfforts",
+          "defaultReasoningEffort",
+          "inputModalities",
+          "supportsPersonality",
+          "multiAgentVersion",
+          "additionalSpeedTiers",
+          "serviceTiers",
+          "defaultServiceTier",
+          "isDefault"
+        ],
+        "cachedContextWindow": 272000,
+        "cachedMaxContextWindow": 872000,
+        "effectiveContextWindowPercent": 95
+      },
+      {
+        "model": "gpt-5.5",
+        "catalogKeys": [
+          "id",
+          "model",
+          "upgrade",
+          "upgradeInfo",
+          "availabilityNux",
+          "displayName",
+          "description",
+          "modelSpecialty",
+          "hidden",
+          "supportedReasoningEfforts",
+          "defaultReasoningEffort",
+          "inputModalities",
+          "supportsPersonality",
+          "multiAgentVersion",
+          "additionalSpeedTiers",
+          "serviceTiers",
+          "defaultServiceTier",
+          "isDefault"
+        ],
+        "cachedContextWindow": 272000,
+        "cachedMaxContextWindow": 272000,
+        "effectiveContextWindowPercent": 95
+      },
+      {
+        "model": "gpt-5.4-mini",
+        "catalogKeys": [
+          "id",
+          "model",
+          "upgrade",
+          "upgradeInfo",
+          "availabilityNux",
+          "displayName",
+          "description",
+          "modelSpecialty",
+          "hidden",
+          "supportedReasoningEfforts",
+          "defaultReasoningEffort",
+          "inputModalities",
+          "supportsPersonality",
+          "multiAgentVersion",
+          "additionalSpeedTiers",
+          "serviceTiers",
+          "defaultServiceTier",
+          "isDefault"
+        ],
+        "cachedContextWindow": 272000,
+        "cachedMaxContextWindow": 272000,
+        "effectiveContextWindowPercent": 95
+      },
+      {
+        "model": "gpt-5.3-codex-spark",
+        "catalogKeys": [
+          "id",
+          "model",
+          "upgrade",
+          "upgradeInfo",
+          "availabilityNux",
+          "displayName",
+          "description",
+          "modelSpecialty",
+          "hidden",
+          "supportedReasoningEfforts",
+          "defaultReasoningEffort",
+          "inputModalities",
+          "supportsPersonality",
+          "multiAgentVersion",
+          "additionalSpeedTiers",
+          "serviceTiers",
+          "defaultServiceTier",
+          "isDefault"
+        ],
+        "cachedContextWindow": 128000,
+        "cachedMaxContextWindow": 128000,
+        "effectiveContextWindowPercent": 95
+      }
+    ]
+  },
+  "claude": {
+    "version": "2.1.259 (Claude Code)",
+    "sdkPath": "/tmp/stopped-model-sdk/package/sdk.mjs",
+    "rows": [
+      {
+        "value": "default",
+        "resolvedModel": "deepseek-v4-pro[1m]",
+        "descriptorKeys": [
+          "value",
+          "resolvedModel",
+          "displayName",
+          "description",
+          "supportsEffort",
+          "supportedEffortLevels",
+          "supportsAdaptiveThinking",
+          "supportsAutoMode"
+        ],
+        "observedModel": "deepseek-v4-pro[1m]",
+        "rawMaxTokens": 1000000,
+        "maxTokens": 1000000
+      },
+      {
+        "value": "opus",
+        "resolvedModel": "deepseek-v4-pro",
+        "descriptorKeys": [
+          "value",
+          "resolvedModel",
+          "displayName",
+          "description",
+          "supportsEffort",
+          "supportedEffortLevels",
+          "supportsAdaptiveThinking",
+          "supportsAutoMode"
+        ],
+        "observedModel": "deepseek-v4-pro",
+        "rawMaxTokens": 200000,
+        "maxTokens": 200000
+      },
+      {
+        "value": "sonnet",
+        "resolvedModel": "deepseek-v4-flash",
+        "descriptorKeys": [
+          "value",
+          "resolvedModel",
+          "displayName",
+          "description",
+          "supportsEffort",
+          "supportedEffortLevels",
+          "supportsAdaptiveThinking",
+          "supportsAutoMode"
+        ],
+        "observedModel": "deepseek-v4-flash",
+        "rawMaxTokens": 200000,
+        "maxTokens": 200000
+      }
+    ]
+  }
+}

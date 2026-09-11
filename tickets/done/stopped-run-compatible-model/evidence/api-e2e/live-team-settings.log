@@ -1,0 +1,234 @@
+Agents
+Agent Teams
+Skills
+Memory
+Nodes
+Workspaces
+Temp Workspace
+workspace
+A
+api-model-live-1788963702207
+(1)
+TEAMS
+A
+api-model-live-1788963702207-root
+(1)
+Remember my private lead label: lead-amber-7291. Reply only "Remembered lead". Do not use tools o...
+1m
+C
+coordinator
+1m
+Nested
+1m
+Settings
+Team Configuration
+Team Definition
+api-model-live-1788963702207-root
+Runtime
+AutoByteus
+Codex App Server
+Claude Agent SDK
+
+Runtime is fixed. Replacement models must have at least the saved model’s context capacity.
+
+Default LLM Model (Global)
+OpenAI / GPT-5.6-Luna (default reasoning: medium)
+
+Runtime is fixed. Replacement models must have at least the saved model’s context capacity.
+
+Thinking
+
+Use the model settings below to control thinking.
+
+Use setting
+Advanced
+Reasoning Effort ⓘ
+low
+medium
+high
+xhigh
+max
+Fast mode ⓘ
+Default
+fast
+Workspace Directory
+Existing
+New
+
+Saved value is unavailable in current options.
+
+Workspace: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+
+Auto approve tools
+
+High-trust mode for Codex team members: automatically allows tool calls and access/permission requests for this run.
+
+Auto approve tools
+Team Members Override (3)
+coordinator
+Coordinator
+Runtime
+AutoByteus
+Codex App Server
+Claude Agent SDK
+Model
+OpenAI / GPT-5.6-Luna (default reasoning: medium)
+Thinking
+
+Use the model settings below to control thinking.
+
+Use setting
+Advanced
+Reasoning Effort ⓘ
+low
+medium
+high
+xhigh
+max
+Fast mode ⓘ
+Default
+fast
+Workspace Directory
+Existing
+New
+
+Saved value is unavailable in current options.
+
+Workspace: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+
+Auto approve
+Off
+Nested
+TEAM
+/Nested
+Inherited
+Runtime
+AutoByteus
+Codex App Server
+Claude Agent SDK
+
+Runtime is fixed. Replacement models must have at least the saved model’s context capacity.
+
+Default LLM Model
+OpenAI / GPT-5.6-Luna (default reasoning: medium)
+
+Runtime is fixed. Replacement models must have at least the saved model’s context capacity.
+
+Thinking
+
+Use the model settings below to control thinking.
+
+Use setting
+Advanced
+Reasoning Effort ⓘ
+low
+medium
+high
+xhigh
+max
+Fast mode ⓘ
+Default
+fast
+Workspace Directory
+Existing
+New
+
+Saved value is unavailable in current options.
+
+Workspace: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+
+Auto approve tools
+
+Inherited by descendant scopes without an override.
+
+Auto approve tools
+lead
+Coordinator
+
+Nested / lead
+
+Runtime
+AutoByteus
+Codex App Server
+Claude Agent SDK
+Model
+OpenAI / GPT-5.6-Luna (default reasoning: medium)
+Thinking
+
+Use the model settings below to control thinking.
+
+Use setting
+Advanced
+Reasoning Effort ⓘ
+low
+medium
+high
+xhigh
+max
+Fast mode ⓘ
+Default
+fast
+Workspace Directory
+Existing
+New
+
+Saved value is unavailable in current options.
+
+Workspace: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+
+Auto approve
+Off
+reviewer
+
+Nested / reviewer
+
+Runtime
+AutoByteus
+Codex App Server
+Claude Agent SDK
+Model
+OpenAI / GPT-5.6-Luna (default reasoning: medium)
+Thinking
+
+Use the model settings below to control thinking.
+
+Use setting
+Advanced
+Reasoning Effort ⓘ
+low
+medium
+high
+xhigh
+max
+Fast mode ⓘ
+Default
+fast
+Workspace Directory
+Existing
+New
+
+Saved value is unavailable in current options.
+
+Workspace: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace
+
+Auto approve
+Off
+●
+This team is stopped. Saved model settings will be used when it resumes.
+Save
+Files
+Team
+Terminal
+Activity
+Token
+Artifacts
+VNC Viewer
+Messages
+0 Messages
+
+No team messages yet
+
+Accepted inter-agent messages will appear here with their reference files.
+
+Tasks
+0 tasks

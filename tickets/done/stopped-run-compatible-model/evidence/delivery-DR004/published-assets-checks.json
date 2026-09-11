@@ -1,0 +1,59 @@
+{
+  "observedAt": "2026-09-11T01:00:16.117500+00:00",
+  "releaseURL": "https://github.com/AutoByteus/autobyteus-workspace/releases/tag/v1.4.69",
+  "releaseID": 386710364,
+  "releaseTag": "v1.4.69",
+  "stablePublicRelease": true,
+  "assetCount": 21,
+  "allAssetsUploadedNonemptyWithSHA256": true,
+  "curatedBodyMatchesTaggedNotes": true,
+  "metadata": [
+    {
+      "metadata": "latest-linux-arm64.yml",
+      "sha256": "sha256:07cd355595911b15ecaa1f9b6af16689dd9805dfa650cd51bf08ef2c6984ba72",
+      "version": "1.4.69",
+      "fileReferences": [
+        "AutoByteus_personal_linux-arm64-1.4.69.AppImage"
+      ],
+      "advertisedReferencedSizesMatch": true,
+      "unadvertisedSizes": []
+    },
+    {
+      "metadata": "latest-linux.yml",
+      "sha256": "sha256:b154f2461520225e0fcbb0599c9acdfebc7b139d11d68fa52638b66f03a7401f",
+      "version": "1.4.69",
+      "fileReferences": [
+        "AutoByteus_personal_linux-x64-1.4.69.AppImage"
+      ],
+      "advertisedReferencedSizesMatch": true,
+      "unadvertisedSizes": []
+    },
+    {
+      "metadata": "latest-mac.yml",
+      "sha256": "sha256:c0e3bbc089e2c1ad0b4d3c43480f33f43b32e3cd20be66e4ade547ba70835636",
+      "version": "1.4.69",
+      "fileReferences": [
+        "AutoByteus_personal_macos-arm64-1.4.69.zip",
+        "AutoByteus_personal_macos-arm64-1.4.69.dmg",
+        "AutoByteus_personal_macos-x64-1.4.69.zip",
+        "AutoByteus_personal_macos-x64-1.4.69.dmg"
+      ],
+      "advertisedReferencedSizesMatch": true,
+      "unadvertisedSizes": []
+    },
+    {
+      "metadata": "latest.yml",
+      "sha256": "sha256:0ca203374a8b9b6a9cc2cc63decf3a7f3169aad968383afecdad45f97351fe9c",
+      "version": "1.4.69",
+      "fileReferences": [
+        "AutoByteus_personal_windows-1.4.69.exe"
+      ],
+      "advertisedReferencedSizesMatch": true,
+      "unadvertisedSizes": [
+        "AutoByteus_personal_windows-1.4.69.exe"
+      ]
+    }
+  ],
+  "downloadedAssetDigestsMatch": true,
+  "scope": "Downloaded metadata/APK/gateway bytes verified; all desktop platform package/smoke/signature checks attributed to tagged CI. No local GUI, installed-user upgrade, or public App Store acceptance claimed."
+}

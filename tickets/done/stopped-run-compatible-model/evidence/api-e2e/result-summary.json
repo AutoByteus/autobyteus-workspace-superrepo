@@ -1,0 +1,29 @@
+{
+  "revision": "API-REV-001",
+  "result": "Pass",
+  "finalConfidencePercent": 95,
+  "postRepositoryConfidencePercent": 75.7,
+  "repositoryUniqueFinal": {
+    "files": 32,
+    "tests": 248
+  },
+  "durableBrowserScenarios": 6,
+  "ownedLiveProviderConversations": 3,
+  "supportedNewModelAttribution": "Provider turn_context + correlated task_complete; no self-report",
+  "saveTimeHistoryHashChecks": "Pass Agent/compacted/Team; compacted exact provider transcript hash unchanged",
+  "criticalScenarios": [
+    "SCN-001",
+    "SCN-002",
+    "SCN-003",
+    "SCN-004",
+    "SCN-005",
+    "SCN-006"
+  ],
+  "broaderValidation": "Required and completed",
+  "remainingFailureIds": [],
+  "reviewScope": [
+    "autobyteus-server-ts/tests/e2e/run-history/stopped-run-model-config-graphql.e2e.test.ts",
+    "autobyteus-server-ts/tests/integration/agent-team-execution/agent-team-run-manager.integration.test.ts",
+    "autobyteus-web/tests/e2e/existing-run-model-config-probe.mjs"
+  ]
+}

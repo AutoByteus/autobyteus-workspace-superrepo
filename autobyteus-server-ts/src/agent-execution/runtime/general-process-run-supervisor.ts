@@ -47,7 +47,7 @@ import { RunFileChangeService } from "../../services/run-file-changes/run-file-c
 import { createGeneralProcessPublishedArtifactRelayService } from "../../application-orchestration/services/application-published-artifact-relay-service.js";
 import { TokenUsageMigrationReadiness } from "../../token-usage/providers/token-usage-migration-readiness.js";
 import type { WorkspaceManager } from "../../workspaces/workspace-manager.js";
-import type { RunModelConfigValidator } from "../../llm-management/services/model-config-validation-service.js";
+import type { RunModelSelectionValidator } from "../../llm-management/services/run-model-selection-service.js";
 import type { DefinitionAdmissionService } from "../../collaboration-definition-admission/services/definition-admission-service.js";
 import { AgentOrgRunHistoryCatalogService } from "../../run-history/services/agent-org-run-history-catalog-service.js";
 import { CollaborationRootHistoryService } from "../../run-history/services/collaboration-root-history-service.js";
@@ -64,7 +64,7 @@ export type GeneralProcessRunSupervisorInput = Readonly<{
   workspaceManager: WorkspaceManager;
   agentProviderFactoryBuilder: AgentProviderFactoryBuilder;
   agentToolMcpSessionAuthority: ScopedAgentToolMcpSessionAuthority;
-  modelConfigValidator: RunModelConfigValidator;
+  modelSelectionValidator: RunModelSelectionValidator;
 }>;
 
 const requireGeneralProcessRunSupervisorInput = (
@@ -86,8 +86,8 @@ const requireGeneralProcessRunSupervisorInput = (
     || !input.workspaceManager
     || !input.agentProviderFactoryBuilder
     || !input.agentToolMcpSessionAuthority
-    || !input.modelConfigValidator
-    || typeof input.modelConfigValidator.validate !== "function"
+    || !input.modelSelectionValidator
+    || typeof input.modelSelectionValidator.validate !== "function"
   ) {
     throw new Error("Complete GeneralProcessRunSupervisor input is required.");
   }
@@ -203,7 +203,7 @@ export class GeneralProcessRunSupervisor {
       agentTeamRunManager = AgentTeamRunManager.initializeProcessInstance({
         memoryDir,
         taskExecutionIdentity,
-        modelConfigValidator: input.modelConfigValidator,
+        modelSelectionValidator: input.modelSelectionValidator,
         flatTeamExecutionFactory,
         memberExecutionContextBuilder,
       });
@@ -234,7 +234,7 @@ export class GeneralProcessRunSupervisor {
         historyCatalogService,
         workspaceManager,
         tokenUsageReadiness,
-        modelConfigValidator: input.modelConfigValidator,
+        modelSelectionValidator: input.modelSelectionValidator,
       });
       agentRunService = new AgentRunService(memoryDir, {
         agentRunManager,
@@ -272,7 +272,7 @@ export class GeneralProcessRunSupervisor {
         teamIdentities: new TeamRunIdentityAllocator(),
         workspaces: workspaceManager,
         admission: input.definitionAdmissionService,
-        modelConfigValidator: input.modelConfigValidator,
+        modelSelectionValidator: input.modelSelectionValidator,
         history: agentOrgRunHistoryCatalogService,
       });
 

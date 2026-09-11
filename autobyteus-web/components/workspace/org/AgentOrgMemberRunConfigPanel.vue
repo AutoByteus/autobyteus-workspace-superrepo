@@ -38,6 +38,7 @@
         :workspace-locked="true"
         :runtime-locked="true"
         :existing-run="true"
+        :original-model-identifier="lockedConfig.llmModelIdentifier"
         :existing-model-config-editable="false"
       />
     </div>

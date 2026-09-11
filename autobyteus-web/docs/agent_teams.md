@@ -161,3 +161,20 @@ and launch config do not persist a Team-wide or task-Team eligibility flag.
 - `services/agentStreaming/TeamStreamingService.ts`
 - `components/workspace/config/TeamRunConfigForm.vue`
 - `components/workspace/history/AgentTeamRunHistoryPanel.vue`
+
+## Compatible Model Selection On Stopped Runs
+
+The existing-run form permits a stopped standalone Team root or exact direct
+Agent to edit its model/settings pair while runtime, workspace, approval policy,
+addresses, and execution/provider identities remain locked. Model options are
+advisory: Save revalidates every affected scope against its original saved model
+and requires verified target context capacity at least that baseline. Same-model
+settings still require a current model/schema, but no replacement-capacity check.
+
+Root pair changes propagate only to Agents linked by draft-start
+runtime/model/settings equality. Divergent or directly edited Agents remain
+independent. All intended patches validate before one strict Team V2 write.
+An indeterminate write/read-back locks Save until the existing Refresh verifies
+canonical state; it must not be presented as a confirmed failure or replayed.
+This does not unlock active AgentOrg member settings, add mounted-Team save/root
+authority, or restore nested configured Team authoring.

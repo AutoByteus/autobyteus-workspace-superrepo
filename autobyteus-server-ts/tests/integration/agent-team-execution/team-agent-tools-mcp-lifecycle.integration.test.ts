@@ -203,10 +203,11 @@ describe("supported Team Agent Tools MCP lifecycle integration", () => {
         } as never,
         taskExecutionIdentity,
         activeRootDirectory: new ActiveCollaborationRootDirectory(),
-        modelConfigValidator: {
-          validate: vi.fn(async ({ llmConfig }) => ({
+        modelSelectionValidator: {
+          validateMany: vi.fn(),
+          validate: vi.fn(async ({ selection }) => ({
             kind: "valid" as const,
-            config: llmConfig,
+            selection,
           })),
         },
       });

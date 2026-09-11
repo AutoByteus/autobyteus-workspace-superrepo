@@ -1,0 +1,14 @@
+{
+  "observedAt": "2026-09-10T23:30:47.422152+00:00",
+  "result": "Pass",
+  "source": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web/electron-dist",
+  "destination": "/home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR003/electron-dist",
+  "copiedEntriesVerified": 32538,
+  "manifest": "/home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR003/electron-dist-manifest.json",
+  "manifestSha256": "dc2954d91b1b10b493e1b6c293724bbe01518c9a6a78aa026ee5bebce530159d",
+  "appImage": "/home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR003/electron-dist/AutoByteus_enterprise_linux-arm64-1.4.68.AppImage",
+  "appImageSha256": "9ee0b9d410554741d83c52fdc67b2de0c6ee96bc3c40ee04ca34a2edbe931881",
+  "localGeneratedStateBackup": "/home/autobyteus/workspace/.codex/artifacts/stopped-run-compatible-model-DR003/local-generated-state.tar.gz",
+  "backupSha256": "ac7bc001b0233908006334720272b42803b98a3ec9c3bb70299602fe68f15f54",
+  "scope": "All AppImage/unpacked resources, hashes, symlinks and mode bits verified before cleanup. Backup includes only task-local ignored agents/db/memory/tests tmp/.nuxtrc; private external artifact storage, not staged."
+}

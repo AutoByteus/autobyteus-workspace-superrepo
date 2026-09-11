@@ -261,6 +261,7 @@ export class AgentRunService {
 
   updateStoppedModelConfig(input: {
     agentRunId: string;
+    llmModelIdentifier: string;
     llmConfig: Readonly<Record<string, unknown>> | null;
   }): Promise<RunModelConfigUpdateResult<AgentRunMetadata | null>> {
     return this.lifecycleService.updateStoppedModelConfig(input);

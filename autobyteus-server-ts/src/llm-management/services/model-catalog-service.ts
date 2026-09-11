@@ -196,10 +196,10 @@ export class ModelCatalogService {
     if (LLMFactory.sourceModelCount(key) > 0) LLMFactory.removeSourceModels(key);
   }
 
-  async listLlmModels(runtimeKind?: string | null): Promise<ModelInfo[]> {
+  async listLlmModels(runtimeKind?: string | null, workspaceRootPath?: string): Promise<ModelInfo[]> {
     const runtime = normalizeRuntime(runtimeKind);
     if (runtime === RuntimeKind.CLAUDE_AGENT_SDK) return this.claudeModelCatalog.listModels();
-    if (runtime === RuntimeKind.CODEX_APP_SERVER) return this.codexModelCatalog.listModels();
+    if (runtime === RuntimeKind.CODEX_APP_SERVER) return this.codexModelCatalog.listModels(workspaceRootPath);
     return LLMFactory.listAvailableModels();
   }
 

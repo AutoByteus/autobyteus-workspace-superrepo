@@ -75,7 +75,7 @@ const createScope = async () => {
     workspaceManager: {} as never,
     bindingReader: { getBinding: vi.fn(async () => null) },
     artifactDeliverySink: { accept: vi.fn(async () => undefined) },
-    modelConfigValidator: { validate: vi.fn() },
+    modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
     applicationAgentTools,
   });
   const kernel = (scope as unknown as { kernel: ApplicationExecutionScopeKernel }).kernel;

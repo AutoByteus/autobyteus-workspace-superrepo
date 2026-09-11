@@ -100,6 +100,7 @@ const editableNode = (input: {
 }
 const storedNode = (changes: Partial<ResolvedTeamRunLaunchConfig> = {}): ExistingTeamFormAgentNode => ({
   mode: 'existing',
+  originalModelIdentifier: resolved(changes).llmModelIdentifier,
   kind: 'agent',
   address: '/reviewer',
   displayName: 'Reviewer',

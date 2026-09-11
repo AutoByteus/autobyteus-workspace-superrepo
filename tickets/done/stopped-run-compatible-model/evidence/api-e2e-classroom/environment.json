@@ -1,0 +1,19 @@
+{
+  "key": "api-classroom-1789027849290",
+  "runtimeRoot": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290",
+  "database": "file:///home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/db/api-classroom-1789027849290.db",
+  "workdir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-classroom-1789027849290/classroom",
+  "startedAt": "2026-09-10T08:10:49.304Z",
+  "cleanup": {
+    "nuxt": "owned group signalled",
+    "server": "stopped",
+    "localData": "owned runtime/database/key removed"
+  },
+  "pid": 28014,
+  "serverUrl": "http://127.0.0.1:33039",
+  "frontendUrl": "http://127.0.0.1:42291",
+  "nuxtPid": 28181,
+  "ready": true,
+  "readyAt": "2026-09-10T08:36:58.465Z",
+  "finishedAt": "2026-09-10T23:06:43.581Z"
+}

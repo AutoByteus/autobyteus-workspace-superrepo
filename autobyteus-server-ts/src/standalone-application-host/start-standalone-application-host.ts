@@ -56,7 +56,7 @@ import {
 import { getWorkspaceManager } from "../workspaces/workspace-manager.js";
 import { getRuntimeAvailabilityService } from "../runtime-management/runtime-availability-service.js";
 import { getModelCatalogService } from "../llm-management/services/model-catalog-service.js";
-import { ModelConfigValidationService } from "../llm-management/services/model-config-validation-service.js";
+import { RunModelSelectionService } from "../llm-management/services/run-model-selection-service.js";
 import { getModelAvailabilityService } from "../llm-management/services/model-availability-service.js";
 import { getLlmProviderService } from "../llm-management/llm-providers/services/llm-provider-service.js";
 import { getCodexAppServerClientManager } from "../runtime-management/codex/client/codex-app-server-client-manager.js";
@@ -253,7 +253,7 @@ export const startStandaloneApplicationHost = async (
       workspaceManager,
     });
     const modelCatalogService = getModelCatalogService();
-    const modelConfigValidator = new ModelConfigValidationService(modelCatalogService);
+    const modelSelectionValidator = new RunModelSelectionService(modelCatalogService);
     const generalAssembly = agentToolsMcpHost.sessionAuthorities.begin({
       scopeIdentity: "general-process",
     });
@@ -275,7 +275,7 @@ export const startStandaloneApplicationHost = async (
         workspaceManager,
         agentProviderFactoryBuilder,
         agentToolMcpSessionAuthority: generalProcessAuthority,
-        modelConfigValidator,
+        modelSelectionValidator,
       });
     generalProcessAuthority = null;
     const applicationRuntime = buildApplicationPlatformRuntime({
@@ -289,7 +289,7 @@ export const startStandaloneApplicationHost = async (
       workspaceManager,
       runtimeAvailabilityService: getRuntimeAvailabilityService(),
       modelCatalogService,
-      modelConfigValidator,
+      modelSelectionValidator,
       modelAvailabilityService: getModelAvailabilityService(),
       llmProviderService: getLlmProviderService(),
       codexClientManager: getCodexAppServerClientManager(),

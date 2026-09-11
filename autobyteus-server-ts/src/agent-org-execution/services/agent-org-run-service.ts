@@ -12,7 +12,7 @@ import type { DefinitionAdmissionService } from "../../collaboration-definition-
 import type { AgentOrgRun } from "../domain/agent-org-run.js";
 import { AgentOrgRunManager } from "./agent-org-run-manager.js";
 import { AgentOrgRunPlanner } from "./agent-org-run-planner.js";
-import type { RunModelConfigValidator } from "../../llm-management/services/model-config-validation-service.js";
+import type { RunModelSelectionValidator } from "../../llm-management/services/run-model-selection-service.js";
 import type { AgentOrgRunHistoryCatalogService } from "../../run-history/services/agent-org-run-history-catalog-service.js";
 
 export type AgentOrgLaunchConfigurationInput = Readonly<{
@@ -47,7 +47,7 @@ export class AgentOrgRunService {
     teamIdentities: Pick<TeamRunIdentityAllocator, "allocateForTeamDefinitionName">;
     workspaces: Pick<WorkspaceManager, "ensureWorkspaceByRootPath">;
     admission: Pick<DefinitionAdmissionService, "requireAvailable">;
-    modelConfigValidator: RunModelConfigValidator;
+    modelSelectionValidator: Pick<RunModelSelectionValidator, "validate">;
     history: Pick<AgentOrgRunHistoryCatalogService, "initialize" | "recordCreated" | "recordRestored" | "recordTerminated" | "recordRunSummary">;
   }>) {}
 
@@ -107,10 +107,16 @@ export class AgentOrgRunService {
       if (!configuration.workspaceRootPath?.trim()) {
         throw coded("AGENT_ORG_WORKSPACE_REQUIRED", `Workspace is required for AgentOrg placement '${address}'.`);
       }
-      const result = await this.dependencies.modelConfigValidator.validate({
-        runtimeKind: configuration.runtimeKind,
-        llmModelIdentifier: configuration.llmModelIdentifier,
-        llmConfig: configuration.llmConfig,
+      const result = await this.dependencies.modelSelectionValidator.validate({
+        context: {
+          runtimeKind: configuration.runtimeKind,
+          currentModelIdentifier: configuration.llmModelIdentifier,
+          workspaceRootPath: configuration.workspaceRootPath,
+        },
+        selection: {
+          llmModelIdentifier: configuration.llmModelIdentifier,
+          llmConfig: configuration.llmConfig,
+        },
       });
       if (result.kind !== "valid") {
         const detail = result.kind === "invalid"

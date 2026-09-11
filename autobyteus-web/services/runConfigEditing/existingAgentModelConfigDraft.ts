@@ -1,3 +1,4 @@
+import type { ExistingRunModelSelection } from '~/types/agent/ExistingRunModelConfigDraft'
 export const cloneExistingRunJsonValue = <T>(value: T): T => {
   if (Array.isArray(value)) return value.map(cloneExistingRunJsonValue) as T
   if (value && typeof value === 'object') {
@@ -25,3 +26,14 @@ export const existingRunModelConfigsEqual = (
   left: Record<string, unknown> | null | undefined,
   right: Record<string, unknown> | null | undefined,
 ): boolean => JSON.stringify(canonicalize(left ?? null)) === JSON.stringify(canonicalize(right ?? null))
+
+export const cloneExistingRunSelection = (selection: ExistingRunModelSelection): ExistingRunModelSelection => ({
+  llmModelIdentifier: selection.llmModelIdentifier, llmConfig: cloneExistingRunModelConfig(selection.llmConfig),
+})
+export const existingRunSelectionsEqual = (left: ExistingRunModelSelection, right: ExistingRunModelSelection): boolean =>
+  left.llmModelIdentifier === right.llmModelIdentifier && existingRunModelConfigsEqual(left.llmConfig, right.llmConfig)
+export const selectionAllowed = (original: ExistingRunModelSelection, draft: ExistingRunModelSelection,
+  state?: import('~/types/agent/ExistingRunModelConfigDraft').ExistingRunModelOptionsState): boolean =>
+  original.llmModelIdentifier === draft.llmModelIdentifier || Boolean(state?.status === 'ready' &&
+    state.options?.currentModelIdentifier === original.llmModelIdentifier &&
+    state.options.replacements.some((option) => option.llmModelIdentifier === draft.llmModelIdentifier))

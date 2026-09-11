@@ -1,3 +1,4 @@
+import type { ExistingRunModelSelection, ExistingRunModelOptionsState } from '~/types/agent/ExistingRunModelConfigDraft'
 import type {
   AgentLaunchConfigurationDto,
   ConfiguredMemberExecutionDto,
@@ -21,14 +22,13 @@ const workspace = (launch: AgentLaunchConfigurationDto): ExistingWorkspaceDispla
 }
 const resolved = (
   launch: AgentLaunchConfigurationDto,
-  llmConfig: Record<string, unknown> | null,
+  selection: ExistingRunModelSelection,
 ): Readonly<ResolvedTeamRunLaunchConfig> => ({
   runtimeKind: launch.runtime_kind as AgentRuntimeKind,
   workspaceId: null,
   workspaceMetadata: null,
   workspaceRootPath: launch.workspace_root_path,
-  llmModelIdentifier: launch.llm_model_identifier,
-  llmConfig,
+  ...selection,
   autoExecuteTools: launch.auto_execute_tools,
   skillAccessMode: launch.skill_access_mode as SkillAccessMode,
 })
@@ -39,6 +39,7 @@ export const projectExistingTeamRunFormModel = (input: {
   isActive: boolean
   modelConfigEditable: boolean
   modelConfigReason: string | null
+  modelOptionsByAddress?: Readonly<Record<string, ExistingRunModelOptionsState>>
   saving: boolean
 }): ExistingTeamRunFormModel => {
   const scope = (
@@ -52,9 +53,11 @@ export const projectExistingTeamRunFormModel = (input: {
       mode: 'existing',
       address,
       displayName,
-      effectiveConfig: resolved(launch, draft.draftLlmConfig),
+      effectiveConfig: resolved(launch, draft.draftSelection),
       isCustomized: address !== '/' && (!draft.linkedToParentAtDraftStart || draft.directlyEdited),
       directlyEdited: draft.directlyEdited,
+      originalModelIdentifier: draft.originalSelection.llmModelIdentifier,
+      modelOptions: input.modelOptionsByAddress?.[address],
       storedWorkspace: workspace(launch),
     }
   }
@@ -62,15 +65,6 @@ export const projectExistingTeamRunFormModel = (input: {
     members: readonly ConfiguredMemberExecutionDto[],
     coordinatorAddress: string,
   ): readonly ExistingTeamFormMemberNode[] => members.map((member) => {
-    if (member.kind === 'configured_team') {
-      return {
-        mode: 'existing',
-        kind: 'agent_team',
-        address: member.address as AgentTeamAddress,
-        scope: scope(member.address as AgentTeamAddress, nameAt(member.address), member.default_launch_configuration),
-        children: visit(member.members, member.coordinator_address),
-      }
-    }
     const draft = input.planner.scopesByAddress[member.address]
     if (!draft) throw new Error(`Existing Team draft is missing configured Agent '${member.address}'.`)
     return {
@@ -81,7 +75,9 @@ export const projectExistingTeamRunFormModel = (input: {
       isCoordinator: member.address === coordinatorAddress,
       isCustomized: !draft.linkedToParentAtDraftStart || draft.directlyEdited,
       directlyEdited: draft.directlyEdited,
-      effectiveConfig: resolved(member.launch_configuration, draft.draftLlmConfig),
+      effectiveConfig: resolved(member.launch_configuration, draft.draftSelection),
+      originalModelIdentifier: draft.originalSelection.llmModelIdentifier,
+      modelOptions: input.modelOptionsByAddress?.[member.address],
       storedWorkspace: workspace(member.launch_configuration),
     }
   })

@@ -1,0 +1,29 @@
+{
+  "dateUTC": "2026-09-11T00:31:36.628981+00:00",
+  "round": "DR-004",
+  "trigger": "lets do a new release thanks",
+  "priorResult": "DR-003 Delivery Completed; release not required at that time",
+  "version": "1.4.69",
+  "target": "origin/personal",
+  "checkedHEAD": "f3de2f67ffbb50db9c02e8da4d4d5ea69448d71f",
+  "checkedRemote": "f3de2f67ffbb50db9c02e8da4d4d5ea69448d71f",
+  "integration": "git fetch origin personal --tags; git merge --ff-only origin/personal; Already up to date",
+  "upstreamAcceptance": "evidence/delivery-DR003/user-verification.json; API-REV-003 Pass95%; CRR-005 N/A gate satisfied",
+  "classification": {
+    "task_size": "Medium",
+    "architectural_risk": "High",
+    "route": "Reviewed"
+  },
+  "preflight": {
+    "cleanBeforeEdits": true,
+    "artifactHygiene": "Pass, 27329 tracked files",
+    "currentManagedManifest": "Pass v1.4.68",
+    "tagAvailability": "v1.4.69 absent after fetch; release helper rechecks remote",
+    "newProductionOrTestDelta": false,
+    "newRuntimeRerun": "Not needed: unchanged finalized source; fresh release CI will validate packaging"
+  },
+  "releaseNotesSHA256": "47944474275e0adb9670479412af390ab302a4cb01424f977370baecd519cbdf",
+  "method": "pnpm release 1.4.69 -- --release-notes tickets/done/stopped-run-compatible-model/release-notes.md",
+  "noDuplicateManualDispatch": true,
+  "separateObservation": "API-F001 unresolved, not fixed/not causally attributed to model-switch ticket"
+}

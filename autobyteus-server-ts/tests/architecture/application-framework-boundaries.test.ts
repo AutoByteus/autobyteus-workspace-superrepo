@@ -378,7 +378,7 @@ const CONSTRUCTION_OBLIGATIONS: readonly ConstructionObligation[] = [
     symbol: "StandaloneAgentRunLifecycleService",
     moduleSuffix: "autobyteus-server-ts/src/agent-execution/services/standalone-agent-run-lifecycle-service.ts",
     kind: "new",
-    requiredInputs: ["agentRunManager", "metadataService", "historyCatalogService", "workspaceManager", "tokenUsageReadiness", "modelConfigValidator"].map((path) => ({
+    requiredInputs: ["agentRunManager", "metadataService", "historyCatalogService", "workspaceManager", "tokenUsageReadiness", "modelSelectionValidator"].map((path) => ({
       kind: "object-property" as const,
       argumentIndex: 1,
       path,
@@ -418,7 +418,7 @@ const CONSTRUCTION_OBLIGATIONS: readonly ConstructionObligation[] = [
     symbol: "AgentTeamRunManager",
     moduleSuffix: "autobyteus-server-ts/src/agent-team-execution/services/agent-team-run-manager.ts",
     kind: "new",
-    requiredInputs: ["memoryDir", "flatTeamExecutionFactory", "taskExecutionIdentity", "modelConfigValidator", "memberExecutionContextBuilder"].map((path) => ({
+    requiredInputs: ["memoryDir", "flatTeamExecutionFactory", "taskExecutionIdentity", "modelSelectionValidator", "memberExecutionContextBuilder"].map((path) => ({
       kind: "object-property" as const,
       argumentIndex: 0,
       path,
@@ -490,7 +490,7 @@ const SCOPE_BUILD_FIELDS = [
   "workspaceManager",
   "bindingReader",
   "artifactDeliverySink",
-  "modelConfigValidator",
+  "modelSelectionValidator",
 ] as const;
 
 const ORCHESTRATION_BUILD_FIELDS = [
@@ -537,7 +537,7 @@ const PLATFORM_BUILD_FIELDS = [
   "llmProviderService",
   "codexClientManager",
   "requireCurrentModelIdentifier",
-  "modelConfigValidator",
+  "modelSelectionValidator",
 ] as const;
 
 const normalizePath = (path: string): string => path.split(sep).join("/");

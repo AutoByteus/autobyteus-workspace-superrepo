@@ -1,0 +1,22 @@
+{
+  "before": {
+    "runId": "api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438",
+    "agentDefinitionId": "api-model-live-1788963702207",
+    "workspaceRootPath": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/workspace",
+    "memoryDir": "/home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-server-ts/tests/.tmp/api-model-live-1788963702207/memory/agents/api_model_live_1788963702207_b7ed67a6e51f442398c2ccd467aa3438",
+    "llmModelIdentifier": "gpt-5.6-luna",
+    "llmConfig": null,
+    "autoExecuteTools": false,
+    "skillAccessMode": "PRELOADED_ONLY",
+    "runtimeKind": "codex_app_server",
+    "platformAgentRunId": "01a0868b-deac-7ec0-94ae-b93fb14b6753",
+    "preparedAt": "2026-09-09T14:21:48.371Z",
+    "preparedExpiresAt": "2026-09-10T14:21:48.371Z",
+    "startedAt": "2026-09-09T14:21:48.712Z",
+    "applicationExecutionContext": null
+  },
+  "hashesBefore": {
+    "raw_traces_active.jsonl": "2940675b402bdb4c9146324bd7359c1048854d3c5fd82931b05593e7f2b217ce"
+  },
+  "target": "gpt-5.6-terra"
+}

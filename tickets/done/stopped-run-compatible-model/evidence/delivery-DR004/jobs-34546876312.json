@@ -1,0 +1,313 @@
+{
+  "total_count": 3,
+  "jobs": [
+    {
+      "id": 103101309012,
+      "run_id": 34546876312,
+      "workflow_name": "Android APK Release",
+      "head_branch": "v1.4.69",
+      "run_url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/actions/runs/34546876312",
+      "run_attempt": 1,
+      "node_id": "CR_kwDORZKejM8AAAAYAVEgVA",
+      "head_sha": "17d4f2327329cee3509062fd823b8e049f563682",
+      "url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/actions/jobs/103101309012",
+      "html_url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876312/job/103101309012",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-11T00:31:53Z",
+      "started_at": "2026-09-11T00:31:56Z",
+      "completed_at": "2026-09-11T00:32:20Z",
+      "name": "Resolve Android Release Metadata",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-11T00:31:57Z",
+          "completed_at": "2026-09-11T00:31:57Z"
+        },
+        {
+          "name": "Resolve release metadata",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-11T00:31:57Z",
+          "completed_at": "2026-09-11T00:31:57Z"
+        },
+        {
+          "name": "Checkout release ref",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-11T00:31:57Z",
+          "completed_at": "2026-09-11T00:32:16Z"
+        },
+        {
+          "name": "Validate workspace package versions match release tag",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-11T00:32:16Z",
+          "completed_at": "2026-09-11T00:32:16Z"
+        },
+        {
+          "name": "Validate bundled managed messaging manifest matches release tag",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-11T00:32:16Z",
+          "completed_at": "2026-09-11T00:32:16Z"
+        },
+        {
+          "name": "Resolve release commit SHA",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-11T00:32:16Z",
+          "completed_at": "2026-09-11T00:32:16Z"
+        },
+        {
+          "name": "Summarize Android release plan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-09-11T00:32:16Z",
+          "completed_at": "2026-09-11T00:32:16Z"
+        },
+        {
+          "name": "Post Checkout release ref",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-09-11T00:32:16Z",
+          "completed_at": "2026-09-11T00:32:16Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-09-11T00:32:16Z",
+          "completed_at": "2026-09-11T00:32:16Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/check-runs/103101309012",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000004503,
+      "runner_name": "GitHub Actions 1000004503",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 103101407561,
+      "run_id": 34546876312,
+      "workflow_name": "Android APK Release",
+      "head_branch": "v1.4.69",
+      "run_url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/actions/runs/34546876312",
+      "run_attempt": 1,
+      "node_id": "CR_kwDORZKejM8AAAAYAVKhSQ",
+      "head_sha": "17d4f2327329cee3509062fd823b8e049f563682",
+      "url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/actions/jobs/103101407561",
+      "html_url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876312/job/103101407561",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-11T00:32:20Z",
+      "started_at": "2026-09-11T00:32:58Z",
+      "completed_at": "2026-09-11T00:35:40Z",
+      "name": "Build Android APK",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-11T00:32:58Z",
+          "completed_at": "2026-09-11T00:32:59Z"
+        },
+        {
+          "name": "Checkout workspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-11T00:32:59Z",
+          "completed_at": "2026-09-11T00:33:16Z"
+        },
+        {
+          "name": "Set up Java",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-11T00:33:16Z",
+          "completed_at": "2026-09-11T00:33:20Z"
+        },
+        {
+          "name": "Set up Android SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-11T00:33:20Z",
+          "completed_at": "2026-09-11T00:33:39Z"
+        },
+        {
+          "name": "Install Android SDK platform",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-11T00:33:39Z",
+          "completed_at": "2026-09-11T00:33:43Z"
+        },
+        {
+          "name": "Build APK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-11T00:33:43Z",
+          "completed_at": "2026-09-11T00:35:33Z"
+        },
+        {
+          "name": "Upload Android APK workflow artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-09-11T00:35:33Z",
+          "completed_at": "2026-09-11T00:35:34Z"
+        },
+        {
+          "name": "Post Set up Java",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-09-11T00:35:34Z",
+          "completed_at": "2026-09-11T00:35:39Z"
+        },
+        {
+          "name": "Post Checkout workspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-09-11T00:35:39Z",
+          "completed_at": "2026-09-11T00:35:39Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-09-11T00:35:39Z",
+          "completed_at": "2026-09-11T00:35:39Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/check-runs/103101407561",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000004516,
+      "runner_name": "GitHub Actions 1000004516",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 103102125987,
+      "run_id": 34546876312,
+      "workflow_name": "Android APK Release",
+      "head_branch": "v1.4.69",
+      "run_url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/actions/runs/34546876312",
+      "run_attempt": 1,
+      "node_id": "CR_kwDORZKejM8AAAAYAV2Xow",
+      "head_sha": "17d4f2327329cee3509062fd823b8e049f563682",
+      "url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/actions/jobs/103102125987",
+      "html_url": "https://github.com/AutoByteus/autobyteus-workspace/actions/runs/34546876312/job/103102125987",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-11T00:35:41Z",
+      "started_at": "2026-09-11T00:35:43Z",
+      "completed_at": "2026-09-11T00:36:10Z",
+      "name": "Publish Android APK To GitHub Release",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-09-11T00:35:44Z",
+          "completed_at": "2026-09-11T00:35:46Z"
+        },
+        {
+          "name": "Checkout workspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-09-11T00:35:46Z",
+          "completed_at": "2026-09-11T00:36:04Z"
+        },
+        {
+          "name": "Download Android APK artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-09-11T00:36:04Z",
+          "completed_at": "2026-09-11T00:36:05Z"
+        },
+        {
+          "name": "Validate publishable APK artifact",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-09-11T00:36:05Z",
+          "completed_at": "2026-09-11T00:36:05Z"
+        },
+        {
+          "name": "Resolve release notes mode",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-09-11T00:36:05Z",
+          "completed_at": "2026-09-11T00:36:05Z"
+        },
+        {
+          "name": "Publish Android APK asset with curated notes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-09-11T00:36:05Z",
+          "completed_at": "2026-09-11T00:36:07Z"
+        },
+        {
+          "name": "Publish Android APK asset with generated notes fallback",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-09-11T00:36:07Z",
+          "completed_at": "2026-09-11T00:36:07Z"
+        },
+        {
+          "name": "Post Checkout workspace",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-09-11T00:36:07Z",
+          "completed_at": "2026-09-11T00:36:08Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-09-11T00:36:08Z",
+          "completed_at": "2026-09-11T00:36:08Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/AutoByteus/autobyteus-workspace/check-runs/103102125987",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000004518,
+      "runner_name": "GitHub Actions 1000004518",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

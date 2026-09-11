@@ -24,7 +24,7 @@ describe("AgentOrgRunService history ordering", () => {
       agentIdentities: { allocateForAgentDefinition: async () => "agent-run-1" },
       teamIdentities: { allocateForTeamDefinitionName: () => "team-run-1" },
       workspaces: { ensureWorkspaceByRootPath: async () => ({ getBasePath: () => "/tmp/workspace" }) },
-      modelConfigValidator: { validate: async () => ({ kind: "valid" }) },
+      modelSelectionValidator: { validate: async ({ selection }) => ({ kind: "valid", selection }) },
       history: {
         initialize: async () => { historyInitialized = true; },
         recordCreated,

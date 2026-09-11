@@ -1,3 +1,6 @@
+import type { RunModelSelectionService } from "../../llm-management/services/run-model-selection-service.js";
+import type { RunModelOptions } from "../../llm-management/domain/run-model-selection.js";
+import type { AgentLaunchConfiguration } from "../../agent-team-execution/domain/team-run-config.js";
 import type { ApplicationRunOwnershipReader } from "../../application-orchestration/services/application-run-ownership-service.js";
 import type { AgentRunService } from "../../agent-execution/services/agent-run-service.js";
 import type { TeamRunExecutionTreeSnapshot } from "../../agent-team-execution/domain/team-run-execution-tree.js";
@@ -24,6 +27,7 @@ const agentMetadata = (config: AgentRunResumeConfig): AgentRunMetadata => {
 
 export class StudioRunModelConfigService {
   constructor(private readonly dependencies: Readonly<{
+    modelSelectionService: Pick<RunModelSelectionService, "listOptions" | "listOptionsMany">;
     applicationRunOwnership: ApplicationRunOwnershipReader;
     agentResumeConfigService: Pick<AgentRunResumeConfigService, "getAgentRunResumeConfig">;
     teamResumeConfigService: Pick<TeamRunHistoryService, "getTeamRunResumeConfig">;
@@ -57,8 +61,32 @@ export class StudioRunModelConfigService {
       : canonical;
   }
 
+  async agentRunModelOptions(agentRunId: string): Promise<RunModelOptions> {
+    const { metadataConfig: config } = await this.getAgentRunResumeConfig(agentRunId);
+    return this.dependencies.modelSelectionService.listOptions({ runtimeKind: config.runtimeKind,
+      currentModelIdentifier: config.llmModelIdentifier, workspaceRootPath: config.workspaceRootPath });
+  }
+
+  async teamRunModelOptions(teamRunId: string): Promise<Array<RunModelOptions & {
+    scopeKind: "CONFIGURED_TEAM" | "CONFIGURED_AGENT"; scopeAddress: string;
+  }>> {
+    const { executionTree: tree } = await this.getTeamRunResumeConfig(teamRunId);
+    const scopes: Array<{ scopeKind: "CONFIGURED_TEAM" | "CONFIGURED_AGENT";
+      scopeAddress: string; config: AgentLaunchConfiguration }> = [
+      { scopeKind: "CONFIGURED_TEAM", scopeAddress: "/", config: tree.rootTeam.defaultLaunchConfiguration }];
+    for (const member of tree.rootTeam.members) {
+      scopes.push({ scopeKind: "CONFIGURED_AGENT", scopeAddress: member.address, config: member.launchConfiguration });
+    }
+    const options = await this.dependencies.modelSelectionService.listOptionsMany(scopes.map(({ config }) => ({
+      runtimeKind: config.runtimeKind, currentModelIdentifier: config.llmModelIdentifier,
+      workspaceRootPath: config.workspaceRootPath ?? process.cwd(),
+    })));
+    return scopes.map(({ scopeKind, scopeAddress }, index) => ({ scopeKind, scopeAddress, ...options[index]! }));
+  }
+
   async updateStoppedAgentRunModelConfig(input: {
     agentRunId: string;
+    llmModelIdentifier: string;
     llmConfig: Readonly<Record<string, unknown>> | null;
   }): Promise<RunModelConfigUpdateResult<AgentRunMetadata | null>> {
     let canonical: AgentRunResumeConfig | null = null;

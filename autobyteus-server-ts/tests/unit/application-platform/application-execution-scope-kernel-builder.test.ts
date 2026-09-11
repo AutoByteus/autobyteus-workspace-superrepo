@@ -141,7 +141,7 @@ const createHarness = (input: {
     workspaceManager: {} as never,
     bindingReader: { getBinding: vi.fn(async () => null) },
     artifactDeliverySink: { accept: vi.fn(async () => undefined) },
-    modelConfigValidator: { validate: vi.fn() },
+    modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
     applicationAgentTools,
   };
   return {
@@ -173,7 +173,7 @@ describe("buildApplicationExecutionScopeKernel construction transaction", () => 
       "workspaceManager",
       "bindingReader",
       "artifactDeliverySink",
-      "modelConfigValidator",
+      "modelSelectionValidator",
       "applicationAgentTools",
     ] as const) {
       for (const [label, value, omit] of [

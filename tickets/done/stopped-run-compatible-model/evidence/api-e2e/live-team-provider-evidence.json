@@ -1,0 +1,73 @@
+{
+  "result": "Pass",
+  "observedAt": "2026-09-09T14:34:41.626665+00:00",
+  "rootTeamRunId": "api_model_live_1788963702207_root_9bbec28af23a42be8d54be108aec298c",
+  "observations": [
+    {
+      "scope": "/Nested/lead",
+      "localAgentRunId": "api_model_live_1788963702207_f30a7a7132cf4fbd96a749eb5cc3e49a",
+      "providerConversationId": "01a08693-ac12-74c2-92a8-542827b4e0b5",
+      "path": "/root/.codex/sessions/2026/09/09/rollout-2026-09-09T14-30-19-01a08693-ac12-74c2-92a8-542827b4e0b5.jsonl",
+      "savedModel": "gpt-5.6-sol",
+      "records": [
+        {
+          "timestamp": "2026-09-09T14:30:28.427Z",
+          "type": "turn_context",
+          "model": "gpt-5.6-luna",
+          "turnId": "01a08693-ac63-79c3-8d8e-cc764b183a9e"
+        },
+        {
+          "timestamp": "2026-09-09T14:30:31.479Z",
+          "type": "task_complete",
+          "turnId": "01a08693-ac63-79c3-8d8e-cc764b183a9e",
+          "answer": "Remembered lead"
+        },
+        {
+          "timestamp": "2026-09-09T14:32:10.678Z",
+          "type": "turn_context",
+          "model": "gpt-5.6-sol",
+          "turnId": "01a08695-5c66-7c63-a12d-cc2fc74650cf"
+        },
+        {
+          "timestamp": "2026-09-09T14:32:14.850Z",
+          "type": "task_complete",
+          "turnId": "01a08695-5c66-7c63-a12d-cc2fc74650cf",
+          "answer": "lead-amber-7291 | continued"
+        }
+      ]
+    },
+    {
+      "scope": "/Nested/reviewer",
+      "localAgentRunId": "api_model_live_1788963702207_7785b295c4da435ca9966779fd4543ca",
+      "providerConversationId": "01a08694-0a65-79c3-9f3a-5811bcee1dda",
+      "path": "/root/.codex/sessions/2026/09/09/rollout-2026-09-09T14-30-44-01a08694-0a65-79c3-9f3a-5811bcee1dda.jsonl",
+      "savedModel": "gpt-5.6-terra",
+      "records": [
+        {
+          "timestamp": "2026-09-09T14:30:50.105Z",
+          "type": "turn_context",
+          "model": "gpt-5.6-luna",
+          "turnId": "01a08694-0aad-7ca1-98e9-26b6dc0aabd2"
+        },
+        {
+          "timestamp": "2026-09-09T14:30:53.517Z",
+          "type": "task_complete",
+          "turnId": "01a08694-0aad-7ca1-98e9-26b6dc0aabd2",
+          "answer": "Remembered reviewer"
+        },
+        {
+          "timestamp": "2026-09-09T14:34:03.732Z",
+          "type": "turn_context",
+          "model": "gpt-5.6-terra",
+          "turnId": "01a08697-15da-7db2-a27a-8534048ab4c8"
+        },
+        {
+          "timestamp": "2026-09-09T14:34:06.169Z",
+          "type": "task_complete",
+          "turnId": "01a08697-15da-7db2-a27a-8534048ab4c8",
+          "answer": "reviewer-amber-7291 | continued"
+        }
+      ]
+    }
+  ]
+}

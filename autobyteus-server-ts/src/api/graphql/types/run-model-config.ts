@@ -1,4 +1,5 @@
-import { Field, ObjectType } from "type-graphql";
+import { GraphQLJSON } from "graphql-scalars";
+import { Field, Float, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class RunModelConfigEditabilityObject {
@@ -17,4 +18,37 @@ export class RunModelConfigFieldErrorObject {
 
   @Field(() => String)
   message!: string;
+}
+
+@ObjectType()
+export class RunModelSelectionObject {
+  @Field(() => String)
+  llmModelIdentifier!: string;
+  @Field(() => GraphQLJSON, { nullable: true })
+  llmConfig!: Readonly<Record<string, unknown>> | null;
+}
+@ObjectType()
+export class RunModelOptionObject {
+  @Field(() => String)
+  llmModelIdentifier!: string;
+  @Field(() => Float)
+  contextTokens!: number;
+}
+@ObjectType()
+export class RunModelOptionsObject {
+  @Field(() => String)
+  currentModelIdentifier!: string;
+  @Field(() => Float, { nullable: true })
+  currentContextTokens!: number | null;
+  @Field(() => [RunModelOptionObject])
+  replacements!: readonly RunModelOptionObject[];
+  @Field(() => String, { nullable: true })
+  unavailableReason!: string | null;
+}
+@ObjectType()
+export class TeamScopeModelOptionsObject extends RunModelOptionsObject {
+  @Field(() => String)
+  scopeKind!: string;
+  @Field(() => String)
+  scopeAddress!: string;
 }

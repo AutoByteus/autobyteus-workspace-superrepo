@@ -108,8 +108,8 @@ describe("memory layout and projection integration", () => {
           assertCurrentSchemaReady: vi.fn(),
           assertExistingRunRestoreReady: vi.fn(),
         },
-        modelConfigValidator: {
-          validate: async ({ llmConfig }) => ({ kind: "valid", config: llmConfig as Readonly<Record<string, unknown>> | null }),
+        modelSelectionValidator: {
+          validate: async ({ selection }) => ({ kind: "valid", selection }),
         },
       });
       const service = new AgentRunService(memoryDir, {

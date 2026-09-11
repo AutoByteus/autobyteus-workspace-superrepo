@@ -1,0 +1,5 @@
+
+> autobyteus@1.4.68 test:e2e:existing-run-model-config /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/autobyteus-web
+> node tests/e2e/existing-run-model-config-probe.mjs --output-dir ../tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved
+
+Existing run model-config probe passed. Evidence: /home/autobyteus/workspace/.codex/worktrees/stopped-run-compatible-model/tickets/in-progress/stopped-run-compatible-model/evidence/api-e2e/browser-preserved/existing-run-model-config-evidence.json

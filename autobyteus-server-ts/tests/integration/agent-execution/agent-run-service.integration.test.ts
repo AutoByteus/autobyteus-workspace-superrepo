@@ -122,7 +122,7 @@ const createLifecycleService = (
     assertCurrentSchemaReady: vi.fn(),
     assertExistingRunRestoreReady: vi.fn(),
   },
-  modelConfigValidator: { validate: vi.fn() },
+  modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
 });
 
 const unusedProvisioningService = (): AgentRunProvisioningService =>

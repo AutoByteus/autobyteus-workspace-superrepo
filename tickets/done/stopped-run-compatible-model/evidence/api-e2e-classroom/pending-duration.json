@@ -1,0 +1,6 @@
+{
+  "toolStartedAt": "2026-09-10T22:54:05.224Z",
+  "beforeStopSnapshotAt": "2026-09-10T22:56:46.526796+00:00",
+  "observedPendingSeconds": 161.302796,
+  "correction": "Earlier >5min checkpoint wording used run-age sidebar, not tool duration; canonical artifacts corrected to provider timestamp difference. No completion before Stop; no approval visible on selection/reopen."
+}

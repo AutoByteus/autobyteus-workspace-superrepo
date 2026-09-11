@@ -1,0 +1,6 @@
+{
+  "initialCheck": "KeyError size on Windows latest.yml",
+  "classification": "Delivery-local evidence checker assumption, not a failed production build or updater contract finding",
+  "correction": "Compare sizes where advertised; explicitly record Windows metadata does not advertise size. Still require every referenced asset uploaded/nonempty with API SHA256, correct version, and SHA512 field. No production metadata/code changed.",
+  "historyPreserved": true
+}

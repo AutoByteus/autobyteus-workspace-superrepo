@@ -52,7 +52,7 @@ const createSupervisorInput = () => {
     workspaceManager: WorkspaceManager.getInstance(),
     agentProviderFactoryBuilder: createProviderBuilder(),
     agentToolMcpSessionAuthority: createAuthority(),
-    modelConfigValidator: { validate: vi.fn() },
+    modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
   };
 };
 
@@ -125,7 +125,7 @@ describe("GeneralProcessRunSupervisor ownership", () => {
       flatTeamExecutionFactory: new FlatTeamExecutionFactory(),
       memberExecutionContextBuilder: new MemberExecutionContextBuilder(input.agentTeamDefinitionService),
       taskExecutionIdentity: createTaskExecutionIdentityCapabilities({ allocateForAgentDefinition: async () => "task-agent-run" }),
-      modelConfigValidator: { validate: vi.fn() },
+      modelSelectionValidator: { validate: vi.fn(), validateMany: vi.fn() },
     });
     try {
       expect(() => new GeneralProcessRunSupervisor(input)).toThrow("already initialized");
@@ -152,7 +152,7 @@ describe("GeneralProcessRunSupervisor ownership", () => {
     for (const property of [
       "memoryDir", "contextFilePathEnvironment", "agentDefinitionService", "agentTeamDefinitionService",
       "agentOrgDefinitionService", "definitionAdmissionService", "workspaceManager", "agentProviderFactoryBuilder",
-      "agentToolMcpSessionAuthority", "modelConfigValidator",
+      "agentToolMcpSessionAuthority", "modelSelectionValidator",
     ] as const) {
       const invalid = { ...createSupervisorInput() } as Record<string, unknown>;
       delete invalid[property];
