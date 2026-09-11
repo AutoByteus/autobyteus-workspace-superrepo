@@ -26,6 +26,7 @@ concise chronological architecture-review history.
 | ARCH-REV-017 | Round 17 / approved `RER-028` task-workflow parity and `AD-REV-019` | `AD-REV-019` | Pass (former scoped authority) | Pass | `AR-FIND-008` superseded by RER-028; no new finding |
 | ARCH-REV-018 | Round 18 / approved `RER-029` field-free Team/Org authoring | `AD-REV-020` | Pass | Pass | `PKG-AUTH-001` resolved; prior findings retained/superseded; no new finding |
 | ARCH-REV-019 | Round 19 / approved `RER-031` compact message/task UI and exact Org heading | `AD-REV-021` | Pass | Pass | `UI-CLEAN-001` resolved; no new finding |
+| ARCH-REV-020 | Round 20 — history inspection, deliberate continuation and retained stop | AD-REV-023; AD-REV-022 copy-only direct | Pass | Pass | HIST-INSPECT-001/002 resolved at design boundary; no new AR-FIND |
 
 ## Revision Entries
 
@@ -504,3 +505,32 @@ None.
 - Material classification changes: Focused Small/Low; cumulative Large/High remains. No new high-risk lifecycle premise is inferred from this UI change. Existing source/API/Delivery results retain their recorded scope.
 - Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
 - Remaining risks: deleting metadata rather than data, exact all-member/settled navigation, same-name targets, system/reference distinction, disclosure accessibility and scope resets, and heading-only state invariance. Implement and validate the focused component/adapter/localization and desktop/narrow paths through normal downstream ownership; no executable or delivery completion is claimed.
+
+
+### ARCH-REV-020 — Observational history, exact continuation and retained stop pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 20; DR-009 user restart/history and stop-to-configuration defects with explicit request for design correction.
+- Triggering role, report path, and finding IDs: Architecture Designer; `architecture-history-inspection-investigation.md`, AD-REV-023; HIST-INSPECT-001/002. Separate COMPOSER-001/IR-044 remains a source preservation obligation.
+- Relevant architecture design revision IDs: `AD-REV-023@5403b798194bce3e5b7bdf9c0fe36d91f6cd02b7`; AD-REV-022 copy-only direct; cumulative earlier design outside explicit supersession.
+- Requirements authority: `RER-032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a`.
+- Prior authoritative decision: `Pass` (ARCH-REV-019 on AD-REV-021). No intervening structural review inferred for AD-REV-022.
+- Current authoritative decision: `Pass`.
+- What changed: Independently traced current Org history actions, context/transport/hydration, access and watcher boundaries, local submission, history activity generations and server inspection/restore against Team browse/Send/stop. DS-035–037 separate all observational reads from explicit Send-to-restore, add a truthful send-only inactive configured capability, move local submission to one browser owner, preserve matching reactive AgentContext and exact payload across readiness, and retain selection/conversation after confirmed stop. The local pending guard and generation checks serve supported visible actions, not a new runtime queue. VAL-054–058 describe required network/runtime and rendered validation; no executable pass is inferred. RER-032 plural Orgs supersedes earlier singular heading copy.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `HIST-INSPECT-001` | Source-confirmed realization defect | Resolved at design boundary | AD-REV-023; DS-035/036; VAL-054/055/057/058 | All browse/mount/reconnect paths inspect; explicit configured Send captures exact identity, restores full root and waits for strict readiness before one prepared command. |
+| `HIST-INSPECT-002` | Source-confirmed realization defect | Resolved at design boundary | DS-037; VAL-056–058 | Historical transition and transport retirement retain exact selection/conversation; no launch redirect, stale callback reopening or optimistic failed-stop status. |
+| `COMPOSER-001` | IR-044 source correction, separately owned | Preserve; not source-reviewed here | IR-044 source 25436ef4d; DS-036; VAL-055/058 | One local submission moves out of transport with draft/attachment/pending/error/newer-edit/echo behavior intact. Concurrent composer changes remain downstream-owned. |
+| `AR-FIND-001`–`AR-FIND-007` | Resolved | Remain resolved | Prior review history; cumulative design | No definition/migration/handoff/FIFO/fence algorithm change; browser operation/history/read/tree-state owners remain distinct. |
+| `AR-FIND-008` / `AAV-001` | Former configured-only policy superseded; retained history preserved | Retained; configured-selection restore exception superseded | RER-028/032; DS-028–030/035–037 | Ordinary task messages and exact retained participant views persist; read never activates tasks or substitutes source identity. |
+| `UI-CLEAN-001` / `PKG-AUTH-001` | Approved design resolutions | Retained with RER-032 copy supersession | AD-REV-020–023 | Compact presentation and field-free authoring unchanged; plural Orgs is current heading. |
+| Earlier `ADI`/`IDI` and Product impacts; `CR-FIND-019` | Resolved design impacts / separate source regression | Retained | Cumulative design and downstream records | No Product surface replacement, backend lifecycle extension or conflation with this browser correction. |
+
+- New or remaining finding IDs: None.
+- Material classification changes: Focused Medium/High; cumulative Large/High. No Requirement Gap or new Product gate. Prior source/API/Delivery results retain only their recorded scope.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
+- Remaining risks: actual no-activation history, strict readiness and exact pending submission, reactive context/debounce preservation, stop/error truth, transport/history generations, send-only versus read-only capability and navigation continuity. Renew source and desktop/narrow/runtime validation after implementation; no execution, release or delivery completion claimed.
