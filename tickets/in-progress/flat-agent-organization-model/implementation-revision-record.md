@@ -48,6 +48,7 @@
 
 | IR-040 | Architecture Reviewer ARCH-REV019 / approved RER031 incl RER030 | UI-CLEAN001; no new CR-FIND | Architecture reconciliation; Large/High | AD-REV021; ARCH-REV019; prior CRR060; API25 ongoing/API24 historical; DR008 | Compact Messages/task detail and Org history copy; exact retained endpoints preserved; ready for cumulative source review. |
 | IR-041 | User-approved Architecture Designer AD-REV022 / RER032 copy re-entry | UI-CLEAN001; no new CR-FIND | Focused Small/Low; cumulative Large/High | AD-REV022; retained ARCH-REV019; CRR061 prior; API25 ongoing/DR008 historical | Exact Orgs heading and affected copy assertions; local checks/render pass, cumulative source review next. |
+| IR-042 | Code Reviewer CRR063 / API25 failure-origin Local Fix | CR-FIND033 / API-FIND028 | Local Fix; Large/High | RER032; AD022/ARCH019 parent; prior CRR062; API25 Fail; DR008 historical | Cold exact task navigation awaits canonical history read without drawer; local checks complete, source review next. |
 
 ## Revision Entries
 
@@ -989,3 +990,17 @@
 - Preservation:9110 starting paths hashed,9109 unchanged; exact authorized assertion overlap disclosed in preexisting-catalog.diff. Prior other-owner Org/组织 assertion retained and narrowly pluralized, not claimed as wholly authored here. All other docs/API/review/Delivery/raw files untouched/unstaged. No raw secret/runtime package publication.
 - Evidence: implementation-evidence/IR-041/local-checks.md, focused.log, guards.log, preservation.txt, preexisting-catalog.diff, render/evidence.json and safe screenshots.
 - Next: get_handoff_rules selected the completed Large-or-High implementation, validated and ready-for-independent-source-review rule; exact recipient /software_engineering_team/code_reviewer. Then existing API/Delivery gates. No downstream pass claimed.
+
+
+### IR-042 — Resolve cold exact task navigation through canonical history read
+- Trigger: Code Reviewer CRR063 failure-origin, CR-FIND033/API-FIND028. Supported normal narrow closed-drawer route already has strict hydrated tasks, but original action treated unloaded history as missing root. No Design Impact/Requirement Gap/Product gate.
+- Authority: RER032/AD022, retained cumulative AD021/ARCH019 Pass; RER028–031 and all earlier relevant decisions remain. New architecture review N/A. Cumulative task_size=Large/architectural_risk=High confirmed; existing source/API/Delivery gates retained.
+- Prior authoritative result: IR041 source88fa0c3ff55d9d6a87a27df094b369ea62d1595c/artifact81af52d97d2016a9e65529f25dda35361c2a94fc. CRR062 Pass historical, superseded for advancement by CRR063; API25 Fail78.3 with held matrix. API24/CRR059/DR008 remain scoped history; DR007 limits preserved.
+- Current result: source14f7acfce33d28b74d619ce7d10bf13903c20c3f; implementation/local validation complete, current code and implementation-handoff authoritative. No current source/API/Delivery pass.
+- Behaviors: BEH018/014, REQ035/036/031, AC030/034/026, SCN019/015; DS034b/DS030/DS025. Exact participant action now awaits existing runHistoryStore.refreshAgentOrgHistory only on absent root, propagates family errors and then resolves strict canonical row. No live-context activity inference or drawer dependency; old genuine-missing/error and active/history branches remain.
+- Files: useWorkspaceHistorySubjectActions.ts plus new colocated coldHistory spec. One production file87nonempty,+10/-1; no >500 or >220line signal. No cache/API/schema/runtime/queue/retry/poll/timeout/manual reconnect or lifecycle addition; persistence Not Affected.
+- Tests:8 new real-component/action/Pinia/read/strict-parser/context/router cases; active held read, exact non-coordinator/repeated same-name, warm reuse, inactive no activation and strict errors. Pre-fix action reproduces original failure. Initial unsupported unknown-ID-throws expectation corrected to existing null target, no new production behavior.
+- Local checks:20files151tests final cohort and overlapping5/62 pass; guards/literal audit0; generated SDK prerequisite + production Nuxt16route build pass. No full typecheck/Electron/new server/provider/migration acceptance.
+- Render:5 actual strict-synthetic-stream/component/action/read/context states desktop/narrow, keyboard/Back/reload, zero pre-click history reads and one cold read, exact read-only task destination, no command/Restore/pageerror/overflow. Memory router/fixture not exact production emitted URL browser Back390 proof; renewed API/E2E must execute that and all held cases.
+- Preservation:10029 starting other-owner hashes unchanged; API/source-review/Delivery/raw evidence untouched/unstaged. Own temporary route/process/generated SDK removed; no raw DB/env/key or package publication. Evidence under implementation-evidence/IR-042, initial/expected-failing logs retained.
+- Next: get_handoff_rules selected completed reviewer-requested Local Fix on Large/High package returning for source review; exact recipient /software_engineering_team/code_reviewer. Then full renewed API/E2E. API25 residual limits and separate CRR059/DR008 scope retained; no Delivery readiness.
