@@ -13,6 +13,8 @@
 
 | DR-007 | `CRR-051 / Not Applicable` after IR-034 / API-REV-019 renewed validation | `DR-006 / Awaiting Explicit User Verification` (superseded) | `Blocked — Local Fix` at mandatory latest-base merge | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `release-notes.md`, `delivery-evidence/dr-007/*` |
 
+| DR-008 | CRR-059 Pass after fresh API-REV-024; concurrent PKG-AUTH-001 inquiry | DR-007 Blocked — Local Fix (resolved upstream) | Blocked — Design Impact; approved RER029 re-entry pending, RER028 native candidate available | docs-sync-report.md, handoff-summary.md, release-deployment-report.md, release-notes.md, delivery-evidence/dr-008/* |
+
 ## Revision Entries
 
 ### DR-001 — Initial delivery integration blocked by latest-base conflicts
@@ -138,3 +140,57 @@
 - Evidence limits preserved: queue passage inferred within HTTP intervals, no independent ingress/FIFO timestamps; direct live sample initializing-to-Offline; normal history/Restore after exhaustion is not in-place automatic recovery; API-FIND-025 locator-only, API-FIND-024/026 historical Not Reproduced with no source attribution; native shell/distributed deployment unclaimed; harness/scoring corrections retained.
 - Remaining concerns: preserve flat-Team/AgentOrg ownership while adopting base model-selection validator/save/form changes; no recursive configured-Team resurrection, weakened strict admission, speculative retry/replay, or source fix for unproven stalls. Raw retained runtime/env/key evidence must not be indiscriminately committed/published.
 - Terminal return message/reference: N/A. Local Fix handoff confirmed `DELIVERED` to `/software_engineering_team/implementation_engineer`, exact run `implementation_engineer_c58a9da47f7346ad84da5ce2486ab593`; receipt: `delivery-evidence/dr-007/handoff-confirmation.json`. Delivery stops pending a later recovery result.
+
+### DR-008 — Current task-inclusive package built; authoring contract inquiry holds finalization
+
+- Date/trigger: 2026-09-11; **RER-028 / AD-REV-019 / ARCH-REV-017 Pass / IR-001–038 / CRR-058 source Pass / API-REV-024 Pass / CRR-059 test-review Pass**; Large / High reviewed route.
+- Prior result: DR-007 Blocked — Local Fix. IR035 resolved latest-base conflicts;
+  IR036–038 and the completed current reviews/API24 supersede the prior candidate.
+- Current authoritative result: **Blocked — Design Impact / approved RER029 re-entry pending**;
+  current RER028 integration/docs/build/native smoke complete, user acceptance
+  missing. PKG-AUTH001 initially identified the authoring Requirement Gap. Before handoff,
+  approved RER029 removed authored schemaVersion from both Team/Org definition
+  families while preserving runtime versions. That resolves the gap but requires
+  Architecture impact/transition and applicable downstream validation; the built
+  RER028 source is unchanged and does not implement the new rule.
+- Source/reviewed artifact: `22809caca4a313e8079581a2a1b5b2e4eb2555f7` / `6e2745680cd3529ab6787de07df252e92854247c`.
+- Safety checkpoint: `14a94fc45de8bcab271e996eb7d6e8440f0d3ac5`, 17 explicit paths,
+  including all five reviewed tests. Base `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793` already current;
+  no new base commit/merge-triggered rerun. Pre-offer fetch confirms same base.
+- Concurrent HEAD `7ef7921304f504367c5d43929b62ffe773e474ad` adds only Architecture's
+  inquiry; source/tests/build inputs unchanged. Preserved without claiming its
+  authorship or any completed new design. Requirements subsequently approved RER029 in
+  separate upstream-owned edits; no implementation/validation for it is inferred.
+- Fresh verification: standard ARM64 Electron build exit0, all guards/audit,
+  server bootstrap, renderer/native packaging passed. AppImage1.4.69,
+  524,065,092 bytes, SHA256 `dd794306220d50ad95d78f8e70f633c1ad2df253d02d51a3721d54ecf1498e3c`. Not a version/tag/release.
+- Native smoke: actual AppImage on display99, window65011716/main55845,
+  backend55895 healthy at127.0.0.1:31008, exact renderer binding, isolated
+  `/tmp/autobyteus-dr008-user-test-20260911`; two copied sample Orgs visible.
+  Other-ticket production-port app preserved. Updater-disabled test-profile
+  toast dismissed; no full native/provider journey or user verification inferred.
+- Docs sync: **Pass — Updated**, four canonical documents promote task-inclusive
+  Messages/Tasks, exact retained read-only inspection, genuine notification
+  truth and retired parallel history/Team-only Tasks owners. First-message title
+  eligibility intentionally stays configured-external only.
+- Docs report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/docs-sync-report.md`.
+- Handoff summary: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/handoff-summary.md`.
+- Release/deployment report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/release-deployment-report.md`.
+- Evidence: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-008`; API24 full cumulative Pass95.9%, 1,698 tests/287 files,
+  all recorded limitations retained. CRR059 Pass, not N/A.
+- Preservation: 6,202 other-owner baseline hashes matched before RER029 upstream edits;
+  those later Requirements-owned edits are also preserved, not overwritten; only docs/report
+  edits after safety checkpoint; two generated SDK output dirs retained outside
+  worktree; raw DB/env/key evidence unstaged and not publication artifacts.
+- User verification/finalization: no acceptance/archive/final push/merge/tag/
+  release/deployment/final cleanup. Native app left available for bounded testing.
+- Terminal return to Requirements Engineer: **Blocked / not sent**.
+- Why recorded: distinguish resolved DR007 merge blocker and successful current
+  package preparation from the same-round approved RER029 authoring contract
+  change; never infer delivery completion from the build or earlier records.
+- Next recipient/action: current Design Impact/non-deployment rule selects
+  `/software_engineering_team/architecture_designer`; consume approved RER029 from Requirements, design the bounded transition,
+  complete applicable implementation/review/API validation, then renewed
+  Delivery/user verification. No new implementation assignment or redundant
+  task-parity rerun requested.
+- Handoff confirmed: `DELIVERED` to `/software_engineering_team/architecture_designer`, exact run `architecture_designer_6b8b3019214246e086957b3f395901bb`; receipt `delivery-evidence/dr-008/handoff-confirmation.json`. Successful terminal Requirements return remains not sent. Delivery stops pending a later validated re-entry.

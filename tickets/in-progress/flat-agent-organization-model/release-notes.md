@@ -1,43 +1,73 @@
-# AORG-FLAT-TEAM-001 Release Notes (Draft)
+# AgentOrg / Flat Team — Release Notes Draft
 
-> **DR-007 HOLD (2026-09-11):** This older draft is superseded for delivery by
-> RER-026 / IR-034 / CRR-050 / API-REV-019 / CRR-051. The required latest-base
-> merge is blocked by 17 conflicts, so the draft below is historical, not the
-> current integrated release/package state. API-REV-019's current upstream
-> AppImage hash is `dfceecd28aa4902865ba3559b5a2193a09d290b272562ac0ac33f734638aa9c3`;
-> no DR-007 rebuild or launch is claimed. Refresh these notes after
-> reconciliation to include IR-033 exact mutation inputs and IR-034 terminal
-> Offline projection, with the evidence limits in the current delivery report.
+**DR-008 — local verification candidate, not a published release.**
+Current authority: RER-028 / AD-REV-019 / IR-038 / CRR-058 / API-REV-024 /
+CRR-059. The local package inherits version **1.4.69** from the integrated base;
+this is not a new version/tag or a replacement of the existing public release.
+Publication remains gated on explicit user verification, the newly approved RER029
+design/implementation/validation route, and repository finalization. Approved RER029 removal of authored
+`schemaVersion` fields is not included in this RER028 build. These notes supersede the DR-007 blocked integration draft.
 
-## Agent Organizations And Flat Teams
+## User-visible changes
 
-- Agent Teams remain reusable flat groups of direct Agents with one direct-Agent coordinator; Agent Orgs combine direct Agents and reusable flat Teams without an Org coordinator.
-- A durably accepted same-Org message between configured Agents now appears exactly once as inbound member input in the receiving Agent's center event monitor.
-- Every selected configured Agent in an AgentOrg—direct or mounted-Team-hosted—has the shared right-side **Messages** experience over the owning Org, with truthful sent/received direction, exact complete-Org counterpart identity, content, time, and references.
-- Direct-to-direct, direct-to-mounted, mounted-to-direct, and mounted-to-mounted configured communication is covered. Messages involving task-scoped endpoints remain excluded from configured-member center/Messages presentation.
-- AgentOrg status snapshots traverse each structural Team root once and delegate recursive task descendants to that Team, preventing duplicate AgentRun status identities while preserving the flat directory for routing, settlement, and whole-Org shutdown.
-- Existing first-message AgentOrg titles, unified **Workspaces**, exact focus/configuration, automatic-only recovery, Task review/acceptance, history/Restore/provider continuation, terminal Stop, and migration behavior remain intact.
-- The historical standalone-Team `submit_task_result` stall was not reproduced on the unchanged artifact. Correlated validation crossed local MCP ingress, Team FIFO, durable commit, HTTP/provider completion, revision/resubmission/acceptance, clean restart/Restore, and provider continuation; no timeout, retry, replay, or product-source change was introduced.
-- Existing supported fixed-depth data migrates to Team V2 and AgentOrg V1. Incompatible external packages require publication by their owning repositories.
+- Reusable flat Agent Teams contain direct Agents with a coordinator; Agent Orgs
+  compose direct Agents and flat Teams without an Org coordinator or configured
+  Team nesting. Org launch starts without an implicit recipient.
+- Team-like collapsed member overrides, exact inheritance and readiness, runtime
+  Retry/default abandonment, Temp Workspace default, and strict edit/save
+  projection preserve deliberate configuration choices.
+- One Workspaces hierarchy keeps Teams and Agent Orgs distinct while exact
+  selection controls the URL, center, and single highlighted row. Locked
+  exact-Agent settings return to the same monitor; New is a separate journey.
+- Shared Messages now include all accepted ordinary configured/task Agent and
+  task-Team directions. Exact sender/receiver execution identity, receiver input,
+  and references survive history and Restore without a duplicate message store.
+- Familiar Tasks is available to direct and mounted Org participants as well as
+  task Agents/Teams. Assignment, submission, revision, acceptance, interruption,
+  and references remain tied to the exact relevant task and execution.
+- Participant navigation distinguishes repeated same-address tasks. Settled and
+  inactive executions retain read-only history, Messages, Tasks, configuration,
+  and references without silently restarting the execution.
+- Genuine accepted task-system inputs remain distinct from ordinary messages.
+  Notification rejection is a warning, not a fabricated receipt or lost durable
+  task update.
+- Already-mounted task facets and status rows update without refocus. Settled
+  executions converge offline and leave the live roster while retaining history.
+  Mounted-Team summaries remain presentation-only aggregates.
+- Automatic recovery preserves exact focus and bounded attempts, with separate
+  successful recovery and one-notice exhaustion behavior; no manual Reconnect.
+- AgentOrg history uses the first accepted non-empty external configured-member
+  message as its stable summary. Task/system traffic never replaces the title.
+  Derived metadata write failure does not replay accepted work or poison writes.
+- Separate Team V2 and AgentOrg V1 persisted families preserve task/provider
+  identity through supported migration, clean restart, Restore and terminal Stop.
+  The integrated stopped compatible-model workflow remains available for its
+  supported standalone Agent/flat Team scopes; it is not an Org model-edit grant.
 
-## Validation
+## Validation and limits
 
-- Cumulative source review: `CRR-044 / Pass`, `9.4/10`.
-- Focused runtime origin review: `CRR-045`; no source finding.
-- API/E2E: `API-REV-016 / Pass`, `97.6%`; all planned and held paths completed, `API-FIND-021` resolved for validation, no current finding.
-- Proportional durable test-code review: `CRR-046 / Not Applicable` because API-REV-016 changed no repository-resident durable test or production source.
-- Delivery confirmed the latest base was already integrated and built the guarded ARM64 Electron package for actual user verification.
+Fresh full cumulative API-REV-024 passed at 95.9% reported confidence, with
+1,698 repository tests in 287 distinct files and current live task/message,
+notification, exact inspection, publication, recovery, migration and restart
+coverage. CRR-059 passed all five durable test updates. Native package build and
+launch evidence is recorded separately in the DR-008 delivery report, not
+inferred from browser execution.
 
-## User-Verification Build
+The recursive initial native-wait prompt needed ordinary clarification;
+controlled notification/model probes are not real-provider failure evidence;
+the second non-quiescent startup assertion was invalid and the third startup
+provides the exact preservation proof. Historical stall causes remain unknown.
+External definition repositories must publish compatible definitions separately.
+No actual Brief Studio provider-user journey or distributed rollout is claimed.
+See `delivery-evidence/dr-008/upstream-evidence-limits.md` and API24 reconciliation.
 
-- Package source/checkpoint: `6bca86cac41c3171b35eba3c38b7543da3fde62d` plus Delivery-owned documentation/evidence, which does not change the binary.
-- AppImage: `AutoByteus_enterprise_linux-arm64-1.4.68.AppImage`.
-- Size: `524007444` bytes; SHA-256: `85b082299b25b1c5279ca9e9bf433920cbe5fb1331b63685e6c2f02a175aaf5d`.
-- Status: running for explicit user verification; this draft is not released.
+## Rollout / rollback
 
-## Compatibility Note
-
-Definitions in separately maintained external packages remain unavailable until
-their owners publish Team V2 / AgentOrg V1-compatible packages. Compatible
-definitions and server/history functions remain available; there is no legacy
-runtime fallback.
+Use the repository's normal post-finalization release script only if publication
+is selected. Back up server data before a supported legacy-family migration;
+inspect migration outcomes and do not force incompatible definitions through
+admission. Never run an older family reader against migrated data to simulate
+rollback: retain a verified pre-migration backup and matching executable.
+The isolated DR-008 desktop test root is not the normal production data root.
+No target branch, public tag, external package, or deployment was changed by this
+local verification preparation.

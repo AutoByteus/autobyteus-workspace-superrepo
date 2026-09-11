@@ -299,7 +299,7 @@ subscription, and Stop/pending state must not influence either the exact-run
 cue or the group projection.
 
 A direct mounted-Team row inside one AgentOrg may render a presentation-only
-five-state summary in `AgentOrgRunHistoryPanel`. The summary folds exact Agent
+five-state summary in `WorkspaceAgentOrgHistoryCollection`. The summary folds exact Agent
 statuses in that mounted Team branch with precedence `running > initializing >
 error > idle > offline`. Direct Team Agents plus task Agents and task-Team
 Agents beneath that mounted placement contribute; the Team container itself,
@@ -404,33 +404,40 @@ keyboard focus. Selected execution rows keep a straight 2px indigo inset rule,
 `#eef2ff` background, and zero corner radius so selection does not erase the
 tree grammar or node role.
 
-`CollaborationOverviewPanel` is the root-neutral owner of the local
-Messages/Tasks accordion state. A `CollaborationMessagesContextView` supplies
-the owning Team or AgentOrg label, selected configured member, projected
-messages, and reference loader; the panel does not infer root identity from the
-component placement. Messages remains the default for a selected collaboration
-root with no delegated task entries, but the panel opens Tasks automatically
-when the selected team run already has
-persisted delegated task entries or when a new delegated-task identity appears
-while the same run is mounted. The auto-open signature is derived from the same
-`deriveDelegatedTaskEntries(...)` entries consumed by
-`TeamDelegatedTasksSection`, keyed by persisted task id and live execution
-identity when available, so unrelated messages or refreshes do not open Tasks. A
-user may still collapse Tasks for the same task set; the panel reopens only for
-a different delegated-task signature or a selected-run change to a run that has
-delegated tasks. When the selected root/member changes and there are no delegated
-tasks, the panel opens Messages. Standalone Team and AgentOrg workspaces compose
-the same Messages presentation; Team Tasks remain available only where a Team
-task context exists.
+`CollaborationOverviewPanel` owns local Messages/Tasks accordion state through
+independent `CollaborationMessagesContextView` and
+`CollaborationTasksContextView` facets. The adapters supply exact root and focused
+AgentRun identity, projections, and reference routes; the panel does not infer
+identity from component placement or require a Team context for a direct Org
+Agent. Messages is the default when no relevant tasks exist. Tasks opens when the
+selected exact root/member has tasks or a different delegated-task identity set
+arrives. The signature uses the same entries rendered by
+`CollaborationDelegatedTasksSection`, including task and execution identity.
+Unrelated message refreshes do not reopen Tasks, and the user may collapse it
+for the same task set.
 
-`TeamDelegatedTasksSection` derives entries from persisted task-delegation
-records in `taskDelegationStore`, filtered by the focused sender/receiver
-address perspective. Live task-agent/task-team projection nodes in
-`AgentTeamContext` are optional enrichment for matching records and provisional
-visibility for not-yet-refreshed live tasks; they are not the durable display
-source. Opening or reloading active and historical team runs hydrates records via
-`getTaskDelegationRecords(teamRunId)`, and live task-delegation websocket events
-schedule a debounced records refresh.
+`CollaborationDelegatedTasksSection` owns shared layout and local task/reference
+selection, not record loading. Its Team adapter projects persisted records from
+`taskDelegationStore`; Team live execution nodes remain optional enrichment and
+provisional visibility, not the durable display source. Active/history Team
+hydration uses `getTaskDelegationRecords(teamRunId)` with debounced live-event
+refresh. Its Org adapter instead projects the strict root view through
+`agentOrgTaskPresentation.ts` and `AgentOrgExecutionViewIndex`, with relevance to
+the exact delegator, task Agent, or assigned task-Team roster. Independently
+delegated descendants are not roster members merely by ancestry. Both adapters
+provide root-owned reference routes and exact participant navigation.
+
+The Org index retains configured and task executions after settlement, including
+actual host/task binding and captured launch configuration. Participant links
+select the exact AgentRun, never another run at the same address. Read-only
+`getAgentOrgRunInspection` uses the existing root transition lane and strict
+package families without activating, restoring, or repairing them. Missing
+history is not replaced with fabricated emptiness. Inactive/settled contexts
+retain monitor history, Messages, Tasks, and locked configuration without live
+command authority. Fresh root events publish reactive context changes without
+refocus; settlement retires the live row but preserves retained inspection.
+The unified Workspaces collection is the history owner; the parallel
+`AgentOrgRunHistoryPanel.vue` was removed.
 
 Inside that section, `deriveDelegatedTaskEntries(...)` projects every current-
 schema task record into one ordered conversation: the assignment root followed
@@ -1400,12 +1407,15 @@ A key architectural pattern is the **Sidecar Store Pattern** for runtime data. I
     - Does not parse chat text in the frontend and does not make raw paths in `InterAgentMessageSegment` clickable.
     - AgentOrg contexts retain their own strict root-sidecar payload and build a
       `CollaborationMessagesContextView` with
-      `agentOrgCommunicationPerspective.ts`. The index correlates every
-      configured direct/mounted AgentRun plus task-scoped AgentRun, rejects
-      unknown or duplicate identity, excludes any message with a task endpoint
-      from configured-member presentation, and resolves counterpart identity
-      across the complete fixed-depth Org. AgentOrg references open through the
-      AgentOrg-rooted message route; no Team store or second ledger is created.
+      `agentOrgCommunicationPerspective.ts` and the retained
+      `AgentOrgExecutionViewIndex`. Every admitted ordinary configured/task pair
+      is eligible; the exact selected sender/receiver AgentRun determines
+      relevance. Unknown, duplicate, or mismatched identities fail closed.
+      Same-address tasks remain distinct and counterparts retain host/task
+      identity. Genuine accepted task-system inputs belong in the event monitor,
+      not ordinary Messages; a task record is not a notification receipt.
+      AgentOrg references open through the AgentOrg-rooted message route; no
+      Team store or second ledger is created.
 3.  **Activity (`AgentActivityStore`)**:
     - Tracks run activities as a discriminated `RunActivity` history. Tool calls, file writes, and terminal commands are `kind: 'tool'`; compaction lifecycle/boundary rows are `kind: 'compaction'`; exact run-scoped instruction captures are `kind: 'system_instruction'`.
     - Is updated through shared tool Activity projection from eligible live transcript segment events and lifecycle events, through `compactionActivityProjection.ts` for live `COMPACTION_STATUS` payloads, and through `systemInstructionActivityHandler.ts` for live/replayed exact instruction facts.

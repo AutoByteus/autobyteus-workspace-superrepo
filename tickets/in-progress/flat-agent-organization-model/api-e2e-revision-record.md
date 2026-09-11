@@ -37,6 +37,12 @@ The latest `api-e2e-coverage-investigation.md` and
 
 | API-REV-024 | CRR058 / full renewed merged-artifact RER028 matrix | RER028; ADREV019; ARCHREV017; IR001–038; CRR058 | Pass96.0% (API23 historical adjudication) | Pass95.9% — fresh cumulative execution |
 
+| API-REV-025 | CRR060–062 / full field-free authoring and compact UI renewal | RER032; AD022; parentARCH019; IR001–041 | Pass95.9% (API24 historical) | Fail78.3% |
+
+| API-REV-026 | CRR064 / IR042 fresh full renewal | RER032; AD022; parentARCH019; IR001–042 | Fail78.3% | Fail79.0% |
+
+| API-REV-027 | CRR066 / IR043 fresh full cumulative renewal | RER032; AD022; parentARCH019; IR001–043 | Fail79.0% | Pass95.6% |
+
 ## Revision Entries
 
 ### API-REV-001 — Real AgentTeam/AgentOrg/Codex/browser baseline
@@ -888,6 +894,7 @@ None. API-REV-010 passed its IR-028 artifact; API-REV-011 validates the newly ch
 | --- | --- | --- | --- |
 | `API-FIND-018 / LIVE-003B` | implementation-owned shared atomic-writer Local Fix; accepted work's caught derived-index failure also escaped through a rejecting cleanup tail and terminated Node | **Resolved / Pass.** Accepted ACK stayed truthful; exact EISDIR was caught once; socket/GraphQL/process remained available; no replay/relabel; exact restore; later same-path persistence; no unhandled/fatal marker; SIGTERM exit 0. | `API-REV-013/live/LIVE-003B-observed-boundaries.md`; `metadata-failure-fixed-result.json`; `post-fix-process-and-log-check.log` |
 | API-REV-011/012 held `LIVE-004/005` | Not Tested after critical fail-fast | **Resolved / Pass.** Production-browser history/switch/Restore/config/narrow focus, real Team/Org/task, active+stopped strict negatives, stop/terminal, restart/post-restart continuation and scoped history recovery all passed. | `API-REV-013/live/LIVE-004-*.json`; `LIVE-005-*.json`; ledger sequences 27–42 |
+| API-REV-025 | Code Reviewer CRR061/062; full renewed UI-CLEAN/current artifact | RER032 / AD022 / ARCH019parent / IR001–041 | API24 Pass95.9% | **Fail78.3%** — API-FIND-028 |
 
 - Migration/idempotence: Pass; status remained `SUCCEEDED`, attempt count 1, both histories queryable and both indexes byte-stable.
 - Cleanup: complete; owned ports/processes/tabs absent, copied secrets and generated outputs removed, fixture hashes `18/18`, source/artifact and diff integrity pass.
@@ -1201,3 +1208,43 @@ No timeout, retry, replay, compatibility or alternate recovery/lifecycle machine
 -Fiveupdateddurablepaths:4API20unchanged + rootExecutionViewState.spec.ts exacttaskDTO/strictnegative/heldfacetreactivity;126insertions/227deletions. Proportionalreview Required, no durablefiledeletion/sourceedit/staging/commit.
 -Ownservices/tabs/observers closed,7envfiles/5generatedoutputsremoved;4913other-owner/19fixturefiles unchanged, sourceHEADfixed. Data/reference/providertraces retained/authsharedbrowserpreserved. No native-shell/AppImage/userverification/release/externalpublication claim.
 -Canonicalreports/ledger andAPI24case-reconciliation/confidence/diff/cleanup/integrity persisted; successfuldynamicroute requests proportionalCodeReview only, not source-scorecard reopening.
+
+### API-REV-025 — Current cumulative renewal; cold narrow task navigation failure
+- Completed 2026-09-11T14:51:15.461564+00:00; current source88fa0c3ff55d9d6a87a27df094b369ea62d1595c/artifact81af52d97d2016a9e65529f25dda35361c2a94fc. RER032/AD022/ARCH019parentPass/IR001–041/CRR062; Large/High Reviewed.
+- PriorAPI24Pass95.9% remains RER028/IR038. Earlier API25IR039 unsigned interrupted evidence has no inferred result. No prior open attributed failure carried fromAPI24; historical API20 firstguard/delay/older stall causes remain unassigned.
+- Fresh renewal server156/874, core6/29, Electron9/39 on byte-unchanged carried paths; currentCRR062 web156/1002 and exact3/14; builds/guards/localization0/Briefpack/registeredA–F. Repeats nonadditive. Earlier stale catalog tuple corrected after validity record; incorporated/disclosedIR041, no current dirty test delta. CRR059 priorfive-file review preserved; later successful package requires applicable proportional disposition.
+- Actualopen_tab import4Agents/2Teams/2Orgs; Team/Org authoring/Apollo/partial/locale/roundtrip; exact config/runtimefailureRetry/default;12ordinarydirection cases;8formalcycles32acceptedupdates with exact provider/MCPsession/rpc/adapter/FIFO/durable/HTTP/provider correlation;18accepted notifications pluscontrolledrejection; fresh exact rootAgent/rootTeam/recursive/mounted live transitions; repeatedidentity/relevance; real stoppedmodel Save/reopen/same-provider saved-model continuation. No old pass substitution.
+- API-FIND-028: normal UI-emitted configured Org route, Back/Refresh390, visible exact settled task-Team dispatcher link -> handled Error500/history unavailable. Warm and drawer-initialized controls succeed; canonicalserverhealthy/rootfilesunchanged. Current source/historypanel mount dependency supports preliminary ImplementationLocalFix. Original handcrafted URL not sole evidence; exit0 helper not pass over coldPassedfalse.
+- Remaining full compactlocale/inactive/member permutations, frozenopen scope/UIStop, currentbrowserrecovery, mainrestart/Restore/missingbinding/compaction, dedicatedlivefirstwinner remainNotTested. Ownedmigration/strictnegative/derivedfailureprocess checks passed; cleanupSIGTERMchild0 does not substitute held lifecycle.
+- Postrepository84.9%Required -> final50/95/90/98/75/50/90=78.3% **Fail**. All critical proof/95mean gate unmet independently ofscore.
+- Ownedserver cleanexit0, rendererSIGTERM, tabs13/14closed/observerinspectorcollectoroff/sharedauthpreserved;4generatedoutputs17owntmpdirs7envfilesremoved;19fixturehashesunchanged. CurrentHEAD/otherownerintegrity in final/integrity-result.json; no source/staging/commit.
+- Canonical investigation/report/ledger/revision updated; /home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-025-renewed-crr061/case-reconciliation.md, final/confidence.json, cleanup-result.json and live/API-FIND-028-cold-narrow-task-navigation.md are retained. Fresh dynamic route requested focusedfailure-origin review, not successful-test review or Delivery readiness.
+
+### API-REV-026 — Fresh full CRR064 renewal; standalone settled-task navigation failure
+- Completed 2026-09-11T15:55:24.262517+00:00; RER032/AD022/parentARCH019Pass/IR001–042/CRR064; source14f7acfce33d28b74d619ce7d10bf13903c20c3f/artifactb5e56b4659c1df80e7fb535eb683e4bfad00d93c; Large/HighReviewed. PriorAPI25Fail78.3 remains historical; no oldPass substitution.
+- PriorAPI-FIND028 resolved in actual current cold390 emittedOrgURL/Back/Refresh/samevisibletasklink: exactroot/AgentRun/address/readOnly, onehistoryread, noError/activation/write in quiescent fullhash observation. Initial hashwindow overlapped previouscallerreply; originalincompletebeforemap preserved, no sourceattribution.
+- Fresh server156/874, web157/1010, core6/29, Electron9/39 =1952/328 nonoverlapping; exactcold2/14 and focusedoverlaps separate; builds16routes/bootstrap/guards/audit0/devkit/Briefpack/registeredA–F passed.
+- Current actualimport/authoring/Apollo/localehandoffs/fieldfreeroundtrip/configruntimefailureRetry/default;4configured+8taskmessagedirections;8formalcycles32commands exactprovider/MCPsessionRPC/adapter/FIFOadmission/start/durable/memory/HTTP;18acceptednoticespluscontrolledrejection; freshsamewindowrootAgent/rootTeam/recursive/mounted transitions; repeats/relevance; stoppedmodelSave/reopen/savedmodelrealcontinuation;10Orgcompactmode/width taskvisits andactiveAPIstrict/inspection; ownedmigration/derivedwritefailure processchecks passed.
+- **API-FIND029**: shared standaloneTeam acceptedsettledtask named verifier link -> realError500/notvisiblememberofexactTeam. Normaltree/button confirmation no syntheticquery/noactivation/no writes; taskstillaccepted. PreliminaryImplementationLocalFix, independentownerreviewrequired. Initial consumedTeamquerypostcondition is APIownedcorrection, not explanation forrealError500. No tasktoolstall/servercrash inferred.
+- Remainingcompactlocale/standalone390/inactive/frozen/permutations, dedicatedlivefirsttitle, browserrecovery/exhaustion, mainrestart/Restore/compaction/stoppednegative/frozenopenUIStop heldNotTested. Nooldpasssubstitution. Historicalunknownfirstguard/delay/stalls unchanged.
+- Actual postrepository84.9%Required -> final50/95/90/98/80/50/90=**79.0% Fail**; criticalAC034failureindependentlyblocksPass.
+- No source/durabletestchange/staging/commit; CRR059priorfivefilePass retained, laterapplicableproportionaldispositionrequired. Sharedbrowser/auth preserved; tabs15/16closed; servercleanexit0, ownrendererSIGTERM/observersoff;4generatedoutputs17owntmpdirs6envfilesremoved;19fixtureunchanged. Canonicalreports/ledger/revision andAPI26case-reconciliation/finalconfidence/cleanup/integrity persisted; focusedfailure-originroute, noDeliveryreadiness.
+
+### API-REV-027 — Full current CRR066 renewal; exact retained Team task fix validated
+
+- Trigger: Code Reviewer CRR066, canonical code-review-report.md; user full retesting. RER032 / cumulative AD022 / parentAD021-ARCH019 Pass / IR001–043; artifact6da826f8c246c197a70cceb69e19e33fdbdfdf69/source4ffcdf733ff597a0d2ae94587eb91ec47f749501. Large/High Reviewed.
+- Previous result: **API26 Fail79.0%**. Current: **Pass95.6%**, 2026-09-11T17:34:48.711002+00:00. Fresh full matrix, not delta or old-result reuse.
+- Durable delta: none. Temporary exact retained normal-tree helper, second same-address standalone formal cycle, actual retained transport replacement, scoped observation corrections only. Historical CRR059 five-file review unchanged; request current separate proportional N/A disposition.
+- Added/rechecked:9cycles/36localupdates,35successful nativepairs plus one disclosed post-success providerwrappererror;12ordinarydirections and restored equality; repeatedtask/host/provider/noactivation readonly active/inactive/desktop390/locales, fresh same-window4scopepublication, all authoring/config/model/compaction/task/status/summary/history/strict/migration/recovery/frozenStop/tworestarts/shutdown.
+- Repository: server156/874, web160/1039, core6/29, Electron9/39, builds/guards/audit0/Brief/devkit; exact overlaps not additive. Real production browser tabs17–22, own server8600/staticrenderer3600, freshdata/currentCodex; no nativeAppImage claim.
+
+| Prior reference | Previous classification | Current resolution | Evidence |
+|---|---|---|---|
+| API-FIND029 | Source-resolved IR043, API26 observed standalone retained target Error500 | **Execution-resolved** through normal tree/Tasks named target; exact original/repeat IDs/content/Activity/read_only, no write/reactivation/fallback; bothwidths/locales/inactive and real liveevent/replacement snapshot retention | API27/live/CLEAN-TEAM-retained-current.json; CLEAN-TEAM-REPEAT-retained-current.json; CLEAN-TEAM-retained-inactive.json; CLEAN-TEAM-live-continuity.json; CLEAN-TEAM-reconnect.json |
+| API-FIND028 | API26 real coldOrg resolved | Fresh current cold390 no-drawer +inactive continuity pass | API27/live/CLEAN-navigation-quiescent-confirmation.json; repository/cold-navigation-inactive.json |
+| API26 held cumulative cases | Not Tested | Fresh current full required scopes complete; originalDirect pre-readiness stopped-view observation remains incomplete, separate secondphase exacthistory-readyjourney passes | API27/case-reconciliation.md; RESTORE-direct-second.json; final-live-state.json |
+
+- Original nonzero observations retained/disposed explicitly in current report: APIownedsetup/selector/observation scope; not product defects. Repeatedrequest_revision nativewrapperReferenceError afterlocal success is runtime-only, not outerprovider success. Historical unknownstalls/API20firstguard unchanged. No acceptedwork replayed.
+- Cleanup:3SIGTERMexit0,2purestartupbytes+mtime unchanged; own6tabs/observers/processes/env/initiallyabsentbuildoutputs/currenttmp removed; fixture19unchanged and all non-APIotherownerbaseline hashes preserved; sourceHEAD/no source/durable delta/diffchecks pass.
+- Artifacts: canonical investigation/execution/ledger/revision plus API27 case-reconciliation/confidence/cleanup/integrity and originalfailure receipts.
+- New/remaining API finding: none. Required next recipient: Code Reviewer via current handoff rules for separate applicable proportional disposition. Native/package/docs/userverification/release/deployment downstream, not signedoff.

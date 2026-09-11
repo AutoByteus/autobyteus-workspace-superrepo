@@ -20,6 +20,9 @@ independently launchable and keep their own coordinator and Team-local handoffs.
 - Handoff sources are exact Agents. Destinations may be an Agent or a mounted
   Team; a Team destination resolves through its direct coordinator.
 - Save is atomic and retains a failed draft for correction.
+- Mutation members contain only `memberName`, `ref`, `refType`, and `refScope`;
+  Apollo response metadata such as `__typename` is not echoed into input.
+  An omitted optional update remains omitted rather than resetting stored intent.
 
 AgentOrg has no coordinator field, initial recipient, or implicit first member.
 
@@ -121,21 +124,37 @@ A mounted Team uses the same Team workspace panel and task/communication
 presentation as a standalone Team. Its live task monitor continues to update
 without requiring focus-away/refocus.
 
-Every selected configured Org Agent, whether direct or inside a mounted Team,
-has one right-side collaboration surface identified with the owning AgentOrg.
-Its **Messages** section uses the shared Team interaction language and projects
-only root messages in which the selected Agent is sender or receiver. Rows show
-truthful sent/received direction, the exact counterpart across the complete Org,
-content, time, and message-owned references. Direct-to-direct,
-direct-to-mounted, mounted-to-direct, and mounted-to-mounted configured pairs
-therefore use the same surface; messages involving a task-scoped endpoint are
-excluded from this configured-member perspective.
+Every selected retained Org Agent has independent **Messages** and **Tasks**
+facets in the shared collaboration surface. This includes configured direct and
+mounted Agents, fresh task Agents, and Agents inside task Teams; a direct Agent
+does not need a synthetic Team context. `AgentOrgExecutionViewIndex` correlates
+the exact retained AgentRun, physical host, task record, and captured source.
+Logical addresses alone do not identify a task instance: repeated delegations
+to the same address remain separate executions.
 
-The receiver's center event monitor also receives exactly one inbound member
-input after a configured-pair message is durably accepted. Live updates and
-rehydration use the same root-owned message identities, so reconnect, history,
-and Restore do not invent a second Team-owned copy. Reference content stays on
-the AgentOrg-rooted message route.
+**Messages** projects only committed ordinary root messages in which the exact
+selected AgentRun is sender or receiver. All admitted configured/task endpoint
+pairs share truthful sent/received direction, counterpart identity, content,
+time, and message-owned references. The receiver's center monitor receives one
+inbound member input from the same committed message before its reserved input
+is released. Live updates, history, and Restore retain the same root-owned
+identity; there is no second Team ledger or configured-only presentation gate.
+References stay on the AgentOrg-rooted message route.
+
+**Tasks** projects exact durable assignments, submissions, reviews,
+interruptions, and their references. A record is relevant to its exact delegator,
+task Agent, or members of the assigned fresh task Team. Separately delegated
+descendants do not join that roster merely through ancestry. Participant links
+open the exact retained AgentRun, including settled instances, without selecting
+the current configured source at the same address. The shared section owns
+layout and local selection; the Org adapter owns record projection and routes.
+
+Genuine accepted task-system inputs appear in the recipient event monitor, not
+as ordinary Messages. A task record alone never fabricates a notification or
+receipt. A rejected notification leaves the committed task record visible and
+reports the warning truthfully. Fresh message/task/status publications update
+already-mounted facets without refocus; snapshots are the recovery path, not a
+substitute for normal live publication.
 
 The left **Workspaces** hierarchy remains mounted across configuration, active,
 focused, and stopped/history states. Within each Workspace it retains the
@@ -198,6 +217,17 @@ the last good slice instead of blanking the entire navigation tree.
 
 - Stopped history retains the AgentOrg V1 execution tree, messages, task records,
   member memory, and provider bindings.
+- Read-only inspection uses `getAgentOrgRunInspection` and exact retained
+  AgentRun selection. It reads the current strict package without activating,
+  restoring, migrating, or repairing it. Missing/unreadable records are errors,
+  not fabricated empty history. Configuration comes from the captured launch
+  snapshot and projections use the actual execution/provider binding, never a
+  same-address configured Agent's transcript or the Org-root memory path.
+- Settled task executions remain inspectable after their live row retires.
+  Inactive/settled inspection retains Messages, Tasks, references, configuration,
+  and monitor history as read-only; it exposes no composer, tool-decision, or
+  interrupt authority. Inactive contexts initialize offline. Inspection and
+  explicit Restore remain distinct operations.
 - Restore rebuilds the same logical placements and preserves supported provider
   conversation identity.
 - A stopped Team can restore independently through its own Team root journey.
@@ -213,14 +243,23 @@ the last good slice instead of blanking the entire navigation tree.
 - `agentOrgRunConfigStore.ts`: launch draft, sparse overrides, readiness, and
   admission.
 - `agentOrgRunStore.ts`: create/restore/terminate and selected Org.
-- `agentOrgContextsStore.ts`: hydrated execution contexts.
+- `agentOrgContextsStore.ts`: hydrated execution contexts and owned read-only
+  inspection requests.
+- `services/agentOrgExecution/agentOrgExecutionViewIndex.ts`: derived retained
+  execution/task identity index; not another persistence or lifecycle owner.
+- `services/agentOrgExecution/agentOrgTaskPresentation.ts` and
+  `agentOrgCommunicationPerspective.ts`: root-owned Tasks and Messages facets.
 - `services/agentOrgExecution/agentOrgStreamingService.ts`: stream protocol.
 - `services/agentOrgExecution/agentOrgContextHydration.ts`: initial/reopen
   hydration.
 - `components/agentOrgs/AgentOrgExperience.vue`: catalog/detail/authoring.
 - `components/workspace/config/AgentOrgRunConfigPanel.vue`: launch form.
-- `components/workspace/history/AgentOrgRunHistoryPanel.vue`: root/tree
-  history and exact focus.
+- `components/workspace/history/WorkspaceAgentOrgHistoryCollection.vue`:
+  AgentOrg rows within the unified Workspaces projection. The separate
+  `AgentOrgRunHistoryPanel.vue` history owner was removed.
+- `components/workspace/collaboration/CollaborationOverviewPanel.vue` and
+  `CollaborationDelegatedTasksSection.vue`: shared independent facets and Tasks
+  layout, replacing the Team-only Tasks section.
 - `components/workspace/org/AgentOrgWorkspaceView.vue`: focused/unfocused and
   stopped workspace states plus the exact-member config/Back adapter.
 - `components/workspace/org/AgentOrgMemberRunConfigPanel.vue`: locked current-

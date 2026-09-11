@@ -120,15 +120,24 @@ task lineage, and cross-root targets fail closed.
 
 The AgentOrg communication sidecar remains the single root message authority.
 After an inter-Agent append is durable, the root stream publishes that message.
-When both correlated endpoints are configured Org members (direct Agents or
-Agents in directly mounted Teams), the same commit also presents exactly one
-`MEMBER_INPUT_MESSAGE` to the receiving Agent before releasing its reserved
-input. The presentation preserves the canonical sender address, content,
-reference context, parent message id, origin, and committed time. Messages with
-a task Agent or task-Team Agent endpoint remain valid root communication where
-otherwise admitted, but do not become configured-member center presentation.
+For every admitted ordinary endpoint pair, the same commit also presents exactly
+one `MEMBER_INPUT_MESSAGE` to the receiving Agent before releasing its reserved
+input. Configured direct/mounted Agents, task Agents, and task-Team Agents all
+use this path. Presentation correlates retained exact identities; it does not
+re-admit a committed message against later liveness or a configured-only gate.
+The presentation preserves canonical sender address, content, reference context,
+parent message id, origin, and committed time.
 Rejected, failed, self-targeted, cross-root, or uncommitted sends publish no
 receiver input event.
+
+Task-system notification presentation is separate from ordinary communication.
+The shared `task-system-input-presentation.ts` helper marks genuine SYSTEM
+notification provenance, display content, and backend-response suppression.
+Existing execution-handle acceptance controls recipient presentation; task
+records do not fabricate accepted inputs. A committed task update remains durable
+if its notification is rejected, with an explicit warning rather than a false
+receipt. There is no additional notification ledger, retry queue, or provider
+failure inferred from a controlled notification rejection.
 
 ## Tasks, Status, And Lifecycle
 
@@ -201,6 +210,26 @@ a handled settlement tail, so one caller-visible write rejection cannot escape
 as an unhandled rejection, poison later same-path writes, or retain stale queue
 ownership.
 
+### Retained Execution Inspection
+
+`getAgentOrgRunInspection` returns the existing execution-view DTO through the
+run service and manager's existing per-root transition lane. For an active root,
+the manager captures and closes a coherent package snapshot connection. For an
+inactive root, it strictly reads and jointly validates the execution tree, task
+records, and communication sidecar. Missing or unreadable families fail instead
+of becoming empty history. Inactive views have no live statuses; retained client
+contexts initialize offline.
+
+Inspection does not activate providers, Restore, rewrite packages, migrate, or
+repair data. Exact retained task Agent/Team identity survives settlement and
+distinguishes repeated runs at one logical address. Member projections use the
+actual retained physical execution/provider binding, not the configured source's
+memory directory or an Org-root fallback. Configuration derives from captured
+launch data rather than current mutable definitions. The existing tree and task
+record families are sufficient; this inspection query adds no persisted family
+or migration. Live settlement publishes the complete updated view, retiring live
+task rows without discarding retained inspection or introducing a second cache.
+
 ## Migration And External Publication
 
 Required startup migration
@@ -240,6 +269,7 @@ Definition GraphQL operations:
 Run GraphQL operations:
 
 - `createAgentOrgRun`, `restoreAgentOrgRun`, `terminateAgentOrgRun`
+- `getAgentOrgRunInspection` (read-only retained package, distinct from Restore)
 - `getAgentOrgMemberRunProjection`
 - `getAgentOrgMemberEventMonitorActiveTracePage`
 - `getAgentOrgExecutionCheckpoint`
