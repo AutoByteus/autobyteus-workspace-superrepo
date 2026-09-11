@@ -56,3 +56,9 @@ User confirmation is recorded in `evidence/delivery-DR003/user-verification.json
 
 ### DR-003 Final Result
 Repository finalization and cleanup completed after explicit user confirmation. Current handoff/release reports contain the final archived paths and evidence. Long-lived doc hashes remain unchanged; no new docs ambiguity or implementation issue. Terminal package eligible; no public release requested.
+
+## DR-004 — Requested Release Preparation
+- User authorized a new release after completed DR-003. Latest origin/personal is the finalized f3de2f67f state, with no newly integrated code.
+- Seven canonical behavior docs remain accurate; no new behavior/API/architecture documentation change is needed.
+- Archived release notes are now curated functional notes for v1.4.69, using the root release template. Prior candidate/local-build/acceptance notes and reports remain byte-preserved in evidence/delivery-DR004.
+- Release helper will copy those notes into .github/release-notes/release-notes.md. Publication and build verification remain pending, not assumed successful.

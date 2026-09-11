@@ -1,13 +1,5 @@
 # Delivery / Release / Deployment Report — stopped-run-compatible-model
 
-## Current Release Round — DR-004 In Progress
-
-The user explicitly requested “lets do a new release thanks” on 2026-09-11, after DR-003 ticket acceptance/finalization. This authorizes the documented new personal release, targeting **v1.4.69**. Latest origin/personal was fetched and is identical to finalized `f3de2f67ffbb50db9c02e8da4d4d5ea69448d71f`; ff-only integration is Already up to date. No new code/test state or renewed functional acceptance is needed. Prior DR-003 no-release outcome remains historical below, not the scope of this new round.
-
-README release helper will synchronize desktop/gateway versions, curated notes and managed manifest, commit/tag/push, and start five tag workflows. Release/publication is **Pending**, not yet Completed; no successful terminal handoff for DR-004 until applicable publication/verification gates finish. No local services, user data or TestFlight public App Store approval will be managed. Prior reports/notes are preserved in `evidence/delivery-DR004/prior-*`.
-
-## Prior DR-003 Result (Historical)
-
 ## Final Status — DR-003
 **Delivery Completed.** Explicit ticket verification **Yes**; repository finalization **Completed**; applicable release/deployment/rollout **Not required**; safe task-worktree/local-branch cleanup **Completed**; unresolved ticket blocker **None**. Classification **Medium / High / Reviewed** unchanged. Historical DR-001/002 holds remain in the revision record and prior-report snapshots; this is the current authority.
 

@@ -1,13 +1,5 @@
 # Final Handoff — stopped-run-compatible-model
 
-## Current Release Round — DR-004 In Progress
-
-The user explicitly requested “lets do a new release thanks” on 2026-09-11, after DR-003 ticket acceptance/finalization. This authorizes the documented new personal release, targeting **v1.4.69**. Latest origin/personal was fetched and is identical to finalized `f3de2f67ffbb50db9c02e8da4d4d5ea69448d71f`; ff-only integration is Already up to date. No new code/test state or renewed functional acceptance is needed. Prior DR-003 no-release outcome remains historical below, not the scope of this new round.
-
-README release helper will synchronize desktop/gateway versions, curated notes and managed manifest, commit/tag/push, and start five tag workflows. Release/publication is **Pending**, not yet Completed; no successful terminal handoff for DR-004 until applicable publication/verification gates finish. No local services, user data or TestFlight public App Store approval will be managed. Prior reports/notes are preserved in `evidence/delivery-DR004/prior-*`.
-
-## Prior DR-003 Result (Historical)
-
 ## Authoritative Delivery Result
 **DR-003 — Delivery Completed.** User verification, repository finalization and safe task cleanup are complete. Public release/tag/deployment/rollout: **Not required**, not performed. This is the terminal package prepared for Requirements Engineer verification, not an assertion that the separate approval issue was fixed.
 
