@@ -1,6 +1,7 @@
 import type { TranslationCatalog } from "../../runtime/types";
 
 const messages = {
+  "workspace.agentOrg.inspectionUnavailable": "Saved Agent Org data is unavailable. No run was started.",
   "workspace.runModelConfig.loading": "Loading run configuration…",
   "workspace.runModelConfig.runUnavailable": "This run is no longer available.",
   "workspace.runModelConfig.save": "Save",

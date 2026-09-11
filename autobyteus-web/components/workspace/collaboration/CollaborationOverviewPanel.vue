@@ -7,12 +7,11 @@
     />
 
     <div
-      v-if="team"
       class="flex flex-col transition-all duration-300 ease-in-out"
       :class="delegatedTasksExpanded ? 'min-h-0 flex-1' : 'flex-none'"
     >
-      <TeamDelegatedTasksSection
-        :team="team"
+      <CollaborationDelegatedTasksSection
+        :tasks="tasks"
         :collapsed="!delegatedTasksExpanded"
         class="h-full"
         @toggle="toggleSection('delegatedTasks')"
@@ -23,26 +22,26 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget'
+import type { CollaborationTasksContextView } from '~/types/workspace/collaborationTasksContextView'
 import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView'
-import TeamDelegatedTasksSection from '~/components/workspace/team/TeamDelegatedTasksSection.vue'
+import CollaborationDelegatedTasksSection from './CollaborationDelegatedTasksSection.vue'
 import CollaborationMessagesSection from './CollaborationMessagesSection.vue'
 
 type OverviewSection = 'messages' | 'delegatedTasks'
 const props = defineProps<{
   messages: CollaborationMessagesContextView
-  team?: TeamWorkspaceContextView | null
+  tasks: CollaborationTasksContextView
 }>()
 const expandedSection = ref<OverviewSection | null>('messages')
 const lastAutoOpenedTaskSignatureKey = ref('')
 const messagesExpanded = computed(() => expandedSection.value === 'messages')
 const delegatedTasksExpanded = computed(() => expandedSection.value === 'delegatedTasks')
-const taskEntries = computed(() => props.team?.listDelegatedTaskEntries() ?? [])
+const taskEntries = computed(() => props.tasks.listDelegatedTaskEntries())
 const taskSignature = computed(() => taskEntries.value
-  .map((entry) => [entry.entryKey, entry.kind, entry.taskId ?? '', entry.runId ?? ''].join(':'))
+  .map((entry) => [entry.entryKey, entry.kind, entry.taskId, entry.runId].join(':'))
   .sort()
   .join('|'))
-const scopeKey = computed(() => `${props.messages.rootKind}:${props.messages.rootRunId}`)
+const scopeKey = computed(() => `${props.messages.rootKind}:${props.messages.rootRunId}:${props.messages.focusedAgentRunId}`)
 
 watch([scopeKey, taskSignature], ([nextScope, nextSignature], previous) => {
   const scopeChanged = nextScope !== (previous?.[0] ?? '')

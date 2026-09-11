@@ -1,3 +1,6 @@
+import type { AgentOrgIndexedAgentExecution } from "../services/agent-org-execution-index.js";
+import { buildMemberInputPresentationEvent } from "../../agent-collaboration/execution/events/member-input-presentation-event-builder.js";
+import { projectAgentPresentationMessage } from "../../agent-collaboration/execution/events/agent-presentation-message-projector.js";
 import type { AgentInputUserMessage } from "autobyteus-ts/agent/message/agent-input-user-message.js";
 import type { AgentOperationResult } from "../../agent-execution/domain/agent-operation-result.js";
 import type { AgentRunInputOptions, AgentRunInputReservationResult } from "../../agent-execution/input/agent-run-input-contract.js";
@@ -16,7 +19,7 @@ import type { AgentOrgRunExecutionTreeSnapshot } from "./agent-org-run-execution
 import type { AgentOrgRunEvent } from "./agent-org-run-event.js";
 import type { AgentOrgTaskDelegationRecordsFileV1 } from "../persistence/agent-org-task-delegation-records-v1.js";
 import type { AgentOrgCommunicationMessagesFileV1 } from "../persistence/agent-org-communication-messages-v1.js";
-import { AgentOrgExecutionIndex, type AgentOrgIndexedAgentExecution } from "../services/agent-org-execution-index.js";
+import { AgentOrgExecutionIndex } from "../services/agent-org-execution-index.js";
 import { AgentOrgRootAgentExecutionRegistry } from "../services/agent-org-root-agent-execution-registry.js";
 import { AgentOrgTeamExecutionDirectory } from "../services/agent-org-team-execution-directory.js";
 import { AgentOrgRunPersistenceCoordinator } from "../services/agent-org-run-persistence-coordinator.js";
@@ -42,23 +45,6 @@ export type AgentOrgRunPackageSnapshot = Readonly<{
   messages: AgentOrgCommunicationMessagesFileV1;
   statuses: readonly CollaborationAgentStatusSnapshot[];
 }>;
-
-type ConfiguredOrgAgentExecutionIdentity = Readonly<
-  Pick<AgentOrgIndexedAgentExecution, "agentRunId" | "address" | "host"> & {
-    executionKind: "configured";
-  }
->;
-
-type OrgCommittedMessagePresentationEligibility =
-  | Readonly<{
-      kind: "configured_pair";
-      sender: ConfiguredOrgAgentExecutionIdentity;
-      receiver: ConfiguredOrgAgentExecutionIdentity;
-    }>
-  | Readonly<{
-      kind: "preserved_task_pair";
-      direction: "configured_to_task" | "task_to_configured" | "task_to_task";
-    }>;
 
 /** Native coordinator-free AgentOrg aggregate and sole live owner of its scope. */
 export class AgentOrgRun implements ActiveRootMessageBoundary {
@@ -357,53 +343,17 @@ export class AgentOrgRun implements ActiveRootMessageBoundary {
     message: AgentOrgCommunicationMessagesFileV1["messages"][number],
     receiverInput: AgentInputUserMessage,
   ): void {
-    const eligibility = this.classifyCommittedMessageEndpoints(
-      message.senderAgentRunId,
-      message.receiverAgentRunId,
-    );
-    if (eligibility.kind !== "configured_pair") return;
-
-    const identity = this.identityFor(eligibility.receiver.agentRunId, eligibility.receiver.address);
-    const adapted = this.presentation.adapt(identity, {
-      kind: "member_input",
-      message: receiverInput,
-      receivedAt: message.createdAt,
+    // Admission already succeeded. Retained identities, not current liveness,
+    // correlate this post-durable presentation consequence.
+    this.index.requireAgent(message.senderAgentRunId);
+    const receiver = this.index.requireAgent(message.receiverAgentRunId);
+    const identity = this.identityFor(receiver.agentRunId, receiver.address);
+    const event = buildMemberInputPresentationEvent({
+      execution: identity, message: receiverInput, receivedAt: message.createdAt,
     });
-    if (adapted.kind !== "publish") {
-      throw new Error(adapted.kind === "rejected"
-        ? adapted.message
-        : `Committed AgentOrg message '${message.messageId}' produced no receiver presentation.`);
-    }
-    this.options.publisher.publish({ kind: "agent_presentation", execution: identity, message: adapted.message });
-  }
-
-  private classifyCommittedMessageEndpoints(
-    senderAgentRunId: string,
-    receiverAgentRunId: string,
-  ): OrgCommittedMessagePresentationEligibility {
-    const sender = this.index.getAgent(senderAgentRunId);
-    const receiver = this.index.getAgent(receiverAgentRunId);
-    if (!sender || !receiver
-      || !this.index.isLiveAgent(sender.agentRunId)
-      || !this.index.isLiveAgent(receiver.agentRunId)) {
-      throw new Error(`Committed AgentOrg message '${senderAgentRunId}' -> '${receiverAgentRunId}' has an unclassified endpoint.`);
-    }
-    const senderConfigured = sender.executionKind === "configured";
-    const receiverConfigured = receiver.executionKind === "configured";
-    if (senderConfigured && receiverConfigured) {
-      return Object.freeze({
-        kind: "configured_pair",
-        sender: sender as ConfiguredOrgAgentExecutionIdentity,
-        receiver: receiver as ConfiguredOrgAgentExecutionIdentity,
-      });
-    }
-    return Object.freeze({
-      kind: "preserved_task_pair",
-      direction: senderConfigured
-        ? "configured_to_task"
-        : receiverConfigured
-          ? "task_to_configured"
-          : "task_to_task",
+    this.options.publisher.publish({
+      kind: "agent_presentation", execution: identity,
+      message: projectAgentPresentationMessage(event),
     });
   }
 

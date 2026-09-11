@@ -75,6 +75,11 @@ export class AgentOrgRunResolver {
   private readonly service = getStudioAgentOrgRunService();
   private readonly memberViews = getAgentOrgMemberRunViewProjectionService();
 
+  @Query(() => GraphQLJSON)
+  getAgentOrgRunInspection(@Arg("orgRunId", () => String) orgRunId: string) {
+    return this.service.getInspection(orgRunId);
+  }
+
   @Query(() => AgentOrgMemberRunProjectionPayload)
   async getAgentOrgMemberRunProjection(
     @Arg("orgRunId", () => String) orgRunId: string,

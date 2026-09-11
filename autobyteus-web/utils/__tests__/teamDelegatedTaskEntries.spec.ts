@@ -91,7 +91,11 @@ describe('deriveDelegatedTaskEntries', () => {
     expect(deriveDelegatedTaskEntries(context, 'coordinator-run')).toEqual([{
       kind: 'task_agent',
       entryKey: 'task:task-cycle',
-      teamRunId: ROOT,
+      root: { kind: 'agent_team', runId: ROOT },
+      participants: [
+        { agentRunId: 'coordinator-run', address: '/coordinator', label: 'coordinator' },
+        { agentRunId: 'task-worker-run', address: '/worker', label: 'worker' },
+      ],
       taskId: 'task-cycle',
       runId: 'task-worker-run',
       displayStatus: 'accepted',

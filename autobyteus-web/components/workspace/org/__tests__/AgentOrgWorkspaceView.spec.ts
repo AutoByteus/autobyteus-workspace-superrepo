@@ -29,6 +29,8 @@ vi.mock('~/stores/activeContextStore', () => ({
   useActiveContextStore: () => ({
     get activeWorkspaceTarget() { return state.target },
     connectAgentOrg: connect,
+    inspectAgentOrg: vi.fn(),
+    selectAgentOrg: vi.fn(),
     disconnectAgentOrg: disconnect,
     agentOrgContextFor: () => state.context,
     agentOrgErrorFor: () => state.error,
@@ -38,19 +40,19 @@ vi.mock('~/stores/workspaceCenterViewStore', () => ({
   useWorkspaceCenterViewStore: () => center,
 }))
 
-const context = (phase: 'live' | 'reopen_required' = 'live') => ({
+const context = (phase: 'live' | 'reopen_required' | 'historical' = 'live') => ({
   phase,
   error: phase === 'reopen_required' ? 'Sequence gap' : null,
   executionTree: { rootOrg: { orgDefinitionId: 'org-def' } },
 })
 const directTarget = {
-  kind: 'agent_org_direct_agent',
+  kind: 'agent_org_direct_agent', access: 'live',
   root: { orgRunId: 'org-run' },
   address: '/writer',
   context: { state: { runId: 'agent-run' } },
 }
 const mountedTeamTarget = {
-  kind: 'agent_org_team_member',
+  kind: 'agent_org_team_member', access: 'live',
   root: { orgRunId: 'org-run' },
   address: '/delivery/reviewer',
   context: { state: { runId: 'mounted-agent-run' } },
@@ -163,7 +165,7 @@ describe('AgentOrgWorkspaceView', () => {
 
   it('opens an inactive root as terminal history without starting a live stream', () => {
     route.query.mode = 'history'
-    state.context = null
+    state.context = context('historical')
     state.target = null
     const wrapper = mountSubject()
 

@@ -18,6 +18,7 @@ export type LocatedAgentOrgAgentExecution = Readonly<{
   ancestorTeamRunIds: readonly string[];
   agentRunId: string;
   memberAddress: AgentTeamAddress;
+  platformAgentRunId: string | null;
   configuredPlacement: ConfiguredAgentExecutionNode | null;
   memoryDir: string;
   tree: AgentOrgRunExecutionTreeSnapshot;
@@ -113,10 +114,11 @@ export class AgentOrgExecutionTreeLocationService {
       ancestorTeamRunIds: scope.ancestorTeamRunIds,
       agentRunId,
       memberAddress: agent.address,
+      platformAgentRunId: agent.source.platformAgentRunId,
       configuredPlacement: configured && "agentRunId" in configured ? configured : null,
       memoryDir: this.layout.getRootedAgentRunDirPath(scope, agentRunId),
       tree,
-      isActive,
+      isActive: isActive && index.isLiveAgent(agentRunId),
     });
   }
   private async listRootIds(): Promise<string[]> {

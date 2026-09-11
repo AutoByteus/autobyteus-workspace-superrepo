@@ -12,13 +12,24 @@ export const projectAgentOrgExecutionView = (
   run: AgentOrgRun,
   snapshot: AgentOrgRunPackageSnapshot,
   baseChangeSequence: number,
-): RootExecutionViewDto => RootExecutionViewDtoSchema.parse({
+): RootExecutionViewDto => projectAgentOrgExecutionSnapshot({
+  orgRunId: run.orgRunId, isActive: run.isActive(), snapshot, baseChangeSequence,
+});
+
+export const projectAgentOrgExecutionSnapshot = (input: Readonly<{
+  orgRunId: string;
+  isActive: boolean;
+  snapshot: AgentOrgRunPackageSnapshot;
+  baseChangeSequence: number;
+}>): RootExecutionViewDto => {
+  const { orgRunId, isActive, snapshot, baseChangeSequence } = input;
+  return RootExecutionViewDtoSchema.parse({
   root_subject_kind: "agent_org",
-  root_run_id: run.orgRunId,
+  root_run_id: orgRunId,
   schema_version: 1,
   root_org: {
     base_change_sequence: baseChangeSequence,
-    is_active: run.isActive(),
+    is_active: isActive,
     execution_tree: snapshot.tree,
     task_records: snapshot.tasks,
     communication_messages: snapshot.messages,
@@ -32,7 +43,8 @@ export const projectAgentOrgExecutionView = (
       error_details: null,
     })),
   },
-});
+  });
+};
 
 export const projectAgentOrgExecutionEvent = (
   run: AgentOrgRun,

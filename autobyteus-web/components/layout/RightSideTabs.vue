@@ -42,7 +42,7 @@
         <CollaborationOverviewPanel
           v-if="activeMessagesView"
           :messages="activeMessagesView"
-          :team="activeTeamView"
+          :tasks="activeTasksView!"
         />
       </div>
       <div
@@ -107,11 +107,9 @@ const { toggleRightPanel } = useRightPanel();
 const currentAgentRunId = computed(() => activeContextStore.activeAgentContext?.state.runId ?? '');
 const activeWorkspaceId = computed(() => activeContextStore.activeWorkspaceTarget?.context.config.workspaceId ?? undefined);
 const activeWorkspaceMetadata = computed(() => activeContextStore.activeWorkspaceTarget?.context.config.workspaceMetadata ?? null);
-const activeTeamView = computed(() => {
+const activeTasksView = computed(() => {
   const target = activeContextStore.activeWorkspaceTarget;
-  return target?.kind === 'standalone_team_member' || target?.kind === 'agent_org_team_member'
-    ? target.team
-    : null;
+  return target && 'collaborationTasks' in target ? target.collaborationTasks : null;
 });
 const activeMessagesView = computed(() => {
   const target = activeContextStore.activeWorkspaceTarget;

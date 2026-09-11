@@ -1,3 +1,4 @@
+import { isTaskDelegationSystemTaskNotificationMessage, getTaskDelegationSystemTaskNotificationDisplayContent } from "./task-system-input-presentation.js";
 import type { AgentPresentationMessage } from "@autobyteus/agent-presentation-contracts";
 import type { CollaborationAgentExecutionEvent } from "../domain/collaboration-agent-execution-event.js";
 import {
@@ -52,11 +53,19 @@ export class CollaborationAgentPresentationEventAdapter {
       const result = this.agentRuns.adapt(rawEvent.event);
       return result.kind === "publish" ? publish(result.event) : result;
     }
-    if (rawEvent.kind === "member_input") return publish(buildMemberInputPresentationEvent({
-      execution,
-      message: rawEvent.message,
-      receivedAt: rawEvent.receivedAt,
-    }));
+    if (rawEvent.kind === "member_input") {
+      if (isTaskDelegationSystemTaskNotificationMessage(rawEvent.message)) return publish(Object.freeze({
+        eventType: "SYSTEM_TASK_NOTIFICATION",
+        details: Object.freeze({
+          sender: Object.freeze({ kind: "system" }),
+          content: getTaskDelegationSystemTaskNotificationDisplayContent(rawEvent.message) ?? rawEvent.message.content,
+        }),
+        statusHint: null,
+      }));
+      return publish(buildMemberInputPresentationEvent({
+        execution, message: rawEvent.message, receivedAt: rawEvent.receivedAt,
+      }));
+    }
     if (rawEvent.kind === "status_overlay") {
       if (!sameCollaborationMemberExecutionIdentity(rawEvent.snapshot.execution, execution)) return Object.freeze({
         kind: "rejected",

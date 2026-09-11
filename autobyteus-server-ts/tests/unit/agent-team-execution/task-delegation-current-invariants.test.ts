@@ -1,3 +1,6 @@
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { createCollaborationMemberExecutionIdentity, createTeamRootExecutionIdentity } from "../../../src/agent-collaboration/execution/domain/root-execution-identity.js";
 import type { RootTaskLifecycleAdapter } from "../../../src/agent-collaboration/execution/task/root-task-lifecycle-adapter.js";
@@ -17,6 +20,7 @@ type Placement = Readonly<{ address: "/researcher" }>;
 const createHarness = (input: {
   records?: readonly TaskDelegationRecordV1[];
   schemaError?: Error;
+  notify?: RootTaskLifecycleAdapter<Placement>["deliverSystemMessage"];
   activationError?: Error;
   settlementReady?: (task: TaskDelegationRecordV1) => boolean;
 } = {}) => {
@@ -66,7 +70,7 @@ const createHarness = (input: {
       return true;
     },
     enterLifecycleFailStop: vi.fn(),
-    deliverSystemMessage: async () => ({ accepted: true }),
+    deliverSystemMessage: input.notify ?? (async () => ({ accepted: true })),
   };
   const engine = new RootTaskLifecycleEngine(adapter);
   return { engine, abort, events, settlementAttempts, settlementOrder, records: () => records };
@@ -111,6 +115,7 @@ describe("root-neutral current task lifecycle invariants", () => {
     expect(message.content).toContain("Task delegator AgentRun ID: coordinator-run");
     expect(message.content).toContain("/tmp/evidence.log");
     expect(message.content).not.toContain("task_");
+    expect(message.metadata).toMatchObject({ task_delegation_system_task_notification: true, suppress_system_task_notification: true });
   });
 
   it("settles terminal descendants before their owning parent during shutdown", async () => {
@@ -173,4 +178,25 @@ describe("root-neutral current task lifecycle invariants", () => {
     )).rejects.toBe(error);
     expect(harness.abort).not.toHaveBeenCalled();
   });
+});
+
+
+it("preserves the saved result when a separately marked system notification is rejected", async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "task-notification-"));
+  const report = path.join(directory, "report.md");
+  await fs.writeFile(report, "Retained report");
+  try {
+    const notify = vi.fn(async () => ({ accepted: false, code: "NOT_ACTIVE", message: "recipient inactive" }));
+    const harness = createHarness({ records: [terminal({ taskId: "task", agentRunId: "agent-task" })], notify });
+    const actor = createCollaborationMemberExecutionIdentity({ root, agentRunId: "agent-task", memberAddress: "/researcher" });
+    const result = await harness.engine.submitTaskResult({ identity: actor }, { message: "Saved result", reference_files: [report] });
+    expect(result).toMatchObject({ task_id: "task", status: "awaiting_review" });
+    expect(result.message).toBeTruthy();
+    expect(harness.records()[0]).toMatchObject({ status: "awaiting_review", updates: [{ message: "Saved result", referenceFiles: [report] }] });
+    expect(harness.events).toEqual(["submitted"]);
+    expect(notify).toHaveBeenCalledOnce();
+    expect(notify).toHaveBeenCalledWith("coordinator-run", expect.objectContaining({ metadata: expect.objectContaining({
+      task_delegation_system_task_notification: true, suppress_system_task_notification: true,
+    }) }));
+  } finally { await fs.rm(directory, { recursive: true, force: true }); }
 });

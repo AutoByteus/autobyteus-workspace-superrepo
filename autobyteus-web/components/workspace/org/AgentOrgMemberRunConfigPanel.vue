@@ -54,7 +54,7 @@ import type { ActiveAgentWorkspaceTarget } from '~/types/workspace/activeAgentWo
 import type { WorkspaceSelectionState } from '~/types/workspace/WorkspaceSelectionState'
 
 type AgentOrgMemberTarget = Extract<ActiveAgentWorkspaceTarget,
-  { kind: 'agent_org_direct_agent' | 'agent_org_team_member' }>
+  { kind: 'agent_org_direct_agent' | 'agent_org_team_member' | 'agent_org_task_agent' | 'agent_org_task_team_member' }>
 
 const props = defineProps<{ target: AgentOrgMemberTarget }>()
 defineEmits<{ (event: 'back'): void }>()

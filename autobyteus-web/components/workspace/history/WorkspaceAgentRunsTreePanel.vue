@@ -178,6 +178,7 @@ const selectedAgentOrg = computed(() => {
   return {
     rootRunId,
     focusAddress: agentOrgContextsStore.contextFor(rootRunId)?.selectedAddress ?? null,
+    selection: agentOrgContextsStore.contextFor(rootRunId)?.selection ?? null,
   };
 });
 const treeState = useWorkspaceHistoryTreeState({
@@ -413,6 +414,9 @@ const sectionActions: WorkspaceHistorySectionActions = {
   }),
   onSelectAgentOrgMember: (run, memberAddress) => executeSubjectAction({
     rootSubjectKind: 'agent_org', rootRunId: run.rootRunId, action: 'select', memberAddress,
+  }),
+  onInspectAgentOrgExecution: (run, agentRunId, memberAddress) => executeSubjectAction({
+    rootSubjectKind: 'agent_org', rootRunId: run.rootRunId, action: 'inspect', agentRunId, memberAddress,
   }),
   onTerminateAgentOrg: (run) => executeSubjectAction({
     rootSubjectKind: 'agent_org', rootRunId: run.rootRunId, action: 'stop',

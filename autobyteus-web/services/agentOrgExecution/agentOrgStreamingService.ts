@@ -1,3 +1,4 @@
+import type { OrgWorkspaceSelection } from './agentOrgExecutionViewIndex'
 import {
   CollaborationStreamServerMessageSchema,
   type CollaborationStreamClientMessage,
@@ -53,7 +54,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
   private released = false
   private intentionalClose = false
   private recoveryCheckpoint: ExecutionCheckpoint | null = null
-  private recoveryFocus: string | null = null
+  private recoveryFocus: OrgWorkspaceSelection | null = null
   private streamPhase: AgentOrgStreamPhase = 'disconnected'
   private transparentRecoveryAttempts = 0
   private transparentRecoveryScheduled = false
@@ -130,7 +131,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     }
     if (!this.ownsOperation(generation)) return
     this.recoveryCheckpoint = checkpoint
-    this.recoveryFocus = this.context?.selectedAddress ?? null
+    this.recoveryFocus = this.context?.selection ?? null
     this.closeSocket('AgentOrg checkpointed recovery')
     if (this.released) return
     this.openSocket()
@@ -239,11 +240,12 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
       if (message.payload.root_subject_kind !== 'agent_org') {
         throw new Error('AgentOrg stream supplied a non-Org snapshot.')
       }
-      const previousFocus = this.recoveryFocus ?? this.context?.selectedAddress ?? null
+      const previousFocus = this.recoveryFocus ?? this.context?.selection ?? null
       const hydratedCandidate = await hydrateAgentOrgExecutionContext({
         orgRunId: this.options.orgRunId,
         view: message.payload.root_org,
         transport: this,
+        isCurrent: () => this.isCurrent(generation),
       })
       if (!this.isCurrent(generation)) return
       if (!await this.verifyRecoveryCandidate(hydratedCandidate, generation)) return

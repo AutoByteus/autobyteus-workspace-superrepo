@@ -1,3 +1,4 @@
+import type { OrgWorkspaceSelection } from '~/services/agentOrgExecution/agentOrgExecutionViewIndex';
 import { computed, ref, unref, watch, type MaybeRef } from 'vue';
 import { normalizeRootPath } from '~/stores/runHistoryReadModel';
 import type {
@@ -41,7 +42,7 @@ interface SelectionStoreLike {
 export const useWorkspaceHistoryTreeState = (params: {
   runHistoryStore: RunHistoryTreeStoreLike;
   selectionStore: SelectionStoreLike;
-  selectedAgentOrg?: MaybeRef<Readonly<{ rootRunId: string; focusAddress: string | null }> | null>;
+  selectedAgentOrg?: MaybeRef<Readonly<{ rootRunId: string; focusAddress: string | null; selection?: OrgWorkspaceSelection | null }> | null>;
 }) => {
   const expandedWorkspaces = ref<Record<string, boolean>>({});
   const expandedAgents = ref<Record<string, boolean>>({});
@@ -66,7 +67,9 @@ export const useWorkspaceHistoryTreeState = (params: {
   const selectedRevealKey = computed<string | null>(() => {
     const selectedAgentOrg = params.selectedAgentOrg ? unref(params.selectedAgentOrg) : null;
     if (selectedAgentOrg?.rootRunId) {
-      return `agent_org:${selectedAgentOrg.rootRunId}\u0000${selectedAgentOrg.focusAddress ?? ''}`;
+      const exact = selectedAgentOrg.selection;
+      const identity = exact?.kind === 'agent_execution' ? exact.agentRunId : exact?.teamRunId ?? '';
+      return `agent_org:${selectedAgentOrg.rootRunId}\u0000${selectedAgentOrg.focusAddress ?? ''}\u0000${identity}`;
     }
     const selectedType = params.selectionStore.selectedType;
     const selectedRunId = params.selectionStore.selectedRunId?.trim() || '';
@@ -345,11 +348,13 @@ export const useWorkspaceHistoryTreeState = (params: {
   };
   const isAgentOrgRunSelected = (rootRunId: string): boolean => {
     const selected = params.selectedAgentOrg ? unref(params.selectedAgentOrg) : null;
-    return selected?.rootRunId === rootRunId;
+    return selected?.rootRunId === rootRunId && !selected.selection;
   };
-  const isAgentOrgMemberSelected = (rootRunId: string, address: string): boolean => {
+  const isAgentOrgMemberSelected = (rootRunId: string, address: string, agentRunId?: string): boolean => {
     const selected = params.selectedAgentOrg ? unref(params.selectedAgentOrg) : null;
-    return selected?.rootRunId === rootRunId && selected.focusAddress === address;
+    if (selected?.rootRunId !== rootRunId) return false;
+    if (agentRunId) return selected.selection?.kind === 'agent_execution' && selected.selection.agentRunId === agentRunId;
+    return selected.selection?.kind === 'configured_team' && selected.focusAddress === address;
   };
   const revealAgentOrgRunAncestry = (rootRunId: string, focusAddress = ''): boolean => {
     const ancestry = params.runHistoryStore.getAgentOrgNavigationAncestry?.(rootRunId);

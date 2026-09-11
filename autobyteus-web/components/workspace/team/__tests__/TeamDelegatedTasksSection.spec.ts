@@ -2,7 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { describe, expect, it } from 'vitest';
 import type { TaskDelegationRecordDto } from '@autobyteus/team-stream-contracts';
-import TeamDelegatedTasksSection from '../TeamDelegatedTasksSection.vue';
+import TeamDelegatedTasksSection from '../../collaboration/CollaborationDelegatedTasksSection.vue';
 import {
   applyTestTeamMessage,
   buildTestTeamContext,
@@ -10,7 +10,7 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
-import { testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
+import { testCollaborationTasksContextView } from '~/test-support/teamWorkspaceContextView';
 
 const reference = (referenceId: string, path: string) => ({
   reference_id: referenceId,
@@ -89,7 +89,7 @@ const mountSubject = (
   teamContext = buildTeamContext(),
   props: { focusedAgentRunId?: string; collapsed?: boolean } = {},
 ) => mount(TeamDelegatedTasksSection, {
-  props: { team: testTeamWorkspaceContextView(teamContext, String(props.focusedAgentRunId || teamContext.view.getFocusedAgentRunId())), collapsed: props.collapsed },
+  props: { tasks: testCollaborationTasksContextView(teamContext, String(props.focusedAgentRunId || teamContext.view.getFocusedAgentRunId())), collapsed: props.collapsed },
   global: {
     stubs: {
       Icon: { props: ['icon'], template: '<span data-test="task-icon" :data-icon="icon" />' },

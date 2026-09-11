@@ -14,6 +14,7 @@ type ReservedAgentInput = Extract<AgentRunInputReservationResult, { reserved: tr
 
 const createSubject = (options: Readonly<{
   persistence?: (orgRunId: string) => AgentOrgRunPersistenceCoordinator;
+  settledTask?: boolean;
 }> = {}) => {
   const orgRunId = "org-communication";
   const root = createAgentOrgRootExecutionIdentity(orgRunId);
@@ -25,7 +26,7 @@ const createSubject = (options: Readonly<{
     address: "/team",
     teamRunId: "team-run",
     coordinatorAddress: mounted.address,
-    members: [mounted],
+    members: [mounted, testOrgAgentNode("/team/second", "mounted-second-run")],
   });
   const otherTeam = testOrgTeamNode({
     address: "/other",
@@ -42,7 +43,7 @@ const createSubject = (options: Readonly<{
     agentRunId: "task-one-run",
     platformAgentRunId: null,
     startedAt: "2026-09-06T00:00:00.000Z",
-    settledAt: null,
+    settledAt: options.settledTask ? "2026-09-06T00:01:00.000Z" : null,
   } as const;
   const secondTask = {
     address: mounted.address,
@@ -57,7 +58,7 @@ const createSubject = (options: Readonly<{
     platformAgentRunId: null,
   } as const;
   const secondTaskTeamMember = {
-    address: direct.address,
+    address: "/team/second",
     agentRunId: "task-team-member-two-run",
     platformAgentRunId: null,
   } as const;
@@ -237,7 +238,7 @@ describe("AgentOrg committed communication presentation", () => {
     ["task to task-Team member", "task-one-run", "/director", "task-team-member-run"],
     ["task-Team member to task", "task-team-member-run", "/team/reviewer", "task-one-run"],
     ["task-Team member to task-Team member", "task-team-member-run", "/team/reviewer", "task-team-member-two-run"],
-  ])("preserves %s delivery without a configured-member input event", async (
+  ])("presents accepted %s delivery once for the exact receiver", async (
     _label,
     senderAgentRunId,
     senderAddress,
@@ -251,9 +252,12 @@ describe("AgentOrg committed communication presentation", () => {
       content: "Task-scoped update.",
     })).resolves.toMatchObject({ accepted: true, agentRunId: targetAgentRunId });
 
-    expect(subject.order).toEqual(["reservation_commit", "communication", "release"]);
-    expect(subject.sequences).toEqual([1]);
-    expect(subject.events).toHaveLength(1);
+    expect(subject.order).toEqual(["reservation_commit", "communication", "MEMBER_INPUT_MESSAGE", "release"]);
+    expect(subject.sequences).toEqual([1, 2]);
+    expect(subject.events).toHaveLength(2);
+    expect(subject.events[1]).toMatchObject({ kind: "agent_presentation",
+      execution: { agentRunId: targetAgentRunId }, message: { type: "MEMBER_INPUT_MESSAGE",
+        payload: { content: expect.stringContaining("Task-scoped update."), sender_agent_run_id: senderAgentRunId } } });
     expect(subject.events[0]?.kind).toBe("communication");
     expect(subject.run.getCommunicationSnapshot().messages).toHaveLength(1);
   });
@@ -340,4 +344,19 @@ describe("AgentOrg committed communication presentation", () => {
     expect(subject.reservations[1]?.reservation.cancel).toHaveBeenCalledTimes(1);
     expect(subject.events).toHaveLength(1);
   });
+});
+
+
+it("correlates a committed receiver presentation against retained rather than live-only task identity", async () => {
+  const { AgentInputUserMessage } = await import("autobyteus-ts/agent/message/agent-input-user-message.js");
+  const subject = createSubject({ settledTask: true });
+  const message = { messageId: "committed-before-settlement", senderAgentRunId: "direct-run", receiverAgentRunId: "task-one-run",
+    content: "Accepted work", messageType: "agent_message", referenceFiles: [], createdAt: "2026-09-06T00:00:59.000Z" };
+  // Exercise only the post-commit callback, not a new admission to a settled task.
+  const committed = subject.run as unknown as { presentCommittedCommunication(message: unknown, receiverInput: unknown): void };
+  expect(() => committed.presentCommittedCommunication(message, new AgentInputUserMessage("Accepted work"))).not.toThrow();
+  expect(subject.events).toHaveLength(1);
+  expect(subject.events[0]).toMatchObject({ kind: "agent_presentation", execution: { agentRunId: "task-one-run" },
+    message: { type: "MEMBER_INPUT_MESSAGE", payload: { content: "Accepted work" } } });
+  expect(subject.reserveRootAgentInput).not.toHaveBeenCalled();
 });

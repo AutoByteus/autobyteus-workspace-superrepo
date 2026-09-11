@@ -97,7 +97,7 @@ describe('RightSideTabs', () => {
         },
         CollaborationOverviewPanel: {
           name: 'CollaborationOverviewPanel',
-          props: ['messages', 'team'],
+          props: ['messages', 'tasks'],
           template: '<div class="collaboration-overview-stub" />',
         },
         TerminalPanel: {
@@ -192,6 +192,7 @@ describe('RightSideTabs', () => {
     activeWorkspaceTarget.value = {
       kind: 'agent_org_direct_agent',
       collaborationMessages: messages,
+      collaborationTasks: { rootKind: 'agent_org', rootRunId: 'org-run', focusedAgentRunId: 'direct' },
       context: { config: { workspaceId: null, workspaceMetadata: null } },
     };
     activeTab.value = 'teamMembers';
@@ -201,7 +202,7 @@ describe('RightSideTabs', () => {
 
     const overview = wrapper.getComponent({ name: 'CollaborationOverviewPanel' });
     expect(overview.props('messages')).toStrictEqual(messages);
-    expect(overview.props('team')).toBeNull();
+    expect(overview.props('tasks')).toMatchObject({ rootKind: 'agent_org', focusedAgentRunId: 'direct' });
   });
 
   it('tracks the compound collaboration root when Team and AgentOrg run IDs collide', async () => {

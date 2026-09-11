@@ -12,26 +12,11 @@
           />
           <span v-else>{{ initials }}</span>
         </div>
-        <div class="min-w-0 flex-1">
-          <div class="flex min-w-0 items-center gap-2">
-            <h4 class="truncate text-base font-medium text-gray-800" :title="memberName">{{ memberName }}</h4>
-            <span
-              v-if="focusedTask"
-              class="shrink-0 rounded-full bg-indigo-100 px-2 py-0.5 text-[0.6875rem] font-semibold text-indigo-700"
-            >{{ t('workspace.task_monitor.task') }}</span>
-            <AgentStatusDisplay :status="target.context.state.currentStatus" />
-          </div>
-          <p
-            v-if="focusedTask"
-            class="truncate text-xs text-slate-500"
-            :title="focusedTask.description"
-          >{{ focusedTask.description }}</p>
-          <p
-            v-if="focusedTaskStatus"
-            class="text-xs font-medium text-slate-600"
-            data-test="team-workspace-task-status"
-          >{{ focusedTaskStatus }}</p>
-        </div>
+        <CollaborationTaskHeading v-if="focusedTask" :name="memberName" :agent-run-id="target.context.state.runId" :task="focusedTask" :status="target.context.state.currentStatus" />
+        <template v-else>
+          <h4 class="truncate text-base font-medium text-gray-800" :title="memberName">{{ memberName }}</h4>
+          <AgentStatusDisplay :status="target.context.state.currentStatus" />
+        </template>
       </div>
       <WorkspaceHeaderActions
         v-if="showHeaderActions"
@@ -45,6 +30,7 @@
     />
     <div class="relative min-h-0 flex-1">
       <AgentEventMonitor
+        :read-only="target.access === 'read_only'"
         :conversation="target.context.state.conversation"
         :run-id="target.context.state.runId"
         :agent-name="memberName"
@@ -70,6 +56,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import CollaborationTaskHeading from '~/components/workspace/collaboration/CollaborationTaskHeading.vue'
 import type { ActiveAgentWorkspaceTarget } from '~/types/workspace/activeAgentWorkspaceTarget'
 import AgentEventMonitor from '~/components/workspace/agent/AgentEventMonitor.vue'
 import AgentStatusDisplay from '~/components/workspace/agent/AgentStatusDisplay.vue'
@@ -82,7 +69,7 @@ import { useAgentActivityStore } from '~/stores/agentActivityStore'
 import { useLocalization } from '~/composables/useLocalization'
 
 type TeamTarget = Extract<ActiveAgentWorkspaceTarget,
-  { kind: 'standalone_team_member' | 'agent_org_team_member' }>
+  { kind: 'standalone_team_member' | 'agent_org_team_member' | 'agent_org_task_team_member' }>
 const props = withDefaults(defineProps<{
   target: TeamTarget
   showHeaderActions?: boolean
@@ -104,12 +91,6 @@ const avatarUrl = computed(() => props.target.context.config.agentAvatarUrl?.tri
   || '')
 const showAvatar = computed(() => Boolean(avatarUrl.value) && !avatarFailed.value)
 const focusedTask = computed(() => props.target.team.focusedTaskPresentation())
-const focusedTaskStatus = computed(() => focusedTask.value
-  ? t('workspace.task_monitor.combined_status', {
-      lifecycle: t(`workspace.task_monitor.lifecycle.${focusedTask.value.displayStatus}`),
-      execution: t(`workspace.task_monitor.execution.${props.target.context.state.currentStatus}`),
-    })
-  : '')
 const showAuthoritativeTaskEmpty = computed(() => Boolean(
   focusedTask.value
   && props.target.team.isFocusedProjectionAuthoritative()

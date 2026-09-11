@@ -1,8 +1,9 @@
+import type { CollaborationTasksContextView } from '~/types/workspace/collaborationTasksContextView'
 import type { AgentTeamContext } from '~/types/agent/AgentTeamContext'
 import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget'
 import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView'
-import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective'
+import { projectTeamCommunicationPerspective, projectTeamCommunicationMemberIdentity } from '~/utils/teamCommunication/teamCommunicationPerspective'
 import { deriveDelegatedTaskEntries } from '~/utils/teamDelegatedTaskEntries'
 import { isTeamMemberProjectionAuthoritative } from '~/services/runHydration/teamMemberProjectionHydrationService'
 
@@ -35,9 +36,7 @@ export const testTeamWorkspaceContextView = (
       context: entry.agentContext,
       coordinator: entry.memberAddress === view.getExecutionTree().root_team.coordinator_address,
     })),
-    listDelegatedTaskEntries: () => deriveDelegatedTaskEntries(team, focusedAgentRunId),
-    taskReferenceContentPath: (taskId, referenceId) =>
-      `team-runs/${view.getRootTeamRunId()}/task-delegations/${taskId}/references/${referenceId}/content`,
+
   }
 }
 
@@ -56,10 +55,7 @@ export const testCollaborationMessagesContextView = (
     focusedMemberAddress,
     memberIdentityByAgentRunId: () => Object.fromEntries(entries.map((entry) => [
       entry.agentRunId,
-      {
-        address: entry.memberAddress,
-        label: entry.memberAddress.split('/').at(-1) || entry.memberAddress,
-      },
+      projectTeamCommunicationMemberIdentity(view, entry.agentRunId),
     ])),
     listMessages: () => projectTeamCommunicationPerspective({
       view,
@@ -68,5 +64,17 @@ export const testCollaborationMessagesContextView = (
     }).messages,
     referenceContentPath: (messageId, referenceId) =>
       `team-runs/${view.getRootTeamRunId()}/team-communication/messages/${messageId}/references/${referenceId}/content`,
+  }
+}
+
+export const testCollaborationTasksContextView = (
+  team: AgentTeamContext,
+  focusedAgentRunId = team.view.getFocusedAgentRunId(),
+): CollaborationTasksContextView => {
+  const view = team.view
+  return { rootKind: 'agent_team', rootRunId: view.getRootTeamRunId(), focusedAgentRunId,
+    listDelegatedTaskEntries: () => deriveDelegatedTaskEntries(team, focusedAgentRunId),
+    taskReferenceContentPath: (taskId, referenceId) =>
+      `team-runs/${view.getRootTeamRunId()}/task-delegations/${taskId}/references/${referenceId}/content`,
   }
 }

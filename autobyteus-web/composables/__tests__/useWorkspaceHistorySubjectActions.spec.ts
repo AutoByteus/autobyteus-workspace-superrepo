@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   contexts: {
     select: vi.fn(),
     connect: vi.fn(),
+    inspect: vi.fn().mockResolvedValue(undefined),
     disconnect: vi.fn(),
   },
   selection: {
@@ -90,7 +91,7 @@ describe('useWorkspaceHistorySubjectActions', () => {
         rootSubjectKind: 'agent_org',
         definitionId: 'delivery-org',
         orgRunId: 'restored-org-run',
-        mode: 'active',
+        mode: 'active', memberAddress: '/software',
       },
     })
   })
@@ -116,7 +117,7 @@ describe('useWorkspaceHistorySubjectActions', () => {
         rootSubjectKind: 'agent_org',
         definitionId: 'delivery-org',
         orgRunId: 'org-run-1',
-        mode: 'active',
+        mode: 'active', memberAddress: '/software/coordinator',
       },
     })
   })
@@ -140,4 +141,17 @@ describe('useWorkspaceHistorySubjectActions', () => {
       query: { rootSubjectKind: 'agent_org', definitionId: 'delivery-org', mode: 'configuration' },
     })
   })
+  it.each([true, false])('inspects an exact retained task without restoring it (root active=%s)', async (isActive) => {
+    mocks.history.agentOrgHistory = [historyRun(isActive)]
+    await useWorkspaceHistorySubjectActions().execute({ rootSubjectKind: 'agent_org', rootRunId: 'org-run-1',
+      action: 'inspect', agentRunId: 'task-run-exact', memberAddress: '/software/coordinator' })
+    expect(mocks.orgRun.restore).not.toHaveBeenCalled()
+    expect(mocks.contexts.select).toHaveBeenCalledWith('org-run-1', { kind: 'agent_execution', agentRunId: 'task-run-exact' })
+    expect(isActive ? mocks.contexts.connect : mocks.contexts.inspect).toHaveBeenCalledWith('org-run-1')
+    expect(mocks.push).toHaveBeenCalledWith({ path: '/workspace', query: {
+      rootSubjectKind: 'agent_org', definitionId: 'delivery-org', orgRunId: 'org-run-1',
+      mode: isActive ? 'active' : 'history', agentRunId: 'task-run-exact', memberAddress: '/software/coordinator',
+    } })
+  })
+
 })

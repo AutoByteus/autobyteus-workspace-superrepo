@@ -1,8 +1,12 @@
+import { taskBearingView } from './taskBearingOrgFixture'
+import { AgentContext } from '~/types/agent/AgentContext'
+import { AgentRunState } from '~/types/agent/AgentRunState'
+import { AgentOrgExecutionViewIndex } from '../agentOrgExecutionViewIndex'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { computed } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
-import type { AgentOrgExecutionContext } from '../agentOrgExecutionContext'
-import { projectAgentOrgTeamTasks } from '../agentOrgTeamPresentation'
+import { AgentOrgExecutionContext } from '../agentOrgExecutionContext'
+import { projectAgentOrgTasks } from '../agentOrgTaskPresentation'
 import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
 
 const mocks = vi.hoisted(() => ({
@@ -107,7 +111,7 @@ const snapshot = {
 }
 
 const candidate = (selectedAddress: string | null = null, changeSequence = 4) => ({
-  phase: 'live', changeSequence, selectedAddress,
+  phase: 'live', changeSequence, selectedAddress, selection: selectedAddress ? { kind: 'agent_execution', agentRunId: 'agent-run' } : null,
   select: vi.fn(), setActive: vi.fn(), applyEvent: vi.fn(), requireReopen: vi.fn(),
 }) as unknown as AgentOrgExecutionContext
 
@@ -165,7 +169,7 @@ describe('AgentOrgStreamingService', () => {
 
     finishHydration(second)
     await vi.waitFor(() => expect(publish).toHaveBeenCalledTimes(2))
-    expect(second.select).toHaveBeenCalledWith('/direct')
+    expect(second.select).toHaveBeenCalledWith({ kind: 'agent_execution', agentRunId: 'agent-run' })
     expect(publish).toHaveBeenLastCalledWith(second)
     expect(mocks.query).toHaveBeenCalledTimes(2)
     expect(reportError).not.toHaveBeenCalled()
@@ -208,7 +212,7 @@ describe('AgentOrgStreamingService', () => {
 
     await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second))
     expect(first.requireReopen).toHaveBeenCalled()
-    expect(second.select).toHaveBeenCalledWith('/direct')
+    expect(second.select).toHaveBeenCalledWith({ kind: 'agent_execution', agentRunId: 'agent-run' })
     expect(mocks.query).toHaveBeenCalledTimes(2)
     expect(reportError).not.toHaveBeenCalled()
   })
@@ -363,55 +367,29 @@ describe('AgentOrgStreamingService', () => {
   })
 
   it('publishes one store-observable context identity so the mounted-Team task panel advances without refocus', async () => {
-    const team = {
-      address: '/team', teamDefinitionId: 'team-def', role: null, description: null,
-      teamRunId: 'team-run', coordinatorAddress: '/team/coordinator',
-      defaultLaunchConfiguration: launch, taskExecutions: [],
-      members: [{
-        address: '/team/coordinator', agentDefinitionId: 'coordinator-def', role: null,
-        description: null, agentRunId: 'agent-coordinator', platformAgentRunId: null,
-        launchConfiguration: launch,
-      }, {
-        address: '/team/worker', agentDefinitionId: 'worker-def', role: null,
-        description: null, agentRunId: 'agent-worker', platformAgentRunId: null,
-        launchConfiguration: launch,
-      }],
-    }
-    const baseTask = {
-      taskId: 'task-live', delegatorAgentRunId: 'agent-coordinator', recipientAddress: '/team/worker',
-      taskExecution: { agentRunId: 'task-agent-run' }, description: 'Verify the live result.',
-      referenceFiles: [], status: 'active', updates: [], createdAt: '2026-09-01T00:00:01.000Z',
-    }
-    const context = {
-      phase: 'live', changeSequence: 4, selectedAddress: '/team',
-      view: {
-        ...snapshot.payload.root_org,
-        execution_tree: {
-          ...snapshot.payload.root_org.execution_tree,
-          rootOrg: { ...snapshot.payload.root_org.execution_tree.rootOrg, members: [team] },
-        },
-        task_records: {
-          ...snapshot.payload.root_org.task_records,
-          records: [baseTask],
-        },
-      },
-      select: vi.fn(), setActive: vi.fn(), requireReopen: vi.fn(),
-      applyEvent(this: any, changeSequence: number, event: any) {
-        const records = this.view.task_records.records.map((record: any) =>
-          record.taskId === event.event.task.taskId ? event.event.task : record)
-        this.view = { ...this.view, task_records: { ...this.view.task_records, records } }
-        this.changeSequence = changeSequence
-        return 'applied' as const
-      },
-    } as unknown as AgentOrgExecutionContext
+    const view = taskBearingView()
+    view.base_change_sequence = 4
+    const baseTask = view.task_records.records[0]!
+    const context = new AgentOrgExecutionContext({ orgRunId: 'org-run', view,
+      transport: { interactionFor: () => ({ send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn() }) },
+      entries: [...new AgentOrgExecutionViewIndex(view).agents.values()].map((agent) => ({
+        agentRunId: agent.agentRunId, memberAddress: agent.address,
+        context: new AgentContext({ ...agent.source.launchConfiguration,
+          agentDefinitionId: agent.source.agentDefinitionId, agentDefinitionName: agent.address,
+          workspaceId: null, isLocked: true } as any,
+          new AgentRunState(agent.agentRunId, { id: agent.agentRunId, messages: [], createdAt: '', updatedAt: '' } as any)),
+      })),
+    })
+    context.select('/director')
+    vi.spyOn(context, 'select')
     mocks.hydrate.mockResolvedValue(context)
     const contextsStore = useAgentOrgContextsStore()
     const observed = computed(() => contextsStore.contextFor('org-run'))
     const panelStatus = computed(() => {
       const value = observed.value as any
       if (!value) return null
-      return projectAgentOrgTeamTasks({
-        orgRunId: 'org-run', view: value.view, team, focusedAgentRunId: 'agent-coordinator',
+      return projectAgentOrgTasks({
+        orgRunId: 'org-run', view: value.view, index: value.index, focusedAgentRunId: 'agent-director',
       })[0]?.displayStatus ?? null
     })
     const submission = {

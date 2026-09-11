@@ -341,7 +341,7 @@ describe('useWorkspaceHistoryTreeState', () => {
         runs: [{ rootRunId: 'org-run-1' }],
       }],
     }];
-    selectedAgentOrg.value = { rootRunId: 'org-run-1', focusAddress: '/software/worker' };
+    selectedAgentOrg.value = { rootRunId: 'org-run-1', focusAddress: '/software/worker', selection: { kind: 'agent_execution', agentRunId: 'worker-task-1' } };
 
     await flushReactiveUpdates();
 
@@ -349,7 +349,17 @@ describe('useWorkspaceHistoryTreeState', () => {
     expect(treeState.isAgentOrgDefinitionExpanded('workspace:/ws/a', 'delivery-org')).toBe(true);
     expect(treeState.isAgentOrgRunExpanded('org-run-1')).toBe(true);
     expect(treeState.isAgentOrgTeamExpanded('org-run-1', '/software')).toBe(true);
-    expect(treeState.isAgentOrgMemberSelected('org-run-1', '/software/worker')).toBe(true);
+    expect(treeState.isAgentOrgMemberSelected('org-run-1', '/software/worker', 'worker-task-1')).toBe(true);
+
+    expect(treeState.isAgentOrgRunSelected('org-run-1')).toBe(false);
+    expect(treeState.isAgentOrgMemberSelected('org-run-1', '/software/worker', 'configured-worker')).toBe(false);
+    treeState.toggleAgentOrgTeam('org-run-1', '/software');
+    selectedAgentOrg.value = { rootRunId: 'org-run-1', focusAddress: '/software/worker',
+      selection: { kind: 'agent_execution', agentRunId: 'worker-task-2' } };
+    await flushReactiveUpdates();
+    expect(treeState.isAgentOrgTeamExpanded('org-run-1', '/software')).toBe(true);
+    expect(treeState.isAgentOrgMemberSelected('org-run-1', '/software/worker', 'worker-task-1')).toBe(false);
+    expect(treeState.isAgentOrgMemberSelected('org-run-1', '/software/worker', 'worker-task-2')).toBe(true);
 
     state.nodes = [{ ...state.nodes[0], workspaceId: 'catalog-workspace-a' }];
     state.navigationTopologyRevision += 1;

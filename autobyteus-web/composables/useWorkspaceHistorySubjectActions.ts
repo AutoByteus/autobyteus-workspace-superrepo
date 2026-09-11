@@ -7,8 +7,9 @@ import { useAgentSelectionStore } from '~/stores/agentSelectionStore'
 export type WorkspaceHistorySubjectAction = Readonly<{
   rootSubjectKind: 'agent_org'
   rootRunId: string
-  action: 'open' | 'select' | 'stop'
+  action: 'open' | 'select' | 'inspect' | 'stop'
   memberAddress?: string
+  agentRunId?: string
 }>
 
 export const useWorkspaceHistorySubjectActions = () => {
@@ -41,6 +42,7 @@ export const useWorkspaceHistorySubjectActions = () => {
 
     if (command.action === 'open') {
       if (run.isActive) orgContexts.connect(run.rootRunId)
+      else await orgContexts.inspect(run.rootRunId)
       selection.clearSelection()
       await router.push({
         path: '/workspace',
@@ -54,6 +56,19 @@ export const useWorkspaceHistorySubjectActions = () => {
       return
     }
 
+    if (command.action === 'inspect') {
+      if (!command.agentRunId) throw new Error('Exact task Agent execution is required.')
+      selection.clearSelection()
+      orgContexts.select(run.rootRunId, { kind: 'agent_execution', agentRunId: command.agentRunId })
+      if (run.isActive) orgContexts.connect(run.rootRunId)
+      else await orgContexts.inspect(run.rootRunId)
+      await router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId,
+        orgRunId: run.rootRunId, mode: run.isActive ? 'active' : 'history', agentRunId: command.agentRunId,
+        ...(command.memberAddress ? { memberAddress: command.memberAddress } : {}),
+      } })
+      return
+    }
+
     const memberAddress = command.memberAddress?.trim()
     if (!memberAddress) throw new Error('AgentOrg member selection requires an exact address.')
     const activeRunId = run.isActive ? run.rootRunId : await orgRunStore.restore(run.rootRunId)
@@ -63,7 +78,7 @@ export const useWorkspaceHistorySubjectActions = () => {
     await historyStore.refreshTreeQuietly()
     await router.push({
       path: '/workspace',
-      query: { rootSubjectKind: 'agent_org', definitionId, orgRunId: activeRunId, mode: 'active' },
+      query: { rootSubjectKind: 'agent_org', definitionId, orgRunId: activeRunId, mode: 'active', memberAddress },
     })
   }
 

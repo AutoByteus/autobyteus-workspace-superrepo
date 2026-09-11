@@ -56,12 +56,12 @@
                 v-if="display.row.kind === 'agent'"
                 type="button"
                 class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-left text-sm disabled:cursor-wait disabled:opacity-60"
-                :class="isMemberSelected(run.rootRunId, display.row.address) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'"
+                :class="isMemberSelected(run.rootRunId, display.row.address, display.row.agentRunId) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'"
                 :disabled="!run.isActive && state.isAgentOrgRestoring"
                 :style="rowStyle(display.row.depth)"
                 :aria-label="agentRowLabel(display.row)"
                 :aria-level="display.row.depth + 1"
-                :aria-selected="isMemberSelected(run.rootRunId, display.row.address)"
+                :aria-selected="isMemberSelected(run.rootRunId, display.row.address, display.row.agentRunId)"
                 :data-test="`agent-org-agent-row-${display.row.agentRunId}`"
                 :data-status="display.row.status"
                 role="treeitem"
@@ -94,18 +94,18 @@
                 <Icon icon="heroicons:user-group-20-solid" class="mr-1.5 h-4 w-4 text-gray-500" />
                 <span class="truncate font-semibold">{{ label(display.row.address) }}</span>
               </button>
-              <div v-else-if="display.row.kind === 'task_agent'" class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-sm" :class="display.row.taskKind === 'direct' ? 'bg-indigo-50/70 text-indigo-900' : 'text-gray-600'" :style="rowStyle(display.row.depth)" :aria-label="agentRowLabel(display.row)" :aria-level="display.row.depth + 1" :data-test="`agent-org-task-agent-row-${display.row.agentRunId}`" :data-status="display.row.status" role="treeitem">
+              <button type="button" v-else-if="display.row.kind === 'task_agent'" @click="actions.onInspectAgentOrgExecution?.(run, display.row.agentRunId, display.row.address)" :aria-selected="isMemberSelected(run.rootRunId, display.row.address, display.row.agentRunId)" class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-sm" :class="isMemberSelected(run.rootRunId, display.row.address, display.row.agentRunId) ? 'is-selected text-indigo-900' : 'text-gray-600 hover:bg-gray-50'" :title="`${display.row.address} · ${display.row.agentRunId}`" :style="rowStyle(display.row.depth)" :aria-label="agentRowLabel(display.row)" :aria-level="display.row.depth + 1" :data-test="`agent-org-task-agent-row-${display.row.agentRunId}`" :data-status="display.row.status" role="treeitem">
                 <WorkspaceHierarchyBranches :depth="display.row.depth" :continuing-ancestor-depths="display.continuingAncestorDepths" :has-following-sibling="display.hasFollowingSibling" />
                 <span class="ml-2 mr-1 h-3.5 w-3.5 flex-none" aria-hidden="true" />
                 <StatusDot class="mr-1.5" :status="display.row.status" :variant="display.row.taskKind === 'direct' ? 'transient' : 'solid'" />
-                <span class="truncate">{{ display.row.taskKind === 'direct' ? taskLabel(display.row.address) : label(display.row.address) }}</span>
-              </div>
-              <div v-else class="org-execution-row relative flex min-h-7 w-full items-center rounded-md bg-indigo-50/70 text-sm text-indigo-900" :style="rowStyle(display.row.depth)" :aria-level="display.row.depth + 1" :data-test="`agent-org-task-team-row-${display.row.teamRunId}`" role="treeitem">
+                <span class="truncate">{{ display.row.taskKind === 'direct' ? taskLabel(display.row.address) : label(display.row.address) }} · {{ display.row.agentRunId.slice(-6) }}</span>
+              </button>
+              <button type="button" v-else @click="actions.onInspectAgentOrgExecution?.(run, display.row.coordinatorAgentRunId, display.row.coordinatorAddress)" class="org-execution-row relative flex min-h-7 w-full items-center rounded-md text-sm text-gray-600 hover:bg-gray-50" :title="`${display.row.address} · ${display.row.teamRunId}`" :aria-label="`${taskLabel(display.row.address)} · ${display.row.teamRunId}`" :style="rowStyle(display.row.depth)" :aria-level="display.row.depth + 1" :data-test="`agent-org-task-team-row-${display.row.teamRunId}`" role="treeitem">
                 <WorkspaceHierarchyBranches :depth="display.row.depth" :continuing-ancestor-depths="display.continuingAncestorDepths" :has-following-sibling="display.hasFollowingSibling" />
                 <span class="ml-2 mr-1 h-3.5 w-3.5" aria-hidden="true" />
                 <Icon icon="heroicons:user-group-20-solid" class="mr-1.5 h-3.5 w-3.5 text-indigo-600" />
-                <span class="truncate">{{ taskLabel(display.row.address) }}</span>
-              </div>
+                <span class="truncate">{{ taskLabel(display.row.address) }} · {{ display.row.teamRunId.slice(-6) }}</span>
+              </button>
             </template>
           </div>
         </div>
@@ -136,7 +136,7 @@ const isDefinitionExpanded = (definitionId: string) => props.state.isAgentOrgDef
 const toggleDefinition = (definitionId: string) => props.state.toggleAgentOrgDefinition?.(props.workspaceId, definitionId)
 const isRunExpanded = (rootRunId: string) => props.state.isAgentOrgRunExpanded?.(rootRunId) ?? false
 const isRunSelected = (rootRunId: string) => props.state.isAgentOrgRunSelected?.(rootRunId) ?? false
-const isMemberSelected = (rootRunId: string, address: string) => props.state.isAgentOrgMemberSelected?.(rootRunId, address) ?? false
+const isMemberSelected = (rootRunId: string, address: string, agentRunId?: string) => props.state.isAgentOrgMemberSelected?.(rootRunId, address, agentRunId) ?? false
 const isTeamExpanded = (rootRunId: string, address: string) => props.state.isAgentOrgTeamExpanded?.(rootRunId, address) ?? false
 const isTerminating = (rootRunId: string) => props.state.isAgentOrgTerminating?.(rootRunId) ?? false
 const terminationError = (rootRunId: string) => props.state.agentOrgTerminationError?.(rootRunId) ?? null
@@ -145,7 +145,7 @@ const initials = (address: string) => label(address).split(/\s+/).slice(0, 2).ma
 const taskLabel = (address: string) => t('workspace.agentOrg.history.taskLabel', { name: label(address) })
 const agentStatusLabelKey = (status: AgentStatus) => `workspace.history.hierarchy.status.${status}`
 const teamStatusLabelKey = (status: AgentStatus) => `workspace.components.workspace.history.WorkspaceHistoryWorkspaceSection.team_status_${status}`
-const agentRowLabel = (row: AgentOrgHistoryAgentRow | AgentOrgHistoryTaskAgentRow) => `${label(row.address)}, ${t(agentStatusLabelKey(row.status))}`
+const agentRowLabel = (row: AgentOrgHistoryAgentRow | AgentOrgHistoryTaskAgentRow) => `${label(row.address)}, ${t(agentStatusLabelKey(row.status))}, ${row.address}, ${row.agentRunId}`
 const teamRowLabel = (row: AgentOrgHistoryTeamRow) => `${label(row.address)}. ${t(teamStatusLabelKey(row.status))}`
 const rowStyle = (depth: number) => ({ paddingLeft: `calc((${depth} + 1) * 0.875rem)` })
 const relative = (createdAt: string) => {

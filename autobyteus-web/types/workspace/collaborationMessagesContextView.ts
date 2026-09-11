@@ -1,10 +1,15 @@
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type { TeamReferenceFile } from '~/types/teamReferenceFile'
 
-export interface CollaborationMessageMemberIdentity {
-  readonly address: AgentTeamAddress
-  readonly label: string
-}
+export type CollaborationMessageMemberIdentity = Readonly<{
+  address: AgentTeamAddress
+  label: string
+}> & (Readonly<{ kind: 'configured' }> | Readonly<{
+  kind: 'task'
+  taskId: string
+  hostRunId: string
+  executionRunId: string
+}>)
 
 export interface CollaborationMessagePerspectiveRow {
   readonly messageId: string
@@ -16,8 +21,7 @@ export interface CollaborationMessagePerspectiveRow {
   readonly referenceFiles: readonly TeamReferenceFile[]
   readonly direction: 'sent' | 'received'
   readonly counterpartAgentRunId: string
-  readonly counterpartAddress: AgentTeamAddress
-  readonly counterpartLabel: string
+  readonly counterpart: CollaborationMessageMemberIdentity
 }
 
 export interface CollaborationMessagesPerspective {

@@ -1,6 +1,7 @@
 import type { TranslationCatalog } from "../../runtime/types";
 
 const messages = {
+  "workspace.agentOrg.inspectionUnavailable": "无法读取已保存的智能体组织数据。未启动任何运行。",
   "workspace.runModelConfig.loading": "正在加载运行配置…",
   "workspace.runModelConfig.runUnavailable": "此运行已不可用。",
   "workspace.runModelConfig.save": "保存",

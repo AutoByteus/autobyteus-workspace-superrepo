@@ -50,7 +50,7 @@
       <div v-else class="flex h-full min-h-0 overflow-hidden" data-test="team-delegated-tasks-split">
         <aside
           class="min-h-0 shrink-0 overflow-y-auto border-r border-slate-200 pb-2"
-          :style="{ width: `${leftPaneWidth}px` }"
+          :style="{ width: `${leftPaneWidth}px`, maxWidth: '50%' }"
           data-test="team-delegated-tasks-navigator"
         >
           <TeamDelegatedTaskNavigator
@@ -71,15 +71,26 @@
           @mousedown="startResize"
         />
 
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+          <nav v-if="selectedEntry" class="flex flex-wrap gap-2 border-b border-slate-100 p-2">
+            <button v-for="participant in selectedEntry.participants" :key="participant.agentRunId"
+              type="button" class="truncate rounded px-2 py-1 text-xs text-indigo-700 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-500"
+              :title="`${participant.address} · ${participant.agentRunId}`"
+              :aria-label="`${participant.label} · ${participant.address} · ${participant.agentRunId}`"
+              @click="selectParticipant(participant.agentRunId, participant.address)">
+              {{ participant.label }} · {{ participant.agentRunId.slice(-6) }}
+            </button>
+          </nav>
         <TeamDelegatedTaskDetailPane
           :selected-entry="selectedEntry"
           :selected-item="selectedItem"
           :selected-reference="selectedReference"
           :reference-refresh-signal="referenceRefreshSignal"
           :reference-content-path="selectedEntry && selectedReference
-            ? team.taskReferenceContentPath(selectedEntry.taskId, selectedReference.referenceId)
+            ? tasks.taskReferenceContentPath(selectedEntry.taskId, selectedReference.referenceId)
             : ''"
         />
+        </div>
       </div>
     </div>
   </section>
@@ -87,20 +98,23 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useWorkspaceHistorySubjectActions } from '~/composables/useWorkspaceHistorySubjectActions';
+import { buildWorkspaceExecutionRoute, openWorkspaceExecutionLink } from '~/services/workspace/workspaceNavigationService';
 import { Icon } from '@iconify/vue';
-import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget';
+import type { CollaborationTasksContextView } from '~/types/workspace/collaborationTasksContextView';
 import { useHorizontalSplitResize } from '~/composables/useHorizontalSplitResize';
 import {
   type DelegatedTaskEntry,
   type DelegatedTaskItemLocator,
   type DelegatedTaskLifecycleItem,
   type DelegatedTaskReferenceLocator,
-} from '~/utils/teamDelegatedTaskEntries';
+} from '~/types/workspace/collaborationTaskPresentation';
 import TeamDelegatedTaskDetailPane from '~/components/workspace/team/TeamDelegatedTaskDetailPane.vue';
 import TeamDelegatedTaskNavigator from '~/components/workspace/team/TeamDelegatedTaskNavigator.vue';
 
 const props = withDefaults(defineProps<{
-  team: TeamWorkspaceContextView;
+  tasks: CollaborationTasksContextView;
   collapsed?: boolean;
 }>(), {
   collapsed: false,
@@ -109,6 +123,21 @@ const props = withDefaults(defineProps<{
 defineEmits<{
   (e: 'toggle'): void;
 }>();
+
+const router = useRouter();
+const subjectActions = useWorkspaceHistorySubjectActions();
+const selectParticipant = async (agentRunId: string, memberAddress: string) => {
+  const root = selectedEntry.value?.root;
+  if (!root) return;
+  if (root.kind === 'agent_org') {
+    await subjectActions.execute({ rootSubjectKind: 'agent_org', rootRunId: root.runId,
+      action: 'inspect', agentRunId, memberAddress });
+  } else {
+    const link = { kind: 'team' as const, teamRunId: root.runId, agentRunId };
+    await openWorkspaceExecutionLink(link);
+    await router.push(buildWorkspaceExecutionRoute(link));
+  }
+};
 
 const selectedEntryKey = ref<string | null>(null);
 const selectedItemKey = ref<string | null>(null);
@@ -120,9 +149,9 @@ const { paneWidth: leftPaneWidth, startResize } = useHorizontalSplitResize({
   maxWidth: 360,
 });
 
-const rootTeamRunId = computed(() => props.team.rootRunId);
+const scopeKey = computed(() => `${props.tasks.rootKind}:${props.tasks.rootRunId}:${props.tasks.focusedAgentRunId}`);
 const delegatedTaskEntries = computed<readonly DelegatedTaskEntry[]>(() => (
-  props.team.listDelegatedTaskEntries()
+  props.tasks.listDelegatedTaskEntries()
 ));
 const selectedEntry = computed(() => (
   delegatedTaskEntries.value.find((entry) => entry.entryKey === selectedEntryKey.value) ?? null
@@ -141,7 +170,7 @@ const delegatedTaskSelectionSignature = computed(() => delegatedTaskEntries.valu
 
 const rootItem = (entry: DelegatedTaskEntry): DelegatedTaskLifecycleItem => entry.lifecycleItems[0];
 
-watch(rootTeamRunId, () => {
+watch(scopeKey, () => {
   selectedEntryKey.value = null;
   selectedItemKey.value = null;
   selectedReferenceId.value = null;
@@ -149,7 +178,7 @@ watch(rootTeamRunId, () => {
 });
 
 watch(
-  () => [rootTeamRunId.value, delegatedTaskSelectionSignature.value],
+  () => [scopeKey.value, delegatedTaskSelectionSignature.value],
   () => {
     if (!delegatedTaskEntries.value.length) {
       selectedEntryKey.value = null;

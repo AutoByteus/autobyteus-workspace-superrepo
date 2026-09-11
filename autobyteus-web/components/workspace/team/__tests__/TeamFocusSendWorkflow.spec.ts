@@ -14,8 +14,8 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
-import { testCollaborationMessagesContextView, testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
-import type { TeamWorkspaceContextView } from '~/types/workspace/activeAgentWorkspaceTarget';
+import { testCollaborationMessagesContextView, testCollaborationTasksContextView } from '~/test-support/teamWorkspaceContextView';
+import type { CollaborationTasksContextView } from '~/types/workspace/collaborationTasksContextView';
 import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView';
 
 const labels: Record<string, string> = {
@@ -37,10 +37,10 @@ const labels: Record<string, string> = {
 const WorkflowHarness = defineComponent({
   components: { CollaborationOverviewPanel, AgentTeamEventMonitor, AgentUserInputTextArea },
   props: {
-    team: { type: Object as PropType<TeamWorkspaceContextView>, required: true },
+    tasks: { type: Object as PropType<CollaborationTasksContextView>, required: true },
     messages: { type: Object as PropType<CollaborationMessagesContextView>, required: true },
   },
-  template: '<div><CollaborationOverviewPanel :team="team" :messages="messages" /><AgentTeamEventMonitor /><AgentUserInputTextArea data-test="workflow-composer" /></div>',
+  template: '<div><CollaborationOverviewPanel :tasks="tasks" :messages="messages" /><AgentTeamEventMonitor /><AgentUserInputTextArea data-test="workflow-composer" /></div>',
 });
 
 const CollaborationMessagesPanelStub = defineComponent({
@@ -82,7 +82,7 @@ const mountWorkflow = () => {
   const sendMessageSpy = vi.spyOn(teamRunStore, 'sendMessageToFocusedMember').mockResolvedValue(undefined);
   const wrapper = mount(WorkflowHarness, {
     props: {
-      team: testTeamWorkspaceContextView(teamContext),
+      tasks: testCollaborationTasksContextView(teamContext),
       messages: testCollaborationMessagesContextView(teamContext),
     },
     global: {

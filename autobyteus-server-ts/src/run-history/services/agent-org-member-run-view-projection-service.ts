@@ -52,7 +52,7 @@ export class AgentOrgMemberRunViewProjectionService {
     agentRunId: string,
   ): Promise<AgentOrgMemberRunProjection> {
     const location = await this.requireLocation(orgRunId, memberAddress, agentRunId);
-    const projection = await this.agentViews.getProjectionFromMetadata({
+    const projection = await this.agentViews.getRequiredProjectionFromMetadata({
       runId: location.agentRunId,
       metadata: metadataFor(location),
     });
@@ -126,7 +126,7 @@ const metadataFor = (location: LocatedAgentOrgAgentExecution): AgentRunMetadata 
     autoExecuteTools: configured.launchConfiguration.autoExecuteTools,
     skillAccessMode: configured.launchConfiguration.skillAccessMode,
     runtimeKind: configured.launchConfiguration.runtimeKind as AgentRunMetadata["runtimeKind"],
-    platformAgentRunId: configured.platformAgentRunId,
+    platformAgentRunId: location.platformAgentRunId,
   };
 };
 

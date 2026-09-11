@@ -1,10 +1,11 @@
+import { AgentOrgExecutionViewIndex } from './agentOrgExecutionViewIndex'
 import type { AgentOrgExecutionViewDto } from '@autobyteus/collaboration-stream-contracts'
 import { AgentContext } from '~/types/agent/AgentContext'
 import { AgentRunState } from '~/types/agent/AgentRunState'
 import { AgentStatus } from '~/types/agent/AgentStatus'
 import type { AgentRunConfig, SkillAccessMode } from '~/types/agent/AgentRunConfig'
 import type { WorkspaceMetadata } from '~/types/workspace/WorkspaceMetadata'
-import { parseAgentTeamAddress, type AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
+import { type AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import { initializeRuntimeStatusState } from '~/services/runStatus/agentRuntimeStatusState'
 import { buildConversationFromProjection } from '~/services/runHydration/runProjectionConversation'
 import type { RunProjectionConversationEntry } from '~/services/runHydration/runProjectionConversation'
@@ -27,8 +28,6 @@ import {
 } from './agentOrgExecutionContext'
 
 type LaunchConfiguration = AgentOrgExecutionViewDto['execution_tree']['rootOrg']['defaultLaunchConfiguration']
-type TaskExecution = AgentOrgExecutionViewDto['execution_tree']['rootOrg']['taskExecutions'][number]
-type TaskMember = Extract<TaskExecution, { teamRunId: string }>['members'][number]
 
 type AgentSeed = Readonly<{
   address: AgentTeamAddress
@@ -48,64 +47,11 @@ type Projection = Readonly<{
 const nameAt = (address: string): string =>
   address.split('/').filter(Boolean).at(-1)?.replace(/[_-]+/g, ' ') || address
 
-const collectTaskMemberSeeds = (
-  member: TaskMember,
-  inherited: LaunchConfiguration,
-  output: AgentSeed[],
-): void => {
-  if ('agentRunId' in member) {
-    output.push(Object.freeze({
-      address: parseAgentTeamAddress(member.address), agentRunId: member.agentRunId,
-      agentDefinitionId: 'task-execution', launch: inherited,
-    }))
-    return
-  }
-  member.members.forEach((child) => collectTaskMemberSeeds(child, inherited, output))
-  member.taskExecutions.forEach((task) => collectTaskSeeds(task, inherited, output))
-}
-
-const collectTaskSeeds = (
-  task: TaskExecution,
-  inherited: LaunchConfiguration,
-  output: AgentSeed[],
-): void => {
-  if ('agentRunId' in task) {
-    output.push(Object.freeze({
-      address: parseAgentTeamAddress(task.address), agentRunId: task.agentRunId,
-      agentDefinitionId: 'task-execution', launch: inherited,
-    }))
-    return
-  }
-  task.members.forEach((member) => collectTaskMemberSeeds(member, inherited, output))
-  task.taskExecutions.forEach((child) => collectTaskSeeds(child, inherited, output))
-}
-
-const collectAgentSeeds = (view: AgentOrgExecutionViewDto): readonly AgentSeed[] => {
-  const output: AgentSeed[] = []
-  const root = view.execution_tree.rootOrg
-  for (const member of root.members) {
-    if ('agentRunId' in member) output.push(Object.freeze({
-      address: parseAgentTeamAddress(member.address), agentRunId: member.agentRunId,
-      agentDefinitionId: member.agentDefinitionId, launch: member.launchConfiguration,
-    }))
-    else {
-      member.members.forEach((agent) => output.push(Object.freeze({
-        address: parseAgentTeamAddress(agent.address), agentRunId: agent.agentRunId,
-        agentDefinitionId: agent.agentDefinitionId, launch: agent.launchConfiguration,
-      })))
-      member.taskExecutions.forEach((task) => collectTaskSeeds(task, member.defaultLaunchConfiguration, output))
-    }
-  }
-  root.taskExecutions.forEach((task) => collectTaskSeeds(task, root.defaultLaunchConfiguration, output))
-  const runIds = new Set<string>()
-  for (const seed of output) {
-    if (runIds.has(seed.agentRunId)) {
-      throw new Error(`Duplicate AgentOrg AgentRun identity '${seed.agentRunId}'.`)
-    }
-    runIds.add(seed.agentRunId)
-  }
-  return Object.freeze(output)
-}
+const collectAgentSeeds = (view: AgentOrgExecutionViewDto): readonly AgentSeed[] =>
+  [...new AgentOrgExecutionViewIndex(view).agents.values()].map((agent) => Object.freeze({
+    address: agent.address, agentRunId: agent.agentRunId,
+    agentDefinitionId: agent.source.agentDefinitionId, launch: agent.source.launchConfiguration,
+  }))
 
 const resolveWorkspaces = async (
   seeds: readonly AgentSeed[],
@@ -167,25 +113,21 @@ const createAgentContext = (
 const fetchProjection = async (
   orgRunId: string,
   seed: AgentSeed,
-): Promise<Projection | null> => {
-  try {
-    const response = await getApolloClient().query<{ getAgentOrgMemberRunProjection: Projection | null }>({
-      query: GetAgentOrgMemberRunProjection,
-      variables: { orgRunId, memberAddress: seed.address, agentRunId: seed.agentRunId },
-      fetchPolicy: 'network-only',
-    })
-    if (response.errors?.length) {
-      throw new Error(response.errors.map((error: { message: string }) => error.message).join(', '))
-    }
-    const projection = response.data?.getAgentOrgMemberRunProjection ?? null
-    if (projection && (projection.agentRunId !== seed.agentRunId || projection.memberAddress !== seed.address)) {
-      throw new Error(`Projection identity mismatch for '${seed.agentRunId}'.`)
-    }
-    return projection
-  } catch (error) {
-    console.warn(`[agentOrgContextHydration] Projection unavailable for '${seed.agentRunId}'.`, error)
-    return null
+): Promise<Projection> => {
+  const response = await getApolloClient().query<{ getAgentOrgMemberRunProjection: Projection | null }>({
+    query: GetAgentOrgMemberRunProjection,
+    variables: { orgRunId, memberAddress: seed.address, agentRunId: seed.agentRunId },
+    fetchPolicy: 'network-only',
+  })
+  if (response.errors?.length) {
+    throw new Error(response.errors.map((error: { message: string }) => error.message).join(', '))
   }
+  const projection = response.data?.getAgentOrgMemberRunProjection ?? null
+  if (projection && (projection.agentRunId !== seed.agentRunId || projection.memberAddress !== seed.address)) {
+    throw new Error(`Projection identity mismatch for '${seed.agentRunId}'.`)
+  }
+  if (!projection) throw new Error(`Projection unavailable for '${seed.agentRunId}'.`)
+  return projection
 }
 
 type PendingActivityReplacement = Readonly<{
@@ -197,9 +139,8 @@ type PendingActivityReplacement = Readonly<{
 const applyProjection = (
   context: AgentContext,
   seed: AgentSeed,
-  projection: Projection | null,
-): PendingActivityReplacement | null => {
-  if (!projection) return null
+  projection: Projection,
+): PendingActivityReplacement => {
   resetRecentEventMonitorBaseline(context)
   context.state.conversation = buildConversationFromProjection(
     seed.agentRunId,
@@ -223,7 +164,8 @@ const applyProjection = (
 export const hydrateAgentOrgExecutionContext = async (input: Readonly<{
   orgRunId: string
   view: AgentOrgExecutionViewDto
-  transport: AgentOrgCommandTransport
+  transport?: AgentOrgCommandTransport
+  isCurrent?(): boolean
 }>): Promise<AgentOrgExecutionContext> => {
   if (input.view.execution_tree.rootOrg.orgRunId !== input.orgRunId
     || input.view.task_records.orgRunId !== input.orgRunId
@@ -253,6 +195,7 @@ export const hydrateAgentOrgExecutionContext = async (input: Readonly<{
       activityReplacement,
     })
   }))
+  if (input.isCurrent && !input.isCurrent()) throw new Error('AgentOrg hydration ownership released.')
   const context = new AgentOrgExecutionContext({
     ...input,
     entries: hydrated.map((item) => item.entry),

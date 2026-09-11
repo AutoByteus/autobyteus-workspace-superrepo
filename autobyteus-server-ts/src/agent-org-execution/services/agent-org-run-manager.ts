@@ -3,7 +3,7 @@ import { ActiveCollaborationRootDirectory, getActiveCollaborationRootDirectory }
 import { createAgentOrgRootExecutionIdentity } from "../../agent-collaboration/execution/domain/root-execution-identity.js";
 import { AgentOrgRunExecutionTreeStore } from "../../run-history/store/agent-org-run-execution-tree-store.js";
 import type { AgentOrgRunExecutionTreeFileV1 } from "../domain/agent-org-run-execution-tree.js";
-import { AgentOrgRun } from "../domain/agent-org-run.js";
+import { AgentOrgRun, type AgentOrgRunPackageSnapshot } from "../domain/agent-org-run.js";
 import { AgentOrgTaskDelegationRecordsV1Store } from "../persistence/agent-org-task-delegation-records-v1-store.js";
 import { AgentOrgCommunicationMessagesV1Store } from "../persistence/agent-org-communication-messages-v1-store.js";
 import type { AgentOrgTaskDelegationRecordsFileV1 } from "../persistence/agent-org-task-delegation-records-v1.js";
@@ -129,13 +129,48 @@ export class AgentOrgRunManager {
   }
   listActiveOrgRunIds(): readonly string[] { return Object.freeze([...this.active.keys()].filter((id) => this.getActive(id))); }
 
-  async terminate(orgRunIdInput: string): Promise<boolean> {
+  getInspection(orgRunIdInput: string): Promise<Readonly<{
+    orgRunId: string;
+    isActive: boolean;
+    snapshot: AgentOrgRunPackageSnapshot;
+    baseChangeSequence: number;
+  }>> {
     const orgRunId = required(orgRunIdInput, "orgRunId");
-    const run = this.active.get(orgRunId);
-    if (!run) return false;
-    const result = await run.terminate();
-    if (!result.accepted) return false;
-    return this.unregister(orgRunId, run) || !this.active.has(orgRunId);
+    return this.withTransition(orgRunId, async () => {
+      const active = this.getActive(orgRunId);
+      if (active) {
+        const connection = await active.openPackageSnapshotConnection();
+        try {
+          return Object.freeze({ orgRunId, isActive: true,
+            snapshot: connection.snapshot, baseChangeSequence: connection.baseChangeSequence });
+        } finally { connection.close(); }
+      }
+      const dir = this.layout.getOrgDirPath(orgRunId);
+      const [tree, tasks, messages] = await Promise.all([
+        this.executionTreeStore.read(dir, orgRunId),
+        this.taskRecordsStore.read(dir, orgRunId),
+        this.communicationStore.read(dir, orgRunId),
+      ]);
+      if (!tree || !tasks || !messages) throw new Error(`AgentOrg '${orgRunId}' inspection package is unavailable.`);
+      const state = validateAgentOrgStatePackage({ executionTree: tree, taskRecords: tasks, communicationMessages: messages });
+      // The current DTO carries statuses for live executions only. Inactive
+      // inspection has none; retained contexts initialize as offline.
+      const statuses = Object.freeze([]);
+      return Object.freeze({ orgRunId, isActive: false, baseChangeSequence: 0,
+        snapshot: Object.freeze({ tree: state.executionTree, tasks: state.taskRecords,
+          messages: state.communicationMessages, statuses }) });
+    });
+  }
+
+  terminate(orgRunIdInput: string): Promise<boolean> {
+    const orgRunId = required(orgRunIdInput, "orgRunId");
+    return this.withTransition(orgRunId, async () => {
+      const run = this.active.get(orgRunId);
+      if (!run) return false;
+      const result = await run.terminate();
+      if (!result.accepted) return false;
+      return this.unregister(orgRunId, run) || !this.active.has(orgRunId);
+    });
   }
   async stopAllAgentOrgRuns(): Promise<void> {
     const errors: unknown[] = [];

@@ -13,7 +13,7 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
-import { testCollaborationMessagesContextView, testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
+import { testCollaborationMessagesContextView, testCollaborationTasksContextView } from '~/test-support/teamWorkspaceContextView';
 
 const labels: Record<string, string> = {
   'workspace.components.workspace.team.TeamOverviewPanel.messages': 'Messages',
@@ -90,7 +90,7 @@ const seedNestedTeam = () => {
 
 const mountSubject = () => mount(CollaborationOverviewPanel, {
   props: {
-    team: testTeamWorkspaceContextView(useAgentTeamContextsStore().activeTeamContext!),
+    tasks: testCollaborationTasksContextView(useAgentTeamContextsStore().activeTeamContext!),
     messages: testCollaborationMessagesContextView(useAgentTeamContextsStore().activeTeamContext!),
   },
   global: {
@@ -161,7 +161,7 @@ describe('CollaborationOverviewPanel current execution aggregate', () => {
     await wrapper.get('[data-test="team-delegated-tasks-header"]').trigger('click');
     const nested = seedNestedTeam();
     await wrapper.setProps({
-      team: testTeamWorkspaceContextView(nested),
+      tasks: testCollaborationTasksContextView(nested),
       messages: testCollaborationMessagesContextView(nested),
     });
     await nextTick();

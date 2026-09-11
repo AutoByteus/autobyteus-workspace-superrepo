@@ -12,8 +12,9 @@
           />
           <span v-else class="text-[0.625rem] font-semibold tracking-wide text-slate-600">{{ initials }}</span>
         </div>
-        <h4 class="truncate text-base font-medium text-gray-800" :title="headerTitle">{{ headerTitle }}</h4>
-        <AgentStatusDisplay :status="target.context.state.currentStatus" />
+        <CollaborationTaskHeading v-if="'task' in target" :name="agentName" :agent-run-id="target.context.state.runId" :task="target.task" :status="target.context.state.currentStatus" />
+        <h4 v-else class="truncate text-base font-medium text-gray-800" :title="headerTitle">{{ headerTitle }}</h4>
+        <AgentStatusDisplay v-if="!('task' in target)" :status="target.context.state.currentStatus" />
       </div>
       <WorkspaceHeaderActions
         v-if="showHeaderActions"
@@ -27,6 +28,7 @@
     />
     <div class="min-h-0 flex-1">
       <AgentEventMonitor
+        :read-only="target.access === 'read_only'"
         :conversation="target.context.state.conversation"
         :run-id="target.context.state.runId"
         :agent-name="agentName"
@@ -47,6 +49,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import CollaborationTaskHeading from '~/components/workspace/collaboration/CollaborationTaskHeading.vue'
 import type { ActiveAgentWorkspaceTarget } from '~/types/workspace/activeAgentWorkspaceTarget'
 import AgentEventMonitor from '~/components/workspace/agent/AgentEventMonitor.vue'
 import AgentStatusDisplay from '~/components/workspace/agent/AgentStatusDisplay.vue'

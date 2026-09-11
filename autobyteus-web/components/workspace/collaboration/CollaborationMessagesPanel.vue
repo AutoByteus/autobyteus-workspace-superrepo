@@ -47,9 +47,14 @@
                   <p class="mt-0.5 truncate text-xs text-gray-500">
                     {{ counterpartMetadata(message) }}
                   </p>
-                  <p class="truncate font-mono text-xs text-gray-400" :title="message.counterpartAddress">
-                    {{ message.counterpartAddress }}
+                  <p class="truncate font-mono text-xs text-gray-400" :title="message.counterpart.address">
+                    {{ message.counterpart.address }}
                   </p>
+                  <span v-if="message.counterpart.kind === 'task'" class="rounded-full bg-indigo-100 px-2 py-0.5 text-[0.6875rem] text-indigo-700"
+                    :title="`${message.counterpart.taskId} · ${message.counterpart.hostRunId} · ${message.counterpartAgentRunId}`"
+                    :aria-label="`${$t('workspace.task_monitor.task')} · ${message.counterpart.taskId} · ${message.counterpartAgentRunId}`">
+                    {{ $t('workspace.task_monitor.task') }} · {{ message.counterpartAgentRunId.slice(-6) }}
+                  </span>
                   <p class="mt-1 line-clamp-2 whitespace-pre-line text-sm leading-5 text-gray-600">
                     {{ message.content }}
                   </p>
@@ -118,7 +123,7 @@
               <span class="shrink-0 text-xs text-gray-400">{{ formatTimestamp(selectedMessage.createdAt) }}</span>
             </div>
             <p class="ml-6 mt-0.5 break-all font-mono text-xs text-gray-400">
-              {{ selectedMessage.counterpartAddress }}
+              {{ selectedMessage.counterpart.address }}
             </p>
           </div>
           <MarkdownRenderer
@@ -196,7 +201,7 @@ const counterpartMetadata = (message: CollaborationMessagePerspectiveRow): strin
     : `${t('workspace.components.workspace.team.TeamCommunicationPanel.from_counterpart')} ${counterpartName(message)}`;
 };
 const counterpartName = (message: CollaborationMessagePerspectiveRow): string => {
-  return message.counterpartLabel || t('workspace.components.workspace.team.TeamCommunicationPanel.unknown_teammate');
+  return message.counterpart.label || t('workspace.components.workspace.team.TeamCommunicationPanel.unknown_teammate');
 };
 const directionIcon = (message: CollaborationMessagePerspectiveRow): string =>
   message.direction === 'sent' ? 'heroicons:paper-airplane' : 'heroicons:inbox-arrow-down';

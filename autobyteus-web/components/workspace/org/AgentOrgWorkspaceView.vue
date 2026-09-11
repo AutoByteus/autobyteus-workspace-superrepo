@@ -1,6 +1,6 @@
 <template>
   <div class="relative flex h-full min-h-0 flex-col bg-white" data-test="agent-org-workspace-view">
-    <div v-if="isHistorical" class="flex h-full items-center justify-center px-6 text-center text-gray-500" data-test="agent-org-stopped-history">
+    <div v-if="isHistorical && context && !target" class="flex h-full items-center justify-center px-6 text-center text-gray-500" data-test="agent-org-stopped-history">
       <div class="max-w-md space-y-3">
         <span class="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
           <Icon icon="heroicons:building-office-2-20-solid" class="h-6 w-6" />
@@ -37,19 +37,19 @@
       @back="center.showChat"
     />
     <AgentWorkspaceSurface
-      v-else-if="target.kind === 'agent_org_direct_agent'"
+      v-else-if="target.kind === 'agent_org_direct_agent' || target.kind === 'agent_org_task_agent'"
       class="min-h-0 flex-1"
       :target="target"
-      :show-header-actions="true"
+      :show-header-actions="target.access === 'live'"
       :recovery-notice="recoveryNotice"
       @new-agent="openNewOrgRun"
       @edit-config="openMemberConfiguration"
     />
     <TeamWorkspaceSurface
-      v-else-if="target.kind === 'agent_org_team_member'"
+      v-else-if="target.kind === 'agent_org_team_member' || target.kind === 'agent_org_task_team_member'"
       class="min-h-0 flex-1"
       :target="target"
-      :show-header-actions="true"
+      :show-header-actions="target.access === 'live'"
       :recovery-notice="recoveryNotice"
       @new-team="openNewOrgRun"
       @edit-config="openMemberConfiguration"
@@ -78,18 +78,36 @@ const isHistorical = computed(() => route.query.mode === 'history')
 const context = computed(() => active.agentOrgContextFor(orgRunId.value))
 const streamError = computed(() => active.agentOrgErrorFor(orgRunId.value))
 const recoveryNotice = computed(() => streamError.value
-  ? t('workspace.agentOrg.recovery.exhausted')
+  ? t(isHistorical.value ? 'workspace.agentOrg.inspectionUnavailable' : 'workspace.agentOrg.recovery.exhausted')
   : null)
 const target = computed(() => {
   const current = active.activeWorkspaceTarget
-  return current?.kind === 'agent_org_direct_agent' || current?.kind === 'agent_org_team_member'
+  return current && 'root' in current
     ? current
     : null
 })
 const targetIdentity = computed(() => target.value
   ? `${target.value.root.orgRunId}\u0000${target.value.address}\u0000${target.value.context.state.runId}`
   : null)
-const connect = () => { if (orgRunId.value && !isHistorical.value) active.connectAgentOrg(orgRunId.value) }
+const connect = () => {
+  if (!orgRunId.value) return
+  if (isHistorical.value) void active.inspectAgentOrg(orgRunId.value)
+  else active.connectAgentOrg(orgRunId.value)
+}
+const selectRouteExecution = () => {
+  if (!orgRunId.value) return
+  const agentRunId = String(route.query.agentRunId || '')
+  const address = String(route.query.memberAddress || '')
+  if (agentRunId) {
+    const identity = context.value?.index.agents.get(agentRunId)
+    if (identity && address && identity.address !== address) {
+      active.selectAgentOrg(orgRunId.value, null)
+      return
+    }
+    active.selectAgentOrg(orgRunId.value, { kind: 'agent_execution', agentRunId })
+  } else if (address) active.selectAgentOrg(orgRunId.value, address)
+}
+watch([() => route.query.agentRunId, () => route.query.memberAddress, context], selectRouteExecution, { immediate: true })
 const openNewOrgRun = () => {
   const definitionId = context.value?.executionTree.rootOrg.orgDefinitionId
     || String(route.query.definitionId || '')
@@ -101,20 +119,20 @@ const openNewOrgRun = () => {
   })
 }
 const openMemberConfiguration = () => {
-  if (target.value) center.showConfig()
+  if (target.value?.access === 'live') center.showConfig()
 }
 
 onMounted(() => {
   center.showChat()
   connect()
 })
-onBeforeUnmount(() => { if (orgRunId.value && !isHistorical.value) active.disconnectAgentOrg(orgRunId.value) })
+onBeforeUnmount(() => { if (orgRunId.value) active.disconnectAgentOrg(orgRunId.value) })
 watch([orgRunId, isHistorical], ([nextRunId, nextHistorical], [previousRunId, previousHistorical]) => {
   center.showChat()
-  if (previousRunId && !previousHistorical && (previousRunId !== nextRunId || nextHistorical)) {
+  if (previousRunId && (previousRunId !== nextRunId || previousHistorical !== nextHistorical)) {
     active.disconnectAgentOrg(previousRunId)
   }
-  if (!nextHistorical) connect()
+  connect()
 })
 watch(targetIdentity, (nextIdentity, previousIdentity) => {
   if (previousIdentity && nextIdentity !== previousIdentity) center.showChat()

@@ -47,7 +47,7 @@ import type {
   DelegatedTaskDisplayStatus,
   DelegatedTaskLifecycleItem,
   DelegatedTaskParticipant,
-} from '~/utils/teamDelegatedTaskEntries';
+} from '~/types/workspace/collaborationTaskPresentation';
 import MarkdownRenderer from '~/components/conversation/segments/renderer/MarkdownRenderer.vue';
 
 const props = defineProps<{

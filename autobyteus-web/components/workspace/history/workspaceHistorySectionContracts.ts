@@ -39,7 +39,7 @@ export interface WorkspaceHistorySectionState {
   isAgentOrgTeamExpanded?: (rootRunId: string, address: string) => boolean;
   toggleAgentOrgTeam?: (rootRunId: string, address: string) => void;
   isAgentOrgRunSelected?: (rootRunId: string) => boolean;
-  isAgentOrgMemberSelected?: (rootRunId: string, address: string) => boolean;
+  isAgentOrgMemberSelected?: (rootRunId: string, address: string, agentRunId?: string) => boolean;
   isAgentOrgRestoring?: boolean;
   isAgentOrgTerminating?: (rootRunId: string) => boolean;
   agentOrgTerminationError?: (rootRunId: string) => string | null;
@@ -86,5 +86,6 @@ export interface WorkspaceHistorySectionActions {
   ) => Promise<void> | void;
   onOpenAgentOrgRun?: (run: AgentOrgRunHistoryItem) => Promise<void> | void;
   onSelectAgentOrgMember?: (run: AgentOrgRunHistoryItem, address: string) => Promise<void> | void;
+  onInspectAgentOrgExecution?: (run: AgentOrgRunHistoryItem, agentRunId: string, address: string) => Promise<void> | void;
   onTerminateAgentOrg?: (run: AgentOrgRunHistoryItem) => Promise<void> | void;
 }

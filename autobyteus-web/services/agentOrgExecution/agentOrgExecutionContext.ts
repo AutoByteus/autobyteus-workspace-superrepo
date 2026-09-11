@@ -15,16 +15,17 @@ import type { CollaborationMessagesContextView } from '~/types/workspace/collabo
 import { toAgentPresentationProjectionMessage } from '~/services/agentStreaming/teamStreamDtoAdapters'
 import { dispatchAgentStreamMessage } from '~/services/agentStreaming/agentStreamMessageProjector'
 import { applyOfflineOrTerminalCleanup } from '~/services/runStatus/agentRuntimeStatusState'
-import { projectAgentOrgTeamTasks } from './agentOrgTeamPresentation'
+import { projectAgentOrgTasks } from './agentOrgTaskPresentation'
+import type { CollaborationTasksContextView } from '~/types/workspace/collaborationTasksContextView'
+import { AgentOrgExecutionViewIndex, type OrgWorkspaceSelection, type OrgAgentViewIdentity, type OrgTeamViewIdentity } from './agentOrgExecutionViewIndex'
 import { projectSettledAgentOrgTask } from './agentOrgTaskSettlementProjection'
 import {
   assertAgentOrgCommunicationMessagesCorrelated,
-  createAgentOrgCommunicationPerspectiveIndex,
   projectAgentOrgCommunicationPerspective,
-  type AgentOrgCommunicationPerspectiveIndex,
+  projectAgentOrgMessageIdentity,
 } from './agentOrgCommunicationPerspective'
 
-export type AgentOrgSyncPhase = 'hydrating' | 'live' | 'reopen_required' | 'closed'
+export type AgentOrgSyncPhase = 'hydrating' | 'live' | 'historical' | 'reopen_required' | 'closed'
 export type AgentOrgEventApplication = 'applied' | 'checkpoint_required'
 
 export interface AgentOrgCommandTransport {
@@ -37,16 +38,8 @@ export type AgentOrgContextEntry = Readonly<{
   context: AgentContext
 }>
 
-type ConfiguredMember = AgentOrgExecutionViewDto['execution_tree']['rootOrg']['members'][number]
-type ConfiguredTeam = Extract<ConfiguredMember, { teamRunId: string }>
-type ConfiguredAgent = Extract<ConfiguredMember, { agentRunId: string }>
-type TaskExecution = AgentOrgExecutionViewDto['execution_tree']['rootOrg']['taskExecutions'][number]
-type TaskTeam = Extract<TaskExecution, { teamRunId: string }>
-type TaskTeamMember = TaskTeam['members'][number]
-type TaskTeamNode = TaskTeam | Extract<TaskTeamMember, { teamRunId: string }>
 type TaskRecord = AgentOrgExecutionViewDto['task_records']['records'][number]
 type TaskEvent = Extract<AgentOrgExecutionEventDto, { kind: 'task' }>['event']
-type ConfiguredPlacementKind = 'agent' | 'team'
 
 const nameAt = (address: string): string => address.split('/').filter(Boolean).at(-1)?.replace(/[_-]+/g, ' ') || address
 
@@ -55,25 +48,20 @@ export class AgentOrgExecutionContext {
   view: AgentOrgExecutionViewDto
   phase: AgentOrgSyncPhase = 'hydrating'
   error: string | null = null
-  focusAddress: AgentTeamAddress | null = null
+  selection: OrgWorkspaceSelection | null = null
+  index: AgentOrgExecutionViewIndex
   private readonly contexts = shallowReactive(new Map<string, AgentContext>())
-  private readonly addressByRunId = new Map<string, AgentTeamAddress>()
-  private readonly addressByTeamRunId = new Map<string, AgentTeamAddress>()
-  private readonly configuredPlacementKindByAddress = new Map<AgentTeamAddress, ConfiguredPlacementKind>()
-  private readonly taskAgentAddressByRunId = new Map<string, AgentTeamAddress>()
-  private readonly taskTeamAddressByRunId = new Map<string, AgentTeamAddress>()
-  private readonly communicationIndex: AgentOrgCommunicationPerspectiveIndex
-  private readonly messagesViewByAgentRunId = new Map<string, CollaborationMessagesContextView>()
   private nextChangeSequence: number
 
   constructor(input: Readonly<{
     orgRunId: string
     view: AgentOrgExecutionViewDto
     entries: readonly AgentOrgContextEntry[]
-    transport: AgentOrgCommandTransport
+    transport?: AgentOrgCommandTransport
   }>) {
     this.orgRunId = input.orgRunId
     this.view = structuredClone(input.view)
+    this.index = new AgentOrgExecutionViewIndex(this.view)
     this.nextChangeSequence = input.view.base_change_sequence + 1
     for (const entry of input.entries) {
       if (entry.agentRunId !== entry.context.state.runId || this.contexts.has(entry.agentRunId)) {
@@ -82,36 +70,37 @@ export class AgentOrgExecutionContext {
       entry.context.state = reactive(entry.context.state)
       const context = reactive(entry.context)
       this.contexts.set(entry.agentRunId, context)
-      this.addressByRunId.set(entry.agentRunId, entry.memberAddress)
+      if (this.index.requireAgent(entry.agentRunId).address !== entry.memberAddress) throw new Error('AgentOrg context address mismatch.')
     }
-    this.indexAndValidateIdentities()
-    this.communicationIndex = createAgentOrgCommunicationPerspectiveIndex(this.view)
-    assertAgentOrgCommunicationMessagesCorrelated(
-      this.communicationIndex,
-      this.view.communication_messages.messages,
-    )
+    if (this.contexts.size !== this.index.agents.size) throw new Error('AgentOrg context scope is incomplete.')
+    assertAgentOrgCommunicationMessagesCorrelated(this.index, this.view.communication_messages.messages)
     for (const status of input.view.agent_statuses) {
-      const address = this.addressByRunId.get(status.agent_run_id)
+      const address = this.index.agents.get(status.agent_run_id)?.address
       if (address !== status.member_address) {
         throw new Error(`AgentOrg status '${status.agent_run_id}' has no exact context identity.`)
       }
       this.contexts.get(status.agent_run_id)!.state.currentStatus = status.status as AgentStatus
     }
     this.transport = input.transport
-    this.phase = 'live'
+    if (input.view.is_active && !input.transport) throw new Error('Live AgentOrg context needs its command transport.')
+    this.phase = input.view.is_active ? 'live' : 'historical'
   }
 
-  private readonly transport: AgentOrgCommandTransport
+  private readonly transport?: AgentOrgCommandTransport
 
   get executionTree() { return this.view.execution_tree }
   get isActive(): boolean { return this.view.is_active }
   get changeSequence(): number { return this.nextChangeSequence - 1 }
-  get selectedAddress(): AgentTeamAddress | null { return this.focusAddress }
+  get selectedAddress(): AgentTeamAddress | null {
+    return this.selection?.kind === 'configured_team'
+      ? this.index.teams.get(this.selection.teamRunId)?.address ?? null
+      : this.index.selectedAgent(this.selection)?.address ?? null
+  }
 
   listAgentContextEntries(): readonly AgentOrgContextEntry[] {
     return Object.freeze([...this.contexts].map(([agentRunId, context]) => Object.freeze({
       agentRunId,
-      memberAddress: this.addressByRunId.get(agentRunId)!,
+      memberAddress: this.index.requireAgent(agentRunId).address,
       context,
     })))
   }
@@ -120,71 +109,34 @@ export class AgentOrgExecutionContext {
     return this.contexts.get(agentRunId) ?? null
   }
 
-  select(address: string | null): void {
-    if (!address) {
-      this.focusAddress = null
-      return
-    }
-    const parsed = parseAgentTeamAddress(address)
-    const member = this.executionTree.rootOrg.members.find((candidate) => candidate.address === parsed)
-    if (member && 'agentRunId' in member) {
-      this.focusAddress = parsed
-      return
-    }
-    if (member && 'teamRunId' in member && this.teamCoordinator(member)) {
-      this.focusAddress = parsed
-      return
-    }
-    const team = this.teamContainingAgent(parsed)
-    this.focusAddress = team ? parsed : null
+  select(selection: OrgWorkspaceSelection | string | null): void {
+    const candidate = typeof selection === 'string' ? this.index.configuredSelection(selection) : selection
+    this.selection = this.index.selectedAgent(candidate) ? candidate : null
   }
 
   activeTarget(): ActiveAgentWorkspaceTarget | null {
-    if (!this.focusAddress
-      || (this.phase !== 'live' && this.phase !== 'reopen_required')
-      || !this.isActive) return null
-    const rootMember = this.executionTree.rootOrg.members.find((member) => member.address === this.focusAddress)
-    if (rootMember && 'agentRunId' in rootMember) {
-      const context = this.contexts.get(rootMember.agentRunId)
-      if (!context) return null
-      return Object.freeze({
-        kind: 'agent_org_direct_agent',
-        root: Object.freeze({ orgRunId: this.orgRunId }),
-        address: rootMember.address,
-        collaborationMessages: this.messagesView(rootMember.address, rootMember.agentRunId),
-        context,
-        interaction: this.transport.interactionFor(rootMember.agentRunId),
-        browse: Object.freeze({
-          kind: 'agentOrgMember', orgRunId: this.orgRunId,
-          memberAddress: rootMember.address, agentRunId: rootMember.agentRunId,
-        }),
-      })
+    if (!['live', 'historical', 'reopen_required'].includes(this.phase)) return null
+    const agent = this.index.selectedAgent(this.selection)
+    if (!agent) return null
+    const context = this.contexts.get(agent.agentRunId)!
+    const access = this.isActive && agent.live && this.phase !== 'historical'
+      ? { access: 'live' as const, interaction: this.transport!.interactionFor(agent.agentRunId) }
+      : { access: 'read_only' as const }
+    const common = {
+      ...access, root: Object.freeze({ orgRunId: this.orgRunId }), address: agent.address, context,
+      collaborationMessages: this.messagesView(agent.address, agent.agentRunId),
+      collaborationTasks: this.tasksView(agent.agentRunId),
+      browse: Object.freeze({ kind: 'agentOrgMember' as const, orgRunId: this.orgRunId,
+        memberAddress: agent.address, agentRunId: agent.agentRunId }),
     }
-    const team = rootMember && 'teamRunId' in rootMember
-      ? rootMember
-      : this.teamContainingAgent(this.focusAddress)
-    if (!team) return null
-    const focusedMember = rootMember && 'teamRunId' in rootMember
-      ? this.teamCoordinator(team)
-      : team.members.find((member) => member.address === this.focusAddress)
-    if (!focusedMember) return null
-    const memberAddress = focusedMember.address
-    const agentRunId = focusedMember.agentRunId
-    const context = this.contexts.get(agentRunId)
-    if (!context || this.addressByRunId.get(agentRunId) !== memberAddress) return null
-    return Object.freeze({
-      kind: 'agent_org_team_member',
-      root: Object.freeze({ orgRunId: this.orgRunId }),
-      team: this.teamView(team, memberAddress, agentRunId, context),
-      address: memberAddress,
-      collaborationMessages: this.messagesView(memberAddress, agentRunId),
-      context,
-      interaction: this.transport.interactionFor(agentRunId),
-      browse: Object.freeze({
-        kind: 'agentOrgMember', orgRunId: this.orgRunId,
-        memberAddress, agentRunId,
-      }),
+    const task = agent.task ? this.taskPresentation(agent.task.executionRunId) : null
+    if (agent.kind === 'task') return Object.freeze({ ...common, kind: 'agent_org_task_agent', task: task! })
+    if (agent.host.kind === 'team') return Object.freeze({
+      ...common, team: this.teamView(this.index.requireTeam(agent.host.runId), agent, context),
+      ...(task ? { kind: 'agent_org_task_team_member' as const, task }
+        : { kind: 'agent_org_team_member' as const }),
     })
+    return Object.freeze({ ...common, kind: 'agent_org_direct_agent' })
   }
 
   applyEvent(changeSequence: number, event: AgentOrgExecutionEventDto): AgentOrgEventApplication {
@@ -194,7 +146,7 @@ export class AgentOrgExecutionContext {
       throw new Error(this.error!)
     }
     if (event.kind === 'agent_presentation') {
-      const address = this.addressByRunId.get(event.agent_run_id)
+      const address = this.index.agents.get(event.agent_run_id)?.address
       const context = this.contexts.get(event.agent_run_id)
       if (!context || address !== event.member_address) {
         this.requireReopen(`Agent presentation identity '${event.agent_run_id}' is not in the context.`)
@@ -214,20 +166,17 @@ export class AgentOrgExecutionContext {
       const settlement = event.event.kind === 'settled'
         ? this.projectTaskSettlement(event.event.task, event.event.settledAt)
         : null
-      if (settlement) this.view = settlement.view
+      if (settlement) this.commitView(settlement.view)
       else {
         const records = [...this.view.task_records.records]
         const index = records.findIndex((record) => record.taskId === event.event.task.taskId)
         if (index >= 0) records[index] = event.event.task
         else records.push(event.event.task)
-        this.view = {
-          ...this.view,
-          task_records: { ...this.view.task_records, records },
-        }
+        this.commitView({ ...this.view, task_records: { ...this.view.task_records, records } })
       }
     } else {
       try {
-        assertAgentOrgCommunicationMessagesCorrelated(this.communicationIndex, [event.message])
+        assertAgentOrgCommunicationMessagesCorrelated(this.index, [event.message])
       } catch {
         this.correlationFailure(`AgentOrg communication message '${event.message.messageId}' identity mismatch.`)
       }
@@ -246,7 +195,7 @@ export class AgentOrgExecutionContext {
   setActive(active: boolean): void {
     this.view = { ...this.view, is_active: active }
     if (!active) {
-      this.focusAddress = null
+      this.selection = null
       this.phase = 'closed'
     }
   }
@@ -256,94 +205,15 @@ export class AgentOrgExecutionContext {
     this.phase = 'reopen_required'
   }
 
-  private teamContainingAgent(address: AgentTeamAddress): ConfiguredTeam | null {
-    return this.executionTree.rootOrg.members.find((member): member is ConfiguredTeam =>
-      'teamRunId' in member && member.members.some((agent) => agent.address === address)) ?? null
-  }
-
-  private indexAndValidateIdentities(): void {
-    for (const member of this.executionTree.rootOrg.members) {
-      if ('agentRunId' in member) {
-        this.registerConfiguredPlacement(member.address, 'agent')
-        this.requireAgentContextIdentity(member.agentRunId, member.address, 'Configured Agent')
-        continue
-      }
-      this.registerConfiguredPlacement(member.address, 'team')
-      this.registerTeamIdentity(member.teamRunId, member.address)
-      for (const agent of member.members) {
-        this.registerConfiguredPlacement(agent.address, 'agent')
-        this.requireAgentContextIdentity(
-          agent.agentRunId,
-          agent.address,
-          `Configured Team '${member.address}' member`,
-        )
-      }
-      if (!this.teamCoordinator(member)) {
-        throw new Error(`Configured Team '${member.address}' coordinator is not one of its direct Agent members.`)
-      }
-      member.taskExecutions.forEach((task) => this.indexTaskExecution(task))
-    }
-    this.executionTree.rootOrg.taskExecutions.forEach((task) => this.indexTaskExecution(task))
-    for (const task of this.view.task_records.records) this.validateSnapshotTask(task)
-  }
-
-  private registerConfiguredPlacement(address: string, kind: ConfiguredPlacementKind): void {
-    const parsed = parseAgentTeamAddress(address)
-    if (this.configuredPlacementKindByAddress.has(parsed)) {
-      throw new Error(`Duplicate AgentOrg configured address '${parsed}'.`)
-    }
-    this.configuredPlacementKindByAddress.set(parsed, kind)
-  }
-
-  private requireAgentContextIdentity(agentRunId: string, address: string, label: string): void {
-    if (this.addressByRunId.get(agentRunId) !== address || !this.contexts.has(agentRunId)) {
-      throw new Error(`${label} '${address}' has no exact AgentOrg context.`)
-    }
-  }
-
-  private registerTeamIdentity(teamRunId: string, address: string): void {
-    if (this.addressByTeamRunId.has(teamRunId)) {
-      throw new Error(`Duplicate AgentOrg TeamRun identity '${teamRunId}'.`)
-    }
-    this.addressByTeamRunId.set(teamRunId, parseAgentTeamAddress(address))
-  }
-
-  private indexTaskExecution(task: TaskExecution): void {
-    if ('agentRunId' in task) {
-      this.requireAgentContextIdentity(task.agentRunId, task.address, 'Task Agent')
-      this.taskAgentAddressByRunId.set(task.agentRunId, parseAgentTeamAddress(task.address))
-      return
-    }
-    this.indexTaskTeam(task, true)
-  }
-
-  private indexTaskTeam(team: TaskTeamNode, taskExecutionRoot: boolean): void {
-    this.registerTeamIdentity(team.teamRunId, team.address)
-    if (taskExecutionRoot) {
-      this.taskTeamAddressByRunId.set(team.teamRunId, parseAgentTeamAddress(team.address))
-    }
-    team.members.forEach((member) => {
-      if ('agentRunId' in member) {
-        this.requireAgentContextIdentity(member.agentRunId, member.address, 'Task Team Agent')
-      } else {
-        this.indexTaskTeam(member, false)
-      }
-    })
-    team.taskExecutions.forEach((task) => this.indexTaskExecution(task))
-  }
-
-  private teamCoordinator(team: ConfiguredTeam): ConfiguredAgent | null {
-    const coordinator = team.members.find((member) => member.address === team.coordinatorAddress) ?? null
-    return coordinator
-      && this.addressByRunId.get(coordinator.agentRunId) === coordinator.address
-      && this.contexts.has(coordinator.agentRunId)
-      ? coordinator
-      : null
+  private commitView(view: AgentOrgExecutionViewDto): void {
+    const index = new AgentOrgExecutionViewIndex(view)
+    this.view = view
+    this.index = index
   }
 
   private validateTaskEvent(event: TaskEvent): AgentOrgEventApplication {
     const task = event.task
-    if (!this.addressByRunId.has(task.delegatorAgentRunId)) {
+    if (!this.index.agents.has(task.delegatorAgentRunId)) {
       this.correlationFailure(`AgentOrg task '${task.taskId}' delegator identity mismatch.`)
     }
     const existing = this.view.task_records.records.find((record) => record.taskId === task.taskId)
@@ -359,21 +229,10 @@ export class AgentOrgExecutionContext {
     return 'applied'
   }
 
-  private validateSnapshotTask(task: TaskRecord): void {
-    if (!this.addressByRunId.has(task.delegatorAgentRunId)
-      || !this.taskExecutionMatchesConfiguredRecipient(task)) {
-      throw new Error(`AgentOrg task '${task.taskId}' snapshot identity mismatch.`)
-    }
-  }
-
   private taskExecutionMatchesConfiguredRecipient(task: TaskRecord): boolean {
-    const recipient = parseAgentTeamAddress(task.recipientAddress)
-    if ('agentRunId' in task.taskExecution) {
-      return this.configuredPlacementKindByAddress.get(recipient) === 'agent'
-        && this.taskAgentAddressByRunId.get(task.taskExecution.agentRunId) === recipient
-    }
-    return this.configuredPlacementKindByAddress.get(recipient) === 'team'
-      && this.taskTeamAddressByRunId.get(task.taskExecution.teamRunId) === recipient
+    const runId = 'agentRunId' in task.taskExecution ? task.taskExecution.agentRunId : task.taskExecution.teamRunId
+    const indexed = this.index.assignments.get(runId)
+    return Boolean(indexed && indexed.taskId === task.taskId && this.sameTaskIdentity(indexed, task))
   }
 
   private validateFreshTaskExecution(task: TaskRecord): void {
@@ -382,9 +241,10 @@ export class AgentOrgExecutionContext {
     const runId = 'agentRunId' in task.taskExecution
       ? task.taskExecution.agentRunId
       : task.taskExecution.teamRunId
-    if (this.configuredPlacementKindByAddress.get(recipient) !== expectedKind
-      || this.addressByRunId.has(runId)
-      || this.addressByTeamRunId.has(runId)) {
+    const source = this.index.configured.get(recipient)
+    if (!source || ('agentRunId' in source ? 'agent' : 'team') !== expectedKind
+      || this.index.agents.has(runId)
+      || this.index.teams.has(runId)) {
       this.correlationFailure(`AgentOrg task '${task.taskId}' execution identity mismatch.`)
     }
   }
@@ -423,64 +283,51 @@ export class AgentOrgExecutionContext {
     throw new Error(this.error!)
   }
 
-  private teamView(
-    team: ConfiguredTeam,
-    focusedMemberAddress: AgentTeamAddress,
-    focusedAgentRunId: string,
-    focusedAgentContext: AgentContext,
-  ): TeamWorkspaceContextView {
-    const members = team.members.map((member) => Object.freeze({
-      address: member.address,
-      agentRunId: member.agentRunId,
-      context: this.contexts.get(member.agentRunId)!,
-      coordinator: member.address === team.coordinatorAddress,
+  private taskPresentation(executionRunId: string) {
+    const task = this.index.assignments.get(executionRunId)!
+    return Object.freeze({ taskId: task.taskId, description: task.description,
+      displayStatus: task.status === 'active'
+        ? (task.updates.at(-1) && 'decision' in task.updates.at(-1)!
+          && (task.updates.at(-1) as { decision: string }).decision === 'request_revision'
+            ? 'revision_requested' as const : 'in_progress' as const)
+        : task.status })
+  }
+
+  private teamView(team: OrgTeamViewIdentity, agent: OrgAgentViewIdentity, context: AgentContext): TeamWorkspaceContextView {
+    const members = this.index.teamMembers(team.teamRunId).map((member) => Object.freeze({
+      address: member.address, agentRunId: member.agentRunId, context: this.contexts.get(member.agentRunId)!,
+      coordinator: member.agentRunId === this.index.coordinator(team.teamRunId).agentRunId,
     }))
     return Object.freeze({
       rootKind: 'agent_org', rootRunId: this.orgRunId,
       teamRunId: team.teamRunId, teamAddress: team.address,
-      teamDefinitionName: nameAt(team.address), coordinatorAddress: team.coordinatorAddress,
-      focusedMemberAddress, focusedAgentRunId, focusedAgentContext,
-      focusedTaskPresentation: () => null,
+      teamDefinitionName: nameAt(team.address), coordinatorAddress: team.source.coordinatorAddress,
+      focusedMemberAddress: agent.address, focusedAgentRunId: agent.agentRunId, focusedAgentContext: context,
+      focusedTaskPresentation: () => agent.task ? this.taskPresentation(agent.task.executionRunId) : null,
       isFocusedProjectionAuthoritative: () => true,
       listMembers: () => Object.freeze(members),
-      listDelegatedTaskEntries: () => projectAgentOrgTeamTasks({
-        orgRunId: this.orgRunId,
-        view: this.view,
-        team,
-        focusedAgentRunId,
-      }),
+    })
+  }
+
+  private tasksView(focusedAgentRunId: string): CollaborationTasksContextView {
+    return Object.freeze({ rootKind: 'agent_org', rootRunId: this.orgRunId, focusedAgentRunId,
+      listDelegatedTaskEntries: () => projectAgentOrgTasks({ orgRunId: this.orgRunId,
+        view: this.view, index: this.index, focusedAgentRunId }),
       taskReferenceContentPath: (taskId: string, referenceId: string) =>
         `agent-org-runs/${encodeURIComponent(this.orgRunId)}/task-delegations/${encodeURIComponent(taskId)}/references/${encodeURIComponent(referenceId)}/content`,
     })
   }
 
-  private messagesView(
-    focusedMemberAddress: AgentTeamAddress,
-    focusedAgentRunId: string,
-  ): CollaborationMessagesContextView {
-    const current = this.messagesViewByAgentRunId.get(focusedAgentRunId)
-    if (current) return current
-    const memberIdentities = Object.freeze(Object.fromEntries(
-      [...this.communicationIndex.configuredByRunId].map(([agentRunId, identity]) => [
-        agentRunId,
-        Object.freeze({ ...identity }),
-      ]),
-    ))
-    const messages = Object.freeze({
-      rootKind: 'agent_org',
-      rootRunId: this.orgRunId,
-      focusedAgentRunId,
-      focusedMemberAddress,
-      memberIdentityByAgentRunId: () => memberIdentities,
-      listMessages: () => projectAgentOrgCommunicationPerspective({
-        index: this.communicationIndex,
-        messages: this.view.communication_messages.messages,
-        focusedAgentRunId,
-      }),
+  private messagesView(focusedMemberAddress: AgentTeamAddress, focusedAgentRunId: string): CollaborationMessagesContextView {
+    return Object.freeze({
+      rootKind: 'agent_org', rootRunId: this.orgRunId, focusedAgentRunId, focusedMemberAddress,
+      memberIdentityByAgentRunId: () => Object.freeze(Object.fromEntries([...this.index.agents.keys()].map((id) => [id,
+        projectAgentOrgMessageIdentity(this.index, id),
+      ]))),
+      listMessages: () => projectAgentOrgCommunicationPerspective({ index: this.index,
+        messages: this.view.communication_messages.messages, focusedAgentRunId }),
       referenceContentPath: (messageId: string, referenceId: string) =>
         `agent-org-runs/${encodeURIComponent(this.orgRunId)}/communication/messages/${encodeURIComponent(messageId)}/references/${encodeURIComponent(referenceId)}/content`,
     })
-    this.messagesViewByAgentRunId.set(focusedAgentRunId, messages)
-    return messages
   }
 }

@@ -1,3 +1,4 @@
+import { markTaskDelegationSystemTaskNotificationMetadata } from "../events/task-system-input-presentation.js";
 import { randomUUID } from "node:crypto";
 import { AgentInputUserMessage } from "autobyteus-ts/agent/message/agent-input-user-message.js";
 import { SenderType } from "autobyteus-ts/agent/sender-type.js";
@@ -333,7 +334,7 @@ export class RootTaskLifecycleEngine<TPlacement> {
   }
 
   private async notify(agentRunId: string, content: string): Promise<string | null> {
-    const result = await this.adapter.deliverSystemMessage(agentRunId, new AgentInputUserMessage(content, SenderType.SYSTEM));
+    const result = await this.adapter.deliverSystemMessage(agentRunId, new AgentInputUserMessage(content, SenderType.SYSTEM, null, markTaskDelegationSystemTaskNotificationMetadata({})));
     return result.accepted ? null : `Task transition committed, but notification failed: ${result.message ?? result.code ?? "unknown error"}`;
   }
 }

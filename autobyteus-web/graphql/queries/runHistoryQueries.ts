@@ -355,3 +355,9 @@ export const GetAgentRunResumeConfig = gql`
     }
   }
 `;
+
+export const GetAgentOrgRunInspection = gql`
+  query GetAgentOrgRunInspection($orgRunId: String!) {
+    getAgentOrgRunInspection(orgRunId: $orgRunId)
+  }
+`;

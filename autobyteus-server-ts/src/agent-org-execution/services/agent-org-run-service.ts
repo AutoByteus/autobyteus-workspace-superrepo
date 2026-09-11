@@ -1,3 +1,4 @@
+import { projectAgentOrgExecutionSnapshot } from "../../services/agent-streaming/agent-org-execution-view-projector.js";
 import type { SkillAccessMode } from "autobyteus-ts/agent/context/skill-access-mode.js";
 import type { AgentDefinitionService } from "../../agent-definition/services/agent-definition-service.js";
 import type { AgentTeamDefinitionService } from "../../agent-team-definition/services/agent-team-definition-service.js";
@@ -149,6 +150,10 @@ export class AgentOrgRunService {
 
   getActive(agentOrgRunId: string): AgentOrgRun | null {
     return this.dependencies.manager.getActive(required(agentOrgRunId, "agentOrgRunId"));
+  }
+
+  async getInspection(orgRunId: string) {
+    return projectAgentOrgExecutionSnapshot(await this.dependencies.manager.getInspection(orgRunId));
   }
 
   recordRunActivity(run: AgentOrgRun, input: { summary?: string | null } = {}): Promise<void> {

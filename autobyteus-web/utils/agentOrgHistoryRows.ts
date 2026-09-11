@@ -21,7 +21,7 @@ export type AgentOrgHistoryTaskAgentRow = Readonly<{
   agentRunId: string; status: AgentStatus; depth: number
 }>
 export type AgentOrgHistoryTaskTeamRow = Readonly<{
-  key: string; kind: 'task_team'; address: string; teamRunId: string; depth: number
+  key: string; kind: 'task_team'; address: string; teamRunId: string; depth: number; coordinatorAgentRunId: string; coordinatorAddress: string
 }>
 export type AgentOrgHistoryRow =
   | AgentOrgHistoryAgentRow
@@ -38,6 +38,7 @@ type TaskBranchNode = AgentOrgTaskExecutionNode | AgentOrgTaskTeamMember
 type TaskTeamNode = Exclude<TaskBranchNode, { agentRunId: string }>
 type StatusSource = Readonly<{
   authority: TeamStatusAuthority
+  coordinatorFor(team: TaskTeamNode): Readonly<{ agentRunId: string; address: string }>
   statusForAgentRunId(agentRunId: string): AgentStatus | string | null | undefined
 }>
 
@@ -54,6 +55,16 @@ const statusSource = (
   )
   return {
     authority: live ? 'live' : 'historical',
+    coordinatorFor: (team) => {
+      const source = (context?.executionTree ?? run.executionTree).rootOrg.members.find((member) =>
+        'teamRunId' in member && member.address === team.address)
+      if (!source || !('teamRunId' in source)) throw new Error(`Missing captured Team source '${team.address}'.`)
+      const findMembers = (node: TaskTeamNode): { agentRunId: string; address: string }[] => node.members.flatMap((member) =>
+        'agentRunId' in member ? [member] : findMembers(member))
+      const matches = findMembers(team).filter((member) => member.address === source.coordinatorAddress)
+      if (matches.length !== 1) throw new Error(`Missing exact task coordinator '${team.teamRunId}'.`)
+      return matches[0]!
+    },
     statusForAgentRunId: (agentRunId) => live
       ? context?.getAgentContext(agentRunId)?.state.currentStatus
       : undefined,
@@ -64,11 +75,13 @@ const exactAgentStatus = (source: StatusSource, agentRunId: string): AgentStatus
   foldTeamAggregateStatus([source.statusForAgentRunId(agentRunId)], source.authority)
 
 const flattenTaskTeam = (team: TaskTeamNode, depth: number, source: StatusSource): AgentOrgHistoryRow[] => {
+  const coordinator = source.coordinatorFor(team)
   const rows: AgentOrgHistoryRow[] = [{
     key: `task-team:${team.teamRunId}`,
     kind: 'task_team',
     address: team.address,
     teamRunId: team.teamRunId,
+    coordinatorAgentRunId: coordinator.agentRunId, coordinatorAddress: coordinator.address,
     depth,
   }]
   for (const member of team.members) {
@@ -92,7 +105,7 @@ const flattenTask = (
   task: AgentOrgTaskExecutionNode,
   depth: number,
   source: StatusSource,
-): AgentOrgHistoryRow[] => isAgentOrgTaskAgentNode(task)
+): AgentOrgHistoryRow[] => task.settledAt !== null ? [] : isAgentOrgTaskAgentNode(task)
   ? [{
       key: `task-agent:${task.agentRunId}`,
       kind: 'task_agent',

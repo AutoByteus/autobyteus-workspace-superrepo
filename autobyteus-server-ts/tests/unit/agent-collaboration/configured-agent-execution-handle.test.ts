@@ -1,3 +1,7 @@
+import { AgentInputUserMessage } from "autobyteus-ts/agent/message/agent-input-user-message.js";
+import { SenderType } from "autobyteus-ts/agent/sender-type.js";
+import { markTaskDelegationSystemTaskNotificationMetadata } from "../../../src/agent-collaboration/execution/events/task-system-input-presentation.js";
+import { CollaborationAgentPresentationEventAdapter } from "../../../src/agent-collaboration/execution/events/collaboration-agent-presentation-event-adapter.js";
 import { describe, expect, it, vi } from "vitest";
 import { SkillAccessMode } from "autobyteus-ts/agent/context/skill-access-mode.js";
 import { RuntimeKind } from "../../../src/runtime-management/runtime-kind-enum.js";
@@ -20,7 +24,7 @@ const taskCommands = (root: ReturnType<typeof createTeamRootExecutionIdentity>) 
   reviewTaskResult: vi.fn(),
 });
 
-const build = (kind: "agent_team" | "agent_org") => {
+const build = (kind: "agent_team" | "agent_org", runtimeKind = RuntimeKind.AUTOBYTEUS) => {
   const root = kind === "agent_team"
     ? createTeamRootExecutionIdentity("root-run")
     : createAgentOrgRootExecutionIdentity("root-run");
@@ -55,7 +59,7 @@ const build = (kind: "agent_team" | "agent_org") => {
   const prepareNewAgentRun = vi.fn(async ({ runId, config }) => ({
     runId,
     runtimeKind: config.runtimeKind,
-    platformAgentRunId: null,
+    platformAgentRunId: runtimeKind === RuntimeKind.AUTOBYTEUS ? null : "external-thread",
     commitPublication: () => fakeRun,
     abort,
   }));
@@ -70,7 +74,7 @@ const build = (kind: "agent_team" | "agent_org") => {
       llmConfig: null,
       autoExecuteTools: false,
       skillAccessMode: SkillAccessMode.PRELOADED_ONLY,
-      runtimeKind: RuntimeKind.AUTOBYTEUS,
+      runtimeKind,
       workspaceRootPath: null,
       platformAgentRunId: null,
     },
@@ -87,7 +91,7 @@ const build = (kind: "agent_team" | "agent_org") => {
     } as never,
     activityInspector: { inspect: () => ({ kind: "none" as const }) } as never,
   });
-  return { handle, root, identity, scope, memberExecutionContext, prepareNewAgentRun, fakeRun, abort };
+  return { handle, root, identity, scope, memberExecutionContext, prepareNewAgentRun, fakeRun, abort, publishAgentEvent };
 };
 
 describe("ConfiguredAgentExecutionHandle", () => {
@@ -129,5 +133,33 @@ describe("ConfiguredAgentExecutionHandle", () => {
       memberExecutionContext: fixture.memberExecutionContext,
       callbacks: { publishAgentEvent: vi.fn(), acceptPlatformBinding: vi.fn() },
     })).toThrow("same root");
+  });
+});
+
+describe("accepted task-system input presentation", () => {
+  it.each(Object.values(RuntimeKind))("publishes only genuinely accepted marked input through the shared %s handle", async (runtimeKind) => {
+    const f = build("agent_org", runtimeKind);
+    const prepared = await f.handle.prepareConfiguredActivation();
+    prepared.commitAfterDurability();
+    f.publishAgentEvent.mockClear();
+    const input = new AgentInputUserMessage("Saved task result is ready.", SenderType.SYSTEM, null,
+      markTaskDelegationSystemTaskNotificationMetadata({ task_id: "task-one" }));
+    expect(input.metadata.suppress_system_task_notification).toBe(true);
+    f.fakeRun.postUserMessage.mockResolvedValueOnce({ accepted: false, code: "NOT_ACTIVE" });
+    expect(await f.handle.postMessage(input)).toMatchObject({ accepted: false });
+    expect(f.publishAgentEvent.mock.calls.filter(([, event]) => event.kind === "member_input")).toHaveLength(0);
+    f.fakeRun.postUserMessage.mockResolvedValueOnce({ accepted: true });
+    expect(await f.handle.postMessage(input)).toMatchObject({ accepted: true });
+    const inputs = f.publishAgentEvent.mock.calls.filter(([, event]) => event.kind === "member_input");
+    expect(inputs).toHaveLength(1);
+    const adapter = new CollaborationAgentPresentationEventAdapter(() => f.identity);
+    expect(adapter.adapt(f.identity, inputs[0]![1])).toMatchObject({ kind: "publish", message: {
+      type: "SYSTEM_TASK_NOTIFICATION", payload: { sender: { kind: "system" }, content: input.content },
+    } });
+    const human = new AgentInputUserMessage("Same words, human input.", SenderType.USER, null,
+      markTaskDelegationSystemTaskNotificationMetadata({}));
+    expect(adapter.adapt(f.identity, { kind: "member_input", message: human })).toMatchObject({
+      kind: "publish", message: { type: "MEMBER_INPUT_MESSAGE" },
+    });
   });
 });

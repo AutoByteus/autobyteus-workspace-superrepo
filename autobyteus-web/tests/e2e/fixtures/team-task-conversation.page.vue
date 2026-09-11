@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-screen bg-slate-100 p-6" data-test="team-task-conversation-probe">
     <section class="mx-auto h-[760px] max-w-[1180px] overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
-      <CollaborationOverviewPanel :team="team" :messages="messages" />
+      <CollaborationOverviewPanel :tasks="team" :messages="messages" />
     </section>
   </main>
 </template>
@@ -23,7 +23,7 @@ import {
   testSubTeamNode,
   testTaskRecord,
 } from '~/test-support/currentTeamTestFixtures';
-import { testCollaborationMessagesContextView, testTeamWorkspaceContextView } from '~/test-support/teamWorkspaceContextView';
+import { testCollaborationMessagesContextView, testCollaborationTasksContextView } from '~/test-support/teamWorkspaceContextView';
 
 const ROOT_TEAM_RUN_ID = 'browser-team-run';
 const TEACHER_RUN_ID = 'teacher-run';
@@ -162,10 +162,10 @@ const restoredContext = buildTestTeamContext({
 
 const teamStore = useAgentTeamContextsStore();
 const selectionStore = useAgentSelectionStore();
-const team = shallowRef(testTeamWorkspaceContextView(initialContext));
+const team = shallowRef(testCollaborationTasksContextView(initialContext));
 const messages = shallowRef(testCollaborationMessagesContextView(initialContext));
 const refreshTeam = () => {
-  team.value = testTeamWorkspaceContextView(initialContext);
+  team.value = testCollaborationTasksContextView(initialContext);
   messages.value = testCollaborationMessagesContextView(initialContext);
 };
 teamStore.addTeamContext(initialContext);

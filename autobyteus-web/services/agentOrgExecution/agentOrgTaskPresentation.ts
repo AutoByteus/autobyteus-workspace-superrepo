@@ -1,16 +1,15 @@
 import type { AgentOrgExecutionViewDto } from '@autobyteus/collaboration-stream-contracts'
 import type { AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
+import type { AgentOrgExecutionViewIndex } from './agentOrgExecutionViewIndex'
 import { memberAddressBasename } from '~/types/agent/AgentTeamAddress'
 import type {
   DelegatedTaskDirection,
   DelegatedTaskEntry,
   DelegatedTaskLifecycleItem,
   DelegatedTaskParticipant,
-} from '~/utils/teamDelegatedTaskEntries'
+} from '~/types/workspace/collaborationTaskPresentation'
 import { projectAgentOrgReference } from './agentOrgReferenceProjection'
 
-type RootMember = AgentOrgExecutionViewDto['execution_tree']['rootOrg']['members'][number]
-type ConfiguredTeam = Extract<RootMember, { teamRunId: string }>
 type TaskRecord = AgentOrgExecutionViewDto['task_records']['records'][number]
 
 const named = (address: string): DelegatedTaskParticipant => ({
@@ -72,14 +71,15 @@ const lifecycle = (
     }
     if ('reviewId' in update) {
       const reviewedResultOrdinal = ordinals.get(update.reviewedSubmissionId)
-      if (reviewedResultOrdinal === undefined) continue
+      if (reviewedResultOrdinal === undefined) throw new Error(`Unknown reviewed submission '${update.reviewedSubmissionId}'.`)
       if (update.decision === 'request_revision') {
+        if (!update.comment) throw new Error(`Revision '${update.reviewId}' has no recorded comment.`)
         items.push({
           kind: 'review',
           decision: 'request_revision',
           itemKey: `task:${task.taskId}:review:${update.reviewId}`,
           createdAt: update.createdAt,
-          content: update.comment ?? 'Revision requested',
+          content: update.comment,
           direction: assignment,
           referenceFiles: update.referenceFiles.map((filePath) =>
             projectAgentOrgReference(update.reviewId, filePath, update.createdAt)),
@@ -114,26 +114,25 @@ const lifecycle = (
   return items as [DelegatedTaskLifecycleItem, ...DelegatedTaskLifecycleItem[]]
 }
 
-export const projectAgentOrgTeamTasks = (input: Readonly<{
+export const projectAgentOrgTasks = (input: Readonly<{
   orgRunId: string
   view: AgentOrgExecutionViewDto
-  team: ConfiguredTeam
+  index: AgentOrgExecutionViewIndex
   focusedAgentRunId: string
 }>): readonly DelegatedTaskEntry[] => {
-  const addressByRun = new Map(input.team.members.map((member) => [member.agentRunId, member.address]))
   return input.view.task_records.records.flatMap((task): DelegatedTaskEntry[] => {
     const targetAgentRunId = 'agentRunId' in task.taskExecution ? task.taskExecution.agentRunId : null
-    if (task.delegatorAgentRunId !== input.focusedAgentRunId
-      && targetAgentRunId !== input.focusedAgentRunId) return []
-    const delegatorAddress = addressByRun.get(task.delegatorAgentRunId)
-    if (!delegatorAddress) return []
+    if (!input.index.isRelevant(task, input.focusedAgentRunId)) return []
+    const delegatorAddress = input.index.requireAgent(task.delegatorAgentRunId).address
     const runId = targetAgentRunId
       ?? ('teamRunId' in task.taskExecution ? task.taskExecution.teamRunId : '')
     if (!runId) return []
     return [{
       kind: targetAgentRunId ? 'task_agent' : 'task_team',
       entryKey: `task:${task.taskId}`,
-      teamRunId: input.orgRunId,
+      root: { kind: 'agent_org', runId: input.orgRunId },
+      participants: [input.index.requireAgent(task.delegatorAgentRunId), ...input.index.taskParticipants(task)]
+        .map((agent) => ({ agentRunId: agent.agentRunId, address: agent.address, label: memberAddressBasename(agent.address) })),
       taskId: task.taskId,
       runId,
       displayStatus: displayStatus(task),

@@ -1,3 +1,4 @@
+import { markTaskDelegationSystemTaskNotificationMetadata } from "../events/task-system-input-presentation.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { AgentInputUserMessage } from "autobyteus-ts/agent/message/agent-input-user-message.js";
@@ -33,4 +34,4 @@ export const buildTaskAssigneeWorkPacket = (input: {
   `Task delegator AgentRun ID: ${input.delegator.agentRunId}`,
   "", "Description:", input.description,
   ...(input.referenceFiles.length ? ["", "Reference files:", ...input.referenceFiles.map((file) => `- ${file}`)] : []),
-].join("\n"), SenderType.SYSTEM);
+].join("\n"), SenderType.SYSTEM, null, markTaskDelegationSystemTaskNotificationMetadata({}));

@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import type { TeamReferenceFile } from '~/types/teamReferenceFile';
-import type { DelegatedTaskEntry, DelegatedTaskLifecycleItem } from '~/utils/teamDelegatedTaskEntries';
+import type { DelegatedTaskEntry, DelegatedTaskLifecycleItem } from '~/types/workspace/collaborationTaskPresentation';
 import TeamDelegatedTaskItemDetail from '~/components/workspace/team/TeamDelegatedTaskItemDetail.vue';
 import TeamTaskReferenceViewer from '~/components/workspace/team/TeamTaskReferenceViewer.vue';
 

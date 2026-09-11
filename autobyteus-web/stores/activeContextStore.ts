@@ -1,3 +1,4 @@
+import type { CollaborationTasksContextView } from '~/types/workspace/collaborationTasksContextView';
 import { defineStore } from 'pinia';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
@@ -21,7 +22,7 @@ import type {
 import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView';
 import type { AgentTeamContext } from '~/types/agent/AgentTeamContext';
 import { parseAgentTeamAddress } from '~/types/agent/AgentTeamAddress';
-import { projectTeamCommunicationPerspective } from '~/utils/teamCommunication/teamCommunicationPerspective';
+import { projectTeamCommunicationPerspective, projectTeamCommunicationMemberIdentity } from '~/utils/teamCommunication/teamCommunicationPerspective';
 import { deriveDelegatedTaskEntries } from '~/utils/teamDelegatedTaskEntries';
 import { isTeamMemberProjectionAuthoritative } from '~/services/runHydration/teamMemberProjectionHydrationService';
 
@@ -60,6 +61,14 @@ export const useActiveContextStore = defineStore('activeContext', () => {
         address: entry.memberAddress, agentRunId: entry.agentRunId,
         context: entry.agentContext, coordinator: entry.memberAddress === tree.root_team.coordinator_address,
       }))),
+
+    });
+  };
+
+  const standaloneTeamTasksView = (team: AgentTeamContext): CollaborationTasksContextView => {
+    const view = team.view;
+    return Object.freeze({ rootKind: 'agent_team', rootRunId: view.getRootTeamRunId(),
+      focusedAgentRunId: view.getFocusedAgentRunId(),
       listDelegatedTaskEntries: () => Object.freeze(deriveDelegatedTaskEntries(
         team,
         view.getFocusedAgentRunId(),
@@ -79,10 +88,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
       focusedMemberAddress: view.getFocusedMemberAddress(),
       memberIdentityByAgentRunId: () => Object.freeze(Object.fromEntries(entries.map((entry) => [
         entry.agentRunId,
-        Object.freeze({
-          address: entry.memberAddress,
-          label: entry.memberAddress.split('/').at(-1)?.replace(/[_-]+/g, ' ') || entry.memberAddress,
-        }),
+        projectTeamCommunicationMemberIdentity(view, entry.agentRunId),
       ]))),
       listMessages: () => Object.freeze(projectTeamCommunicationPerspective({
         view,
@@ -95,7 +101,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
   };
 
   const activeWorkspaceTarget = computed<ActiveAgentWorkspaceTarget | null>(() => {
-    if (route?.query.rootSubjectKind === 'agent_org' && route.query.mode === 'active') {
+    if (route?.query.rootSubjectKind === 'agent_org' && (route.query.mode === 'active' || route.query.mode === 'history')) {
       const orgRunId = String(route.query.orgRunId || '');
       return agentOrgContextsStore.contextFor(orgRunId)?.activeTarget() ?? null;
     }
@@ -103,7 +109,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
       const context = agentContextsStore.activeRun || null;
       if (!context) return null;
       return Object.freeze({
-        kind: 'standalone_agent', context,
+        kind: 'standalone_agent', access: 'live', context,
         interaction: Object.freeze({
           send: async () => { await agentRunStore.sendUserInputAndSubscribe(); },
           interrupt: async () => { await agentRunStore.interruptGeneration(context.state.runId); },
@@ -120,8 +126,9 @@ export const useActiveContextStore = defineStore('activeContext', () => {
       if (!team || !context) return null;
       const teamView = standaloneTeamView(team);
       return Object.freeze({
-        kind: 'standalone_team_member', context, team: teamView,
+        kind: 'standalone_team_member', access: 'live', context, team: teamView,
         collaborationMessages: standaloneTeamMessagesView(team),
+        collaborationTasks: standaloneTeamTasksView(team),
         interaction: Object.freeze({
           send: async (content: string, paths: readonly ContextFilePath[]) => {
             await agentTeamRunStore.sendMessageToFocusedMember(content, [...paths]);
@@ -152,6 +159,8 @@ export const useActiveContextStore = defineStore('activeContext', () => {
   });
 
   const connectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.connect(orgRunId);
+  const inspectAgentOrg = (orgRunId: string) => agentOrgContextsStore.inspect(orgRunId);
+  const selectAgentOrg = agentOrgContextsStore.select;
   const disconnectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.disconnect(orgRunId);
   const agentOrgContextFor = (orgRunId: string) => agentOrgContextsStore.contextFor(orgRunId);
   const agentOrgErrorFor = (orgRunId: string): string | null => agentOrgContextsStore.errorFor(orgRunId);
@@ -217,7 +226,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     approvalTarget: ToolApprovalTarget | null = null,
   ) => {
     const target = activeWorkspaceTarget.value;
-    if (!target) throw new Error('Cannot approve tool: No active workspace target.');
+    if (!target || target.access !== 'live') throw new Error('Cannot approve tool: No active workspace target.');
     await target.interaction.decideTool(invocationId, isApproved, reason, approvalTarget);
   };
 
@@ -239,7 +248,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
 
     try {
       const target = activeWorkspaceTarget.value;
-      if (!target) throw new Error('Cannot send: No active workspace target.');
+      if (!target || target.access !== 'live') throw new Error('Cannot send: No active workspace target.');
       await target.interaction.send(context.requirement, context.contextFilePaths);
     } catch (error) {
       console.error('Failed to send message via activeContextStore:', error);
@@ -264,7 +273,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     }
 
     const target = activeWorkspaceTarget.value;
-    if (!target || target.context !== context) {
+    if (!target || target.access !== 'live' || target.context !== context) {
       throw new Error('Cannot interrupt generation: Active workspace target is stale.');
     }
     return target.interaction.interrupt();
@@ -279,6 +288,8 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     currentContextPaths,
     activeConfig,
     connectAgentOrg,
+    inspectAgentOrg,
+    selectAgentOrg,
     disconnectAgentOrg,
     agentOrgContextFor,
     agentOrgErrorFor,

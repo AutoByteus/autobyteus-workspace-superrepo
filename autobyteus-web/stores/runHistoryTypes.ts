@@ -3,7 +3,7 @@ import type { AgentStatus } from '~/types/agent/AgentStatus';
 import type { RunProjectionConversationEntry } from '~/services/runHydration/runProjectionConversation';
 import type { RunProjectionActivityEntry } from '~/services/runHydration/runProjectionActivityHydration';
 import type { TeamRunExecutionTreeDto } from '@autobyteus/team-stream-contracts';
-import type { TeamExecutionTaskPresentation } from '~/services/teamExecution/taskDelegationPresentation';
+import type { CollaborationTaskHeadingPresentation } from '~/types/workspace/collaborationTaskPresentation';
 import type { AgentOrgExecutionTree } from '~/types/collaboration/agentOrgExecution';
 import type { RunTreeWorkspaceNode } from '~/utils/runTreeProjection';
 
@@ -192,7 +192,7 @@ export interface RunHistoryTransientExecutionRow extends RunHistoryTeamExecution
   kind: 'transient_execution';
   transientKind: 'task_agent' | 'task_team' | 'task_team_child';
   currentStatus: AgentStatus | string | null;
-  task: TeamExecutionTaskPresentation | null;
+  task: CollaborationTaskHeadingPresentation | null;
 }
 
 export type RunHistoryTeamExecutionRow =

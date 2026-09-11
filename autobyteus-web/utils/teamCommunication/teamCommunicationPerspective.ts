@@ -1,7 +1,9 @@
+import { agentIdsInTaskTeam } from '~/utils/teamDelegatedTaskEntries';
 import type { TeamCommunicationMessageDto } from '@autobyteus/team-stream-contracts';
 import type { TeamExecutionViewState } from '~/services/teamExecution/teamExecutionViewState';
 import type {
   CollaborationMessagePerspectiveRow,
+  CollaborationMessageMemberIdentity,
   CollaborationMessagesPerspective,
 } from '~/types/workspace/collaborationMessagesContextView';
 import { memberAddressBasename } from '~/types/agent/AgentTeamAddress';
@@ -39,9 +41,22 @@ export const projectTeamCommunicationPerspective = (input: {
       })),
       direction: sent ? 'sent' : 'received',
       counterpartAgentRunId,
-      counterpartAddress,
-      counterpartLabel: memberAddressBasename(counterpartAddress),
+      counterpart: projectTeamCommunicationMemberIdentity(input.view, counterpartAgentRunId),
     }];
   }).sort(compareDesc);
   return { messages };
+};
+
+export const projectTeamCommunicationMemberIdentity = (
+  view: TeamExecutionViewState, agentRunId: string,
+): CollaborationMessageMemberIdentity => {
+  const address = view.getMemberAddress(agentRunId);
+  if (!address) throw new Error(`Team communication participant '${agentRunId}' is unavailable.`);
+  const assigned = view.listTaskHistoryRows().find((task) => task.targetAgentRunId === agentRunId
+    || (task.targetTeamRunId && agentIdsInTaskTeam(view.getExecutionTree(), task.targetTeamRunId).has(agentRunId)));
+  const common = { address, label: memberAddressBasename(address) };
+  return assigned ? { ...common, kind: 'task', taskId: assigned.task.task_id,
+    hostRunId: view.getAgentExecutionLocation(agentRunId)!.containingTeamRunId,
+    executionRunId: (assigned.targetAgentRunId ?? assigned.targetTeamRunId)! }
+    : { ...common, kind: 'configured' };
 };
