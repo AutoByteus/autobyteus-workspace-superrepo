@@ -9,7 +9,7 @@
 - Last completed design: AD-REV-020@a83fa7541e8648a5472493f214a3ba8ed14af6b6;
   ARCH-REV-018 Pass. Inspected source HEAD: 932c81b2261ffcc21ac540b0f25522ecfa1cb29a.
 
-## User-Approved Presentation Direction
+## Original User-Approved Presentation Direction (Heading Superseded By RER-032)
 
 1. Remove the always-visible participant name/ID strip above task detail.
    Keep the familiar task heading, status, direction, timestamp and content.
@@ -44,7 +44,7 @@
   synchronization; this is not a missing user decision or an invitation to
   redesign the history surface.
 
-## Resolution — Approved RER-031 / AD-REV-021
+## Prior Resolution — Approved RER-031 / AD-REV-021
 
 RER-031@3b8c18a28af7674619a797a92a208dabfa851f54 includes the heading-only
 RER-030 and explicitly approves all three presentation corrections: exact Org
@@ -60,6 +60,17 @@ AD-REV-020 authoring transition, runtime/task/message records and policies remai
 unchanged. This inquiry is evidence/navigation only, not a competing UI spec.
 Only architecture-owned artifacts change; no source/tests/upstream/delivery edits
 or new executable pass. Independent review receives the cumulative package.
+
+## Current Resolution — RER-032 / AD-REV-022
+
+The user subsequently requested plural Orgs, matching Teams, and explicitly
+asked Architecture to notify Implementation. That message was delivered to the
+existing implementation execution. RER-032@ca04d7157 now commits the exact
+plural heading; all RER-031 message/task cleanup is unchanged. AD-REV-022
+synchronizes DS-034/VAL-053 and returns this Small/Low copy-only result directly
+to Implementation. Parent AD-REV-021 / ARCH-REV-019 Pass is retained. Earlier
+singular text above is historical only, not current implementation direction.
+No Product gate, structural review reopening, new task or lifecycle change.
 
 ## User Evidence
 

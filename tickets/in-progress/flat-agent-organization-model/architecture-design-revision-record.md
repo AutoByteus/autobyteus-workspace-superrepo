@@ -29,6 +29,7 @@ does not revise intended behavior.
 | AD-REV-019 | Requirements Engineer approved RER-028 / user task-workflow parity correction | API-FIND-019; AAV-001 retained-history interpretation; REQ-034–036; AC-029–031; SCN-018–020 | `Architecture Revision — Task-Inclusive Messages, Participant Tasks And Retained Execution Views` | `Architecture Design Complete`; superseded configured gate removed; exact participant facets/selection/history and truthful system input; 45-case design self-validation; focused Medium/High, cumulative Large/High; independent Architecture Review selected |
 | AD-REV-020 | Approved RER-029 authoring simplification; Delivery DR-008 re-entry | PKG-AUTH-001 | Architecture Revision — Field-Free Team/Org Definition Authoring And Owned Transition | Architecture Design Complete; focused Medium/High, cumulative task_size=Large / architectural_risk=High; self-validation 50 cases; independent Architecture Review selected |
 | AD-REV-021 | User-approved UI cleanup; approved RER-031 including RER-030 | UI-CLEAN-001; REQ-031/034/035; AC-026/034 | Architecture Revision — Compact Messages, Inline Task Navigation And Org History Heading | Architecture Design Complete; focused Small/Low, cumulative task_size=Large / architectural_risk=High; 53-case design inventory; independent Architecture Review selected |
+| AD-REV-022 | Approved RER-032 plural history-label clarification | UI-CLEAN-001; REQ-031; AC-026 | Architecture Revision — Orgs Literal Synchronization Only | Architecture Design Complete; current copy-only task_size=Small / architectural_risk=Low, direct Implementation re-entry; parent Large/High review remains passed; VAL-053 updated |
 
 ## Revision Entries
 
@@ -1715,3 +1716,29 @@ does not revise intended behavior.
   access after settlement, hover-only identity on narrow screens, or title-driven
   state reset. VAL-051–053 specify positive/negative checks. No remaining material
   decision; no migration, schema, provider, task-policy or authoring-scope change.
+
+### AD-REV-022 — Plural Orgs History Heading Only
+
+- Date: 2026-09-11. Approved RER-032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a
+  supersedes singular history copy only. User explicitly requested notifying
+  Implementation to use Orgs alongside Teams; that clarification was delivered.
+- Prior authority: AD-REV-021@22d191ea4a9d066aec24faf017a25e090d1b4763 /
+  ARCH-REV-019 Pass@be6b20f4a988eabbeb797a70af1b9cb0091c2f64; IR-040
+  source 06d020da3. No prior pass/failure or whole-package hold is inferred.
+- Change: DS-034 history localized value and current heading references become
+  Orgs; VAL-053 follows it. Existing key, category order/membership/state,
+  main-navigation/domain names, right Team/Org tab, task/message UI mechanism,
+  exact identity, runtime/persistence and RER-029 transition remain unchanged.
+- Result: Architecture Design Complete. Current task_size=Small,
+  architectural_risk=Low; direct Implementation route. This single display value
+  and copy assertions need no additional structural architecture review. The
+  cumulative parent's Large/High classification and completed independent review
+  remain authoritative; downstream source/API/Delivery gates are not bypassed.
+- Existing implementation execution owns source/localization/test updates and
+  their validation. This package synchronizes the earlier user clarification,
+  not a duplicate task or separate implementation assignment.
+- Artifacts: design copy/status/scoped classification, VAL-053, inquiry resolution
+  and this appended entry. Prior revision bodies/upstream/other-owner files stay.
+- Remaining risk: accidental broad rename or changing keys/state while updating
+  display text. Restrict to history collectionLabel and its exact expectations;
+  keep Chinese organization label unchanged. No open behavior/design decision.
