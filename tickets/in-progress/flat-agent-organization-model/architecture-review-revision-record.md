@@ -596,3 +596,32 @@ None.
 - Material classification changes: focused Medium/High and cumulative Large/High remain; no Requirement Gap or Product gate.
 - Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
 - Remaining risks: exact-ID propagation, cross-view ownership, actual file/REST/provider reads, async draft recovery, migration known-field/owner/commit/readiness correctness and actual cutover inventory. Different terminal-status/old-draft evidence returns for a transition decision; no guessed discard/upgrade. Require cumulative source review and renewed real API/E2E/Delivery validation. Existing expected-rejection/mock results do not establish desired success.
+
+### Post-handoff provenance receipt — no new review round
+
+Architecture Designer forwarded Delivery's additional provenance after the
+ARCH-REV-022 handoff. AD-REV-025 and the Pass decision are unchanged; this is an
+evidence addendum, not another design approval or deployment-readiness result.
+
+Delivery identifies these recorded backend roots for the existing DS-043
+cutover inventory obligation:
+
+- `/root/.autobyteus/server-data` — DR003–005, Delivery-reported.
+- `/home/vncuser/.autobyteus/server-data` — DR006; independently confirmed in
+  `delivery-evidence/dr-006/electron-launch.log:37829–37841`. This additional
+  normal-profile root was not included in Architecture's bounded samples.
+- `/tmp/autobyteus-dr008-user-test-20260911/server-data` — DR008; recorded launch
+  data root confirmed in `delivery-evidence/dr-008/native-launch.json`.
+- `/tmp/autobyteus-dr009-user-test-20260911/server-data` — DR009, reused across
+  its recorded restarts; launch root confirmed in
+  `delivery-evidence/dr-009/restart-20260911T2308/native-launch.json`.
+
+These are historical exposure paths, not a globally complete inventory or a
+current existence/physical-alias/content check. Delivery's records document local
+build/test exposure; inherited version labels and port29695 do not establish
+publication or exclude another owner's deployment/saved Org locators. No current
+user-data scan or mutation was performed for this receipt. DS-043 already requires
+actual roots/status/draft/locator evidence and a return on unprovable old draft
+ownership or terminal migration success with old locators. No replay, empty-data
+assumption or new migration mechanism follows from this evidence. Forward these
+paths as additional clarification to the existing Implementation execution.
