@@ -9,8 +9,9 @@
 - Current source pin: b3de58a24bcfc0173ae414924b5079e1f7ead838.
 - Earlier Team baseline: 5fb16658e7bd2aefd750f99eb596a17382e161ac.
 - Local origin/personal: 5645b49d6f51faa60bd3545bc8e3f0e7e3f96793.
-- Result: existing warning and trigger explained; the first rejection in the
-  observed runtime remains unclassified. This is not a new completed AD revision,
+- Result: existing warning and trigger explained; the follow-up below establishes
+  the first browser rejection and publication stack. Corrective attribution remains
+  with Code Reviewer. This is not a new completed AD revision,
   implementation assignment, Requirements gap or expanded validation pass.
 - No fetch, source/test edit, browser command, runtime mutation or restart.
 
@@ -74,6 +75,47 @@ A bounded evidence question was delivered to the existing API/E2E execution for
 its original console warning/adjudication. No new task, retry, source fix, runtime
 intervention or hold was assigned. Existing validation and failure-origin ownership
 remain intact. Do not hide the banner or weaken sequence checks to erase the symptom.
+
+## Follow-Up — First Rejection Established By API/E2E
+
+API/E2E subsequently answered the bounded evidence question and supplied
+`API-REV-028/live/TEAM-first-failure-current.json`,
+`API-FIND-030-wire-boundary.json`, `TEAM-activation-confirmation.json`,
+`API-FIND-030-compiled-correlation.json`, and
+`API-FIND-030-standalone-task-activation-context-publication.md`.
+The earlier uncertainty above records the initial inquiry, not the current evidence.
+
+The original retained Chromium console contains, in order:
+
+1. `TEAM_EXECUTION_EVENT_INVALID: TypeError: Cannot read properties of undefined (reading 'memberAddress')`.
+2. `TEAM_EXECUTION_CHANGE_SEQUENCE_GAP: Expected change sequence 40, received 41.`
+
+The original empty errors array listened to `pageerror`, not caught reducer
+console warnings. It therefore did not establish absence of a browser failure.
+Activation event 40 failed application; status event 41 encountered the unadvanced
+client sequence. Network frame loss is not established.
+
+A second independent normal standalone Team reproduced the same exception and
+expected-23/received-24 gap with only delegation, without the message precursor.
+The promptly resumed caught-exception debugger retained the production stack:
+`applyMessage -> commitContextAssociations -> reactive Map.set -> synchronous
+reactive dependency evaluation -> activeContextStore standalone Team view ->
+listAgentContextEntries -> locations.value.get(id).memberAddress`.
+The current source associates new contexts before publishing the corresponding
+next locations/tree. The captured consumer consequently sees an incomplete
+context/location pair. This is concrete publication evidence, not justification
+for weakening sequence checks or adding recovery retries.
+
+Both delegations and initial provider replies succeeded. No submission/review
+was attempted, and intentionally active tasks kept the root checkpoint's task-work
+condition true. Healthy server/GraphQL responses and cleanup SIGTERM exit 0 do
+not convert the failed UI scenario into a pass or prove the held lifecycle matrix.
+
+API/E2E completed API-REV-028 as Fail (reported 74.0%) and successfully routed
+API-FIND-030 to Code Reviewer for failure-origin classification. Full remaining
+matrix/VAL-054–058 remained Not Tested. Architecture does not duplicate that
+handoff, assign a competing fix, infer the final source owner, or reopen Requirements
+from this informational answer. No new design revision or source/test change.
 
 ## Checks
 
