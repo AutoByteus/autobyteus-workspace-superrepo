@@ -92,10 +92,10 @@ const member = (value: unknown, index: number): AgentOrgDefinitionConfigMember =
   }
   if (
     candidate.refScope !== "shared"
-    && candidate.refScope !== "agent_org_owned"
+    && candidate.refScope !== "org_local"
     && candidate.refScope !== "application_owned"
   ) {
-    return fail(`${label}.refScope must be 'shared', 'agent_org_owned', or 'application_owned'.`);
+    return fail(`${label}.refScope must be 'shared', 'org_local', or 'application_owned'.`);
   }
   return Object.freeze({
     memberName: requiredString(candidate.memberName, `${label}.memberName`),

@@ -5,7 +5,7 @@ import {
 } from "../../agent-collaboration/domain/collaboration-handoff.js";
 import type { DefinitionSourceDescriptor } from "../../collaboration-definition-admission/domain/definition-source-descriptor.js";
 
-export type AgentOrgMemberRefScope = "shared" | "agent_org_owned" | "application_owned";
+export type AgentOrgMemberRefScope = "shared" | "org_local" | "application_owned";
 
 export class AgentOrgMember {
   memberName: string;

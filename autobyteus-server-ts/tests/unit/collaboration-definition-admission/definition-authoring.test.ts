@@ -15,7 +15,7 @@ const roots: string[] = [];
 afterEach(async () => { await Promise.all(roots.splice(0).map((p) => fs.rm(p, { recursive: true, force: true }))); });
 const teamConfig = () => ({ coordinatorMemberName: "lead", members: [{ memberName: "lead", ref: "agent", refScope: "shared" }],
   handoffs: [], avatarUrl: null, defaultLaunchConfig: null });
-const orgConfig = () => ({ members: [{ memberName: "team", ref: "team", refType: "agent_team", refScope: "shared" }],
+const orgConfig = () => ({ members: [{ memberName: "team", ref: "agent-org-owned-team-opaque", refType: "agent_team", refScope: "org_local" }],
   handoffs: [], avatarUrl: null, defaultLaunchConfig: null });
 const familyCases = [
   { name: "Team", config: teamConfig, parse: parseAgentTeamDefinitionConfig },
@@ -67,8 +67,8 @@ it("creates, edits, reloads and package-roundtrips both families with unchanged 
   const team = await teams.create(new AgentTeamDefinition({ id: "team", name: "Team", description: "Before", instructions: "Do work.",
     coordinatorMemberName: "lead", nodes: ["lead", "worker"].map((memberName) => new TeamMember({ memberName, ref: memberName, refScope: "shared" })), handoffs }));
   const org = await orgs.create(new AgentOrgDefinition({ id: "org", name: "Org", description: "Before", instructions: "Coordinate.",
-    members: [new AgentOrgMember({ memberName: "direct", ref: "lead", refType: "agent", refScope: "shared" }),
-      new AgentOrgMember({ memberName: "team", ref: "team", refType: "agent_team", refScope: "shared" })],
+    members: [new AgentOrgMember({ memberName: "direct", ref: "agent-org-owned-agent-opaque", refType: "agent", refScope: "org_local" }),
+      new AgentOrgMember({ memberName: "team", ref: "agent-org-owned-team-opaque", refType: "agent_team", refScope: "org_local" })],
     handoffs: [{ from: "/direct", to: "/team", rules: ["Original exact text"] }] }));
   team.description = "After"; org.description = "After";
   await teams.update(team); await orgs.update(org);
@@ -92,4 +92,8 @@ it("creates, edits, reloads and package-roundtrips both families with unchanged 
 it.each(["brief-studio/agent-teams/brief-studio-team", "socratic-math-teacher/agent-teams/socratic-math-team"])("keeps repository application %s on the current strict authoring shape", async (relative) => {
   const raw = JSON.parse(await fs.readFile(path.resolve("../applications", relative, "team-config.json"), "utf8"));
   expect(raw).not.toHaveProperty("schemaVersion"); expect(() => parseAgentTeamDefinitionConfig(raw)).not.toThrow();
+});
+
+it.each(["agent_org_owned", "team_local", "unknown"])("rejects retired/unknown Org authored scope %s at the normal codec", (refScope) => {
+  expect(() => parseAgentOrgDefinitionConfig({ ...orgConfig(), members: [{ ...orgConfig().members[0], refScope }] })).toThrow(/refScope/);
 });

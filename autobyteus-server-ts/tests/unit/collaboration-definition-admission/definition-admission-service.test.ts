@@ -40,7 +40,7 @@ const teamDefinition = (id = 'team-1', agentId = 'agent-1') => new AgentTeamDefi
   id, name: id, description: '', instructions: '', coordinatorMemberName: 'coordinator',
   nodes: [new TeamMember({ memberName: 'coordinator', ref: agentId, refScope: 'shared' })],
 });
-const orgDefinition = (id = 'org-1', teamId = 'team-1', refScope: 'shared' | 'agent_org_owned' = 'shared') => new AgentOrgDefinition({
+const orgDefinition = (id = 'org-1', teamId = 'team-1', refScope: 'shared' | 'org_local' = 'shared') => new AgentOrgDefinition({
   id, name: id, description: '', instructions: '',
   members: [new AgentOrgMember({ memberName: 'team', ref: teamId, refType: 'agent_team', refScope })],
 });
@@ -134,8 +134,8 @@ describe('DefinitionAdmissionService', () => {
   it('keeps unrelated scanning available when an Org-owned reference has no exact physical mapping', async () => {
     const dataRoot = await temporaryRoot();
     await writePackage(dataRoot, 'agent-teams', 'team-1', teamConfig());
-    await writePackage(dataRoot, 'agent-orgs', 'org-1', orgConfig('opaque-owned-team', 'agent_org_owned'));
-    const { service } = build({ dataRoot, team: teamDefinition(), org: orgDefinition('org-1', 'opaque-owned-team', 'agent_org_owned') });
+    await writePackage(dataRoot, 'agent-orgs', 'org-1', orgConfig('opaque-owned-team', 'org_local'));
+    const { service } = build({ dataRoot, team: teamDefinition(), org: orgDefinition('org-1', 'opaque-owned-team', 'org_local') });
     const results = await service.scan();
     expect(results.find((item) => item.subjectKind === 'agent_team')).toMatchObject({ status: 'available' });
     expect(results.find((item) => item.subjectKind === 'agent_org')).toMatchObject({ status: 'unavailable' });

@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import type { AppConfig } from "../../../src/config/app-config.js";
+import { AppConfig } from "../../../src/config/app-config.js";
 import { AppDataMigrationRegistry } from "../../../src/app-data-migrations/app-data-migration-registry.js";
 import { AppDataMigrationRunner } from "../../../src/app-data-migrations/app-data-migration-runner.js";
 import { AppDataMigrationRecordRepository } from "../../../src/app-data-migrations/repositories/app-data-migration-record-repository.js";
@@ -11,7 +11,7 @@ import { CollaborationDefinitionAuthoringShapeAppDataMigration, COLLABORATION_DE
 import { AgentOrgFlatTeamFamiliesV1AppDataMigration, AGENT_ORG_FLAT_TEAM_FAMILIES_V1_MIGRATION_ID as FAMILY } from "../../../src/app-data-migrations/migrations/agent-org-flat-team-families-v1/agent-org-flat-team-families-v1-app-data-migration.js";
 import { TEAM_RUN_EXECUTION_TREE_V2_MIGRATION_ID as PREREQUISITE } from "../../../src/app-data-migrations/migrations/team-run-execution-tree-v2-app-data-migration.js";
 import { AtomicRunPackageFileCommitWriter } from "../../../src/run-history/store/atomic-run-package-file-commit-writer.js";
-import { parseMigrationOrgDefinitionConfig, parseMigrationTeamDefinitionConfig } from "../../../src/app-data-migrations/legacy/collaboration-definition-versioned-config.js";
+import { selectOrgAuthoringCandidate, selectTeamAuthoringCandidate } from "../../../src/app-data-migrations/legacy/collaboration-definition-authoring-transition.js";
 
 const roots: string[] = [], clients: PrismaClient[] = [];
 afterEach(async () => {
@@ -74,7 +74,7 @@ it("does not hide physical children behind an invalid parent and bounds failure 
   const result = await env.migration().execute();
   expect(result).toMatchObject({ status: "FAILED", summary: { failedCount: 8, migratedCount: 1 } });
   expect(await read(child)).toEqual(team()); expect(await fs.readFile(parent)).toEqual(bytes);
-  expect(result.summary.details.find((d) => d.itemId === "FAILED_DEFINITION")?.message.match(/team-config.json/g)).toHaveLength(5);
+  expect(result.summary.details.find((d) => d.itemId === "FAILED_DEFINITION")?.message.match(/(?:team|org)-config.json/g)).toHaveLength(5);
 });
 
 it("recovers ordinary-authoring canonical journals before classifying both root and owned-child definitions", async () => {
@@ -165,9 +165,79 @@ it.each(["completed", "pending", "failed-runtime", "stale-running"])("uses real 
 });
 
 it("keeps prior validators migration-only and default registry order explicit", () => {
-  expect(parseMigrationTeamDefinitionConfig({ schemaVersion: 2, ...team() })).toEqual(team());
-  expect(parseMigrationOrgDefinitionConfig({ schemaVersion: 1, ...org() })).toEqual(org());
-  expect(() => parseMigrationOrgDefinitionConfig({ schemaVersion: "1", ...org() })).toThrow();
+  expect(selectTeamAuthoringCandidate({ schemaVersion: 2, ...team() })).toEqual(team());
+  expect(selectOrgAuthoringCandidate({ schemaVersion: 1, ...org() })).toEqual(org());
+  expect(() => selectOrgAuthoringCandidate({ schemaVersion: "1", ...org() })).toThrow();
   const list = new AppDataMigrationRegistry().listDefinitions(), index = list.findIndex((d) => d.id === FAMILY);
   expect(list[index + 1]?.id).toBe(AUTHORING); expect(list[index + 1]?.prerequisiteMigrationIds).toBeUndefined();
+});
+
+
+it.each(["version-only", "scope-only", "both", "current"])("commits exactly the final authoring candidate for %s without normalizing other JSON", async (variant) => {
+  const env = await environment();
+  const value = { ...org(), members: [
+    { memberName: "direct", ref: "agent-org-owned-agent-opaque", refType: "agent", refScope: variant === "scope-only" || variant === "both" ? "agent_org_owned" : "org_local" },
+    { memberName: "team", ref: "agent-org-owned-team-opaque", refType: "agent_team", refScope: "org_local" },
+  ], handoffs: [{ from: "/direct", to: "/team", rules: ["Exact  user prose", "Next"] }],
+    defaultLaunchConfig: team().defaultLaunchConfig };
+  const raw = variant === "version-only" || variant === "both" ? { schemaVersion: 1, ...value } : value;
+  const original = structuredClone(raw), expected = { ...value, members: value.members.map((m) => ({ ...m, refScope: "org_local" })) };
+  expect(selectOrgAuthoringCandidate(raw)).toEqual(expected); expect(raw).toEqual(original);
+  const file = await write(path.join(env.orgs, "org"), "org", raw), before = await fs.readFile(file);
+  const writer = new AtomicRunPackageFileCommitWriter(), spy = vi.spyOn(writer, "write");
+  expect((await env.migration(writer).execute()).status).toBe("SUCCEEDED");
+  expect(spy).toHaveBeenCalledTimes(variant === "current" ? 0 : 1);
+  expect(await read(file)).toEqual(expected);
+  if (variant === "current") expect(await fs.readFile(file)).toEqual(before);
+  spy.mockClear(); expect((await env.migration(writer).execute()).status).toBe("SUCCEEDED"); expect(spy).not.toHaveBeenCalled();
+});
+
+it.each(["unknown", "team_local", "AGENT_ORG_OWNED", " org_local", null])("rejects non-authorized Org scope %j without writes", async (refScope) => {
+  const env = await environment(), raw = { ...org(), members: [{ ...org().members[0], refScope }] };
+  const file = await write(path.join(env.orgs, "invalid"), "org", raw), before = await fs.readFile(file);
+  const writer = new AtomicRunPackageFileCommitWriter(), spy = vi.spyOn(writer, "write");
+  expect((await env.migration(writer).execute()).status).toBe("FAILED"); expect(spy).not.toHaveBeenCalled(); expect(await fs.readFile(file)).toEqual(before);
+});
+
+
+it("runs the complete production registry on a fresh pre-ticket data root, directly producing final authored configs", async () => {
+  const { appConfigProvider } = await import("../../../src/config/app-config-provider.js");
+  const env = await environment();
+  const config = new AppConfig({ appDataDir: env.root });
+  // Production AppConfig getters create their owned roots before registry execution.
+  await fs.mkdir(env.orgs, { recursive: true });
+  vi.spyOn(config, "getAgentTeamsDir").mockReturnValue(env.teams);
+  vi.spyOn(config, "getAgentOrgsDir").mockReturnValue(env.orgs);
+  vi.spyOn(config, "getMemoryDir").mockReturnValue(env.memory);
+  vi.spyOn(config, "getOperationalDatabaseUrl").mockReturnValue(process.env.DATABASE_URL!);
+  vi.spyOn(config, "getAdditionalAgentPackageRoots").mockReturnValue([]);
+  vi.spyOn(config, "getAdditionalApplicationPackageRoots").mockReturnValue([]);
+  vi.spyOn(appConfigProvider, "config", "get").mockReturnValue(config);
+  const legacyFlat = { ...team(), members: team().members.map((m) => ({ ...m, refType: "agent" })) };
+  const flat = await write(path.join(env.teams, "flat"), "team", legacyFlat);
+  const legacyOrg = { ...legacyFlat, coordinatorMemberName: "direct", members: [
+    { memberName: "direct", ref: "original-agent", refType: "agent", refScope: "shared" },
+    { memberName: "team", ref: "child", refType: "agent_team", refScope: "team_local" },
+  ], handoffs: [] };
+  const source = path.join(env.teams, "mixed"); await write(source, "team", legacyOrg);
+  await write(path.join(source, "agent-teams", "child"), "team", legacyFlat);
+  await write(path.join(source, "agent-teams", "unreferenced"), "team", legacyFlat);
+  const external = await write(path.join(env.root, "external"), "org", { schemaVersion: 1, ...org() });
+  const externalBytes = await fs.readFile(external);
+  const { repository } = await runnerFor(env);
+  const registry = new AppDataMigrationRegistry();
+  const runner = new AppDataMigrationRunner(registry, repository, { logsDir: path.join(env.root, "production-logs") });
+  const results = await runner.runPending();
+  expect(results.map((result) => result.migrationId)).toEqual(registry.listDefinitions().map((definition) => definition.id));
+  for (const id of [PREREQUISITE, FAMILY, AUTHORING]) { const result = results.find((result) => result.migrationId === id)!; expect(result, result.logPath ? await fs.readFile(result.logPath, "utf8") : result.errorMessage ?? "").toMatchObject({ status: "SUCCEEDED" }); }
+  expect(await read(flat)).toEqual(team());
+  const targetDir = path.join(env.orgs, "mixed"), target = await read(path.join(targetDir, "org-config.json"));
+  expect(target).not.toHaveProperty("schemaVersion"); expect(target.members[1]).toMatchObject({ memberName: "team", refScope: "org_local" });
+  expect(target.members[1].ref).toMatch(/^agent-org-owned-/);
+  for (const child of ["child", "unreferenced"]) expect(await read(path.join(targetDir, "agent-teams", child, "team-config.json"))).toEqual(team());
+  await expect(fs.access(source)).rejects.toMatchObject({ code: "ENOENT" });
+  expect(await fs.readFile(external)).toEqual(externalBytes);
+  const before = await repository.getRecord(FAMILY), finalBytes = await fs.readFile(path.join(targetDir, "org-config.json"));
+  await runner.runPending(); expect(await repository.getRecord(FAMILY)).toEqual(before);
+  expect(await fs.readFile(path.join(targetDir, "org-config.json"))).toEqual(finalBytes);
 });

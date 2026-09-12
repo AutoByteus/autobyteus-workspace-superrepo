@@ -172,7 +172,7 @@ describe("AgentOrg flat-Team family startup migration", () => {
     const interruptedResult = await env.migration(interruptionWriter).execute();
     expect(interruptedResult.status).toBe("FAILED");
     expect(JSON.parse(await fs.readFile(path.join(source, "agent-teams", "delivery", "team-config.json"), "utf8")))
-      .toMatchObject({ schemaVersion: 2 });
+      .not.toHaveProperty("schemaVersion");
     expect(JSON.parse(await fs.readFile(path.join(source, "team-config.json"), "utf8"))).not.toHaveProperty("schemaVersion");
 
     const retry = await env.migration().execute();
@@ -181,9 +181,9 @@ describe("AgentOrg flat-Team family startup migration", () => {
     expect(detailCount(retry, "MIGRATED_ORG_DEFINITION")).toBe(1);
     await expect(fs.access(source)).rejects.toMatchObject({ code: "ENOENT" });
     expect(JSON.parse(await fs.readFile(path.join(target, "org-config.json"), "utf8")))
-      .toMatchObject({ schemaVersion: 1 });
+      .not.toHaveProperty("schemaVersion");
     expect(JSON.parse(await fs.readFile(path.join(target, "agent-teams", "delivery", "team-config.json"), "utf8")))
-      .toMatchObject({ schemaVersion: 2 });
+      .not.toHaveProperty("schemaVersion");
     await expect(fs.access(path.join(target, "team-config.json"))).rejects.toMatchObject({ code: "ENOENT" });
     await expect(fs.access(path.join(target, "team.md"))).rejects.toMatchObject({ code: "ENOENT" });
   });
@@ -206,9 +206,9 @@ describe("AgentOrg flat-Team family startup migration", () => {
 
     expect((await env.migration(interruptionWriter).execute()).status).toBe("FAILED");
     expect(JSON.parse(await fs.readFile(path.join(source, "agent-teams", "delivery", "team-config.json"), "utf8")))
-      .toMatchObject({ schemaVersion: 2 });
+      .not.toHaveProperty("schemaVersion");
     expect(JSON.parse(await fs.readFile(path.join(source, "org-config.json"), "utf8")))
-      .toMatchObject({ schemaVersion: 1 });
+      .not.toHaveProperty("schemaVersion");
     await expect(fs.access(path.join(source, "org.md"))).rejects.toMatchObject({ code: "ENOENT" });
 
     const retry = await env.migration().execute();
@@ -256,18 +256,36 @@ describe("AgentOrg flat-Team family startup migration", () => {
     expect(await fs.readdir(env.teamDefinitions)).toEqual(["flat"]);
   });
 
-  it.each([1, null])("cleans interrupted Org family retirement with version %s without rewriting its current config", async (version) => {
+  it.each([1, null])("cleans interrupted Org family retirement only after final target verification, source version %s", async (version) => {
     const env = await createEnvironment(), source = await writeLegacyOrgDefinition(env);
     expect((await env.migration().execute()).status).toBe("SUCCEEDED");
     const dir = path.join(env.orgDefinitions, "software-org"), file = path.join(dir, "org-config.json");
-    if (version === null) { const config = JSON.parse(await fs.readFile(file, "utf8")); delete config.schemaVersion; await fs.writeFile(file, json(config)); }
+    if (version !== null) { const config = JSON.parse(await fs.readFile(file, "utf8")); config.schemaVersion = version; config.members = config.members.map((m: any) => ({ ...m, refScope: m.refScope === "org_local" ? "agent_org_owned" : m.refScope })); await fs.writeFile(file, json(config)); }
     const before = await fs.readFile(file);
     await fs.writeFile(path.join(dir, "team-config.json"), "retired"); await fs.writeFile(path.join(dir, "team.md"), "retired");
     const writer = new AtomicRunPackageFileCommitWriter(), spy = vi.spyOn(writer, "write");
-    expect((await env.migration(writer).execute()).status).toBe("SUCCEEDED"); expect(spy).not.toHaveBeenCalled();
-    expect(await fs.readFile(file)).toEqual(before);
+    expect((await env.migration(writer).execute()).status).toBe("SUCCEEDED"); expect(spy).toHaveBeenCalledTimes(version === null ? 0 : 1);
+    if (version === null) expect(await fs.readFile(file)).toEqual(before);
+    const final = JSON.parse(await fs.readFile(file, "utf8"));
+    expect(final).not.toHaveProperty("schemaVersion"); expect(final.members.some((m: any) => m.refScope === "org_local")).toBe(true);
     await expect(fs.access(path.join(dir, "team-config.json"))).rejects.toMatchObject({ code: "ENOENT" });
     await expect(fs.access(path.join(dir, "team.md"))).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("does not retire an Org source when a versioned owned child write is indeterminate; ordinary retry verifies every final target", async () => {
+    const env = await createEnvironment(); await writeLegacyOrgDefinition(env);
+    expect((await env.migration().execute()).status).toBe("SUCCEEDED");
+    const dir = path.join(env.orgDefinitions, "software-org"), child = path.join(dir, "agent-teams", "delivery", "team-config.json");
+    const current = JSON.parse(await fs.readFile(child, "utf8")); await fs.writeFile(child, json({ schemaVersion: 2, ...current }));
+    await fs.writeFile(path.join(dir, "team-config.json"), "retired"); await fs.writeFile(path.join(dir, "team.md"), "retired");
+    const writer = new AtomicRunPackageFileCommitWriter(), physical = writer.write.bind(writer);
+    vi.spyOn(writer, "write").mockImplementationOnce(async (input) => { await physical(input); return { outcome: "renamed_finalization_indeterminate", file: input.file, stage: "sync_directory", cause: new Error("uncertain") }; });
+    expect((await env.migration(writer).execute()).status).toBe("FAILED");
+    expect(await fs.readFile(path.join(dir, "team-config.json"), "utf8")).toBe("retired");
+    const retry = new AtomicRunPackageFileCommitWriter(), spy = vi.spyOn(retry, "write");
+    expect((await env.migration(retry).execute()).status).toBe("SUCCEEDED"); expect(spy).not.toHaveBeenCalled();
+    expect(JSON.parse(await fs.readFile(child, "utf8"))).toEqual(current);
+    await expect(fs.access(path.join(dir, "team-config.json"))).rejects.toMatchObject({ code: "ENOENT" });
   });
 
   it("keeps a native flat Team V2 package a strict zero-write cohort", async () => {

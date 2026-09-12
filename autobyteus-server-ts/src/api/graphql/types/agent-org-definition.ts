@@ -64,10 +64,27 @@ registerEnumType(AgentOrgMemberScope, { name: "AgentOrgMemberScope" });
 }
 @ObjectType() class DefinitionEndpointCatalog { @Field(() => [DefinitionEndpoint]) from!: DefinitionEndpoint[]; @Field(() => [DefinitionEndpoint]) to!: DefinitionEndpoint[]; }
 
+const toDomainScope = (value: AgentOrgMemberScope): DomainMember["refScope"] => {
+  switch (value) {
+    case AgentOrgMemberScope.SHARED: return "shared";
+    case AgentOrgMemberScope.AGENT_ORG_OWNED: return "org_local";
+    case AgentOrgMemberScope.APPLICATION_OWNED: return "application_owned";
+    default: throw new Error(`Unsupported AgentOrg member scope '${String(value)}'.`);
+  }
+};
+const toGraphqlScope = (value: DomainMember["refScope"]): AgentOrgMemberScope => {
+  switch (value) {
+    case "shared": return AgentOrgMemberScope.SHARED;
+    case "org_local": return AgentOrgMemberScope.AGENT_ORG_OWNED;
+    case "application_owned": return AgentOrgMemberScope.APPLICATION_OWNED;
+    default: throw new Error(`Unsupported authored AgentOrg member scope '${String(value)}'.`);
+  }
+};
+
 const member = (value: AgentOrgMemberInput): DomainMember => new DomainMember({
   memberName: value.memberName, ref: value.ref,
   refType: value.refType === AgentOrgMemberType.AGENT ? "agent" : "agent_team",
-  refScope: value.refScope === AgentOrgMemberScope.SHARED ? "shared" : value.refScope === AgentOrgMemberScope.AGENT_ORG_OWNED ? "agent_org_owned" : "application_owned",
+  refScope: toDomainScope(value.refScope),
 });
 const project = (value: DomainOrg): AgentOrgDefinition => ({
   id: value.id ?? "", name: value.name, description: value.description, instructions: value.instructions,
@@ -77,7 +94,7 @@ const project = (value: DomainOrg): AgentOrgDefinition => ({
   members: value.members.map((item) => ({
     memberName: item.memberName, ref: item.ref,
     refType: item.refType === "agent" ? AgentOrgMemberType.AGENT : AgentOrgMemberType.AGENT_TEAM,
-    refScope: item.refScope === "shared" ? AgentOrgMemberScope.SHARED : item.refScope === "agent_org_owned" ? AgentOrgMemberScope.AGENT_ORG_OWNED : AgentOrgMemberScope.APPLICATION_OWNED,
+    refScope: toGraphqlScope(item.refScope),
   })),
 });
 const graphError = (error: unknown): GraphQLError => new GraphQLError(error instanceof Error ? error.message : String(error), {

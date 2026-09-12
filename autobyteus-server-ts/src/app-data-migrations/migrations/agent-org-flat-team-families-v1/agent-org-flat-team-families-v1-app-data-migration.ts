@@ -7,7 +7,9 @@ import { appConfigProvider } from "../../../config/app-config-provider.js";
 import { AgentMemoryLayout } from "../../../agent-memory/store/agent-memory-layout.js";
 import type { AppDataMigrationDefinition, AppDataMigrationExecutionResult, AppDataMigrationItemDetail } from "../../domain/app-data-migration-types.js";
 import { TEAM_RUN_EXECUTION_TREE_V2_MIGRATION_ID } from "../team-run-execution-tree-v2-app-data-migration.js";
-import { parseMigrationTeamDefinitionConfig, parseMigrationOrgDefinitionConfig } from "../../legacy/collaboration-definition-versioned-config.js";
+import { selectTeamAuthoringCandidate, selectOrgAuthoringCandidate } from "../../legacy/collaboration-definition-authoring-transition.js";
+import { parseAgentTeamDefinitionConfig } from "../../../agent-team-definition/providers/agent-team-definition-config.js";
+import { parseAgentOrgDefinitionConfig } from "../../../agent-org-definition/providers/agent-org-definition-config.js";
 import { listOwnedDefinitionPackages, readOwnedDefinitionPackage } from "../../legacy/owned-definition-package-inventory.js";
 import { validateTeamRunExecutionTreePayload } from "../../../run-history/store/team-run-execution-tree-schema.js";
 import { validateAgentOrgRunExecutionTreePayload } from "../../../run-history/store/agent-org-run-execution-tree-schema.js";
@@ -84,19 +86,18 @@ const legacyConfig = (value: unknown): LegacyTeamConfig => {
   return { coordinatorMemberName: string(root.coordinatorMemberName, "coordinatorMemberName"), members, handoffs, avatarUrl, defaultLaunchConfig };
 };
 const teamTarget = (legacy: LegacyTeamConfig): unknown => ({
-  schemaVersion: 2, coordinatorMemberName: legacy.coordinatorMemberName,
+  coordinatorMemberName: legacy.coordinatorMemberName,
   members: legacy.members.map(({ memberName, ref, refScope }) => ({ memberName, ref, refScope })),
   handoffs: legacy.handoffs, avatarUrl: legacy.avatarUrl, defaultLaunchConfig: legacy.defaultLaunchConfig,
 });
 const orgTarget = (legacy: LegacyTeamConfig, legacyRootDefinitionId: string): unknown => ({
-  schemaVersion: 1,
   members: legacy.members.map((member) => ({
     memberName: member.memberName,
     ref: member.refScope === "team_local"
       ? buildAgentOrgOwnedDefinitionId(member.refType, legacyRootDefinitionId, member.ref)
       : member.ref,
     refType: member.refType,
-    refScope: member.refScope === "team_local" ? "agent_org_owned" : member.refScope,
+    refScope: member.refScope === "team_local" ? "org_local" : member.refScope,
   })),
   handoffs: legacy.handoffs, avatarUrl: legacy.avatarUrl, defaultLaunchConfig: legacy.defaultLaunchConfig,
 });
@@ -162,17 +163,26 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       const configPath = path.join(source, "team-config.json");
       let raw: unknown;
       try { raw = (await readOwnedDefinitionPackage({ ownershipRoot: teamRoot, packagePath: source, family: "team",
-        validateConfig: (value) => { try { return parseMigrationTeamDefinitionConfig(value); } catch { return legacyConfig(value); } },
+        validateConfig: (value) => { try { return selectTeamAuthoringCandidate(value); } catch { return legacyConfig(value); } },
       })).config; }
       catch (error) { this.add("FAILED_DEFINITION", configPath, errorReason(error)); continue; }
-      try { parseMigrationTeamDefinitionConfig(raw); this.add("SKIPPED_CURRENT_DEFINITION", configPath); continue; }
-      catch { /* isolated released decoder follows */ }
+      let currentTarget: Record<string, unknown> | undefined;
+      try { currentTarget = selectTeamAuthoringCandidate(raw); } catch { /* isolated released decoder follows */ }
+      if (currentTarget) {
+        try {
+          const changed = !isDeepStrictEqual(raw, currentTarget);
+          if (changed) await this.writeDefinition(configPath, currentTarget, parseAgentTeamDefinitionConfig);
+          else parseAgentTeamDefinitionConfig(raw);
+          this.add(changed ? "MIGRATED_FLAT_TEAM_DEFINITION" : "SKIPPED_CURRENT_DEFINITION", configPath);
+        } catch (error) { this.add("FAILED_DEFINITION", configPath, errorReason(error)); }
+        continue;
+      }
       try {
         const legacy = legacyConfig(raw);
         const organizationLike = legacy.members.some((member) => member.refType === "agent_team");
         if (!organizationLike) {
-          const target = teamTarget(legacy); parseMigrationTeamDefinitionConfig(target);
-          await this.writeJson(configPath, target); parseMigrationTeamDefinitionConfig(JSON.parse(await fs.readFile(configPath, "utf8")));
+          const target = teamTarget(legacy);
+          await this.writeDefinition(configPath, target, parseAgentTeamDefinitionConfig);
           this.add("MIGRATED_FLAT_TEAM_DEFINITION", configPath); continue;
         }
         const destination = path.join(orgRoot, entry.name);
@@ -182,19 +192,19 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
         }
         const plan = await this.planOrgDefinition(source, destination, entry.name, legacy);
         for (const child of plan.ownedTeams) {
-          if (child.writeRequired) await this.writeJson(child.configPath, child.target);
-          parseMigrationTeamDefinitionConfig(await readJson(child.configPath));
+          if (child.writeRequired) await this.writeDefinition(child.configPath, child.target, parseAgentTeamDefinitionConfig);
+          await this.verifyDefinition(child.configPath, child.target, parseAgentTeamDefinitionConfig);
         }
-        if (plan.writeOrgConfig) await this.writeJson(plan.orgConfigPath, plan.orgTarget);
+        if (plan.writeOrgConfig) await this.writeDefinition(plan.orgConfigPath, plan.orgTarget, parseAgentOrgDefinitionConfig);
         if (plan.writeOrgMarkdown) await atomicText(plan.orgMarkdownPath, plan.orgMarkdown);
-        parseMigrationOrgDefinitionConfig(await readJson(plan.orgConfigPath));
+        await this.verifyDefinition(plan.orgConfigPath, plan.orgTarget, parseAgentOrgDefinitionConfig);
         if (await fs.readFile(plan.orgMarkdownPath, "utf8") !== plan.orgMarkdown) {
           throw new Error(`Prospective Org markdown '${plan.orgMarkdownPath}' does not match its released source.`);
         }
         await fs.rename(source, plan.destination);
         await fs.rm(path.join(destination, "team-config.json"), { force: true });
         await fs.rm(path.join(destination, "team.md"), { force: true });
-        parseMigrationOrgDefinitionConfig(await readJson(path.join(destination, "org-config.json")));
+        await this.verifyDefinition(path.join(destination, "org-config.json"), plan.orgTarget, parseAgentOrgDefinitionConfig);
         this.add("MIGRATED_ORG_DEFINITION", destination);
       } catch (error) { this.add("FAILED_DEFINITION", configPath, errorReason(error)); }
     }
@@ -206,15 +216,20 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
     legacy: LegacyTeamConfig,
   ): Promise<OrgDefinitionPlan> {
     const ownedTeams: OwnedTeamDefinitionPlan[] = [];
+    const childRoot = path.join(source, "agent-teams");
+    const children = new Set(await listOwnedDefinitionPackages(this.config.getAgentTeamsDir(), childRoot));
     for (const member of legacy.members.filter((item) => item.refType === "agent_team" && item.refScope === "team_local")) {
-      const configPath = path.join(source, "agent-teams", member.ref, "team-config.json");
+      children.add(path.join(childRoot, member.ref));
+    }
+    for (const directory of [...children].sort()) {
+      const configPath = path.join(directory, "team-config.json");
       const raw = (await readOwnedDefinitionPackage({ ownershipRoot: this.config.getAgentTeamsDir(),
         packagePath: path.dirname(configPath), family: "team",
-        validateConfig: (value) => { try { return parseMigrationTeamDefinitionConfig(value); } catch { return legacyConfig(value); } },
+        validateConfig: (value) => { try { return selectTeamAuthoringCandidate(value); } catch { return legacyConfig(value); } },
       })).config;
       try {
-        parseMigrationTeamDefinitionConfig(raw);
-        ownedTeams.push({ configPath, target: raw, writeRequired: false });
+        const target = selectTeamAuthoringCandidate(raw);
+        ownedTeams.push({ configPath, target, writeRequired: !isDeepStrictEqual(raw, target) });
         continue;
       } catch { /* exact current prospective output or released input only */ }
       let child: LegacyTeamConfig;
@@ -225,19 +240,20 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
         throw new Error(`Owned Team definition '${configPath}' is not flat: member '${nested.memberName}' references a Team.`);
       }
       const target = teamTarget(child);
-      parseMigrationTeamDefinitionConfig(target);
+      parseAgentTeamDefinitionConfig(target);
       ownedTeams.push({ configPath, target, writeRequired: true });
     }
     const orgTargetPayload = orgTarget(legacy, rootDefinitionId);
-    parseMigrationOrgDefinitionConfig(orgTargetPayload);
+    parseAgentOrgDefinitionConfig(orgTargetPayload);
     const orgConfigPath = path.join(source, "org-config.json");
-    const writeOrgConfig = !(await exists(orgConfigPath));
+    let writeOrgConfig = !(await exists(orgConfigPath));
     if (!writeOrgConfig) {
       const prospective = await readJson(orgConfigPath);
-      parseMigrationOrgDefinitionConfig(prospective);
-      if (!isDeepStrictEqual(parseMigrationOrgDefinitionConfig(prospective), parseMigrationOrgDefinitionConfig(orgTargetPayload))) {
+      const candidate = selectOrgAuthoringCandidate(prospective);
+      if (!isDeepStrictEqual(candidate, orgTargetPayload)) {
         throw new Error(`Prospective Org config '${orgConfigPath}' does not match the exact target.`);
       }
+      writeOrgConfig = !isDeepStrictEqual(prospective, candidate);
     }
     const orgMarkdown = await fs.readFile(path.join(source, "team.md"), "utf8");
     const orgMarkdownPath = path.join(source, "org.md");
@@ -325,15 +341,29 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
     try { packages = await listOwnedDefinitionPackages(root); }
     catch (error) { this.add("FAILED_DEFINITION", root, errorReason(error)); return; }
     for (const dir of packages) {
-      try { await readOwnedDefinitionPackage({ ownershipRoot: root, packagePath: dir, family: "org",
-        validateConfig: parseMigrationOrgDefinitionConfig }); }
+      this.scanned += 1;
+      let converted = false;
+      try {
+        const source = await readOwnedDefinitionPackage({ ownershipRoot: root, packagePath: dir, family: "org",
+          validateConfig: selectOrgAuthoringCandidate });
+        const target = selectOrgAuthoringCandidate(source.config);
+        if (!isDeepStrictEqual(source.config, target)) { await this.writeDefinition(path.join(dir, "org-config.json"), target, parseAgentOrgDefinitionConfig); converted = true; }
+        await this.verifyDefinition(path.join(dir, "org-config.json"), target, parseAgentOrgDefinitionConfig);
+        for (const child of await listOwnedDefinitionPackages(root, path.join(dir, "agent-teams"))) {
+          const sourceChild = await readOwnedDefinitionPackage({ ownershipRoot: root, packagePath: child, family: "team", validateConfig: selectTeamAuthoringCandidate });
+          const childTarget = selectTeamAuthoringCandidate(sourceChild.config), file = path.join(child, "team-config.json");
+          if (!isDeepStrictEqual(sourceChild.config, childTarget)) { await this.writeDefinition(file, childTarget, parseAgentTeamDefinitionConfig); converted = true; }
+          await this.verifyDefinition(file, childTarget, parseAgentTeamDefinitionConfig);
+        }
+      }
       catch (error) { this.add("FAILED_DEFINITION", dir, errorReason(error)); continue; }
       const retiredConfig = path.join(dir, "team-config.json");
       const retiredMarkdown = path.join(dir, "team.md");
-      if (!(await exists(retiredConfig)) && !(await exists(retiredMarkdown))) continue;
-      this.scanned += 1;
+      if (!(await exists(retiredConfig)) && !(await exists(retiredMarkdown))) {
+        this.add(converted ? "MIGRATED_ORG_DEFINITION" : "SKIPPED_CURRENT_DEFINITION", dir); continue;
+      }
       try {
-        parseMigrationOrgDefinitionConfig(JSON.parse(await fs.readFile(path.join(dir, "org-config.json"), "utf8")));
+        parseAgentOrgDefinitionConfig(JSON.parse(await fs.readFile(path.join(dir, "org-config.json"), "utf8")));
         await fs.readFile(path.join(dir, "org.md"), "utf8");
         await fs.rm(retiredConfig, { force: true });
         await fs.rm(retiredMarkdown, { force: true });
@@ -426,6 +456,16 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       JSON.parse(await fs.readFile(getAgentOrgCommunicationMessagesV1Path(dir), "utf8")),
       orgRunId,
     );
+  }
+  private async verifyDefinition(filePath: string, target: unknown, validate: (value: unknown) => unknown): Promise<void> {
+    const actual = await readJson(filePath);
+    validate(actual);
+    if (!isDeepStrictEqual(actual, target)) throw new Error(`Definition '${filePath}' differs from its selected final target.`);
+  }
+  private async writeDefinition(filePath: string, target: unknown, validate: (value: unknown) => unknown): Promise<void> {
+    validate(target);
+    await this.writeJson(filePath, target);
+    await this.verifyDefinition(filePath, target, validate);
   }
   private async writeJson(filePath: string, payload: unknown, file = "definition"): Promise<void> {
     const outcome = await this.writer.write({ file, filePath, payload });

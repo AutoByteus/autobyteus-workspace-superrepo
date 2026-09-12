@@ -52,7 +52,7 @@ export const listAgentOrgOwnedDefinitionSources = async (input: {
       const familyDirName = input.subject === "agent" ? "agents" : "agent-teams";
       const localEntries = await fs.readdir(path.join(orgDir, familyDirName), { withFileTypes: true }).catch(() => []);
       for (const member of config.members) {
-        if (member.refScope !== "agent_org_owned" || member.refType !== input.subject || seen.has(member.ref)) continue;
+        if (member.refScope !== "org_local" || member.refType !== input.subject || seen.has(member.ref)) continue;
         const matches = localEntries.filter((entry) => entry.isDirectory()
           && candidateIds(input.subject, orgEntry.name, entry.name).includes(member.ref));
         if (matches.length !== 1) {

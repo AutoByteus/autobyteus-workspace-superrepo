@@ -1,3 +1,4 @@
+import { isDraftUploadedContextAttachment, coerceDraftUploadedContextAttachment } from '~/utils/contextFiles/contextAttachmentModel'
 import { RootExecutionViewDtoSchema } from '@autobyteus/collaboration-stream-contracts'
 import { defineStore } from 'pinia'
 import { ref, shallowReactive, watch } from 'vue'
@@ -8,11 +9,13 @@ import type { OrgWorkspaceSelection } from '~/services/agentOrgExecution/agentOr
 import type { AgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgExecutionContext'
 import { stageAgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgContextHydration'
 import { AgentOrgStreamingService } from '~/services/agentOrgExecution/agentOrgStreamingService'
-import { beginLocalUserSubmission, failLocalSubmission, type LocalUserSubmissionHandle } from '~/services/runSubmission/localUserSubmission'
+import { beginLocalUserSubmission, failLocalSubmission, finalizeLocalSubmissionAttachments, type LocalUserSubmissionHandle } from '~/services/runSubmission/localUserSubmission'
 import { upsertUserMessageByIdentity } from '~/services/agentStreaming/handlers/userMessageProjection'
 import { GetAgentOrgRunInspection } from '~/graphql/queries/runHistoryQueries'
 import { getApolloClient } from '~/utils/apolloClient'
 import { useRunHistoryStore } from '~/stores/runHistoryStore'
+import { useContextFileUploadStore } from '~/stores/contextFileUploadStore'
+import { buildOrgMemberDraftContextFileOwner, buildOrgMemberFinalContextFileOwner } from '~/utils/contextFiles/contextFileOwner'
 import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
 
 export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
@@ -165,7 +168,7 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
       || access === 'read_only') throw new Error('AgentOrg send target is not ready or is stale.')
     if (operations.value[id] || context.submissionPending) throw new Error('AgentOrg member submission is already pending.')
     if (access === 'continuable') operations.value = { ...operations.value, [id]: 'continuation' }
-    const attachments = contextPaths.map((attachment) => ({ ...attachment }))
+    let attachments = contextPaths.map((attachment) => ({ ...attachment }))
     const messageId = crypto.randomUUID()
     const dedupeKey = `member_input:${id}:${agentRunId}:${messageId}`
     const submission = beginLocalUserSubmission(context, { text: content, attachments, navigationTarget: null })
@@ -190,6 +193,13 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
       }
       const service = services.get(id)
       if (!service) throw new Error('AgentOrg interaction stream is not ready.')
+      if (attachments.some((file) => isDraftUploadedContextAttachment(file) || coerceDraftUploadedContextAttachment(file))) {
+        attachments = await useContextFileUploadStore().finalizeDraftAttachments({
+          draftOwner: buildOrgMemberDraftContextFileOwner(id, address),
+          finalOwner: buildOrgMemberFinalContextFileOwner(id, address), attachments,
+        })
+        finalizeLocalSubmissionAttachments(submission, attachments)
+      }
       await service.sendPrepared({ agentRunId, content, attachments, messageId, dedupeKey })
     } catch (cause) {
       failLocalSubmission(submission, cause)
