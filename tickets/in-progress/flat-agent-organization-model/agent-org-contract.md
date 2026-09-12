@@ -4,10 +4,10 @@
 
 - Contract ID: `AORG-CONTRACT-001`
 - Requirements package: `AORG-FLAT-TEAM-001`
-- Requirements revision: `RER-029`
+- Requirements revision: `RER-033`
 - Status: `Approved`
-- Approval reference: Cumulative domain/runtime, ownership/admission and approved Product authority through RER-028 remain. On 2026-09-11 the user explicitly removes schemaVersion from both org-config.json and team-config.json. RER-029 changes only authored definition versions, normal admission/output and bounded server-owned definition transition; runtime execution schemas/paths and unrelated Product/task behavior remain unchanged.
-- Owner/date: Requirements Engineer / 2026-09-11
+- Approval reference: Cumulative approval through RER-032 remains. On 2026-09-12 PKG-AUTH-002 records the user's explicit request via Code Reviewer/Architecture to rename only authored Org member refScope agent_org_owned to org_local. RER-033 defines that vocabulary and meaning-preserving owned transition; unversioned authoring, Team scope, separate ownership/IDs/paths, Product and runtime contracts remain unchanged.
+- Owner/date: Requirements Engineer / 2026-09-12
 - Purpose: Provide one normative configured-structure, launch/configuration/focus, handoff behavior/authoring, and on-disk execution-tree contract that Product Design and later Architecture Design must preserve after applicable approval.
 
 This contract reuses the current TeamRun V2 child, handoff, launch, and task
@@ -259,7 +259,7 @@ Current AgentOrg Definition rules:
 1. Normal writes emit exactly the top-level keys shown above.
 2. `schemaVersion` is absent, not an optional authoring field. Normal save/export output does not reinsert it.
 3. A member has exactly `memberName`, `ref`, `refType`, and `refScope`; `refType` is exactly `agent` or `agent_team`.
-4. Supported `refScope` values are `shared`, `agent_org_owned`, or `application_owned` when valid for the source owner.
+4. Supported `refScope` values are `shared`, `org_local`, or `application_owned` when valid for the source owner. `org_local` refers to the same exact Agent/flat-Team definition bundled in the owning Org; it replaces only the former authored scope spelling, not its ownership or identity.
 5. The config has no `coordinatorMemberName`, recipient, focus, or fallback field.
 6. A version-bearing file, nested Org, Team-owned Team, unresolved reference, unsupported key/scope, wrong family, or Org referring to an unavailable Team fails target admission.
 
@@ -317,6 +317,45 @@ runtime migration.
 | --- | --- | --- | --- |
 | ORG-CASE-062 | Author, save/reload, export and import a current Team or Org config | No schemaVersion required, persisted or reintroduced; all remaining authored values retain their semantics | No relaxed unrelated fields, retired-shape fallback or UI redesign. |
 | ORG-CASE-063 | Transition otherwise-current version-bearing owned definitions | Remove only the superseded authored version, preserve identity/meaning and keep current configs valid | No external writes, normal versioned fallback, runtime schema change or new runtime migration. |
+
+### Org-Local Authored Reference Vocabulary — Approved In RER-033
+
+Org member `refScope` values are exactly `shared`, `org_local` and
+`application_owned`. Team values remain `shared`, `team_local` and
+`application_owned`. Normal Org authoring/read/write/import/export preserves
+the new authored vocabulary and exact reference meaning; the retired
+`agent_org_owned` authored scope fails normal admission with an actionable
+package/definition/member-field diagnostic, not a permanent dual-name fallback.
+
+Illustrative Org member referring to an already identified bundled Team
+(the opaque ref is preserved, not renamed to match the scope):
+
+```json
+{
+  "memberName": "research_team",
+  "ref": "agent-org-owned-team:example-org:research-team",
+  "refType": "agent_team",
+  "refScope": "org_local"
+}
+```
+
+Preserve previously valid otherwise-current server-owned Org definition
+meaning through a bounded spelling transition, including exact refs/identities,
+ownership, handoffs, launch defaults and other authored values. Current
+org_local definitions remain valid. Inventory, transition/readiness and
+technical mappings remain Architecture-owned; any retired-name handling is
+transition-only. External repositories retain their approved read-only and
+separate-owner availability boundary. This does not rename ownershipScope,
+internal source kind, agent-org-owned-agent/team identity prefixes, directories
+or runtime schemas, or authorize runtime-migration replay. Prior version-field
+removal remains independent; neither change authorizes unrelated field loss.
+
+| Case ID | Trigger / Input | Required Outcome | Rejected Or Preserved Alternative |
+| --- | --- | --- | --- |
+| ORG-CASE-064 | Author/create/edit/save/read/export/import an Org using org_local for bundled Agents or flat Teams | Same exact definitions/refs resolve; authored scope uses org_local throughout the supported roundtrip | Shared/application-owned Org and all Team scope vocabulary remain unchanged; no renamed identity or global/basename fallback. |
+| ORG-CASE-065 | Normal Org admission receives agent_org_owned, team_local or an unsupported/unresolved local scope | Reject with package/definition/member-field diagnostic and current allowed vocabulary | No second normal name, silent normalization or relaxed resolution. |
+| ORG-CASE-066 | Transition an otherwise-current server-owned Org using the retired authored scope | Preserve identities/refs/ownership and all other meaning under org_local; current configs remain valid | No external writes, ownership/ID/path/schema rename, runtime rewrite/replay or new configured topology. |
+
 
 ## Current TeamRun V2 Assessment
 
@@ -648,7 +687,7 @@ identity.
 | ORG-VERIFY-007 | ORG-CASE-032–042 | Explicit From/To/When detail and authoring; eligible endpoint projection; coordinator indication; address visibility; CRUD/order/validation/cancel/atomic save; Org-versus-Team ownership separation. |
 | ORG-VERIFY-008 | ORG-CASE-043–048 | Direct-to-Org configuration, Org → Team → Agent effective-setting precedence, referenced-definition immutability, complete launch validation, full-scope activation, and no initial focus. |
 | ORG-VERIFY-009 | Mixed-root projection contract | Mandatory `root_subject_kind`, correct Team V2/AgentOrg V1 union branch, Team-only compatibility, package/payload/projection agreement, and failure-closed mismatch handling. |
-| ORG-VERIFY-010 | ORG-CASE-049–055, ORG-CASE-062–063 | Unversioned current Team/Org definition shapes, authored roundtrip and bounded version-bearing owned-definition transition, source ownership, migration-only legacy decoding, target-only normal admission, external dependency diagnostics, runtime independence, and approved per-definition availability. |
+| ORG-VERIFY-010 | ORG-CASE-049–055, ORG-CASE-062–066 | Unversioned current Team/Org definition shapes, org_local authored scope with exact reference preservation, authored roundtrip and bounded owned-definition transitions, source ownership, migration-only legacy decoding, target-only normal admission, external dependency diagnostics, runtime independence, and approved per-definition availability. |
 | ORG-VERIFY-011 | ORG-CASE-056–058 | Mounted Team aggregate status over exact in-branch Agent projections; five-state precedence; collapsed visibility; accessible meaning; truthful stopped/history behavior; no Team-root lifecycle or persistence authority. |
 | ORG-VERIFY-012 | ORG-CASE-059–061 | Exact-Agent count and adjacent accessible outer disclosure; outer and per-Team default collapse; established Team-scope identity/state/disclosure language; exact coordinator Agent identification; exact-placement-local inheritance/customization; sibling independence; draft preservation; unchanged effective-setting precedence, flat membership, coordinator-free Org, and distinct payload/runtime ownership. |
 
@@ -760,3 +799,7 @@ RER-029 approval on 2026-09-11 explicitly removes the authored schemaVersion
 attribute from both Team and Org configs. It supersedes the earlier numeric
 definition-version requirement only; native Team V2 / AgentOrg V1 execution
 files, runtime migration and all other cumulative constraints remain approved.
+
+RER-033 additionally supersedes only the former authored Org member scope
+spelling with org_local. Exact refs, ownership and runtime contract values
+remain; no similarly named internal or opaque-identity field is renamed.
