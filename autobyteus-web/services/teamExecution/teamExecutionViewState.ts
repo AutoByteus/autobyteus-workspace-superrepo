@@ -52,6 +52,7 @@ export interface TeamExecutionViewState {
   focusAgent(agentRunId: string): MutationResult;
   focusAgentForInspection(agentRunId: string): MutationResult;
   listAgentContextEntries(): readonly TeamAgentContextEntry[];
+  listLiveAgentContextEntries(): readonly TeamAgentContextEntry[];
   listNavigationRows(): readonly TeamExecutionNavigationRow[];
   listTaskHistoryRows(): readonly TeamTaskHistoryRow[];
   listCommunicationMessages(): readonly TeamCommunicationMessageDto[];
@@ -427,6 +428,11 @@ export const createTeamExecutionViewState = (
     listAgentContextEntries: () => Object.freeze([...publication.value.contexts].map(([agentRunId, agentContext]) => Object.freeze({
       agentRunId, memberAddress: publication.value.locations.get(agentRunId)!.memberAddress, agentContext,
     }))),
+    // The stream snapshot covers live placements, not every retained context.
+    listLiveAgentContextEntries: () => Object.freeze(collectLiveAgentExecutionLocations(publication.value.tree)
+      .map(({ agentRunId, memberAddress }) => Object.freeze({
+        agentRunId, memberAddress, agentContext: publication.value.contexts.get(agentRunId)!,
+      }))),
     listNavigationRows: navigationRows,
     listTaskHistoryRows: () => buildTaskHistoryRows(publication.value.tasks),
     listCommunicationMessages: () => Object.freeze([...publication.value.messages]),
