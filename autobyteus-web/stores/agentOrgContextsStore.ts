@@ -195,8 +195,8 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
       if (!service) throw new Error('AgentOrg interaction stream is not ready.')
       if (attachments.some((file) => isDraftUploadedContextAttachment(file) || coerceDraftUploadedContextAttachment(file))) {
         attachments = await useContextFileUploadStore().finalizeDraftAttachments({
-          draftOwner: buildOrgMemberDraftContextFileOwner(id, address),
-          finalOwner: buildOrgMemberFinalContextFileOwner(id, address), attachments,
+          draftOwner: buildOrgMemberDraftContextFileOwner(id, agentRunId),
+          finalOwner: buildOrgMemberFinalContextFileOwner(id, agentRunId), attachments,
         })
         finalizeLocalSubmissionAttachments(submission, attachments)
       }

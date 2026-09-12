@@ -28,7 +28,11 @@ import { buildAgentOrgOwnedDefinitionId } from "../../../agent-org-definition/ut
 import { TeamRunHistoryIndexStore } from "../../../run-history/store/team-run-history-index-store.js";
 import { AgentOrgRunHistoryIndexStore } from "../../../run-history/store/agent-org-run-history-index-store.js";
 import type { AgentOrgRunIndexRowRecord } from "../../../run-history/store/agent-org-run-history-index-record-types.js";
-import { validateReleasedTeamRunV2, type ReleasedTeamRunV2 } from "./released-team-run-v2-schema.js";
+import { validateReleasedTeamRunV2 } from "./released-team-run-v2-schema.js";
+
+import { validateAgentOrgStatePackage } from "../../../agent-org-execution/services/agent-org-state-package-validator.js";
+import { AgentOrgContextFileLocatorTransition } from "./agent-org-context-file-locator-transition.js";
+import { orgTreeTarget } from "./agent-org-runtime-tree-target.js";
 
 export const AGENT_ORG_FLAT_TEAM_FAMILIES_V1_MIGRATION_ID = "20260901_agent_org_flat_team_families_v1";
 
@@ -114,17 +118,6 @@ const atomicText = async (target: string, content: string): Promise<void> => {
   await fs.rename(temp, target);
 };
 
-const orgTreeTarget = (released: ReleasedTeamRunV2): unknown => {
-  const root = released.root as Record<string, unknown>;
-  const team = released.rootTeam as Record<string, unknown>;
-  return {
-    schemaVersion: 1, subjectKind: "agent_org", createdAt: root.createdAt, archivedAt: root.archivedAt,
-    applicationBinding: root.applicationBinding, handoffs: root.handoffs,
-    rootOrg: { address: "/", orgDefinitionId: team.teamDefinitionId, orgDefinitionName: team.teamDefinitionName,
-      orgRunId: team.teamRunId, defaultLaunchConfiguration: team.defaultLaunchConfiguration,
-      members: team.members, taskExecutions: team.taskExecutions },
-  };
-};
 
 export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrationDefinition {
   readonly id = AGENT_ORG_FLAT_TEAM_FAMILIES_V1_MIGRATION_ID;
@@ -136,6 +129,7 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
   private counts = new Map<Disposition, Count>();
   private scanned = 0;
   private readonly layout: AgentMemoryLayout;
+  private locatorTransition!: AgentOrgContextFileLocatorTransition;
   constructor(
     private readonly memoryDir: string,
     private readonly config: AppConfig = appConfigProvider.config,
@@ -146,6 +140,9 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
     this.counts.clear(); this.scanned = 0;
     await this.migrateDefinitions();
     await this.cleanupDefinitionTargets();
+    this.locatorTransition = new AgentOrgContextFileLocatorTransition(this.memoryDir, this.writer, () => this.config.getBaseUrl());
+    await this.locatorTransition.prepareAndCommit();
+    for (const [id, reason] of this.locatorTransition.failures) this.add("FAILED_RUNTIME", id, reason);
     await this.migrateRuntimeRoots();
     await this.cleanupOrgTargets();
     await this.migrateHistoryIndexes();
@@ -274,6 +271,10 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
       if (!entry.isDirectory()) continue;
       this.scanned += 1;
       const source = path.join(sourceRoot, entry.name);
+      if (this.locatorTransition.failures.has(entry.name)) {
+        if (await exists(path.join(targetRoot, entry.name))) this.add("FAILED_FAMILY_CONFLICT", source, "AgentOrg run destination already exists.");
+        continue;
+      }
       const filePath = getTeamRunExecutionTreePath(source);
       let raw: unknown;
       try { raw = JSON.parse(await fs.readFile(filePath, "utf8")); }
@@ -319,6 +320,7 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
         validateAgentOrgRunExecutionTreePayload(JSON.parse(await fs.readFile(getAgentOrgRunExecutionTreePath(source), "utf8")), entry.name);
         validateAgentOrgTaskDelegationRecordsV1(JSON.parse(await fs.readFile(getAgentOrgTaskDelegationRecordsV1Path(source), "utf8")), entry.name);
         validateAgentOrgCommunicationMessagesV1(JSON.parse(await fs.readFile(getAgentOrgCommunicationMessagesV1Path(source), "utf8")), entry.name);
+        await this.locatorTransition.validateRoot(source, entry.name);
         await fs.mkdir(targetRoot, { recursive: true });
         await fs.rename(source, targetDir);
         await this.validateCompleteOrgRunPackage(targetDir, entry.name);
@@ -444,18 +446,20 @@ export class AgentOrgFlatTeamFamiliesV1AppDataMigration implements AppDataMigrat
     }
   }
   private async validateCompleteOrgRunPackage(dir: string, orgRunId: string): Promise<void> {
-    validateAgentOrgRunExecutionTreePayload(
+    await this.locatorTransition.validateRoot(dir, orgRunId);
+    const executionTree = validateAgentOrgRunExecutionTreePayload(
       JSON.parse(await fs.readFile(getAgentOrgRunExecutionTreePath(dir), "utf8")),
       orgRunId,
     );
-    validateAgentOrgTaskDelegationRecordsV1(
+    const taskRecords = validateAgentOrgTaskDelegationRecordsV1(
       JSON.parse(await fs.readFile(getAgentOrgTaskDelegationRecordsV1Path(dir), "utf8")),
       orgRunId,
     );
-    validateAgentOrgCommunicationMessagesV1(
+    const communicationMessages = validateAgentOrgCommunicationMessagesV1(
       JSON.parse(await fs.readFile(getAgentOrgCommunicationMessagesV1Path(dir), "utf8")),
       orgRunId,
     );
+    validateAgentOrgStatePackage({ executionTree, taskRecords, communicationMessages });
   }
   private async verifyDefinition(filePath: string, target: unknown, validate: (value: unknown) => unknown): Promise<void> {
     const actual = await readJson(filePath);

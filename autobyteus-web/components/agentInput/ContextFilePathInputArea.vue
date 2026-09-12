@@ -204,7 +204,7 @@ const resolveDraftOwnerForContext = (targetContext: AgentContext | null) => {
   // retained task/standalone read-only targets do not acquire upload authority.
   if (target.access === 'read_only' && target.kind !== 'agent_org_direct_agent'
     && target.kind !== 'agent_org_team_member') return null;
-  if ('root' in target) return buildOrgMemberDraftContextFileOwner(target.root.orgRunId, target.address);
+  if ('root' in target) return buildOrgMemberDraftContextFileOwner(target.root.orgRunId, target.context.state.runId);
   if (target.kind === 'standalone_agent') return buildAgentDraftContextFileOwner(target.context.state.runId);
   return buildTeamMemberDraftContextFileOwner(target.team.rootRunId, target.team.focusedMemberAddress);
 };

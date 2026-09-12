@@ -13,6 +13,9 @@ import { TEAM_RUN_EXECUTION_TREE_V2_MIGRATION_ID as PREREQUISITE } from "../../.
 import { AtomicRunPackageFileCommitWriter } from "../../../src/run-history/store/atomic-run-package-file-commit-writer.js";
 import { selectOrgAuthoringCandidate, selectTeamAuthoringCandidate } from "../../../src/app-data-migrations/legacy/collaboration-definition-authoring-transition.js";
 
+import { testExecutionTree, testAgentNode } from "../../fixtures/current-team-run-fixtures.js";
+import { testOrgTeamNode, testOrgAgentNode } from "../../fixtures/current-agent-org-run-fixtures.js";
+
 const roots: string[] = [], clients: PrismaClient[] = [];
 afterEach(async () => {
   vi.restoreAllMocks();
@@ -225,11 +228,40 @@ it("runs the complete production registry on a fresh pre-ticket data root, direc
   const external = await write(path.join(env.root, "external"), "org", { schemaVersion: 1, ...org() });
   const externalBytes = await fs.readFile(external);
   const { repository } = await runnerFor(env);
+  // Representative pre-ticket current trace layout + released one-level Team root.
+  // This is disposable first startup, not an execution against any inventoried installation.
+  vi.spyOn(config, "getBaseUrl").mockReturnValue("http://127.0.0.1:43151");
+  const runtimeSource = path.join(env.memory, "agent_teams", "runtime-org");
+  await fs.mkdir(path.join(runtimeSource, "mounted", "worker", "context_files"), { recursive: true });
+  const base = testExecutionTree({ rootTeamRunId: "runtime-org", coordinatorAddress: "/direct", children: [testAgentNode("/direct", { agentRunId: "director" })] });
+  const runtimeTree = { ...base, rootTeam: { ...base.rootTeam, members: [...base.rootTeam.members,
+    testOrgTeamNode({ address: "/team", teamRunId: "mounted", coordinatorAddress: "/team/lead", members: [testOrgAgentNode("/team/lead", "worker")] })] } };
+  await fs.writeFile(path.join(runtimeSource, "team_run_execution_tree.json"), json(runtimeTree));
+  await fs.writeFile(path.join(runtimeSource, "task_delegation_records.json"), json({ schemaVersion: 1, rootTeamRunId: "runtime-org", records: [] }));
+  await fs.writeFile(path.join(runtimeSource, "team_communication_messages.json"), json({ schemaVersion: 1, rootTeamRunId: "runtime-org", messages: [] }));
+  await fs.mkdir(path.join(runtimeSource, "director"), { recursive: true });
+  const savedUri = "/rest/team-runs/mounted/members/%2Fteam%2Flead/context-files/ctx_saved__image.png";
+  const savedTrace = { id: "retained-trace", trace_type: "user", turn_id: "retained-turn", seq: 1, ts: 1788257556,
+    content: "Preserve my attachment", media: { images: [savedUri] } };
+  await fs.writeFile(path.join(runtimeSource, "director", "raw_traces_active.jsonl"), JSON.stringify(savedTrace) + "\n");
+  const imageBytes = Buffer.from([0, 16, 128, 255]);
+  await fs.writeFile(path.join(runtimeSource, "mounted", "worker", "context_files", "ctx_saved__image.png"), imageBytes);
+  const nativeDir = path.join(env.memory, "agent_teams", "native-flat"); await fs.mkdir(nativeDir, { recursive: true });
+  const nativeTree = json(testExecutionTree({ rootTeamRunId: "native-flat", coordinatorAddress: "/lead", children: [testAgentNode("/lead", { agentRunId: "native-lead" })] }));
+  await fs.writeFile(path.join(nativeDir, "team_run_execution_tree.json"), nativeTree);
+  await fs.writeFile(path.join(nativeDir, "task_delegation_records.json"), json({ schemaVersion: 1, rootTeamRunId: "native-flat", records: [] }));
+  await fs.writeFile(path.join(nativeDir, "team_communication_messages.json"), json({ schemaVersion: 1, rootTeamRunId: "native-flat", messages: [] }));
   const registry = new AppDataMigrationRegistry();
   const runner = new AppDataMigrationRunner(registry, repository, { logsDir: path.join(env.root, "production-logs") });
   const results = await runner.runPending();
   expect(results.map((result) => result.migrationId)).toEqual(registry.listDefinitions().map((definition) => definition.id));
   for (const id of [PREREQUISITE, FAMILY, AUTHORING]) { const result = results.find((result) => result.migrationId === id)!; expect(result, result.logPath ? await fs.readFile(result.logPath, "utf8") : result.errorMessage ?? "").toMatchObject({ status: "SUCCEEDED" }); }
+  const runtimeTarget = path.join(env.memory, "agent_orgs", "runtime-org");
+  expect(JSON.parse(await fs.readFile(path.join(runtimeTarget, "director", "raw_traces_active.jsonl"), "utf8"))).toEqual({ ...savedTrace,
+    media: { images: ["/rest/agent-org-runs/runtime-org/agent-runs/worker/context-files/ctx_saved__image.png"] } });
+  expect(await fs.readFile(path.join(runtimeTarget, "mounted", "worker", "context_files", "ctx_saved__image.png"))).toEqual(imageBytes);
+  expect(await fs.readFile(path.join(nativeDir, "team_run_execution_tree.json"), "utf8")).toBe(nativeTree);
+  await expect(fs.access(runtimeSource)).rejects.toMatchObject({ code: "ENOENT" });
   expect(await read(flat)).toEqual(team());
   const targetDir = path.join(env.orgs, "mixed"), target = await read(path.join(targetDir, "org-config.json"));
   expect(target).not.toHaveProperty("schemaVersion"); expect(target.members[1]).toMatchObject({ memberName: "team", refScope: "org_local" });

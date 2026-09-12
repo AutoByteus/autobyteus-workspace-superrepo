@@ -52,7 +52,7 @@ let activeView: ReturnType<typeof taskBearingView>
 let store: ReturnType<typeof useAgentOrgContextsStore>
 let files: ReturnType<typeof mount>
 const uploaded = new Map<string, File>()
-const ownerPath = (owner: any, draft: boolean) => `/rest/${draft ? 'drafts/' : ''}agent-org-runs/${encodeURIComponent(owner.orgDraftId ?? owner.orgRunId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/`
+const ownerPath = (owner: any, draft: boolean) => `/rest/${draft ? 'drafts/' : ''}agent-org-runs/${encodeURIComponent(owner.orgRunId)}/agent-runs/${encodeURIComponent(owner.agentRunId)}/context-files/`
 const file = () => new File(['Exact selected Agent file contents'], 'notes.txt', { type: 'text/plain' })
 async function choose() {
   const input = files.find('input[type="file"]')
@@ -115,7 +115,7 @@ describe('actual shared Org file input -> active target -> attachment upload own
     const address = store.contextFor('org-run')!.index.requireAgent(id).address
     expect(useActiveContextStore().activeWorkspaceTarget?.access).toBe('continuable')
     await choose()
-    expect(JSON.parse(mocks.post.mock.calls[0]![1].get('owner'))).toEqual({ kind: 'org_member_draft', orgDraftId: 'org-run', memberAddress: address })
+    expect(JSON.parse(mocks.post.mock.calls[0]![1].get('owner'))).toEqual({ kind: 'org_member_draft', orgRunId: 'org-run', agentRunId: id })
     expect(context.contextFilePaths).toHaveLength(1)
     expect(files.text()).toContain('Context Files (1)')
     const opened = vi.spyOn(window, 'open').mockImplementation(() => null)
@@ -125,7 +125,7 @@ describe('actual shared Org file input -> active target -> attachment upload own
     expect(await uploaded.get(url)!.text()).toBe('Exact selected Agent file contents')
     await files.find('button[aria-label="Remove file"]').trigger('click'); await flushPromises()
     expect(context.contextFilePaths).toEqual([])
-    expect(mocks.delete).toHaveBeenCalledWith(ownerPath({ orgDraftId: 'org-run', memberAddress: address }, true).replace('/rest', '') + '1-notes.txt')
+    expect(mocks.delete).toHaveBeenCalledWith(ownerPath({ orgRunId: 'org-run', agentRunId: id }, true).replace('/rest', '') + '1-notes.txt')
     await choose()
     expect(context.contextFilePaths).toHaveLength(1)
     await files.findAll('button').find((button) => /clear.all/i.test(button.text()))!.trigger('click'); await flushPromises()
@@ -142,14 +142,14 @@ describe('actual shared Org file input -> active target -> attachment upload own
     expect(mocks.post.mock.calls.map(([url]) => url)).toEqual(['/context-files/upload'])
     const socket = await ready(); await flushPromises()
     expect(mocks.post.mock.calls[1]).toEqual(['/context-files/finalize', {
-      draftOwner: { kind: 'org_member_draft', orgDraftId: 'org-run', memberAddress: address },
-      finalOwner: { kind: 'org_member_final', orgRunId: 'org-run', memberAddress: address },
+      draftOwner: { kind: 'org_member_draft', orgRunId: 'org-run', agentRunId: id },
+      finalOwner: { kind: 'org_member_final', orgRunId: 'org-run', agentRunId: id },
       attachments: [{ storedFilename: '1-notes.txt', displayName: 'notes.txt' }],
     }])
     expect(socket.sent).toHaveLength(1)
     const command = socket.sent[0].payload
     expect(command.target_agent_run_id).toBe(id)
-    expect(command.context_file_paths).toEqual([ownerPath({ orgRunId: 'org-run', memberAddress: address }, false) + '1-notes.txt'])
+    expect(command.context_file_paths).toEqual([ownerPath({ orgRunId: 'org-run', agentRunId: id }, false) + '1-notes.txt'])
     socket.emit({ type: 'ROOT_EXECUTION_EVENT', payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', change_sequence: activeView.base_change_sequence + 1,
       event: { kind: 'agent_presentation', agent_run_id: id, member_address: address, message: { type: 'MEMBER_INPUT_MESSAGE', payload: {
         message_id: command.message_id, dedupe_key: command.dedupe_key, content: command.content, input_origin: 'user_message',
@@ -220,7 +220,7 @@ describe('actual shared Org file input -> active target -> attachment upload own
     expect(mocks.delete).not.toHaveBeenCalled(); expect(context.contextFilePaths).toEqual([]); expect(socket.sent).toHaveLength(1)
   })
   it('hydrates and opens an inactive retained member image through the same UserMessage preview, without Restore or upload', async () => {
-    const locator = '/rest/agent-org-runs/org-run/members/%2Fteam%2Fworker/context-files/retained.png'
+    const locator = '/rest/agent-org-runs/org-run/agent-runs/agent-team-worker-configured/context-files/retained.png'
     const query = mocks.query.getMockImplementation()!
     mocks.query.mockImplementation(async (input) => {
       const result = await query(input)

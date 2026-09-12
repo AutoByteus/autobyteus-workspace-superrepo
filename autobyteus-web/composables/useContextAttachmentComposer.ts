@@ -62,7 +62,7 @@ const sameDraftOwner = (
       && left.memberAddress === right.memberAddress;
   }
   if (left.kind === 'org_member_draft' && right.kind === 'org_member_draft') {
-    return left.orgDraftId === right.orgDraftId && left.memberAddress === right.memberAddress;
+    return left.orgRunId === right.orgRunId && left.agentRunId === right.agentRunId;
   }
   return false;
 };

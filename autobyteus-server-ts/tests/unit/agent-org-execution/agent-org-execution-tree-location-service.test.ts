@@ -43,7 +43,7 @@ describe("AgentOrg and compound execution locations", () => {
     const resolved = await compound.findAgent({ rootSubjectKind: "agent_org", rootRunId: "org-b", memberAddress: "/shared" });
     expect(resolved).toMatchObject({ rootSubjectKind: "agent_org", rootRunId: "org-b", agentRunId: second.direct.agentRunId });
     expect(teams.findAgent).not.toHaveBeenCalled();
-    const owner = await new ContextFileOwnerResolver({ locations: compound }).resolveFinalOwner({ kind: "org_member_final", orgRunId: "org-b", memberAddress: second.direct.address });
+    const owner = await new ContextFileOwnerResolver({ locations: compound }).resolveFinalOwner({ kind: "org_member_final", orgRunId: "org-b", agentRunId: second.direct.agentRunId });
     expect(owner).toMatchObject({ kind: "org_member_final", rootSubjectKind: "agent_org", rootRunId: "org-b", agentRunId: second.direct.agentRunId });
   });
 

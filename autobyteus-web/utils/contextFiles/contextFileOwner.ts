@@ -1,12 +1,12 @@
 export type DraftContextFileOwnerDescriptor =
   | { kind: 'agent_draft'; draftRunId: string }
   | { kind: 'team_member_draft'; teamDraftId: string; memberAddress: string }
-  | { kind: 'org_member_draft'; orgDraftId: string; memberAddress: string };
+  | { kind: 'org_member_draft'; orgRunId: string; agentRunId: string };
 
 export type FinalContextFileOwnerDescriptor =
   | { kind: 'agent_final'; runId: string }
   | { kind: 'team_member_final'; teamRunId: string; memberAddress: string }
-  | { kind: 'org_member_final'; orgRunId: string; memberAddress: string };
+  | { kind: 'org_member_final'; orgRunId: string; agentRunId: string };
 
 const normalizeRequiredString = (value: string, fieldName: string): string => {
   const normalized = value.trim();
@@ -45,21 +45,21 @@ export const buildTeamMemberFinalContextFileOwner = (
 });
 
 export const buildOrgMemberDraftContextFileOwner = (
-  orgDraftId: string,
-  memberAddress: string,
+  orgRunId: string,
+  agentRunId: string,
 ): DraftContextFileOwnerDescriptor => ({
   kind: 'org_member_draft',
-  orgDraftId: normalizeRequiredString(orgDraftId, 'orgDraftId'),
-  memberAddress: normalizeRequiredString(memberAddress, 'memberAddress'),
+  orgRunId: normalizeRequiredString(orgRunId, 'orgRunId'),
+  agentRunId: normalizeRequiredString(agentRunId, 'agentRunId'),
 });
 
 export const buildOrgMemberFinalContextFileOwner = (
   orgRunId: string,
-  memberAddress: string,
+  agentRunId: string,
 ): FinalContextFileOwnerDescriptor => ({
   kind: 'org_member_final',
   orgRunId: normalizeRequiredString(orgRunId, 'orgRunId'),
-  memberAddress: normalizeRequiredString(memberAddress, 'memberAddress'),
+  agentRunId: normalizeRequiredString(agentRunId, 'agentRunId'),
 });
 
 export const buildDraftContextFileEndpoint = (
@@ -71,7 +71,7 @@ export const buildDraftContextFileEndpoint = (
     return `/drafts/agent-runs/${encodeURIComponent(owner.draftRunId)}/context-files/${encodedStoredFilename}`;
   }
   if (owner.kind === 'org_member_draft') {
-    return `/drafts/agent-org-runs/${encodeURIComponent(owner.orgDraftId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodedStoredFilename}`;
+    return `/drafts/agent-org-runs/${encodeURIComponent(owner.orgRunId)}/agent-runs/${encodeURIComponent(owner.agentRunId)}/context-files/${encodedStoredFilename}`;
   }
   return `/drafts/team-runs/${encodeURIComponent(owner.teamDraftId)}/members/${encodeURIComponent(owner.memberAddress)}/context-files/${encodedStoredFilename}`;
 };

@@ -57,6 +57,18 @@ export class AtomicRunPackageFileCommitWriter {
     filePath: string;
     payload: unknown;
   }): Promise<RunPackageFileWriteResult<TFile>> {
+    let text: string;
+    try { text = `${JSON.stringify(input.payload, null, 2)}\n`; }
+    catch (cause) { return { outcome: "not_renamed", file: input.file, stage: "write_temp", cause: asError(cause) }; }
+    return this.writeSerializedText({ file: input.file, filePath: input.filePath, text });
+  }
+
+  /** Already serialized authority bytes (for example migration JSONL); same commit boundary. */
+  async writeSerializedText<TFile extends RunPackageFileRole>(input: {
+    file: TFile;
+    filePath: string;
+    text: string;
+  }): Promise<RunPackageFileWriteResult<TFile>> {
     const filePath = path.resolve(input.filePath);
     const directory = path.dirname(filePath);
     const tempPath = tempPathFor(filePath);
@@ -67,7 +79,7 @@ export class AtomicRunPackageFileCommitWriter {
       await this.operations.mkdir(directory, { recursive: true });
       stage = "write_temp";
       tempHandle = await this.operations.open(tempPath, "wx");
-      await tempHandle.writeFile(`${JSON.stringify(input.payload, null, 2)}\n`, "utf-8");
+      await tempHandle.writeFile(input.text, "utf-8");
       stage = "sync_temp";
       await tempHandle.sync();
       stage = "close_temp";

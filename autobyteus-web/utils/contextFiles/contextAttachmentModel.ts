@@ -9,8 +9,8 @@ import { migrateContextLocalFileLocator } from '~/utils/contextFiles/contextLoca
 const UPLOADED_DRAFT_AGENT_ROUTE = /^\/rest\/drafts\/agent-runs\/([^/]+)\/context-files\/([^/?#]+)$/;
 const UPLOADED_DRAFT_TEAM_ROUTE =
   /^\/rest\/drafts\/team-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
-const UPLOADED_DRAFT_ORG_ROUTE = /^\/rest\/drafts\/agent-org-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
-const UPLOADED_FINAL_ORG_ROUTE = /^\/rest\/agent-org-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
+const UPLOADED_DRAFT_ORG_ROUTE = /^\/rest\/drafts\/agent-org-runs\/([^/]+)\/agent-runs\/([^/]+)\/context-files\/([^/?#]+)$/;
+const UPLOADED_FINAL_ORG_ROUTE = /^\/rest\/agent-org-runs\/([^/]+)\/agent-runs\/([^/]+)\/context-files\/([^/?#]+)$/;
 const UPLOADED_FINAL_AGENT_ROUTE = /^\/rest\/runs\/([^/]+)\/context-files\/([^/?#]+)$/;
 const UPLOADED_FINAL_TEAM_ROUTE =
   /^\/rest\/team-runs\/([^/]+)\/members\/([^/]+)\/context-files\/([^/?#]+)$/;
@@ -117,8 +117,8 @@ const parseUploadedLocator = (
   const draftOrgMatch = pathname.match(UPLOADED_DRAFT_ORG_ROUTE);
   if (draftOrgMatch) return {
     storedFilename: decodeStoredFilename(draftOrgMatch[3]), phase: 'draft',
-    draftOwner: { kind: 'org_member_draft', orgDraftId: decodePathSegment(draftOrgMatch[1]),
-      memberAddress: decodePathSegment(draftOrgMatch[2]) },
+    draftOwner: { kind: 'org_member_draft', orgRunId: decodePathSegment(draftOrgMatch[1]),
+      agentRunId: decodePathSegment(draftOrgMatch[2]) },
   };
   const finalOrgMatch = pathname.match(UPLOADED_FINAL_ORG_ROUTE);
   if (finalOrgMatch) return { storedFilename: decodeStoredFilename(finalOrgMatch[3]), phase: 'final' };
