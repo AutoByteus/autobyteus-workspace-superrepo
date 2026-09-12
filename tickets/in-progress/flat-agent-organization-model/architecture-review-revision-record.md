@@ -30,6 +30,7 @@ concise chronological architecture-review history.
 | ARCH-REV-021 | Round 21 — Org-local authoring and first-run final migration output | AD-REV-024; DS-038–040 | Pass | Pass | PKG-AUTH-002 resolved; AR-PREM-008 rejects deployed-intermediate assumption; no new AR-FIND |
 | ARCH-REV-022 | Round 22 — exact Org attachment ownership and initial saved-link preservation | AD-REV-025; DS-041–043 | Pass | Pass | IR048-DI-001 resolved at design boundary; AR-PREM-009; no new AR-FIND |
 | ARCH-REV-023 | Round 23 — durable non-media user association and both cold read surfaces | AD-REV-026; DS-044–046 | Pass | Pass | CR-FIND042 / API-FIND035 resolved at design boundary; AR-PREM-010; no new AR-FIND |
+| ARCH-REV-024 | Round 24 / CRR089 physical-read recovery | AD-REV-027 | Pass | Fail | AR-FIND-009 |
 
 ## Revision Entries
 
@@ -657,3 +658,34 @@ paths as additional clarification to the existing Implementation execution.
 - Material classification changes: focused Medium/High, cumulative Large/High; no new Requirement Gap or Product decision.
 - Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
 - Remaining risks: dual-producer/clone completeness, disjoint validation, both read DTOs and shared Open/equality, actual archives/file-only visitor, historical unrecoverable associations, and separate actual-root cutover. API33 remains Fail78.6; all held cumulative/runtime/browser/proportional-review and Delivery/native/user limits remain. Reviewer performed no application tests, live requests, data/source/test changes or migration.
+
+
+### ARCH-REV-024 — Physical read correction needs final member-projection coverage
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 24; CRR089 / CR-FIND046 / API-FIND039 after four normal API37 Stop/history overlap cases and the installed-client composition proof.
+- Triggering role, report path, and finding IDs: Architecture Designer; `architecture-history-inspection-investigation.md`, `code-review-evidence/CRR-089/README.md`, `read-client-composition-result.json`, `failure-proof-summary.json`; complete original reference inventory retained in `handoff-reference-files.txt`.
+- Relevant architecture design revision IDs: `AD-REV-027@129c0e3867470e45a54700c6f5c4f7274a91fdba`, DS-047 / strengthened DS-037 / VAL-058/076–078; cumulative earlier authorities unchanged.
+- Requirements authority: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`; four upstream artifacts independently checked byte-identical.
+- Source evidence: IR001–058 source `bbdea002ee59da87cc7174bfc2924888c0bb38f7`; incoming artifact `d76731eaa3260a123f1ce8c6ace0e14994fddcde`. Local personal and origin/personal both rechecked at `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`; source comparison only, no fetch/checkout/execution.
+- Prior authoritative decision: `Pass` — ARCH-REV-023 on AD026.
+- Current authoritative decision: `Fail` — Design Impact; sole new blocker AR-FIND-009.
+- What changed: accepted the bounded root-history acquisition correction, logical commit guards, immediate IR058 navigation publication, independent root inspection and root/Agent/aggregate separation. Original Team overlay is not assumed immune because its reconciler can update context activity from history. Independently followed the final inspection through its child member query and found that the new stage can still share an old pre-Stop content response. Existing current-Symbol and exact identity checks reject the obsolete candidate but do not establish freshness of a newer subscriber's body. Thus the final retained-view promise remains incomplete without a broader lifecycle redesign.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| CR-FIND046 / API-FIND039 | Confirmed current history/client composition defect; architecture scope initially Unclear | Root-history design correction sound; execution still pending | DS-047; VAL-076/078 | Private typed history read uses network-only plus per-operation independent acquisition; latest generation and independent workspace handling retained. No hosted/source repair claimed. |
+| CRR088 review gap / IR058 immediate publication | Mocked independent promises missed physical sharing; immediate publication execution-resolved in four API37 cases | Preserve correction and required real-client regression | DS-037/047; CRR089 evidence | Installed Apollo inspected; IR058 synchronous inactive navigation retained. No original overlay/status-helper replacement. |
+| HIST-INSPECT-001/002 | AD023/ARCH020 observational history and Stop-retained conversation; later scoped source results | Root activity protection strengthened; final member-content gap newly identified | DS-035/037/047; AR-PREM-012/013 | Root Stop is exposed during loading; current final stage reads exact member projections with default dedup. Newest stage can consume old body and publish stale conversation. |
+| AR-FIND-001–007 / PKG-AUTH-002 | Earlier resolved authorities | Retained | Cumulative RER033/design | No definition/handoff-order/external-ownership/FIFO/fence/status-reduction change. |
+| AR-FIND-008 / AAV-001 / task parity | Former configured-only policy superseded; exact retained identity established | Retained | Cumulative task/UI authority | No filtering, source-binding substitution, runtime ownership or task reactivation change. |
+| IR048-DI-001 / CR-FIND042 / API-FIND035 | Exact-owner and non-media lifetime designs passed in ARCH022/023 | Retained, not reaccepted as execution | DS-041–046; current evidence limits | No new attachment/persistence design delta or reconstruction of missing associations. |
+| IR049 actual installation | Positive terminal-family/old-locator return condition | Still separate before-cutover decision; not coding hold | Existing investigation/evidence | No replay/reset/new migration, installed-data readiness or global provenance inference. |
+| Product/UI / COMPOSER-001 / CR-FIND-019 / API proportional review | Independent prior scopes and obligations | Retained | Cumulative reports | New review does not waive failed/missing API evidence or user/Delivery gates. |
+
+- New or remaining finding IDs: AR-FIND-009 (Medium, Design Impact). AR-PREM-011 validates the observed history overlap; AR-PREM-012 validates source-supported root inspection adjacency; AR-PREM-013 validates the distinct member-projection phase of the same coherent inspect-and-stop journey. No fifth API37 failure is claimed.
+- Material classification changes: focused Medium/High and cumulative Large/High retained; no Requirement Gap or Product decision. Required correction completes one existing read dependency, not a global transport or runtime policy.
+- Recommended recipient: `/software_engineering_team/architecture_designer` under the most-specific completed-review Fail rule; no implementation forwarding.
+- Remaining risks or uncertainty: require bounded final member-read provenance, actual loader/Pinia/context/navigation overlap tests and positive controls, then selected source review/full cumulative API/E2E/proportional test review/applicable Delivery. Reviewer in-memory diagnostics use installed Apollo and controlled timing; actual member helper/query was AST-extracted but publication simplified and content synthetic. They are mechanism evidence only, not a production or browser result. Four cache.diff/canonizeResults diagnostics occurred in that member probe. API37 remains Fail69.3; prior source/API/attachment/native/unknown-origin gaps retain their recorded scopes. No source/test/runtime/data/migration/Delivery mutation or acceptance by this round.
