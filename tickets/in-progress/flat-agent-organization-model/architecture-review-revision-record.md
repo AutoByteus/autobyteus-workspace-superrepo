@@ -31,6 +31,7 @@ concise chronological architecture-review history.
 | ARCH-REV-022 | Round 22 — exact Org attachment ownership and initial saved-link preservation | AD-REV-025; DS-041–043 | Pass | Pass | IR048-DI-001 resolved at design boundary; AR-PREM-009; no new AR-FIND |
 | ARCH-REV-023 | Round 23 — durable non-media user association and both cold read surfaces | AD-REV-026; DS-044–046 | Pass | Pass | CR-FIND042 / API-FIND035 resolved at design boundary; AR-PREM-010; no new AR-FIND |
 | ARCH-REV-024 | Round 24 / CRR089 physical-read recovery | AD-REV-027 | Pass | Fail | AR-FIND-009 |
+| ARCH-REV-025 | Round 25 / AR-FIND-009 recovery | AD-REV-028 | Fail | Pass | AR-FIND-009 resolved |
 
 ## Revision Entries
 
@@ -689,3 +690,34 @@ paths as additional clarification to the existing Implementation execution.
 - Material classification changes: focused Medium/High and cumulative Large/High retained; no Requirement Gap or Product decision. Required correction completes one existing read dependency, not a global transport or runtime policy.
 - Recommended recipient: `/software_engineering_team/architecture_designer` under the most-specific completed-review Fail rule; no implementation forwarding.
 - Remaining risks or uncertainty: require bounded final member-read provenance, actual loader/Pinia/context/navigation overlap tests and positive controls, then selected source review/full cumulative API/E2E/proportional test review/applicable Delivery. Reviewer in-memory diagnostics use installed Apollo and controlled timing; actual member helper/query was AST-extracted but publication simplified and content synthetic. They are mechanism evidence only, not a production or browser result. Four cache.diff/canonizeResults diagnostics occurred in that member probe. API37 remains Fail69.3; prior source/API/attachment/native/unknown-origin gaps retain their recorded scopes. No source/test/runtime/data/migration/Delivery mutation or acceptance by this round.
+
+
+### ARCH-REV-025 — Complete stopped-inspection acquisition passes
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 25; AD028 recovery of ARCH024 Fail / AR-FIND-009 on AD027.
+- Triggering role, report path, and finding IDs: Architecture Designer; canonical design, architecture-history-inspection investigation and self-validation; prior reviewer report/record at eeffdd437246f8c4f538752041764b67702872a0; AR-FIND-009 / AR-PREM-013.
+- Relevant architecture design revision IDs: `AD-REV-028@a87637d4f11934dd048d3ca617b19e643cc34df2`, completed DS-037/047 and DS-047-M / VAL-079; valid AD027 history/root work and earlier cumulative authorities retained.
+- Requirements authority: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`, unchanged. No Requirement Gap or Product decision.
+- Source evidence: IR001–058 source `bbdea002ee59da87cc7174bfc2924888c0bb38f7`; independently verified seven inspected source files unchanged, four upstream files equal approved RER033 and four Architecture artifacts equal AD028. No source/API execution or new root action in this round.
+- Prior authoritative decision: `Fail` — ARCH-REV-024 on AD027.
+- Current authoritative decision: `Pass` — cumulative RER033 / AD028, architecture boundary only.
+- What changed: verified that the existing shared fetchProjection uniformly uses independently originated network-only member requests for inspection and stream staging; root read independence no longer stands in for child freshness. Exact root/address/AgentRun identity, Symbol/generation cancellation, local activity conflicts, complete candidate publication, first/matched-context behavior and error/draft/selection retention stay with their current owners. The old child-read exclusion/two-production-file limit is explicitly superseded; the final map contains three existing production files and one dedicated real-client staging/publication regression. VAL079 covers the old-root-complete/child-pending case and both release orders rather than relying on an AST-only diagnostic. The bounded correction preserves valid DS047/IR058 and introduces no new owner or protocol.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| AR-FIND-009 / AR-PREM-013 | ARCH024 Fail: final member projection could reuse a pre-Stop sample | Resolved at design boundary; executable proof pending | AD028, DS-037/047/M, VAL-079 | Shared exact member operation gets network-only plus scoped queryDeduplication=false for all staging; generation/identity/activity/publication guards retained. Canonical exclusion and file map reconciled. Real-client/Pinia staging test includes both completion orders, newer conversation/activities, first/adopted contexts and failure/atomicity controls. |
+| CR-FIND046 / API-FIND039 | Root-history correction accepted in design; API37 still failing | Valid design retained; execution not yet accepted | DS-047-H; VAL-076/078 | Private history operation, separate physical reads and latest commit/error guards preserve independent workspace family and immediate IR058 publication. |
+| CRR088 mocked-client review gap / AR-PREM-012 | Installed-client proof required; source-supported root-inspection adjacency established | Retained and extended through composite inspection | VAL-077/079 | Actual root/member documents, installed Apollo, staging and Pinia publication required; diagnostic is not application or hosted proof. |
+| HIST-INSPECT-001/002 / COMPOSER-001 | Observational history and retained Stop/submission authority | Preserved | DS-035–037/047/M | No restore on read, failed-read erase, forced cold reopen or stale-body merge; historical fast path valid after correct final publication. |
+| AR-FIND-001–008 / PKG-AUTH-002 / task and UI authorities | Earlier resolved or superseded findings | Unchanged | Cumulative RER033/design | No authoring/external writes/handoff order/FIFO/fence/task policy/root-family/status-reduction change. |
+| IR048-DI-001 / CR-FIND042 / API-FIND035 | Prior exact attachment and same-row association designs passed | Retained at their actual scope | DS-041–046; current reports | No locator/recording/schema/migration change; historical missing associations not fabricated. |
+| IR049 actual installation | Separate terminal-family/old-locator return condition | Still Architecture-owned BEFORE CUTOVER, not coding hold | Existing investigation/evidence | No replay/reset/installed-data readiness claim; implementation and disposable validation may proceed under their approved scope. |
+| API/Delivery evidence, Product and proportional test review | Failed/missing or separately scoped gates | Retained | Current API37 and cumulative reference index | Architecture Pass is not renewed API, successful test-code review, native/user/release or Delivery acceptance. |
+
+- New or remaining finding IDs: None. AR-PREM-011/012/013 remain supported production premises; the previously missing child-read response is now covered by the existing acquisition boundary, not invented lifecycle machinery.
+- Material classification changes: focused Medium/High, cumulative task_size=Large / architectural_risk=High retained. No new requirement, public/schema/persistence/runtime or Product change.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule; reconcile AD027/028 into the existing cumulative source package.
+- Remaining risks or uncertainty: independent requests still need logical latest-generation and atomic staging/publication guards; shared helper must remain consistent for stream and inspection. Implement the dedicated installed-client/actual-staging/Pinia regression and final conversation/activities/failure oracles, plus valid active/pending/rejected/successful Stop controls. No probe rerun or executable repair in this review. API37 remains Fail69.3; full cumulative API/E2E and successful proportional API-test review remain required after selected source review. All recorded missing evidence/native/unknown-stall/AAV002/003/installation limits remain; no old-root replay or Delivery readiness.
