@@ -32,6 +32,7 @@ does not revise intended behavior.
 | AD-REV-022 | Approved RER-032 plural history-label clarification | UI-CLEAN-001; REQ-031; AC-026 | Architecture Revision — Orgs Literal Synchronization Only | Architecture Design Complete; current copy-only task_size=Small / architectural_risk=Low, direct Implementation re-entry; parent Large/High review remains passed; VAL-053 updated |
 | AD-REV-023 | User DR-009 restart/stop comparison and explicit design-update instruction | HIST-INSPECT-001/002 | Architecture Revision — Observational History, Deliberate Continuation And Retained Stop | Architecture Design Complete; focused Medium/High, cumulative Large/High; 58-case self-validation; independent Architecture Review selected |
 | AD-REV-024 | Approved RER-033 and user's explicit first-run migration clarification | PKG-AUTH-002; REQ-037; AC-035/036 | Architecture Revision — Org Local Authoring And Existing Initial Migration Final Output | Architecture Design Complete; focused Medium/High, cumulative Large/High; 63-case self-validation; independent Architecture Review selected |
+| AD-REV-025 | Implementation IR-048 Design Impact and user exact-ID confirmation | IR048-DI-001; original CRR-072/API-FIND-031 retained separately | Architecture Revision — Exact Org Attachment Ownership And Saved Locator Preservation | Architecture Design Complete; focused Medium/High, cumulative Large/High; 69-case design self-validation; independent re-review selected |
 
 ## Revision Entries
 
@@ -1840,3 +1841,44 @@ does not revise intended behavior.
   scoped renewed API/Delivery work. No source/test edits, new executable pass or
   delivery completion in this Architecture round. No Product or Requirements
   decision remains under the explicitly clarified first-run premise.
+
+### AD-REV-025 — Exact Org Attachment Ownership And Saved Locator Preservation
+
+- Trigger: Implementation Engineer IR-048 / IR048-DI-001 at source checkpoint
+  6d77b3c8b2d3deeddd5c3392dc2ce69bc63b7982, blocked result
+  5636a1f3a7978cd280a85f7f4602c8db5c63b6ab; the user confirms exact AgentRun
+  identity and requests completed design followed by independent review.
+- Authority: RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9 unchanged;
+  prior AD-REV-024@b26c90787cf5ded1da6364ca52e7ae1e6b635cba passed
+  ARCH-REV-021@93aafae8f13a239b382a5f3f246f10b661f90733.
+- Finding distinction: CRR-072's missing frontend upload integration was correctly
+  Local Fix and is checkpointed. Real-owner composition independently exposes
+  address-only finalization/read ambiguity after retained same-address tasks.
+  Its expected-rejection probe and mocked renderer are not successful upload or
+  saved-file validation. No failure is retroactively attributed to naming work.
+- Affected approved behavior: existing shared input/context-file parity;
+  REQ-003/012/014–016/034–036; AC-003/008–011/029–031/034; SCN-004/018/019.
+  No Requirement Gap, Product redesign or upstream artifact edit.
+- Design changes: DS-041 tightens Org draft/final owner to exact OrgRun/AgentRun,
+  matching REST locators, stored-only lookup and physical draft scope; DS-042
+  maps existing shared composer/submission/file-service owners and removes old
+  normal Org routes/parsers. Draft remove/clear gains the missing DELETE adapter.
+- Persisted-data decision: existing exact final bytes and runtime trees need no
+  identity migration. Actual saved Team media URIs require locator preservation
+  in the existing first-rollout family conversion (DS-043). Known structured
+  fields alone change; original file bytes, IDs, ordering and other meaning stay.
+  Actual old Org/draft/deployment inventory remains an explicit cutover check,
+  not an inferred empty/deployed cohort. Uncorrelated data is preserved/returned;
+  no automatic new migration, record reset, runtime replay or normal alias.
+- Classification: focused task_size=Medium / architectural_risk=High; cumulative
+  task_size=Large / architectural_risk=High. API/identity/persistence boundary
+  changes require review; payload/file counts do not inflate classification.
+- Updated artifacts: canonical design, self-validation VAL-064–069, this revision
+  record and architecture-context-file-ownership-investigation.md. Prior
+  AD-REV-001–024 bodies and Requirements/Product/downstream evidence preserved.
+- Result: Architecture Design Complete; independent re-review selected. IR-048
+  remains held for reviewed recovery, then returns one combined Implementation
+  package through source review/full renewed API/E2E and Delivery ownership.
+- Remaining risks/evidence: actual cutover data/deployment prerequisites; real
+  file-byte, finalization, retained/cross-view click, async draft and first-rollout
+  migration checks. No new source/API/desktop/provider or delivery pass claimed.

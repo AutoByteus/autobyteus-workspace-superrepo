@@ -11,15 +11,23 @@
   supplement `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`-`VIS-OVR-006`, which
   supersedes only RV-012 Placement Overrides lines 89-95 and `VIS-015`
 - Architecture result: `Architecture Design Complete`
-- Architecture revision: `AD-REV-024`
-- Architecture review: Pending for AD-REV-024; prior ARCH-REV-020 Pass covers AD-REV-023 only. This delta is not yet approved for implementation.
+- Architecture revision: `AD-REV-025`
+- Architecture review: Pending for AD-REV-025; ARCH-REV-021 Pass covers AD-REV-024. IR-048 is held for this separate exact-attachment Design Impact.
 - Date: 2026-09-12
 - Workspace: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`
 - Branch / approved revision commit: `requirements/flat-agent-organization-model` / `f84c5299f10898f49acff6a0e481d1cd61c769a9`
 
 ## Current-State Read
 
-**Current impact round (AD-REV-024):** approved RER-033 changes authored Org
+**Current impact round (AD-REV-025):** IR048-DI-001 exposes address-only Org
+attachment ownership after supported same-address task retention. DS-041–043
+carry exact AgentRun identity through draft/final/read and preserve saved links
+at the existing initial family cutover. Original CRR-072 upload omission remains
+correctly classified separately. Approved RER-033 unchanged; no Product gap.
+IR-048 source checkpoint 6d77b3c8b / result 5636a1f3a is not a completed implementation.
+Focused Medium/High; cumulative Large/High; independent re-review required.
+
+**Prior impact round (AD-REV-024), passed ARCH-REV-021:** approved RER-033 changes authored Org
 refScope to `org_local`. DS-038–040 govern strict normal authoring/resolution,
 separate internal ownership/API mapping and the existing unreleased migration's
 final output. The user explicitly clarified first-run production rollout: edit
@@ -317,6 +325,317 @@ sidecar behavior without either new configured-member consequence. That was
 the approved RER-026 boundary, not earlier Team task parity. RER-028 now
 expressly supersedes it; AD-REV-019 removes that gate and restores supported
 all-participant presentation, exact Tasks relevance and retained task inspection.
+
+## AD-REV-025 — Exact Org Attachment Ownership And Saved Locators (DS-041–043)
+
+### Authority, evidence and design-health assessment
+
+IR048-DI-001 is a **Design Impact**, distinct from the correctly attributed
+CRR-072/API-FIND-031 frontend upload omission. RER-033 remains approved and
+unchanged. REQ-003/014–016/034–036, AC-003/009–011/029–031/034 and the existing
+shared composer/attachment contract govern; the user explicitly confirmed exact
+AgentRun identity and requested revision/re-review. No new Product decision.
+
+Source baseline: IR-048 checkpoint 6d77b3c8b / result 5636a1f3a, following
+AD-REV-024 / ARCH-REV-021 Pass. The actual-owner observation uses a strict saved
+Org tree, real tree store/location service and real final-owner resolver. Direct
+and mounted configured owners resolve before task retention; after supported
+same-address tasks are retained, address-only resolution fails while exact-ID
+resolution succeeds. It proves an identity-contract defect, not a real user-file
+loss or a successful end-to-end upload. The mocked renderer's 16 observations
+cannot validate this boundary.
+
+`architecture-context-file-ownership-investigation.md` records source witnesses,
+read-only stored-data samples, original Team comparison and evidence limits.
+In local origin/personal@5645b49d6, Team attachment ownership uses **containing
+TeamRun ID + address**, not exact AgentRun ID. Fresh task Teams have distinct
+containing IDs; task Agents sharing a host/address can still be ambiguous. Do not
+claim the earlier Team contract universally solved this problem. This round
+corrects Org ownership, not unrelated Team authoring/draft/route contracts.
+
+Refactor posture: **Refactor needed now — bounded existing capability extension**.
+The attachment subsystem owns file identity and movement; the existing strict
+execution location service owns execution membership/physical ancestry. The
+frontend already knows the exact AgentRun but drops it at the attachment API.
+No new runtime owner, registry, ledger, queue or cache is needed. Address is a
+placement/navigation value, not an execution discriminator.
+
+| Supported behavior / trigger | Complete target path | Invariant / validation |
+| --- | --- | --- |
+| Select configured or live task Agent, choose/drop/paste file, open/remove draft | Shared input → captured ActiveAgentWorkspaceTarget → attachment composer/upload store → Context Files API/services → exact Org owner validation → draft bytes/locator → captured AgentContext and established preview | Exact root/AgentRun throughout; no focus-derived reassignment, no activation on preparation/open; VAL-064/067 |
+| Send prepared files, including after supported task retention or configured history selection | Org submission owner → deliberate continuation only if required → captured exact draft/final descriptors → finalization service → stored-only location → exact physical directory → finalized attachments → existing exact SEND_MESSAGE | Same captured execution; no message dispatch on finalization failure; existing local-submission recovery remains; VAL-065/067 |
+| Click a sent/retained attachment, including a reference shown in another participant's view | Conversation/Messages/Tasks reference → saved locator → existing authorized resource handling → file-read service → strict root + AgentRun lookup → exact bytes | File owner comes from locator, never viewer; no restore or task reactivation; VAL-066/068 |
+| Initial family cutover with existing saved attachment references | Existing startup migration → strict source/target tree plan → migration-only locator transform → committed record writes/reread → existing root move/cleanup → current history projection/GET | Preserve file identity/content and structured references; no runtime old-route reader or second migration; VAL-069 |
+
+| Spine ID | Kind / governing owner | Start → main-line nodes → end | Purpose |
+| --- | --- | --- | --- |
+| CF-01 | Primary / ContextFileUploadService | File chooser → captured composer target → upload store/API → upload service/owner validation → exact draft layout → returned attachment | Preparation and preview without runtime start |
+| CF-02 | Primary / Org submission + ContextFileFinalizationService at their respective boundaries | Send → exact submission/continuation owner → finalize API/service → owner resolver/location → physical move → current locator → SEND_MESSAGE/provider path normalization | No ownership loss across asynchronous finalization |
+| CF-03 | Primary / ContextFileReadService | Saved attachment click → authorized resource request → read API/service → owner resolver/strict location → physical file → image/text/download surface | Retained exact read independent of current focus/status |
+| CF-04 | Return / captured composer and submission owners | Upload/finalize result → captured target/key → existing attachment hydration/submission reconciliation → correct draft/conversation | No new pending-owner cache; preserve later edits and switched focus |
+| CF-05 | Bounded local / finalization service | Validate owner pair → validate descriptor list → per-file draft/final existence and existing move semantics → current locators → prune consumed draft dirs | Retain existing partial-batch retry/idempotence, not a transaction/queue redesign |
+| CF-06 | Primary / existing family migration | Startup inventory → complete strict tree/record/file plan → migration-owned URI transformation → atomic commit/reread → family rename/cleanup → readiness | Preserve known saved links during first rollout |
+
+### DS-041 — Exact Org Attachment Contract
+
+Keep the existing discriminated owner union. Replace **only** the Org variants:
+
+```ts
+type OrgMemberDraftOwner = Readonly<{
+  kind: 'org_member_draft'; orgRunId: string; agentRunId: string;
+}>;
+type OrgMemberFinalOwner = Readonly<{
+  kind: 'org_member_final'; orgRunId: string; agentRunId: string;
+}>;
+```
+
+`agentRunId` is the exact canonical execution-tree AgentRun ID, not an Agent
+Definition ID, provider/platform session ID, task ID, address or display suffix.
+`orgRunId` is retained to validate root membership, not as a substitute for Agent
+identity. Org selection occurs after root creation; there is no prelaunch Org
+Agent composer. Remove the misleading Org `orgDraftId` and redundant authored
+`memberAddress` from this contract. Standalone Agent and Team variants remain
+unchanged. Do not introduce an optional AgentRun ID or an old/new shape union.
+
+The existing ContextFileOwnerResolver owns validation of Org draft/final
+identity through the stored-only CollaborationExecutionLocationService:
+`findAgent({rootSubjectKind:'agent_org', rootRunId:orgRunId, agentRunId})` and the
+sync equivalent. Require one exact correlated result. Derive address, Team
+ancestry and `memoryDir` from that result. Do not accept caller-supplied ancestry,
+configured-placement identity or a containing-Team substitute. Keep the location
+service's strict uniqueness rule; do not modify its configured/task admission.
+
+Use the same owner resolver for Org draft upload, draft read/delete and
+finalization. This validates an existing retained execution, not live readiness:
+inactive configured Agents can prepare drafts without activation; retained task
+history can be read without becoming writable in the UI. Existing active-target
+access/command policy remains authoritative for sending. IDs are not credentials;
+existing REST authentication and filename/path safety remain in force.
+
+| Surface | Exact current Org shape |
+| --- | --- |
+| Multipart POST `/rest/context-files/upload` | `owner` is the new Org draft descriptor; existing file/result fields unchanged |
+| POST `/rest/context-files/finalize` | Exact Org draft/final pair plus existing storedFilename/displayName array |
+| Draft GET and DELETE | `/rest/drafts/agent-org-runs/:orgRunId/agent-runs/:agentRunId/context-files/:storedFilename` |
+| Final GET | `/rest/agent-org-runs/:orgRunId/agent-runs/:agentRunId/context-files/:storedFilename` |
+| Draft physical directory | `$APP_DATA/draft_context_files/agent-org-runs/<orgRunId>/agent-runs/<agentRunId>/context_files/` |
+| Final physical directory | Existing exact `LocatedAgent.memoryDir/context_files/`; no new hierarchy or file-byte move for already-current Org final files |
+
+All ID/path segments are encoded once by builders and decoded/validated once by
+routes. Require exact Org descriptor keys and non-empty safe ID segments; reject
+retired `orgDraftId`/`memberAddress`, missing AgentRun ID and mixed-family pairs.
+The resolved Agent must belong to the stated Org. Never search other roots or
+pick the first/configured/live address match. Existing POST/DELETE error shape
+remains400; validly shaped GET with absent owner/file returns 404, invalid shape
+returns 400. The resolver may expose a bounded Org-owner-not-found error from its existing
+file so the REST adapter can distinguish 404 from invalid 400 without parsing
+error strings. Do not mask filesystem/internal failures as successful empty files.
+DELETE keeps existing idempotent 204 semantics after valid owner resolution.
+
+For Org finalization, validate matching `orgRunId` **and** `agentRunId` on the
+captured draft/final descriptors before directory creation/moves. Reject any
+cross-root/cross-Agent or Org/non-Org pair. Reuse current per-file move, existing
+final-file retry and cleanup rules; do not add a second completion journal.
+A finalization error prevents SEND_MESSAGE and follows the established guarded
+submission restoration; it does not move an attachment into whichever Agent is
+now focused. A finalized attachment subsequently referenced by another Agent
+keeps its original owner/locator and is not re-finalized or relabeled for the
+recipient. This is not a new communication/admission restriction.
+
+### DS-042 — Reuse, Publication, Removal And File Ownership
+
+The shared input and attachment composer depend only on the exact active-target
+boundary. The Org submission owner supplies its captured root/AgentRun to draft
+and final builders before awaiting work. `sameDraftOwner`, remove/clear, parser,
+hydration and click/open must use this same pair. Existing request placeholders,
+AgentContext draft state and local-submission guards remain the only frontend
+state owners. Preserve typed edits, typed-then-cleared intent, focus switching
+and context replacement fixes from CRR-068/IR-048.
+
+Server current locator builders, REST registration and local-path normalization
+must agree with frontend builders/recognizers. Provider input normalization must
+resolve a current final Org locator to the exact physical file, preserving the
+original accepted attachment URI for normal history recording. No local-path
+resolver fallback may select another execution. Read/open uses the locator owner
+when the viewer is a different sender, receiver or task participant.
+
+Add the missing Org draft DELETE route through the existing read/delete service;
+this is part of existing remove/clear parity, not a new retention policy. Final
+files remain retained when a UI reference is removed. Keep existing MIME/size
+checks, 24-hour draft TTL, filename construction and authorized blob/preview
+lifecycle. Use existing desktop/narrow image/text/file presentation; no UI redesign.
+
+| Final file / owner | Responsibility and allowed dependencies | Removal / forbidden shortcut |
+| --- | --- | --- |
+| `autobyteus-server-ts/src/context-files/domain/context-file-owner-types.ts` | Tight Org descriptors, parsers and current locator builders; no lookup or migration knowledge | Address-only Org variants/builders and orgDraftId removed |
+| `.../context-files/services/context-file-owner-resolver.ts` | Org draft/final correlation via exact stored-only collaboration location; one membership boundary, sync twin for local-path reads | No active manager, address ranking, extra identity index or caller bypass |
+| `.../context-files/store/context-file-layout.ts` | Exact Org draft path; unchanged resolved final directory; existing safe-child rules | Address-shared Org draft directory no longer written/read by current services |
+| `.../context-files/services/context-file-upload-service.ts`, `context-file-read-service.ts`, `context-file-finalization-service.ts` | Reuse owner validation; upload/read/delete/pair-checked movement within existing owners | No duplicate route-level filesystem resolver or new lifecycle owner |
+| `.../context-files/services/context-file-local-path-resolver.ts` | Recognize only current exact Org routes and pass exact identity to owner resolver; other families unchanged | Old Org regex/descriptor branch removed |
+| `.../api/rest/context-files.ts` | Compose existing services; strict Org GET/DELETE/POST decoding/error adaptation | Old address-only Org GET routes removed, no redirect/alias |
+| `autobyteus-web/utils/contextFiles/contextFileOwner.ts`, `contextAttachmentModel.ts` | Matching current closed types/builders/locator parsing/hydration | No address-only Org parser or silent old locator normalization |
+| `autobyteus-web/components/agentInput/ContextFilePathInputArea.vue` | Derive root + canonical AgentRun from captured exact active target; retain null/read-only guards | No fake Agent/Team context or independent target store |
+| `autobyteus-web/composables/useContextAttachmentComposer.ts`, `stores/contextFileUploadStore.ts` | Exact owner equality, captured upload results, open/remove/clear, established transport/results | No focus-at-completion reassignment or second attachment cache |
+| `autobyteus-web/stores/agentOrgContextsStore.ts` | Captured exact owner pair in the existing deliberate submission/continuation path | No new submission owner or restore on choose/open |
+| Existing strict Org tree/index/location, execution/task/communication records | Derive all retained configured/task physical locations unchanged | No tree version, ID, path ancestry, task settlement, routing or ack schema change |
+
+Placement stays inside existing capability folders. Route/type adapters are thin;
+services retain the actual invariants and lifecycle. No empty facade is added.
+The shared atomic package writer may gain a serialized-text entrypoint for
+migration JSONL bytes; one commit implementation must serve JSON and text, not
+a competing writer or a JSON string double-encoding. Record-shape transformation
+belongs only in the migration helper specified below.
+
+### DS-043 — Evidence-Based Saved-Reference Transition And Readiness
+
+The physical final file already lives under an exact AgentRun directory. The
+problem is the locator, not the file contents. Read-only evidence on 2026-09-12:
+166 structured Team final attachment URIs in `media.images[]` under
+`/home/autobyteus/data/memory`; 97 are in nested roots and 69 in flat roots. All 166
+correlate to one physical context file and its owning trace Agent directory.
+They occur in 77 trace files totaling 92,559,674 bytes (largest 7,852,024 bytes),
+which justifies file-bounded transformation rather than rewriting all history.
+The sampled `/root/.autobyteus/server-data` and DR009 server-data roots contain 4
+and 2 Org trees respectively and no context files. Text mentions of Org routes
+inside conversation prose were excluded. These are bounded samples, not a
+universal inventory or a never-deployed claim. IR-048's hash inventory, mocked
+renderer and expected-rejection test are not saved-attachment evidence.
+
+Thus **migration is required for affected saved locators**, independently of
+PKG-AUTH-002 spelling/definition migration. Extend the existing first-rollout
+`20260901_agent_org_flat_team_families_v1` migration to produce final usable
+attachment references as part of its target package. Do not add a migration for
+an intermediate branch shape, reset an existing migration record, or replay
+runtime migration solely to change authoring. Existing AD-REV-024 scope/naming
+instructions remain unchanged. This decision rests on actual saved Team links
+and known attachment writers/readers, not on assuming Org attachment data empty.
+
+| Data surface | Decision | Exact treatment |
+| --- | --- | --- |
+| Current execution trees, AgentRun identity/ancestry, task/message semantics | Directly Usable — No Migration for this identity correction | Schema/IDs/structure/status unchanged; preserve established family cutover separately |
+| Final file bytes within already-current Org physical directories | Directly Usable — No Migration | Exact lookup reaches existing file; do not copy/re-key by address |
+| Saved structured locators whose owning Team root converts to Org | Migration Required in existing family transform | Rewrite only locator values to exact Org root + AgentRun using the proven source owner; preserve bytes and all unrelated record fields |
+| Saved address-only Org final locators found in the owned cutover inventory | Same bounded locator transform, only when actual records establish this cohort | Known writer shape 37d05c7f; derive exact owner from strict tree + physical file. No claim that a sample proves deployment or absence |
+| Existing exact Org locators | Directly Usable — No Migration | Validate correlation; no rewrite/timestamp update |
+| New process-local Org drafts | Current shape from creation | Exact draft pair/path, no persisted browser draft-owner schema or extra draft ledger |
+| Any pre-existing address-only Org draft bytes/references | Inventory-dependent; never guess execution ownership | Record separately before cutover; see readiness rule below. Do not discard unexpired files or map ambiguous drafts to configured Agents |
+| External repository/package files and unrelated arbitrary text/URLs | Not Affected | No repository writes or global string replacement |
+
+**One migration-owned transform.** Add
+`app-data-migrations/migrations/agent-org-flat-team-families-v1/agent-org-context-file-locator-transition.ts`
+as an internal concern of the existing family migration, not a separately
+registered migration, runtime adapter or generic URI-repair service:
+
+1. Before writes, inventory the actual configured server memory/app-data roots,
+   all relevant strict source/target execution packages and structured attachment
+   fields. Keep temporary generated evidence/test fixtures separate. Build one
+   ephemeral old-owner→exact-target plan from strict trees, never live focus.
+   Include retained tasks. Read archived and active raw-trace files; current
+   record readers project their `media.images/audio/video` unchanged. Inspect
+   communication `referenceFiles`, task `referenceFiles` and submission/review
+   `updates[].referenceFiles` as separate known typed fields. No rewrite of prose,
+   instructions, tool payload text, provider-owned history or arbitrary workspace
+   paths is authorized.
+2. Parse only the known local attachment locator grammars: server-relative, or
+   absolute HTTP(S) with the configured installation origin/loopback under the
+   existing local-path resolver trust rule. Do not classify a foreign URL as
+   local merely because its pathname resembles an owned route. For old Team locators,
+   correlate their **containing** TeamRun ID and address to the source tree; for
+   old Org locators use root/address. Filter indexed candidates first, then
+   require exactly one candidate with the named physical file. File presence
+   disambiguates this migration's known old selector; it is never a normal lookup
+   fallback. Do not equate the containing record/viewer with the file owner.
+   Zero or multiple valid owners, mismatched roots, missing referenced bytes or
+   unsupported structured source shape fail with bounded file/field diagnostics.
+   Preserve the source instead of selecting configured/live/first candidate.
+3. Build the current locator with target OrgRun ID and canonical AgentRun ID,
+   keeping storedFilename, display/reference meaning and existing URL origin
+   form; change only the owned route path, not arbitrary URL authorities. Source
+   URI grammar and ownership/filesystem proof must establish a local owned
+   attachment; unrelated remote URLs remain unchanged. Preserve record ordering,
+   timestamps, correlation/turn/sequence IDs and all non-locator values.
+4. Finish and validate the locator/physical-owner plan before record writes.
+   Transform and commit one affected file at a time; do not hold the entire
+   history corpus in memory. Use the existing atomic commit boundary for JSON
+   sidecars and serialized UTF-8 JSONL;
+   preserve nonchanged lines/bytes, line order and archived/active filenames.
+   Require committed outcome and a strict reread/value comparison. Prospective
+   target locator validation before the family rename uses the planned target
+   tree and the corresponding source physical directory; after rename it uses
+   the current stored-only resolver and canonical physical path. Do not require
+   a not-yet-published target directory to exist prematurely.
+5. Complete the existing whole-root move, current package validation and retired
+   authority cleanup. Extend target-only cleanup/idempotence to validate/finish
+   this same known locator transformation after an ordinary interrupted attempt.
+   Already-current records are zero-write. Original attachment bytes/hash remain
+   unchanged; no second backup/journal/recovery state machine. Rebuild derived
+   history/projection state through existing startup ownership after completion.
+   Persisted trace IDs remain unchanged; legacy derived fingerprints that include
+   media URIs are recomputed normally, never backfilled as new persisted IDs or
+   appended as duplicate conversation records.
+6. Only records with a locator into an affected root may change. Flat Team V2
+   execution trees/paths always remain byte-identical; flat/standalone records
+   without such a reference remain zero-write. If an actual structured reference
+   in another owned history record points into a converted root, update that
+   value from the same proven plan, not by rebinding to its enclosing Agent.
+   This is a locator-preservation exception to earlier blanket package-byte
+   wording, not a flat Team runtime migration or new cross-root routing policy.
+
+**Draft and deployment readiness is explicit, not an empty-inventory assumption.**
+Existing frontend Org draft state is process-local; current source has no durable
+browser draft-owner registry. The bounded samples contain no Org draft bytes,
+and prior real failed chooser attempts issued no upload. Before a real cutover,
+record the selected app-data roots and any actual old Org draft files or saved
+draft references. A positive cohort must prove one exact execution from independent
+retained owner evidence before moving bytes/changing a reference; address alone
+on a repeated-address tree is insufficient. If that evidence is absent, preserve
+those files and return the concrete unresolved data condition to Architecture;
+do not silently delete, infer disposability from TTL, or create a normal alias.
+No hypothetical draft migration or new journal is authorized by this design.
+Normal existing expiry continues to own genuinely expired orphan drafts.
+
+The recorded first-production-rollout premise selects the **existing pending
+family migration**. Source introduction, IR048 mocks and local test DB records do
+not prove deployment. Inventory the actual migration status before execution. If
+an installation already has terminal family migration success **and** locators
+that require transformation, do not reset/replay it or claim readiness: return
+that concrete deployment-state evidence for a separate transition decision.
+This is an explicit unsupported cutover precondition, not an assumed absence or
+an approved post-deployment migration. Do not mutate live user data for probes.
+
+The family migration retains **no warning success** for required locator mapping,
+write/reread or cleanup failure: `FAILED` prevents current admission, with existing
+ordinary startup retry. Summary migration's separately scoped valid-empty
+`SUCCEEDED_WITH_WARNINGS` remains unchanged. Counts/concise result in the existing
+runner; bounded diagnostics in its attempt log, no attachment content/credentials
+in status. Use normal storage assumptions from the production migration convention.
+
+### Implementation sequence, risks and completion evidence
+
+1. Preserve/reconcile IR-048's Org-local/first-run code and original frontend
+   upload fix. Change only the attachment contract/consumers described above.
+2. Implement closed exact Org types, owner resolver and current routes/layout;
+   wire existing upload/read/finalization services, including Org draft DELETE.
+3. Update captured frontend ownership and all current locator parsers/builders;
+   keep submission, continuation, task access and retained inspection unchanged.
+4. Extend the existing initial family transform and its current-readiness check
+   for demonstrated saved locator preservation; inventory deployment/draft
+   preconditions without guessing. Remove old normal Org route/parser branches.
+5. Require real-filesystem + actual service/REST tests for repeated addresses,
+   exact byte reads, finalization, removal, provider normalization and restart.
+   Browser mocks alone are insufficient. Verify desktop/narrow chooser, text/image
+   opening, sent/retained opening and exact focus/async behavior with real HTTP.
+6. Return one completed cumulative Implementation package through source review,
+   renewed API/E2E and Delivery. Naming-only partial advancement is not selected.
+
+Residual risks: saved-locator inventory may expose unsupported/ambiguous old
+ownership or a different deployment status; do not report those as migrated.
+Provider-owned arbitrary history/prose is not rewritten. Existing Team owner
+contract is preserved and not proclaimed universally ambiguity-free. Native
+shell and real-provider evidence remain downstream-owned. All API29 held groups
+remain held until actually rerun; no new executable or delivery pass follows from
+this design's self-validation.
+
 
 ## AD-REV-024 — Org Local Authoring And First-Run Migration Target (DS-038–040)
 
@@ -814,7 +1133,25 @@ mechanisms remain unchanged. This is a completed design, not an executable pass.
 
 ## Task Size And Architectural Risk (Mandatory)
 
-### Current AD-REV-024 Result — Org Local Authoring / First-Run Output
+### Current AD-REV-025 Result — Exact Attachment Ownership / Saved References
+
+- task_size: `Large` cumulative; focused `Medium`.
+- architectural_risk: `High`, focused and cumulative.
+- Selected route: independent Architecture Review under the revised-impact rule.
+- Structural surface: closed attachment owner/URL contract, exact physical draft
+  scope, shared client/service consumers and migration-owned saved locator values.
+  These change API/persistence/correlation boundaries despite a compact UI effect.
+- Payload surface: source fixtures, known structured URI fields and docs. Their
+  count (including the 166 observed URIs) does not determine size/risk.
+- Reuse: current context-file services, stored-only location, AgentContext,
+  submission/preview owners and initial migration. No new runtime subsystem,
+  migration ID or presentation dashboard.
+- Runtime ownership/definition naming remain reviewed; AD-REV-024 is passed.
+  IR-048 is a combined blocked checkpoint, not a partial implementation handoff.
+- New self-validation VAL-064–069 is design-level only. Independent review,
+  actual filesystem/REST and fresh API/E2E/user verification remain required.
+
+### Prior AD-REV-024 Result — Org Local Authoring / First-Run Output
 
 - task_size: `Large` cumulative; focused `Medium`.
 - architectural_risk: `High`, focused and cumulative.
@@ -3652,15 +3989,20 @@ nonmatching entries but cannot change the relative order of matches.
 
 ## Relevant Supplemental Task Artifacts
 
+Current exact-attachment evidence map:
+`architecture-context-file-ownership-investigation.md` (IR048-DI-001, pinned
+original Team comparison, actual structured saved-URI samples and limits).
+Canonical design DS-041–043 owns decisions; no upstream investigation edit.
+
 | Artifact Path | Purpose | Related Requirement / Acceptance-Criteria IDs | Relationship To This Design | Status / Approval Applicability |
 | --- | --- | --- | --- | --- |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md` | Normative configured structure, exact definition and run families, source ownership/admission, task ownership, handoff authoring/order, launch/configuration/focus, mixed projections, and launch override hierarchy. | REQ-001–037; AC-001–036; ORG-CASE-001–066 | Governs fixed-depth invariants, unversioned Team/Org definitions and org_local, native Team Run V2 / Org Run V1, target-only admission, two-family reuse, no-focus activation, transition, failure-closed projection, and exact override disclosure/state semantics. | Approved through `RER-033`; authoritative. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md` | Requirements-owned evidence and current production-path inventory. | BEH-001–BEH-018; PRE-001-PRE-005 | Supplies approved behavior and inventory evidence, including the exact API-FIND-019 Team/Org adapter and selected-member projection comparison; architecture evidence above extends rather than rewrites it. | Current through `RER-033`; not behavior authority by itself. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md` | Cumulative approval/navigation history. | RER-001–RER-033 | Establishes progressive Team reuse, Product UI, configuration-first launch, Team-V2/Org-V1 runtime correction, external-definition scope/admission, override hierarchy, launch/shell/workspace parity, first-message history parity, and AgentOrg communication-observability parity. | Approved/cumulative. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md` | Independent review result and finding history through AD-REV-023. | Latest completed ARCH-REV-020 Pass on AD-REV-023; earlier rounds retained | Records prior findings; `ARCH-REV-014` passed cumulative AD-REV-016; `ARCH-REV-015` accepted AD-REV-017's core and returned `AR-FIND-008` for receiver-only eligibility. | AD-REV-024 pending independent review; prior passes retain recorded scope |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md` and `implementation-revision-record.md` | Implementation-owned history and recovery evidence. | IR-001–047; IDI-001; ADI-007 | IR-001 proved Team-root coupling; later reviewed rounds implemented runtime/presentation/status/lifecycle, mounted-Team launch/status, localization, recovery, and bounded CRR/API fixes. | Inspected IR-047 artifact 56fb8983f; separate CRR-072 upload Local Fix remains with Implementation. AD-REV-024 is not yet reviewed for implementation. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` and `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md` | Independent review result and finding history through AD-REV-024. | Latest completed ARCH-REV-021 Pass on AD-REV-024; earlier rounds retained | Records prior findings; `ARCH-REV-014` passed cumulative AD-REV-016; `ARCH-REV-015` accepted AD-REV-017's core and returned `AR-FIND-008` for receiver-only eligibility. | AD-REV-025 pending independent review; prior passes retain recorded scope |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md` and `implementation-revision-record.md` | Implementation-owned history and recovery evidence. | IR-001–048; IDI-001; ADI-007; IR048-DI-001 | IR-001 proved Team-root coupling; later reviewed rounds implemented runtime/presentation/status/lifecycle, mounted-Team launch/status, localization, recovery, and bounded CRR/API fixes. | IR-048 checkpoint6d77b3c8b/result5636a1f3a; original upload Local Fix checkpointed, new exact-owner Design Impact held. AD-REV-024 passed ARCH-REV-021; AD-REV-025 requires re-review. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, and `api-e2e-evidence/API-REV-002/followup-api-find008*` | Real-system evidence through API-FIND-008, including clean control, normal submit/independent-accept overlap, and the invalid-self-review settlement reproduction. | BEH-009; REQ-015; AC-010; API-FIND-008; CR-CAND-020 | Separates supported production reachability from technical coupling evidence; the invalid self-review tail is explicitly non-authoritative for behavior. | Retained downstream evidence only; AD-REV-011/ARCH-REV-009 closed that design path. Current reports remain independently owned and artifact-specific; no new AD-REV-024 executable pass is claimed. |
-| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md` | Architecture-owned use-case/data-flow self-validation requested by the user. | BEH-001-BEH-018; SCN-001–SCN-024; IDI-001; ADI-007; API-FIND-007/008/019; CR-FIND-020; AR-FIND-003-008 | Walks the cumulative runtime plus launch/config/history ownership and VAL-038-040's accepted-delivery event, four endpoint directions, complete-Org selected-member projection, restore, responsive, and negative-path boundaries. | AD-REV-024 including VAL-059–063; design validation only, not executable evidence. |
+| `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-self-validation.md` | Architecture-owned use-case/data-flow self-validation requested by the user. | BEH-001-BEH-018; SCN-001–SCN-024; IDI-001; ADI-007; API-FIND-007/008/019; CR-FIND-020; AR-FIND-003-008 | Walks the cumulative runtime plus launch/config/history ownership and VAL-038-040's accepted-delivery event, four endpoint directions, complete-Org selected-member projection, restore, responsive, and negative-path boundaries. | AD-REV-025 including VAL-064–069; design validation only, not executable evidence. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/api-e2e-evidence/API-REV-013/post-pass-user-discovery/API-FIND-019-agentorg-communication-visibility-gap.md` | Real post-pass communication-observability evidence and explicit API/E2E coverage correction. | BEH-017; REQ-034; AC-029; SCN-018 | Establishes the supported delivery-success/presentation-failure path and Team parity control; drives DS-028, not a new message schema or Product dashboard. | Architecture evidence input; cumulative API/E2E must be renewed after implementation/review. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-server-ts/docs/design/production_data_migration_conventions.md` | Canonical server convention for known-source/fixed-target transformation, forward-only runtime, reachability, failure scope, recovery, residue, summaries/logs, and review. | REQ-012, REQ-013, REQ-027; AC-008, AC-022; SCN-004, SCN-011 | Governs AD-REV-004 migration mechanics; requirements continue to govern target state and availability. | Current repository architecture authority; explicitly identified by the user. |
 | `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/code-review-report.md` and `code-review-revision-record.md` | Failure-origin and cumulative source/test-code review authority through the pre-RER-026 path. | CR-FIND-011-026; API-FIND-008/016/017 | Prior reviews close their bounded findings; API-FIND-019 was discovered after the last pass and has separate RER-026 authority. | RER-028/AD-REV-019 govern the task-inclusive correction; a fresh cumulative source review remains downstream. |
@@ -3703,7 +4045,12 @@ orchestration.
 
 ## Task Design Health Assessment (Mandatory)
 
-Current AD-REV-024: authoring-contract change; existing definition/admission owners
+Current AD-REV-025: exact attachment identity/locator gap; bounded refactor now
+inside existing Context Files/active-target/location owners (DS-041/042). Saved
+link transformation belongs in the existing initial family migration (DS-043),
+not a current runtime fallback.
+
+Prior AD-REV-024: authoring-contract change; existing definition/admission owners
 remain correct. Refactor the tight scope type/mapping and existing unreleased
 migration generators, not runtime ownership or the registry lifecycle. DS-038–040
 state exact removals, first-run premise and preservation. No additional migration
@@ -4047,6 +4394,13 @@ existing owners. Refactor now as DS-031–033; no runtime redesign.
 
 ## Persisted Data / State Transition Decision (Mandatory When Persisted Data May Be Affected)
 
+AD-REV-025 / DS-043 governs attachment bytes, draft scope and structured locator
+values separately from definition authoring. Saved Team-to-Org attachment links
+require transformation; current exact final bytes/trees do not. The known first
+rollout extends the existing family migration, never resets a terminal record.
+Actual draft/deployment inventory prerequisites are explicit; sample zero counts
+are not a universal no-data assertion.
+
 AD-REV-024 / DS-039 governs the current first-run definition target and bounded
 owned preservation. Update existing unreleased migration code directly; do not
 freeze intermediate branch outputs or add another migration. DS-032/033 are
@@ -4116,7 +4470,7 @@ specifies validation of correlation; it never fills missing facts heuristically.
 | Implementation-repository server-owned definitions | `Migration Required — source/build change` | Commit exact field-free configs and current fixture checks (DS-032); deployed runtime never rewrites repository or application bundles. |
 | Writable server-data definitions | `Migration Required` for approved old authoring/family sources; final unversioned/new-scope config `Directly Usable` | DS-039 updates existing first-run generators and owned authoring pass in place. Final targets directly, no additional migration or runtime replay. |
 | External definition roots | `External Dependency — no in-ticket migration` | Perform target-only admission. Compatible packages admit; incompatible packages and dependent Orgs are capability-scoped unavailable with diagnostics. Record owner action but make no write/SCM/release claim. |
-| Agent-only Team Run V2 packages | `Directly Usable — No Migration` | Validate exact V2/root/path/coordinator/Agent-only membership and record `SKIPPED_ALREADY_CURRENT`; perform no package/file/path/timestamp write. |
+| Agent-only Team Run V2 packages | `Directly Usable — No Migration` | Validate exact V2/root/path/coordinator/Agent-only membership and record `SKIPPED_ALREADY_CURRENT`; perform no execution-tree/path write; unaffected records remain zero-write. DS-043 permits only proven structured locator references into converted roots to change. |
 | One-level organization-like Team Run V2 packages | `Migration Required — registered startup migration` | Materialize and validate the complete Org V1 package (Org tree plus strict Org task/message sidecars) inside the source package, atomically rename that package to the Org family, then remove all retired Team authority files before success. Cleanup failure leaves that root unavailable and retryable. Definition-source availability never removes a runtime package from this cohort. |
 | Root package-readiness catalogs and in-memory projection caches | `Discard or Rebuild` | Re-enumerate strict Team/Org packages and rebuild tagged projections; old/failed items do not enter current readiness. This never authorizes discarding stable history summaries. |
 | Team and AgentOrg run history indexes | `Directly Usable — preserve derived values`; AgentOrg empty-summary cohort has `Migration Required` | Join strict current packages to current index rows while preserving every non-empty summary. AgentOrg create/stop/restore/rebuild never recomputes or replaces it. Only the registered AD-REV-015 migration may backfill an empty Org row from unique evidence; normal reads/rebuilds never scan traces. |
@@ -4271,17 +4625,20 @@ migration ID or runtime replay is introduced. Runtime output is unchanged.
   admission-unavailable without making the format migration fail.
 - **Native flat Team runtime:** strict-validate the existing Team Run V2 file,
   direct Agent membership/coordinator, ID/path correlation, and family conflict
-  absence; record current/failed. A successful no-op performs zero filesystem
-  mutations, including no timestamp, backup, temp file, or index write.
+  absence; record current/failed. A successful no-op performs zero execution-tree/path mutations. Without an
+  actually inventoried structured attachment reference into a converted Org root,
+  it also performs zero record/timestamp/temp-file writes. DS-043 permits only
+  that proven locator-value preservation exception, never a flat-tree rewrite.
 - **Organization-like runtime:** read and validate the complete Team Run V2 state package; transform and
   target-validate the Org Run V1 tree plus `agent_org_task_delegation_records.json`
   and `agent_org_communication_messages.json` in memory; atomically write/reread
   those three prospective Org authorities beside the old Team authorities; then
   atomically rename the entire package directory from `agent_teams/<id>` to
   `agent_orgs/<id>`. Reread/correlate the complete canonical Org package before
-  removing the old Team tree and Team task/message sidecars. Task/message record
-  arrays and all relative Agent memory/content directories are unchanged; only
-  their strict root envelopes change. The transform preserves the already-
+  removing the old Team tree and Team task/message sidecars. Task/message record meaning and all relative Agent memory/content directories
+  remain unchanged. Their strict root envelopes change; DS-043 additionally
+  transforms proven structured attachment locator values in sidecars/raw traces
+  to preserve the same exact file after the family move. The transform preserves the already-
   compiled handoff/rule order and never consults a live definition.
 - **Ordinary relaunch/idempotence:** old-only source repeats transformation;
   source with a complete valid prospective Org tree/sidecar set revalidates and performs the same
@@ -4400,6 +4757,8 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 
 
 ## Data-Flow Spine Inventory
+
+AD-REV-025 adds CF-01–06 in DS-041–043: preparation, finalization/send, retained read, captured return, local per-file movement and initial locator transformation.
 
 AD-REV-021: DS-034a/b/c/r above enumerate message read/identity, exact task navigation, history copy and unchanged authoritative updates.
 
@@ -4796,6 +5155,8 @@ are in DS-031; no local decoder is presented as the whole user path.
 | AgentOrg derived history summary | DS-027 | Org command, history catalog, mixed history read, startup migration | Qualify exact configured accepted SEND_MESSAGE, serialize first write, refresh authoritative family, conservatively infer only unique legacy evidence | Prevents task/system traffic, optimistic UI, trace fallback, and multiple summary owners. |
 
 ## Ownership Boundaries
+
+AD-REV-025: Context Files owns attachment identity/movement, strict stored-only location owns membership/ancestry, and captured active-target/submission own frontend intent. DS-041/042 forbids address-ranking and lifecycle activation at file-read boundaries.
 
 AD-REV-021: DS-034 keeps item detail pure, navigation at the existing section/root action boundary, data in existing facets/adapters, and disclosure state local.
 
@@ -5216,6 +5577,8 @@ Tasks record -X-> fabricated delivered notification/communication
 
 
 ## Interface Boundary Mapping
+
+DS-041 defines the closed exact Org owner and current REST URL contract. Its root + AgentRun pair replaces Org address-only draft/final identity; no other family API changes.
 
 AD-REV-021: DS-034 changes only UI projection/selection events; no public API or persistence contract.
 
@@ -5697,6 +6060,8 @@ no durable schema, migration, delivery tool or root lifecycle algorithm changes.
 
 ## Final File Responsibility Mapping
 
+DS-042 is the current attachment file/owner map; DS-043 adds the one migration-owned locator transform under the existing family migration. No competing service, registry or schema is added.
+
 AD-REV-020 concrete add/modify/rename/remove mapping is the DS-033 table. The
 normal versioned codec files disappear (no wrappers); their historical numeric
 knowledge is confined to the migration helper. All provider/discovery/bundle
@@ -6072,7 +6437,7 @@ AD-REV-007 clean-cut presentation renames are included in the same implementatio
 | Org execution composition | `AgentOrgRun -> Org adapters -> ConfiguredAgentExecutionHandle + FlatTeamExecutionFactory`; mounted Team has no root registry/package | Synthetic RootTeamRun, standalone Team roots, or standalone direct Org Agents | One Org lifecycle/durability owner. |
 | Tagged member context | `{root:{rootSubjectKind:'agent_org',rootRunId}, memberAddress, agentRunId}` plus bound task commands | `rootTeamRunId` alias or resolver returning RootTeamRun | Same Agent tools operate without false Team ownership. |
 | Org memory | `agent_orgs/<org>/<teamRunLineage...>/<agent>`; direct Agent has empty lineage | shallow-only helper that loses mounted/task Team lineage or synthetic root segment | Preserves direct package rename and exact content. |
-| Org sidecars | strict `subjectKind/orgRunId` task/message envelopes over unchanged records | reuse Team envelope/filename and reinterpret `rootTeamRunId` | Fail-closed subject truth. |
+| Org sidecars | strict `subjectKind/orgRunId` envelopes over unchanged record semantics; only DS-043 proven attachment locator values change during cutover | reuse Team envelope/filename and reinterpret `rootTeamRunId` | Fail-closed subject truth. |
 | Mixed projection | `{root_subject_kind:'agent_team', execution_tree: teamV2Dto}` or Org branch | Infer from missing coordinator/version/name | Fail-closed correctness. |
 | Fixed depth | Org `/software_engineering_team/architecture_designer`; Team `/architecture_designer` | `/department/team/subteam/agent` | Explicit configured ownership. |
 | Task host | Org Agent delegates to `/software_engineering_team`; fresh task Team lives in exact host `taskExecutions` | Add task Team to Org `members` | Configured vs task distinction. |
@@ -6087,7 +6452,7 @@ AD-REV-007 clean-cut presentation renames are included in the same implementatio
 | Org Agent event | raw callback -> presentation adapter -> strict Org subject envelope -> stream reducer -> existing Agent handlers | `event: unknown`, component `any`, `JSON.stringify` | Protocol truth and UI state meet at one typed boundary. |
 | Org commands | active target port -> strict send/interrupt/approve/deny command -> exact AgentOrgRun command -> typed ack | component-owned socket/send-only special case | Accepted composer and tool cards retain behavior parity. |
 | Root stop | active Org history root-row action -> AgentOrgRunService termination | focused member header or mounted-Team terminate | Lifecycle action stays with its root owner. |
-| Migration | existing startup runner + server-owned definition conversion + flat runtime hash/path unchanged + validated Org target followed by one direct package rename; external roots zero-write | rewrite external projects, rewrite all runtime Teams, custom journal/staging/recovery, try-both reader, recursive flattening | Minimal in-scope change, forward-only runtime, and exact ownership/runtime contracts. |
+| Migration | existing startup runner + server-owned definition conversion + flat execution-tree hash/path unchanged + validated Org target with DS-043 locator preservation followed by one direct package rename; external roots zero-write | rewrite external projects, rewrite all runtime Teams, custom journal/staging/recovery, try-both reader, recursive flattening | Minimal in-scope change, forward-only runtime, and exact ownership/runtime contracts. |
 | API split | explicit Org and Team create/restore plus compound mixed read identity | `createGroupRun(id)` or `getRun(id)` guesses kind | Subject authority. |
 
 ## Backward-Compatibility Rejection Log (Mandatory)
@@ -6159,6 +6524,8 @@ authority chain. Components do not bypass the context to use the collaboration
 socket, raw root events, standalone Team stores, or subject GraphQL clients.
 
 ## Change / Refactor Sequence
+
+Execute the AD-REV-025 six-step sequence in DS-043 after independent review; reconcile rather than overwrite IR-048 and its preserved other-owner evidence.
 
 For the latest RER-029 delta use DS-033 sequence: codecs/consumers, isolated
 historical validation plus new registered pass, repository configs/fixtures,
@@ -6582,6 +6949,8 @@ Earlier AD-REV-017/018 sequences remain in the revision record as history only.
     smaller and safer abstraction.
 
 ## Risks
+
+AD-REV-025 risks are exact-ID loss at one remaining consumer, insufficient real-byte validation, and undiscovered saved-locator/draft/deployment cohorts. DS-041–043 and VAL-064–069 define strict failure/return boundaries; mocks and sample zero counts do not establish rollout safety.
 
 AD-REV-020 risks: silently stripping versions in normal reads; hiding owned
 Teams behind an undecodable Org parent; changing old migration outputs or
@@ -7015,7 +7384,14 @@ other owners' work; old test output is not deployed-state or new acceptance proo
   owned-child inventory/preservation and one normal retry. Add no migration for
   intermediate branch states. The existing definition entry has no warning
   result; prior summary/family statuses retain their distinct authority.
-- CRR-072 / API-FIND-031's separately assigned context-file upload omission is
-  implementation-local under already-approved Agent input parity. It is not
-  part of the Org-local authoring delta; if its correction requires a new
-  ownership/API/persistence decision, return that Design Impact separately.
+- CRR-072 / API-FIND-031's original frontend upload omission remains local and
+  checkpointed in IR-048. IR048-DI-001 is the separate returned ownership/locator
+  Design Impact resolved by AD-REV-025 / DS-041–043, pending independent review.
+- Require VAL-064–069 implementation/API evidence: actual files and REST on
+  repeated-address trees, chooser/image/text opening, remove/clear/send,
+  provider exact-path normalization, retained/cross-view click without activation,
+  async focus/edit recovery and initial saved-locator preservation. Do not treat
+  the old expected-rejection probe or mocked renderer as a successful file path.
+- Do not add a migration ID or reset/replay existing migration status from an
+  unsupported deployment assumption. Inventory actual stored locators/drafts;
+  preserve unresolved data and return concrete evidence rather than guessing.

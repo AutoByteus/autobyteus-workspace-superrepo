@@ -3,16 +3,16 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture: `AD-REV-024`, canonical `design-spec.md`
+- Architecture: `AD-REV-025`, canonical `design-spec.md`
 - Approved requirements: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`
-- Prior review: AD-REV-023 / ARCH-REV-020 Pass; current source read at IR-047
-  artifact 56fb8983fba0fb6a35b031aa6124f9ca07b0aab1. Preserve downstream scope.
+- Prior review: AD-REV-024 / ARCH-REV-021 Pass; current source read at IR-048
+  checkpoint 6d77b3c8b / result 5636a1f3a. Original upload omission and new exact
+  owner Design Impact are distinct; no partial source/API advancement.
 - Date: 2026-09-12
-- Result: `Design Self-Validation Pass — Org Local Authoring / First-Run Target; Independent Review Pending`
-- 63 design walkthroughs; VAL-059–063 added, VAL-047/048 and current transition
-  guidance corrected for the user's explicit first-run deployment premise.
-  No new migration is proposed. No source/test/browser/provider execution in this
-  round; previous executable evidence remains scoped to its actual artifact.
+- Result: `Design Self-Validation Pass — Exact Org Attachment Ownership; Independent Review Pending`
+- 69 design walkthroughs; VAL-064–069 added. Read-only source/data investigation
+  and document checks only; no source/test/browser/provider execution or new
+  production inventory/pass claimed by Architecture.
 - Product: no new gate. Existing approved packages remain normative elsewhere.
 
 ## Purpose And Method
@@ -36,7 +36,7 @@ For each supported use case it verifies:
 Inputs:
 
 Source lists below retain earlier rounds' evidence at their recorded pins;
-claims described there as “current” belong to those rounds. Current AD-REV-024
+claims described there as “current” belong to those rounds. Prior AD-REV-024
 uses RER-033 and the user's explicit clarification that the ticket migration has
 not been deployed: update existing code, do not add a migration for an interim
 branch format. Local test completion records are not deployment evidence. AD-REV-020 source
@@ -49,7 +49,7 @@ already implemented correction is still absent.
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed ARCH-REV-020 Pass on AD-REV-023; earlier findings retain historical scope)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed ARCH-REV-021 Pass on AD-REV-024; earlier findings retain historical scope)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -227,9 +227,15 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-058 | Shared surfaces and exact state ownership | Publication/status generations, desktop/narrow and Team regression | DS-035–037 | Pass |
 | VAL-059 | REQ-026/037; AC-035; SCN-023 | Current Org authoring/API roundtrip and exact resolution | DS-038 | Pass |
 | VAL-060 | REQ-027/037; AC-035/036 | Strict retired-scope rejection and external ownership | DS-038 | Pass |
-| VAL-061 | REQ-012/037; AC-033/036; SCN-024 | Single final owned-config transformation and preservation | DS-039l | Pass |
+| VAL-061 | REQ-012/037; AC-033/036; SCN-024 | Single final owned-config transformation and preservation | DS-039 | Pass |
 | VAL-062 | First-run user clarification; AC-035/036 | Existing initial migration final output and ordinary retry | DS-039 | Pass |
 | VAL-063 | REQ-012/027/037; AC-036 | Bounded status, availability and protected runtime | DS-040 | Pass |
+| VAL-064 | Existing attachment parity; REQ-003/016/034 | Exact Org draft upload/open/remove | DS-041/042; CF-01/04 | Pass |
+| VAL-065 | REQ-014/015; exact task identity | Same-address finalization and exact provider file | DS-041/042; CF-02/05 | Pass |
+| VAL-066 | REQ-034–036; AC-029–031/034 | Sent/retained/cross-view file opening | DS-041/042; CF-03 | Pass |
+| VAL-067 | Existing draft/submission parity; DS-036 | Async focus/edit and finalization recovery | DS-041/042; CF-02/04/05 | Pass |
+| VAL-068 | REQ-014–016; retained inspection | Closed current owners and no read activation | DS-041/042 | Pass |
+| VAL-069 | REQ-012/014; AC-008/009; SCN-004 | Initial saved-locator preservation and truthful inventory | DS-043; CF-06 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1840,10 +1846,138 @@ package-family rename. It does not infer logical topology from directory depth.
   first-start/restart tests plus renewed scoped API validation remain downstream.
 
 
+### VAL-064 — Exact Org Draft Upload, Preview And Removal
+
+- Supported trigger: user selects a direct/mounted configured Agent or a live task
+  Agent/task-Team member and chooses/drops/pastes a file through the shared input.
+  Inactive configured preparation remains allowed without activation; retained
+  settled task interaction remains read-only.
+- Spines/owners: CF-01/04; captured active target, composer/upload service,
+  exact owner resolver and existing physical layout. Caller never reaches both
+  resolver and its index internals.
+- Walkthrough: root + canonical AgentRun survive owner builder, multipart parse,
+  stored-only membership validation, exact draft directory, response hydration
+  and image/text click. Missing Org draft DELETE is supplied through the existing
+  service; remove/clear can delete only that captured draft pair/file.
+- Negatives: missing/retired/address-only descriptors, wrong root, same-address
+  sibling execution, invalid path/filename and read-only UI produce no ownership
+  substitution, file leakage or runtime activation. Existing TTL/MIME/size policy
+  remains; final reference removal does not delete retained file bytes.
+- Required executable evidence: real upload/read/delete services and REST with
+  physical files, then chooser/open/remove/clear on desktop and 390x844. Existing
+  IR048 mocked responses are insufficient.
+- Design result: Pass — DS-041/042. Executable status: Not Run by Architecture.
+
+### VAL-065 — Finalization Survives Repeated Configured/Task Addresses
+
+- Supported trigger: configured Agent and one or more fresh task executions share
+  an address; user sends to the exact selected live/continuable execution.
+- Spines/owners: CF-02/05; Org submission owns capture/continuation, Context Files
+  owns pair validation/movement, strict location owns execution/ancestry.
+- Walkthrough: captured OrgRun/AgentRun pair is identical in draft and final
+  descriptors. Stored-only exact lookup finds configured direct, mounted,
+  task-Agent or fresh task-Team Agent without address ranking. Existing final
+  physical directory already includes AgentRun ID. Finalization returns its exact
+  locator; only then does existing exact SEND_MESSAGE proceed.
+- Negatives: reject mixed family/root/Agent pairs before mkdir/move; do not send
+  after failed finalization. Preserve existing filename retry/partial-batch
+  semantics; no new queue/transaction, configured-first or live-first fallback.
+- Required evidence: replace IR048 expected-rejection observation with durable
+  desired-success tests using actual strict trees/files/services; test two
+  settled same-address tasks and concurrent distinct exact owners with distinguishable
+  bytes. Test provider local-path normalization against the same exact file.
+- Design result: Pass — DS-041/042. No current success is inferred from the probe.
+
+### VAL-066 — Sent/Retained Click Uses File Owner, Not Viewer
+
+- Supported trigger: click image/text/file from conversation, Messages or Tasks,
+  including a reference shared to another Agent, then restart and inspect history.
+- Spine/owners: CF-03; saved locator → existing authorized resource transport →
+  read service → owner resolver → strict current tree → exact bytes/preview.
+- Walkthrough: exact stored AgentRun/root identify physical ancestry for direct,
+  mounted and retained task executions. Selecting a different viewer does not
+  change the URI or choose that viewer's same-address file. Root/Agent remain
+  inactive on retained reads; no task or Team root reactivation.
+- Negatives: wrong-root AgentRun, missing owner/file, legacy Org URL and path
+  traversal cannot fall back to another owner;404/400 are truthful, not blank
+  success. Existing authentication remains in force; ID knowledge is not authority.
+- Required evidence: physical byte/hash equality through actual final GET and
+  fresh-process/stored-only read; actual rendered click in current and retained
+  views. Explicit cross-view reference preserves original owner; Team control
+  retains its existing route/behavior without claiming universal Team exactness.
+- Design result: Pass — DS-041/042; executable/user verification remains downstream.
+
+### VAL-067 — Asynchronous Focus, Draft Edits And Submission Recovery
+
+- Supported trigger: user changes focus or edits/clears the draft while an upload,
+  finalization or deliberate continuation is pending.
+- Spines/owners: CF-02/04/05 plus DS-036. Existing captured AgentContext and
+  local-submission guards remain authoritative; no second pending-owner store.
+- Walkthrough: response applies to captured target only; sameDraftOwner compares
+  exact root/AgentRun. Typed-then-cleared is a real edit. Hydration/context
+  replacement retains canonical draft intent. Prepared final locators never get
+  rebuilt using current focus. A finalize/send failure follows existing guarded
+  recovery without overwriting subsequent input.
+- Required evidence: deterministic barriers with two same-address exact Agents,
+  unrelated root focus, typed/cleared edits, partially finalized batch retry,
+  failed send and late upload completion. Assert command recipient and every
+  physical file path separately from visible draft text.
+- Design result: Pass — no competing submission owner introduced.
+
+### VAL-068 — Closed Current Contract And Observational Ownership
+
+- Supported contract: direct/mounted/configured/task/retained exact identity,
+  upload/open without activation, unchanged command/admission/retention policy.
+- Walkthrough: both client and server recognize one Org descriptor/route grammar;
+  sync and async resolution select the same stored exact location. Parser/builders,
+  layout and provider normalization round-trip the canonical AgentRun ID, never
+  platform session, definition ID or address. Draft and final variants differ by
+  phase, not by identity interpretation.
+- Removal check: no current orgDraftId/memberAddress Org variant, old Org route,
+  address ranking, normal migration import, redirect, fake standalone owner,
+  duplicate cache or runtime manager access. Team/Agent contracts unchanged.
+- Required evidence: parser/route golden and strict negative tests; import/source
+  audit; stored-only call-count assertions; wrong-root/file404 and malformed 400;
+  real Org delete 204. Preserve authentication, MIME/size and safe paths.
+- Design result: Pass — DS-041/042, with explicit current-versus-transition boundary.
+
+### VAL-069 — Saved Locator Preservation In The Initial Family Migration
+
+- Supported operational trigger: first production family cutover with existing
+  saved Team attachments. Source evidence contains 166 actual media URIs, including
+  97 in nested roots; these are not synthetic fixtures or conversation prose.
+- Spine/owner: CF-06; existing startup migration owns strict source/target plan,
+  known structured URI transform, commit/reread and current-readiness verification.
+- Walkthrough: correlate containing TeamRun/root/address to strict indexed
+  candidates, then one physical named file; derive exact target Org/AgentRun,
+  preserve bytes and all non-locator fields. Transform archived/active media and
+  known typed reference arrays only. A reference in another participant's record
+  retains the original file owner. Prospective validation uses the source slot
+  until existing rename; post-rename GET uses only the current resolver.
+- Current/negative cases: exact current values zero-write; native flat Team tree
+  bytes/paths unchanged; unaffected records zero-write. Ambiguous/missing file,
+  uncorrelated identity, failed commit/reread or required cleanup is FAILED,
+  never warning success. Keep summary migration's different warning rule scoped.
+- Relaunch: one normal interrupted attempt test covers partially transformed
+  files, target-only cleanup and final idempotence; no new ID/journal/reset/replay.
+- Inventory boundary: actual roots, old Org locators/drafts and migration status
+  are recorded before rollout. Bounded samples are not global absence. Unknown
+  draft ownership or terminal prior success with old locators is returned with
+  evidence, not handled by hypothetical migration/compatibility code.
+- Required evidence: disposable real filesystem/DB/runner copy using redacted
+  representative structured fixtures; byte/hash, exact URI, line/record order,
+  correlation/status and real final GET assertions. No live user-data mutation.
+- Design result: Pass — DS-043 defines the supported first-rollout transformation
+  and explicit unavailable preconditions; no production migration execution or
+  exhaustive installed-data inventory is claimed.
+
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
 | --- | --- | --- | --- |
+| Org attachment services | ContextFileOwnerResolver → strict stored-only collaboration location | active runtime manager, direct index lookup above resolver, address-only identity | Pass |
+| Shared attachment input/composer | Captured ActiveAgentWorkspaceTarget and upload/submission owners | Org sockets, focus-at-completion identity, independent owner cache | Pass |
 | GraphQL Org run resolver | AgentOrgRunService | Org manager/store/scope builder | Pass |
 | GraphQL Team run resolver | AgentTeamRunService | Team manager/store/local Team | Pass |
 | Agent tool | MemberExecutionContext bound commands/delivery | Root manager/index/store or aggregate cast | Pass |
@@ -2350,3 +2484,28 @@ required after that review. Delivery readiness is not claimed.
   --check passed. Only the four Architecture-owned paths are selected for the
   round's commit. Source/test/provider, browser/API and delivery readiness are
   not established by these checks.
+
+## AD-REV-025 Coherence Checks
+
+- DS-041/042 defines one exact Org root/AgentRun contract across both directions
+  and all current parsers/builders/services. Address-only lookup is removed, not
+  supplemented with a fallback. File reads never activate runtime.
+- DS-043 distinguishes stored final bytes, structured URI values, transient
+  drafts and actual cutover inventory/deployment status. Saved Team URI evidence
+  justifies initial conversion; neither empty samples nor mocks prove no data.
+- Prior blanket memory/record-byte preservation wording is tightened only for
+  proven structured locator changes; native Team execution trees stay unchanged.
+- VAL-064–069 explicitly require real filesystem/REST/click evidence and retain
+  the existing API29 held scope. Expected-rejection tests are not desired passes.
+- Document structure, ID uniqueness, upstream/prior-revision preservation and
+  whitespace checks are recorded after execution. These are not source, API,
+  provider, desktop, migration or delivery validation.
+
+- Executed AD-REV-025 document checks: 69 unique VAL headings and matching index
+  rows; one AD-REV-025 body/index; all AD-REV-001–024 bodies unchanged; all four
+  Architecture artifacts have consistent table columns and balanced fences;
+  git diff --check passed. Hash comparison against the entry tracked-file
+  baseline found changes only in the three canonical Architecture documents;
+  the new supplemental evidence map is the fourth selected artifact. Upstream
+  RER-033 documents still match their approved commit. No source/test/other-owner
+  edits, migration execution or executable validation is claimed.
