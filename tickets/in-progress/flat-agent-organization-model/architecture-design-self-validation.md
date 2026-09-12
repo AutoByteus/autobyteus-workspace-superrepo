@@ -3,15 +3,16 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture: `AD-REV-023`, canonical `design-spec.md`
-- Approved requirements: `RER-032@ca04d71577a8ecc2cb087b5dd7cde6d0c5dd8b8a`
-- Prior review: AD-REV-021 / ARCH-REV-019 Pass; AD-REV-022 copy-only direct route.
-  Current evidence: 00c3aeea7; HIST-INSPECT-001/002; preserve IR-044 composer fix.
-- Date: 2026-09-11
-- Result: `Design Self-Validation Pass — History/Continuation/Stop; Independent Review Pending`
-- 58 design walkthroughs in the cumulative inventory; VAL-054–058 added and
-  VAL-032/033/042/044 ownership/access boundaries re-walked. No source, browser,
-  provider or API/E2E execution in this round. Prior tests keep recorded scope.
+- Architecture: `AD-REV-024`, canonical `design-spec.md`
+- Approved requirements: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`
+- Prior review: AD-REV-023 / ARCH-REV-020 Pass; current source read at IR-047
+  artifact 56fb8983fba0fb6a35b031aa6124f9ca07b0aab1. Preserve downstream scope.
+- Date: 2026-09-12
+- Result: `Design Self-Validation Pass — Org Local Authoring / First-Run Target; Independent Review Pending`
+- 63 design walkthroughs; VAL-059–063 added, VAL-047/048 and current transition
+  guidance corrected for the user's explicit first-run deployment premise.
+  No new migration is proposed. No source/test/browser/provider execution in this
+  round; previous executable evidence remains scoped to its actual artifact.
 - Product: no new gate. Existing approved packages remain normative elsewhere.
 
 ## Purpose And Method
@@ -35,7 +36,10 @@ For each supported use case it verifies:
 Inputs:
 
 Source lists below retain earlier rounds' evidence at their recorded pins;
-claims described there as “current” belong to those rounds. AD-REV-020 source
+claims described there as “current” belong to those rounds. Current AD-REV-024
+uses RER-033 and the user's explicit clarification that the ticket migration has
+not been deployed: update existing code, do not add a migration for an interim
+branch format. Local test completion records are not deployment evidence. AD-REV-020 source
 is the reviewed IR-038 checkpoint `14a94fc45`; its delta is DS-031–033. Existing
 VAL-001–045 remain cumulative behavior checks; VAL-046–050 add the authored
 format and owned-definition transition. No older source-gap note says an
@@ -45,7 +49,7 @@ already implemented correction is still absent.
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed structural ARCH-REV-019 Pass on AD-REV-021; AD-REV-022 was copy-only/direct; earlier findings retain historical scope)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed ARCH-REV-020 Pass on AD-REV-023; earlier findings retain historical scope)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -209,8 +213,8 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-044 | SCN-019–020; AC-030–031; AAV-001 | Settlement/read-only exact retained history without activation | DS-029–030 | Pass |
 | VAL-045 | SCN-018–020; REQ-034–036 | Shared Team responsive UI, reactivity and no false ownership | DS-028–030 | Pass |
 | VAL-046 | SCN-021; REQ-026; AC-021/032 | Field-free Team/Org author/save/reload/package roundtrip and strict negatives | DS-031 | Pass |
-| VAL-047 | SCN-022; AC-033 | Completed prior migration, owned numeric targets and current zero-write cohort | DS-032 | Pass |
-| VAL-048 | SCN-004/022; AC-033 | Skip-version ordering, unchanged historical intermediate, retry and independent status | DS-032–033 | Pass |
+| VAL-047 | SCN-022; AC-033/036 | First-run owned authoring preservation and final zero-write cohort | DS-032/039 | Pass |
+| VAL-048 | SCN-004/022; AC-033/036 | Initial final output, ordinary retry and independent status | DS-032–033/039–040 | Pass |
 | VAL-049 | AC-022/033; ORG-CASE-049–055/062–063 | Physical owned child inventory, external zero writes and truthful diagnostics | DS-031–033 | Pass |
 | VAL-050 | AC-032/033; forward-only convention | Complete source cut, failure truth and no runtime/UI expansion | DS-031–033 | Pass |
 | VAL-051 | REQ-034/036; AC-034; SCN-018 | Compact Messages defaults with exact on-demand identity and unchanged accepted rows | DS-034a/r | Pass |
@@ -221,6 +225,11 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-056 | SCN-015/018/019; user terminate finding | Stop retains conversation without new configuration | DS-037 | Pass |
 | VAL-057 | Existing command/recovery contracts | Failure truth and bounded pending conflicts | DS-036l/037r | Pass |
 | VAL-058 | Shared surfaces and exact state ownership | Publication/status generations, desktop/narrow and Team regression | DS-035–037 | Pass |
+| VAL-059 | REQ-026/037; AC-035; SCN-023 | Current Org authoring/API roundtrip and exact resolution | DS-038 | Pass |
+| VAL-060 | REQ-027/037; AC-035/036 | Strict retired-scope rejection and external ownership | DS-038 | Pass |
+| VAL-061 | REQ-012/037; AC-033/036; SCN-024 | Single final owned-config transformation and preservation | DS-039l | Pass |
+| VAL-062 | First-run user clarification; AC-035/036 | Existing initial migration final output and ordinary retry | DS-039 | Pass |
+| VAL-063 | REQ-012/027/037; AC-036 | Bounded status, availability and protected runtime | DS-040 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1472,49 +1481,43 @@ package-family rename. It does not infer logical topology from directory depth.
 - Result: Pass (design); actual production serializer/provider/roundtrip tests
   and rendered existing authoring paths remain downstream obligations.
 
-### VAL-047 — Already-Upgraded Owned Definitions And Current No-Op Cohort
+### VAL-047 — First-Run Owned Definitions And Current No-Op Cohort
 
-- Basis: Supported operational upgrade, SCN-022 / AC-033. Both inspected database
-  snapshots already mark 20260901 SUCCEEDED; source can hold prior versioned
-  targets, so changing only that earlier implementation cannot perform the delta.
-- Primary: ordinary startup → runPending skips completed family migration →
-  new 20260911 definition inventory → migration-only exact prior validator →
-  atomic single-config replacement/reread → strict current admission/new work.
-- Bounded local: one file at a time; compare every non-version JSON value;
-  current field-free source validates/skips with no write. Derived definition
-  content hash may change, but opaque ID/refs/Markdown/assets remain.
-- Ownership: new registered definition migration is sole transition writer;
-  AtomicRunPackageFileCommitWriter owns atomic commit mechanics, not schema.
-- Check: versioned Team and Org both convert; field-free configs have unchanged
-  bytes/mtime; all execution-tree/task/message/history snapshots retain hashes
-  and versions; successful old migration records are not reset/replayed.
-- Result: Pass (design). Real disposable file/runner integration with completed
-  prior records must prove the new migration still executes and succeeds.
+- Basis: approved owned preservation, SCN-022/024 / AC-033/036. Under the user's
+  clarified deployment premise, this ticket is unreleased; earlier local/test
+  SUCCEEDED records do not prove an already-upgraded production installation.
+- Primary: first startup → existing family/authoring migration code updated in
+  place → physical owned inventory → exact final candidate → atomic single-config
+  write and strict reread → current admission/new work. Add no migration entry.
+- Check: known authored version removed; Org old local spelling mapped only to
+  org_local; all other JSON meaning, IDs/refs and Markdown retained. Current
+  final files validate/skip without writes. Existing definition content hashes
+  may change naturally for changed configs, never identities.
+- Ownership: existing registered migration/file writer. Runtime versions/paths
+  remain unchanged by this authoring delta; original runtime cutover is separate.
+- Result: Pass (design). VAL-061/063 supply the current detailed preservation,
+  status and executable obligations; no deployed-intermediate ladder is required.
 
-### VAL-048 — Skip-Version Upgrade, Retry And Independent Migration Status
+### VAL-048 — Initial Final Output, Retry And Independent Status
 
-- Basis: supported earlier release → current startup and ordinary restart,
-  SCN-004/022; existing runner/prerequisite and migration conventions.
-- Primary: startup → pending 20260901 legacy definition/family transform →
-  preserved historical versioned intermediate → new definition-only pass →
-  final field-free codec/admission; earlier runtime conversion stays unchanged.
-- Re-entry: a retry sees already terminal field-free roots/owned Teams and skips
-  inside the old migration; no version reinsertion. Existing prospective target
-  comparisons accept only equal validated non-version values. New pass skips
-  committed current files and retries unfinished source through normal runner.
-- Ownership: old migration alone understands refType/depth/family conversion;
-  shared historical numeric validator is migration-only. New pass knows exact
-  prior numeric/current definitions, not recursive Team interpretation.
-- Independence: registry order is required, not a runtime-success prerequisite.
-  An unrelated old runtime failure does not stop valid definition conversion.
-  Any incomplete/unsupported definition or pending family residue in the new
-  inventory is FAILED, source intact; a complete definition inventory can
-  succeed independently of failed unrelated runtime. No false warning status.
-- Check: completed/pending/failed prior states; earlier/current/prior-numeric
-  definitions; single retry/idempotence sequence; unchanged summary warning
-  policy. Do not manually reset prior records or rerun old runtime for authoring.
-- Result: Pass (design); reject per-poweroff/kill branches, timeout/repair
-  machinery, normal dual parsers and arbitrary corruption scenarios.
+- Basis: supported pre-ticket release → first startup and ordinary restart,
+  SCN-004/022; user clarification and existing runner/convention.
+- Primary: startup → existing family transform → final unversioned Team or
+  org_local Org directly → existing bounded authoring inventory → current
+  admission. The existing family writer is not frozen at a branch intermediate.
+- Re-entry: ordinary same-implementation retry validates/skips current targets,
+  transforms unfinished supported source and fails conflicting prospective output.
+  Final validation uses current codecs, not merely migration source acceptance.
+- Ownership: family migration alone owns old refType/depth conversion; the pure
+  authoring candidate helper knows only authorized version/scope differences.
+  No normal compatibility parser, new migration ID or new runtime owner.
+- Independence: existing registry order, not a new runtime-success prerequisite.
+  A runtime item failure can coexist with independently successful owned
+  definition conversion. Required definition errors remain FAILED/unavailable.
+- Check: original runtime semantics and distinct summary-warning policy unchanged;
+  fresh pre-ticket fixtures and one ordinary retry/idempotence run, not manual
+  production status resets. VAL-062/063 are the expanded current walkthroughs.
+- Result: Pass (design), not executable validation.
 
 ### VAL-049 — Owned Child Inventory, External Boundaries And Admission Diagnostics
 
@@ -1542,7 +1545,8 @@ package-family rename. It does not infer logical topology from directory depth.
 
 ### VAL-050 — Source Cut, Failure Truth And No Runtime/Presentation Expansion
 
-- Basis: AC-032/033 and existing forward-only startup contract, RER-029 only.
+- Basis: AC-032/033 and existing forward-only startup contract; RER-029 field
+  removal remains, with RER-033 scope and DS-039 first-run corrections.
 - Primary: reviewed code/config change → current codec/provider/bundle consumers
   and diagnostics → startup migration attempt → current per-item admission →
   independent source/API validation → fresh Delivery build/user verification.
@@ -1720,6 +1724,121 @@ package-family rename. It does not infer logical topology from directory depth.
 - **Result:** design walkthrough Pass. This is not an expanded API/Delivery pass;
   browser/provider validation must observe network/runtime effects and rendered
   context, not only mocked route assertions or dot colors.
+
+### VAL-059 — Org Local Authoring, API Mapping And Exact Resolution
+
+- **Basis:** supported package author/create/edit/read/save/export/import,
+  REQ-026/037, AC-035, SCN-023. User bundles an Agent and flat Team under an Org.
+- **Primary spine:** authored file or existing GraphQL form → Org definition
+  service/current codec → provider package transaction → saved config → source
+  index/exact dependency validation → current available catalog/launch choices.
+- **Return spine:** domain org_local → existing AGENT_ORG_OWNED API enum → edit
+  and save → org_local bytes. Existing file-copy/export/reimport is the other
+  supported roundtrip; no added API or version/scope injector.
+- **Owners:** service validates meaning; codec defines exact authored grammar;
+  provider owns revision/bytes; source index correlates opaque ID to physical
+  package; admission owns dependency availability. UI never calls migration.
+- **Check:** direct bundled Agent and flat-Team refs preserve exact strings and
+  IDs, including agent-org-owned-* prefixes. Internal kind/ownershipScope and
+  paths stay unchanged. Shared/application-owned Org and Team team_local controls
+  stay unchanged; default-config saves do not emit the retired spelling/version.
+- **Negative:** unknown API/domain value does not default to application ownership;
+  missing exact child stays unavailable, not rebound by basename/global fallback.
+- **Result:** design walkthrough Pass; real codec/provider/API/package roundtrip
+  and exact dependency tests are required downstream, not claimed here.
+
+### VAL-060 — Strict Rejection And Separate External Ownership
+
+- **Basis:** AC-035/036, REQ-027, SCN-023/024. User imports/registers a package
+  containing an old-scope Org alongside valid definitions.
+- **Primary spine:** package registration → known source descriptor → current
+  Org codec/admission → contextual unavailable result → existing catalog/launch
+  gate with independent compatible definitions available.
+- **Check:** agent_org_owned, team_local, unknown refScope, schemaVersion of any
+  value, unsupported/missing keys or wrong family fail normal admission. The
+  reason names members[index].refScope and allowed current values; outer result
+  carries package root, definition ID/path and owner action. Known identity is
+  not fabricated for a malformed record.
+- **Ownership:** registered external source remains read-only even if locally
+  writable or downloaded by the installer. The index filter uses org_local,
+  but its internal descriptor kind remains agent_org_owned. Migration helpers
+  are inaccessible to normal provider/admission/package-service callers.
+- **Failure/return:** rejected source yields no available Org or fallback; unrelated
+  valid definitions and existing runtime history retain their established scope.
+  Registration success does not mean every contained definition was admitted.
+- **Result:** design walkthrough Pass; actual external hashes, diagnostics and
+  available/unavailable catalog controls remain executable obligations.
+
+### VAL-061 — One Final Owned-Config Transformation
+
+- **Basis:** explicit otherwise-current owned preservation, REQ-012/037,
+  AC-033/036, SCN-022/024; not an inferred deployed intermediate release.
+- **Primary spine:** first startup → existing definition authoring migration →
+  physical owned inventory/ordinary transaction read → exact raw-value candidate
+  → atomic config replacement → strict reread/equality → current admission.
+- **Bounded local:** known numeric Team 2/Org 1 removes only schemaVersion;
+  exact old Org local scope maps only to org_local. A file needing both changes
+  receives one final write. Already-final files skip without bytes/mtime changes.
+- **Preservation:** ref strings, IDs, members/handoffs/order/defaults and every
+  other JSON value match source after only authorized differences. Markdown,
+  owned Agent/assets and runtime files stay byte-identical; natural definition
+  revision hashes may change. Team's scope vocabulary never changes.
+- **Boundary:** pure migration helper returns raw selected values, not rebuilt
+  normal codec normalization. Only strict current reread is a terminal check.
+  Unsupported shape/value or failed write/reread is FAILED, not normalized/empty
+  success. No second state owner/journal/source-index-driven inventory.
+- **Result:** design walkthrough Pass; real file/writer preservation, source
+  validation and current/changed/error matrix required before executable pass.
+
+### VAL-062 — Initial Family Migration Emits The Final Format Directly
+
+- **Basis:** explicit user's first-run production premise, approved original
+  zero/one-level cutover and current REQ-026/037. No deployed ticket migration
+  is assumed; local API/Delivery test statuses do not establish deployment.
+- **Primary spine:** fresh isolated pre-ticket data → existing runPending order
+  → existing family generator/preflight → unversioned Team or org_local Org
+  plus direct unversioned owned Teams → atomic publication/package move/cleanup
+  → existing authoring pass zero-write for those final outputs → strict catalog.
+- **Check:** no numeric definition intermediate is generated; original
+  buildAgentOrgOwnedDefinitionId mapping and genuine family move remain.
+  orgTreeTarget still emits the approved runtime version. Native flat Team Run
+  V2 bytes remain unchanged; one-level runtime conversion remains the original
+  approved behavior, not a new spelling-triggered runtime pass.
+- **Retry:** ordinary interrupted attempt sees source-only, exact prospective
+  current target or current canonical package. Source transforms once, final
+  children skip, conflicting target fails. Source helper acceptance alone cannot
+  mark an on-disk retired spelling current; changed selected config is written
+  and strictly reread before cleanup/success.
+- **Rejected premise:** no new ID/registry entry, immutable intermediate writer,
+  multi-release ladder, manual production status reset or alteration of older
+  released migrations. Retained old test datasets are evidence, not rerun targets.
+- **Result:** design walkthrough Pass; production registry/runner/file integration
+  from genuine pre-ticket fixtures and one ordinary restart/idempotence check
+  required. Existing artifact-specific migration passes are not renewed evidence.
+
+### VAL-063 — Bounded Status, Availability And Protected Runtime
+
+- **Basis:** existing startup/restart conventions, REQ-012/027/037, AC-036.
+- **Primary/return:** owned conversion attempts → existing migration result
+  counts → runner attempt log/status → Settings restart guidance → normal
+  current-only admission with independently valid items available.
+- **Status matrix:** existing definition entry succeeds only after complete
+  inventory plus strict converted/current targets. Any required inventory/item
+  error is FAILED with capped reasons; no warning-success for invalid spelling.
+  Preserve family cleanup FAILED and the separate summary migration's valid-empty
+  SUCCEEDED_WITH_WARNINGS. No new persisted status fields or UI controls.
+- **Independence:** existing registry order is unchanged; unrelated family runtime
+  failure does not manufacture a new definition prerequisite. Valid definition
+  conversion may complete independently while failed definition items remain
+  unavailable. Pending/failed work retries through the existing runner; completed
+  entries are not reset to force authoring work on running user data.
+- **Protection:** test external zero writes and first-run native Team runtime
+  zero writes; no scope-driven runtime/schema/identity/command/UI changes. Keep
+  retained API/Delivery evidence unchanged and use fresh fixtures for validation.
+  No new migration entry is needed just because a developer previously ran one.
+- **Result:** design walkthrough Pass; deterministic status/availability and
+  first-start/restart tests plus renewed scoped API validation remain downstream.
+
 
 ## Ownership And Authoritative-Boundary Audit
 
@@ -2040,6 +2159,15 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 
 ## Self-Validation Conclusion
 
+**Current AD-REV-024 conclusion:** all 63 design walkthroughs pass at the design
+boundary. DS-038–040 and VAL-059–063 cover exact authored vocabulary, internal/API
+separation, initial final outputs, owned preservation and bounded status. The
+user-corrected first-run premise supersedes the former already-deployed branch
+assumption; no migration is added. Focused Medium/High, cumulative Large/High;
+independent Architecture Review pending. No source or executable pass is claimed.
+Prior round conclusions below retain their chronological scope.
+
+
 Current AD-REV-023 resolves HIST-INSPECT-001/002 at the design boundary with
 DS-035–037 and five new passing design walkthroughs. History does not activate;
 Send deliberately restores eligible configured targets; Stop retains conversation.
@@ -2201,3 +2329,24 @@ required after that review. Delivery readiness is not claimed.
   The separate right-panel Org tab remains unchanged; Orgs is the history category.
 - Requirements/Product and concurrent source/test/Code Review/Delivery work were
   not edited or staged. These document checks are not executable validation.
+
+## AD-REV-024 Coherence Checks
+
+- Current design/validation targets use org_local only for authored Org refs;
+  internal kind/ownership, opaque IDs/paths and existing GraphQL enum spellings
+  remain explicitly distinct. Team scope vocabulary is unchanged.
+- Existing unreleased migration generators emit final definitions directly; no
+  added migration ID, frozen numeric intermediate or presumed deployed branch
+  upgrade path. Source-reader acceptance is not final target validation.
+- DS-032/033, persisted-data/convention/algorithm tables and VAL-047/048 are
+  reconciled with DS-039/040 and the first-run premise; old revision narratives
+  and prior evidence remain historical, not current instructions.
+- Executed document checks passed: four artifacts have consistent Markdown
+  tables/fenced blocks; VAL-001–063 each has exactly one walkthrough/index row;
+  AD-REV-024 has one body/index; earlier AD-REV-001–023 bodies are byte-for-byte
+  unchanged. Current definition examples omit version and use org_local;
+  runtime type versions remain. No additional spelling migration ID is present.
+- Four upstream documents have no diff against RER-033 f84c5299f; git diff
+  --check passed. Only the four Architecture-owned paths are selected for the
+  round's commit. Source/test/provider, browser/API and delivery readiness are
+  not established by these checks.

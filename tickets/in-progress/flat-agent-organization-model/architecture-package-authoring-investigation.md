@@ -1,9 +1,10 @@
 # Package Authoring — Contract Change Inquiries
 
-**Current status:** PKG-AUTH-001 is closed by approved RER-029 and its AD-REV-020
-resolution. PKG-AUTH-002 below is a new user-requested Org refScope naming change
-awaiting canonical Requirements reconciliation. Earlier sections retain their
-recorded scope and chronology.
+**Current status:** PKG-AUTH-001 was resolved by RER-029 / AD-REV-020.
+PKG-AUTH-002 is resolved by RER-033 / AD-REV-024. The user's 2026-09-12 clarification
+requires treating this ticket's migration as first-run/unreleased: update existing
+code, not add a migration for intermediate branch states. Historical evidence
+below does not establish production deployment; latest resolution is at the end.
 
 ## PKG-AUTH-001 — User-requested simplification
 
@@ -241,3 +242,79 @@ external configs, runtime files, tests and other owners' dirty reports were not
 edited or staged. Read-only source checks and `git diff --check` are not source,
 API/E2E or Delivery validation. The previous stream-warning defect has its own
 Code Review/Implementation route and is not reclassified by this naming request.
+
+## PKG-AUTH-002 Approved Resolution — AD-REV-024
+
+- Authority: RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9, REQ-037 /
+  AC-035–036 / SCN-023–024 / DEC-025. All four canonical Requirements files were
+  read-only and checked unchanged against that commit. No Product gate.
+- User's direct correction on 2026-09-12: the migration is still on this ticket,
+  has not been deployed, and must be treated as never run in production; update
+  existing code directly. This is rollout evidence, not a new authored behavior.
+- The earlier local DB reads in PKG-AUTH-001 and subsequent test-output configs
+  are retained facts about those environments, **not evidence of a released
+  migration**. The earlier inference requiring immutable numeric outputs plus a
+  new release-upgrade pass was too broad. DS-039 corrects that premise; the
+  preliminary extra scope-migration proposal was withdrawn before completion.
+- Workspace/branch unchanged; source at IR-047 artifact 56fb8983f; previous
+  design/review AD-REV-023 / ARCH-REV-020 Pass retain recorded scope. No new
+  source failure, provider/test/browser result or deployment action is claimed.
+
+### Current Source And Data Evidence
+
+Paths are relative to the canonical worktree. Inspected using targeted source
+reads, git diff, Python JSON/path reads and SHA256; no source/data mutation.
+
+| Source | Evidence and design consequence |
+| --- | --- |
+| `autobyteus-server-ts/src/agent-org-definition/providers/agent-org-definition-config.ts:89–99,135+`; domain member type | Normal old-scope validator and same-codec builder must change together to org_local. Other exact keys/defaults remain. |
+| `agent-org-definition/providers/file-agent-org-definition-provider.ts` under server src | Revisioned transaction/read/write consumes the codec; normal hash is content-derived and may change when config bytes change, not definition ID. |
+| `agent-org-definition/providers/agent-org-owned-definition-source-index.ts:55,68` | Authored filter changes; internal kind stays agent_org_owned. Exact matching uses unchanged ID builder and owned physical child, never prefix parsing. |
+| `agent-org-definition/utils/agent-org-owned-definition-id.ts` | Opaque agent-org-owned-agent/team refs remain exactly valid. |
+| `api/graphql/types/agent-org-definition.ts:8,68–80`; `autobyteus-web/stores/agentOrgDefinitionStore.ts:15` | Existing uppercase enum can remain with exhaustive explicit mapping to current lowercase domain. No wider API/client ownership rename needed. |
+| `collaboration-definition-admission/services/definition-admission-service.ts:150+`; source registry; package service | Existing package/ID/path/reason/owner-action result and dependency gate; registration is not semantic success. External ownership stays read-only even for installed local copies. |
+| `app-data-migrations/migrations/agent-org-flat-team-families-v1/agent-org-flat-team-families-v1-app-data-migration.ts:87–101,155–251` | Existing definition generators still emit numeric versions/old local scope. Update these initial outputs directly; strict target validation and writeRequired decisions must cover flat/direct-owned/prospective/cleanup paths. Runtime orgTreeTarget is separate and unchanged. |
+| `app-data-migrations/migrations/collaboration-definition-authoring-shape-app-data-migration.ts:14–75` | Existing registered ID/inventory currently removes only version and skips every unversioned file. Modify candidate equality/transform in place so old-scope unversioned Org also reaches final output; no new entry. |
+| `app-data-migrations/legacy/collaboration-definition-versioned-config.ts` | Prior helper strips version then invokes normal codec; updating only the normal Org codec breaks known owned preservation. Tighten/rename to pure authoring-transition candidate; do not freeze old writers or add a normal compatibility parser. |
+| Registry / runner / owned-definition-package-inventory / atomic writer | Reuse actual existing order, pending/failed retry, owner-contained physical scan and ordinary transaction recovery. Status records are not reset for this authoring change. |
+
+Server source paths abbreviated after the first row above remain under
+`autobyteus-server-ts/src/`. Existing production migration conventions were read;
+normal startup retry, strict current target and bounded capability failure apply.
+No new framework or arbitrary corruption/power-mode matrix is introduced.
+
+Bounded repeatable inventory on 2026-09-12:
+- `/home/autobyteus/data/agent-orgs`: absent.
+- `/root/.autobyteus/server-data/agent-orgs`: present, zero direct config matches.
+- `autobyteus-server-ts/applications/*/agent-orgs/*/org-config.json`: zero matches.
+- Saved **test output** at
+  `api-e2e-evidence/API-REV-028/migration-process-corrected/one-level-catalog/server-data/agent-orgs/api28-migration-org/org-config.json`
+  (relative to ticket): 399 bytes, SHA256
+  `e455c5d6192e812dcf752c2f7e70a12ff129c5e9ff34319e4532c992654209c3`;
+  unversioned, director/shared plus delivery/agent_org_owned with exact ref
+  `agent-org-owned-team:api28-migration-org:delivery`; child directory exists.
+  It proves earlier code's output representation, not a production cohort.
+- This is not an exhaustive deployment inventory. No external repository,
+  runtime-package inventory, database mutation or running app was involved.
+  Actual startup inventories configured owned roots; approved otherwise-current
+  preservation is a requirement independent of claims about deployed counts.
+
+### Architecture Decision And Validation Boundary
+
+DS-038 changes only authored scope/current mapping; DS-039 updates both existing
+unreleased migration implementations directly, producing final definitions in
+one transform and preserving approved owned sources; DS-040 retains existing
+status/availability semantics. No new scope migration is added. Earlier released
+migrations outside this ticket remain historical; runtime tree versions and the
+original family runtime transformation do not change. Source/helper-only old
+shape knowledge never leaks into normal admission.
+
+First-run tests must begin from fresh isolated pre-ticket data, not infer a
+new production upgrade from a developer's already-completed test database.
+Ordinary interruption/restart/idempotence of the final implementation remains
+required. Retained test and Delivery datasets are not rewritten. VAL-059–063
+plus corrected VAL-047/048 cover these obligations at design level only.
+
+Focused Medium/High; cumulative Large/High. Architecture Design Complete with
+independent review selected. Four architecture documents only are changed;
+Requirements, source/tests, other-owner dirty reports and evidence are preserved.

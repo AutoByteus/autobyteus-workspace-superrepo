@@ -31,6 +31,7 @@ does not revise intended behavior.
 | AD-REV-021 | User-approved UI cleanup; approved RER-031 including RER-030 | UI-CLEAN-001; REQ-031/034/035; AC-026/034 | Architecture Revision — Compact Messages, Inline Task Navigation And Org History Heading | Architecture Design Complete; focused Small/Low, cumulative task_size=Large / architectural_risk=High; 53-case design inventory; independent Architecture Review selected |
 | AD-REV-022 | Approved RER-032 plural history-label clarification | UI-CLEAN-001; REQ-031; AC-026 | Architecture Revision — Orgs Literal Synchronization Only | Architecture Design Complete; current copy-only task_size=Small / architectural_risk=Low, direct Implementation re-entry; parent Large/High review remains passed; VAL-053 updated |
 | AD-REV-023 | User DR-009 restart/stop comparison and explicit design-update instruction | HIST-INSPECT-001/002 | Architecture Revision — Observational History, Deliberate Continuation And Retained Stop | Architecture Design Complete; focused Medium/High, cumulative Large/High; 58-case self-validation; independent Architecture Review selected |
+| AD-REV-024 | Approved RER-033 and user's explicit first-run migration clarification | PKG-AUTH-002; REQ-037; AC-035/036 | Architecture Revision — Org Local Authoring And Existing Initial Migration Final Output | Architecture Design Complete; focused Medium/High, cumulative Large/High; 63-case self-validation; independent Architecture Review selected |
 
 ## Revision Entries
 
@@ -1794,3 +1795,48 @@ does not revise intended behavior.
   restore; stale active badge/port after stop; route completion steals focus.
   VAL-054–058 bound these with normal UI scenarios and deterministic barriers.
   No remaining material design question; no successful terminal package handoff.
+
+### AD-REV-024 — Org Local Authoring And Existing Initial Migration Final Output
+
+- Date: 2026-09-12; package AORG-FLAT-TEAM-001; inquiry PKG-AUTH-002.
+- Trigger: Requirements Engineer approved RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9
+  and the user's direct clarification that this ticket's migration is not yet
+  deployed/run in production and its existing code should be updated directly.
+- Prior authority: AD-REV-023@5403b798194bce3e5b7bdf9c0fe36d91f6cd02b7 /
+  ARCH-REV-020 Pass@bf3089ee82af7fe75c3856a0bd45652ffbb08146; inspected source
+  IR-047 artifact 56fb8983fba0fb6a35b031aa6124f9ca07b0aab1. Prior source/API
+  results keep their recorded artifact scope; this request is not a new defect
+  against RER-032 or a retroactive whole-package failure.
+- Approved IDs: REQ-012/026/027/037, AC-035/036, SCN-023/024, DEC-025 and
+  ORG-CASE-064–066, preserving all previous unrelated requirements/Product intent.
+- Decision: one normal authored Org refScope vocabulary with org_local. Keep
+  internal ownershipScope/source kind, opaque ref prefixes/IDs/paths and Team
+  scope unchanged. Existing GraphQL AGENT_ORG_OWNED maps explicitly to/from
+  current domain org_local; no API alias or dual normal JSON reader.
+- Deployment-premise correction: test completion records/intermediate branch
+  configs are not evidence of a released migration. Withdraw the preliminary
+  additional scope-migration proposal and supersede AD-REV-020's frozen family
+  output/already-upgraded-installation assumption. Update the existing family
+  generator and existing owned-authoring pass in place; no new migration ID.
+- Target: initial family conversion writes final unversioned Team/org_local Org
+  definitions directly. Existing bounded owned inventory publishes one final
+  raw-value-preserving candidate for approved superseded version/scope fields,
+  strict reread before success, and zero writes for final configs. Keep genuine
+  old refType/family decoding migration-only and runtime conversion unchanged.
+- Artifacts: design-spec DS-038–040, current target type, data/spine/health/file/
+  convention/guidance maps and DS-032/033 synchronized; package-authoring
+  investigation records evidence/provenance and the first-run premise;
+  self-validation adds VAL-059–063 and reconciles VAL-047/048. Earlier revision
+  bodies remain unchanged. Requirements and Product artifacts are read-only.
+- Classification: focused task_size=Medium / architectural_risk=High; cumulative
+  task_size=Large / architectural_risk=High. Structural package admission,
+  exact source correlation and owned persistence justify review; fixture volume
+  does not. No new runtime architecture is proposed.
+- Result: Architecture Design Complete; independent Architecture Review selected.
+  Review must check mapping/strictness, final first-run outputs, existing-entry
+  retry and preservation, ownership and status boundaries before implementation.
+- Remaining validation: production-code authoring roundtrip, actual filesystem
+  first-start/restart, external/identity/runtime controls, source review and
+  scoped renewed API/Delivery work. No source/test edits, new executable pass or
+  delivery completion in this Architecture round. No Product or Requirements
+  decision remains under the explicitly clarified first-run premise.
