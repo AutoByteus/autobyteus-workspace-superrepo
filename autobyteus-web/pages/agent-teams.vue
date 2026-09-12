@@ -82,6 +82,7 @@ const handleNavigation = (payload: AgentTeamNavigationPayload) => {
         view: payload.view,
         id: payload.id,
         returnToTeam: payload.returnToTeam,
+        ...(returnToOrgId.value ? { returnToOrg: returnToOrgId.value } : {}),
       },
     });
     return;
