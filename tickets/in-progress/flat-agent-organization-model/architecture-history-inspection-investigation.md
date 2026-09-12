@@ -150,3 +150,170 @@ artifact/schema/migration/task-policy change. Focused Medium/High, cumulative
 Large/High; independent review is the next gate. Earlier “not a completed design”
 statements describe the investigation stage, not the current design authority.
 This resolution does not claim source implementation or executable validation.
+
+
+## AD-REV-027 — Original Team Status Comparison And Read-Client Recovery
+
+### Entry, Authority And Investigation Limits
+
+Completed architecture comparison following user direction via Code Reviewer
+CRR-089 / CR-FIND046 / API-FIND039, 2026-09-12. Earlier sections retain their
+AD023 chronology; the current recovery decision is AD027 in design-spec.md.
+Approved RER033 and Product status supplement are unchanged. This round does not
+revise requirements, restore old Team semantics or declare source readiness.
+
+- Assigned worktree/branch: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`,
+  `requirements/flat-agent-organization-model`; HEAD at entry
+  `d76731eaa3260a123f1ce8c6ace0e14994fddcde`; source
+  `bbdea002ee59da87cc7174bfc2924888c0bb38f7`.
+- Reconfirmed both local personal AND origin/personal at
+  `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`. Read with `git show <pin>:<path>`;
+  no fetch, checkout, branch reset or baseline execution. Original comparisons
+  below use this one pin, not current branch files with similar names.
+- `git diff f84c5299f10898f49acff6a0e481d1cd61c769a9 --stat --` the four upstream
+  requirements-doc, investigation-notes, requirements-revision-record and
+  agent-org-contract files returned no difference. Their approval/behavior
+  authority was read, including REQ028/031, AC023/026 and Product status contract.
+- A 31,987 tracked-regular-file SHA256 entry baseline includes other owners'
+  dirty bytes. Only selected Architecture artifacts may change this round;
+  implementation/API/Reviewer/Delivery records and three API test deltas remain
+  theirs. No API/browser/provider/root command or persistence operation was run.
+- Incoming source proof and API37 observations remain attributed to CRR089/API37.
+  Architecture read the actual source and installed-client proof, not an invented
+  reconstruction of browser subscribers or original API36 WS timing.
+
+### Pinned Original Production-Path Evidence
+
+Paths in this table are relative to `autobyteus-web/` at the immutable pin.
+Ranges identify inspected source; the files remain available through git show.
+
+| Source | Observed ownership and implication |
+| --- | --- |
+| `stores/agentTeamRunStore.ts:200–218` | Exact root termination requires successful GraphQL result; disconnects stream, sets view root inactive, performs per-Agent cleanup, marks history inactive and refreshes quietly. Pending/failed termination is not success. Retains context/selection. |
+| `stores/runHistoryStore.ts:255–285` | `markTeamAsInactive` maps the exact root/member activity, invalidates resume editability for refresh, and immediately refreshes navigation topology; active action similarly publishes. Explicit source-to-navigation publication matters. |
+| `stores/runHistoryTeamRows.ts` (`projectConfiguredRows`, history/context builders) | Configured Team containers have no Agent status; exact AgentRun-keyed context status is used for live context rows, history member status for history rows. No root activity computed from aggregate. |
+| `stores/runHistoryTeamHelpers.ts:88–174` | Build history nodes then overlay existing loaded Team contexts, including root isActive at 152/163 and exact Agent rows at 143. This is original precedence, not merely a component style. |
+| `stores/runHistoryTeamExecutionRows.ts` | Stable configured identities and exact transient AgentRun IDs/depth determine navigation rows; task Agent status remains an Agent fact, not Team root status. |
+| `components/workspace/history/workspaceHistoryNestedTeamStatus.ts` | Five-state rank fold scans descendant Agent rows bounded by exact Team row/depth, includes task descendants and excludes containers/outside branches; no lifecycle side effect. |
+| `components/workspace/history/NestedTeamAggregateStatusDot.vue` and `__tests__/workspaceHistoryNestedTeamStatus.spec.ts` | Passive dot exposes localized title/name; source tests cover precedence, empty/missing and recursive task descendants/branch isolation. Tests read, not executed this round. |
+| `services/teamExecution/teamExecutionContextFactory.ts:62–78` | Newly hydrated configured AgentContext starts Offline, not invented Initializing. |
+| `services/teamExecution/teamExecutionViewState.ts:230–280` | Snapshot validates exact root, ID/address, uniqueness and canonical status coverage before setting exact AgentContext currentStatus; emits navigation/projection reconciliation effects. |
+| `services/agentStreaming/TeamStreamingService.ts:252–293` | CONNECTED/snapshot/ready phase validation; root lifecycle event explicitly updates view activity and history navigation. Context/view event processing and leaf status are separate from root lifecycle. |
+| `services/runHydration/teamRunContextHydrationService.ts` and `services/runOpen/teamRunOpenCoordinator.ts:34–79` | Observational resume/tree/member hydration validates identities and root activity, commits context/projections, and attaches stream only if active. Inactive inspection does not restore. |
+| `services/runHydration/teamMemberProjectionHydrationService.ts` | Exact root/context/Agent/address and presentation/activity revisions protect conversation hydration; recorded conversation is not a runtime-status authority. |
+| `stores/agentTeamContextsStore.ts`, `stores/runHistoryNavigationProjection.ts` | Context replacement verifies identity, changes observable store and explicitly reconciles navigation; projection is a derived view, not an independent root lifecycle. |
+| `stores/runHistoryLoadActions.ts` (fetch and `reconcileDiscoveredActiveRuns`) | Original network-only history read has no observed freshness generation. Reconciliation can set existing Team root active from returned active IDs and attach; inactive path disconnects and cleans statuses. Thus context overlay alone is NOT proof against a delayed active history result. |
+
+Original stream `applyEffects` (`TeamStreamingService.ts:297–333`) dispatches
+Agent events into the exact context selected by effect.agentRunId, with root and
+member address. Current Org `AgentOrgExecutionContext.applyEvent:149–171` likewise
+checks sequence and exact ID/address before shared Agent presentation dispatch.
+This is concrete shared status-event handling, not merely similarly named stores.
+
+Original reusable pattern: authoritative root lifecycle → immediate read-model
+publication; exact execution-context Agent status → leaf; descendant-Agent fold →
+Team dot. Original configured recursion/coordinator and its history freshness
+assumptions are not reusable Org contracts. Current approved Org fixed depth,
+unfocused launch, no Org coordinator and mounted-Team lifecycle non-effects win.
+
+### Current Production-Path Evidence And Difference
+
+Paths are relative to the assigned worktree at the recorded source/current bytes.
+
+| Source | Evidence / decision |
+| --- | --- |
+| `autobyteus-web/stores/runHistoryLoadActions.ts:68–185` | Full and focused readers allocate existing Org family generation then issue the same network-only query; latest logical check precedes commit, but neither operation disables deduplication. Full reader isolates workspace and Org results with allSettled. |
+| `autobyteus-web/stores/runHistoryStore.ts:241–246` | Activity action increments family generation, updates exact row, synchronously refreshes cached navigation and starts focused refresh. IR058 effect is correct and retained. |
+| `autobyteus-web/stores/agentOrgContextsStore.ts:35–81,112–144,238–250` | Publish and markHistorical call activity action. Stop invalidates old inspection, awaits successful terminate, marks historical and reads inspection. Inspection has Symbol checks but same network-only query can join a prior in-flight physical operation. onInactive redundantly refreshes again after the action-owned refresh. |
+| `autobyteus-web/stores/agentOrgRunStore.ts` | Thin GraphQL command adapter validates successful termination; context store owns UI transition. No server lifecycle policy should move here. |
+| `autobyteus-web/services/agentOrgExecution/agentOrgExecutionContext.ts:42–82,202–210` | Exact ID/address contexts receive snapshot statuses, root activity is distinct; inactive transition cleans Agent runtime state and retains historical context. |
+| `autobyteus-web/services/agentOrgExecution/agentOrgStreamingService.ts:230–317`, `agentOrgContextHydration.ts` | Existing strict root/sequence/generation/staged-publication barriers and correlated inactive callback; no new protocol needed. Context status authority is not a history-response-derived Agent status. |
+| `autobyteus-web/stores/runHistoryNavigationProjection.ts`, `components/workspace/history/WorkspaceAgentOrgHistoryCollection.vue:31–46` | Org navigation takes history rows, not Team-style context overlay. Root dot and Stop read run.isActive; merely correct selected Agent Offline cannot repair stale root navigation. |
+| `autobyteus-web/utils/agentOrgHistoryRows.ts`, `services/agentOrgExecution/agentOrgTeamBranchStatus.ts`, `utils/workspaceTeamAggregateStatus.ts` | Leaf status is exact live AgentContext when root/context authority permits; mounted aggregate folds own configured/task Agents independent of collapse. Pure presentation, no runtime registration/commands. Keep this separation. |
+| `autobyteus-web/plugins/30.apollo.client.ts:19–76` | Production bound client composes error/auth/HttpLink and normal cache; no dedup override. Preserve binding, credentials and global defaults. |
+| Installed `node_modules/.pnpm/@apollo+client@3.14.0_*/node_modules/@apollo/client/core/ApolloClient.js:62,83` and `QueryManager.js:720–762,1159` | Default dedup true. Per-operation context.queryDeduplication overrides it. Dedup key is printed server query plus canonical variables; network-only still uses Link acquisition. No-cache alone also does not establish independent physical observations. Exact installed path is retained in CRR089/installed-apollo-boundaries.txt. |
+| `autobyteus-server-ts/src/run-history/services/collaboration-root-history-service.ts:28–56` and GraphQL `types/collaboration-root-history.ts` | Read-only facade gets current root from orgRuns.getActive; is_active is Boolean(active), not a task/Agent aggregate. Stored tree remains separate. No server/API change selected. |
+
+Search of current web named-query uses found two production history invocations
+and one inspection invocation, plus definitions/generated artifacts/tests. No
+additional raw-cache watcher for these named queries was identified. Shared
+network-only policy can remain when all authority publication occurs through the
+existing guarded owners. This is a scoped consumer search, not a whole-client audit.
+
+### Confirmed Failure Versus Adjacent Risk
+
+CRR089's recorded actual-loader/parser/query/action + installed-Apollo experiment
+(`read-client-composition-result.json`) shows one Link for two logical calls;
+latest generation 3 was inactive before release and active after old-body release.
+Fresh controlled rejection retained active. That is a composition counterexample,
+not a mocked implementation fix or full Pinia/hosted experiment. API37 establishes
+the supported normal path in four actual Workspaces cases. IR058 pending-only
+publication remains execution-resolved; old API36 gaps remain missing.
+
+An adjacent source-supported path is active history selection → outstanding
+inspection → root Stop → post-Stop inspection. Root Stop exists before inspection
+completion; the new Symbol would otherwise still accept the old deduplicated
+physical query. This round records the risk and applies the same invariant to
+that sole activity-bearing inspection reader. No fifth API37 failure or observed
+inspection resurrection is claimed. Member projection content reads, unrelated
+Team paths and hypothetical replica protocols are not swept into this change.
+
+### Bounded Installed-Client Operation Experiment
+
+Architecture ran a memory-only diagnostic with installed Apollo core 3.14.0,
+InMemoryCache and a controlled Link. Two simultaneous `client.query` calls used
+the same literal `query ArchitectureReadFreshness { activity }`, no variables,
+network-only policy. Baseline produced ONE Link and results `[true,true]` from
+one old response. Adding per-operation `context:{queryDeduplication:false}`
+produced TWO Links and `[true,false]` from separately released responses. Strict
+Node assertions on Link count and results passed, with no backend/network/root
+operation. Client instances were stopped afterward.
+
+Reproduction structure (resolve Apollo from the recorded installed package):
+
+```js
+const pending = [];
+const client = new ApolloClient({ cache: new InMemoryCache(),
+  link: new ApolloLink(() => new Observable(observer => { pending.push(observer); })) });
+const options = { query: gql`query ArchitectureReadFreshness { activity }`,
+  fetchPolicy: 'network-only',
+  ...(independent ? { context: { queryDeduplication: false } } : {}) };
+const a = client.query(options), b = client.query(options);
+await new Promise(resolve => setImmediate(resolve));
+assert.equal(pending.length, independent ? 2 : 1);
+pending[0].next({ data: { activity: true } }); pending[0].complete();
+if (independent) {
+  pending[1].next({ data: { activity: false } }); pending[1].complete();
+}
+assert.deepEqual((await Promise.all([a,b])).map(r => r.data.activity),
+  independent ? [true,false] : [true,true]);
+client.stop();
+```
+
+This is only verification of the installed library option, not production loader,
+Pinia, schema, browser, API acceptance or an implemented repair. Four installed
+Apollo `cache.diff/canonizeResults` deprecation diagnostics appeared in this
+experiment and were not suppressed. During read-only discovery, two guessed
+source locations did not exist (web-local Apollo node_modules and a top-level
+server collaboration-root-history glob); resolved pnpm and run-history/services
+paths were read successfully afterward. Neither diagnostic was treated as product
+failure or erased. Existing Reviewer preparation errors remain in its evidence.
+
+### Completed Design Decision And Boundaries
+
+DS037/047 retains original-style separate authorities but corrects request
+provenance, using one private typed history operation and one inspection option
+at the existing owners, with logical guards retained and redundant onInactive
+refresh removed. No UI status overlay, second activity cache, app epoch, migration,
+global Apollo default or broad Team refactor. This is the smallest justified
+cross-boundary correction given the confirmed history failure and sole analogous
+inspection publisher. Independent fresh active evidence remains valid; pending/
+failed Stop does not fake inactivity. Exact Agent readiness remains independent.
+
+Self-validation VAL058/076–078 defines real-client/real-store tests and normal
+hosted direct/mounted controls. Full cumulative API/E2E and successful proportional
+API-test review remain required. API37 Fail69.3, incomplete groups, native and
+historical evidence gaps are not upgraded; IR049 cutover remains a separate
+Architecture decision. All incoming 2169 references remain linked, not claimed
+independently re-audited here. Result: Architecture Design Complete; focused
+Medium/High, cumulative Large/High; independent revised-impact review required.

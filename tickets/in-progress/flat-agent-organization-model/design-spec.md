@@ -11,21 +11,35 @@
   supplement `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`-`VIS-OVR-006`, which
   supersedes only RV-012 Placement Overrides lines 89-95 and `VIS-015`
 - Architecture result: `Architecture Design Complete`
-- Architecture revision: `AD-REV-026`
-- Architecture review: Pending for AD-REV-026; ARCH-REV-022 Pass covers AD-REV-025. CRR-081 / CR-FIND042 requires this bounded recording/projection correction before cumulative progression.
+- Architecture revision: `AD-REV-027`
+- Architecture review: Pending for AD-REV-027; ARCH-REV-023 Pass covers AD-REV-026. CRR-089 / CR-FIND046 requires the bounded status-read contract correction below; API-REV-037 remains Fail.
 - Date: 2026-09-12
 - Workspace: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`
 - Branch / approved revision commit: `requirements/flat-agent-organization-model` / `f84c5299f10898f49acff6a0e481d1cd61c769a9`
 
 ## Current-State Read
 
-**Current impact round (AD-REV-026):** CRR-081 / CR-FIND042 confirms API33
+**Current impact round (AD-REV-027):** the user-directed comparison of original
+personal/origin-personal Team and nested-Team status ownership is complete at the
+source/design boundary. CRR-089 / CR-FIND046 / API-FIND039 confirms an old physical
+history response being accepted by a newer logical refresh through installed
+Apollo deduplication. IR058 immediate inactive publication is working in the four
+API37 cases; it must be retained. DS-037 is strengthened by DS-047 physical-read
+freshness, including the analogous inspection publisher. Existing Org owners,
+exact Agent status and branch aggregates remain. No Requirement/Product change.
+Source bbdea002ee59da87cc7174bfc2924888c0bb38f7; incoming artifact/HEAD
+d76731eaa3260a123f1ce8c6ace0e14994fddcde; original read-only pin
+5645b49d6f51faa60bd3545bc8e3f0e7e3f96793. Focused Medium/High, cumulative
+Large/High; Architecture Design Complete, independent review required. This is
+not implementation readiness or a repaired API37 result.
+
+**Prior impact round (AD-REV-026), passed ARCH-REV-023:** CRR-081 / CR-FIND042 confirms API33
 loses accepted non-media attachment associations during recording, before cold
 projection. DS-044–046 completes the native/external input → same user trace →
 conversation/page → Open lifetime under unchanged RER-033. Current source
 3d9a019d320878c421429f27c0f074f9a4c4c2f5; artifact
 f8a3f37af0969748f05f0605e5fae1a1cc77f10f. Focused Medium/High, cumulative
-Large/High; independent re-review pending. Known historical missing associations
+Large/High; subsequently passed ARCH-REV-023. Known historical missing associations
 are not fabricated. IR049 actual-installation cutover is not a blanket coding hold.
 
 **Prior impact round (AD-REV-025), passed ARCH-REV-022:** IR048-DI-001 exposes address-only Org
@@ -334,6 +348,246 @@ sidecar behavior without either new configured-member consequence. That was
 the approved RER-026 boundary, not earlier Team task parity. RER-028 now
 expressly supersedes it; AD-REV-019 removes that gate and restores supported
 all-participant presentation, exact Tasks relevance and retained task inspection.
+
+## AD-REV-027 — Root Status Authority And Physical Read Freshness
+
+### Readiness, Evidence And Recovery Classification
+
+Approved RER-033 and all four upstream artifacts remain unchanged at
+f84c5299f10898f49acff6a0e481d1cd61c769a9. The assigned isolated branch/worktree
+and prior reviewed design remain authoritative. No new intended-behavior or
+Product approval gate is needed. The trigger is CRR-089, not a new local-fix
+assignment; the requested original-branch investigation precedes this decision.
+The detailed, pinned comparison and bounded installed-client experiment are in
+`architecture-history-inspection-investigation.md`, AD-REV-027 section. Incoming
+cumulative evidence is indexed by `code-review-evidence/CRR-089/handoff-reference-files.txt`.
+
+- **Confirmed failure:** after normal successful Stop, all four API37 direct/
+  mounted × 1502/390 cases publish inactive correctly while old history is held;
+  release of the unchanged old active body restores root Running/Stop despite
+  backend inactivity and exact Agent/center Offline. A later failed fresh read
+  preserves that stale activity. Only `lateReadCannotUndo` fails in these cases.
+- **Confirmed cause:** the full/focused history readers share identical query
+  and variables through the production bound Apollo client. Its installed 3.14.0
+  default in-flight deduplication allows a new logical generation to subscribe
+  to the pre-Stop physical request. The existing generation guard can reject the
+  old caller correctly while accepting the same bytes for the new caller.
+- **Review gap:** CRR088's separately resolved mocked promises did not exercise
+  this client composition. CRR089's actual-client/actual-loader probe establishes
+  it; it is not a blanket failure of generation guards or IR057/058 regression.
+- **Recovery result:** incoming Unclear design scope resolves to **Design Impact**,
+  a bounded missing read-freshness invariant. Failure origin remains the confirmed
+  implementation composition defect with the specified review gap. No whole-Org
+  redesign, new product semantics, migration or filesystem cause is established.
+
+### Original Ownership Reuse / Adaptation Decision
+
+| Concern | Original Team at pinned personal / origin-personal | Current Org and selected decision |
+| --- | --- | --- |
+| Root activity / Stop | `agentTeamRunStore.terminateTeamRun` requires successful mutation, sets root inactive, cleans exact Agent contexts, immediately calls `markTeamAsInactive` and publishes navigation before quiet refresh. Root activity is not the nested aggregate. | Retain `agentOrgRunStore` as command adapter and `agentOrgContextsStore.stopAndInspect/markHistorical` as browser transition owner. Retain `runHistoryStore.applyAgentOrgActivity` synchronous exact-row publication. Pending/failed Stop cannot fabricate inactive. |
+| Exact Agent truth | Team view snapshot validates AgentRun ID plus member address before updating that exact AgentContext. Context-backed Team rows read these states; projection hydration does not manufacture runtime activity. | Reuse the same ownership pattern already implemented by Org context/index, strict staged snapshot, stream and exact AgentContext. Direct and mounted Agents use identical exact-ID authority; no status inferred from coordinator, name, selection or root dot. |
+| Nested / mounted aggregate | Original depth-bounded descendant-Agent fold, including task Agents, uses running > initializing > error > idle > offline; containers, ancestors and sibling branches do not contribute. | Keep current `projectAgentOrgTeamBranchStatus` and shared fold. Fixed-depth configured Org Teams plus their legitimate task descendants are the scope, regardless of collapse. Presentation only; no mounted root, Stop or lifecycle registration. |
+| Hydration / streams | Original open observes resume/tree/member projections, attaches only if active; Team stream owns snapshot/sequence barrier and lifecycle events. | Keep DS-035 observational inspection, DS-036 explicit continuation, exact staged hydration and current stream-generation barriers. Apply independent physical reads to inspection because it can publish root activity, not because history reads should activate anything. |
+| History precedence | Original `buildTeamNodes` overlays loaded Team contexts over history rows, including root active and exact leaf states; however the original history reconciler itself can set those contexts active from a history response. Its network-only loader has no demonstrated physical-freshness barrier. | Do not clone context-over-history precedence as a purported race fix. Org history owns root navigation facts; exact execution context owns Agent and command readiness. Correct the freshness of root facts at the read boundary. A retained historical context must not permanently veto a genuinely newer active observation. |
+| Navigation publication | Original command/lifecycle/context changes explicitly refresh navigation topology; merely mutating a source row is insufficient for a cached projection. | Preserve IR058 immediate topology publication and normal guarded refresh publication. No UI-only invalidation workaround, duplicate activity map or permanent stopped overlay. |
+
+The original branch is a source comparison, not an executed defect-free baseline.
+Its recursive configured-Team topology and root coordinator are explicitly NOT
+adopted by coordinator-free fixed-depth Orgs. Product's illustrative historical
+status mixtures are not new persisted runtime facts; existing truthful terminal
+status policy remains, with no invented live state or blanket active greying.
+
+### Relevant Behavior, Supported Scenarios And Production Paths
+
+| Behavior / authority | Supported trigger and goal | Preserved outcome | Production path / spines |
+| --- | --- | --- | --- |
+| BEH-014, REQ-031, AC-026; HIST-INSPECT-002; DS-037 | User Stops an active Org in ordinary Workspaces while a normal history read is outstanding. Network completion may be delayed or fail. | Root becomes inactive only on confirmed authority; remains inactive after old response and later read failure; selection, conversation, expansion and draft remain. | Workspaces root action → context operation → command adapter → server root manager/termination → confirmed response or correlated inactive stream → context transition → history publication → same visible tree. DS-037; DS-047. |
+| HIST-INSPECT-001; DS-035/037 | User opens an active exact Agent then Stops that same root while its observational inspection is still in flight. Root Stop is exposed independently of inspection completion. | Superseded inspection cannot re-publish its old active snapshot as a new post-Stop observation. Failed post-Stop inspection retains last committed content. | Exact selection → context inspection owner → bound client → strict root inspection/staged projections → generation-guarded context commit → history activity and selected center. DS-035 with DS-047 read invariant. |
+| BEH-011, REQ-028, AC-023, ORG-CASE-056–058 | User expands/collapses a mounted Team and views individual Agent statuses during active or retained history. | Exact leaf status and branch-only aggregate coexist; aggregate remains visible collapsed and never grants root activity/Stop. | Execution view → exact context index → Agent rows/Team branch fold → approved status presentation. Existing status spine retained. |
+| REQ-004/011; DS-035/036 | Normal active control, failed/pending Stop, later deliberate supported continuation, standalone Team history use. | Valid active roots keep Stop; newer actual active evidence is accepted without granting an unready command port. No restore-on-read, duplicate Send or independent mounted lifecycle. | Existing command/inspection/readiness paths unchanged apart from freshness of observational requests. |
+
+The inspection overlap is a source-supported adjacent contract risk, not a fifth
+observed API37 failure. Controlled timing in tests reproduces these independent
+normal workflows; it does not authorize replaying old API roots, changing real
+response bodies or inventing new concurrent product workflows.
+
+### Design Health, Refactor Posture And Ownership
+
+Change posture: Bug Fix / bounded contract clarification. Current design issue:
+Yes — DS-037 named logical invalidation without specifying physical response
+provenance across the client boundary. Governing owners and data shapes are
+otherwise suitable for this scope. Refactor needed now: **Yes, bounded local
+consolidation only** of the duplicated Org history query/strict parse operation;
+remove the redundant onInactive-triggered refresh already owned by the activity
+action. This is not an extraction of a new status subsystem or generic read manager.
+
+- Context store owns operation sequencing, inspection generation and committed
+  exact contexts. Stream service owns live connection/snapshot/sequence validity.
+- History store owns the Org history slice, existing family generation and its
+  synchronous navigation publication. Load actions own its physical read contract.
+- Apollo is a transport dependency, not root activity authority; cache delivery
+  policy and in-flight deduplication are separate mechanisms.
+- Server `CollaborationRootHistoryService.list` samples `orgRuns.getActive` for
+  `is_active`; it does not infer activity from descendants. Client requests begun
+  after confirmed Stop must not reuse the earlier client operation's observation.
+- Components, route actions and projection utilities remain thin consumers;
+  they cannot repair freshness by hiding Stop or overriding the store.
+
+### DS-047 — Independent Physical Observations Under Existing Generations
+
+This strengthens DS-035/037; it introduces no new wire field, app flag, epoch,
+request ledger or persistent activity cache.
+
+**Invariant:** a generation eligible to publish an Org root activity observation
+must own a physical request initiated for that read, not inherit an older
+in-flight request. Logical latest-generation checks still guard commit after
+all relevant asynchronous work. Neither rule alone replaces the other.
+
+1. Both Org-family reads in `runHistoryLoadActions.ts` call one private typed
+   `readAgentOrgHistory(client)` operation. It issues the existing exact
+   `ListCollaborationRootHistory` query with `fetchPolicy: 'network-only'` and
+   **`context: { queryDeduplication: false }`**, checks GraphQL errors and returns
+   the existing strictly parsed `AgentOrgRunHistoryItem[]`. Reuse the bound client;
+   do not make a new Apollo instance or change auth/readiness/error handling.
+2. Full and focused callers retain the existing shared `agentOrgRequestGeneration`:
+   allocate before awaiting backend readiness; check latest immediately before
+   assigning rows/errors. The full reader's workspace results stay independently
+   governed and are not erased or discarded merely because the Org read is stale.
+   Obsolete requests may finish; their success/failure cannot overwrite current
+   Org rows/error. No cancellation layer is needed for correctness.
+3. `applyAgentOrgActivity` retains its existing order: invalidate older family
+   reads → patch only the exact root's activity fact → synchronously refresh
+   navigation topology → request normal Org history refresh. Do not wait for a
+   network response to expose confirmed inactive, and do not synthesize a summary,
+   execution tree or new root row. Its callers provide validated lifecycle facts.
+4. `agentOrgContextsStore.readInspection` uses the same per-operation
+   `queryDeduplication: false` with its existing `network-only` query, exact root
+   variables/schema, Symbol generation and staging/commit checks. Its existing
+   `inspections` map may coalesce an ordinary duplicate open of the SAME current
+   inspection; it must not be used to reuse an invalidated pre-Stop observation
+   for the post-Stop read. Stop's new inspection must originate independently.
+   Late old inspection/staging callbacks cannot attach a stream or publish activity.
+5. Remove the second `refreshAgentOrgHistory()` from the stream `onInactive`
+   callback: `markHistorical → applyAgentOrgActivity` already performs that request.
+   Keep the accepted-message refresh, which serves summary updates. Different
+   validated publishers may still each refresh; do not add debounce/coalescing
+   machinery to reduce traffic at the expense of freshness.
+6. Read failure retains the last committed exact row/activity and conversation;
+   report the existing appropriate error, without a second Stop or forced route
+   change. A truly newer independent active observation may update root activity
+   after supported activation; no permanent tombstone. Root active alone never
+   supplies an Agent's ready stream, status or command capability.
+
+The library operation option is a supported transport contract at installed
+Apollo 3.14.0 (`QueryManager.getObservableFromLink`), not an arbitrary application
+state flag. `network-only` alone, or changing to `no-cache` alone, does not disable
+in-flight sharing. Keep network-only: current named query consumers publish only
+through guarded promises; no new cache watcher/presentation read is introduced.
+Do not change global Apollo defaults, query variables/names, HTTP headers, schemas,
+server consistency protocol, or unrelated Team/Agent reads. A future additional
+consumer of these root-authority queries must preserve this contract.
+
+### Spine Inventory, Narrative And Off-Spine Concerns
+
+| Spine | Scope / owner | Main line and meaningful result | Off-spine concerns |
+| --- | --- | --- | --- |
+| DS-037 | Primary End-to-End / context operation, then root lifecycle owner | Workspaces Stop → context operation latch → command adapter → root manager termination → successful result → historical context + exact inactive history publication → retained center/root controls. Pending/rejected commands do not take the success transition. | Error presentation, exact selection, per-Agent cleanup; no status aggregate on command line. |
+| DS-047 | Return-Event / history store | Lifecycle fact or normal refresh → existing family generation → bound backend readiness → private query operation → independent Apollo Link request → read-only history service/current root activity → strict parser/latest generation → slice + navigation topology → rendered root controls. | Parser and navigation projection serve this read owner; Apollo handles transport, not lifecycle. |
+| DS-047-H | Bounded Local / history load actions | Allocate logical generation → initiate independent request → complete/parse → compare current generation → publish or discard. | Full-reader workspace family isolation, family errors, existing quiet/loading semantics. |
+| DS-035 / DS-047-I | Primary inspection plus bounded local / context store | Exact history click or post-Stop inspection → current Symbol → independent root inspection → staged exact member projections → re-check current Symbol → commit candidate/activities → publish activity and observational view; attach only on valid active observation. | Root/Agent ID checks, conversation retention, stream generation and selection preservation. |
+
+Allowed dependencies remain components/actions → stores → existing typed client/
+stream/domain services. History's private reader does not import context store or
+router; contexts update activity through history's public action, never internal
+loader mutation. No component watches raw Apollo cache to set status. Fold and row
+projection remain pure and never call transport or lifecycle APIs.
+
+### File Responsibilities, Reuse, Removals And Change Sequence
+
+| Path / action | Final responsibility | Explicit removal / restriction |
+| --- | --- | --- |
+| `autobyteus-web/stores/runHistoryLoadActions.ts` — modify | One private typed Org query/error/parse operation reused by full/focused readers; independent physical requests with existing logical guards. | Remove duplicated Org query option/parsing blocks. No generic framework, new folder or parallel read owner. |
+| `autobyteus-web/stores/agentOrgContextsStore.ts` — modify | Independent activity-bearing inspection; preserve generation/strict staging and all Stop/continuation sequencing. | Remove only redundant onInactive history refresh. Do not replace context store, latch, selection, draft or pending-command ownership. |
+| `autobyteus-web/stores/runHistoryStore.ts` — retain/test | One activity slice and immediate topology publication before guarded refresh. | No new activity map/overlay; no reverting IR058. A source change here requires a specific newly demonstrated need. |
+| `autobyteus-web/stores/__tests__/runHistoryStore.spec.ts`, `agentOrgContextsStore.spec.ts`, `agentOrgInspection.spec.ts`; `components/workspace/history/__tests__/WorkspaceAgentOrgActivityPublication.spec.ts` — extend | Durable installed-Apollo controlled-Link overlap tests with real query/loader/Pinia publication, plus exact inspection overlap. | Mocking independent client promises is not the stale physical-read regression. Preserve API-owned test deltas. |
+| Org/Team status context, branch fold, navigation projection, Apollo plugin, server/runtime/persistence — retain/test relevant controls | Existing separate status and lifecycle authorities; global bound transport unchanged. | No original recursive configured topology, coordinator default, hidden-Stop workaround, global dedup disable or migration. |
+
+Draft responsibilities remain within two existing production files. The only
+reusable extraction is the semantically tight typed history operation; generation
+and publication do not move into it. Thus there is no new owned structure with
+redundant root/status fields and no folder movement. Existing API surfaces, DTOs,
+errors and provider behavior are unchanged. No legacy compatibility branch is
+retained: duplicate operation construction is removed, not wrapped twice.
+
+Sequence: (1) retain and characterize the installed-client failure with durable
+negative baseline, (2) implement the private read contract and inspection option,
+remove the redundant callback refresh, (3) prove immediate and late publication
+with real stores/navigation and active/failed Stop controls, (4) implementation
+validation and selected source review, then **full cumulative API/E2E**, then
+successful proportional test-code review and applicable downstream delivery gates.
+Each completed stage determines its next recipient by fresh team rules.
+
+### Alternatives, Data Decision, Risks And Validation Gate
+
+Rejected: permanent context-over-history overlay (can mask newer real activity
+and does not solve original reconciler freshness), always hiding Stop (false
+active behavior), removing immediate publication (regresses API038), removing
+generations (out-of-order fresh requests still race), no-cache alone (still shares
+Link), global dedup disable (unrelated blast radius), new epoch/tombstone/server
+protocol (not justified), wholesale original Team port (wrong configured topology).
+
+Persisted data: **Not Affected**. Existing response fields and their meaning are
+unchanged; only the client's acquisition/commit contract changes. No raw-record,
+execution-tree, stored locator, config, catalog, schema or migration change; no
+runtime fixture modification, backfill, migration ID or rollout action authorized.
+IR049 actual installation decision remains separately Architecture-owned BEFORE
+cutover and is not a blanket coding hold.
+
+Residual risk: independent concurrent reads increase requests by the number of
+real callers previously coalesced; removing the duplicate inactive callback bounds
+avoidable traffic without new scheduling policy. More than one independent request
+can finish out of order, so generation checks remain essential. This design does
+not claim cross-process/replica consistency beyond the existing current backend
+contract, nor fix unrelated original-Team or old API gaps. New contradictory
+post-Stop backend observations require evidence and a fresh ownership assessment,
+not a compensating client flag.
+
+VAL-058 is strengthened; VAL-076–078 specify physical overlap, inspection overlap
+and truthful positive/negative controls. Required executable evidence includes
+real-client overlap regression for full/focused combinations, old response release
+before/after the new request, new read rejection, preservation of other roots and
+workspace family, valid fresh active acceptance, direct/mounted selected Agents at
+1502/390, genuine pending and rejected Stop, and unchanged selection/draft/content.
+Unit Link controls are not hosted/browser/backend proof. Renew normal hosted cases
+with new owned roots rather than replaying API37 roots, and run the FULL cumulative
+API scope; four focused status cases cannot waive the other groups.
+
+API37 remains Fail69.3 (41 groups: 2 Pass, 37 Not Tested with partial evidence,
+1 Fail, 1 N/A); its 33 passing repository commands/434 distinct main files/2645
+tests are not architecture-run checks or cumulative acceptance. Prior API36
+35-Pass history does not become current. API36 missing narrow/post-consumption
+proof, API35 missing Restore body, API33 lost associations and CRR059/067, IR041,
+API27/29, DR007/009, API20/unknown-stall/native-worker limits remain unfilled.
+API37 POSIX copyback metadata disclosures remain separate, not this UI cause.
+The three API-owned unstaged tests still require successful proportional review
+after eventual cumulative API Pass. AAV002 complete-package-only limits and
+AAV003 upload-label/association distinctions remain unchanged. No reset, provider
+replay, native shell/AppImage, release, user acceptance or Delivery readiness.
+
+### Current Classification And Completion
+
+- Result: **Architecture Design Complete**, recovery **Design Impact resolved in
+  revised design**; source repair and all executable gates still pending.
+- `task_size=Large`, `architectural_risk=High` cumulative; focused `Medium/High`.
+- Structural scope: existing history and inspection acquisition/commit seams,
+  concurrency provenance and navigation publication tests; no new subsystem.
+- Payload/evidence volume: 2169 incoming references, pinned source excerpts and
+  fixture bodies do not determine size/risk. High risk comes from asynchronous
+  root lifecycle controls across client/store boundaries, not Markdown volume.
+- Route: independent Architecture Review of this revised impact before source
+  implementation. Escalate new authority/protocol/persistence/product needs rather
+  than silently broadening or downgrading. Prior ARCH023 Pass is not approval of
+  this new DS-037/047 clarification.
 
 ## AD-REV-026 — Durable Non-Media User Attachments (DS-044–046)
 
@@ -1379,10 +1633,15 @@ is introduced for a selected Agent. Unfocused roots keep their existing prompt.
 
 The existing `runHistoryStore` remains the single history read owner. A confirmed
 stop/active snapshot may update only that row's activity fact through a named
-method and invalidate older in-flight family refresh generations, then refresh
-normally. This is an authoritative command/snapshot fact, not an optimistic
-runtime status or summary. It prevents stale green root badges when the follow-up
-read fails; do not invent per-Agent statuses or a second activity cache. Existing
+method, invalidate older in-flight family refresh generations, and synchronously
+publish navigation before refreshing normally. Under AD-REV-027 / DS-047, every
+activity-bearing history or inspection read must also originate independently at
+the physical Apollo request boundary; a newer logical token cannot inherit an old
+in-flight response. Both full and focused history reads and root inspection use
+network-only plus per-operation queryDeduplication false, retaining existing
+commit guards. This is an authoritative command/snapshot fact, not optimistic
+runtime status or summary. A failed fresh read retains that fact; do not invent
+per-Agent statuses or a second activity cache. Existing
 Agent status/Team aggregate functions continue to read exact live context truth
 or historical Offline. Never paint a genuinely active runtime grey to hide a
 restore bug.
@@ -1437,9 +1696,9 @@ mechanisms remain unchanged. This is a completed design, not an executable pass.
 
 ## Task Size And Architectural Risk (Mandatory)
 
-Current AD-REV-026: focused Medium/High; cumulative Large/High. DS-044–046 changes shared input/reference values, durable user-record facts and read projections, not merely UI payload. Independent revised-impact review is selected.
+Current AD-REV-027: task_size=Large / architectural_risk=High cumulative; focused Medium/High. DS-037/047 strengthens the physical observation contract for history/inspection and retains exact status/publication owners. Concurrency and root-control truth, not content volume, require independent revised-impact Architecture Review. Prior AD-REV-026 shared attachment design passed ARCH-REV-023.
 
-### Current AD-REV-025 Result — Exact Attachment Ownership / Saved References
+### Prior AD-REV-025 Result — Exact Attachment Ownership / Saved References
 
 - task_size: `Large` cumulative; focused `Medium`.
 - architectural_risk: `High`, focused and cumulative.

@@ -3,15 +3,15 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture: `AD-REV-026`, canonical `design-spec.md`
+- Architecture: `AD-REV-027`, canonical `design-spec.md`
 - Approved requirements: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`
-- Prior review: AD-REV-025 / ARCH-REV-022 Pass; current CRR-081 / CR-FIND042
-  on source 3d9a019d / artifact f8a3f37af. API33 is Fail; no partial advancement.
+- Prior review: AD-REV-026 / ARCH-REV-023 Pass; current CRR-089 / CR-FIND046
+  on source bbdea002 / artifact d76731ea. API37 remains Fail; no partial advancement.
 - Date: 2026-09-12
-- Result: `Design Self-Validation Pass — Durable Non-Media Attachment Association; Independent Review Pending`
-- 75 design walkthroughs; VAL-070–075 added and VAL-066 strengthened. Read-only source/data investigation
-  and document checks only; no source/test/browser/provider execution or new
-  production inventory/pass claimed by Architecture.
+- Result: `Design Self-Validation Pass — Root Status Authority And Physical Read Freshness; Independent Review Pending`
+- 78 design walkthroughs; VAL-076–078 added and VAL-058 strengthened. Read-only source
+  comparison, bounded installed-client operation experiment and document checks;
+  no production-source/test change, browser/provider execution or API pass claimed.
 - Product: no new gate. Existing approved packages remain normative elsewhere.
 
 ## Purpose And Method
@@ -223,7 +223,7 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-055 | REQ-016/031/034–036; Team continuation baseline | Deliberate exact continuation, preserved draft and one echo | DS-036 | Pass |
 | VAL-056 | SCN-015/018/019; user terminate finding | Stop retains conversation without new configuration | DS-037 | Pass |
 | VAL-057 | Existing command/recovery contracts | Failure truth and bounded pending conflicts | DS-036l/037r | Pass |
-| VAL-058 | Shared surfaces and exact state ownership | Publication/status generations, desktop/narrow and Team regression | DS-035–037 | Pass |
+| VAL-058 | Shared surfaces and exact state ownership | Immediate publication plus logical/physical freshness, desktop/narrow and Team regression | DS-035–037/047 | Pass |
 | VAL-059 | REQ-026/037; AC-035; SCN-023 | Current Org authoring/API roundtrip and exact resolution | DS-038 | Pass |
 | VAL-060 | REQ-027/037; AC-035/036 | Strict retired-scope rejection and external ownership | DS-038 | Pass |
 | VAL-061 | REQ-012/037; AC-033/036; SCN-024 | Single final owned-config transformation and preservation | DS-039 | Pass |
@@ -241,6 +241,10 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-073 | REQ-014–016/034–036; AC-010/029–031/034 | Truthful absent historical associations | DS-046; CF-10 | Pass |
 | VAL-074 | REQ-014–016/034–036; AC-010/029–031/034 | Known-field locator visitor and archive paths | DS-043/046; CF-06/10 | Pass |
 | VAL-075 | REQ-014–016/034–036; AC-010/029–031/034 | Complete attachment lifetime and cross-family gates | DS-044–046; CF-01–10 | Pass |
+
+| VAL-076 | HIST-INSPECT-002; REQ-031; AC-026 | Real-client full/focused history overlap and rejected refresh | DS-037/047 | Pass |
+| VAL-077 | HIST-INSPECT-001/002; observational read contract | Superseded activity-bearing inspection physical overlap | DS-035/037/047 | Pass |
+| VAL-078 | REQ-004/028/031; AC-023/026 | Valid activity/Stop and exact status controls; cumulative hosted gate | DS-035–037/047 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1723,8 +1727,12 @@ package-family rename. It does not infer logical topology from directory depth.
   history store owns one activity slice; router/panel own selection/display state.
 - **Stale barriers:** stop retires generation before inactive publication; late
   socket/snapshot/recovery callbacks cannot reopen it. Confirmed activity fact
-  invalidates an older in-flight history response; failed refresh does not make a
-  stopped root green. Later authoritative new activity may legitimately change it.
+  invalidates older logical history reads AND DS-047 ensures each new activity-
+  bearing history/inspection read originates as an independent physical request.
+  Both full/focused history readers and inspection retain final commit guards.
+  A failed fresh read cannot turn the stopped root green; later genuinely new
+  active authority may legitimately change it. Separate mocked client promises
+  are insufficient regression proof for installed-client overlap (VAL-076/077).
 - **Interaction:** no raw stream send bypass, no fake live capability for offline
   input, no read-only task Send/approval/interrupt. Same-root mode changes do not
   cancel the pending continuation. Leaving root during operation defers only
@@ -2091,6 +2099,82 @@ package-family rename. It does not infer logical topology from directory depth.
 - Design result: Pass — bounded contract complete; independent review pending.
 
 
+### VAL-076 — Physical History Freshness And Immediate Publication
+
+- **Supported basis:** ordinary Workspaces Stop with a normal active history
+  request outstanding (CRR089/API37); no reactivation or second accepted Stop.
+- **Path:** UI → context stop → command/backend success → historical context →
+  activity action/generation + immediate navigation → independent full/focused
+  client read → strict parser/latest generation → root controls.
+- **Durable test:** real installed Apollo with production default dedup enabled,
+  controlled Link, actual query/strict parser/load actions/Pinia history owner and
+  navigation projection. Hold a pre-Stop active body; apply confirmed lifecycle
+  through the normal action; verify exact row and cached navigation inactive
+  BEFORE releasing anything. The new read must start a distinct Link operation.
+- **Overlap matrix:** old full/new focused, old focused/new full, full/full and
+  focused/focused. Release old body before and after the newer completion; test
+  newer inactive success, rejection and malformed/error responses. Latest logical
+  generation alone must not be the proof. Superseded success/error cannot publish
+  rows or erase the newer error. Unrelated workspace family/root rows remain valid.
+- **Oracle:** installed default baseline demonstrates one physical Link sharing
+  and the failure before repair; targeted operation contract yields independent
+  requests in the minimal harness, while global defaults remain unchanged. A real
+  component observes grey Stopped/no Stop with exact selected Agent unchanged.
+- **Limits:** Link timing is diagnostic, not real backend/Stop acceptance. Hosted
+  request counts may exceed two because other legitimate callers exist; correlate
+  old/new physical observations rather than invent subscriber numbers.
+- **Result:** design walkthrough Pass; durable implementation and API proof pending.
+
+### VAL-077 — Superseded Inspection Cannot Re-Publish Old Activity
+
+- **Supported basis:** open exact Agent of active root, then use visible root Stop
+  before observational inspection finishes; same direct/mounted path. Source-
+  supported adjacent risk, not an observed extra API37 failure.
+- **Owner:** context store's existing inspection Symbol and operation sequencing;
+  strict root snapshot/member hydration and stream readiness remain separate.
+- **Sequence:** hold old active inspection; accept Stop and observe historical
+  transition; new post-Stop inspection must initiate independently with the same
+  exact root query/variables. Release old before/after new snapshot/staging. Old
+  candidate cannot publish activities/context/activity, attach stream or restore
+  root controls; new inactive result may update final content only after validation.
+- **Negative:** rejected/invalid new inspection retains last committed conversation,
+  selection, draft and confirmed inactive root with existing error. Generation
+  changed during asynchronous member hydration also prevents stale commit.
+- **Positive:** ordinary duplicate open may reuse the same current inspection
+  promise; no new request registry is needed. A valid active inspection on normal
+  active open may attach existing ready protocol; it is observational, not Restore.
+- **Proof:** durable real-client/context-store controlled-Link regression plus
+  normal interaction control; mere manual Symbol mutation is not end-to-end proof.
+- **Result:** design walkthrough Pass; no observed inspection failure or fixed
+  production behavior claimed in this round.
+
+### VAL-078 — Positive Controls, Exact Status Separation And Cumulative Gate
+
+- **Basis:** approved root lifecycle, exact Agent status, mounted aggregate,
+  historical inspection and deliberate Send continuation; REQ004/028/031,
+  AC023/026, Product VIS-STATUS001–003 and HIST-INSPECT001/002.
+- **Controls:** active root retains enabled Stop; pending Stop retains truthful
+  active state with existing disabled/pending control; rejected/controlled-aborted
+  Stop never marks root inactive. Successful Stop publishes inactive immediately.
+  Release genuine unchanged old history then reject normal fresh read: inactive
+  controls and center/selection/draft/expansion remain. Test both direct/mounted
+  selection at 1502/390 using new owned roots, not historical API37 replay.
+- **Later truth:** separate supported continuation or new active inspection/history
+  may publish genuinely newer active activity; no permanent stopped overlay.
+  A root active fact never grants live Agent controls without exact ready context.
+- **Status parity:** exact ID/address Agent states feed leaves; mounted Team folds
+  only its own configured/task descendants, including when collapsed, using five-
+  state precedence and accessible names. No independent Team Stop/coordinator
+  root and no synthetic leaf Running from root activity. Standalone Team/Agent
+  inspection, runtime status and Stop remain unchanged by the scoped client option.
+- **Recovery gates:** source review must check all actual root-authority query
+  consumers and real client/store composition. API/E2E must renew FULL cumulative
+  scope, not just four focused cases; eventual successful API-test-code changes
+  receive proportional review. Existing failures/missing evidence/native limits,
+  other-owner test deltas, IR049 installation decision and AAV002/003 remain.
+- **Result:** design walkthrough Pass only; API37 remains Fail, not a repaired
+  scorecard, user verification, native/runtime or Delivery acceptance.
+
 ## Ownership And Authoritative-Boundary Audit
 
 | Higher-Level Caller | Allowed Boundary | Forbidden Same-Level Dependency | Result |
@@ -2412,7 +2496,15 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 
 ## Self-Validation Conclusion
 
-**Current AD-REV-026 conclusion:** 75 design walkthroughs pass at the design
+**Current AD-REV-027 conclusion:** 78 design walkthroughs are coherent at the
+design boundary. The original Team comparison supports retaining root/leaf/aggregate
+separation and immediate publication, not a wholesale status rewrite. DS037/047
+adds the missing physical-response provenance to existing logical guards and
+covers the sole analogous inspection publisher. Focused Medium/High, cumulative
+Large/High; independent review pending. Current source/API37 remains failed;
+no downstream or historical evidence is upgraded by design self-validation.
+
+**Prior AD-REV-026 conclusion:** 75 design walkthroughs pass at the design
 boundary; CR-FIND042 producer/representation/reader/consumer contract is complete.
 Native and external recording retain original non-media references; current
 optional facts preserve old history without inferred repair. Both cold and
@@ -2659,3 +2751,37 @@ required after that review. Delivery readiness is not claimed.
   match RER-033. Other-owner source/tests/reports were not edited or staged;
   read-only API33 raw-record observations and screenshot inspection were not
   fresh API/native/browser execution. No raw evidence was repaired.
+
+
+## AD-REV-027 Coherence Checks
+
+- Verified immutable personal/origin-personal pin and read-only comparison of
+  root command/activity, leaf context, descendant aggregate, hydration/stream,
+  precedence and navigation publication. Original history reconciliation can
+  itself change root activity; no claim of baseline immunity or executed parity.
+- DS037's immediate publication and current-generation guard are retained, with
+  DS047 requiring independently originated activity-bearing history/inspection.
+  One private history operation removes duplicated options/parser policy; the
+  redundant inactive callback refresh is removed without a new owner or scheduler.
+- Three current authority-query invocations are covered at two existing production
+  owners. Status/aggregate helpers, schemas, global client defaults, runtime and
+  migration paths are unchanged. No Requirements/Product gate or new app flag.
+- Installed client operation experiment confirms the per-query option only; four
+  deprecation diagnostics are disclosed in the investigation. This is not a
+  production-source test, hosted rerun or completed implementation.
+- VAL076–078 add durable real-client/store overlap plus valid active/pending/failed
+  controls and full cumulative renewal. Preserve API37 failing state and every
+  still-missing historical/desktop/native/file-lifetime artifact.
+- Document/ID/upstream/other-owner preservation checks are recorded below after
+  execution; no implementation-handoff or other-owner artifact is edited.
+
+- Executed AD-REV-027 document/preservation checks passed: 78 unique detailed VAL
+  headings and matching index rows; one new AD027 body/index; all AD001–026
+  revision-entry bytes retained unchanged. Four selected artifacts have balanced
+  fences/consistent Markdown table columns and git diff --check passes.
+- SHA256 comparison against 31,987 tracked regular entry files found exactly four
+  Architecture-owned changes and 31,983 unchanged files, no missing entry files.
+  All four upstream artifacts match approved RER033. Three API-owned test numstats
+  remain +34/0, +16/-1 and +13/-2. No application/test/other-owner tracked bytes
+  changed. This is not an untracked-tree or POSIX metadata audit and does not
+  replace Reviewer/API integrity receipts. No other owner's files were staged.

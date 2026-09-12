@@ -35,6 +35,8 @@ does not revise intended behavior.
 | AD-REV-025 | Implementation IR-048 Design Impact and user exact-ID confirmation | IR048-DI-001; original CRR-072/API-FIND-031 retained separately | Architecture Revision — Exact Org Attachment Ownership And Saved Locator Preservation | Architecture Design Complete; focused Medium/High, cumulative Large/High; 69-case design self-validation; independent re-review selected |
 | AD-REV-026 | Code Reviewer CRR-081 / API33 failure-origin return | CR-FIND042 / API-FIND035 | Architecture Revision — Durable Non-Media User Attachment Association | Architecture Design Complete; focused Medium/High, cumulative Large/High; independent revised-impact review selected |
 
+| AD-REV-027 | User-directed original personal/origin-personal comparison via CRR-089 / API37 failure-origin return | CR-FIND046 / API-FIND039; prior CR-FIND045 pending-only symptom separately resolved | Architecture Revision — Root Status Authority And Physical Read Freshness | Architecture Design Complete; incoming Unclear resolved to bounded Design Impact; focused Medium/High, cumulative Large/High; independent revised-impact review selected |
+
 ## Revision Entries
 
 ### AD-REV-001 — AgentOrg / Flat AgentTeam Clean-Cut Architecture Baseline
@@ -1928,3 +1930,66 @@ does not revise intended behavior.
   DR007/009 and unknown-origin limits, and Delivery verification. Old API33 lost
   associations are not repaired by this design or claimed as successful tests.
   No source/test/runtime/migration or delivery pass is claimed by Architecture.
+
+
+### AD-REV-027 — Root Status Authority And Physical Read Freshness
+
+- Trigger: user's explicit direction to compare ORIGINAL Team/nested-Team status
+  before selecting the next repair, now triggered by API37 and focused Code Review
+  CRR-089 / CR-FIND046 / API-FIND039. Canonical report: code-review-report.md;
+  evidence and cumulative 2169-reference index: code-review-evidence/CRR-089/.
+- Entry source bbdea002ee59da87cc7174bfc2924888c0bb38f7; artifact/HEAD
+  d76731eaa3260a123f1ce8c6ace0e14994fddcde. Prior AD026/ARCH023 Pass, IR001–058,
+  approved RER033 and AAV003 remain scoped authorities; no review/pass reset.
+- Original local personal AND origin/personal independently rechecked at
+  5645b49d6f51faa60bd3545bc8e3f0e7e3f96793, read-only via git show. Compared
+  root activity/Stop, exact Agent status, nested aggregate, streaming/hydration,
+  history precedence/reconciliation and explicit navigation publication.
+- Reuse existing root/Agent/aggregate ownership separation and immediate inactive
+  publication, not recursive configured Teams, an Org coordinator or a Team-style
+  context overlay. Original history reconciliation can overwrite root context
+  activity; original code is not declared defect-free or executed in this round.
+- API37 confirms IR058 pending-only publication in four direct/mounted ×1502/390
+  cases. New failure is old active physical history response accepted by a newer
+  logical generation through Apollo default deduplication, then retained on fresh
+  rejection. CRR088 mocked-promise composition review gap retained. No attribution
+  to an introducing commit, IR057/058 regression, broad generation failure or FS.
+- Recovery classification: incoming Unclear design scope resolved to bounded
+  Design Impact / missing physical-read invariant. Confirmed implementation
+  composition failure origin is unchanged; no Requirement or Product gap.
+- Design: strengthen DS037 and add DS047. Both full/focused Org history paths use
+  one private typed query/parse operation with network-only and per-operation
+  queryDeduplication false; existing generation/commit and immediate navigation
+  retained. Sole activity-bearing inspection read gets the same physical contract
+  plus existing Symbol/staging guards. Remove redundant onInactive refresh only.
+- Inspection overlap is an adjacent supported source risk, not a fifth observed
+  API37 failure. No new activity cache/epoch/flag/protocol or permanent tombstone,
+  global Apollo change, hidden Stop, aggregate mutation, source-family rewrite,
+  new migration/backfill/rollout or live-provider/root action.
+- Affected authority: BEH011/014, REQ004/028/031, AC023/026, ORG-CASE056–058,
+  HIST-INSPECT001/002 and DS035–037; intended behavior and upstream files unchanged.
+- Self-validation: VAL058 strengthened and VAL076–078 added (78 walkthroughs).
+  Bounded installed-Apollo operation experiment proves the option's Link isolation,
+  not a production repair. Durable real-client/Pinia/navigation regression and
+  current hosted positive/negative Stop controls remain implementation/API work.
+- Classification/result: Architecture Design Complete; focused Medium/High,
+  cumulative task_size=Large / architectural_risk=High; independent revised-impact
+  Architecture Review selected. Risk is physical/logical concurrency and truthful
+  root controls, not the evidence inventory size. Source/API37 readiness remains Fail.
+- Files: design-spec.md; architecture-history-inspection-investigation.md;
+  architecture-design-self-validation.md; this revision index/body. Prior
+  AD001–026 bodies remain unchanged; implementation-handoff is untouched.
+- Downstream: selected source review and FULL cumulative API/E2E, then successful
+  proportional API test-code review remain required; no isolated/local-fix shortcut.
+  Preserve API36 missing narrow/post-consumption evidence, API35 missing Restore
+  body, API33 missing associations, CRR059/067/IR041/API27/29/DR007/009/API20 and
+  unknown-stall/native limits. API37 Fail69.3 and partial groups are not upgraded.
+  Three API-owned unstaged test deltas and all prior receipts remain theirs.
+  AAV002/003 limits and separate IR049 BEFORE-CUTOVER Architecture decision remain.
+  No delivery, user/native-shell/AppImage, installation or release acceptance.
+
+- Routing assessment: get_handoff_rules returned the most-specific resolved
+  Requirement Gap / Design Impact / Unclear → renewed Large/High architecture
+  review rule; selected recipient `/software_engineering_team/architecture_reviewer`.
+  No direct local-fix or Requirements handoff is selected. Message delivery is
+  reported only after the corresponding tool confirms success.
