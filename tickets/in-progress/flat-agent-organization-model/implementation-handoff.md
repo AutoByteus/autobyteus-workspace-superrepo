@@ -1,17 +1,17 @@
-# Implementation Handoff — AORG-FLAT-TEAM-001 / IR-048
+# Implementation Handoff — AORG-FLAT-TEAM-001 / IR-049
 
 ## Result / classification
-**Blocked — Design Impact IR048-DI-001. Not ready for source review, renewed API/E2E or Delivery.**
-- Cycle: Rework; cumulative IR001–048. `implementation-revision-record.md` retains IR001 baseline and all prior rounds. Current code and this document are authoritative.
-- Source/test checkpoint: **6d77b3c8b2d3deeddd5c3392dc2ce69bc63b7982** (20explicit owned paths). Entry HEAD93aafae8f13a239b382a5f3f246f10b661f90733. This is a development checkpoint, not a completed fix or validated release artifact.
-- **task_size=Large / architectural_risk=High — Confirmed / Reviewed**, not downgraded. Focused authoring Medium/High plus frontend Local Fix. New demonstrated file ownership/API decision requires **Architecture Designer**, not a source/API bypass. Lightweight direct-route self-review N/A.
+**Blocked — Design Impact IR049-DI-001 (observed DS-043 cutover precondition). Not ready for source review, renewed API/E2E or Delivery.**
+- Cycle: Rework; cumulative IR001–049. `implementation-revision-record.md` retains IR001 baseline and all prior rounds. Current code and this document are authoritative.
+- Source/test checkpoint: **6d77b3c8b2d3deeddd5c3392dc2ce69bc63b7982** (20explicit owned paths). IR049 entry HEADf54d19775 and review-only provenance addendum2c446274c. No production/test delta retained in IR049. This is a development checkpoint, not a completed fix or validated release artifact.
+- **task_size=Large / architectural_risk=High — Confirmed / Reviewed**, not downgraded. Focused authoring Medium/High plus frontend Local Fix. Exact file ownership is reviewed in AD025; the demonstrated terminal-migration-record transition now requires **Architecture Designer**, not a source/API bypass. Lightweight direct-route self-review N/A.
 
 ## Upstream cumulative package
-- Route Architecture Design; **RER033@f84c5299f10898f49acff6a0e481d1cd61c769a9 / AD024@b26c90787cf5ded1da6364ca52e7ae1e6b635cba / ARCH021 Pass@93aafae8f13a239b382a5f3f246f10b661f90733**, retaining RER032/AD023/ARCH020 and all still-applicable earlier approvals.
+- Route Architecture Design; **RER033@f84c5299f10898f49acff6a0e481d1cd61c769a9 / AD025@b115491c0faa73d1c2b5bfcc88d700c6bff36c0d / ARCH022 Pass@f54d19775**, retaining AD024/ARCH021 and RER032/AD023/ARCH020 and all still-applicable earlier approvals.
 - Canonical requirements-doc.md, investigation-notes.md, requirements-revision-record.md, agent-org-contract.md; routing assessment remains in requirements/investigation/design. design-spec.md, architecture-design-revision-record.md, architecture-design-self-validation.md, design-review-report.md, architecture-review-revision-record.md remain upstream authority.
-- Triggering rework **CRR072 / CR-FIND037 / API29 / API-FIND031 / VAL055** plus user/Architecture clarification to validate upload AND click/open, draft/sent/retained/remove/clear/send. User asked to combine the additional approved PKG-AUTH002 request before one review. Original frontend omission remains implementation-owned; new exact-file-owner impact is separate.
+- Triggering rework **CRR072 / CR-FIND037 / API29 / API-FIND031 / VAL055** plus user/Architecture clarification to validate upload AND click/open, draft/sent/retained/remove/clear/send. User asked to combine the additional approved PKG-AUTH002 request before one review. Original frontend omission remains implementation-owned; IR048-DI-001 is resolved at the design boundary by AD025. IR049-DI-001 is the explicit new transition-state return condition, not a reclassification of that omission.
 - Product authority remains RV012 core, status, Team-overrides VIS-OVR001–006 and baseline promotion; historical VIS015 is not current override authority. Heading remains **Orgs**, below Teams. No new Product change.
-- Still-relevant investigations: package-authoring, task-parity, UI-cleanup, assertion-validity, history-inspection, composer-submission, Team-stream-warning. Prior stopped-run-model/task-monitor requirements and production_data_migration_conventions.md remain applicable. No authoring-only first-run premise is applied to attachment data.
+- Still-relevant investigations: context-file-ownership, package-authoring, task-parity, UI-cleanup, assertion-validity, history-inspection, composer-submission, Team-stream-warning. Prior stopped-run-model/task-monitor requirements and production_data_migration_conventions.md remain applicable. No authoring-only first-run premise is applied to attachment data.
 
 ## Current implementation trace
 | Behavior/design boundary | Current code | Outcome |
@@ -22,17 +22,40 @@
 | DS035–037 / CR-FIND035/036 | Existing context store/strict publication/composer/Team view | Preserved; no owner relocation, runtime/lifecycle/cache/retry/poll/replay change. Existing focused regression cohort passed. CR-FIND036 was already execution-resolved by API29, not reopened. |
 
 ## Design health / blocker
-See **implementation-evidence/IR-048/design-impact.md** and exact actual-owner probe/log. The normal stored tree accepts retained tasks sharing a configured address; location lookup with exact AgentRun succeeds, but the existing final-file descriptor and URL omit that identity. Both finalization and later GET require a unique address match and reject. Choosing configured/first/live or faking standalone ownership is unauthorized. Architecture must settle exact file ownership/locator/data implications before implementation continues. This is not a Requirement Gap, a new provider/runtime stall, or a new browser failure claim.
+See **implementation-evidence/IR-049/design-impact.md**, cutover-inventory.json,
+migration-records.jsonl and strict actual-data observation/log. `/home/autobyteus/data`
+has a terminal **SUCCEEDED/attempts1** family migration record and97 structured
+old media locators within organization-like Team roots. One actual released tree
+and prospective strict Org target validate; its old Team locator has exactly one
+physical source file/AgentRun. Existing runPending correctly skips the completed
+record. DS-043 expressly forbids reset/replay and requires this observed state to
+return to Architecture for a transition decision. No rollout/corruption/origin
+cause is inferred. IR048-DI-001 exact-owner design remains approved; not reopened.
 
-## Local validation and scope
-- Web87files/717tests; server31files/184tests; server full build/bootstrap smoke; web/localization guards and literal audit0. Separate real resolver observation passes expected-rejection assertions, proving the blocker, not functionality.
-- Native Chromium renderer16observations at1440x900/390x844: actual chooser, exact client owner, uploaded text popup content, remove/clear, prepared send/echo, retained PNG opening; no overflow/pageerrors. **External I/O doubled**; these successes do not prove the backend owner on repeated addresses. No provider/API/native-shell/deployment/user approval.
-- Full logs, path lists, source inventory, intermediate setup errors and renderer sources/screenshots retained in implementation-evidence/IR-048. Production web build and AppImage not run after the impact was established; further validation held.
-- Source implementation maximum494nonempty lines; largest changed production delta96lines. No in-scope normal compatibility alias, retired numeric helper/export or default-to-application mapping retained. Migration-only source knowledge stays isolated. New frontend variants match the existing backend union; no new file storage family added.
-- Persisted transition: approved existing startup-only definition migrations updated; runtime generators/versions and registry unchanged. Attachment contract transition **not implemented—Design Impact**.
+## Current-round implementation / checks
+- AD025 DS041–043 remains pending implementation. Exact-owner adapter work began,
+  then the precondition was confirmed; only those13 own initially-clean paths
+  were restored to entry state. No production/test delta remains. Scratch edits
+  are not authoritative or accepted implementation.
+- Named root inventory and migration rows were read-only. SQLite immutable/ro
+  with zero WAL and before/after database hash equality; no runner/reset/restore.
+  Strict local observation **1file/1test Pass** proves the return condition, not
+  desired upload/migration functionality. No file contents or conversation text
+  copied; actual source tree/trace unchanged. Standard test-only Prisma setup is
+  disclosed. Safe scripts/logs/metadata in implementation-evidence/IR-049.
+- Full task/communication/reference inventory, actual migration, service/REST,
+  browser/provider/API/package/Delivery validation are **Held**, not passed.
+  No live application was stopped/rebuilt or user-data migrated.
+- Prior IR048 local evidence remains scoped:87webfiles/717tests,31serverfiles/184tests,
+  server build and guards/audit0;16mocked-I/O renderer observations. These are NOT
+  AD025 intended-success or migration-deployment proof. IR048 actual-owner probe
+  asserts the original rejection, not current functional success.
+- Additional review-only commit2c446274c records named exposure roots; no source
+  drift. Initial ad hoc scanner field/filename mistakes were corrected and are
+  disclosed in the IR049 evidence; decisive source uses actual strict decoders.
 
 ## Preservation / downstream requirements
-- All17090 starting other-owner hashes unchanged; explicit20path source checkpoint only. API-owned registered model probe +13/-2, dirty source-bound docs/Code Review/API/Delivery records and raw evidence retained. Own renderer route/process and three initially absent SDK outputs removed. Existing DR009 app untouched.
+- All17090 starting other-owner hashes unchanged in IR049; no source/test staging. IR048 remains the prior explicit20path source checkpoint. API-owned registered model probe +13/-2, dirty source-bound docs/Code Review/API/Delivery records and raw evidence retained. Own temporary observation-test copy removed; no renderer/process/SDK build this round. Existing DR009 app untouched.
 - API29 remains Fail78.9/incomplete; nine formal cycles36calls retain their recorded scope. Held files/readiness/newer drafts/discard/focus-root, full Stop/final-read/negative/stale-generation, actual Team replacement/reconnect, second restart/finalUIStop still require complete renewed current-artifact API/E2E after source Pass. No historical substitution.
 - Preserve CRR059/CRR067/IR041/DR007/DR009 and API27 limits, pending proportional model-probe review, and unknown historical stalls/API20 first guard/delay. No reassignment or invented cause.
-- Selected result route: Architecture Designer for the demonstrated exact-file-owner decision. Once reviewed guidance returns, reconcile this checkpoint and complete **one cumulative implementation/source-review package**; no partial advancement requested now.
+- Selected result route: Architecture Designer for the demonstrated terminal-record/affected-locator transition decision. Once reviewed transition guidance returns, implement AD025 and reconcile this checkpoint and complete **one cumulative implementation/source-review package**; no partial advancement requested now.
