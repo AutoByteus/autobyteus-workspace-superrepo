@@ -1,7 +1,9 @@
-# Package Authoring — Explicit Version Field Inquiry
+# Package Authoring — Contract Change Inquiries
 
-**Current status:** Approved RER-029 closes the inquiry; see the AD-REV-020
-resolution below. The original request remains chronological evidence.
+**Current status:** PKG-AUTH-001 is closed by approved RER-029 and its AD-REV-020
+resolution. PKG-AUTH-002 below is a new user-requested Org refScope naming change
+awaiting canonical Requirements reconciliation. Earlier sections retain their
+recorded scope and chronology.
 
 ## PKG-AUTH-001 — User-requested simplification
 
@@ -157,3 +159,85 @@ versions and task/UI behavior stay unchanged. Self-validation VAL-046–050 cove
 actual authoring/roundtrip, strict rejections, migration ordering, owned child
 inventory, external zero writes, retry/status and no runtime rewrite. Real
 source/file/runner/browser tests and fresh Delivery remain downstream work.
+
+
+## PKG-AUTH-002 — Org Authored Reference Scope Naming
+
+- Date: 2026-09-12. Stable package: AORG-FLAT-TEAM-001.
+- Trigger: Code Reviewer relayed the user's explicit request to route the
+  `agent_org_owned` versus `team_local` naming concern upstream. The requested
+  Org config literal is `org_local`, symmetric with unchanged Team `team_local`.
+- Outcome: Requirement Gap — user-requested authored-contract revision, not a
+  discovered failure against the current approved contract or CRR-071.
+- Canonical current authority remains RER-032, including AORG-CONTRACT-001's
+  Current AgentOrg Definition rule 4, which explicitly specifies `agent_org_owned`.
+- Inspected source/artifact: IR-047 / 56fb8983fba0fb6a35b031aa6124f9ca07b0aab1,
+  code-review-reported CRR-071 Pass under AD-REV-023 / ARCH-REV-020. Workspace and
+  branch remain the canonical isolated worktree. Existing validation keeps its
+  artifact-specific scope; this inquiry declares no retroactive failure/whole-package hold.
+- This is not a completed AD revision, source assignment, new CR-FIND or approved
+  Requirements revision. No new Product/visual design is requested.
+
+### Requested Behavior And Preserved Boundaries
+
+Normal Org package member `refScope` would use exactly
+`shared | org_local | application_owned`; Team remains
+`shared | team_local | application_owned`. The local scope still means a reference
+resolved to the same exact definition bundled under its owning Org, not a changed
+root owner, topology or reference identity. This request alone does not authorize
+renaming `ownershipScope`, internal source-descriptor `kind`, opaque
+`agent-org-owned-agent` / `agent-org-owned-team` identity prefixes or directories.
+
+Requirements Engineering should reconcile this user direction in the canonical
+requirements, investigation, contract and revision record and record its approval
+basis. Do not impose a fresh UI prototype gate for a config literal. Preserve
+otherwise valid existing owned definition meaning through the approved transition
+boundary; external public/private repositories remain separate-owner/read-only.
+Do not silently accept both literals forever or infer runtime migration replay.
+Architecture selects the detailed transition only after approved re-entry.
+
+### Read-Only Source Evidence / Initial Impact Inventory
+
+Paths below are relative to `autobyteus-server-ts/src/` at the inspected artifact.
+
+1. `agent-org-definition/providers/agent-org-definition-config.ts:89–99` admits
+   `agent_org_owned` and rejects `org_local`. Its builder at 135 onward emits
+   `member.refScope` through the same parser. `file-agent-org-definition-provider.ts`
+   uses that codec for package validation, read and write. Editing only docs or one
+   example would leave current admission rejecting the user's proposed file.
+2. `agent-org-definition/domain/agent-org-definition.ts:8` types the member scope.
+   `api/graphql/types/agent-org-definition.ts:68–80` maps it to/from the exposed
+   authoring enum. Its representation must be considered in the approved design,
+   not changed with an indiscriminate global literal replacement.
+3. `agent-org-definition/providers/agent-org-owned-definition-source-index.ts:55`
+   filters authored `member.refScope`. Lines 8/68 instead describe internal source
+   `kind`; identical old strings in these distinct contracts do not make them a
+   single authorized rename. The index still needs exact definition-to-path correlation.
+4. `agent-org-definition/utils/agent-org-owned-definition-id.ts` creates opaque
+   tagged definition IDs separately. Preserve them and their referenced meaning.
+   Agent/Team provider and GraphQL converter ownership fields are separate concerns.
+5. `agent-team-definition/providers/agent-team-definition-config.ts:95–103`
+   already uses the requested unchanged Team scope vocabulary.
+6. `app-data-migrations/migrations/agent-org-flat-team-families-v1/agent-org-flat-team-families-v1-app-data-migration.ts:99`
+   emits the earlier Org scope from legacy `team_local`. Current/pending/completed
+   definition-transition paths must be assessed separately from immutable earlier
+   outputs and runtime migration cohorts; no source/runner status was changed here.
+7. Existing admission and Team-definition service tests reference owned Org sources.
+   Future approved implementation must inventory all relevant normal create/update/
+   save/import/export consumers, package fixtures and examples, tests and docs.
+   This read-only source search is an initial impact map, not an exhaustive owned,
+   external or persisted/runtime inventory and not a migration plan.
+
+### Handoff And Work Protection
+
+Requested recipient: Requirements Engineering under the Requirement Gap rule.
+Preserve ref resolution, identities, ownership and flat topology, then return the
+approved cumulative revision for Architecture impact/transition assessment and
+conditional review. The current parent classification is Large/High; no completed
+focused design classification is claimed for this inquiry.
+
+Only this Architecture-owned note changed. Requirements/contract/design/source,
+external configs, runtime files, tests and other owners' dirty reports were not
+edited or staged. Read-only source checks and `git diff --check` are not source,
+API/E2E or Delivery validation. The previous stream-warning defect has its own
+Code Review/Implementation route and is not reclassified by this naming request.
