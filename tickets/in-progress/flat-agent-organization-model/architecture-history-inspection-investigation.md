@@ -255,8 +255,10 @@ inspection → root Stop → post-Stop inspection. Root Stop exists before inspe
 completion; the new Symbol would otherwise still accept the old deduplicated
 physical query. This round records the risk and applies the same invariant to
 that sole activity-bearing inspection reader. No fifth API37 failure or observed
-inspection resurrection is claimed. Member projection content reads, unrelated
-Team paths and hypothetical replica protocols are not swept into this change.
+inspection resurrection is claimed. AD027 excluded member projection content reads;
+AR-FIND-009 subsequently established that exclusion as too narrow for DS037.
+Current AD028 includes the exact staged member reader as detailed below. Unrelated
+Team paths and hypothetical replica protocols remain outside this correction.
 
 ### Bounded Installed-Client Operation Experiment
 
@@ -317,3 +319,90 @@ historical evidence gaps are not upgraded; IR049 cutover remains a separate
 Architecture decision. All incoming 2169 references remain linked, not claimed
 independently re-audited here. Result: Architecture Design Complete; focused
 Medium/High, cumulative Large/High; independent revised-impact review required.
+
+
+## AD-REV-028 — Final Staged Member Projection Is A Required Read Dependency
+
+- Trigger/authority: ARCH-REV-024 Fail / Design Impact, sole finding AR-FIND-009
+  (Medium), AR-PREM-013; review/entry HEAD
+  eeffdd437246f8c4f538752041764b67702872a0. Approved RER033 unchanged; source
+  bbdea002ee59da87cc7174bfc2924888c0bb38f7. Four upstream artifacts rechecked
+  against approved f84c5299f10898f49acff6a0e481d1cd61c769a9 with no diff.
+- Workspace/branch remain the assigned isolated worktree and requirements branch
+  stated above. Entry snapshot covers 31,976 tracked regular files (symlinks are
+  excluded in this round), including 20 other-owner dirty tracked files. No
+  application, tests, requirements, reviewer or API records may be changed here.
+- Earlier AD027 clarification acknowledged this omitted dependency, with no
+  interim edits or implementation routing. Formal ARCH024 now authorizes the
+  bounded architecture revision; original Team comparison and valid DS047 stay.
+
+### Supported Path And Source Recheck
+
+Normal user goal: reopen an already-running offscreen Org, then Stop it while
+initial member hydration is pending to inspect final work. Root inspection has
+completed; its exact member request sampled earlier content and remains in flight.
+Normal already-admitted execution records more output before successful Stop.
+The fresh inactive root inspection stages the same member query. This is a
+supported ordinary lifecycle path, not multi-tab/conflicting-edit behavior.
+
+| Exact current source | Observation and consequence |
+| --- | --- |
+| `autobyteus-web/components/workspace/history/WorkspaceAgentOrgHistoryCollection.vue:36–46` and `composables/useWorkspaceHistorySubjectActions.ts` | Root Stop is exposed by active history independently of completion of initial selected-Agent hydration. Existing exact selection/open and Stop actions are the initiating surfaces. |
+| `autobyteus-web/stores/agentOrgContextsStore.ts:112–136,238–250` | New root inspection Symbol protects its own staging/commit. Stop invalidates the old stage but starts a new one; it does not make that stage's separately issued child query physically new. |
+| `autobyteus-web/services/agentOrgExecution/agentOrgContextHydration.ts:112–129` | Same GetAgentOrgMemberRunProjection document and exact root/address/AgentRun variables, network-only without dedup override. Correct identity does not attest when response content was sampled. |
+| Same file `138–209` | applyProjection builds candidate conversation; captures activity expectedRevision after the child response. isCurrent is tested after children settle. Old stage can correctly fail while the new stage adopts the same old physical body. |
+| `autobyteus-web/stores/agentActivityStore.ts:328–339` | Activity revision comparison protects against local changes after capture. With no such intervening change it may pass an old remote sample; it is not a physical-read or server revision guard. |
+| `autobyteus-web/services/agentOrgExecution/agentOrgExecutionContext.ts:130–146`; context store publish `36–54` | Matched-context adoption replaces old.state, including conversation, after activity commit. Object identity, pending-user-message reconciliation and retained draft/selection do not protect newer server output against an old projection candidate. |
+| `autobyteus-web/graphql/queries/runHistoryQueries.ts:241–258`; server `src/run-history/services/agent-org-member-run-view-projection-service.ts:49–67` | Existing exact retained-content service returns conversation/activities separately from root inspection. No response-origin discriminator or shared atomic root/member snapshot is part of this contract. No server change is selected. |
+
+A first hydration without a previously committed context omits newer final content;
+a renewal with a matched context can replace displayed conversation. Subsequent
+historical open may reuse the stale committed context. These are retained-view
+correctness failures, not durable record loss or proof that the root becomes active.
+API37 remains only the separately observed root-control failure; this is not its
+fifth hosted case. The current investigation did not execute a live reproduction.
+
+### Reviewer Diagnostic Provenance And Limits
+
+Read-only inspection of the reviewer's supplied temporary script/log confirms the
+reported diagnostic shape: AST extraction of unchanged fetchProjection; actual
+GraphQL query; installed Apollo3.14; same-ID network-only reads; synthetic body,
+controlled Link, simplified latest-token publication. One Link publishes pre-Stop
+sampled content; diagnostic scoped query override yields two Links and final
+retained content. It is not actual stage/context/Pinia/browser/backend execution,
+a durable test or an implemented repair. Four cache.diff/canonizeResults library
+diagnostics are in the log and are retained as disclosed diagnostics.
+
+- `/tmp/aorg-arch024-member-read.cjs`, SHA256
+  `5fbb069deee4fd5f3a5f87f07d4b262a05058563d686d369cd22a5d4cd449a6a`.
+- `/tmp/aorg-arch024-member-read.log`, SHA256
+  `2f6df9c0c2e97d48c6d2edb416c5e14d1be3897252eee3c75471920b3e2b24a1`.
+- Durable review description/premise remains design-review-report.md and
+  architecture-review-revision-record.md at eeffdd437246f8c4f538752041764b67702872a0.
+  The temporary files are not claimed as repository acceptance evidence or rerun
+  by Architecture in this revision.
+
+### Completed Resolution
+
+DS037/047 now includes the existing fetchProjection operation for all current
+inspection/stream staging, uniformly using network-only and per-operation
+queryDeduplication false with unchanged query/variables and identity/error checks.
+No new read owner or caller-kind flag. Existing logical cancellation, activity
+conflict and all-candidate publication, failure/draft/selection retention remain.
+Do not clear/reload history repeatedly or merge stale bodies to conceal the gap.
+
+The file map now covers three existing production files; only the hydration
+reader is added to AD027's production scope. DS047-M extends the composite spine;
+VAL079 requires actual-client/staging/store proof after the old root query is
+complete but its child is pending. Old/new child completion orders, final content/
+activities, new child rejection/identity failure, multi-child partial-stage
+failure, no prior context/matched adoption and historical reuse are explicit.
+Live/Team controls and root-status VAL058/076–078 remain required.
+
+No live multi-query snapshot isolation, server/schema change, new epoch/queue/
+cache/protocol, migration or backfill. Persisted data is Not Affected. Added
+independent requests remain within current staging callers/members. Cumulative
+Large/High, focused Medium/High; Architecture Design Complete, re-review pending.
+API37 Fail69.3, FULL cumulative/source/proportional-review gates, all historic
+missing/native/AAV002/003 limits and separate IR049 BEFORE-CUTOVER disposition
+remain unchanged. No implementation, delivery or final acceptance is claimed.

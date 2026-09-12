@@ -34,8 +34,8 @@ does not revise intended behavior.
 | AD-REV-024 | Approved RER-033 and user's explicit first-run migration clarification | PKG-AUTH-002; REQ-037; AC-035/036 | Architecture Revision — Org Local Authoring And Existing Initial Migration Final Output | Architecture Design Complete; focused Medium/High, cumulative Large/High; 63-case self-validation; independent Architecture Review selected |
 | AD-REV-025 | Implementation IR-048 Design Impact and user exact-ID confirmation | IR048-DI-001; original CRR-072/API-FIND-031 retained separately | Architecture Revision — Exact Org Attachment Ownership And Saved Locator Preservation | Architecture Design Complete; focused Medium/High, cumulative Large/High; 69-case design self-validation; independent re-review selected |
 | AD-REV-026 | Code Reviewer CRR-081 / API33 failure-origin return | CR-FIND042 / API-FIND035 | Architecture Revision — Durable Non-Media User Attachment Association | Architecture Design Complete; focused Medium/High, cumulative Large/High; independent revised-impact review selected |
-
 | AD-REV-027 | User-directed original personal/origin-personal comparison via CRR-089 / API37 failure-origin return | CR-FIND046 / API-FIND039; prior CR-FIND045 pending-only symptom separately resolved | Architecture Revision — Root Status Authority And Physical Read Freshness | Architecture Design Complete; incoming Unclear resolved to bounded Design Impact; focused Medium/High, cumulative Large/High; independent revised-impact review selected |
+| AD-REV-028 | Architecture Reviewer ARCH-REV-024 Fail / Design Impact | AR-FIND-009 / AR-PREM-013 | Architecture Revision — Complete Final Inspection Member-Read Freshness | Architecture Design Complete; valid DS047 retained, staged member acquisition/file map/VAL079 completed; focused Medium/High, cumulative Large/High; independent revised-impact re-review selected |
 
 ## Revision Entries
 
@@ -1993,3 +1993,58 @@ does not revise intended behavior.
   review rule; selected recipient `/software_engineering_team/architecture_reviewer`.
   No direct local-fix or Requirements handoff is selected. Message delivery is
   reported only after the corresponding tool confirms success.
+
+
+### AD-REV-028 — Complete Final Inspection Member-Read Freshness
+
+- Trigger: Architecture Reviewer ARCH-REV-024 Fail / Design Impact, sole finding
+  AR-FIND-009 (Medium), premise AR-PREM-013. Report/revision committed at
+  eeffdd437246f8c4f538752041764b67702872a0 reviewing AD027@129c0e3867470e45a54700c6f5c4f7274a91fdba.
+  Approved RER033@f84c5299f10898f49acff6a0e481d1cd61c769a9 unchanged. Source
+  bbdea002ee59da87cc7174bfc2924888c0bb38f7 remains unmodified.
+- Supported journey: user reopens a running offscreen Org, then Stops it during
+  first member hydration to inspect final output. Old root read is already done;
+  exact member sample is delayed while normal admitted execution records output.
+  New inactive root stage could share that same older physical child response.
+- Existing Symbol rejects the old publisher, not an old body received by the new
+  stage. Activity revision is captured after response, and context adoption replaces
+  conversation-bearing state. Neither is a physical freshness boundary. Result is
+  stale retained presentation/omission, not durable loss, root reactivation or a
+  fifth observed API37 failure. Earlier clarification messages made no edits.
+- Design resolution: DS037/047 includes existing fetchProjection with network-only
+  plus per-operation queryDeduplication false, unchanged exact query/variables and
+  validation, uniformly for inspection/stream staging. Retain current generation,
+  activity conflict, complete candidate publication, failure/draft/selection and
+  historical reuse behavior. No global option, new queue/epoch/cache/protocol,
+  server/schema/migration or lifecycle redesign.
+- Valid AD027 one-private-history-reader, independent root inspection, immediate
+  IR058 publication and logical success/error/workspace-family guards remain.
+  Qualify child-read exclusion, map the third existing production file and add
+  DS047-M plus a focused real-client/staging/Pinia composition test location.
+- Affected authority: BEH004/006, REQ016/031, AC011/026, HIST-INSPECT001/002 and
+  DS035/037/047. No Requirement Gap, Product decision or new approval gate.
+- Self-validation: VAL079 added (79 design walkthroughs), VAL058/077/078 linked
+  to child overlap; both completion orders, exact final conversation/activities,
+  new child failure/identity, multi-child atomicity, first/adopted context and
+  subsequent historical reuse specified. Reviewer AST/synthetic diagnostic read
+  and hashed, not rerun or represented as actual staging/browser/backend proof.
+- Scope/classification: Architecture Design Complete; focused Medium/High and
+  cumulative task_size=Large / architectural_risk=High retained. Concurrency and
+  retained-state publication, not probe/evidence volume, justify independent
+  revised-impact Architecture Review. Source and executable recovery still pending.
+- Changed artifacts: canonical design, history investigation, self-validation
+  and this index/body only. AD001–027 revision-entry bytes remain unchanged;
+  no implementation-handoff, source/test/upstream/Reviewer/API/Delivery edits.
+- Limits: API37 Fail69.3 and 2169-reference incoming package remain unchanged.
+  Selected source review, FULL cumulative API/E2E and successful proportional
+  API-test review still required. Preserve all AD027-listed historical missing
+  evidence/native/AAV002/003 limits and three API-owned unstaged test deltas.
+  IR049 actual-installation disposition remains separate before cutover, not a
+  coding hold. No live/provider replay, migration, native-shell/AppImage, release,
+  user verification or Delivery readiness is claimed.
+
+- Routing assessment: fresh get_handoff_rules selected the most-specific resolved
+  Requirement Gap / Design Impact / Unclear → revised Large/High architecture
+  review rule, recipient `/software_engineering_team/architecture_reviewer`.
+  No direct implementation or Requirements route applies; successful message
+  delivery is reported only after tool confirmation.

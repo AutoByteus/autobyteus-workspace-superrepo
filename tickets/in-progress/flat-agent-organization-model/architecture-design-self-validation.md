@@ -3,15 +3,15 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture: `AD-REV-027`, canonical `design-spec.md`
+- Architecture: `AD-REV-028`, canonical `design-spec.md`
 - Approved requirements: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`
-- Prior review: AD-REV-026 / ARCH-REV-023 Pass; current CRR-089 / CR-FIND046
-  on source bbdea002 / artifact d76731ea. API37 remains Fail; no partial advancement.
+- Current trigger: ARCH-REV-024 Fail / AR-FIND-009@eeffdd437; prior AD026 /
+  ARCH023 Pass remains scoped. Source bbdea002 unchanged; API37 remains Fail.
 - Date: 2026-09-12
-- Result: `Design Self-Validation Pass — Root Status Authority And Physical Read Freshness; Independent Review Pending`
-- 78 design walkthroughs; VAL-076–078 added and VAL-058 strengthened. Read-only source
-  comparison, bounded installed-client operation experiment and document checks;
-  no production-source/test change, browser/provider execution or API pass claimed.
+- Result: `Design Self-Validation Pass — Complete Final Inspection Member Reads; Independent Review Pending`
+- 79 design walkthroughs; VAL-079 added and VAL-058/077/078 linked to complete
+  staged-member freshness. Current round: source/probe inspection and document
+  checks only; no diagnostic rerun, source/test edit, browser/provider or API pass.
 - Product: no new gate. Existing approved packages remain normative elsewhere.
 
 ## Purpose And Method
@@ -241,10 +241,10 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-073 | REQ-014–016/034–036; AC-010/029–031/034 | Truthful absent historical associations | DS-046; CF-10 | Pass |
 | VAL-074 | REQ-014–016/034–036; AC-010/029–031/034 | Known-field locator visitor and archive paths | DS-043/046; CF-06/10 | Pass |
 | VAL-075 | REQ-014–016/034–036; AC-010/029–031/034 | Complete attachment lifetime and cross-family gates | DS-044–046; CF-01–10 | Pass |
-
 | VAL-076 | HIST-INSPECT-002; REQ-031; AC-026 | Real-client full/focused history overlap and rejected refresh | DS-037/047 | Pass |
 | VAL-077 | HIST-INSPECT-001/002; observational read contract | Superseded activity-bearing inspection physical overlap | DS-035/037/047 | Pass |
 | VAL-078 | REQ-004/028/031; AC-023/026 | Valid activity/Stop and exact status controls; cumulative hosted gate | DS-035–037/047 | Pass |
+| VAL-079 | REQ-016/031; AC-011/026; AR-PREM-013 | Root-complete/member-pending final retained-content overlap | DS-035/037/047-I/M | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1729,7 +1729,8 @@ package-family rename. It does not infer logical topology from directory depth.
   socket/snapshot/recovery callbacks cannot reopen it. Confirmed activity fact
   invalidates older logical history reads AND DS-047 ensures each new activity-
   bearing history/inspection read originates as an independent physical request.
-  Both full/focused history readers and inspection retain final commit guards.
+  Both full/focused history readers and composite inspection retain final commit
+  guards. AD028 includes each staged member projection (VAL-079), not root reads alone.
   A failed fresh read cannot turn the stopped root green; later genuinely new
   active authority may legitimately change it. Separate mocked client promises
   are insufficient regression proof for installed-client overlap (VAL-076/077).
@@ -2143,6 +2144,9 @@ package-family rename. It does not infer logical topology from directory depth.
 - **Positive:** ordinary duplicate open may reuse the same current inspection
   promise; no new request registry is needed. A valid active inspection on normal
   active open may attach existing ready protocol; it is observational, not Restore.
+- **Composite dependency:** root-read independence does not make its child reads
+  fresh. VAL-079 covers the distinct case where the first root read is already
+  complete and its exact member projection remains pending when Stop succeeds.
 - **Proof:** durable real-client/context-store controlled-Link regression plus
   normal interaction control; mere manual Symbol mutation is not end-to-end proof.
 - **Result:** design walkthrough Pass; no observed inspection failure or fixed
@@ -2168,12 +2172,61 @@ package-family rename. It does not infer logical topology from directory depth.
   root and no synthetic leaf Running from root activity. Standalone Team/Agent
   inspection, runtime status and Stop remain unchanged by the scoped client option.
 - **Recovery gates:** source review must check all actual root-authority query
-  consumers and real client/store composition. API/E2E must renew FULL cumulative
+  consumers AND staged-member dependencies, with real client/store composition.
+  VAL-079 adds final conversation/activities rather than only inactive root controls. API/E2E must renew FULL cumulative
   scope, not just four focused cases; eventual successful API-test-code changes
   receive proportional review. Existing failures/missing evidence/native limits,
   other-owner test deltas, IR049 installation decision and AAV002/003 remain.
 - **Result:** design walkthrough Pass only; API37 remains Fail, not a repaired
   scorecard, user verification, native/runtime or Delivery acceptance.
+
+### VAL-079 — Root Read Completed, Old Member Projection Still Pending
+
+- **Supported basis:** AR-PREM-013 / AR-FIND-009, REQ016/031 and AC011/026.
+  User reopens an already-running offscreen Org to inspect work, then Stops it
+  during initial conversation hydration. Already-admitted execution may record
+  output before completed Stop; no new Send/Restore, second Stop or multi-tab premise.
+- **Production spine:** exact Workspaces open → context readInspection → active
+  root result COMPLETE → actual staging's exact child projection IN FLIGHT →
+  normal retained output advances → Stop succeeds → immediate inactive history →
+  independent inactive root result → new exact child projection → stage/current
+  Symbol/activity-conflict checks → context/activities commit → final stopped view.
+- **Durable harness:** installed Apollo with production default dedup unchanged,
+  controlled Link, actual root/member documents, Pinia context/history/activity
+  stores and actual hydration/adoption/publication. Use valid exact fixtures for
+  direct and mounted Agents; control transport/mutation responses, not application
+  state with a simplified newest-token publisher. AST-only evidence is insufficient.
+- **Precondition oracle:** record that the old root query completed and its member
+  query started before Stop; only the CHILD response remains held. Old/new child
+  query and exact variables match. A genuinely newer fixture body contains distinct
+  well-formed final conversation/activities absent from the pre-Stop sample.
+- **Independent-origin oracle:** new child stage starts a separate Link operation;
+  default baseline characterizes the stale sample before the scoped correction.
+  Test old child released before new, and new child committed before old release.
+  Obsolete stages may finish but cannot publish; final conversation/activities
+  contain the newer response, never a merged/pre-Stop replacement. Root remains
+  inactive throughout; this oracle is not another root-reactivation finding.
+- **Retained-state oracle:** cover first publication with no prior Org context and
+  matched-context adoption with existing draft/selection/content. Selection,
+  expansion and drafts survive. After success, another historical open may take
+  the normal context fast path and still shows final content without a forced
+  repair refresh; no duplicate message/activity insertion or provider call.
+- **Failures/atomicity:** reject or return null/wrong identity from a new child;
+  fail one child after another has staged final data; invalidate generation during
+  staging; exercise existing activity-conflict rejection. No partial candidate or
+  activity replacement escapes the existing publication boundary. Preserve last
+  committed content and confirmed inactive/error truth; old child completion is
+  not a fallback. Pending local user-message reconciliation remains intact.
+- **Shared-reader/control scope:** both inspection and stream hydration use the
+  same independently originating fetchProjection operation; retain ordinary live
+  readiness/status/event behavior, exact scope isolation and standalone Team
+  controls. No new source-kind branch, query variable or global cache policy.
+- **Evidence gate:** durable actual-client/staging tests are implementation work;
+  normal hosted final-output and existing direct/mounted Stop controls belong to
+  executable validation alongside FULL cumulative API scope, not instead of it.
+  Reviewer synthetic diagnostic is not this test or a fifth API37 observation.
+- **Result:** design walkthrough Pass; independent re-review and executable
+  correctness remain pending. No durable data loss or new lifecycle claim.
 
 ## Ownership And Authoritative-Boundary Audit
 
@@ -2496,7 +2549,14 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 
 ## Self-Validation Conclusion
 
-**Current AD-REV-027 conclusion:** 78 design walkthroughs are coherent at the
+**Current AD-REV-028 conclusion:** 79 design walkthroughs cover the complete
+post-Stop read dependency: independently originated root and exact member responses,
+then existing guarded staging/publication. AR-FIND-009's member exclusion and
+file/test gaps are resolved in design, not claimed fixed in source. Original Team
+comparison and valid history/root status decisions remain. Focused Medium/High,
+cumulative Large/High; independent re-review pending, API37 still Fail.
+
+**Prior AD-REV-027 self-assessment (member completeness superseded by AR-FIND-009):** 78 design walkthroughs are coherent at the
 design boundary. The original Team comparison supports retaining root/leaf/aggregate
 separation and immediate publication, not a wholesale status rewrite. DS037/047
 adds the missing physical-response provenance to existing logical guards and
@@ -2755,6 +2815,9 @@ required after that review. Delivery readiness is not claimed.
 
 ## AD-REV-027 Coherence Checks
 
+Historical AD027 checks below are not current evidence of member-read completeness;
+ARCH024 / AR-FIND-009 required the AD028 completion recorded next.
+
 - Verified immutable personal/origin-personal pin and read-only comparison of
   root command/activity, leaf context, descendant aggregate, hydration/stream,
   precedence and navigation publication. Original history reconciliation can
@@ -2763,9 +2826,10 @@ required after that review. Delivery readiness is not claimed.
   DS047 requiring independently originated activity-bearing history/inspection.
   One private history operation removes duplicated options/parser policy; the
   redundant inactive callback refresh is removed without a new owner or scheduler.
-- Three current authority-query invocations are covered at two existing production
-  owners. Status/aggregate helpers, schemas, global client defaults, runtime and
-  migration paths are unchanged. No Requirements/Product gate or new app flag.
+- AD027 covered three root-authority query invocations at two production owners;
+  this omitted the staged-member dependency later required by AR-FIND-009/AD028.
+  Status/aggregate helpers, schemas, global client defaults, runtime and migration
+  paths stay unchanged. No Requirements/Product gate or new app flag.
 - Installed client operation experiment confirms the per-query option only; four
   deprecation diagnostics are disclosed in the investigation. This is not a
   production-source test, hosted rerun or completed implementation.
@@ -2785,3 +2849,37 @@ required after that review. Delivery readiness is not claimed.
   remain +34/0, +16/-1 and +13/-2. No application/test/other-owner tracked bytes
   changed. This is not an untracked-tree or POSIX metadata audit and does not
   replace Reviewer/API integrity receipts. No other owner's files were staged.
+
+
+## AD-REV-028 Coherence Checks
+
+- AR-PREM-013 is a normal offscreen-active reopen/Stop journey. The old root query
+  has finished while its separately sampled member response is still pending;
+  successful Stop precedes the new final stage. No multi-tab or new input premise.
+- DS037/047 now includes that child query in the existing shared hydration owner,
+  uniformly across inspection/stream staging. Exact variables, result validation,
+  generation/activity-conflict and all-candidate commit remain unchanged. No
+  interpretation of local revision or context identity as physical freshness.
+- Three-production-file map and DS047-M complete the read dependency without
+  restarting valid AD027 history/root acquisition and immediate IR058 publication.
+  No new owner/global client option, server protocol, migration or persistence work.
+- VAL079 distinguishes stale final conversation/activities from root activity,
+  requires real client/staging/store composition, both completion orders and
+  negative/atomicity/retained-state controls. Existing 78 walkthroughs and full
+  cumulative downstream gates remain; no code/API/native/Delivery pass is claimed.
+- Reviewer temporary script/log read and hashed, not rerun. Its synthetic content,
+  controlled Link, simplified publisher and four disclosed diagnostics remain
+  limits, not actual staging/Pinia/browser/backend evidence.
+- Final artifact/preservation checks are recorded after execution below.
+
+- Executed AD-REV-028 artifact checks passed: 79 unique detailed VAL headings and
+  matching index rows, one AD028 index/body, and all AD001–027 revision-entry bytes
+  retained unchanged. Four Architecture artifacts have balanced fences/consistent
+  table columns; git diff --check passed. Index table separators were normalized
+  without changing prior revision-entry bodies.
+- Entry-to-final SHA256 check: 31,976 tracked regular files (symlinks excluded),
+  exactly four Architecture changes, 31,972 unchanged, zero missing entry files.
+  All 20 incoming other-owner dirty tracked files remain unchanged, including
+  three API test deltas +34/0, +16/-1, +13/-2. Four Requirements artifacts still
+  match RER033. No source/test/other-owner file was edited or staged. This is not
+  an untracked-tree, symlink or POSIX-metadata audit; existing receipts retain scope.
