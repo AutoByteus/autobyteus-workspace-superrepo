@@ -27,6 +27,7 @@ concise chronological architecture-review history.
 | ARCH-REV-018 | Round 18 / approved `RER-029` field-free Team/Org authoring | `AD-REV-020` | Pass | Pass | `PKG-AUTH-001` resolved; prior findings retained/superseded; no new finding |
 | ARCH-REV-019 | Round 19 / approved `RER-031` compact message/task UI and exact Org heading | `AD-REV-021` | Pass | Pass | `UI-CLEAN-001` resolved; no new finding |
 | ARCH-REV-020 | Round 20 — history inspection, deliberate continuation and retained stop | AD-REV-023; AD-REV-022 copy-only direct | Pass | Pass | HIST-INSPECT-001/002 resolved at design boundary; no new AR-FIND |
+| ARCH-REV-021 | Round 21 — Org-local authoring and first-run final migration output | AD-REV-024; DS-038–040 | Pass | Pass | PKG-AUTH-002 resolved; AR-PREM-008 rejects deployed-intermediate assumption; no new AR-FIND |
 
 ## Revision Entries
 
@@ -534,3 +535,33 @@ None.
 - Material classification changes: Focused Medium/High; cumulative Large/High. No Requirement Gap or new Product gate. Prior source/API/Delivery results retain only their recorded scope.
 - Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
 - Remaining risks: actual no-activation history, strict readiness and exact pending submission, reactive context/debounce preservation, stop/error truth, transport/history generations, send-only versus read-only capability and navigation continuity. Renew source and desktop/narrow/runtime validation after implementation; no execution, release or delivery completion claimed.
+
+
+### ARCH-REV-021 — Org-local authoring and first-run final output pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 21; RER-033 approved PKG-AUTH-002 and user clarified this ticket's migration is not deployed/run in production.
+- Triggering role, report path, and finding IDs: Architecture Designer; `architecture-package-authoring-investigation.md`, AD-REV-024; PKG-AUTH-002. CRR-072/API-FIND-031 is a separate upload Implementation Local Fix.
+- Relevant architecture design revision IDs: `AD-REV-024@b26c90787cf5ded1da6364ca52e7ae1e6b635cba`, DS-038–040 with reconciled DS-032/033; cumulative earlier design outside explicit rollout/output supersession.
+- Requirements authority: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`.
+- Prior authoritative decision: `Pass` (ARCH-REV-020 on AD-REV-023).
+- Current authoritative decision: `Pass`.
+- What changed: Independently traced normal codec/domain/provider/service, exact owned-source discovery, GraphQL/web mapping, existing migration generators/helper/inventory and registry/runner. Authored org_local is distinct from internal ownership and opaque identity; exhaustive existing-enum mapping avoids API aliases. Existing first-run migrations produce final definitions directly; the pure raw candidate changes only approved fields, writes once when needed and requires strict reread/equality before completion. Current configs skip without writes, external content stays read-only and migration-specific failure/warning meanings stay separate. The saved API28 old-scope config was reread and matched its recorded hash; its test provenance cannot establish deployment. No source or executable validation was performed.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| `PKG-AUTH-002` | Approved authored-scope impact awaiting design/review | Resolved at design boundary | RER-033; DS-038–040; VAL-059–063 | Exact normal spelling/API/internal split, one-transform owned preservation, first-run output, status and external boundaries are explicit. |
+| `PKG-AUTH-001` / earlier AD-REV-020 rollout inference | Field-free transition passed with frozen-intermediate premise | Field-free contract retained; premise/output obligation superseded | AD-REV-024; revised DS-032/033 and VAL-047/048; AR-PREM-008 | Explicit first-run user fact rejects new spelling migration and frozen branch output; existing entries update directly, no reset/runtime replay. Earlier review history remains unchanged. |
+| `AR-FIND-001` / `AR-FIND-002` | Resolved definition transition/ownership and handoff order | Retained under current approved vocabulary | REQ-012/026/027/037; DS-039 | External ownership unchanged, raw refs/handoffs/order/defaults preserved except authorized fields. |
+| `AR-FIND-003`–`AR-FIND-007` | Resolved | Remain resolved | Prior review history; DS-040 migration-specific status | No runtime FIFO/fence or browser-history owner change; definition/family FAILED versus summary warning remains explicit. |
+| `AR-FIND-008` / `AAV-001`, UI/Product impacts | Superseded configured-only policy / retained accepted surfaces | Unchanged | Cumulative design, RER-033 scope exclusions | Task communication/retained identity, compact presentation, plural Orgs and override/status behavior unaffected. |
+| `HIST-INSPECT-001/002` / `COMPOSER-001` | AD-REV-023 design passed; separate source obligations | Retained | ARCH-REV-020; DS-035–037 | No restore-on-browse, stop-to-launch or input ownership regression authorized by scope naming. |
+| `CRR-072` / `API-FIND-031` | Separate upload implementation-local assignment | Outside this focused review; no duplicate assignment | code-review-evidence/CRR-072/design-versus-implementation.md | Existing Org upload ownership integration is not an authoring-contract finding or new source pass. |
+| `CR-FIND-019` and other prior source obligations | Separately owned | Retained | Prior source/review records | Not absorbed or claimed resolved by this design result. |
+
+- New or remaining finding IDs: None. AR-PREM-008 records a rejected premise, not a blocking finding.
+- Material classification changes: Focused Medium/High; cumulative Large/High. No Requirement Gap or Product gate. Prior deployment inference withdrawn proportionately under explicit user evidence; approved owned preservation remains independently required.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
+- Remaining risks: authored/internal/API confusion, normal fallback, value normalization, permissive terminal skips, prospective-target/retry coherence, ownership scan and external writes, migration-specific status reduction. Require actual first-run/file/runner/roundtrip and downstream source/API/Delivery validation. Existing evidence is not rewritten or expanded into a current pass.
