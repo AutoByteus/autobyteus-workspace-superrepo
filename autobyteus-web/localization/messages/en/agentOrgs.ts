@@ -54,6 +54,8 @@ const messages = {
   'agentOrgs.experience.form.teamGroup': 'Team · {{name}}',
   'agentOrgs.experience.form.nameRequired': 'Enter an Agent Org name before saving.',
   'agentOrgs.experience.form.handoffsInvalid': 'Resolve the highlighted handoffs before saving this Agent Org.',
+  'agentOrgs.experience.form.referencesLoading': 'Loading referenced definitions…',
+  'agentOrgs.experience.form.referencesUnavailable': 'Referenced definitions are unavailable or do not match this Org: {{refs}}.',
 } satisfies TranslationCatalog;
 
 export default messages;

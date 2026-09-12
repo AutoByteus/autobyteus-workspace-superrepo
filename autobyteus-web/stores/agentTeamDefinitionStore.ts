@@ -11,7 +11,7 @@ import {
 import { useWindowNodeContextStore } from '~/stores/windowNodeContextStore'
 import type { DefaultLaunchConfig } from '~/types/launch/defaultLaunchConfig'
 
-export type AgentTeamDefinitionOwnershipScope = 'SHARED' | 'APPLICATION_OWNED'
+export type AgentTeamDefinitionOwnershipScope = 'SHARED' | 'APPLICATION_OWNED' | 'AGENT_ORG_OWNED'
 export type AgentMemberRefScope = 'SHARED' | 'TEAM_LOCAL' | 'APPLICATION_OWNED' | null
 
 export interface TeamMemberInput {
@@ -34,6 +34,8 @@ export interface AgentTeamDefinition {
   coordinatorMemberName: string
   nodes: TeamMemberInput[]
   ownershipScope?: AgentTeamDefinitionOwnershipScope | null
+  ownerOrgId?: string | null
+  ownerOrgName?: string | null
   ownerTeamId?: string | null
   ownerTeamName?: string | null
   ownerApplicationId?: string | null
@@ -74,7 +76,7 @@ export interface UpdateAgentTeamDefinitionInput {
 const normalizeOwnershipScope = (
   value: AgentTeamDefinitionOwnershipScope | null | undefined,
 ): AgentTeamDefinitionOwnershipScope => (
-  value === 'APPLICATION_OWNED' ? 'APPLICATION_OWNED' : 'SHARED'
+  value === 'APPLICATION_OWNED' || value === 'AGENT_ORG_OWNED' ? value : 'SHARED'
 )
 
 export const useAgentTeamDefinitionStore = defineStore('agentTeamDefinition', () => {

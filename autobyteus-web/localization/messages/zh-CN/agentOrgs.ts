@@ -54,6 +54,8 @@ const messages = {
   'agentOrgs.experience.form.teamGroup': '团队 · {{name}}',
   'agentOrgs.experience.form.nameRequired': '保存前请输入智能体组织名称。',
   'agentOrgs.experience.form.handoffsInvalid': '保存此智能体组织前，请先解决突出显示的交接规则问题。',
+  'agentOrgs.experience.form.referencesLoading': '正在加载引用的定义…',
+  'agentOrgs.experience.form.referencesUnavailable': '引用的定义不可用或与此组织不匹配：{{refs}}。',
 } satisfies TranslationCatalog;
 
 export default messages;

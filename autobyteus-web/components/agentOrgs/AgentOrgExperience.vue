@@ -1,6 +1,8 @@
 <template>
   <div class="h-full overflow-auto bg-slate-50" data-test="agent-org-experience">
-    <div class="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
+    <div :key="`${view}:${selectedOrg.id}`" class="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
+      <p v-if="referencesLoading && view !== 'org-list'" class="mb-4 text-sm text-slate-600" role="status">{{ t('agentOrgs.experience.form.referencesLoading') }}</p>
+      <p v-if="references.unavailable.length" class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">{{ t('agentOrgs.experience.form.referencesUnavailable', { refs: references.unavailable.join(', ') }) }}</p>
       <template v-if="view === 'org-list'">
         <header class="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center">
           <h1 class="sr-only">{{ t('agentOrgs.experience.catalog.title') }}</h1>
@@ -97,7 +99,7 @@
             </div>
           </section>
 
-          <HandoffManager :model-value="detailOrgHandoffs" :from-options="detailOrgHandoffOptions.from" :to-options="detailOrgHandoffOptions.to" mode="view" scope="org" />
+          <div v-show="!referencesLoading"><HandoffManager :model-value="detailOrgHandoffs" :from-options="detailOrgHandoffOptions.from" :to-options="detailOrgHandoffOptions.to" mode="view" scope="org" /></div>
         </div>
       </template>
 
@@ -145,10 +147,10 @@
             </div>
           </section>
 
-          <HandoffManager ref="orgHandoffManager" v-model="formOrgHandoffs" :from-options="formOrgHandoffOptions.from" :to-options="formOrgHandoffOptions.to" mode="edit" scope="org" />
+          <div v-show="!referencesLoading"><HandoffManager ref="orgHandoffManager" v-model="formOrgHandoffs" :from-options="formOrgHandoffOptions.from" :to-options="formOrgHandoffOptions.to" mode="edit" scope="org" /></div>
           <section v-if="saveError" class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700" role="alert">{{ saveError }}</section>
           <section v-if="saved" class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800" role="status">{{ t('agentOrgs.experience.form.saved') }}</section>
-          <div class="flex justify-end gap-3"><button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')">{{ t('agentOrgs.experience.actions.cancel') }}</button><button type="submit" class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">{{ view === 'org-create' ? t('agentOrgs.experience.actions.createOrg') : t('agentOrgs.experience.actions.saveChanges') }}</button></div>
+          <div class="flex justify-end gap-3"><button type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" @click="go('org-list')">{{ t('agentOrgs.experience.actions.cancel') }}</button><button type="submit" :disabled="saving || referencesLoading || references.unavailable.length > 0" class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">{{ view === 'org-create' ? t('agentOrgs.experience.actions.createOrg') : t('agentOrgs.experience.actions.saveChanges') }}</button></div>
         </form>
       </template>
     </div>
@@ -157,13 +159,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRoute, useRouter } from 'vue-router'
 import HandoffManager from '~/components/collaboration/handoffs/HandoffManager.vue'
+import { buildTeamLocalAgentDefinitionId } from '~/utils/teamLocalDefinitionId'
+import { loadAgentOrgAuthoringReferences, type AgentOrgAuthoringReferences } from '~/services/agentOrgDefinition/agentOrgAuthoringReferences'
 import { useLocalization } from '~/composables/useLocalization'
 import { useAgentDefinitionStore, type AgentDefinition } from '~/stores/agentDefinitionStore'
-import { useAgentTeamDefinitionStore, type AgentTeamDefinition } from '~/stores/agentTeamDefinitionStore'
+import { useAgentTeamDefinitionStore } from '~/stores/agentTeamDefinitionStore'
 import {
   useAgentOrgDefinitionStore,
   type AgentOrgDefinition,
@@ -203,6 +207,8 @@ const formName = ref('')
 const formDescription = ref('')
 const formMembers = ref<AgentOrgMember[]>([])
 const formOrgHandoffs = ref<EditableHandoff[]>([])
+const references = ref<AgentOrgAuthoringReferences>({ agents: {}, teams: {}, unavailable: [] })
+const referencesLoading = ref(false)
 
 const emptyOrg: AgentOrgDefinition = {
   id: '', name: '', description: '', instructions: '', revision: '', members: [], handoffs: [],
@@ -213,16 +219,16 @@ const view = computed<OrgView>(() => {
 })
 const selectedOrg = computed(() => orgStore.byId(String(route.query.id || '')) ?? emptyOrg)
 const orgInitials = (name: string): string => name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('') || 'AO'
-const toAgentView = (definition: AgentDefinition | null | undefined, fallbackId: string): AgentView => {
+const toAgentView = (definition: Pick<AgentDefinition, 'id' | 'name' | 'description'> | null | undefined, fallbackId: string): AgentView => {
   const name = definition?.name || fallbackId
   return { id: definition?.id || fallbackId, name, description: definition?.description || '', initials: orgInitials(name) }
 }
-const agentById = (id: string): AgentView => toAgentView(agentStore.getAgentDefinitionById(id), id)
+const agentById = (id: string): AgentView => toAgentView(references.value.agents[id] ?? agentStore.getAgentDefinitionById(id), id)
 const teamById = (id: string): TeamView => {
-  const team = teamStore.getAgentTeamDefinitionById(id)
+  const team = references.value.teams[id] ?? teamStore.getAgentTeamDefinitionById(id)
   if (!team) return { id, name: id, description: '', coordinatorId: '' }
   const coordinator = team.nodes.find((member) => member.memberName === team.coordinatorMemberName)
-  return { id: team.id, name: team.name, description: team.description, coordinatorId: coordinator?.ref || team.coordinatorMemberName }
+  return { id: team.id, name: team.name, description: team.description, coordinatorId: coordinator?.refScope === 'TEAM_LOCAL' ? buildTeamLocalAgentDefinitionId(team.id, coordinator.ref) : coordinator?.ref || team.coordinatorMemberName }
 }
 const memberAriaLabel = (member: CatalogMember): string => member.kind === 'team'
   ? t('agentOrgs.experience.member.teamLabel', { name: teamById(member.ref).name })
@@ -264,7 +270,7 @@ const buildHandoffOptions = (members: readonly AgentOrgMember[]) => {
       const option = { id: member.memberName, kind: 'agent' as const, label: agentById(member.ref).name, address: `/${member.memberName}`, group: t('agentOrgs.experience.form.directAgentsGroup') }
       from.push(option); to.push(option); continue
     }
-    const team = teamStore.getAgentTeamDefinitionById(member.ref)
+    const team = references.value.teams[member.ref] ?? teamStore.getAgentTeamDefinitionById(member.ref)
     if (!team) continue
     const teamAddress = `/${member.memberName}`
     const teamOption = { id: member.memberName, kind: 'team' as const, label: team.name, address: teamAddress, group: t('agentOrgs.experience.form.teamsGroup'), coordinatorAddress: `${teamAddress}/${team.coordinatorMemberName}` }
@@ -288,7 +294,21 @@ const hydrateForm = (): void => {
   formOrgHandoffs.value = view.value === 'org-create' ? [] : toEditableHandoffs(org.handoffs)
   saved.value = false; saveError.value = ''; memberPickerOpen.value = false; memberPickerTab.value = 'agents'; memberSearch.value = ''
 }
-watch([view, () => route.query.id], hydrateForm, { immediate: true })
+watch([view, () => route.query.id, () => selectedOrg.value.id], hydrateForm, { immediate: true })
+const referencedMembers = computed(() => view.value === 'org-list' ? []
+  : view.value === 'org-detail' ? selectedOrg.value.members : formMembers.value)
+watch(() => JSON.stringify([selectedOrg.value.id, selectedOrg.value.revision, referencedMembers.value]), async (_, __, onCleanup) => {
+  let current = true
+  onCleanup(() => { current = false })
+  referencesLoading.value = true
+  references.value = { agents: {}, teams: {}, unavailable: [] }
+  const resolved = await loadAgentOrgAuthoringReferences(selectedOrg.value.id, referencedMembers.value, {
+    agent: agentStore.getAgentDefinitionById, team: teamStore.getAgentTeamDefinitionById,
+  })
+  if (!current) return
+  references.value = resolved
+  referencesLoading.value = false
+}, { immediate: true })
 const go = (nextView: OrgView, id?: string) => router.push({ path: '/agent-orgs', query: { view: nextView, ...(id ? { id } : {}) } })
 const openTeam = (id: string) => router.push({ path: '/agent-teams', query: { view: 'team-detail', id, returnToOrg: selectedOrg.value.id } })
 const openLaunch = (id: string) => router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId: id, mode: 'configuration' } })
@@ -306,7 +326,7 @@ const removeMember = (ref: string, refType: AgentOrgMember['refType']): void => 
 const removeOrgAgent = (id: string) => removeMember(id, 'AGENT')
 const removeOrgTeam = (id: string) => removeMember(id, 'AGENT_TEAM')
 const saveOrg = async (): Promise<void> => {
-  if (saving.value) return
+  if (saving.value || referencesLoading.value || references.value.unavailable.length) return
   if (!formName.value.trim()) { saveError.value = t('agentOrgs.experience.form.nameRequired'); return }
   if (!orgHandoffManager.value?.validateAll()) { saveError.value = t('agentOrgs.experience.form.handoffsInvalid'); return }
   saving.value = true; saved.value = false; saveError.value = ''
@@ -335,6 +355,5 @@ const saveOrg = async (): Promise<void> => {
 }
 onMounted(async () => {
   await Promise.allSettled([orgStore.fetchAll(), agentStore.fetchAllAgentDefinitions(), teamStore.fetchAllAgentTeamDefinitions()])
-  if (view.value !== 'org-create') hydrateForm()
 })
 </script>

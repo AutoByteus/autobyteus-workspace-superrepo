@@ -11,6 +11,7 @@
       </div>
       <div v-else-if="!teamDef" class="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700">
         <h2 class="font-bold">{{ $t('agentTeams.components.agentTeams.AgentTeamDetail.agent_team_not_found') }}</h2>
+        <p v-if="referenceError" class="mt-2 text-sm" role="alert">{{ referenceError }}</p>
       </div>
 
       <div v-else class="space-y-4">
@@ -75,13 +76,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, toRefs } from 'vue'
+import { computed, watch, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import AgentDeleteConfirmDialog from '~/components/agents/AgentDeleteConfirmDialog.vue'
 import ExpandableInstructionCard from '~/components/common/ExpandableInstructionCard.vue'
 import HandoffManager from '~/components/collaboration/handoffs/HandoffManager.vue'
 import { useAgentTeamDefinitionStore, type AgentTeamDefinition } from '~/stores/agentTeamDefinitionStore'
 import { useAgentDefinitionStore } from '~/stores/agentDefinitionStore'
+import { useAgentOrgDefinitionStore } from '~/stores/agentOrgDefinitionStore'
+import { loadAgentOrgAuthoringReferences, type AgentOrgAuthoringReferences } from '~/services/agentOrgDefinition/agentOrgAuthoringReferences'
 import { useRunActions } from '~/composables/useRunActions'
 import { useLocalization } from '~/composables/useLocalization'
 import { buildTeamLocalAgentDefinitionId } from '~/utils/teamLocalDefinitionId'
@@ -96,23 +99,42 @@ const agentStore = useAgentDefinitionStore()
 const { prepareTeamRun } = useRunActions()
 const { t } = useLocalization()
 const loading = ref(false)
+const referenceError = ref('')
 const showDeleteConfirm = ref(false)
-const teamDef = computed(() => teamStore.getAgentTeamDefinitionById(teamDefinitionId.value))
+const orgReferences = ref<AgentOrgAuthoringReferences | null>(null)
+const teamDef = computed(() => returnToOrgId.value
+  ? orgReferences.value?.teams[teamDefinitionId.value] ?? null
+  : teamStore.getAgentTeamDefinitionById(teamDefinitionId.value))
 const isShared = computed(() => (teamDef.value?.ownershipScope ?? 'SHARED') === 'SHARED')
 type TeamNode = AgentTeamDefinition['nodes'][number]
 const agentId = (node: TeamNode): string => node.refScope === 'TEAM_LOCAL' && teamDef.value
   ? buildTeamLocalAgentDefinitionId(teamDef.value.id, node.ref)
   : node.ref
-const agentName = (node: TeamNode): string => agentStore.getAgentDefinitionById(agentId(node))?.name || node.ref
+const agentName = (node: TeamNode): string => (orgReferences.value?.agents[agentId(node)] ?? agentStore.getAgentDefinitionById(agentId(node)))?.name || node.ref
 const initials = (name: string): string => name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('') || 'AT'
 const handoffEndpoints = computed<HandoffEndpointOption[]>(() => (teamDef.value?.nodes ?? []).map((node) => ({ id: node.memberName, kind: 'agent', label: node.memberName, address: `/${node.memberName}`, group: t('handoffs.manager.groups.teamAgents') })))
 const displayHandoffs = computed(() => toEditableHandoffs(teamDef.value?.handoffs))
 
-onMounted(async () => {
-  loading.value = true
-  await Promise.all([teamStore.fetchAllAgentTeamDefinitions(), agentStore.fetchAllAgentDefinitions()])
-  loading.value = false
-})
+watch([teamDefinitionId, returnToOrgId], async ([teamId, orgId], _, onCleanup) => {
+  let current = true
+  onCleanup(() => { current = false })
+  loading.value = true; orgReferences.value = null; referenceError.value = ''
+  try {
+    await Promise.all([teamStore.fetchAllAgentTeamDefinitions(), agentStore.fetchAllAgentDefinitions()])
+    if (orgId) {
+      const orgStore = useAgentOrgDefinitionStore()
+      await orgStore.fetchAll()
+      const member = orgStore.byId(orgId)?.members.find(member => member.refType === 'AGENT_TEAM' && member.ref === teamId)
+      if (!member) return
+      const resolved = await loadAgentOrgAuthoringReferences(orgId, [member], {
+        agent: agentStore.getAgentDefinitionById, team: teamStore.getAgentTeamDefinitionById,
+      })
+      if (current && !resolved.unavailable.length) orgReferences.value = resolved
+    }
+  } catch (error) {
+    if (current) referenceError.value = error instanceof Error ? error.message : String(error)
+  } finally { if (current) loading.value = false }
+}, { immediate: true })
 const runTeam = (): void => { if (teamDef.value) { prepareTeamRun(teamDef.value); void router.push('/workspace') } }
 const viewAgent = (node: TeamNode): void => { if (teamDef.value) emit('navigate', { target: 'agents', view: 'detail', id: agentId(node), returnToTeam: teamDef.value.id }) }
 const deleteTeam = async (): Promise<void> => {
