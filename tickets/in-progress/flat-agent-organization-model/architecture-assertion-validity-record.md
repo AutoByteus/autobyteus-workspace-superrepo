@@ -241,3 +241,86 @@ reporting and cleanup. No API-REV-032 pass or delivery readiness is inferred.
 Current handoff rules contain no matching stage-outcome rule for this bounded
 assertion reply; return it by ordinary message only to the requesting API/E2E
 execution, with no duplicate assignment or additional recipient.
+
+
+## AAV-003 — Retained Uploaded File Label Versus Recorded Storage Basename
+
+- Date: 2026-09-12; package `AORG-FLAT-TEAM-001`.
+- Trigger: API-REV-034 bounded assertion-validity question, not a stage result.
+- Authority: RER-033 / AD-REV-026 / ARCH-REV-023 Pass; IR-055 / CRR-082;
+  inspected HEAD `841508edcb766eaf918ddd9bedf8217ae8ab3d6a` in the canonical
+  `requirements/flat-agent-organization-model` worktree.
+- Basis: established context-file/history parity, DS-044/045, CF-08 and VAL-071.
+- Outcome: **Resolved — existing human-label assertion is valid in this case**.
+  This is not a completed design revision or an implementation assignment.
+
+### Evidence
+
+1. `api-e2e-evidence/API-REV-034/live/CF-task-message_agent.json` records one
+   normal Send, the text attachment's displayName
+   `API34-CF-TASK-MESSAGE_AGENT.txt`, separate storedFilename
+   `ctx_b40cebe41258__API34-CF-TASK-MESSAGE_AGENT.txt`, and original exact Org/
+   AgentRun locator. API's receipt reports original recording/projection and
+   both immediate Opens successful; Architecture did not rerun them.
+2. `live/CF-label-confirmation.json` in the same round records both widths
+   1502/390 with the prefixed text label/aria Open name and unchanged clean image
+   label. Both text Opens return hash
+   `b0d123679b4a6e8fe612777157f34746a3ff99ef410e51e4b3b195da620bc867`;
+   both views retain raw-user-row hash
+   `118c5b50b88a43deb71059b5fe3f20a8a3bbb17a6ae0ced1b06ec920454bba22`.
+   The receipt reports no runtime writes, mutations or page errors. Read-only
+   inspection of `live/screenshots/CF-label-area-390.png` corroborates the
+   visible prefix. These are API-owned observations, not new Architecture
+   browser/execution results or independent Sends at each width.
+3. `autobyteus-server-ts/src/services/agent-streaming/agent-org-stream-handler.ts:123`
+   constructs `new ContextFile(filePath)`. `autobyteus-ts/src/agent/message/context-file.ts:35–38`
+   supplies basename when no fileName is supplied. DS-044 therefore correctly
+   preserves the accepted stored basename in this raw record. It is not proof
+   of corruption or association loss.
+4. `autobyteus-web/services/runHydration/runProjectionConversation.ts:156–158`
+   and `services/eventMonitor/eventMonitorActiveTraceBrowsePresentation.ts:27–31`
+   pass recorded fileName as displayName to shared hydration. In
+   `utils/contextFiles/contextAttachmentModel.ts:64–66,191–204,245–253`, an
+   explicit displayName overrides the established uploaded-name derivation.
+   That derivation removes the upload storage prefix from a recognized uploaded
+   locator's stored filename. It already existed at pre-AD026 source
+   `3d9a019d320878c421429f27c0f074f9a4c4c2f5`. Current media hydration passes
+   no explicit filename; the asymmetry explains the different image label.
+
+### Assertion Disposition And Limits
+
+CF-08's **same file label/type/locator** and DS-045's **familiar label and Open**
+refer to the user-facing attachment label, not mandatory literal rendering of
+raw `file_name`. For this ordinary upload the expected visible text and aria
+name remain `API34-CF-TASK-MESSAGE_AGENT.txt` / `Open API34-CF-TASK-MESSAGE_AGENT.txt`
+after cold return. Treating the new storage prefix as an allowed label would
+weaken that existing assertion. Correct Open bytes do not satisfy label parity.
+
+DS-044's exact accepted-name preservation and DS-045's instruction to carry
+captured type/name through shared hydration are still valid. The stored fact
+and the shared presentation result are different layers. Carrying that fact
+is not authority to bypass familiar uploaded-name presentation or to equate
+all captured basenames with explicit human display names. The design's
+prohibition on filename/directory reconstruction concerns inventing a missing
+attachment association or owner; it does not prohibit the existing display
+formatting of an already-recorded, recognized upload. No URI, owner, file bytes,
+raw fact or historical association needs rewriting to answer this question.
+
+This bounded answer does not prescribe global prefix stripping, discard explicit
+custom labels, or change unrelated workspace/external-locator naming policies.
+Do not weaken exact type/locator/row/Open checks, broaden filename inference,
+repair API fixtures/history, add a new schema/migration/lookup/cache, or resume
+settled tasks. Keep the observed label mismatch separate from the scoped
+success of the prior non-media association correction. API/E2E owns execution
+and reporting; Code Reviewer owns subsequent source failure-origin attribution.
+If correction actually requires a new contract/owner/persistence decision,
+return that demonstrated Design Impact rather than silently expanding scope.
+
+Only this assertion record is changed. Requirements, design/review authority,
+cumulative Large/High, and the implementation/validation route are unchanged.
+No AD-REV-027, fresh architecture pass, source finding/fix assignment, API34
+cumulative Pass or Delivery readiness is created. Existing actual-installation
+cutover and unrelated held validation remain separate. Current handoff rules
+have no matching stage-outcome rule for this assertion-only reply; return one
+ordinary answer to the requesting API/E2E execution, not duplicate specialist
+work or a whole-round Architecture hold.
