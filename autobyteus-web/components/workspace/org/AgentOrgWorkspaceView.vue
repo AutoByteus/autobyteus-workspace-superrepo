@@ -78,9 +78,13 @@ const orgRunId = computed(() => String(route.query.orgRunId || ''))
 const isHistorical = computed(() => route.query.mode === 'history')
 const context = computed(() => active.agentOrgContextFor(orgRunId.value))
 const streamError = computed(() => active.agentOrgErrorFor(orgRunId.value))
-const recoveryNotice = computed(() => streamError.value
-  ? t(isHistorical.value ? 'workspace.agentOrg.inspectionUnavailable' : 'workspace.agentOrg.recovery.exhausted')
-  : null)
+const recoveryNotice = computed(() => {
+  if (!streamError.value) return null
+  // A successful Restore can require recovery before a live snapshot changes the route.
+  // The retained history URL is not evidence that no run was started.
+  const inspectionFailed = isHistorical.value && context.value?.phase !== 'reopen_required'
+  return t(inspectionFailed ? 'workspace.agentOrg.inspectionUnavailable' : 'workspace.agentOrg.recovery.exhausted')
+})
 const target = computed(() => {
   const current = active.activeWorkspaceTarget
   return current && 'root' in current

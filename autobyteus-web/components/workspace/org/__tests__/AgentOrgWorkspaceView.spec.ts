@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { reactive } from 'vue'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { localizationRuntime } from '~/localization/runtime/localizationRuntime'
 import AgentOrgWorkspaceView from '../AgentOrgWorkspaceView.vue'
 
 const state = reactive({
@@ -79,6 +80,7 @@ const mountSubject = () => mount(AgentOrgWorkspaceView, {
 })
 
 describe('AgentOrgWorkspaceView', () => {
+  afterEach(async () => { await localizationRuntime.setPreference('en') })
   beforeEach(() => {
     vi.clearAllMocks()
     state.context = context()
@@ -136,12 +138,13 @@ describe('AgentOrgWorkspaceView', () => {
     expect(state.target).toStrictEqual(mountedTeamTarget)
   })
 
-  it('keeps the committed shared surface visible while bounded recovery remains transport-owned', () => {
+  it.each(['en', 'zh-CN'] as const)('keeps the committed shared surface visible with %s active-route recovery', async (locale) => {
+    await localizationRuntime.setPreference(locale)
     state.context = context('reopen_required')
     state.error = 'Sequence gap'
     const wrapper = mountSubject()
     expect(wrapper.find('[data-test="shared-agent-surface"]').exists()).toBe(true)
-    expect(wrapper.get('[data-test="shared-agent-surface"]').attributes('data-recovery')).toContain('recover automatically')
+    expect(wrapper.get('[data-test="shared-agent-surface"]').attributes('data-recovery')).toBe(localizationRuntime.translate('workspace.agentOrg.recovery.exhausted'))
     expect(wrapper.text()).not.toContain('Reconnect')
   })
 
@@ -153,6 +156,19 @@ describe('AgentOrgWorkspaceView', () => {
     expect(wrapper.get('[role="alert"]').text()).toContain('recover automatically')
     expect(wrapper.text()).not.toContain('Agent Org stream needs to reconnect')
     expect(wrapper.find('button').exists()).toBe(false)
+  })
+
+  it.each(['en', 'zh-CN'] as const)('retains the %s cold inspection failure notice without implying activation', async (locale) => {
+    await localizationRuntime.setPreference(locale)
+    route.query.mode = 'history'
+    state.context = null
+    state.target = null
+    state.error = 'inspection unavailable'
+    const wrapper = mountSubject()
+    expect(wrapper.get('[role="alert"]').text()).toBe(localizationRuntime.translate('workspace.agentOrg.inspectionUnavailable'))
+    expect(wrapper.text()).not.toContain(localizationRuntime.translate('workspace.agentOrg.recovery.exhausted'))
+    expect(push).not.toHaveBeenCalled()
+    wrapper.unmount()
   })
 
   it('starts with the approved nullable-focus prompt instead of inventing a member fallback', () => {
