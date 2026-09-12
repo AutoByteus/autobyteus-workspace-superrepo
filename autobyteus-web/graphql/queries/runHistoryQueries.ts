@@ -143,7 +143,7 @@ const activeTracePageFields = gql`
       visuals {
         ... on EventMonitorUserVisual {
           kind visualId eventId kindOrdinal text
-          attachments { attachmentId mediaType locator }
+          attachments { attachmentId fileType fileName locator }
         }
         ... on EventMonitorAssistantTextVisual { kind visualId eventId kindOrdinal content }
         ... on EventMonitorThinkingVisual { kind visualId eventId kindOrdinal content }

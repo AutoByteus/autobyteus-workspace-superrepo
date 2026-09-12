@@ -1,3 +1,5 @@
+import { RunMemoryFileStore } from "autobyteus-ts/memory/store/run-memory-file-store.js";
+import { parseRawTraceFileAttachments } from "autobyteus-ts/memory/models/raw-trace-attachments.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -16,7 +18,7 @@ const entries = async (directory: string) => fs.readdir(directory, { withFileTyp
   throw error;
 });
 
-/** Only app-owned raw media and formal sidecar reference fields, never prose or provider history. */
+/** Only app-owned raw attachment and formal sidecar fields, never prose or provider history. */
 export async function listContextFileRecordSources(input: {
   rootDirectories: readonly string[];
   agentDirectories: readonly string[];
@@ -34,6 +36,14 @@ export async function listContextFileRecordSources(input: {
       if (entry.isFile() && (entry.name === "raw_traces_active.jsonl" || /^raw_traces_\d{6,}\.jsonl$/.test(entry.name))) {
         sources.push({ kind: "trace", filePath: path.join(directory, entry.name) });
       }
+    }
+  }
+  for (const directory of new Set(input.agentDirectories)) {
+    const store = new RunMemoryFileStore(directory);
+    for (const segment of store.listCompleteRawTraceArchiveSegments()) {
+      const filePath = store.getCompleteRawTraceArchiveSegmentPathByFileName(segment.file_name);
+      if (!filePath) throw new Error(`Missing complete raw trace archive path: ${segment.file_name}`);
+      if (!sources.some((source) => source.filePath === filePath)) sources.push({ kind: "trace", filePath });
     }
   }
   return sources.sort((a, b) => a.filePath.localeCompare(b.filePath));
@@ -59,11 +69,26 @@ export async function transformContextFileRecordLocators(
       const line = lines[i]!;
       if (!line.trim()) continue;
       const row = object(JSON.parse(line), `line ${i / 2 + 1}`);
-      if (row["media"] === undefined || row["media"] === null) continue;
-      const media = object(row["media"], `line ${i / 2 + 1}.media`);
+      const field = `${source.filePath}:line ${i / 2 + 1}`;
       changed = false;
-      for (const key of ["images", "audio", "video"]) {
-        if (media[key] !== undefined) await strings(media, key, `line ${i / 2 + 1}.media.${key}`);
+      if (row["media"] !== undefined && row["media"] !== null) {
+        const media = object(row["media"], `${field}.media`);
+        for (const key of ["images", "audio", "video"]) {
+          if (media[key] !== undefined) await strings(media, key, `${field}.media.${key}`);
+        }
+      }
+      let files;
+      try {
+        files = parseRawTraceFileAttachments(row["file_attachments"], String(row["trace_type"]));
+      } catch (error) {
+        throw new Error(`${field}.file_attachments: ${(error as Error).message}`);
+      }
+      for (const [ordinal, file] of files.entries()) {
+        const next = await transform(file.uri, `${field}.file_attachments[${ordinal}].uri`);
+        if (file.uri !== next) {
+          (row["file_attachments"] as Record<string, unknown>[])[ordinal]!.uri = next;
+          changed = true;
+        }
       }
       if (changed) lines[i] = JSON.stringify(row);
     }

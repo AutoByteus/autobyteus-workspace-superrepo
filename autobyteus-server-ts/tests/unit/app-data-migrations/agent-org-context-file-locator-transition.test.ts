@@ -99,6 +99,52 @@ describe('initial family locator transition: actual files, no user data', () => 
     expect(readiness.listDiagnostics()).toEqual([]); expect(readiness.listAdmitted('agent_org')).toEqual(['org']); expect(readiness.listAdmitted('agent_team')).toEqual(['flat']);
   });
 
+
+  it('transforms file-only user facts in actual complete nested archive paths and preserves current no-op/archive metadata', async () => {
+    const e = await env();
+    const filename = 'ctx_task__notes.txt', uri = old('org', '/direct', filename);
+    await put(path.join(e.source, 'task', 'context_files', filename), 'exact task text');
+    const row = { id: 'file-only', trace_type: 'user', source_event: 'native', turn_id: 't',
+      seq: 2, ts: 123, content: '', file_attachments: [{ uri, file_type: 'text', file_name: 'accepted label.txt' }] };
+    const unchanged = JSON.stringify({ id: 'old-media-only', trace_type: 'user', content: 'no association facts' });
+    const fileName = 'raw_traces_archive/segment-retained.jsonl';
+    const manifest = { schema_version: 1, next_segment_index: 2, segments: [{
+      index: 1, file_name: fileName, boundary_type: 'native_compaction', boundary_key: 'complete-archive',
+      archived_at: 321, first_trace_id: row.id, last_trace_id: row.id, record_count: 2, status: 'complete',
+    }] };
+    await put(path.join(e.source, 'direct', fileName), unchanged + '\r\n' + JSON.stringify(row) + '\r\n');
+    await put(path.join(e.source, 'direct', 'raw_traces_manifest.json'), json(manifest));
+    const writer = new AtomicRunPackageFileCommitWriter(), write = vi.spyOn(writer, 'writeSerializedText');
+    expect((await e.migrate(writer)).status).toBe('SUCCEEDED');
+    const targetFile = path.join(e.target, 'direct', fileName);
+    const expected = { ...row, file_attachments: [{ ...row.file_attachments[0], uri: current('task', filename) }] };
+    const bytes = await fs.readFile(targetFile, 'utf8');
+    expect(bytes).toBe(unchanged + '\r\n' + JSON.stringify(expected) + '\r\n');
+    expect(JSON.parse(await fs.readFile(path.join(e.target, 'direct', 'raw_traces_manifest.json'), 'utf8'))).toEqual(manifest);
+    expect(new RunMemoryFileStore(path.join(e.target, 'direct')).readCompleteRawTraceArchiveSegmentDictsByFileName(fileName))
+      .toEqual([JSON.parse(unchanged), expected]);
+    write.mockClear(); expect((await e.migrate(writer)).status).toBe('SUCCEEDED');
+    expect(write.mock.calls.filter(([input]) => input.file === 'context_file_locators')).toEqual([]);
+    expect(await fs.readFile(targetFile, 'utf8')).toBe(bytes);
+    const readiness = new RootRunPackageReadinessIndex(e.memory); await readiness.rebuild();
+    expect(readiness.listAdmitted('agent_org')).toEqual(['org']);
+    // Required byte loss is diagnosed even when the only reference lives in a complete archive.
+    await fs.unlink(path.join(e.target, 'task', 'context_files', filename));
+    await readiness.rebuild(); expect(readiness.listAdmitted('agent_org')).toEqual([]);
+  });
+
+  it.each(['image', 'retired'])('rejects invalid present file-only %s facts before writing/moving the initial package', async type => {
+    const e = await env();
+    const source = path.join(e.source, 'direct', 'raw_traces_active.jsonl');
+    const text = JSON.stringify({ trace_type: 'user', file_attachments: [{ uri: current('direct'), file_type: type, file_name: null }] });
+    await put(source, text);
+    const writer = new AtomicRunPackageFileCommitWriter(), write = vi.spyOn(writer, 'writeSerializedText');
+    expect((await e.migrate(writer)).status).toBe('FAILED');
+    expect(await fs.readFile(source, 'utf8')).toBe(text);
+    expect(write.mock.calls.filter(([input]) => input.file === 'context_file_locators')).toEqual([]);
+    await expect(fs.stat(e.target)).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it.each(['missing', 'ambiguous'])('fails %s owner proof before any record write, preserves bytes and withholds admission', async (scenario) => {
     const e = await env(), uri = old('org', '/direct'), file = path.join(e.source, 'direct', 'raw_traces_active.jsonl');
     await put(file, trace(uri));

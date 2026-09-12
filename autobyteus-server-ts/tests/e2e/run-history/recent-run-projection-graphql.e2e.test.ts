@@ -62,7 +62,7 @@ const ACTIVE_TRACE_PAGE_FIELDS = `
       __typename
       ... on EventMonitorUserVisual {
         kind visualId eventId kindOrdinal text
-        attachments { attachmentId mediaType locator }
+        attachments { attachmentId fileType fileName locator }
       }
       ... on EventMonitorAssistantTextVisual { kind visualId eventId kindOrdinal content }
       ... on EventMonitorThinkingVisual { kind visualId eventId kindOrdinal content }
@@ -836,7 +836,7 @@ describe("recent run projection GraphQL e2e", () => {
     ]);
     expect(withHugeResult.events[0]?.visuals[0]).toMatchObject({
       kind: "user",
-      attachments: [{ mediaType: "image", locator: "workspace://images/user.png" }],
+      attachments: [{ fileType: "image", locator: "workspace://images/user.png" }],
     });
     expect(withHugeResult.events.at(-1)?.visuals[0]).toMatchObject({
       kind: "tool_card",

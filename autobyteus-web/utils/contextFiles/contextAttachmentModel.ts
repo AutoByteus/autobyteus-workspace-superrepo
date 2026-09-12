@@ -30,6 +30,7 @@ const CONTEXT_ATTACHMENT_TYPE_BY_VALUE: Record<string, ContextAttachmentType> = 
   pptx: 'Pptx',
   python: 'Python',
   text: 'Text',
+  unknown: 'Unknown',
   video: 'Video',
   xlsx: 'Xlsx',
   xml: 'Xml',
@@ -37,7 +38,7 @@ const CONTEXT_ATTACHMENT_TYPE_BY_VALUE: Record<string, ContextAttachmentType> = 
 
 const normalizeExplicitContextAttachmentType = (value?: string | null): ContextAttachmentType | null => {
   const normalized = value?.trim().toLowerCase();
-  if (!normalized || normalized === 'unknown') {
+  if (!normalized) {
     return null;
   }
   return CONTEXT_ATTACHMENT_TYPE_BY_VALUE[normalized] ?? null;
