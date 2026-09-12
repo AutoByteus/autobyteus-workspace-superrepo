@@ -13,3 +13,7 @@ export const buildAgentOrgOwnedDefinitionId = (
   const prefix = kind === "agent" ? "agent-org-owned-agent" : "agent-org-owned-team";
   return `${prefix}:${required(orgDefinitionId, "orgDefinitionId")}:${required(localDefinitionId, "localDefinitionId")}`;
 };
+
+/** Family classification only. Ownership and physical paths still require the exact source index. */
+export const isAgentOrgOwnedAgentDefinitionId = (id: string): boolean =>
+  /^agent-org-owned-agent:[^:/\\]+:[^:/\\]+$/.test(id);
