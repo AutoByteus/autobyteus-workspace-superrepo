@@ -244,10 +244,14 @@ export const hydrateContextAttachment = (input: {
 
   const uploaded = parseUploadedLocator(locator);
   if (uploaded) {
+    // ContextFile defaults its recorded name to the URI basename, not a custom label.
+    const isStoredBasename = input.displayName === uploaded.storedFilename
+      || input.displayName === getLocatorBasename(locator);
     return createUploadedContextAttachment({
       storedFilename: uploaded.storedFilename,
       locator,
-      displayName: input.displayName ?? getDisplayNameFromStoredFilename(uploaded.storedFilename),
+      displayName: isStoredBasename ? getDisplayNameFromStoredFilename(uploaded.storedFilename)
+        : input.displayName ?? getDisplayNameFromStoredFilename(uploaded.storedFilename),
       phase: uploaded.phase,
       type,
     });
