@@ -33,6 +33,7 @@ does not revise intended behavior.
 | AD-REV-023 | User DR-009 restart/stop comparison and explicit design-update instruction | HIST-INSPECT-001/002 | Architecture Revision — Observational History, Deliberate Continuation And Retained Stop | Architecture Design Complete; focused Medium/High, cumulative Large/High; 58-case self-validation; independent Architecture Review selected |
 | AD-REV-024 | Approved RER-033 and user's explicit first-run migration clarification | PKG-AUTH-002; REQ-037; AC-035/036 | Architecture Revision — Org Local Authoring And Existing Initial Migration Final Output | Architecture Design Complete; focused Medium/High, cumulative Large/High; 63-case self-validation; independent Architecture Review selected |
 | AD-REV-025 | Implementation IR-048 Design Impact and user exact-ID confirmation | IR048-DI-001; original CRR-072/API-FIND-031 retained separately | Architecture Revision — Exact Org Attachment Ownership And Saved Locator Preservation | Architecture Design Complete; focused Medium/High, cumulative Large/High; 69-case design self-validation; independent re-review selected |
+| AD-REV-026 | Code Reviewer CRR-081 / API33 failure-origin return | CR-FIND042 / API-FIND035 | Architecture Revision — Durable Non-Media User Attachment Association | Architecture Design Complete; focused Medium/High, cumulative Large/High; independent revised-impact review selected |
 
 ## Revision Entries
 
@@ -1882,3 +1883,48 @@ does not revise intended behavior.
 - Remaining risks/evidence: actual cutover data/deployment prerequisites; real
   file-byte, finalization, retained/cross-view click, async draft and first-rollout
   migration checks. No new source/API/desktop/provider or delivery pass claimed.
+
+### AD-REV-026 — Durable Non-Media User Attachment Association
+
+- Date: 2026-09-12; trigger CRR-081 / CR-FIND042 following API33 API-FIND035.
+- Authority: RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9 unchanged;
+  prior AD-REV-025@b115491c0faa73d1c2b5bfcc88d700c6bff36c0d / ARCH-REV-022 Pass.
+  Inspected source3d9a019d320878c421429f27c0f074f9a4c4c2f5,
+  artifactf8a3f37af0969748f05f0605e5fae1a1cc77f10f; IR001–054 retained.
+- Evidence: actual configured/task chooser/Send/immediate Open followed by cold
+  retained Tasks participant loses text while image and both exact files remain.
+  Two actual raw user rows have media only, confirmed independently read-only.
+  Both recorder and both projection paths were investigated; optimistic display
+  and final GET do not prove the message-to-history association.
+- Missing invariant: CF02 stopped at normalization and CF03 assumed a saved
+  locator; original non-media association had no persisted/reader contract.
+  This bounded seam does not invalidate the entire Org architecture or reopen
+  execution-resolved CR-FIND041, earlier owner/upload or authoring fixes.
+- DS-044: one user RawTraceItem with disjoint existing media and optional typed
+  file_attachments; a reusable reference value/partition, original forwarded
+  external input and typed native provider-copy snapshot through existing ingest.
+  No new ledger, writer, queue, ACK, root schema or provider request field.
+- DS-045: memory normalization/replay, conversation and typed active-trace-page
+  GraphQL/web projections retain type/name/URI and equality/identity; shared
+  UserMessage/Open reused. Native/external and standalone/Org remain root-neutral.
+- DS-046: directly usable optional-fact old records, no inferred historical
+  association backfill; preserve available files and recorded cross-view refs.
+  Existing known-field visitor includes file-only rows and actual archive paths;
+  initial locator transformation is extended in place, with no new migration ID.
+  IR049 actual-installation cutover remains separate from implementation/testing.
+- Affected authority: existing context-file/history parity, REQ-014–016/034–036,
+  AC-010/011/029–031/034; no Requirements or Product decision/artifact change.
+- Classification: focused task_size=Medium / architectural_risk=High due to
+  shared input/trace/read-contract changes; cumulative Large/High. Payload count
+  is not the risk basis. Independent revised-impact Architecture Review selected.
+- Artifacts: design DS-044–046 and cumulative maps; strengthened VAL-066 and new
+  VAL-070–075; context-file investigation evidence; this index/entry. Prior
+  AD-REV-001–025 bodies remain unchanged. No implementation-handoff edit.
+- Result: Architecture Design Complete. Reviewer must check typed snapshot and
+  producer exclusivity, disjoint representation, both read surfaces, strict
+  optional facts and truthful data limits before forwarding to Implementation.
+- Outstanding execution: fresh complete file lifetime and all held API33 groups,
+  pending successful API model-probe proportional review, prior native/provider/
+  DR007/009 and unknown-origin limits, and Delivery verification. Old API33 lost
+  associations are not repaired by this design or claimed as successful tests.
+  No source/test/runtime/migration or delivery pass is claimed by Architecture.

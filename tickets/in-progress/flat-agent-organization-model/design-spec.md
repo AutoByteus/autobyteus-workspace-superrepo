@@ -11,15 +11,24 @@
   supplement `AORG-TEAM-OVERRIDES-001` / `VIS-OVR-001`-`VIS-OVR-006`, which
   supersedes only RV-012 Placement Overrides lines 89-95 and `VIS-015`
 - Architecture result: `Architecture Design Complete`
-- Architecture revision: `AD-REV-025`
-- Architecture review: Pending for AD-REV-025; ARCH-REV-021 Pass covers AD-REV-024. IR-048 is held for this separate exact-attachment Design Impact.
+- Architecture revision: `AD-REV-026`
+- Architecture review: Pending for AD-REV-026; ARCH-REV-022 Pass covers AD-REV-025. CRR-081 / CR-FIND042 requires this bounded recording/projection correction before cumulative progression.
 - Date: 2026-09-12
 - Workspace: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`
 - Branch / approved revision commit: `requirements/flat-agent-organization-model` / `f84c5299f10898f49acff6a0e481d1cd61c769a9`
 
 ## Current-State Read
 
-**Current impact round (AD-REV-025):** IR048-DI-001 exposes address-only Org
+**Current impact round (AD-REV-026):** CRR-081 / CR-FIND042 confirms API33
+loses accepted non-media attachment associations during recording, before cold
+projection. DS-044–046 completes the native/external input → same user trace →
+conversation/page → Open lifetime under unchanged RER-033. Current source
+3d9a019d320878c421429f27c0f074f9a4c4c2f5; artifact
+f8a3f37af0969748f05f0605e5fae1a1cc77f10f. Focused Medium/High, cumulative
+Large/High; independent re-review pending. Known historical missing associations
+are not fabricated. IR049 actual-installation cutover is not a blanket coding hold.
+
+**Prior impact round (AD-REV-025), passed ARCH-REV-022:** IR048-DI-001 exposes address-only Org
 attachment ownership after supported same-address task retention. DS-041–043
 carry exact AgentRun identity through draft/final/read and preserve saved links
 at the existing initial family cutover. Original CRR-072 upload omission remains
@@ -326,6 +335,297 @@ the approved RER-026 boundary, not earlier Team task parity. RER-028 now
 expressly supersedes it; AD-REV-019 removes that gate and restores supported
 all-participant presentation, exact Tasks relevance and retained task inspection.
 
+## AD-REV-026 — Durable Non-Media User Attachments (DS-044–046)
+
+### Trigger, Approved Scope And Design Health
+
+CRR-081 / CR-FIND042 promotes API-FIND035 after a supported chooser → one Send
+→ provider reply → Accepted task or normal Stop → cold exact Tasks participant
+journey. Source `3d9a019d320878c421429f27c0f074f9a4c4c2f5`, inspected artifact
+`f8a3f37af0969748f05f0605e5fae1a1cc77f10f`. The text and image both open immediately;
+after hydration the image remains but the text label/Open disappears. Actual
+files and final GET bytes remain correct. Two real user trace records and both
+initial/retained projections contain image/audio/video only. This is a missing
+message-association invariant, not wrong ownership, deletion, failed task
+settlement or a provider stall. Architecture independently read those two
+records; evidence details are in the context-file investigation supplement.
+
+Behavior basis: existing shared context-file/conversation continuity under
+REQ-014–016/034–036, AC-010/011/029–031/034 and DS-042/VAL-066. No new intended
+behavior or Product gate is required. RER-033, exact root/AgentRun file locators,
+org_local authoring, first-rollout migration policy and compact UI remain intact.
+CR-FIND041's execution-resolved status correction is not reopened. AAV-002 is
+still only a bounded package-roundtrip clarification.
+
+Change posture: Bug Fix; root cause: Missing Invariant / Shared Structure
+Looseness. Refactor needed now, narrowly: remove the assumption that a user
+attachment is necessarily image/audio/video from recording and projection.
+Keep media semantics, native/external recorder ownership and physical file
+ownership separate. No replacement conversation store, attachment ledger,
+provider-history scraper, queue, retry system or root lifecycle is justified.
+The existing input/recording/history capability absorbs this extension.
+
+Focused task_size=Medium / architectural_risk=High: bounded existing input,
+shared trace, projection and renderer files, but a durable representation and
+read-API contract change. Cumulative task_size=Large / architectural_risk=High.
+File/fixture volume is not the classification basis. Independent revised-impact
+Architecture Review precedes implementation; current API33 remains Fail and
+all outstanding cumulative validation/proportional-review limits remain.
+
+### Supported Behavior And Spine Inventory
+
+| Spine | Kind / supported trigger | Main line through governing owners to meaningful outcome | Invariant |
+| --- | --- | --- | --- |
+| CF-07 | Primary / user chooses files and Sends to an exact active configured/task Agent, direct or Team-hosted | Shared composer/submission → existing finalization → AgentRun admission/provider dispatch → original forwarded-message observer OR native input/MemoryManager → one user raw trace in exact Agent memory directory → cold projection and file click | The recorded user row owns the association; URI still names original file owner |
+| CF-08 | Primary return / cold selection, deliberate Restore, retained Tasks participant, or supported active-trace browsing | Existing inspection/history service → exact stored memory source → normal raw normalizer/replay → conversation or active-trace-page projection → shared attachment hydration/UserMessage → existing authorized file read/Open | Same file label/type/locator survives without activation or provider fallback |
+| CF-09 | Bounded local / normal provider adaptation and recording | Capture accepted ContextFile reference values → provider-local copy or native input clone → disjoint media/file partition → one existing writer append | Provider path and recorded locator have distinct meanings; no competing writer |
+| CF-10 | Operational / normal rotation, restart, and existing initial cutover | Existing raw store/archive → typed record read/write preserving optional attachment facts → existing locator visitor/readiness or pending family transformation → strict reread | Preserve recorded associations; never synthesize associations absent from history |
+
+Unrelated stream retry/corruption, guessed file-directory reconstruction, new
+Org-only package eligibility and a new rollout for IR049's sampled installation
+are not initiating scenarios for this revision. IR049's positive cutover finding
+remains installation-specific, not a whole-code or disposable-test hold.
+
+### DS-044 — One User Trace With Disjoint Media And File References
+
+**Representation.** Extend the existing versionless RawTraceItem, not its file
+family or a second record. Retain `media.images/audio/video` exactly as media
+URI arrays. Add optional `file_attachments` for **non-media** ContextFiles on
+`trace_type: user` only. Internal TypeScript property is `fileAttachments`.
+Each element preserves `{uri, file_type, file_name}` from accepted input;
+`file_type` is an existing ContextFileType other than image/audio/video,
+including unknown, and `file_name` is the accepted nullable string. URI is
+non-empty and preserved byte-for-byte. No MIME guess, binary data, arbitrary
+metadata, file content, provider path or repeated root/Agent ID is needed in
+this value. Exact file ownership remains in the URI; exact message ownership
+remains the trace's existing run directory/id/turn/seq.
+
+```json
+{
+  "trace_type": "user",
+  "content": "Please review these files.",
+  "media": {"images": ["/rest/agent-org-runs/org-1/agent-runs/agent-9/context-files/ctx_i__diagram.png"]},
+  "file_attachments": [
+    {"uri": "/rest/agent-org-runs/org-1/agent-runs/agent-9/context-files/ctx_t__notes.txt", "file_type": "text", "file_name": "notes.txt"}
+  ]
+}
+```
+
+This is an attachment excerpt, not a replacement for required raw trace IDs,
+turn, time, seq or source_event. Media and non-media are non-overlapping facts,
+not legacy/current alternatives. Each accepted input item goes to exactly one
+partition, preserving order within that partition and never collapsing distinct
+locators by name/content. Existing media grouping remains; the file group keeps
+its input order. This revision does not promise a new cross-media ordering UI.
+Empty/no non-media associations serialize without the field. Absence/null/empty
+means no recorded non-media association, **not proof none was originally sent**.
+Readers use the same version-agnostic optional-fact contract for old and new
+rows. Present malformed entries or a media type in file_attachments are diagnosed
+through the existing owning read/write error boundary, not silently dropped or
+converted from filenames. Non-user raw entries do not acquire file attachments.
+
+**Reusable value.** Add `agent/message/context-file-reference.ts` in the core
+library: immutable `ContextFileReference {uri, fileType, fileName}`, capture from
+ContextFile, and explicit snake-case serialization/validation. It is a small
+value, not a locator resolver or store. The memory-owned
+`memory/models/raw-trace-attachments.ts` partitions references into existing
+RawTraceMedia and validated non-media `fileAttachments`; both recorder paths
+reuse it. RawTraceItem owns roundtrip serialization. Do not persist a parallel
+all-attachments copy beside the media/file partitions.
+
+**External runtime producer.** AgentRun's existing forwarded fact and original
+message remain authoritative. `RuntimeMemoryEventAccumulator` captures/partitions
+that message's ContextFiles and gives both partitions to
+ExternalRuntimeMemoryWriter in the same user append. Split the user input arm
+from assistant/reasoning in RuntimeMemoryTraceInput so non-user records cannot
+accidentally receive this field. Retain turn/correlation/time and existing
+acceptance, observer dispatch, recorder FIFO, shutdown drain and error behavior.
+No record at upload, reservation or rejected/non-forwarded send; no second row
+on provider completion, focus, restore or click. A provider reply/immediate
+optimistic display is not proof that this append preserved all fields. Retain
+current recording failure diagnostics; no new ACK durability or crash guarantee
+is introduced by this representation change.
+
+**Native producer is not an unexamined exception.** The native MemoryIngestInputProcessor
+also reduces input to LLMUserMessage today; that has no non-media file field.
+Moreover the server normalizes ContextFile.uri before native backend dispatch.
+Use a typed **in-process recording snapshot**, not a provider-path guess:
+
+- Add `recordingFileAttachments: readonly ContextFileReference[] | null` to
+  AgentInputUserMessage (default null; optional final constructor argument).
+  The normalizer sets it on the provider-facing copy from the non-media
+  partition of the original input's ContextFiles **before** path replacement. It ignores any caller-supplied
+  recording snapshot at this authoritative server adaptation boundary. The
+  original forwarded message stays untouched and external recording uses that
+  original, not the provider copy.
+- Preserve the typed snapshot through AgentInputUserMessage.toDict/fromDict
+  under `recording_file_attachments`, because the core input pipeline clones through
+  those methods. This is an internal value carried by the clone, not a new
+  REST/GraphQL input, persisted sidecar, provider API field, or metadata cache.
+  Do not encode this contract inside an untyped metadata key. Native direct
+  core inputs without a server adaptation snapshot capture the triggering
+  event's original non-media ContextFiles, not the processed LLM body or
+  mutated processor output. Null here means no adaptation was performed, not a historical version.
+- MemoryIngestInputProcessor uses the triggering event's recording snapshot (or
+  its unadapted original input references) and passes it explicitly to
+  MemoryManager.ingestUserMessage alongside the existing processed LLM message.
+  The MemoryManager validates the non-media references and appends one raw user
+  row alongside its existing processed LLM media. Native media arrays continue
+  to come from LLMUserMessage exactly as before; do not change their values or
+  working-context media/provenance semantics as a side effect of this non-media
+  correction. Existing processed text and TOOL-continuation exclusion remain.
+  Internal no-context callers pass an empty reference collection. Update all
+  callers/tests coherently; do not add a server-side second native recorder.
+- Provider consumers still receive their normalized ContextFiles and existing
+  LLM content/media. They do not serialize the recording snapshot into provider
+  requests. This snapshot separates two real meanings (recorded user locator
+  versus provider-local input); it is not a second durable attachment authority.
+
+The shared native and external paths serve standalone Agents/Teams as well as
+Org configured/task executions. Keep them root-neutral; no Org conditional in
+raw trace serialization. Regression tests must cover those existing consumers;
+no standalone owner/URL redesign is included.
+
+### DS-045 — Complete Cold Projection And Existing Open Experience
+
+AgentMemory's raw normalizer/domain carries typed fileAttachments from the
+single trace. HistoricalReplayMessageEvent carries it only for user messages;
+RunProjectionConversationEntry exposes optional `fileAttachments` with camel-case
+reference keys `{uri,fileType,fileName}` beside unchanged media. Both the initial
+and cold GraphQL conversation JSON use this same projection. The typed Memory
+view also exposes the nullable collection through its existing GraphQL object.
+No new query, provider-history source or server attachment lookup occurs during
+projection. Existing exact memory-source location, recent window, pagination,
+revision/cache invalidation and status/read_only rules remain authoritative.
+
+The second read surface must not remain media-only: replace the user
+`EventMonitorActiveTraceAttachment.mediaType` field with `fileType` using the
+existing ContextFileType vocabulary and nullable `fileName`. Keep attachmentId
+and locator. Update the typed GraphQL object, page projection, web query/DTO and
+browse presentation together; retain no attachment-field alias. **Media visuals**
+(assistant media segments) retain mediaType unchanged. User media and file
+attachments use the same existing UserMessage controls; no new card/tab.
+Use stable eventId + partition + ordinal for attachment IDs; retain existing
+media IDs and add a distinct file partition. The same shared hydration maps
+file type/displayName and passes the original URI to existing Open. Identity is
+never reconstructed from selected participant or visible title.
+
+Include fileAttachments in existing browser projectionEntryKey/merge so identical
+text/time with different files cannot collapse or lose the collection. Where a
+raw record already has an ID, preserve the replay ID. Extend the existing
+no-ID content fingerprint with a file-reference contribution only when present,
+leaving previous empty-file fingerprints unchanged. No global deduplication,
+new sequence, or persisted replay ID. Recent-presentation witnesses must include
+the resulting attachment facts; existing active-trace IDs/cursors/window semantics
+remain. Do not merge a media-only provider row into a falsely complete message.
+
+`buildConversationFromProjection` and active-trace browse presentation both call
+hydrateContextAttachment for file references using captured type/name and the
+original locator. Keep existing media handling and image decode/open. Do not
+parse prose, resolve filesystem names, fetch attachments just to build a history
+row, replace cold history with an optimistic cache, or attach files from adjacent
+messages/tasks. The user sees the familiar label and Open action, including at
+390px and on retained Offline/read_only task participants. Viewing/opening never
+activates a run or adds a composer to a settled task.
+
+### DS-046 — Existing Data, Rotation And Initial Locator Cutover
+
+| Data cohort | Disposition | Required preservation / limitation |
+| --- | --- | --- |
+| Existing valid user traces with media only or no attachments | Directly Usable — No Migration | Same current optional-fact reader; preserve every existing content/ID/media fact and bytes; no rewrite to add empty fields |
+| API33's two user rows missing the sent text association | No recoverable association in these authoritative rows; preserve source, no inferred backfill | Files and known cross-view refs remain readable. Captured API Send evidence proves the defect but is not application migration input. Do not claim these old conversations repaired |
+| New user rows with non-media associations | Current writes/reads in existing raw files | Same-row atomic append through existing writer, exact fromDict/toDict and normalizer; no new record file, ledger, schemaVersion or migration ID |
+| Existing final attachment bytes, Org/Team trees, task/communication sidecars, provider history and working-context snapshots | Not Affected by representation extension | No file relocation/deletion, root version, task state, provider-history rewrite or native working-context snapshot version change |
+| Normal raw-trace archive/rotation | Directly Usable with extended RawTraceItem roundtrip | Preserve field through current active/archive movement and compaction; no new retention policy or manifest/version change |
+| Proven structured locators subject to DS-043's initial family conversion | Existing transition, extended known field visitor | Visit file_attachments[].uri as well as media and formal sidecar refs; transform only proven locator values under the existing owner-correlation plan |
+
+No old authoritative text association is discovered by the read-only evidence.
+It is incorrect to say a migration can recover a field the recorder never saved.
+Document this historical evidence limit in implementation/validation/delivery;
+retain all available bytes, do not mark legacy loss as a successful retained-click
+test. If an independently authoritative association source or a requirement to
+recover those specific lost links is later established, return that evidence
+before designing a separate recovery. No user-data scan/reset/replay is required
+to implement or validate this forward recording correction on disposable data.
+
+Extend `context-file-record-locators.ts`'s explicit visitor with the validated
+user file_attachments[].uri path; it must not skip file-only rows just because
+media is absent. The visitor serves existing read-only readiness and the
+migration-only transformation, not a normal URI rewriter. Reuse the actual raw
+store/archive manifest paths to enumerate complete archived segments as well as
+active files (not only root-level raw_traces_N names); preserve existing archive
+membership/status/IDs/counts/times. In the initial family transition, only URI
+values may change; record metadata/name/type/other JSON keys and unaffected
+lines/terminators stay intact, with existing atomic file commit/strict reread.
+Current exact URIs are zero-write. Absent fields create no fabricated data;
+invalid present fields use bounded source/field diagnostics. DS-043's completed
+family-record/old-locator installation return condition remains separate; do not
+reset/replay or introduce another migration ID to bypass it.
+
+### File Responsibilities, Dependency Direction And Removal
+
+All server paths below are under `autobyteus-server-ts/src/` unless prefixed.
+
+| File / capability owner | Target responsibility / permitted dependency | Removal or forbidden bypass |
+| --- | --- | --- |
+| `autobyteus-ts/src/agent/message/context-file-reference.ts` (new) | Small immutable reference value and exact codec/capture from ContextFile | No filesystem, root identity lookup, arbitrary metadata or state |
+| `autobyteus-ts/src/agent/message/agent-input-user-message.ts` | Carry typed provider-copy recording snapshot through clone serialization | No public transport/metadata alias or durable parallel snapshot |
+| `agent-execution/input/agent-run-provider-input-normalizer.ts` | Capture original non-media refs then independently resolve provider-copy paths | Never derive history from the normalized physical path |
+| `autobyteus-ts/src/memory/models/raw-trace-attachments.ts` (new), `raw-trace-item.ts` | One shared partition/validation and same-row file_attachments roundtrip | Media-only user record assumption removed; no duplicate all-files field |
+| `autobyteus-ts/src/agent/input-processor/memory-ingest-input-processor.ts`, `memory/memory-manager.ts` | Native recording passes canonical original refs through existing ingest boundary | No new server native observer/writer or LLM field stuffing |
+| `agent-memory/services/runtime-memory-event-payload.ts`, `runtime-memory-event-accumulator.ts` | External original-message capture and shared partition, one forwarded user append | Replace media-only extraction call; no focus or provider-output reconstruction |
+| `agent-memory/domain/memory-recording-models.ts`, `store/external-runtime-memory-writer.ts` | User-only typed input and complete single RawTraceItem construction | No sidecar, additional queue or changed acceptance fact |
+| `agent-memory/domain/models.ts`, `services/raw-trace-record-normalizer.ts` | Typed read of stored optional non-media facts through shared codec | No guessing missing fields or silently dropping invalid present entries |
+| `run-history/projection/historical-replay-event-types.ts`, both raw-to-replay and replay-to-conversation transformers, `run-projection-types.ts` | Preserve association through existing read spine | No provider replay or second history source |
+| `run-history/projection/historical-replay-event-identity.ts` | Preserve ID-led replay; extend existing no-ID fingerprint for present file facts | No old-row ID rewrite or file-name identity |
+| `api/graphql/types/memory-view.ts` | Expose typed nullable file reference facts in existing read object | No query/command/lifecycle change |
+| `run-history/projection/event-monitor-active-trace-page-types.ts`, `event-monitor-active-trace-page-projection.ts`, `api/graphql/types/event-monitor-active-trace-page.ts` | General fileType/fileName in existing user attachment object and stable derived attachment IDs | Remove user-attachment mediaType; keep actual media visuals unchanged |
+| `autobyteus-web/services/runHydration/runProjectionConversation.ts` | Hydrate media plus file facts; preserve collection in equality/merge | Remove media-only user hydration; no viewer-based rebind |
+| `autobyteus-web/services/eventMonitor/eventMonitorActiveTracePageService.ts`, `eventMonitorActiveTraceBrowsePresentation.ts`, `graphql/queries/runHistoryQueries.ts` | Synchronized page DTO/query/file type mapping into shared UserMessage | No stale three-media-only attachment branch |
+| `autobyteus-web/utils/contextFiles/contextAttachmentModel.ts`, `components/conversation/UserMessage.vue` | Existing shared type/name/locator hydration and Open/preview remain final consumer | Reuse, do not fork Org/task renderer or broaden URL permissions |
+| `context-files/services/context-file-record-locators.ts`, existing family transition and readiness consumers | Recognize explicit stored user file refs, including current complete archive paths; validate/transform URI only | No prose, directory-based association, general repair or normal migration call |
+| Existing raw store/archive, local projection provider and recent witness | Preserve extended values under existing lifecycle; focused tests where no source changes are needed | No new cache/rotation owner or history-source fallback |
+
+Native/core code must not import server ContextFile services. Server adapters
+supply values; core memory owns serialization; read projections depend on the
+memory read boundary, never both it and an independently scanned attachment
+directory. Web depends on projection and shared file-resource actions, not raw
+files or runtime managers. Add no empty facade: two small value/partition files
+are semantically owned, with all state remaining in existing owners.
+
+### Implementation Sequence, Validation And Residual Risks
+
+1. Implement the reference codec/partition and RawTraceItem roundtrip first;
+   verify missing/empty/current/invalid payload behavior and old-media stability.
+2. Wire external and native producers, capturing before provider mutation,
+   preserving native TOOL exclusions and all command/recording lifecycle rules.
+3. Extend memory normalization, replay/conversation and typed page/GraphQL/web
+   consumers together; remove obsolete media-only user assumptions/field aliases.
+4. Extend the explicit locator visitor/readiness/initial transformation for
+   non-media fields and real archive layout. Do not execute it on actual user
+   roots during implementation. Test old-current zero writes and supported
+   pending first-rollout transforms separately from IR049 installation readiness.
+5. Prove complete lifetimes with real file storage and normal HTTP/GraphQL:
+   new Send → recorded user row → cold read → actual label/Open → original bytes.
+   Cover text+image and representative other non-media types, no-context/media-only
+   controls, configured/task direct/Team-hosted, Accepted/Interrupted, and native
+   plus external producers. Include active-trace page/rotation/restart, exact
+   same-address/different-AgentRun isolation and cross-view file-owner continuity.
+6. Then selected independent source review and renewed cumulative API/E2E;
+   successful API test-code review remains pending, followed by Delivery-owned
+   docs/build/user verification. No prior partial result is promoted.
+
+VAL-070–075 below bound those checks; VAL-066 is strengthened from a saved-file
+assumption to recorded-message lifetime evidence. Risks: clone drops canonical
+snapshot; one producer remains media-only; malformed file type silently omitted;
+page DTO diverges from conversation JSON; dedup collapses same-text/different-file
+rows; archive rewrite drops associations; normal read repairs old locators; tests
+mistake GET200/optimistic state for durable association. Historical lost metadata
+is a disclosed evidence limit, not fixed by this design. All prior API33 held
+readiness/restart/Restore/compaction/reconnect/Stop/finalUI work and proportional
+review remain required; no executable or delivery pass is claimed here.
+
+
 ## AD-REV-025 — Exact Org Attachment Ownership And Saved Locators (DS-041–043)
 
 ### Authority, evidence and design-health assessment
@@ -370,7 +670,7 @@ placement/navigation value, not an execution discriminator.
 | Spine ID | Kind / governing owner | Start → main-line nodes → end | Purpose |
 | --- | --- | --- | --- |
 | CF-01 | Primary / ContextFileUploadService | File chooser → captured composer target → upload store/API → upload service/owner validation → exact draft layout → returned attachment | Preparation and preview without runtime start |
-| CF-02 | Primary / Org submission + ContextFileFinalizationService at their respective boundaries | Send → exact submission/continuation owner → finalize API/service → owner resolver/location → physical move → current locator → SEND_MESSAGE/provider path normalization | No ownership loss across asynchronous finalization |
+| CF-02 | Primary / Org submission + ContextFileFinalizationService at their respective boundaries | Send → exact submission/continuation owner → finalize API/service → owner resolver/location → physical move → current locator → SEND_MESSAGE/provider path normalization → original-reference recording under CF-07/09 | No ownership loss across finalization or durable message association |
 | CF-03 | Primary / ContextFileReadService | Saved attachment click → authorized resource request → read API/service → owner resolver/strict location → physical file → image/text/download surface | Retained exact read independent of current focus/status |
 | CF-04 | Return / captured composer and submission owners | Upload/finalize result → captured target/key → existing attachment hydration/submission reconciliation → correct draft/conversation | No new pending-owner cache; preserve later edits and switched focus |
 | CF-05 | Bounded local / finalization service | Validate owner pair → validate descriptor list → per-file draft/final existence and existing move semantics → current locators → prune consumed draft dirs | Retain existing partial-batch retry/idempotence, not a transaction/queue redesign |
@@ -455,7 +755,10 @@ and context replacement fixes from CRR-068/IR-048.
 Server current locator builders, REST registration and local-path normalization
 must agree with frontend builders/recognizers. Provider input normalization must
 resolve a current final Org locator to the exact physical file, preserving the
-original accepted attachment URI for normal history recording. No local-path
+original accepted attachment URI for normal history recording. DS-044–046
+completes that producer/representation/projection contract for non-media files
+as well as media; same-row association must exist before claiming a retained
+click is covered. No local-path
 resolver fallback may select another execution. Read/open uses the locator owner
 when the viewer is a different sender, receiver or task participant.
 
@@ -531,7 +834,8 @@ registered migration, runtime adapter or generic URI-repair service:
    fields. Keep temporary generated evidence/test fixtures separate. Build one
    ephemeral old-owner→exact-target plan from strict trees, never live focus.
    Include retained tasks. Read archived and active raw-trace files; current
-   record readers project their `media.images/audio/video` unchanged. Inspect
+   record readers preserve `media.images/audio/video` and DS-044 user
+   `file_attachments[].uri` facts. Inspect
    communication `referenceFiles`, task `referenceFiles` and submission/review
    `updates[].referenceFiles` as separate known typed fields. No rewrite of prose,
    instructions, tool payload text, provider-owned history or arbitrary workspace
@@ -1132,6 +1436,8 @@ schemaVersion removal, task presentation, full-scope activation and shutdown
 mechanisms remain unchanged. This is a completed design, not an executable pass.
 
 ## Task Size And Architectural Risk (Mandatory)
+
+Current AD-REV-026: focused Medium/High; cumulative Large/High. DS-044–046 changes shared input/reference values, durable user-record facts and read projections, not merely UI payload. Independent revised-impact review is selected.
 
 ### Current AD-REV-025 Result — Exact Attachment Ownership / Saved References
 
@@ -3992,7 +4298,9 @@ nonmatching entries but cannot change the relative order of matches.
 Current exact-attachment evidence map:
 `architecture-context-file-ownership-investigation.md` (IR048-DI-001, pinned
 original Team comparison, actual structured saved-URI samples and limits).
-Canonical design DS-041–043 owns decisions; no upstream investigation edit.
+Canonical design DS-041–046 owns attachment decisions; the investigation
+supplement now includes CRR-081/API33 retained-record evidence and both recorder
+paths. No upstream investigation edit.
 
 | Artifact Path | Purpose | Related Requirement / Acceptance-Criteria IDs | Relationship To This Design | Status / Approval Applicability |
 | --- | --- | --- | --- | --- |
@@ -4045,7 +4353,11 @@ orchestration.
 
 ## Task Design Health Assessment (Mandatory)
 
-Current AD-REV-025: exact attachment identity/locator gap; bounded refactor now
+Current AD-REV-026: CR-FIND042 is a missing non-media recording/projection
+invariant; DS-044–046 extends existing shared input/memory/history value owners
+with no new lifecycle or ledger. Historical missing links are not reconstructed.
+
+Prior AD-REV-025: exact attachment identity/locator gap; bounded refactor now
 inside existing Context Files/active-target/location owners (DS-041/042). Saved
 link transformation belongs in the existing initial family migration (DS-043),
 not a current runtime fallback.
@@ -4393,6 +4705,10 @@ existing owners. Refactor now as DS-031–033; no runtime redesign.
   a hidden Org ledger, browser event synthesis, or Team-root fallback.
 
 ## Persisted Data / State Transition Decision (Mandatory When Persisted Data May Be Affected)
+
+AD-REV-026 / DS-046: versionless optional non-media facts preserve existing
+readable history without rewriting or inventing missing associations. Existing
+locator transition/readiness extends its explicit visitor only; no new migration.
 
 AD-REV-025 / DS-043 governs attachment bytes, draft scope and structured locator
 values separately from definition authoring. Saved Team-to-Org attachment links
@@ -4758,6 +5074,9 @@ fixtures, live-user-data tests, or infrastructure-corruption scenarios.
 
 ## Data-Flow Spine Inventory
 
+AD-REV-026 adds CF-07–10 in DS-044–046: accepted original input through both
+recorders, durable association, both projection surfaces and actual file Open.
+
 AD-REV-025 adds CF-01–06 in DS-041–043: preparation, finalization/send, retained read, captured return, local per-file movement and initial locator transformation.
 
 AD-REV-021: DS-034a/b/c/r above enumerate message read/identity, exact task navigation, history copy and unchanged authoritative updates.
@@ -5028,6 +5347,8 @@ are in DS-031; no local decoder is presented as the whole user path.
 
 ## Removal / Decommission Plan (Mandatory)
 
+AD-REV-026 removes media-only user extraction/hydration and user-page attachment mediaType in one coherent producer/consumer change. Keep media visuals and old valid optional facts, not a compatibility alias. No filenames/prose repair path is introduced.
+
 | Item To Remove / Decommission | Why | Replacement | Scope / Preservation Note |
 | --- | --- | --- | --- |
 | Normal `providers/team-definition-config.ts` unversioned recursive codec | Target admission has two exact field-free family shapes (DS-031). | `agent-team-definition-config.ts` + `agent-org-definition-config.ts`; copied legacy knowledge only in migration folder | Delete normal import/export paths; external rejection must not reach migration decoder. |
@@ -5155,6 +5476,8 @@ are in DS-031; no local decoder is presented as the whole user path.
 | AgentOrg derived history summary | DS-027 | Org command, history catalog, mixed history read, startup migration | Qualify exact configured accepted SEND_MESSAGE, serialize first write, refresh authoritative family, conservatively infer only unique legacy evidence | Prevents task/system traffic, optimistic UI, trace fallback, and multiple summary owners. |
 
 ## Ownership Boundaries
+
+AD-REV-026: typed immutable input reference values serve existing native/external memory writers; same-row raw facts serve existing history/page owners; file-resource ownership is unchanged. See DS-044–046 for the complete boundary contract.
 
 AD-REV-025: Context Files owns attachment identity/movement, strict stored-only location owns membership/ancestry, and captured active-target/submission own frontend intent. DS-041/042 forbids address-ranking and lifecycle activation at file-read boundaries.
 
@@ -5577,6 +5900,8 @@ Tasks record -X-> fabricated delivered notification/communication
 
 
 ## Interface Boundary Mapping
+
+AD-REV-026 / DS-045 adds fileAttachments in existing conversation/memory reads and replaces user page-attachment mediaType with fileType/fileName. Request/ACK/root schemas do not change; genuine media visuals remain mediaType.
 
 DS-041 defines the closed exact Org owner and current REST URL contract. Its root + AgentRun pair replaces Org address-only draft/final identity; no other family API changes.
 
@@ -6026,6 +6351,8 @@ no durable schema, migration, delivery tool or root lifecycle algorithm changes.
 
 ## Shared Structure / Data Model Tightness Check
 
+AD-REV-026: media URI arrays and non-media file_attachments are disjoint; no duplicate all-file persisted copy. recordingFileAttachments is only a typed provider-copy input value, not another durable authority. See DS-044.
+
 | Structure | Singular Meaning? | Overlap Risk | Corrective Action |
 | --- | --- | --- | --- |
 | `DefinitionAdmissionResult` | Yes | Medium | Available branch contains one exact subject; unavailable branch is diagnostic data, never a fallback definition. |
@@ -6059,6 +6386,8 @@ no durable schema, migration, delivery tool or root lifecycle algorithm changes.
 | AgentOrg form projection result | Yes — complete success view or blocking diagnostic | Low | Use a closed discriminated result; success cannot silently omit invalid refs and failure cannot produce a launchable partial view. |
 
 ## Final File Responsibility Mapping
+
+AD-REV-026 file responsibilities and removals are in DS-044–046 above: core reference/partition values, native and external recording, raw normalizer, both replay projections, synchronized GraphQL/web DTOs and existing locator visitor. No competing store or renderer.
 
 DS-042 is the current attachment file/owner map; DS-043 adds the one migration-owned locator transform under the existing family migration. No competing service, registry or schema is added.
 
@@ -6950,6 +7279,12 @@ Earlier AD-REV-017/018 sequences remain in the revision record as history only.
 
 ## Risks
 
+AD-REV-026 residual risks and mitigations are in DS-044–046 / VAL-070–075:
+provider-copy snapshot loss, one producer or page remaining media-only, unsafe
+normalization/dedup, archive omission and mistaken legacy repair. Historical
+missing associations and IR049 actual cutover remain explicit limits, not a
+blanket code hold.
+
 AD-REV-025 risks are exact-ID loss at one remaining consumer, insufficient real-byte validation, and undiscovered saved-locator/draft/deployment cohorts. DS-041–043 and VAL-064–069 define strict failure/return boundaries; mocks and sample zero counts do not establish rollout safety.
 
 AD-REV-020 risks: silently stripping versions in normal reads; hiding owned
@@ -7038,6 +7373,8 @@ numeric diagnostics. DS-031–033 and VAL-046–050 close those design paths.
 | Rejected/uncommitted send leaks into presentation | Low / Critical | Invoke both presentation consequences only from the successful durable-commit callback; rejection/failure injection tests | No optimistic client repair or rollback path is added. |
 
 ## Guidance For Implementation
+
+Newest recovery: implement DS-044–046 only after AD-REV-026 review. CR-FIND042 requires complete original-input recording through cold/page Open, not a UI-only label fix. VAL-070–075 and strengthened VAL-066 require real persisted lifetime evidence; API33 remains Fail. IR049 installation cutover and all prior cumulative gates stay separately scoped.
 
 Latest authoring delta: implement DS-038–040 under RER-033 and the explicit
 first-run rollout premise. Normal Org files use org_local; internal ownership,

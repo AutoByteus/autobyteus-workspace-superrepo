@@ -3,14 +3,13 @@
 ## Status
 
 - Package: `AORG-FLAT-TEAM-001`
-- Architecture: `AD-REV-025`, canonical `design-spec.md`
+- Architecture: `AD-REV-026`, canonical `design-spec.md`
 - Approved requirements: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`
-- Prior review: AD-REV-024 / ARCH-REV-021 Pass; current source read at IR-048
-  checkpoint 6d77b3c8b / result 5636a1f3a. Original upload omission and new exact
-  owner Design Impact are distinct; no partial source/API advancement.
+- Prior review: AD-REV-025 / ARCH-REV-022 Pass; current CRR-081 / CR-FIND042
+  on source 3d9a019d / artifact f8a3f37af. API33 is Fail; no partial advancement.
 - Date: 2026-09-12
-- Result: `Design Self-Validation Pass — Exact Org Attachment Ownership; Independent Review Pending`
-- 69 design walkthroughs; VAL-064–069 added. Read-only source/data investigation
+- Result: `Design Self-Validation Pass — Durable Non-Media Attachment Association; Independent Review Pending`
+- 75 design walkthroughs; VAL-070–075 added and VAL-066 strengthened. Read-only source/data investigation
   and document checks only; no source/test/browser/provider execution or new
   production inventory/pass claimed by Architecture.
 - Product: no new gate. Existing approved packages remain normative elsewhere.
@@ -49,7 +48,7 @@ already implemented correction is still absent.
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/agent-org-contract.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md`
-- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed ARCH-REV-021 Pass on AD-REV-024; earlier findings retain historical scope)
+- `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md` (latest completed ARCH-REV-022 Pass on AD-REV-025; earlier findings retain historical scope)
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-handoff.md`
 - `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/implementation-revision-record.md`
@@ -236,6 +235,12 @@ package-family rename. It does not infer logical topology from directory depth.
 | VAL-067 | Existing draft/submission parity; DS-036 | Async focus/edit and finalization recovery | DS-041/042; CF-02/04/05 | Pass |
 | VAL-068 | REQ-014–016; retained inspection | Closed current owners and no read activation | DS-041/042 | Pass |
 | VAL-069 | REQ-012/014; AC-008/009; SCN-004 | Initial saved-locator preservation and truthful inventory | DS-043; CF-06 | Pass |
+| VAL-070 | REQ-014–016/034–036; AC-010/029–031/034 | Both original-reference recording producers | DS-044; CF-07/09 | Pass |
+| VAL-071 | REQ-014–016/034–036; AC-010/029–031/034 | Initial/cold exact file identity and Open | DS-045; CF-08 | Pass |
+| VAL-072 | REQ-014–016/034–036; AC-010/029–031/034 | Active-trace page and archive preservation | DS-044–046; CF-08/10 | Pass |
+| VAL-073 | REQ-014–016/034–036; AC-010/029–031/034 | Truthful absent historical associations | DS-046; CF-10 | Pass |
+| VAL-074 | REQ-014–016/034–036; AC-010/029–031/034 | Known-field locator visitor and archive paths | DS-043/046; CF-06/10 | Pass |
+| VAL-075 | REQ-014–016/034–036; AC-010/029–031/034 | Complete attachment lifetime and cross-family gates | DS-044–046; CF-01–10 | Pass |
 
 ## Detailed Use-Case Walkthroughs
 
@@ -1890,6 +1895,11 @@ package-family rename. It does not infer logical topology from directory depth.
 
 ### VAL-066 — Sent/Retained Click Uses File Owner, Not Viewer
 
+- AD-REV-026 strengthening: CF-07/08 must first prove original accepted text/file
+  associations in the exact raw user row and both initial/cold projections.
+  Correct final GET or optimistic UI alone is insufficient (CR-FIND042).
+  DS-044–046 and VAL-070–075 close this lifetime, with no repaired API33 evidence.
+
 - Supported trigger: click image/text/file from conversation, Messages or Tasks,
   including a reference shared to another Agent, then restart and inspect history.
 - Spine/owners: CF-03; saved locator → existing authorized resource transport →
@@ -1970,6 +1980,115 @@ package-family rename. It does not infer logical topology from directory depth.
 - Design result: Pass — DS-043 defines the supported first-rollout transformation
   and explicit unavailable preconditions; no production migration execution or
   exhaustive installed-data inventory is claimed.
+
+
+### VAL-070 — Non-Media Facts Survive Both Recording Producers
+
+- Supported trigger: user sends text/image or other accepted ContextFiles to an
+  exact Agent through native, Codex or Claude runtime; standalone/Org selection
+  does not change recording semantics. No tool-continuation user row is invented.
+- Spine/owners: CF-07/09; existing AgentRun/original-message observer or native
+  input processor → shared reference partition → existing user trace writer.
+- Walkthrough: external recording reads original ContextFiles; native receives
+  pre-normalization recordingFileAttachments through the existing clone boundary,
+  or captures its unadapted original event at direct core ingress. Non-media URI/type/name
+  remain exact while provider-facing ContextFiles retain physical paths; native
+  LLM media/working-context provenance values remain unchanged. One
+  user append carries both disjoint partitions. Other trace kinds cannot carry
+  file_attachments; no metadata blob is stored.
+- Required checks: unit roundtrip/partition for every current non-media type,
+  unknown, media-only, file-only, mixed and empty; original/provider-copy mutation
+  isolation and toDict/fromDict; actual external recorder/native processor/store
+  composition and exact user row count. Declined/unforwarded inputs remain absent.
+- Design result: Pass — DS-044; no real runtime pass inferred by this walkthrough.
+
+### VAL-071 — Initial And Cold Conversation Preserve File Identity
+
+- Supported trigger: Send text+image, receive reply, then cold exact history or
+  retained Tasks participant selection after Accepted or normal Stop Interrupted.
+- Spine/owners: CF-07/08; original user row → memory normalizer/replay → initial
+  and retained conversation JSON → shared hydration → rendered label/Open.
+- Walkthrough: uri/fileType/fileName traverse every boundary. Direct and mounted
+  task AgentRun IDs may share addresses without changing locators. Unrelated
+  viewers cannot rebind ownership; Offline/read_only cannot activate execution.
+  File references participate in equality/merge; same text/time with different
+  files stays distinct. Existing identified replay rows retain IDs.
+- Required checks: recreate API33's two real normal journeys on corrected source,
+  both widths1502/390, exact stored trace and initial/cold JSON, actual label and
+  click returning original text bytes plus image decode/hash. No stale local
+  context/cache/direct-GET substitute for the visible control.
+- Design result: Pass — DS-045; old API33 failure evidence remains unchanged.
+
+### VAL-072 — Active-Trace Page And Archive Do Not Lose Files
+
+- Supported trigger: existing Earlier active-trace browsing, normal native or
+  provider compaction/rotation, restart, then supported retained memory reads.
+- Spine/owners: CF-08/10; raw store/archive → existing replay/page → typed GraphQL
+  user attachment object → query/DTO/browse presentation → shared UserMessage.
+- Walkthrough: user attachment uses fileType/fileName, not a media-only field;
+  real media visuals keep mediaType. Stable event/partition/ordinal IDs remain
+  derivable, old media IDs unchanged. RawTraceItem serialization/normalization
+  preserves non-media facts across ordinary archive movement.
+- Required checks: actual store active→complete archive→read roundtrip; typed
+  GraphQL page with non-media file and no-context/media controls; recent-window
+  overflow/pagination and browse Open. Preserve current active/archive visibility
+  policy; do not expose archived records through a new center source/fallback.
+- Design result: Pass — DS-044–046; compaction algorithm, cursor and retention
+  policy unchanged, not a new compaction/runtime validation pass.
+
+### VAL-073 — Existing Missing Association Is Not Fabricated
+
+- Supported basis: API33's two saved user rows omit text URI although original
+  exact files and cross-view references remain. This is an observed source limit.
+- Spine/owners: CF-10; same optional-fact normalizer/RawTraceItem reader, no repair.
+- Walkthrough: valid media-only/no-file rows remain readable, with unchanged IDs,
+  content/media. New current rows carry file_attachments; absent/null/empty reads
+  no recorded non-media facts. Invalid present shape/type/URI fails contextually
+  rather than silently claiming complete history. No old/new version branch.
+- Required checks: old records remain byte-identical; no writes on read or default
+  empty-field backfill; captured Send receipts/provider prose/directories cannot
+  become record-association authority. API33 original failure remains failure;
+  only fresh accepted writes demonstrate the corrected lifetime.
+- Design result: Pass — DS-046; historical missing text links remain disclosed,
+  not counted as repaired or removed by a migration.
+
+### VAL-074 — Locator Visitor Covers File-Only And Archived Rows
+
+- Supported trigger: existing pending first-rollout family transition or current
+  package readiness visits known structured attachment references.
+- Spine/owners: CF-06/10; existing source enumeration → explicit field visitor →
+  proven exact-owner plan or current validation → atomic commit/reread if needed.
+- Walkthrough: visit file_attachments[].uri independently of media presence,
+  including complete segments in the actual raw archive layout. Validate current
+  non-media shape; change only a proven URI value, preserving file type/name and
+  trace/manifest identity/order/time/count. Current exact rows zero-write.
+- Required checks: disposable physical package with file-only, mixed, cross-view,
+  current and archive rows; old missing fields remain untouched; no prose or
+  filename/record-owner inference. Existing migration failure statuses and strict
+  reread remain, no new ID or replay. Assert no active runtime calls.
+- Design result: Pass — DS-043/046. IR049's already-completed actual installation
+  remains a separate pre-cutover decision, not a prerequisite for these tests.
+
+### VAL-075 — Complete Lifetime And Cross-Family Regression Gate
+
+- Supported trigger: shared chooser/Send/Stop/history/Open lifecycle across
+  configured/task direct and Team-hosted Agents, same-address distinct executions,
+  retained task participants and cross-view references.
+- Spine/owners: CF-01–10; existing input → exact files → original recording →
+  stored history → both shared presentation paths → authorized original-file read.
+- Walkthrough: no source/context double owner, no separate ledger or optimistic
+  history substitution. Standalone Team/Agent contracts and provider requests
+  unchanged except preserved native recording facts; Org compact UI unchanged.
+- Required checks: producer composition plus real filesystem/REST/GraphQL and
+  browser desktop/narrow lifetime on current artifact. Exercise text/image plus
+  representative non-media formats, draft removal/rejected Send, retry/edit/focus
+  regression, restart and read-only no-activation controls. Keep source/fixture
+  generation, API evidence, native limits and actual user-root inventory distinct.
+- Cumulative gate: renewed selected source review and full pending API33 groups;
+  pending API model-probe proportional review after cumulative Pass; fresh Delivery
+  verification remains downstream. Earlier counts and resolved findings keep
+  their precise scope, never inherited as this correction's execution pass.
+- Design result: Pass — bounded contract complete; independent review pending.
 
 
 ## Ownership And Authoritative-Boundary Audit
@@ -2293,7 +2412,17 @@ is a lateral process index with a narrow capability, not a lifecycle layer.
 
 ## Self-Validation Conclusion
 
-**Current AD-REV-024 conclusion:** all 63 design walkthroughs pass at the design
+**Current AD-REV-026 conclusion:** 75 design walkthroughs pass at the design
+boundary; CR-FIND042 producer/representation/reader/consumer contract is complete.
+Native and external recording retain original non-media references; current
+optional facts preserve old history without inferred repair. Both cold and
+active-trace-page presentation reuse the shared Open experience. Focused
+Medium/High, cumulative Large/High; independent review pending. This is not
+source/API/browser/provider or delivery validation. Historical missing links and
+IR049 installation readiness are explicitly limited; all downstream holds remain.
+
+
+**Prior AD-REV-024 conclusion:** all 63 design walkthroughs pass at the design
 boundary. DS-038–040 and VAL-059–063 cover exact authored vocabulary, internal/API
 separation, initial final outputs, owned preservation and bounded status. The
 user-corrected first-run premise supersedes the former already-deployed branch
@@ -2302,7 +2431,7 @@ independent Architecture Review pending. No source or executable pass is claimed
 Prior round conclusions below retain their chronological scope.
 
 
-Current AD-REV-023 resolves HIST-INSPECT-001/002 at the design boundary with
+Prior AD-REV-023 resolves HIST-INSPECT-001/002 at the design boundary with
 DS-035–037 and five new passing design walkthroughs. History does not activate;
 Send deliberately restores eligible configured targets; Stop retains conversation.
 The prior configured-selection restore exception is removed. One context-store
@@ -2509,3 +2638,24 @@ required after that review. Delivery readiness is not claimed.
   the new supplemental evidence map is the fourth selected artifact. Upstream
   RER-033 documents still match their approved commit. No source/test/other-owner
   edits, migration execution or executable validation is claimed.
+
+## AD-REV-026 Coherence Checks
+
+- DS-044–046 covers input snapshot, native/external same-row recording, strict
+  optional facts, raw normalization, conversation/page GraphQL and web consumers,
+  equality/identity, archive preservation and the known-field locator visitor.
+- VAL-066 now spans accepted input to stored association before a retained click;
+  VAL-070–075 add both producers and both projection surfaces, legacy source
+  limits, archive/initial cutover and cumulative real-file/UI regression gates.
+- Document and preservation checks are recorded after execution below. No
+  application/test/data mutation or executable validation is claimed.
+
+- Executed AD-REV-026 artifact checks passed: 75 unique detailed VAL headings
+  and matching index rows; exactly one AD-REV-026 index/body; prior AD-REV-001–025
+  revision bodies byte-for-byte unchanged; four selected artifacts have balanced
+  fences and consistent Markdown table columns; git diff --check passed.
+- Hash comparison with this round's tracked-file baseline found changes only in
+  the four Architecture-owned artifacts. All four Requirements documents still
+  match RER-033. Other-owner source/tests/reports were not edited or staged;
+  read-only API33 raw-record observations and screenshot inspection were not
+  fresh API/native/browser execution. No raw evidence was repaired.

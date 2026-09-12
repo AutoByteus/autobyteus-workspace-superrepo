@@ -2,6 +2,10 @@
 
 ## Status and scope
 
+Current: AD-REV-026 / CRR-081 / CR-FIND042; see the appended non-media
+association evidence and decisions. The following AD-REV-025 scope and source
+pins remain historical, not claims the exact-owner implementation is absent.
+
 - Package AORG-FLAT-TEAM-001; Architecture recovery IR048-DI-001 / AD-REV-025.
 - Approved authority RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9.
 - Source checkpoint 6d77b3c8b2d3deeddd5c3392dc2ce69bc63b7982;
@@ -125,3 +129,85 @@ rebuild or implementation task was assigned.
 - Existing RER033/AD024 naming and first-run target remain; no new Product or
   Requirements decision is invented. No architecture-created implementation
   handoff, source/test modification, native runtime action or validation pass.
+
+## AD-REV-026 — CRR-081 / API33 Non-Media Association Recovery
+
+### Authority, scope and method
+
+Current recovery is CR-FIND042 / API-FIND035 under unchanged RER-033, following
+AD-REV-025 / ARCH-REV-022 Pass. Source3d9a019d320878c421429f27c0f074f9a4c4c2f5;
+artifactf8a3f37af0969748f05f0605e5fae1a1cc77f10f. The earlier sections retain
+AD25's address-only-owner source evidence; that owner implementation is no
+longer the current missing seam. The new failure is the absent original
+non-media association between Send and history, not file storage or retrieval.
+
+Read-only inspection: current source, CRR081 source/proof report, API33 actual
+stored raw records and supplemental desktop screenshot. No application tests,
+browser/provider/HTTP requests, migration, runtime or fixture mutations were
+performed by Architecture. Reviewer/API live observations keep their ownership.
+The screenshot shows retained Interrupted/Offline history with image-only
+Context files; its recorded post-shutdown capture label is preserved.
+
+### Producer/reader evidence map
+
+Paths are relative to the canonical worktree; server abbreviates
+`autobyteus-server-ts/src`, core abbreviates `autobyteus-ts/src`.
+
+| Source | Current observation | Design consequence |
+| --- | --- | --- |
+| server `agent-execution/domain/agent-run.ts`, `agent-run-command-observer-dispatch.ts` | Backend gets a normalized copy; forwarded observer receives original input; observer delivery is isolated and not a new persistence ACK | Capture original refs at existing recorder, do not change command admission/failure semantics |
+| server `agent-memory/services/runtime-memory-event-payload.ts:71–81`, `runtime-memory-event-accumulator.ts:50–62` | Pure extractor selects only image/audio/video; same user row has no non-media field | Shared disjoint media/file partition needed before append |
+| server `agent-memory/domain/memory-recording-models.ts`, `store/external-runtime-memory-writer.ts` | User shares a non-tool arm; writer maps media into RawTraceItem | Tighten user-specific file facts and preserve in one append |
+| core `memory/models/raw-trace-item.ts` | Versionless toDict/fromDict has media but no generic file facts | Optional non-media file_attachments, not a new ledger/file or version ladder |
+| core `agent/input-processor/memory-ingest-input-processor.ts:39–40`, `memory/memory-manager.ts:196–215` | Native ingest reduces input to LLMUserMessage and records media only | Native path must receive original reference value through existing ingest, not a second external recorder |
+| server `agent-execution/input/agent-run-provider-input-normalizer.ts`; core `agent/pipelines/agent-input-pipeline.ts` | Provider copy rewrites uri, and core pipeline clones via message toDict/fromDict before processors | Typed in-process recording snapshot must precede rewrite and survive clone |
+| server `agent-memory/services/raw-trace-record-normalizer.ts`, domain/models | Read normalization retains only recognized media arrays | Carry validated optional file facts, no reconstruction from bytes |
+| server `run-history/projection/providers/local-memory-run-view-projection-provider.ts:24–28` | App-owned local replay is display authority for Codex, Claude and native | Keep one history source; provider history is not a repair fallback |
+| server replay types, both transformers, run-projection-types; web `runHydration/runProjectionConversation.ts` | Conversation projection and user hydration only carry media; equality also keys media | Carry files through every hop and include in equality/merge |
+| server `event-monitor-active-trace-page-types.ts`, page projector, GraphQL type; web page query/browse presentation | Second supported earlier-message surface has a three-media-only attachment object | Generalize user attachment type/name coherently, retain actual media visuals |
+| core `memory/store/run-memory-file-store.ts`, `raw-trace-archive-manager.ts`, manifest type | Raw objects serialize via RawTraceItem; complete archive segments have established manifest/path/membership and no per-content hash field | Preserve extension through roundtrip/rotation; use real complete segment enumeration, do not invent another archive |
+| server `context-files/services/context-file-record-locators.ts` | Explicit known-field visitor skips trace rows with no media and enumerates root-level trace filenames | File-only rows need independent file_attachments visitor; complete manifest-backed archive segments remain part of DS043's required scope |
+
+### Exact saved-record evidence and limits
+
+Within API-owned `api-e2e-evidence/API-REV-033/runtime/server-data/memory/agent_orgs/`
+under root `aorg_e2e_mixed_org_19ff35d0c89c46cbac607c9c4666f424`, Architecture
+independently matched these two recorded user inputs at line4:
+
+| AgentRun / trace ID | Physical relative path | Observed record / file hash |
+| --- | --- | --- |
+| aorg_e2e_analyst_26ca3c55f1934c32bd8834d3accfaeed / rt_1789223383442_b93cb086-3cdc-4d7a-bb38-abb511a101ce | aorg_e2e_analyst_26ca3c55f1934c32bd8834d3accfaeed/raw_traces_active.jsonl | 577-byte user row has id/ts/turn_id/seq/trace_type/content/source_event/media only; whole-file SHA256 589e0f1b182f051b391c1489cfd98e8ecf7204345017e7c688baf02322185658 |
+| aorg_e2e_lead_80cf60f9dd7a42fa9dd4495d668c7fbd / rt_1789224695345_b3e832ee-a80e-4da1-960f-24ef528d1d3e | aorg_support_pair_880551f4ab6d4a6ca10a53ac466d4f7c/aorg_e2e_lead_80cf60f9dd7a42fa9dd4495d668c7fbd/raw_traces_active.jsonl | 574-byte user row has the same keys/media-only shape; whole-file SHA256 b62108d3301deb8f6f705ff673e830eee6ce53d8aa977ed6bf37b9a9acb25c01 |
+
+Two records, not four independent Sends: CRR081/API33 view each at1502/390 after
+Accepted/Interrupted. Reviewer independently matched physical and original/HTTP
+file hashes; Architecture did not issue new GETs. Real chooser/one Send/provider
+reply supplies product reachability; the extractor probe only isolates the loss.
+No complete installation inventory or universal historical absence is inferred.
+
+### Decision and alternatives
+
+DS-044–046 extends one versionless user row with disjoint non-media references,
+using existing ContextFile type/name/URI meaning. Retain media arrays and their
+readers; add no parallel all-attachments durable copy. This avoids rewriting
+valid old media records solely for representational cleanliness. Replacing all
+media with a new all-file schema would require transformation without restoring
+the missing text associations; the extra rollout cost does not solve this defect.
+Adding text filenames to prompt prose or scanning the context_files directory
+cannot establish which message owns an attachment and is rejected. Cached live
+attachments mask cold failure and are not a source of durable truth.
+
+Native and external recorders stay separate existing owners; a typed ephemeral
+provider-copy recording value keeps canonical URI apart from provider-local path.
+Core never calls a server resolver. Both projection forms reuse existing file
+presentation; no new task/Org UI or file-access authorization policy.
+
+Old records remain directly readable without a version branch or empty-field
+rewrite. Known missing associations cannot be recovered from these authoritative
+rows; preserve them and available bytes/cross-view references, disclose the
+limitation, and do not consume test Send captures as a migration source. Extend
+only the existing known-field locator visitor for genuine new stored facts and
+DS043 initial transformation. No new migration, user data replay/reset or loss
+of old evidence. IR049 actual cutover remains distinct from coding/disposable
+validation; the recreated-container/missing-vnc-path explanation is not a
+prerequisite or a negative attachment inventory.
