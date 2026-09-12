@@ -2,6 +2,7 @@
   <div class="relative flex h-full min-h-0 flex-col bg-white" data-test="agent-org-workspace-view">
     <div v-if="isHistorical && context && !target" class="flex h-full items-center justify-center px-6 text-center text-gray-500" data-test="agent-org-stopped-history">
       <div class="max-w-md space-y-3">
+        <WorkspaceRecoveryNotice v-if="recoveryNotice" :message="recoveryNotice" />
         <span class="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
           <Icon icon="heroicons:building-office-2-20-solid" class="h-6 w-6" />
         </span>
@@ -89,10 +90,8 @@ const target = computed(() => {
 const targetIdentity = computed(() => target.value
   ? `${target.value.root.orgRunId}\u0000${target.value.address}\u0000${target.value.context.state.runId}`
   : null)
-const connect = () => {
-  if (!orgRunId.value) return
-  if (isHistorical.value) void active.inspectAgentOrg(orgRunId.value)
-  else active.connectAgentOrg(orgRunId.value)
+const open = () => {
+  if (orgRunId.value) void active.inspectAgentOrg(orgRunId.value).catch(() => undefined)
 }
 const selectRouteExecution = () => {
   if (!orgRunId.value) return
@@ -124,16 +123,21 @@ const openMemberConfiguration = () => {
 
 onMounted(() => {
   center.showChat()
-  connect()
+  open()
 })
 onBeforeUnmount(() => { if (orgRunId.value) active.disconnectAgentOrg(orgRunId.value) })
-watch([orgRunId, isHistorical], ([nextRunId, nextHistorical], [previousRunId, previousHistorical]) => {
+watch(orgRunId, (nextRunId, previousRunId) => {
   center.showChat()
-  if (previousRunId && (previousRunId !== nextRunId || previousHistorical !== nextHistorical)) {
-    active.disconnectAgentOrg(previousRunId)
-  }
-  connect()
+  if (previousRunId && previousRunId !== nextRunId) active.disconnectAgentOrg(previousRunId)
+  open()
 })
+watch(() => context.value?.phase, (phase) => {
+  if (phase !== 'live' && phase !== 'historical') return
+  const mode = phase === 'live' ? 'active' : 'history'
+  if (route.query.rootSubjectKind === 'agent_org' && route.query.orgRunId === orgRunId.value && route.query.mode !== mode) {
+    void router.replace({ path: '/workspace', query: { ...route.query, mode } })
+  }
+}, { immediate: true })
 watch(targetIdentity, (nextIdentity, previousIdentity) => {
   if (previousIdentity && nextIdentity !== previousIdentity) center.showChat()
 })

@@ -93,7 +93,6 @@ const agentContext = (runId: string, name: string) => new AgentContext({
   agentName: name, llmModelIdentifier: launch.llmModelIdentifier,
 }))
 const build = (snapshot = view(), taskEntries: ConstructorParameters<typeof AgentOrgExecutionContext>[0]['entries'] = []) => {
-  const send = vi.fn().mockResolvedValue(undefined)
   const context = new AgentOrgExecutionContext({
     orgRunId: 'org-run', view: snapshot,
     entries: [
@@ -103,9 +102,8 @@ const build = (snapshot = view(), taskEntries: ConstructorParameters<typeof Agen
       { agentRunId: 'agent-other-member', memberAddress: parseAgentTeamAddress('/other/member'), context: agentContext('agent-other-member', 'Other Member') },
       ...taskEntries,
     ],
-    transport: { interactionFor: () => ({ send, interrupt: vi.fn(), decideTool: vi.fn() }) },
   })
-  return { context, send }
+  return { context }
 }
 
 const task = (overrides: Partial<AgentOrgTaskRecordDto> = {}): AgentOrgTaskRecordDto => ({
@@ -129,19 +127,19 @@ describe('AgentOrgExecutionContext', () => {
   it('starts unfocused and resolves direct Team focus only to its exact coordinator', () => {
     const { context } = build()
     expect(context.selectedAddress).toBeNull()
-    expect(context.activeTarget()).toBeNull()
+    expect(context.selectedTarget()).toBeNull()
     context.select('/team')
-    expect(context.activeTarget()).toMatchObject({
+    expect(context.selectedTarget()).toMatchObject({
       kind: 'agent_org_team_member', address: '/team/coordinator',
       context: { state: { runId: 'agent-coordinator' } },
     })
     context.select('/team/member')
-    expect(context.activeTarget()).toMatchObject({
+    expect(context.selectedTarget()).toMatchObject({
       kind: 'agent_org_team_member', address: '/team/member',
       context: { state: { runId: 'agent-member' } },
     })
     context.select('/missing')
-    expect(context.activeTarget()).toBeNull()
+    expect(context.selectedTarget()).toBeNull()
   })
 
   it('projects strict Agent presentation and fails closed on a sequence gap', () => {
@@ -165,7 +163,7 @@ describe('AgentOrgExecutionContext', () => {
     })).toThrow(/Expected change sequence 6, received 7/)
     expect(context.phase).toBe('reopen_required')
     context.select('/direct')
-    expect(context.activeTarget()).toMatchObject({
+    expect(context.selectedTarget()).toMatchObject({
       kind: 'agent_org_direct_agent',
       address: '/direct',
       context: { state: { runId: 'agent-direct' } },
@@ -202,7 +200,7 @@ describe('AgentOrgExecutionContext', () => {
     const { context } = build(snapshot)
 
     context.select('/direct')
-    const directTarget = context.activeTarget()
+    const directTarget = context.selectedTarget()
     if (!directTarget || !('collaborationMessages' in directTarget)) {
       throw new Error('Expected a configured AgentOrg target.')
     }
@@ -225,7 +223,7 @@ describe('AgentOrgExecutionContext', () => {
     ])
 
     context.select('/team/member')
-    const mountedTarget = context.activeTarget()
+    const mountedTarget = context.selectedTarget()
     if (!mountedTarget || !('collaborationMessages' in mountedTarget)) {
       throw new Error('Expected a mounted AgentOrg target.')
     }
@@ -245,7 +243,7 @@ describe('AgentOrgExecutionContext', () => {
     ])
 
     context.select('/other/member')
-    const otherTarget = context.activeTarget()
+    const otherTarget = context.selectedTarget()
     if (!otherTarget || !('collaborationMessages' in otherTarget)) {
       throw new Error('Expected the other mounted AgentOrg target.')
     }
@@ -261,7 +259,7 @@ describe('AgentOrgExecutionContext', () => {
     const { context: rawContext } = build()
     const context = shallowReactive(rawContext)
     context.select('/team/member')
-    const target = context.activeTarget()
+    const target = context.selectedTarget()
     if (!target || !('collaborationMessages' in target)) {
       throw new Error('Expected a mounted AgentOrg target.')
     }
@@ -278,7 +276,7 @@ describe('AgentOrgExecutionContext', () => {
         counterpart: { kind: 'configured', address: '/direct', label: 'direct' },
       }),
     ])
-    const currentTarget = context.activeTarget()
+    const currentTarget = context.selectedTarget()
     if (!currentTarget || !('collaborationMessages' in currentTarget)) throw new Error('Expected retained member target.')
     expect(currentTarget.collaborationMessages).toMatchObject({
       rootKind: 'agent_org', rootRunId: 'org-run', focusedAgentRunId: 'agent-member',
@@ -350,7 +348,7 @@ describe('AgentOrgExecutionContext', () => {
     }]
     const { context } = build(snapshot, entries)
     context.select('/direct')
-    const target = context.activeTarget()
+    const target = context.selectedTarget()
     if (!target || !('collaborationMessages' in target)) {
       throw new Error('Expected a configured AgentOrg target.')
     }
@@ -373,7 +371,7 @@ describe('AgentOrgExecutionContext', () => {
         counterpartAgentRunId: 'agent-task-fresh', counterpart: taskIdentity }),
     ])
     context.select({ kind: 'agent_execution', agentRunId: 'agent-task-fresh' })
-    const taskTarget = context.activeTarget()
+    const taskTarget = context.selectedTarget()
     if (!taskTarget || !('collaborationMessages' in taskTarget)) throw new Error('Expected exact task target.')
     expect(taskTarget.context.state.runId).toBe('agent-task-fresh')
     expect(taskTarget.collaborationMessages.listMessages()).toEqual([
@@ -381,7 +379,7 @@ describe('AgentOrgExecutionContext', () => {
       expect.objectContaining({ messageId: 'message-to-task', direction: 'received', counterpartAgentRunId: 'agent-direct' }),
     ])
     context.select('/team/member')
-    const configuredSource = context.activeTarget()
+    const configuredSource = context.selectedTarget()
     if (!configuredSource || !('collaborationMessages' in configuredSource)) throw new Error('Expected configured source.')
     expect(configuredSource.context.state.runId).toBe('agent-member')
     expect(configuredSource.collaborationMessages.listMessages()).toEqual([])

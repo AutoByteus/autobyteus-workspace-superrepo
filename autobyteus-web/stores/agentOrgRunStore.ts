@@ -12,7 +12,6 @@ export type AgentOrgLaunchInput = {
 
 export const useAgentOrgRunStore = defineStore('agentOrgRun', () => {
   const launching = ref(false)
-  const restoring = ref(false)
   const terminatingRunIds = ref<ReadonlySet<string>>(new Set())
   const terminationErrors = ref<Record<string, string | null>>({})
 
@@ -28,14 +27,11 @@ export const useAgentOrgRunStore = defineStore('agentOrgRun', () => {
   }
 
   const restore = async (orgRunId: string): Promise<string> => {
-    restoring.value = true
-    try {
-      const { data, errors: gqlErrors } = await getApolloClient().mutate({ mutation: RestoreAgentOrgRun, variables: { agentOrgRunId: orgRunId } })
-      if (gqlErrors?.length) throw new Error(gqlErrors.map((entry: { message: string }) => entry.message).join(', '))
-      const result = data?.restoreAgentOrgRun
-      if (!result?.success || !result.agentOrgRunId) throw new Error(result?.message || 'AgentOrg restore failed.')
-      return result.agentOrgRunId
-    } finally { restoring.value = false }
+    const { data, errors: gqlErrors } = await getApolloClient().mutate({ mutation: RestoreAgentOrgRun, variables: { agentOrgRunId: orgRunId } })
+    if (gqlErrors?.length) throw new Error(gqlErrors.map((entry: { message: string }) => entry.message).join(', '))
+    const result = data?.restoreAgentOrgRun
+    if (!result?.success || !result.agentOrgRunId) throw new Error(result?.message || 'AgentOrg restore failed.')
+    return result.agentOrgRunId
   }
 
   const terminate = async (orgRunId: string): Promise<void> => {
@@ -57,7 +53,7 @@ export const useAgentOrgRunStore = defineStore('agentOrgRun', () => {
     }
   }
   return {
-    launching, restoring, terminatingRunIds, terminationErrors,
+    launching, terminatingRunIds, terminationErrors,
     launch, restore, terminate,
   }
 })

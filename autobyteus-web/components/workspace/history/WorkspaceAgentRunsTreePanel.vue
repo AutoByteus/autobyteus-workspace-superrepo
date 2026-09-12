@@ -373,11 +373,8 @@ const sectionState: WorkspaceHistorySectionState = {
   toggleAgentOrgTeam: treeState.toggleAgentOrgTeam,
   isAgentOrgRunSelected: treeState.isAgentOrgRunSelected,
   isAgentOrgMemberSelected: treeState.isAgentOrgMemberSelected,
-  get isAgentOrgRestoring() {
-    return agentOrgRunStore.restoring;
-  },
-  isAgentOrgTerminating: (rootRunId: string) => agentOrgRunStore.terminatingRunIds.has(rootRunId),
-  agentOrgTerminationError: (rootRunId: string) => agentOrgRunStore.terminationErrors[rootRunId] ?? null,
+  isAgentOrgTerminating: (rootRunId: string) => Boolean(agentOrgContextsStore.operations[rootRunId]) || agentOrgRunStore.terminatingRunIds.has(rootRunId),
+  agentOrgTerminationError: (rootRunId: string) => agentOrgRunStore.terminationErrors[rootRunId] ?? agentOrgContextsStore.errorFor(rootRunId),
   agentOrgContextFor: (rootRunId: string) => agentOrgContextsStore.contextFor(rootRunId),
 };
 

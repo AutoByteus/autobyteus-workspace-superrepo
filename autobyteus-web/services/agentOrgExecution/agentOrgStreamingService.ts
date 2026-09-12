@@ -4,19 +4,16 @@ import {
   type CollaborationStreamClientMessage,
   type CollaborationStreamServerMessage,
 } from '@autobyteus/collaboration-stream-contracts'
-import { shallowReactive, watch } from 'vue'
+import { shallowReactive } from 'vue'
 import type { ContextFilePath } from '~/types/conversation'
-import { beginLocalUserSubmission, failLocalSubmission } from '~/services/runSubmission/localUserSubmission'
-import type { AgentInteractionPort } from '~/types/workspace/activeAgentWorkspaceTarget'
 import { useWindowNodeContextStore } from '~/stores/windowNodeContextStore'
 import { getActiveRemoteAccessCredential } from '~/utils/remoteAccess/authorizedTransport'
 import { buildAuthenticatedWebSocketUrl } from '~/utils/remoteAccess/websocketAuth'
 import { GetAgentOrgExecutionCheckpoint } from '~/graphql/queries/runHistoryQueries'
 import { getApolloClient } from '~/utils/apolloClient'
-import { hydrateAgentOrgExecutionContext } from './agentOrgContextHydration'
+import { stageAgentOrgExecutionContext } from './agentOrgContextHydration'
 import {
   AgentOrgExecutionContext,
-  type AgentOrgCommandTransport,
 } from './agentOrgExecutionContext'
 
 type CommandAck = Extract<CollaborationStreamServerMessage, { type: 'AGENT_COMMAND_ACK' }>
@@ -45,10 +42,11 @@ const recoveryDelay = (attempt: number): number => attempt === 0
   ? 0
   : Math.min(1_000 * (2 ** (attempt - 1)), 30_000)
 
-export class AgentOrgStreamingService implements AgentOrgCommandTransport {
+export class AgentOrgStreamingService {
   private socket: WebSocket | null = null
   private context: AgentOrgExecutionContext | null = null
   private processing: Promise<void> = Promise.resolve()
+  private readonly readiness = new Set<{ resolve(): void; reject(error: Error): void }>()
   private readonly pending = new Map<string, PendingCommand>()
   private nextGenerationId = 0
   private activeGeneration: StreamGeneration | null = null
@@ -64,7 +62,8 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
 
   constructor(private readonly options: Readonly<{
     orgRunId: string
-    publish(context: AgentOrgExecutionContext): void
+    publish(context: AgentOrgExecutionContext, commitActivities: () => void): void
+    onInactive?(): void
     reportError(message: string): void
     onAcceptedExternalUserMessage?(event: Readonly<{
       orgRunId: string
@@ -142,69 +141,48 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     this.released = true
     this.clearTransparentRecovery()
     this.closeSocket('AgentOrg context released')
-    this.context?.setActive(false)
     this.context = null
     this.recoveryCheckpoint = null
     this.recoveryFocus = null
     this.rejectPending('AgentOrg context was released.')
+    this.settleReadiness(new Error('AgentOrg context was released.'))
   }
 
-  interactionFor(agentRunId: string): AgentInteractionPort {
-    const target = agentRunId.trim()
-    if (!target) throw new Error('AgentOrg interaction requires an exact AgentRun ID.')
-    return Object.freeze({
-      send: async (content: string, contextPaths: readonly ContextFilePath[]) => {
-        const org = this.requireReadyContext()
-        const context = org.getAgentContext(target)
-        if (!context || !org.index.requireAgent(target).live) throw new Error('AgentOrg send target is not live.')
-        if (context.submissionPending) throw new Error('AgentOrg member submission is already pending.')
-        const attachments = contextPaths.map((attachment) => ({ ...attachment }))
-        const messageId = crypto.randomUUID()
-        const dedupeKey = `member_input:${this.options.orgRunId}:${target}:${messageId}`
-        const submission = beginLocalUserSubmission(context, {
-          text: content, attachments, navigationTarget: null,
-        })
-        Object.assign(submission.message, { messageId, dedupeKey })
-        let draftEdited = false
-        const stopWatching = watch(() => [context.requirement, context.contextFilePaths], () => {
-          draftEdited = true
-        }, { deep: true, flush: 'sync' })
-        try {
-          await this.command({
-            type: 'SEND_MESSAGE',
-            payload: {
-              ...this.commandRoot(target),
-              content,
-              context_file_paths: attachments.map(attachmentLocator),
-              image_urls: [],
-              message_id: messageId,
-              dedupe_key: dedupeKey,
-            },
-          })
-        } catch (error) {
-          failLocalSubmission(submission, error)
-          if (!draftEdited) {
-            context.requirement = content
-            context.contextFilePaths = attachments
-          }
-          throw error
-        } finally {
-          stopWatching()
-        }
-      },
-      interrupt: () => this.command({
-        type: 'INTERRUPT_GENERATION',
-        payload: this.commandRoot(target),
-      }),
-      decideTool: (invocationId: string, approved: boolean, reason: string | null) => this.command({
-        type: approved ? 'APPROVE_TOOL' : 'DENY_TOOL',
-        payload: {
-          ...this.commandRoot(target),
-          invocation_id: invocationId,
-          reason,
-        },
-      }),
-    })
+  isReady(): boolean {
+    return !this.released && this.streamPhase === 'ready' && this.context?.phase === 'live'
+      && this.socket?.readyState === WebSocket.OPEN
+  }
+
+  whenReady(): Promise<void> {
+    if (this.isReady()) return Promise.resolve()
+    if (this.released) return Promise.reject(new Error('AgentOrg context was released.'))
+    return new Promise((resolve, reject) => { this.readiness.add({ resolve, reject }) })
+  }
+
+  private settleReadiness(error?: Error): void {
+    for (const waiter of this.readiness) error ? waiter.reject(error) : waiter.resolve()
+    this.readiness.clear()
+  }
+
+  sendPrepared(input: Readonly<{ agentRunId: string; content: string;
+    attachments: readonly ContextFilePath[]; messageId: string; dedupeKey: string }>): Promise<void> {
+    const context = this.requireReadyContext()
+    if (!context.index.requireAgent(input.agentRunId).live) throw new Error('AgentOrg send target is not live.')
+    return this.command({ type: 'SEND_MESSAGE', payload: {
+      ...this.commandRoot(input.agentRunId), content: input.content,
+      context_file_paths: input.attachments.map(attachmentLocator), image_urls: [],
+      message_id: input.messageId, dedupe_key: input.dedupeKey,
+    } })
+  }
+
+  interrupt(agentRunId: string): Promise<void> {
+    return this.command({ type: 'INTERRUPT_GENERATION', payload: this.commandRoot(agentRunId) })
+  }
+
+  decideTool(agentRunId: string, invocationId: string, approved: boolean, reason: string | null): Promise<void> {
+    return this.command({ type: approved ? 'APPROVE_TOOL' : 'DENY_TOOL', payload: {
+      ...this.commandRoot(agentRunId), invocation_id: invocationId, reason,
+    } })
   }
 
   private commandRoot(targetAgentRunId: string) {
@@ -278,34 +256,32 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
         throw new Error('AgentOrg stream supplied a non-Org snapshot.')
       }
       const previousFocus = this.recoveryFocus ?? this.context?.selection ?? null
-      const hydratedCandidate = await hydrateAgentOrgExecutionContext({
+      const staged = await stageAgentOrgExecutionContext({
+        source: 'stream',
         orgRunId: this.options.orgRunId,
         view: message.payload.root_org,
-        transport: this,
         isCurrent: () => this.isCurrent(generation),
       })
       if (!this.isCurrent(generation)) return
-      if (!await this.verifyRecoveryCandidate(hydratedCandidate, generation)) return
+      if (!await this.verifyRecoveryCandidate(staged.context, generation)) return
       if (!this.isCurrent(generation)) return
       // The stream and every Vue observer must retain the same observable
       // identity. Mutating a raw class instance after publishing its Vue proxy
       // leaves top-level task-record replacements invisible until another UI
       // action happens to invalidate the consumer.
-      const candidate = shallowReactive(hydratedCandidate)
-      // A verified replacement owns runtime truth, not the user's unsent draft.
-      for (const entry of candidate.listAgentContextEntries()) {
-        const previous = this.context?.getAgentContext(entry.agentRunId)
-        if (!previous) continue
-        entry.context.requirement = previous.requirement
-        entry.context.contextFilePaths = previous.contextFilePaths.map((attachment) => ({ ...attachment }))
-      }
+      const candidate = shallowReactive(staged.context)
       if (previousFocus) candidate.select(previousFocus)
+      this.options.publish(candidate, staged.commitActivities)
       this.context = candidate
       this.recoveryCheckpoint = null
       this.recoveryFocus = null
       this.streamPhase = 'ready'
       this.resetTransparentRecovery()
-      this.options.publish(candidate)
+      if (candidate.isActive) this.settleReadiness()
+      else {
+        this.options.onInactive?.()
+        this.disconnect()
+      }
       return
     }
     if (!this.context || this.streamPhase !== 'ready') {
@@ -320,6 +296,10 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
       return
     }
     this.context.setActive(message.payload.is_active)
+    if (!message.payload.is_active) {
+      this.options.onInactive?.()
+      this.disconnect()
+    }
   }
 
   private async processFrame(generation: StreamGeneration, raw: string): Promise<void> {
@@ -391,6 +371,7 @@ export class AgentOrgStreamingService implements AgentOrgCommandTransport {
     if (this.released || this.transparentRecoveryScheduled || this.transparentRecoveryInFlight || this.socket) return
     if (this.transparentRecoveryAttempts >= MAX_TRANSPARENT_RECOVERY_ATTEMPTS) {
       this.options.reportError(detail)
+      this.settleReadiness(new Error(detail))
       return
     }
     const delay = recoveryDelay(this.transparentRecoveryAttempts)

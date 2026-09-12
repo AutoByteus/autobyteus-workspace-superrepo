@@ -23,7 +23,6 @@ import { useRunHistoryStore } from '~/stores/runHistoryStore'
 import { useAgentActivityStore } from '~/stores/agentActivityStore'
 import {
   AgentOrgExecutionContext,
-  type AgentOrgCommandTransport,
   type AgentOrgContextEntry,
 } from './agentOrgExecutionContext'
 
@@ -161,19 +160,19 @@ const applyProjection = (
   })
 }
 
-export const hydrateAgentOrgExecutionContext = async (input: Readonly<{
+export const stageAgentOrgExecutionContext = async (input: Readonly<{
   orgRunId: string
   view: AgentOrgExecutionViewDto
-  transport?: AgentOrgCommandTransport
+  source: 'inspection' | 'stream'
   isCurrent?(): boolean
-}>): Promise<AgentOrgExecutionContext> => {
+}>): Promise<{ context: AgentOrgExecutionContext; commitActivities(): void }> => {
   if (input.view.execution_tree.rootOrg.orgRunId !== input.orgRunId
     || input.view.task_records.orgRunId !== input.orgRunId
     || input.view.communication_messages.orgRunId !== input.orgRunId) {
     throw new Error(`AgentOrg snapshot correlation mismatch for '${input.orgRunId}'.`)
   }
   const seeds = collectAgentSeeds(input.view)
-  const workspaces = await resolveWorkspaces(seeds, input.view.is_active)
+  const workspaces = await resolveWorkspaces(seeds, input.source === 'stream' && input.view.is_active)
   const hydrated = await Promise.all(seeds.map(async (seed) => {
     const rootPath = seed.launch.workspaceRootPath
     const context = createAgentContext(
@@ -202,9 +201,10 @@ export const hydrateAgentOrgExecutionContext = async (input: Readonly<{
   })
   const replacements = hydrated.flatMap((item) =>
     item.activityReplacement ? [item.activityReplacement] : [])
-  if (replacements.length > 0
-    && useAgentActivityStore().replaceProjectionActivitiesIfRevisions(replacements) === 'conflict') {
-    throw new Error(`AgentOrg activity changed before '${input.orgRunId}' hydration could commit.`)
-  }
-  return context
+  return { context, commitActivities: () => {
+    if (replacements.length > 0
+      && useAgentActivityStore().replaceProjectionActivitiesIfRevisions(replacements) === 'conflict') {
+      throw new Error(`AgentOrg activity changed before '${input.orgRunId}' hydration could commit.`)
+    }
+  } }
 }

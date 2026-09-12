@@ -103,7 +103,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
   const activeWorkspaceTarget = computed<ActiveAgentWorkspaceTarget | null>(() => {
     if (route?.query.rootSubjectKind === 'agent_org' && (route.query.mode === 'active' || route.query.mode === 'history')) {
       const orgRunId = String(route.query.orgRunId || '');
-      return agentOrgContextsStore.contextFor(orgRunId)?.activeTarget() ?? null;
+      return agentOrgContextsStore.activeTargetFor(orgRunId);
     }
     if (selectionStore.selectedType === 'agent') {
       const context = agentContextsStore.activeRun || null;
@@ -162,8 +162,7 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     return activeWorkspaceTarget.value?.context ?? null;
   });
 
-  const connectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.connect(orgRunId);
-  const inspectAgentOrg = (orgRunId: string) => agentOrgContextsStore.inspect(orgRunId);
+  const inspectAgentOrg = (orgRunId: string) => agentOrgContextsStore.openForInspection(orgRunId);
   const selectAgentOrg = agentOrgContextsStore.select;
   const disconnectAgentOrg = (orgRunId: string): void => agentOrgContextsStore.disconnect(orgRunId);
   const agentOrgContextFor = (orgRunId: string) => agentOrgContextsStore.contextFor(orgRunId);
@@ -252,8 +251,9 @@ export const useActiveContextStore = defineStore('activeContext', () => {
 
     try {
       const target = activeWorkspaceTarget.value;
-      if (!target || target.access !== 'live') throw new Error('Cannot send: No active workspace target.');
-      await target.interaction.send(context.requirement, context.contextFilePaths);
+      if (!target || target.access === 'read_only') throw new Error('Cannot send: No active workspace target.');
+      const port = target.access === 'continuable' ? target.continuation : target.interaction;
+      await port.send(context.requirement, context.contextFilePaths);
     } catch (error) {
       console.error('Failed to send message via activeContextStore:', error);
       throw error;
@@ -291,7 +291,6 @@ export const useActiveContextStore = defineStore('activeContext', () => {
     currentRequirement,
     currentContextPaths,
     activeConfig,
-    connectAgentOrg,
     inspectAgentOrg,
     selectAgentOrg,
     disconnectAgentOrg,

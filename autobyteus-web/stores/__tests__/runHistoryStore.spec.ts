@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { useRunHistoryStore } from '../runHistoryStore';
+import { parseAgentOrgHistoryItems } from '../runHistoryStoreSupport';
 import { buildTestTeamContext, testAgentNode } from '~/test-support/currentTeamTestFixtures';
 
 const buildWorkspaceHistoryGroup = (workspace: Record<string, any>): any => {
@@ -781,6 +782,21 @@ describe('runHistoryStore', () => {
     await store.refreshAgentOrgHistory();
     expect(store.agentOrgHistory[0]?.rootRunId).toBe('org-winner');
     expect(store.historyFamilyErrors.agentOrg).toBe('Focused Org refresh failed');
+  });
+
+  it('invalidates an older active response on confirmed Stop and preserves inactive fact when fresh history fails', async () => {
+    let resolveOlder!: (value: unknown) => void;
+    queryMock.mockReturnValueOnce(new Promise((resolve) => { resolveOlder = resolve; }))
+      .mockRejectedValueOnce(new Error('fresh history unavailable'));
+    const store = useRunHistoryStore();
+    store.agentOrgHistory = parseAgentOrgHistoryItems([buildAgentOrgHistoryRow({ rootRunId: 'org-confirmed', summary: 'Do not alter title' })]);
+    const pending = store.refreshAgentOrgHistory();
+    await vi.waitFor(() => expect(queryMock).toHaveBeenCalledTimes(1));
+    store.applyAgentOrgActivity('org-confirmed', false);
+    await vi.waitFor(() => expect(store.historyFamilyErrors.agentOrg).toBe('fresh history unavailable'));
+    resolveOlder({ data: { listCollaborationRootHistory: [buildAgentOrgHistoryRow({ rootRunId: 'org-confirmed' })] }, errors: [] });
+    await pending;
+    expect(store.agentOrgHistory).toMatchObject([{ rootRunId: 'org-confirmed', isActive: false, summary: 'Do not alter title' }]);
   });
 
   it('shares AgentOrg request generation between full history loads and focused refreshes', async () => {

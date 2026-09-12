@@ -38,7 +38,8 @@ export interface TeamWorkspaceContextView {
   }>[]
 }
 
-type WorkspaceAccess = Readonly<{ access: 'live'; interaction: AgentInteractionPort }>
+export type WorkspaceAccess = Readonly<{ access: 'live'; interaction: AgentInteractionPort }>
+  | Readonly<{ access: 'continuable'; continuation: Pick<AgentInteractionPort, 'send'> }>
   | Readonly<{ access: 'read_only' }>
 
 type WorkspaceTargetCore = WorkspaceAccess & Readonly<{

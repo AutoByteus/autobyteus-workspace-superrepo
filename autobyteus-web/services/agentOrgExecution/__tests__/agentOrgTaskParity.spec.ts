@@ -4,14 +4,13 @@ import { computed, shallowReactive } from 'vue'
 import { projectAgentOrgTasks } from '../agentOrgTaskPresentation'
 import { AgentOrgExecutionViewIndex } from '../agentOrgExecutionViewIndex'
 import { projectAgentOrgCommunicationPerspective } from '../agentOrgCommunicationPerspective'
-import { hydrateAgentOrgExecutionContext } from '../agentOrgContextHydration'
+import { stageAgentOrgExecutionContext } from '../agentOrgContextHydration'
 import { taskBearingView, taskRecord } from './taskBearingOrgFixture'
 const mocks = vi.hoisted(() => ({ query: vi.fn() }))
 vi.mock('~/utils/apolloClient', () => ({ getApolloClient: () => ({ query: mocks.query }) }))
 vi.mock('~/stores/runHistoryStore', () => ({ useRunHistoryStore: () => ({
   ensureWorkspaceByRootPath: vi.fn(), resolveWorkspaceMetadataByRootPath: vi.fn(),
 }) }))
-const transport = { interactionFor: vi.fn(() => ({ send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn() })) }
 beforeEach(() => {
   setActivePinia(createPinia())
   vi.clearAllMocks()
@@ -79,13 +78,13 @@ describe('task-inclusive exact Org presentation', () => {
 
   it('provides direct-Agent Tasks and retains the exact settled conversation read-only without refocus', async () => {
     const view = taskBearingView()
-    const context = shallowReactive(await hydrateAgentOrgExecutionContext({ orgRunId: 'org-run', view, transport }))
+    const context = shallowReactive(await hydrateAgentOrgExecutionContext({ orgRunId: 'org-run', view }))
     context.select('/director')
-    const direct = context.activeTarget()!
+    const direct = context.selectedTarget()!
     expect('collaborationTasks' in direct && direct.collaborationTasks.listDelegatedTaskEntries()).toHaveLength(2)
     context.select({ kind: 'agent_execution', agentRunId: 'agent-worker-task' })
-    const observed = computed(() => context.activeTarget())
-    expect(observed.value).toMatchObject({ kind: 'agent_org_task_agent', access: 'live', context: { config: {
+    const observed = computed(() => context.selectedTarget())
+    expect(observed.value).toMatchObject({ kind: 'agent_org_task_agent', access: 'read_only', context: { config: {
       agentDefinitionId: 'definition-agent-worker-configured', runtimeKind: 'codex_app_server',
     } } })
     const originalContext = observed.value!.context
@@ -120,10 +119,16 @@ describe('task-inclusive exact Org presentation', () => {
     view.agent_statuses = []
     const context = await hydrateAgentOrgExecutionContext({ orgRunId: 'org-run', view })
     context.select({ kind: 'agent_execution', agentRunId: 'agent-task-lead' })
-    expect(context.activeTarget()).toMatchObject({ access: 'read_only', kind: 'agent_org_task_team_member',
+    expect(context.selectedTarget()).toMatchObject({ access: 'read_only', kind: 'agent_org_task_team_member',
       context: { state: { runId: 'agent-task-lead', conversation: { messages: [] } } } })
-    expect('interaction' in context.activeTarget()!).toBe(false)
+    expect('interaction' in context.selectedTarget()!).toBe(false)
     mocks.query.mockRejectedValueOnce(new Error('trace unavailable'))
     await expect(hydrateAgentOrgExecutionContext({ orgRunId: 'org-run', view })).rejects.toThrow('trace unavailable')
   })
 })
+
+async function hydrateAgentOrgExecutionContext(input: Omit<Parameters<typeof stageAgentOrgExecutionContext>[0], 'source'>) {
+  const staged = await stageAgentOrgExecutionContext({ ...input, source: 'stream' })
+  staged.commitActivities()
+  return staged.context
+}

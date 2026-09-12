@@ -113,7 +113,8 @@ const primaryAction = computed(() => resolveAgentPrimaryAction({
   isUploading: contextFileUploadStore.isUploading,
   hasDraft: Boolean(internalRequirement.value.trim()),
 }));
-const isActionDisabled = computed(() => !primaryAction.value.enabled);
+const isActionDisabled = computed(() => !primaryAction.value.enabled
+  || activeContextStore.activeWorkspaceTarget?.access === 'read_only');
 const voiceButtonTitle = computed(() => {
   if (voiceInputStore.isStarting) {
     return 'Starting microphone...';
@@ -252,7 +253,7 @@ const handleStop = () => {
 
 const handlePrimaryAction = () => {
   const action = primaryAction.value;
-  if (!action.enabled) {
+  if (isActionDisabled.value) {
     return;
   }
   if (action.kind === 'interrupt') {

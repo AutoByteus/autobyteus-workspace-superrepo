@@ -7,7 +7,7 @@ import { useActiveContextStore } from '~/stores/activeContextStore'
 import { taskBearingView } from './taskBearingOrgFixture'
 
 const mocks = vi.hoisted(() => ({
-  query: vi.fn(), historyRefresh: vi.fn(), navigation: vi.fn(),
+  query: vi.fn(), mutate: vi.fn(), historyRefresh: vi.fn(), navigation: vi.fn(),
   route: { query: { rootSubjectKind: 'agent_org', orgRunId: 'org-run', mode: 'active' } },
 }))
 vi.mock('vue-router', async (original) => ({ ...await original<typeof import('vue-router')>(), useRoute: () => mocks.route }))
@@ -16,9 +16,9 @@ vi.mock('~/stores/windowNodeContextStore', () => ({
 }))
 vi.mock('~/utils/remoteAccess/authorizedTransport', () => ({ getActiveRemoteAccessCredential: () => null }))
 vi.mock('~/utils/remoteAccess/websocketAuth', () => ({ buildAuthenticatedWebSocketUrl: (url: string) => url }))
-vi.mock('~/utils/apolloClient', () => ({ getApolloClient: () => ({ query: mocks.query }) }))
+vi.mock('~/utils/apolloClient', () => ({ getApolloClient: () => ({ query: mocks.query, mutate: mocks.mutate }) }))
 vi.mock('~/stores/runHistoryStore', () => ({ useRunHistoryStore: () => ({
-  refreshAgentOrgHistory: mocks.historyRefresh, applyRunNavigationEffect: mocks.navigation,
+  applyAgentOrgActivity: vi.fn(), refreshAgentOrgHistory: mocks.historyRefresh, applyRunNavigationEffect: mocks.navigation,
 }) }))
 vi.mock('~/stores/voiceInputStore', () => ({ useVoiceInputStore: () => ({
   isAvailable: false, initialize: vi.fn(), cancelOperationForSource: vi.fn(),
@@ -81,7 +81,7 @@ const status = (value: string) => presentation({ type: 'AGENT_STATUS', payload: 
 
 async function open(agentRunId = 'agent-director') {
   const store = useAgentOrgContextsStore()
-  store.connect('org-run')
+  await store.openForInspection('org-run')
   socket = Socket.instances[0]!
   const view = taskBearingView()
   sequence = view.base_change_sequence
@@ -89,7 +89,7 @@ async function open(agentRunId = 'agent-director') {
   socket.emit({ type: 'ROOT_EXECUTION_VIEW_SNAPSHOT', payload: {
     root_subject_kind: 'agent_org', root_run_id: 'org-run', schema_version: 1, root_org: view,
   } })
-  await vi.waitFor(() => expect(store.contextFor('org-run')).not.toBeNull())
+  await vi.waitFor(() => expect(store.contextFor('org-run')?.phase).toBe('live'))
   const org = store.contextFor('org-run')!
   org.select({ kind: 'agent_execution', agentRunId })
   const active = useActiveContextStore()
@@ -102,8 +102,11 @@ beforeEach(() => {
   setActivePinia(createPinia())
   vi.clearAllMocks()
   Socket.instances = []
+  mocks.mutate.mockReset()
   vi.stubGlobal('WebSocket', Socket)
-  mocks.query.mockImplementation(async ({ variables }: any) => ({ data: { getAgentOrgMemberRunProjection: {
+  mocks.query.mockImplementation(async ({ variables }: any) => !variables.agentRunId
+    ? { data: { getAgentOrgRunInspection: { schema_version: 1, root_subject_kind: 'agent_org', root_run_id: 'org-run', root_org: taskBearingView() } } }
+    : ({ data: { getAgentOrgMemberRunProjection: {
     agentRunId: variables.agentRunId, memberAddress: variables.memberAddress,
     conversation: [], activities: [], hasEarlierActiveTraceEvents: false,
   } } }))
@@ -317,7 +320,7 @@ describe('Org shared composer -> exact interaction -> correlated stream', () => 
     await vi.waitFor(() => expect(useAgentOrgContextsStore().contextFor('org-run')).not.toBe(org))
     await flushPromises()
     const current = active.activeAgentContext!
-    expect(current).not.toBe(context)
+    expect(current).toBe(context)
     expect(current.state.runId).toBe('agent-director')
     expect(current.requirement).toBe('still composing my next message')
     expect(wrapper!.find('textarea').element.value).toBe('still composing my next message')
@@ -331,7 +334,7 @@ describe('Org shared composer -> exact interaction -> correlated stream', () => 
     expect(mocks.navigation).not.toHaveBeenCalled()
   })
 
-  it('releases the exact pending submission on disconnect without touching the newly focused draft', async () => {
+  it('defers view disposal until the exact pending submission finishes without touching another draft', async () => {
     const { org, active, context } = await open()
     context.requirement = 'pending'
     const outcome = active.send().catch((error) => error)
@@ -339,11 +342,204 @@ describe('Org shared composer -> exact interaction -> correlated stream', () => 
     const other = active.activeAgentContext!
     other.requirement = 'other'
     useAgentOrgContextsStore().disconnect('org-run')
+    expect(useAgentOrgContextsStore().contextFor('org-run')).toBe(org)
+    expect(socket.readyState).toBe(Socket.OPEN)
+    ack('rejected')
     expect(await outcome).toBeInstanceOf(Error)
     expect(context.submissionPending).toBe(false)
     expect(context.requirement).toBe('pending')
     expect(other.requirement).toBe('other')
     expect(socket.sent).toHaveLength(1)
     expect(mocks.historyRefresh).not.toHaveBeenCalled()
+  })
+})
+
+const projectionResult = (variables: any) => ({ data: { getAgentOrgMemberRunProjection: {
+  agentRunId: variables.agentRunId, memberAddress: variables.memberAddress,
+  conversation: [], activities: [], hasEarlierActiveTraceEvents: false,
+} } })
+const inspectionResult = (active = false) => {
+  const view = taskBearingView(); view.is_active = active
+  if (!active) view.agent_statuses = []
+  return { data: { getAgentOrgRunInspection: { schema_version: 1,
+    root_subject_kind: 'agent_org', root_run_id: 'org-run', root_org: view } } }
+}
+async function inactive(id = 'agent-director') {
+  mocks.query.mockImplementation(async ({ variables }: any) => variables.agentRunId
+    ? projectionResult(variables) : inspectionResult())
+  const store = useAgentOrgContextsStore()
+  await store.openForInspection('org-run')
+  store.select('org-run', { kind: 'agent_execution', agentRunId: id })
+  const active = useActiveContextStore()
+  wrapper = mount(AgentUserInputTextArea, { global: { stubs: { Icon: true } } })
+  await flushPromises()
+  return { store, active, context: active.activeAgentContext! }
+}
+async function readyRestored() {
+  await vi.waitFor(() => expect(Socket.instances).toHaveLength(1))
+  socket = Socket.instances[0]!
+  const view = taskBearingView(); sequence = view.base_change_sequence
+  socket.emit({ type: 'CONNECTED', payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', session_id: 'restore' } })
+  socket.emit({ type: 'ROOT_EXECUTION_VIEW_SNAPSHOT', payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', schema_version: 1, root_org: view } })
+  await vi.waitFor(() => expect(socket.sent).toHaveLength(1))
+}
+
+describe('observational Org history, exact deliberate continuation and retained stop', () => {
+  it.each(['agent-director', 'agent-team-worker-configured'])('restores only on deliberate %s Send, preserves real input/identity through readiness and sends once', async (id) => {
+    const { store, active, context } = await inactive(id)
+    expect(mocks.mutate).not.toHaveBeenCalled(); expect(Socket.instances).toHaveLength(0)
+    expect(active.activeWorkspaceTarget?.access).toBe('continuable')
+    expect('interaction' in active.activeWorkspaceTarget!).toBe(false)
+    let release!: () => void
+    mocks.mutate.mockImplementationOnce(() => new Promise((resolve) => { release = () => resolve({ data: { restoreAgentOrgRun: { success: true, agentOrgRunId: 'org-run' } } }) }))
+    context.contextFilePaths = [attachment()]
+    await wrapper!.get('textarea').setValue('resume exact')
+    const sent = active.send()
+    expect(context.requirement).toBe(''); expect(context.contextFilePaths).toEqual([]); expect(context.submissionPending).toBe(true)
+    await wrapper!.get('textarea').setValue('next while restoring')
+    store.select('org-run', { kind: 'agent_execution', agentRunId: id === 'agent-director' ? 'agent-team-worker-configured' : 'agent-director' })
+    const other = active.activeAgentContext!
+    other.requirement = 'not consumed'
+    await flushPromises()
+    expect(wrapper!.get('button[title="Send message"]').attributes('disabled')).toBeDefined()
+    await expect(active.send()).rejects.toThrow('Cannot send')
+    await expect(store.stopAndInspect('org-run')).rejects.toThrow('pending')
+    expect(other.requirement).toBe('not consumed')
+    release(); await readyRestored()
+    expect(store.contextFor('org-run')!.getAgentContext(id)).toBe(context)
+    expect(active.activeAgentContext).toBe(other)
+    expect(context.requirement).toBe('next while restoring')
+    expect(context.submissionPending).toBe(true)
+    expect(context.conversation.messages.filter((m) => m.type === 'user')).toHaveLength(1)
+    expect(socket.sent[0].payload).toMatchObject({ target_agent_run_id: id, content: 'resume exact', context_file_paths: ['/workspace/submitted.txt'] })
+    echo(); ack(); status('idle'); await sent; await flushPromises()
+    expect(context.conversation.messages.filter((m) => m.type === 'user')).toHaveLength(1)
+    expect(context.submissionPending).toBe(false)
+    expect(mocks.mutate).toHaveBeenCalledOnce(); expect(mocks.historyRefresh).toHaveBeenCalledOnce()
+    expect(mocks.navigation).not.toHaveBeenCalled()
+  })
+
+  it('keeps stopped exact tasks read-only, not continuable configured lookalikes', async () => {
+    const { store, active, context } = await inactive('agent-task-worker')
+    context.requirement = 'cannot resurrect'
+    expect(active.activeWorkspaceTarget?.access).toBe('read_only')
+    await expect(active.send()).rejects.toThrow('No active workspace target')
+    expect(context.requirement).toBe('cannot resurrect')
+    expect(mocks.mutate).not.toHaveBeenCalled(); expect(Socket.instances).toHaveLength(0)
+    store.select('org-run', { kind: 'agent_execution', agentRunId: 'agent-team-worker-configured' })
+    expect(active.activeWorkspaceTarget?.access).toBe('continuable')
+  })
+
+  it('restores untouched input on failed restore, keeps deliberate discard and releases the root guard', async () => {
+    const { store, active, context } = await inactive()
+    mocks.mutate.mockRejectedValueOnce(new Error('restore rejected'))
+    context.contextFilePaths = [attachment()]
+    await wrapper!.get('textarea').setValue('untouched')
+    await expect(active.send()).rejects.toThrow('restore rejected')
+    expect(context.requirement).toBe('untouched'); expect(context.contextFilePaths).toEqual([attachment()])
+    expect(context.submissionPending).toBe(false); expect(store.operations).toEqual({})
+    let reject!: (error: Error) => void
+    mocks.mutate.mockImplementationOnce(() => new Promise((_, fail) => { reject = fail }))
+    const sent = active.send(); const failure = expect(sent).rejects.toThrow('restore rejected again')
+    await wrapper!.get('textarea').setValue('next'); await wrapper!.get('textarea').setValue('')
+    reject(new Error('restore rejected again')); await failure; await flushPromises()
+    expect(context.requirement).toBe(''); expect(context.contextFilePaths).toEqual([])
+    expect(wrapper!.get('textarea').element.value).toBe(''); expect(Socket.instances).toHaveLength(0)
+    expect(mocks.historyRefresh).not.toHaveBeenCalled()
+  })
+
+  it('does not dispose an explicit continuation on view/root departure before prepared Send completes', async () => {
+    const { store, active, context } = await inactive()
+    mocks.mutate.mockResolvedValue({ data: { restoreAgentOrgRun: { success: true, agentOrgRunId: 'org-run' } } })
+    context.requirement = 'continue after leaving'
+    const sent = active.send()
+    store.disconnect('org-run')
+    expect(store.contextFor('org-run')?.getAgentContext('agent-director')).toBe(context)
+    await readyRestored(); ack(); await sent
+    expect(socket.sent).toHaveLength(1); expect(socket.readyState).toBe(3)
+    expect(store.contextFor('org-run')).toBeNull()
+    expect(mocks.navigation).not.toHaveBeenCalled()
+  })
+
+  it('keeps exact conversation Offline after confirmed stop even if final strict inspection fails', async () => {
+    const { org, context } = await open()
+    context.requirement = 'unsent after stop'
+    context.conversation.messages.push({ type: 'user', text: 'last conversation', timestamp: new Date() })
+    mocks.mutate.mockResolvedValue({ data: { terminateAgentOrgRun: { success: true } } })
+    mocks.query.mockRejectedValue(new Error('final read unavailable'))
+    const store = useAgentOrgContextsStore()
+    await expect(store.stopAndInspect('org-run')).rejects.toThrow('final read unavailable')
+    expect(store.contextFor('org-run')).toBe(org)
+    expect(org.phase).toBe('historical'); expect(org.selectedTarget()?.context).toBe(context)
+    expect(context.state.currentStatus).toBe('offline'); expect(context.requirement).toBe('unsent after stop')
+    expect(context.conversation.messages.at(-1)?.text).toBe('last conversation')
+    expect(store.activeTargetFor('org-run')?.access).toBe('continuable')
+    expect(store.errorFor('org-run')).toBe('final read unavailable')
+    expect(socket.readyState).toBe(3); expect(socket.sent).toEqual([])
+    socket.emit({ type: 'ROOT_EXECUTION_VIEW_SNAPSHOT', payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', schema_version: 1, root_org: taskBearingView() } })
+    await flushPromises(); expect(org.phase).toBe('historical')
+  })
+
+  it('failed Stop leaves last committed active context and selection unchanged', async () => {
+    const { org, context } = await open()
+    mocks.mutate.mockRejectedValue(new Error('stop rejected'))
+    const store = useAgentOrgContextsStore()
+    await expect(store.stopAndInspect('org-run')).rejects.toThrow('stop rejected')
+    expect(store.contextFor('org-run')).toBe(org); expect(org.isActive).toBe(true)
+    expect(org.selectedTarget()?.context).toBe(context); expect(socket.readyState).toBe(1)
+    expect(store.operations).toEqual({}); expect(store.activeTargetFor('org-run')?.access).toBe('live')
+  })
+})
+
+describe('Org strict candidate and terminal boundaries', () => {
+  it('does not partially mutate retained AgentContexts when any inspected projection is invalid', async () => {
+    const { org, context } = await open()
+    context.requirement = 'do not lose'; context.contextFilePaths = [attachment('unsent')]
+    const state = context.state; const config = context.config
+    socket.close()
+    mocks.query.mockImplementation(async ({ variables }: any) => {
+      if (!variables.agentRunId) return inspectionResult()
+      const result = projectionResult(variables)
+      if (variables.agentRunId === 'agent-task-worker') result.data.getAgentOrgMemberRunProjection.agentRunId = 'wrong-exact-id'
+      return result
+    })
+    const store = useAgentOrgContextsStore()
+    await expect(store.openForInspection('org-run')).rejects.toThrow('Projection identity mismatch')
+    expect(store.contextFor('org-run')).toBe(org)
+    expect(context.state).toBe(state); expect(context.config).toBe(config)
+    expect(context.requirement).toBe('do not lose'); expect(context.contextFilePaths).toEqual([attachment('unsent')])
+    expect(org.phase).toBe('reopen_required'); expect(socket.sent).toEqual([])
+  })
+
+  it('retains selection/identity and terminal truth after a correlated inactive event, ignoring retired-generation frames', async () => {
+    const { org, context } = await open('agent-task-worker')
+    socket.emit({ type: 'ROOT_LIFECYCLE', payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', is_active: false } })
+    await flushPromises()
+    const store = useAgentOrgContextsStore()
+    expect(org.phase).toBe('historical'); expect(org.selectedTarget()?.context).toBe(context)
+    expect(context.state.currentStatus).toBe('offline'); expect(store.activeTargetFor('org-run')?.access).toBe('read_only')
+    socket.emit({ type: 'ROOT_LIFECYCLE', payload: { root_subject_kind: 'agent_org', root_run_id: 'org-run', is_active: true } })
+    await flushPromises()
+    expect(org.isActive).toBe(false); expect(Socket.instances).toHaveLength(1)
+    expect(mocks.mutate).not.toHaveBeenCalled()
+  })
+
+  it('a successful restore followed by exhausted readiness keeps unknown truth and never sends or fabricates rollback', async () => {
+    const { store, active, context } = await inactive()
+    vi.useFakeTimers()
+    try {
+      mocks.mutate.mockResolvedValue({ data: { restoreAgentOrgRun: { success: true, agentOrgRunId: 'org-run' } } })
+      vi.stubGlobal('WebSocket', class { static OPEN = 1; static CONNECTING = 0; constructor() { throw new Error('socket unavailable') } })
+      context.requirement = 'not sent'
+      const sent = active.send(); const failure = expect(sent).rejects.toThrow('socket unavailable')
+      await vi.runAllTimersAsync(); await failure
+      expect(mocks.mutate).toHaveBeenCalledOnce()
+      expect(context.requirement).toBe('not sent'); expect(context.submissionPending).toBe(false)
+      expect(store.contextFor('org-run')?.phase).toBe('reopen_required')
+      expect(store.activeTargetFor('org-run')?.access).toBe('read_only')
+      expect(store.errorFor('org-run')).toBe('socket unavailable')
+      expect(store.operations).toEqual({}); expect(Socket.instances).toHaveLength(0)
+      expect(mocks.historyRefresh).not.toHaveBeenCalled()
+    } finally { vi.useRealTimers() }
   })
 })

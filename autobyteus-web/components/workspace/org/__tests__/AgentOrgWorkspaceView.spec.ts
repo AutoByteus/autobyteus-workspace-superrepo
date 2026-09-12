@@ -8,7 +8,7 @@ const state = reactive({
   error: null as string | null,
   target: null as any,
 })
-const connect = vi.fn()
+const inspect = vi.fn().mockResolvedValue(undefined)
 const disconnect = vi.fn()
 const push = vi.fn().mockResolvedValue(undefined)
 const center = reactive({
@@ -23,13 +23,12 @@ const route = reactive({ query: {
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
-  useRouter: () => ({ push }),
+  useRouter: () => ({ push, replace: push }),
 }))
 vi.mock('~/stores/activeContextStore', () => ({
   useActiveContextStore: () => ({
     get activeWorkspaceTarget() { return state.target },
-    connectAgentOrg: connect,
-    inspectAgentOrg: vi.fn(),
+    inspectAgentOrg: inspect,
     selectAgentOrg: vi.fn(),
     disconnectAgentOrg: disconnect,
     agentOrgContextFor: () => state.context,
@@ -171,7 +170,21 @@ describe('AgentOrgWorkspaceView', () => {
 
     expect(wrapper.get('[data-test="agent-org-stopped-history"]').text()).toContain('Stopped Agent Org')
     expect(wrapper.get('[data-test="agent-org-stopped-history"]').text()).toContain('saved state')
-    expect(connect).not.toHaveBeenCalled()
     expect(wrapper.text()).not.toContain('Restore')
   })
+  it('synchronizes same-root historical/live modes without disposing or reopening the workspace', async () => {
+    state.context = context('live')
+    const wrapper = mountSubject()
+    await wrapper.vm.$nextTick()
+    expect(inspect).toHaveBeenCalledTimes(1)
+    state.context.phase = 'historical'
+    await wrapper.vm.$nextTick()
+    expect(push).toHaveBeenCalledWith({ path: '/workspace', query: { ...route.query, mode: 'history' } })
+    route.query.mode = 'history'
+    await wrapper.vm.$nextTick()
+    expect(disconnect).not.toHaveBeenCalled()
+    expect(inspect).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
 })

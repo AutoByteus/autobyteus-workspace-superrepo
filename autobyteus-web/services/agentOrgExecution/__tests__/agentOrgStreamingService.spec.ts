@@ -27,7 +27,7 @@ vi.mock('~/utils/apolloClient', () => ({
   getApolloClient: () => ({ query: mocks.query }),
 }))
 vi.mock('../agentOrgContextHydration', () => ({
-  hydrateAgentOrgExecutionContext: mocks.hydrate,
+  stageAgentOrgExecutionContext: async (input: unknown) => ({ context: await mocks.hydrate(input), commitActivities: vi.fn() }),
 }))
 
 import { AgentOrgStreamingService } from '../agentOrgStreamingService'
@@ -111,7 +111,7 @@ const snapshot = {
 }
 
 const candidate = (selectedAddress: string | null = null, changeSequence = 4) => ({
-  phase: 'live', changeSequence, selectedAddress, selection: selectedAddress ? { kind: 'agent_execution', agentRunId: 'agent-run' } : null,
+  isActive: true, phase: 'live', changeSequence, selectedAddress, selection: selectedAddress ? { kind: 'agent_execution', agentRunId: 'agent-run' } : null,
   select: vi.fn(), setActive: vi.fn(), applyEvent: vi.fn(), requireReopen: vi.fn(),
   listAgentContextEntries: () => [], getAgentContext: () => null,
 }) as unknown as AgentOrgExecutionContext
@@ -155,7 +155,7 @@ describe('AgentOrgStreamingService', () => {
     const initialSocket = TestWebSocket.instances[0]!
     initialSocket.emit(connected)
     initialSocket.emit(snapshot)
-    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first, expect.any(Function)))
 
     initialSocket.emitRaw('{not-json')
     await vi.waitFor(() => expect(first.requireReopen).toHaveBeenCalled())
@@ -171,7 +171,7 @@ describe('AgentOrgStreamingService', () => {
     finishHydration(second)
     await vi.waitFor(() => expect(publish).toHaveBeenCalledTimes(2))
     expect(second.select).toHaveBeenCalledWith({ kind: 'agent_execution', agentRunId: 'agent-run' })
-    expect(publish).toHaveBeenLastCalledWith(second)
+    expect(publish).toHaveBeenLastCalledWith(second, expect.any(Function))
     expect(mocks.query).toHaveBeenCalledTimes(2)
     expect(reportError).not.toHaveBeenCalled()
   })
@@ -203,7 +203,7 @@ describe('AgentOrgStreamingService', () => {
     const initialSocket = TestWebSocket.instances[0]!
     initialSocket.emit(connected)
     initialSocket.emit(snapshot)
-    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first, expect.any(Function)))
 
     initialSocket.emitClose()
     await vi.waitFor(() => expect(TestWebSocket.instances).toHaveLength(2))
@@ -211,7 +211,7 @@ describe('AgentOrgStreamingService', () => {
     replacement.emit(connected)
     replacement.emit(snapshot)
 
-    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second))
+    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second, expect.any(Function)))
     expect(first.requireReopen).toHaveBeenCalled()
     expect(second.select).toHaveBeenCalledWith({ kind: 'agent_execution', agentRunId: 'agent-run' })
     expect(mocks.query).toHaveBeenCalledTimes(2)
@@ -229,7 +229,7 @@ describe('AgentOrgStreamingService', () => {
     const initialSocket = TestWebSocket.instances[0]!
     initialSocket.emit(connected)
     initialSocket.emit(snapshot)
-    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first, expect.any(Function)))
     mocks.query.mockRejectedValue(new Error('checkpoint unavailable'))
 
     vi.useFakeTimers()
@@ -270,7 +270,7 @@ describe('AgentOrgStreamingService', () => {
     recoverySocket.emit(connected)
     recoverySocket.emit(snapshot)
 
-    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(recovered))
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(recovered, expect.any(Function)))
     expect(recoverySocket.readyState).toBe(TestWebSocket.OPEN)
     expect(reportError).not.toHaveBeenCalled()
   })
@@ -314,7 +314,7 @@ describe('AgentOrgStreamingService', () => {
       recoveredSocket.emit(snapshot)
       await vi.runAllTimersAsync()
 
-      expect(publish).toHaveBeenCalledWith(recovered)
+      expect(publish).toHaveBeenCalledWith(recovered, expect.any(Function))
       expect(visibleError).toBeNull()
       expect(reportError).toHaveBeenCalledTimes(1)
     } finally {
@@ -340,7 +340,7 @@ describe('AgentOrgStreamingService', () => {
     const initialSocket = TestWebSocket.instances[0]!
     initialSocket.emit(connected)
     initialSocket.emit(snapshot)
-    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first, expect.any(Function)))
 
     initialSocket.emit({
       type: 'ROOT_EXECUTION_EVENT',
@@ -360,7 +360,7 @@ describe('AgentOrgStreamingService', () => {
     const recoverySocket = TestWebSocket.instances[1]!
     recoverySocket.emit(connected)
     recoverySocket.emit(snapshot)
-    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second))
+    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second, expect.any(Function)))
     expect(first.applyEvent).toHaveBeenCalledWith(5, expect.objectContaining({ kind: 'task' }))
     expect(first.requireReopen).not.toHaveBeenCalled()
     expect(reportError).not.toHaveBeenCalled()
@@ -372,7 +372,6 @@ describe('AgentOrgStreamingService', () => {
     view.base_change_sequence = 4
     const baseTask = view.task_records.records[0]!
     const context = new AgentOrgExecutionContext({ orgRunId: 'org-run', view,
-      transport: { interactionFor: () => ({ send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn() }) },
       entries: [...new AgentOrgExecutionViewIndex(view).agents.values()].map((agent) => ({
         agentRunId: agent.agentRunId, memberAddress: agent.address,
         context: new AgentContext({ ...agent.source.launchConfiguration,
@@ -406,11 +405,18 @@ describe('AgentOrgStreamingService', () => {
       comment: null, referenceFiles: [], createdAt: '2026-09-01T00:00:04.000Z',
     }
 
-    contextsStore.connect('org-run')
+    const inspected = new AgentOrgExecutionContext({ orgRunId: 'org-run', view, entries: context.listAgentContextEntries() })
+    inspected.select('/director')
+    mocks.hydrate.mockResolvedValueOnce(inspected).mockResolvedValue(context)
+    mocks.query.mockResolvedValueOnce({ data: { getAgentOrgRunInspection: {
+      schema_version: 1, root_subject_kind: 'agent_org', root_run_id: 'org-run', root_org: view,
+    } } })
+    await contextsStore.openForInspection('org-run')
     const socket = TestWebSocket.instances[0]!
     socket.emit(connected)
     socket.emit(snapshot)
-    await vi.waitFor(() => expect(observed.value).not.toBeNull())
+    await vi.waitFor(() => expect(observed.value?.phase).toBe('live'))
+    vi.mocked(context.select).mockClear()
     expect(panelStatus.value).toBe('in_progress')
 
     socket.emit({
@@ -468,7 +474,7 @@ describe('AgentOrgStreamingService', () => {
     socket.emit(snapshot)
     await vi.waitFor(() => expect(mocks.hydrate).toHaveBeenCalled())
 
-    const completed = service.interactionFor('agent-run').interrupt()
+    const completed = service.interrupt('agent-run')
     await vi.waitFor(() => expect(socket.sent).toHaveLength(1))
     const command = JSON.parse(socket.sent[0]!)
     socket.emit({
@@ -489,7 +495,6 @@ describe('AgentOrgStreamingService', () => {
   it('notifies history only after an accepted external SEND_MESSAGE ACK without exposing message text', async () => {
     const context = new AgentOrgExecutionContext({
       orgRunId: 'org-run', view: snapshot.payload.root_org as any,
-      transport: { interactionFor: () => ({ send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn() }) },
       entries: [{ agentRunId: 'agent-run', memberAddress: '/direct' as any,
         context: new AgentContext({ agentDefinitionId: 'agent-def', agentDefinitionName: 'Direct' } as any,
           new AgentRunState('agent-run', { id: 'agent-run', messages: [], createdAt: '', updatedAt: '' } as any)) }],
@@ -505,7 +510,7 @@ describe('AgentOrgStreamingService', () => {
     socket.emit(snapshot)
     await vi.waitFor(() => expect(mocks.hydrate).toHaveBeenCalled())
 
-    const completed = service.interactionFor('agent-run').send('Authoritative first message', [])
+    const completed = service.sendPrepared({ agentRunId: 'agent-run', content: 'Authoritative first message', attachments: [], messageId: 'prepared', dedupeKey: 'prepared-key' })
     await vi.waitFor(() => expect(socket.sent).toHaveLength(1))
     const command = JSON.parse(socket.sent[0]!)
     expect(onAcceptedExternalUserMessage).not.toHaveBeenCalled()
@@ -548,7 +553,7 @@ describe('AgentOrgStreamingService', () => {
     socket.emit(snapshot)
     await vi.waitFor(() => expect(mocks.hydrate).toHaveBeenCalled())
 
-    const rejected = service.interactionFor('agent-run').interrupt()
+    const rejected = service.interrupt('agent-run')
     await vi.waitFor(() => expect(socket.sent).toHaveLength(1))
     const command = JSON.parse(socket.sent[0]!)
     socket.emit({
@@ -586,7 +591,7 @@ describe('AgentOrgStreamingService', () => {
     const initialSocket = TestWebSocket.instances[0]!
     initialSocket.emit(connected)
     initialSocket.emit(snapshot)
-    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first, expect.any(Function)))
 
     initialSocket.emit({
       type: 'ROOT_EXECUTION_EVENT',
@@ -627,7 +632,7 @@ describe('AgentOrgStreamingService', () => {
     })
     replacementSocket.emit(snapshot)
 
-    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second))
+    await vi.waitFor(() => expect(publish).toHaveBeenLastCalledWith(second, expect.any(Function)))
     expect(replacementSocket.readyState).toBe(TestWebSocket.OPEN)
     expect(first.requireReopen).not.toHaveBeenCalled()
     expect(reportError).not.toHaveBeenCalled()
@@ -673,7 +678,7 @@ describe('AgentOrgStreamingService', () => {
     const socket = TestWebSocket.instances[0]!
     socket.emit(connected)
     socket.emit(snapshot)
-    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first))
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledWith(first, expect.any(Function)))
 
     socket.emit({
       type: 'ROOT_EXECUTION_EVENT',
@@ -698,7 +703,7 @@ describe('AgentOrgStreamingService', () => {
     expect(socket.readyState).toBe(TestWebSocket.CLOSED)
     expect(TestWebSocket.instances).toHaveLength(1)
     expect(publish).toHaveBeenCalledTimes(1)
-    expect(first.setActive).toHaveBeenCalledWith(false)
+    expect(first.setActive).not.toHaveBeenCalled()
     expect(reportError).not.toHaveBeenCalled()
   })
 })

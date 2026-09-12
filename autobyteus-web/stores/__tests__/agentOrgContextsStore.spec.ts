@@ -1,10 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
+import { taskBearingView } from '~/services/agentOrgExecution/__tests__/taskBearingOrgFixture'
 
 const mocks = vi.hoisted(() => ({
   instances: [] as Array<Record<string, any>>,
   refreshAgentOrgHistory: vi.fn(async () => undefined),
 }))
+
+vi.mock('~/utils/apolloClient', () => ({ getApolloClient: () => ({ query: async ({ variables }: any) => variables.agentRunId
+  ? { data: { getAgentOrgMemberRunProjection: { ...variables, conversation: [], activities: [], hasEarlierActiveTraceEvents: false } } }
+  : { data: { getAgentOrgRunInspection: { schema_version: 1, root_subject_kind: 'agent_org', root_run_id: 'org-run', root_org: taskBearingView() } } },
+}) }))
 
 vi.mock('~/services/agentOrgExecution/agentOrgStreamingService', () => ({
   AgentOrgStreamingService: class {
@@ -18,7 +24,7 @@ vi.mock('~/services/agentOrgExecution/agentOrgStreamingService', () => ({
 }))
 
 vi.mock('~/stores/runHistoryStore', () => ({
-  useRunHistoryStore: () => ({ refreshAgentOrgHistory: mocks.refreshAgentOrgHistory }),
+  useRunHistoryStore: () => ({ refreshAgentOrgHistory: mocks.refreshAgentOrgHistory, applyAgentOrgActivity: vi.fn() }),
 }))
 
 import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
@@ -32,7 +38,7 @@ describe('agentOrgContextsStore accepted-message history invalidation', () => {
 
   it('injects one authoritative AgentOrg-family refresh callback into the stream owner', async () => {
     const store = useAgentOrgContextsStore()
-    store.connect(' org-run ')
+    await store.openForInspection('org-run')
 
     expect(mocks.instances).toHaveLength(1)
     expect(mocks.instances[0]?.options.orgRunId).toBe('org-run')

@@ -5,7 +5,7 @@ import { computed, defineComponent, shallowReactive } from 'vue'
 import { localizationRuntime } from '~/localization/runtime/localizationRuntime'
 import CollaborationOverviewPanel from '../CollaborationOverviewPanel.vue'
 import { taskBearingView } from '~/services/agentOrgExecution/__tests__/taskBearingOrgFixture'
-import { hydrateAgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgContextHydration'
+import { stageAgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgContextHydration'
 const mocks = vi.hoisted(() => ({ execute: vi.fn(), query: vi.fn() }))
 vi.mock('~/composables/useWorkspaceHistorySubjectActions', () => ({ useWorkspaceHistorySubjectActions: () => ({ execute: mocks.execute }) }))
 vi.mock('~/utils/apolloClient', () => ({ getApolloClient: () => ({ query: mocks.query }) }))
@@ -20,10 +20,9 @@ beforeEach(() => {
 })
 describe('shared participant Tasks inspection', () => {
   it('exposes Tasks for a direct Org Agent and navigates by the actual task run rather than source address', async () => {
-    const context = shallowReactive(await hydrateAgentOrgExecutionContext({ orgRunId: 'org-run', view: taskBearingView(),
-      transport: { interactionFor: () => ({ send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn() }) } }))
+    const context = shallowReactive(await hydrateAgentOrgExecutionContext({ orgRunId: 'org-run', view: taskBearingView(), }))
     context.select('/director')
-    const target = computed(() => context.activeTarget()!)
+    const target = computed(() => context.selectedTarget()!)
     mocks.execute.mockImplementation(async ({ agentRunId }) => context.select({ kind: 'agent_execution', agentRunId }))
     const Harness = defineComponent({ components: { CollaborationOverviewPanel }, setup: () => ({ target }),
       template: '<CollaborationOverviewPanel :messages="target.collaborationMessages" :tasks="target.collaborationTasks" />' })
@@ -42,3 +41,9 @@ describe('shared participant Tasks inspection', () => {
     wrapper.unmount()
   })
 })
+
+async function hydrateAgentOrgExecutionContext(input: Omit<Parameters<typeof stageAgentOrgExecutionContext>[0], 'source'>) {
+  const staged = await stageAgentOrgExecutionContext({ ...input, source: 'stream' })
+  staged.commitActivities()
+  return staged.context
+}

@@ -184,7 +184,6 @@ const mountSubject = (options: {
     toggleAgentOrgTeam: vi.fn(),
     isAgentOrgRunSelected: () => false,
     isAgentOrgMemberSelected: () => false,
-    isAgentOrgRestoring: false,
     isAgentOrgTerminating: () => false,
     agentOrgTerminationError: () => null,
     agentOrgContextFor: () => null,

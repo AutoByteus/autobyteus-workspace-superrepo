@@ -6,7 +6,7 @@ import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { useWorkspaceHistorySubjectActions } from '../useWorkspaceHistorySubjectActions'
 import { useRunHistoryStore } from '~/stores/runHistoryStore'
 import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
-import { hydrateAgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgContextHydration'
+import { stageAgentOrgExecutionContext } from '~/services/agentOrgExecution/agentOrgContextHydration'
 import { taskBearingView, taskRecord } from '~/services/agentOrgExecution/__tests__/taskBearingOrgFixture'
 import { ListCollaborationRootHistory } from '~/graphql/queries/collaborationRootHistoryQueries'
 import { GetAgentOrgMemberRunProjection, GetAgentOrgRunInspection } from '~/graphql/queries/runHistoryQueries'
@@ -16,7 +16,7 @@ const mocks = vi.hoisted(() => ({ query: vi.fn(), mutate: vi.fn(), instances: []
 vi.mock('~/utils/apolloClient', () => ({ getApolloClient: () => ({ query: mocks.query, mutate: mocks.mutate }) }))
 vi.mock('~/stores/windowNodeContextStore', () => ({ useWindowNodeContextStore: () => ({ waitForBoundBackendReady: mocks.ready }) }))
 vi.mock('~/services/agentOrgExecution/agentOrgStreamingService', () => ({ AgentOrgStreamingService: class {
-  connect = vi.fn(); disconnect = vi.fn()
+  connect = vi.fn(); disconnect = vi.fn(); isReady = () => true
   constructor(readonly options: any) { mocks.instances.push(this) }
 } }))
 
@@ -66,24 +66,27 @@ const setup = async (active = true) => {
   })
   // Model the already hydrated current route, without mounting the history drawer.
   const context = shallowReactive(await hydrateAgentOrgExecutionContext({ orgRunId: 'org-run', view,
-    ...(active ? { transport: { interactionFor: () => ({ send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn() }) } } : {}),
   }))
   context.select('/director')
   const contexts = useAgentOrgContextsStore()
   if (active) {
-    contexts.connect('org-run')
-    mocks.instances[0].options.publish(context)
+    await contexts.openForInspection('org-run')
+    await flushPromises()
+    contexts.contexts['org-run'] = context
   } else contexts.contexts['org-run'] = context
   const history = useRunHistoryStore()
+  // Isolate the action's unloaded family-read boundary from initial context publication.
+  // The current exact context is valid; the drawer's history slice is not prepared.
+  history.agentOrgHistory = []
+  mocks.query.mockClear()
   expect(history.agentOrgHistory).toEqual([])
-  expect(mocks.query.mock.calls.every(([{ query }]) => query === GetAgentOrgMemberRunProjection)).toBe(true)
   const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/workspace', component: { template: '<div />' } }] })
   await router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', orgRunId: 'org-run', memberAddress: '/director', mode: active ? 'active' : 'history' } })
   let execute!: ReturnType<typeof useWorkspaceHistorySubjectActions>['execute']
   // Real component -> real action -> real Pinia read/strict parser -> real router/context selection.
   wrapper = mount(defineComponent({ setup() {
     execute = useWorkspaceHistorySubjectActions().execute
-    const tasks = context.activeTarget()!.collaborationTasks
+    const tasks = context.selectedTarget()!.collaborationTasks
     return () => h(CollaborationDelegatedTasksSection, { tasks })
   } }), { global: { plugins: [router], stubs: {
     Icon: { template: '<span />' }, MarkdownRenderer: { props: ['content'], template: '<article>{{ content }}</article>' },
@@ -111,13 +114,13 @@ describe('exact Org task inspection independent of history drawer initialization
     expect(history.agentOrgHistory).toHaveLength(1)
     expect(router.currentRoute.value.query).toMatchObject({ rootSubjectKind: 'agent_org', orgRunId: 'org-run',
       definitionId: 'org-definition', mode: 'active', agentRunId: 'agent-task-worker', memberAddress: '/team/worker' })
-    expect(context.activeTarget()).toMatchObject({ access: 'read_only', context: { state: { runId: 'agent-task-worker' } } })
+    expect(context.selectedTarget()).toMatchObject({ access: 'read_only', context: { state: { runId: 'agent-task-worker' } } })
     await wrapper!.findAll('[data-test="team-delegated-task-summary-row"]')[2].trigger('click')
     await wrapper!.get('[data-test="task-direction-team"]').trigger('click')
     await wrapper!.get('[data-test="task-identity-detail"]').findAll('[data-test="task-identity-agent"]')[2].trigger('click')
     await flushPromises()
     expect(router.currentRoute.value.query.agentRunId).toBe('agent-task-worker-two')
-    expect(context.activeTarget()).toMatchObject({ access: 'read_only', context: { state: { runId: 'agent-task-worker-two' } } })
+    expect(context.selectedTarget()).toMatchObject({ access: 'read_only', context: { state: { runId: 'agent-task-worker-two' } } })
     expect(historyQueries()).toHaveLength(1)
     expect(mocks.instances).toHaveLength(1)
     expect(mocks.mutate).not.toHaveBeenCalled()
@@ -127,9 +130,9 @@ describe('exact Org task inspection independent of history drawer initialization
     const { execute, contexts, router } = await setup(false)
     await execute(inspect('agent-task-worker-two'))
     expect(router.currentRoute.value.query).toMatchObject({ mode: 'history', agentRunId: 'agent-task-worker-two' })
-    expect(contexts.contextFor('org-run')?.activeTarget()).toMatchObject({ access: 'read_only', context: { state: { runId: 'agent-task-worker-two' } } })
+    expect(contexts.contextFor('org-run')?.selectedTarget()).toMatchObject({ access: 'read_only', context: { state: { runId: 'agent-task-worker-two' } } })
     expect(historyQueries()).toHaveLength(1)
-    expect(mocks.query.mock.calls.some(([{ query }]) => query === GetAgentOrgRunInspection)).toBe(true)
+    expect(mocks.query.mock.calls.some(([{ query }]) => query === GetAgentOrgRunInspection)).toBe(false) // coherent retained context is reusable
     expect(mocks.instances).toHaveLength(0)
     expect(mocks.mutate).not.toHaveBeenCalled()
   })
@@ -153,16 +156,22 @@ describe('exact Org task inspection independent of history drawer initialization
 
   it('does not substitute a configured or same-address execution for an unknown exact AgentRun', async () => {
     const { execute, context, router } = await setup()
-    await execute(inspect('missing-agent-run'))
-    expect(router.currentRoute.value.query.agentRunId).toBe('missing-agent-run')
-    expect(context.activeTarget()).toBeNull()
+    await expect(execute(inspect('missing-agent-run'))).rejects.toThrow('unavailable')
+    expect(router.currentRoute.value.query.agentRunId).toBeUndefined()
+    expect(context.selectedTarget()?.context.state.runId).toBe('agent-director')
     expect(mocks.mutate).not.toHaveBeenCalled()
   })
 
   it('retains the exact AgentRun requirement before issuing navigation', async () => {
     const { execute, push } = await setup()
-    await expect(execute({ ...inspect(), agentRunId: undefined })).rejects.toThrow('Exact task Agent execution is required')
+    await expect(execute({ ...inspect(), agentRunId: undefined })).rejects.toThrow('Exact task Agent execution is unavailable')
     expect(push).not.toHaveBeenCalled()
     expect(mocks.mutate).not.toHaveBeenCalled()
   })
 })
+
+async function hydrateAgentOrgExecutionContext(input: Omit<Parameters<typeof stageAgentOrgExecutionContext>[0], 'source'>) {
+  const staged = await stageAgentOrgExecutionContext({ ...input, source: 'stream' })
+  staged.commitActivities()
+  return staged.context
+}

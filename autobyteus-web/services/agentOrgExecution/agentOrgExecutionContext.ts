@@ -8,7 +8,6 @@ import { AgentStatus } from '~/types/agent/AgentStatus'
 import { parseAgentTeamAddress, type AgentTeamAddress } from '~/types/agent/AgentTeamAddress'
 import type {
   ActiveAgentWorkspaceTarget,
-  AgentInteractionPort,
   TeamWorkspaceContextView,
 } from '~/types/workspace/activeAgentWorkspaceTarget'
 import type { CollaborationMessagesContextView } from '~/types/workspace/collaborationMessagesContextView'
@@ -27,10 +26,6 @@ import {
 
 export type AgentOrgSyncPhase = 'hydrating' | 'live' | 'historical' | 'reopen_required' | 'closed'
 export type AgentOrgEventApplication = 'applied' | 'checkpoint_required'
-
-export interface AgentOrgCommandTransport {
-  interactionFor(agentRunId: string): AgentInteractionPort
-}
 
 export type AgentOrgContextEntry = Readonly<{
   agentRunId: string
@@ -57,7 +52,6 @@ export class AgentOrgExecutionContext {
     orgRunId: string
     view: AgentOrgExecutionViewDto
     entries: readonly AgentOrgContextEntry[]
-    transport?: AgentOrgCommandTransport
   }>) {
     this.orgRunId = input.orgRunId
     this.view = structuredClone(input.view)
@@ -81,12 +75,8 @@ export class AgentOrgExecutionContext {
       }
       this.contexts.get(status.agent_run_id)!.state.currentStatus = status.status as AgentStatus
     }
-    this.transport = input.transport
-    if (input.view.is_active && !input.transport) throw new Error('Live AgentOrg context needs its command transport.')
     this.phase = input.view.is_active ? 'live' : 'historical'
   }
-
-  private readonly transport?: AgentOrgCommandTransport
 
   get executionTree() { return this.view.execution_tree }
   get isActive(): boolean { return this.view.is_active }
@@ -114,14 +104,12 @@ export class AgentOrgExecutionContext {
     this.selection = this.index.selectedAgent(candidate) ? candidate : null
   }
 
-  activeTarget(): ActiveAgentWorkspaceTarget | null {
+  selectedTarget(): ActiveAgentWorkspaceTarget | null {
     if (!['live', 'historical', 'reopen_required'].includes(this.phase)) return null
     const agent = this.index.selectedAgent(this.selection)
     if (!agent) return null
     const context = this.contexts.get(agent.agentRunId)!
-    const access = this.isActive && agent.live && this.phase !== 'historical'
-      ? { access: 'live' as const, interaction: this.transport!.interactionFor(agent.agentRunId) }
-      : { access: 'read_only' as const }
+    const access = { access: 'read_only' as const }
     const common = {
       ...access, root: Object.freeze({ orgRunId: this.orgRunId }), address: agent.address, context,
       collaborationMessages: this.messagesView(agent.address, agent.agentRunId),
@@ -137,6 +125,25 @@ export class AgentOrgExecutionContext {
         : { kind: 'agent_org_team_member' as const }),
     })
     return Object.freeze({ ...common, kind: 'agent_org_direct_agent' })
+  }
+
+  adoptLocalContexts(previous: AgentOrgExecutionContext): void {
+    if (previous.orgRunId !== this.orgRunId) throw new Error('AgentOrg candidate root mismatch.')
+    const matches = this.listAgentContextEntries().flatMap((entry) => {
+      const old = previous.getAgentContext(entry.agentRunId)
+      if (!old) return []
+      if (previous.index.requireAgent(entry.agentRunId).address !== entry.memberAddress) {
+        throw new Error('AgentOrg candidate retained address mismatch.')
+      }
+      return [{ entry, old }]
+    })
+    // All candidate projections and exact correlations have passed before mutation.
+    for (const { entry, old } of matches) {
+      old.config = entry.context.config
+      old.state = entry.context.state
+      this.contexts.set(entry.agentRunId, old)
+    }
+    this.select(previous.selection)
   }
 
   applyEvent(changeSequence: number, event: AgentOrgExecutionEventDto): AgentOrgEventApplication {
@@ -195,8 +202,9 @@ export class AgentOrgExecutionContext {
   setActive(active: boolean): void {
     this.view = { ...this.view, is_active: active }
     if (!active) {
-      this.selection = null
-      this.phase = 'closed'
+      this.commitView({ ...this.view, agent_statuses: this.view.agent_statuses.map((status) => ({ ...status, status: 'offline' })) })
+      this.contexts.forEach((context) => applyOfflineOrTerminalCleanup(context))
+      this.phase = 'historical'
     }
   }
 

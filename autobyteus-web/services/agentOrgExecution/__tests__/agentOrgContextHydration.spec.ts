@@ -25,7 +25,7 @@ vi.mock('~/stores/runHistoryStore', () => ({
   }),
 }))
 
-import { hydrateAgentOrgExecutionContext } from '../agentOrgContextHydration'
+import { stageAgentOrgExecutionContext } from '../agentOrgContextHydration'
 
 import { taskBearingView, taskRecord } from './taskBearingOrgFixture'
 
@@ -53,7 +53,7 @@ const settledEvent = (
   },
 })
 
-describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
+describe('staged AgentOrg context hydration and publication', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
@@ -66,9 +66,6 @@ describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
     const context = await hydrateAgentOrgExecutionContext({
       orgRunId: 'org-run',
       view: taskBearingView(),
-      transport: { interactionFor: () => ({
-        send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn(),
-      }) },
     })
 
     const entries = context.listAgentContextEntries()
@@ -81,7 +78,7 @@ describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
     expect(context.changeSequence).toBe(8)
 
     context.select('/team')
-    expect(context.activeTarget()).toMatchObject({
+    expect(context.selectedTarget()).toMatchObject({
       kind: 'agent_org_team_member',
       address: '/team/lead',
       context: { state: { runId: 'agent-lead-configured' } },
@@ -108,17 +105,44 @@ describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
         : { agentRunId: variables.agentRunId, memberAddress: variables.memberAddress, conversation: [], activities: [], hasEarlierActiveTraceEvents: false } },
     }))
 
-    await hydrateAgentOrgExecutionContext({
-      orgRunId: 'org-run',
-      view: taskBearingView(),
-      transport: { interactionFor: () => ({
-        send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn(),
-      }) },
+    const staged = await stageAgentOrgExecutionContext({
+      source: 'inspection', orgRunId: 'org-run', view: taskBearingView(),
     })
+    expect(useAgentActivityStore().getActivities('agent-director')).toEqual([])
+    staged.commitActivities()
 
     expect(useAgentActivityStore().getActivities('agent-director')).toEqual([
       expect.objectContaining({ kind: 'tool', invocationId: 'tool-1', status: 'success' }),
     ])
+  })
+
+  it('never creates a workspace while observationally hydrating an active result', async () => {
+    const view = structuredClone(taskBearingView())
+    const director = view.execution_tree.rootOrg.members[0]
+    if (!('agentRunId' in director)) throw new Error('Expected direct fixture Agent')
+    director.launchConfiguration.workspaceRootPath = '/existing/workspace'
+    mocks.resolveWorkspaceMetadataByRootPath.mockResolvedValue(null)
+
+    const staged = await stageAgentOrgExecutionContext({ source: 'inspection', orgRunId: 'org-run', view })
+
+    expect(staged.context.isActive).toBe(true)
+    expect(mocks.resolveWorkspaceMetadataByRootPath).toHaveBeenCalledWith('/existing/workspace')
+    expect(mocks.ensureWorkspaceByRootPath).not.toHaveBeenCalled()
+    expect(staged.context.getAgentContext('agent-director')!.config.workspaceId).toBeNull()
+  })
+
+  it('rejects one unavailable exact projection without publishing any staged activities', async () => {
+    mocks.query.mockImplementation(async ({ variables }) => ({ data: { getAgentOrgMemberRunProjection:
+      variables.agentRunId === 'agent-task-worker' ? null : {
+        agentRunId: variables.agentRunId, memberAddress: variables.memberAddress,
+        conversation: [], hasEarlierActiveTraceEvents: false,
+        activities: [{ kind: 'tool', invocationId: 'staged-tool', toolName: 'read_file', status: 'success', result: 'done', ts: 1 }],
+      },
+    } }))
+    await expect(stageAgentOrgExecutionContext({ source: 'inspection', orgRunId: 'org-run', view: taskBearingView() }))
+      .rejects.toThrow("Projection unavailable for 'agent-task-worker'")
+    expect(useAgentActivityStore().getActivities('agent-director')).toEqual([])
+    expect(useAgentActivityStore().getActivities('agent-task-lead')).toEqual([])
   })
 
   it('projects a live settled task Agent to retained offline hierarchy truth without reload', async () => {
@@ -126,9 +150,6 @@ describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
     const context = await hydrateAgentOrgExecutionContext({
       orgRunId: 'org-run',
       view,
-      transport: { interactionFor: () => ({
-        send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn(),
-      }) },
     })
     context.getAgentContext('agent-worker-task')!.state.currentStatus = AgentStatus.Running
     const run = liveHistoryRun(view)
@@ -170,9 +191,6 @@ describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
     const context = await hydrateAgentOrgExecutionContext({
       orgRunId: 'org-run',
       view,
-      transport: { interactionFor: () => ({
-        send: vi.fn(), interrupt: vi.fn(), decideTool: vi.fn(),
-      }) },
     })
     context.getAgentContext('agent-task-lead')!.state.currentStatus = AgentStatus.Running
     context.getAgentContext('agent-task-worker')!.state.currentStatus = AgentStatus.Running
@@ -194,3 +212,9 @@ describe('hydrateAgentOrgExecutionContext task-bearing package', () => {
     expect(context.error).toBeNull()
   })
 })
+
+async function hydrateAgentOrgExecutionContext(input: Omit<Parameters<typeof stageAgentOrgExecutionContext>[0], 'source'>) {
+  const staged = await stageAgentOrgExecutionContext({ ...input, source: 'stream' })
+  staged.commitActivities()
+  return staged.context
+}

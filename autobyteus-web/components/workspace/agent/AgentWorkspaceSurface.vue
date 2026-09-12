@@ -28,7 +28,7 @@
     />
     <div class="min-h-0 flex-1">
       <AgentEventMonitor
-        :read-only="target.access === 'read_only'"
+        :read-only="target.access === 'read_only' && !('root' in target && (target.context.submissionPending || target.kind === 'agent_org_direct_agent'))"
         :conversation="target.context.state.conversation"
         :run-id="target.context.state.runId"
         :agent-name="agentName"

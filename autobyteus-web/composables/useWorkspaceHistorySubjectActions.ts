@@ -1,6 +1,5 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
-import { useAgentOrgRunStore } from '~/stores/agentOrgRunStore'
 import { useRunHistoryStore } from '~/stores/runHistoryStore'
 import { useAgentSelectionStore } from '~/stores/agentSelectionStore'
 
@@ -16,7 +15,6 @@ export const useWorkspaceHistorySubjectActions = () => {
   const route = useRoute()
   const router = useRouter()
   const historyStore = useRunHistoryStore()
-  const orgRunStore = useAgentOrgRunStore()
   const orgContexts = useAgentOrgContextsStore()
   const selection = useAgentSelectionStore()
 
@@ -35,61 +33,37 @@ export const useWorkspaceHistorySubjectActions = () => {
     const definitionId = run.executionTree.rootOrg.orgDefinitionId
 
     if (command.action === 'stop') {
-      await orgRunStore.terminate(run.rootRunId)
-      orgContexts.disconnect(run.rootRunId)
-      await historyStore.refreshTreeQuietly()
-      if (route.query.rootSubjectKind === 'agent_org'
-        && route.query.mode === 'active'
-        && String(route.query.orgRunId || '') === run.rootRunId) {
-        await router.replace({
-          path: '/workspace',
-          query: { rootSubjectKind: 'agent_org', definitionId, mode: 'configuration' },
-        })
+      try { await orgContexts.stopAndInspect(run.rootRunId) }
+      finally {
+        if (orgContexts.contextFor(run.rootRunId)?.phase === 'historical'
+          && route.query.rootSubjectKind === 'agent_org' && String(route.query.orgRunId || '') === run.rootRunId) {
+          await router.replace({ path: '/workspace', query: { ...route.query, mode: 'history' } })
+        }
       }
       return
     }
 
-    if (command.action === 'open') {
-      if (run.isActive) orgContexts.connect(run.rootRunId)
-      else await orgContexts.inspect(run.rootRunId)
-      selection.clearSelection()
-      await router.push({
-        path: '/workspace',
-        query: {
-          rootSubjectKind: 'agent_org',
-          definitionId,
-          orgRunId: run.rootRunId,
-          mode: run.isActive ? 'active' : 'history',
-        },
-      })
-      return
-    }
-
+    await orgContexts.openForInspection(run.rootRunId)
+    const context = orgContexts.contextFor(run.rootRunId)
+    if (!context) throw new Error(`AgentOrg inspection '${run.rootRunId}' is unavailable.`)
     if (command.action === 'inspect') {
-      if (!command.agentRunId) throw new Error('Exact task Agent execution is required.')
-      selection.clearSelection()
-      orgContexts.select(run.rootRunId, { kind: 'agent_execution', agentRunId: command.agentRunId })
-      if (run.isActive) orgContexts.connect(run.rootRunId)
-      else await orgContexts.inspect(run.rootRunId)
-      await router.push({ path: '/workspace', query: { rootSubjectKind: 'agent_org', definitionId,
-        orgRunId: run.rootRunId, mode: run.isActive ? 'active' : 'history', agentRunId: command.agentRunId,
-        ...(command.memberAddress ? { memberAddress: command.memberAddress } : {}),
-      } })
-      return
+      const agent = command.agentRunId ? context.index.agents.get(command.agentRunId) : null
+      if (!agent || (command.memberAddress && agent.address !== command.memberAddress)) {
+        throw new Error('Exact task Agent execution is unavailable.')
+      }
+      orgContexts.select(run.rootRunId, { kind: 'agent_execution', agentRunId: agent.agentRunId })
+    } else if (command.action === 'select') {
+      const address = command.memberAddress?.trim()
+      if (!address || !context.index.configured.has(address)) throw new Error('AgentOrg member selection requires an exact address.')
+      orgContexts.select(run.rootRunId, address)
     }
-
-    const memberAddress = command.memberAddress?.trim()
-    if (!memberAddress) throw new Error('AgentOrg member selection requires an exact address.')
-    const activeRunId = run.isActive ? run.rootRunId : await orgRunStore.restore(run.rootRunId)
     selection.clearSelection()
-    orgContexts.select(activeRunId, memberAddress)
-    orgContexts.connect(activeRunId)
-    await historyStore.refreshTreeQuietly()
-    await router.push({
-      path: '/workspace',
-      query: { rootSubjectKind: 'agent_org', definitionId, orgRunId: activeRunId, mode: 'active', memberAddress },
-    })
+    await router.push({ path: '/workspace', query: {
+      rootSubjectKind: 'agent_org', definitionId, orgRunId: run.rootRunId,
+      mode: context.isActive ? 'active' : 'history',
+      ...(command.action !== 'open' && command.memberAddress ? { memberAddress: command.memberAddress } : {}),
+      ...(command.action === 'inspect' ? { agentRunId: command.agentRunId } : {}),
+    } })
   }
-
   return { execute }
 }

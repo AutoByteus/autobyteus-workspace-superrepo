@@ -40,7 +40,6 @@ export interface WorkspaceHistorySectionState {
   toggleAgentOrgTeam?: (rootRunId: string, address: string) => void;
   isAgentOrgRunSelected?: (rootRunId: string) => boolean;
   isAgentOrgMemberSelected?: (rootRunId: string, address: string, agentRunId?: string) => boolean;
-  isAgentOrgRestoring?: boolean;
   isAgentOrgTerminating?: (rootRunId: string) => boolean;
   agentOrgTerminationError?: (rootRunId: string) => string | null;
   agentOrgContextFor?: (rootRunId: string) => AgentOrgExecutionContext | null;

@@ -238,6 +238,12 @@ export const useRunHistoryStore = defineStore('runHistory', {
       this.refreshRunNavigationTopology('run-reconcile');
     },
 
+    applyAgentOrgActivity(orgRunId: string, isActive: boolean): void {
+      this.agentOrgRequestGeneration += 1;
+      this.agentOrgHistory = this.agentOrgHistory.map((run) => run.rootRunId === orgRunId ? { ...run, isActive } : run);
+      void this.refreshAgentOrgHistory();
+    },
+
     markTeamAsActive(teamRunId: string): void {
       this.workspaceGroups = this.workspaceGroups.map((workspace) => ({
         ...workspace,
