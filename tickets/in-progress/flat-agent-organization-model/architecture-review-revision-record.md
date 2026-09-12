@@ -28,6 +28,7 @@ concise chronological architecture-review history.
 | ARCH-REV-019 | Round 19 / approved `RER-031` compact message/task UI and exact Org heading | `AD-REV-021` | Pass | Pass | `UI-CLEAN-001` resolved; no new finding |
 | ARCH-REV-020 | Round 20 — history inspection, deliberate continuation and retained stop | AD-REV-023; AD-REV-022 copy-only direct | Pass | Pass | HIST-INSPECT-001/002 resolved at design boundary; no new AR-FIND |
 | ARCH-REV-021 | Round 21 — Org-local authoring and first-run final migration output | AD-REV-024; DS-038–040 | Pass | Pass | PKG-AUTH-002 resolved; AR-PREM-008 rejects deployed-intermediate assumption; no new AR-FIND |
+| ARCH-REV-022 | Round 22 — exact Org attachment ownership and initial saved-link preservation | AD-REV-025; DS-041–043 | Pass | Pass | IR048-DI-001 resolved at design boundary; AR-PREM-009; no new AR-FIND |
 
 ## Revision Entries
 
@@ -565,3 +566,33 @@ None.
 - Material classification changes: Focused Medium/High; cumulative Large/High. No Requirement Gap or Product gate. Prior deployment inference withdrawn proportionately under explicit user evidence; approved owned preservation remains independently required.
 - Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
 - Remaining risks: authored/internal/API confusion, normal fallback, value normalization, permissive terminal skips, prospective-target/retry coherence, ownership scan and external writes, migration-specific status reduction. Require actual first-run/file/runner/roundtrip and downstream source/API/Delivery validation. Existing evidence is not rewritten or expanded into a current pass.
+
+
+### ARCH-REV-022 — Exact Org attachment and saved-locator preservation pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 22; IR-048 returned IR048-DI-001 and user confirmed exact AgentRun ownership/re-review.
+- Triggering role, report path, and finding IDs: Architecture Designer, `architecture-context-file-ownership-investigation.md`; Implementation `implementation-evidence/IR-048/design-impact.md` and expected-rejection observation; IR048-DI-001. Original CRR-072/API-FIND-031 remains a separately identified implementation-local omission to reconcile.
+- Relevant architecture design revision IDs: `AD-REV-025@b115491c0faa73d1c2b5bfcc88d700c6bff36c0d`, DS-041–043 / CF-01–06 / VAL-064–069; cumulative prior design outside explicit selector/locator-preservation supersession.
+- Requirements authority: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`.
+- Prior authoritative decision: `Pass` (ARCH-REV-021 on AD-REV-024).
+- Current authoritative decision: `Pass`.
+- What changed: independently traced shared upload/submission, exact task activation/retention, stored-only location, file movement/provider normalization and raw-media writer/reader. Org descriptors/routes now preserve exact root/AgentRun, validate phase pairs before movement, retain original cross-view file ownership and remove address-only current paths. Independently counted 166 saved Team image locators in 77 traces and checked one unique physical file in a one-level root; this supports initial affected-link conversion, not universal deployment assumptions. Existing family migration owns strict known-field plan/atomic reread/rename/cleanup/readiness, with no extra ID, reset/replay or generic recovery. No executable/source/Delivery result inferred.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| IR048-DI-001 | Implementation blocked on architecture identity/locator impact | Resolved at design boundary | DS-041–043; VAL-064–069 | Closed exact descriptors, stored-only location, draft/final pair validation, all current client/server/provider consumers, real-byte validation and initial saved-link preservation specified. |
+| CRR-072 / API-FIND-031 | Original missing Org upload integration, Local Fix; IR-048 checkpoint partial | Retain and reconcile; not executable acceptance | IR-048 checkpoint6d77b3c8b / result5636a1f3a | New ownership correction does not retroactively misclassify original omission or justify a duplicate assignment/partial source advance. |
+| PKG-AUTH-002 / AR-PREM-008 | AD-REV-024 passed; deployed-intermediate inference rejected | Retained | DS-038–040, DS-043 | org_local/unversioned output, existing first-run entries, no status reset/runtime replay; saved attachments require independent data analysis. |
+| AR-FIND-001/002 | Resolved definition boundary and handoff order | Retained | Cumulative design | External projects stay read-only; no handoff/definition-policy change. |
+| AR-FIND-003–007 | Resolved lifecycle/coherence/status findings | Retained | Cumulative design; DS-043 | One FIFO/fence and browser-history owners unchanged; family FAILED versus separate summary warning remains explicit. |
+| AR-FIND-008 / AAV-001 and task parity | Former configured-only policy superseded; retained-history basis established | Retained | RER-028 cumulative; DS-041/042 | Exact retained task identity and ordinary reference visibility preserved; no source/first-member substitution or reactivation. |
+| HIST-INSPECT-001/002 / COMPOSER-001 / IR-044–048 draft guards | Design/source obligations with recorded scopes | Preserved, not reaccepted as source | DS-035–037/042; VAL-064–068 | Browse/open/preparation stay observational; deliberate Send and captured-context/newer-edit recovery unchanged. |
+| Product/UI and CR-FIND-019 or other source obligations | Existing independent authorities | Retained | Cumulative Product/design/source records | No fresh visual redesign or unrelated source claim. |
+
+- New or remaining finding IDs: None. AR-PREM-009 records the supported initial saved-link consequence, not a new blocker.
+- Material classification changes: focused Medium/High and cumulative Large/High remain; no Requirement Gap or Product gate.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
+- Remaining risks: exact-ID propagation, cross-view ownership, actual file/REST/provider reads, async draft recovery, migration known-field/owner/commit/readiness correctness and actual cutover inventory. Different terminal-status/old-draft evidence returns for a transition decision; no guessed discard/upgrade. Require cumulative source review and renewed real API/E2E/Delivery validation. Existing expected-rejection/mock results do not establish desired success.
