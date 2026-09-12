@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { taskBearingView } from '~/services/agentOrgExecution/__tests__/taskBearingOrgFixture'
 
 const mocks = vi.hoisted(() => ({
+  applyAgentOrgActivity: vi.fn(),
   instances: [] as Array<Record<string, any>>,
   refreshAgentOrgHistory: vi.fn(async () => undefined),
 }))
@@ -24,7 +25,7 @@ vi.mock('~/services/agentOrgExecution/agentOrgStreamingService', () => ({
 }))
 
 vi.mock('~/stores/runHistoryStore', () => ({
-  useRunHistoryStore: () => ({ refreshAgentOrgHistory: mocks.refreshAgentOrgHistory, applyAgentOrgActivity: vi.fn() }),
+  useRunHistoryStore: () => ({ refreshAgentOrgHistory: mocks.refreshAgentOrgHistory, applyAgentOrgActivity: mocks.applyAgentOrgActivity }),
 }))
 
 import { useAgentOrgContextsStore } from '~/stores/agentOrgContextsStore'
@@ -48,6 +49,10 @@ describe('agentOrgContextsStore accepted-message history invalidation', () => {
       commandId: 'command-1',
     })
 
+    expect(mocks.refreshAgentOrgHistory).toHaveBeenCalledTimes(1)
+    mocks.applyAgentOrgActivity.mockClear()
+    mocks.instances[0]?.options.onInactive()
+    expect(mocks.applyAgentOrgActivity).toHaveBeenCalledExactlyOnceWith('org-run', false)
     expect(mocks.refreshAgentOrgHistory).toHaveBeenCalledTimes(1)
     store.disconnect('org-run')
   })

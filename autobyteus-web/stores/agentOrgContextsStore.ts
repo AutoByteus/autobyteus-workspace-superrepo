@@ -76,10 +76,7 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
       orgRunId: id,
       publish: (candidate, commitActivities) => publish(id, candidate, commitActivities),
       reportError: (message) => report(id, message),
-      onInactive: () => {
-        markHistorical(id)
-        void useRunHistoryStore().refreshAgentOrgHistory()
-      },
+      onInactive: () => markHistorical(id),
       onAcceptedExternalUserMessage: () => { void useRunHistoryStore().refreshAgentOrgHistory() },
     })
     services.set(id, service)
@@ -115,7 +112,7 @@ export const useAgentOrgContextsStore = defineStore('agentOrgContexts', () => {
     const current = () => generations.get(id) === generation
     try {
       const result = await getApolloClient().query({ query: GetAgentOrgRunInspection,
-        variables: { orgRunId: id }, fetchPolicy: 'network-only' })
+        variables: { orgRunId: id }, fetchPolicy: 'network-only', context: { queryDeduplication: false } })
       if (!current()) return
       if (result.errors?.length) throw new Error(result.errors.map((e: { message: string }) => e.message).join(', '))
       const envelope = RootExecutionViewDtoSchema.parse(result.data?.getAgentOrgRunInspection)

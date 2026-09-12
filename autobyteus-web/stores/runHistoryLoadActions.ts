@@ -1,3 +1,4 @@
+import type { ApolloClient, NormalizedCacheObject } from '@apollo/client/core';
 import { getApolloClient } from '~/utils/apolloClient';
 import { useWindowNodeContextStore } from '~/stores/windowNodeContextStore';
 import { useWorkspaceStore } from '~/stores/workspace';
@@ -65,6 +66,20 @@ export interface RunHistoryFetchStoreLike {
   resolveWorkspaceMetadataByRootPath(rootPath: string): Promise<WorkspaceMetadata | null>;
 }
 
+const readAgentOrgHistory = async (
+  client: ApolloClient<NormalizedCacheObject>,
+): Promise<AgentOrgRunHistoryItem[]> => {
+  const result = await client.query<{ listCollaborationRootHistory: unknown }>({
+    query: ListCollaborationRootHistory,
+    fetchPolicy: 'network-only',
+    context: { queryDeduplication: false },
+  });
+  if (result.errors?.length) {
+    throw new Error(result.errors.map((error) => error.message).join(', '));
+  }
+  return parseAgentOrgHistoryItems(result.data?.listCollaborationRootHistory ?? []);
+};
+
 export const fetchRunHistoryTree = async (
   store: RunHistoryFetchStoreLike,
   limitPerAgent = 6,
@@ -96,15 +111,7 @@ export const fetchRunHistoryTree = async (
         }
         return result.data?.listWorkspaceRunHistory || [];
       }),
-      client.query<{ listCollaborationRootHistory: unknown }>({
-        query: ListCollaborationRootHistory,
-        fetchPolicy: 'network-only',
-      }).then((result) => {
-        if (result.errors?.length) {
-          throw new Error(result.errors.map((error: { message: string }) => error.message).join(', '));
-        }
-        return parseAgentOrgHistoryItems(result.data?.listCollaborationRootHistory ?? []);
-      }),
+      readAgentOrgHistory(client),
     ]);
 
     if (workspaceResult.status === 'fulfilled') {
@@ -167,14 +174,7 @@ export const refreshAgentOrgHistoryForStore = async (
     const windowNodeContextStore = useWindowNodeContextStore();
     const isReady = await windowNodeContextStore.waitForBoundBackendReady();
     if (!isReady) throw new Error(windowNodeContextStore.lastReadyError || 'Bound backend is not ready');
-    const result = await getApolloClient().query<{ listCollaborationRootHistory: unknown }>({
-      query: ListCollaborationRootHistory,
-      fetchPolicy: 'network-only',
-    });
-    if (result.errors?.length) {
-      throw new Error(result.errors.map((error: { message: string }) => error.message).join(', '));
-    }
-    const rows = parseAgentOrgHistoryItems(result.data?.listCollaborationRootHistory ?? []);
+    const rows = await readAgentOrgHistory(getApolloClient());
     if (generation !== store.agentOrgRequestGeneration) return;
     store.agentOrgHistory = rows;
     store.historyFamilyErrors = { ...store.historyFamilyErrors, agentOrg: null };

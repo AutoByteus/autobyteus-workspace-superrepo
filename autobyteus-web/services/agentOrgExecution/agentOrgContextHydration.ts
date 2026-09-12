@@ -117,6 +117,7 @@ const fetchProjection = async (
     query: GetAgentOrgMemberRunProjection,
     variables: { orgRunId, memberAddress: seed.address, agentRunId: seed.agentRunId },
     fetchPolicy: 'network-only',
+    context: { queryDeduplication: false },
   })
   if (response.errors?.length) {
     throw new Error(response.errors.map((error: { message: string }) => error.message).join(', '))
