@@ -2,290 +2,275 @@
 
 ## Review Round Meta
 
-- Stable package: `AORG-FLAT-TEAM-001`; recovery `IR048-DI-001`.
+- Stable package: `AORG-FLAT-TEAM-001`; trigger `CRR-081 / CR-FIND042 / API-FIND035`.
 - Upstream Requirements Doc: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-doc.md` — approved `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`.
 - Upstream Investigation Notes: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/investigation-notes.md`.
 - Upstream Requirements Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/requirements-revision-record.md`.
-- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` — `AD-REV-025@b115491c0faa73d1c2b5bfcc88d700c6bff36c0d`.
-- Supplemental Task Artifacts Reviewed: contract, context-file ownership investigation, self-validation, IR-048 design-impact/owner-correlation observation and their stated renderer limits; production migration convention; retained authoring, history/composer, task-parity, UI and Product authorities. Delivery report was read for provenance, not treated as current acceptance.
+- Reviewed Design Spec: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-spec.md` — `AD-REV-026@88ee8db1f871156749f473efda8913cc3b291c64`.
+- Supplemental Task Artifacts Reviewed: contract, extended context-file investigation, architecture self-validation, CRR-081 proof/source-boundary context, API33 real retained-text failure/evidence, IR049 actual cutover return; retained authoring, task-parity, UI, history/composer and Product authorities; production migration convention.
 - Architecture Design Revision Record Reviewed: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-design-revision-record.md`.
-- Relevant Architecture Design Revision IDs: AD-REV-025 / DS-041–043; cumulative AD-REV-001–024 outside explicitly superseded attachment selector/record-preservation wording.
+- Relevant Architecture Design Revision IDs: AD-REV-026 / DS-044–046 / CF-07–10; strengthened CF-02/03/06 and VAL-066; cumulative earlier approved design outside explicit non-media recording/projection supersession.
 - Architecture Review Revision Record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/architecture-review-revision-record.md`.
-- Current Architecture Review Revision ID: `ARCH-REV-022`.
-- Current Review Round: 22.
-- Trigger: implementation proved address-only Org file ownership loses exact configured/task execution identity; user confirmed exact AgentRun identity and requested review.
-- Prior Review Round Reviewed: ARCH-REV-021 Pass on AD-REV-024, commit `93aafae8f13a239b382a5f3f246f10b661f90733`.
-- Latest Authoritative Round: ARCH-REV-022.
-- Current-State Evidence Basis: IR-048 checkpoint `6d77b3c8b2d3deeddd5c3392dc2ce69bc63b7982`, blocked result `5636a1f3a7978cd280a85f7f4602c8db5c63b6ab`. Independently read current file owner types/builders, async/sync owner resolver, stored-only execution location, draft layout, finalization/local-path services, REST composition, frontend builder/composer/Org submission capture, task activation/settlement, provider-copy normalization, raw-media writer/projection, initial family migration and package readiness. A read-only structured scan independently counted 166 Team media.images locators in 77 trace files; one sampled nested root has Team V2, direct Agent plus two configured Teams, and one unique physical file for the sampled URI. No attachment content or conversation text was copied.
-- Evidence limits: observed saved links establish a real transition need, not an exhaustive installed-data or deployment inventory. IR-048's passing observation asserts the defect; renderer mocks are not upload/read success. This review is source-informed architecture validation, not implementation, executable, provider, browser or Delivery acceptance. No live data, source, tests or other-owner artifacts were modified.
+- Current Architecture Review Revision ID: `ARCH-REV-023`.
+- Current Review Round: 23.
+- Trigger: actual chooser/Send/immediate Open followed by cold retained Tasks participant loses the text control while original bytes and image survive.
+- Prior Review Round Reviewed: ARCH-REV-022 Pass on AD-REV-025, review `f54d19775753657fc9e4c8715780abac8d759e78`; evidence-only provenance addendum `2c446274c` changes neither design nor result.
+- Latest Authoritative Round: ARCH-REV-023.
+- Current-State Evidence Basis: IR001–054 source `3d9a019d320878c421429f27c0f074f9a4c4c2f5`, artifact `f8a3f37af0969748f05f0605e5fae1a1cc77f10f`; CRR-081 failure-origin report and API33 evidence. Independently read AgentRun normalization/original forwarded observation, native backend/factory/input clone/ingest/MemoryManager, external extractor/writer, RawTraceItem, raw normalizer, replay identity/conversation and typed page/web hydration, locator visitor and complete archive APIs.
+- Independent evidence checks: both API33 exact raw user rows at line4 have id/ts/turn_id/seq/trace_type/content/source_event/media only and one image, no non-media association. Whole-file hashes match the supplement: `589e0f1b182f051b391c1489cfd98e8ecf7204345017e7c688baf02322185658` (analyst) and `b62108d3301deb8f6f705ff673e830eee6ce53d8aa977ed6bf37b9a9acb25c01` (task-Team lead). Viewed `API-REV-033/live/screenshots/CF-retained-text-final-shutdown_root-1502.png`: retained Interrupted/Offline with image-only Context files. This is API's supplemental post-shutdown capture, not a new browser hydration test.
+- Review limits: read-only source/evidence design validation, no executable/provider/browser/HTTP or user-data mutation. Two actual Sends viewed at two widths are not four independent Sends. GET/hash success proves bytes, not durable message association. API33 remains Fail; historical evidence and known actual-installation cutover limits are not repaired by this review.
 
 ## Routing Classification Review
 
 - Task size (`Small`/`Medium`/`Large`): `Large` cumulative; focused delta `Medium`.
 - Architectural risk (`Low`/`High`): `High` cumulative and focused.
-- Classification rationale reviewed: exact execution identity crosses browser drafts, REST, physical storage, provider normalization and retained links; initial family cutover must preserve existing structured references. Counts are evidence, not the size/risk driver.
+- Classification rationale reviewed: shared native/external input recording, versionless persisted user facts, two read contracts and rendering/equality/archive traversal cross existing owners. Volume is not the driver.
 - Independent Architecture Review required by the classification: `Yes`.
 - Classification evidence or correction required: None.
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
 - Overall Basis Status (`Confirmed`/`Contradicted`/`Blocked`): `Confirmed`.
-- Approved requirements / intended behavior understood: current RER-033 includes exact configured/task participation, retained content/reference navigation and established shared attachment parity. The user explicitly confirmed exact AgentRun ownership; no new product policy is inferred.
-- Relevant existing behavior and evidence confirmed: ordinary task activation allocates a new AgentRun while retaining the configured address; durable settlement marks the task rather than erasing its indexed identity. A user can then reopen the original conversation/reference. The current Org final owner drops AgentRun before a strict exactly-one location lookup, and the draft layout also shares address identity. The production path establishes the premise independently of the synthetic reproduction.
-- Scope guardrail confirmed: in scope are exact Org upload/open/remove/finalize/send, retained and cross-view references, current parser/provider parity and demonstrated saved-link preservation during the first family cutover. Out of scope are external-project updates, new auth/security policy, arbitrary URL/prose/provider-history repair, an assumed deployed-intermediate upgrade and Team attachment redesign.
-- Approved change, preserved behavior, and outside scope understood: Yes. Existing stored-only location is membership/physical authority, not liveness or authorization; IDs do not replace existing access controls. File preparation/read cannot activate a root.
-- Every prospective blocking Design Impact finding is traceable to approved authority: Yes; no blocking finding.
-- Remaining material ambiguity: None for implementing this first-rollout contract. Actual deployment/draft inventory is an explicit pre-cutover obligation; a different evidenced cohort returns for a transition decision rather than being guessed or marked migrated.
+- Approved requirements / intended behavior understood: established context-file/history parity means the actual sent attachment remains associated with its user message, not merely present somewhere on disk. No new behavior or prototype is selected.
+- Relevant existing behavior and evidence confirmed: API33's ordinary chooser/one Send/provider reply and cold exact Tasks navigation independently establish reachability. The external extractor, RawTraceItem and both read projections retain only media arrays. Native ingestion independently reduces to LLMUserMessage and therefore also lacks non-media facts. The temporary extractor reproduction isolates the defect; it does not establish the scenario or successful behavior.
+- Scope guardrail confirmed: original non-media association, both current producers and cold/read-page consumers, exact URI/type/name, equality and normal archive/locator handling. Outside scope: historical association invention, provider-history scraping, changing media working-context semantics, another ledger/writer/queue, new ACK durability, migration reset/replay and Product redesign.
+- Approved change, preserved behavior, and outside scope understood: Yes. Existing raw storage can accept an optional fact without version branches or empty-field rewrites; actual old lost metadata is not recoverable merely because file bytes survive.
+- Every prospective blocking Design Impact finding is traceable to approved authority: Yes; no new blocker.
+- Remaining material ambiguity: None for this forward recording/projection design. IR049's evidenced actual-installation cutover condition remains separately unresolved before that installation is migrated; it does not prevent implementing/testing this representation extension on disposable data.
 
 | Behavior ID | Kind | Design Alignment With Approved Intent (`Pass`/`Fail`) | Approved Trigger / Contract And Current-State Evidence (`Pass`/`Fail`/`Unclear`) | Target Outcome / Path / Spine Coherence (`Pass`/`Fail`/`Unclear`) | Status (`Confirmed`/`Needs Correction`/`Unclear`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| BEH-002/004/006 / REQ-003/016 | Upload, preview, remove and Send | Pass | Pass | Pass | Confirmed | Shared chooser/drop/paste and exact selected Agent; CF-01/02/04/05. Preserve inactive configured continuation versus retained-task read-only access. |
-| BEH-009/017/018 / REQ-015/034–036 | Task identity and retained references | Pass | Pass | Pass | Confirmed | Supported delegation allocates a fresh AgentRun at source address; settlement retains it. Exact saved owner must survive later click and cross-participant reference views; CF-03. |
-| BEH-005/007/008 / REQ-014 | Initial cutover and history preservation | Pass | Pass | Pass | Confirmed | Saved Team media survives package move only with corrected affected locator values; AR-PREM-009 and CF-06. Native flat Team execution-tree bytes/path remain unchanged. |
-| BEH-007/010 / REQ-012/027/037 | Authoring and external boundary | Pass | Pass | Pass | Confirmed | AD-REV-024 unversioned/org_local final output, existing entries and external read-only ownership retained; no migration reset or added ID. |
-| Other cumulative behaviors | Preserved | Pass | Pass | Pass | Confirmed | No new task permission, runtime family, command/ACK, lifecycle/FIFO/fence, Product surface or Team attachment contract. |
+| BEH-002/004/006 / REQ-014–016 | User attachment Send and history | Pass | Pass | Pass | Confirmed | Existing chooser, prepared Send and actual Open; record accepted non-media association in the same user row; CF-07/09. |
+| BEH-009/017/018 / REQ-034–036 | Retained task participant/reference | Pass | Pass | Pass | Confirmed | AC-010/011/029–031/034: after accepted task or normal Stop, exact participant conversation retains files and Open without activation; CF-08. |
+| BEH-005/007/008 | Raw storage and initial continuity | Pass | Pass | Pass | Confirmed | Optional versionless facts roundtrip through existing store/complete archive and known-locator visitor; no reconstruction of missing history; CF-10. |
+| BEH-002/005; existing native/external input contract | Shared runtime recording | Pass | Pass | Pass | Confirmed | Native backend and installed ingest processor need original pre-normalization reference value; external original forwarded observer remains separate; AR-PREM-010. |
+| Other cumulative behaviors | Preserved | Pass | Pass | Pass | Confirmed | Exact owner, org_local authoring, task/FIFO/fence/ACK, compact UI, observational history and root lifecycle unchanged. |
 
 ## Supplemental Artifact Coherence Verdict
 
 | Artifact | Purpose And Scope Are Clear? (`Pass`/`Fail`) | Linked To Relevant Core Artifacts? (`Pass`/`Fail`) | Internally Complete? (`Pass`/`Fail`) | Consistent With Related Core Artifacts? (`Pass`/`Fail`) | Status And Approval Applicability Are Clear? (`Pass`/`Fail`) | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
-| Requirements / contract / canonical investigation inventory | Pass | Pass | Pass | Pass | Pass | Approved basis unchanged; current design links the new architecture-owned evidence supplement without claiming new approval. |
-| Context-file ownership investigation | Pass | Pass | Pass | Pass | Pass | Actual source/data, earlier Team limitations, mocked/negative evidence and deployment limits separated. |
-| Design / self-validation / revision | Pass | Pass | Pass | Pass | Pass | CF-01–06, DS-041–043, VAL-064–069 and current persistence/removal guidance agree; 69 design walkthroughs are not executable passes. |
-| IR-048 / CRR-072 / API-FIND-031 | Pass | Pass | Pass | Pass | Pass | Original chooser omission remains Local Fix; exact-owner impact separately resolved at design boundary, not source acceptance. |
-| Retained Product and prior investigations | Pass | Pass | Pass | Pass | Pass | Original, status, overrides and baseline supplements retain scope; no visual redesign. Prior VIS-015 override slice stays historical. |
-| Delivery / API provenance | Pass | Pass | Pass | Pass | Pass | Saved development evidence and prior package smoke do not establish production rollout or current desired upload/read success. |
+| Approved requirements / contract / investigation inventory | Pass | Pass | Pass | Pass | Pass | Unchanged RER-033 authority; latest architecture evidence linked from current design, no new approval claim. |
+| Context-file investigation / CRR081 / API33 | Pass | Pass | Pass | Pass | Pass | Distinguishes original owner impact from missing association; exact two raw rows, current producer/reader maps and evidence limits align. |
+| Design / self-validation / revision | Pass | Pass | Pass | Pass | Pass | DS-044–046 and VAL-070–075 close accepted-input-to-history gap; VAL-066 strengthened; 75 design walkthroughs, not executable passes. |
+| IR049 cutover / prior provenance | Pass | Pass | Pass | Pass | Pass | Positive terminal-record/old-locator condition remains installation-specific; no inferred deployment or reset/replay. |
+| Retained Product/UI/history/task supplements | Pass | Pass | Pass | Pass | Pass | Existing UserMessage/Open and exact retained selection reused; no new visual authority or prototype needed. |
+| API/source/Delivery result records | Pass | Pass | Pass | Pass | Pass | API33 Fail78.6 and held groups remain; CR-FIND041 execution-resolved; no carried test-probe proportional review or Delivery pass inferred. |
 
 ## Task Design Health Assessment Verdict
 
 | Assessment Area | Result (`Pass`/`Fail`) | Evidence | Required Action |
 | --- | --- | --- | --- |
-| Assessment present for current posture | Pass | DS-041 introduction identifies approved behavior realization defect. | None. |
-| Root cause explicit and evidence-backed | Pass | Exact AgentRun exists upstream and in strict location but is discarded by address-only file contract. | None. |
-| Refactor decision explicit | Pass | Bounded existing attachment capability extension now; no new runtime owner/index/cache. | None. |
-| Concrete design supports decision | Pass | Closed descriptors, pair checks, existing stored resolver, all current consumers and migration-owned locator transform mapped. | None. |
+| Assessment present | Pass | Bug fix for missing message-association invariant, distinct from physical ownership. | None. |
+| Root cause evidence-backed | Pass | Both writer representation and readers assume all user attachments are media. | None. |
+| Refactor decision explicit | Pass | Tighten existing shared value, raw row and read contracts now; no parallel runtime/store. | None. |
+| Concrete design supports decision | Pass | Native pre-normalization snapshot, shared partition/codec, same append, complete projections/visitor and removals. | None. |
 
 ## Spine Inventory Verdict
 
 | Spine ID | Scope | Spine Is Readable? (`Pass`/`Fail`) | Narrative Is Clear? (`Pass`/`Fail`) | Facade Vs Governing Owner Is Clear? (`Pass`/`Fail`/`N/A`) | Main Domain Subject Naming Is Clear? (`Pass`/`Fail`) | Ownership Is Clear? (`Pass`/`Fail`) | Off-Spine Concerns Stay Off Main Line? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CF-01 | Chooser -> captured target -> upload API/service -> stored membership -> exact draft bytes/preview | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| CF-02 | Send -> Org captured submission/continuation -> finalization -> exact location/file -> locator -> existing command/provider | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| CF-03 | Retained reference click -> authorized resource/read service -> stored root/AgentRun -> physical bytes | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| CF-04 | Async upload/finalization result -> captured context/key -> established guarded draft/submission reconciliation | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| CF-05 | Pair validation -> descriptor validation -> existing per-file move/reuse -> locator -> consumed-draft pruning | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
-| CF-06 | First startup -> owned inventory/strict plan -> bounded record commit/reread -> family move/cleanup -> readiness/history | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| CF-07 | Chooser/Send -> finalization -> admitted input -> native ingest or external forwarded recorder -> exact user trace -> cold Open | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| CF-08 | Cold exact selection/Earlier browsing -> existing memory read -> replay -> conversation/page -> shared hydration -> authorized Open | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| CF-09 | Original reference capture -> provider-copy/native clone -> shared partition -> existing single recorder append | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| CF-10 | Normal rotation/restart or pending cutover -> actual raw store/archive -> same optional facts -> typed locator validation/transition | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| CF-01–06 retained | Exact root/AgentRun file operations, captured draft lifecycle and initial proven-locator preservation | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
 
 ## Boundary Encapsulation Verdict
 
 | Boundary / Owner | Authoritative Public Entry Point Is Clear? (`Pass`/`Fail`) | Internal Owned Mechanisms Stay Internal? (`Pass`/`Fail`) | Caller Bypass Risk Is Controlled? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Context Files services | Pass | Pass | Pass | Pass | Own file operations/phase validation; callers do not traverse run trees. |
-| Stored-only collaboration location | Pass | Pass | Pass | Pass | Owns strict root membership and physical ancestry; no activation/live fallback. |
-| Org submission / captured composer | Pass | Pass | Pass | Pass | Keep existing context/operation ownership; no second local submission or focus-derived final owner. |
-| Existing family migration | Pass | Pass | Pass | Pass | Legacy locator interpretation internal; fixed target and existing runner commit/status boundaries. |
+| AgentRun input / native input adaptation | Pass | Pass | Pass | Pass | Original accepted message versus provider copy explicit; no observer ACK or admission redesign. |
+| Native MemoryManager / external memory writer | Pass | Pass | Pass | Pass | Existing separate producers each append one user row; no second native observer/writer. |
+| Raw value and memory read/projection | Pass | Pass | Pass | Pass | Memory owns serialization; projections consume its facts, never scan file directories or fetch provider history. |
+| Web shared UserMessage / file-resource action | Pass | Pass | Pass | Pass | Hydrate type/name/URI; file ownership remains saved locator, not current viewer. |
+| Existing locator visitor/readiness/migration | Pass | Pass | Pass | Pass | Read-only current validation versus migration transformation remain separate. |
 
 ## Dependency Direction / Forbidden Shortcut Verdict
 
 | Owner / Boundary | Allowed Dependencies Are Clear? (`Pass`/`Fail`) | Forbidden Shortcuts Are Explicit? (`Pass`/`Fail`) | Direction Is Coherent With Ownership? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| REST and browser adapters | Pass | Pass | Pass | Pass | Closed subject descriptors to existing services; no manager/store bypass or fake Team owner. |
-| Owner resolver / provider normalization | Pass | Pass | Pass | Pass | Current location service only; provider receives a normalized copy, durable accepted URI stays original. |
-| Migration-only locator transition | Pass | Pass | Pass | Pass | Known structured fields and strict tree/file proof; normal readers never import migration or try old paths. |
+| Core reference/input/memory | Pass | Pass | Pass | Pass | Core depends on values and existing store, never server resolver/root owner. |
+| Server normalization/recording | Pass | Pass | Pass | Pass | Supplies captured immutable reference value; external observer still reads original input. |
+| History/page/web | Pass | Pass | Pass | Pass | Existing memory and read DTOs -> hydration/Open; no directory/prose/optimistic-cache reconstruction. |
+| Archive/locator processing | Pass | Pass | Pass | Pass | Actual complete segment APIs; no parallel archive, normal URI repair or provider-history source. |
 
 ## Interface Boundary Verdict
 
 | Interface / API / Query / Command / Method | Subject Is Clear? (`Pass`/`Fail`) | Responsibility Is Singular? (`Pass`/`Fail`) | Identity Shape Is Explicit? (`Pass`/`Fail`) | Generic Boundary Risk (`Low`/`Medium`/`High`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- | --- |
-| Org draft/final owner descriptors | Pass | Pass | Pass | Low | Pass |
-| Upload/finalize POST and exact draft GET/DELETE/final GET | Pass | Pass | Pass | Low | Pass |
-| Stored findAgent rootSubjectKind/rootRunId/agentRunId | Pass | Pass | Pass | Low | Pass |
-| Existing shared composer capture/hydration/finalization | Pass | Pass | Pass | Low | Pass |
-| Migration-local structured locator plan/commit/reread | Pass | Pass | Pass | Low | Pass |
+| ContextFileReference codec/capture | Pass | Pass | Pass | Low | Pass |
+| AgentInputUserMessage.recordingFileAttachments clone contract | Pass | Pass | Pass | Low | Pass |
+| MemoryManager.ingestUserMessage / user RuntimeMemoryTraceInput | Pass | Pass | Pass | Low | Pass |
+| RawTraceItem.fileAttachments / file_attachments | Pass | Pass | Pass | Low | Pass |
+| Conversation/memory read fileAttachments | Pass | Pass | Pass | Low | Pass |
+| Page user attachment fileType/fileName/locator | Pass | Pass | Pass | Low | Pass |
+| Explicit known-field locator visitor | Pass | Pass | Pass | Low | Pass |
 
 ## Existing Capability / Subsystem Reuse Verdict
 
 | Need / Concern | Existing Capability Area Was Checked? (`Pass`/`Fail`) | Reuse / Extension Decision Is Sound? (`Pass`/`Fail`) | New Support Piece Is Justified? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Draft/file storage and operations | Pass | Pass | N/A | Pass | Extend existing services/layout and add missing Org draft DELETE, not a new service stack. |
-| Retained execution location | Pass | Pass | N/A | Pass | Existing strict index already carries actual task identity and ancestry. |
-| Shared attachment/submission UI | Pass | Pass | N/A | Pass | Reuse captured target and draft guards; task read-only policy unchanged. |
-| Atomic JSON/JSONL migration write | Pass | Pass | Pass | Pass | If needed, a serialized-text entry point reuses the same atomic commit implementation, not a second transaction system. |
+| Typed attachment facts | Pass | Pass | Pass | Pass | Small immutable reference and memory partition, not a new store/service. |
+| Input recording | Pass | Pass | N/A | Pass | Installed native ingest and external observer/writer retain sequencing/error/lifecycle contracts. |
+| Cold/page rendering | Pass | Pass | N/A | Pass | Existing local memory authority, typed page query and shared UserMessage/Open. |
+| Archive and locator processing | Pass | Pass | N/A | Pass | Existing complete segment enumeration and known-field visitor extended; no new migration ID. |
 
 ## Subsystem / Capability-Area Allocation Verdict
 
 | Subsystem / Capability Area | Ownership Allocation Is Clear? (`Pass`/`Fail`) | Reuse / Extend / Create-New Decision Is Sound? (`Pass`/`Fail`) | Supports The Right Spine Owners? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Context Files | Pass | Pass | Pass | Pass | Descriptor grammar, file phase/pair validation, storage and resource adaptation. |
-| Collaboration execution location | Pass | Pass | Pass | Pass | Exact membership/physical identity without runtime lifecycle. |
-| Web context attachments and Org contexts | Pass | Pass | Pass | Pass | Shared attachment state versus subject submission remain distinct. |
-| App-data migration | Pass | Pass | Pass | Pass | Sole owner of legacy selector proof and affected persisted-value transition. |
+| Core agent/message | Pass | Pass | Pass | Pass | Reference value and typed internal input snapshot only. |
+| Core memory | Pass | Pass | Pass | Pass | Partition, user-only trace validation/serialization and native ingestion. |
+| Server input and external memory | Pass | Pass | Pass | Pass | Pre-path adaptation and original-message capture/append, respectively. |
+| Server history/GraphQL and web hydration | Pass | Pass | Pass | Pass | Preserve shared read facts and actual existing controls, not runtime ownership. |
+| Context-file locator inventory and raw archive | Pass | Pass | Pass | Pass | Existing exact fields/complete paths; no association discovery from filenames. |
 
 ## Reusable Owned Structures Verdict
 
 | Repeated Structure / Logic | Extraction Need Was Evaluated? (`Pass`/`Fail`) | Shared File Choice Is Sound? (`Pass`/`Fail`/`N/A`) | Ownership Of Shared Structure Is Clear? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Discriminated file-owner variants | Pass | Pass | Pass | Pass | Tighten only Org pair; no optional-ID fallback or runtime root union. |
-| Current URI builders/recognizers | Pass | Pass | Pass | Pass | Client/server owned grammar parity; do not duplicate address ranking in each consumer. |
-| Legacy record transformation | Pass | Pass | Pass | Pass | One migration-local helper; no generic URI repair shared with runtime. |
+| ContextFileReference | Pass | Pass | Pass | Pass | Single immutable URI/type/name value with snake-case codec, no arbitrary metadata. |
+| RawTrace attachments partition | Pass | Pass | Pass | Pass | Shared native/external media versus non-media validation, no duplicated partition policy. |
+| Shared user attachment hydration | Pass | Pass | Pass | Pass | Conversation and page map current type/name/locator to established model/Open. |
 
 ## Shared Structure / Data Model Tightness Verdict
 
 | Shared Structure / Type / Schema | One Clear Meaning Per Field? (`Pass`/`Fail`) | Redundant Attributes Removed? (`Pass`/`Fail`) | Overlapping Representation Risk Is Controlled? (`Pass`/`Fail`) | Shared Core Vs Specialized Variant / Composition Decision Is Sound? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Org descriptor orgRunId + agentRunId | Pass | Pass | Pass | Pass | Pass | Address/ancestry derived; platform/definition/task IDs not interchangeable. |
-| Resolved physical owner | Pass | Pass | Pass | Pass | Pass | Strict location supplies exact memoryDir; viewer identity never changes saved ownership. |
-| Draft/final phase variants | Pass | Pass | Pass | Pass | Pass | Same execution pair, different storage phase; validate both before mutation. |
-| Unchanged task/tree/message records | Pass | Pass | Pass | Pass | Pass | Only known affected URI values transform; no schema/record/ID redesign. |
+| Disjoint media and non-media facts | Pass | Pass | Pass | Pass | Pass | One item in one partition; preserve per-partition order and distinct locators, no redundant all-files copy. |
+| recordingFileAttachments snapshot | Pass | Pass | Pass | Pass | Pass | Transient canonical refs, not provider path or second durable truth. Null means no server adaptation; server overwrites caller-supplied snapshot. |
+| User-only raw extension | Pass | Pass | Pass | Pass | Pass | Other trace kinds cannot acquire file attachments; missing/null/empty is no recorded fact, not evidence of no original upload. |
+| Page attachment general fileType/fileName | Pass | Pass | Pass | Pass | Pass | Remove user mediaType alias; assistant/media visuals retain their separate mediaType. |
+| IDs, equality and fingerprints | Pass | Pass | Pass | Pass | Pass | Persisted IDs unchanged; present file values enter merge/fingerprint, absent values keep old fingerprints. |
 
 ## File Responsibility Mapping Verdict
 
 | File | Responsibility Is Singular And Clear? (`Pass`/`Fail`) | Responsibility Matches The Intended Owner/Boundary? (`Pass`/`Fail`) | Responsibilities Were Re-Tightened After Shared-Structure Extraction? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| context-files/domain/context-file-owner-types.ts | Pass | Pass | Pass | Pass | Closed types/parsing/current locator builders. |
-| context-file-owner-resolver.ts / context-file-layout.ts | Pass | Pass | Pass | Pass | Membership/location versus draft/final physical layout, respectively. |
-| context-file-{upload,read,finalization}-service.ts | Pass | Pass | Pass | Pass | Existing operations; same pair validation before file movement and exact draft validation. |
-| context-file-local-path-resolver.ts / api/rest/context-files.ts | Pass | Pass | Pass | Pass | Provider current locator normalization versus HTTP composition/routes. |
-| Web contextFileOwner.ts / contextAttachmentModel.ts | Pass | Pass | Pass | Pass | Current descriptors and attachment recognition; remove old Org forms. |
-| ContextFilePathInputArea.vue / useContextAttachmentComposer.ts / contextFileUploadStore.ts | Pass | Pass | Pass | Pass | Capture, async owner equality and existing upload/remove/clear/hydration. |
-| agentOrgContextsStore.ts | Pass | Pass | Pass | Pass | Use already captured exact AgentRun for both finalization owners; preserve continuation/submission guards. |
-| agent-org-context-file-locator-transition.ts / existing family migration | Pass | Pass | Pass | Pass | Pure known-selector/field planning versus migration sequencing, committed reread/cleanup/readiness. |
+| core agent/message/context-file-reference.ts / agent-input-user-message.ts | Pass | Pass | Pass | Pass | Value codec and typed clone-carried snapshot; no runtime/transport ownership. |
+| core memory/models/raw-trace-attachments.ts / raw-trace-item.ts | Pass | Pass | Pass | Pass | Shared partition versus same-row roundtrip validation. |
+| core memory-ingest-input-processor.ts / memory-manager.ts | Pass | Pass | Pass | Pass | Triggering original reference value into existing ingest; LLM media/TOOL exclusion unchanged. |
+| server agent-run-provider-input-normalizer.ts | Pass | Pass | Pass | Pass | Capture before path rewrite, preserve original message, no provider request field. |
+| runtime-memory-event-payload.ts / accumulator / writer / recording-models.ts | Pass | Pass | Pass | Pass | Original external references, user-only arm and one append. |
+| raw-trace-record-normalizer.ts / memory models / replay transformers and types | Pass | Pass | Pass | Pass | Stored facts through both reads; no missing-field inference. |
+| historical-replay-event-identity.ts / runProjectionConversation.ts | Pass | Pass | Pass | Pass | Extend existing identity/equality and shared user hydration, no global dedupe. |
+| page types/projector / GraphQL objects / runHistoryQueries / web page service and presentation | Pass | Pass | Pass | Pass | Atomic read-contract cut across both sides, media visuals unchanged. |
+| context-file-record-locators.ts / raw archive APIs / current readiness and initial transition | Pass | Pass | Pass | Pass | File-only field visit and complete actual archive source enumeration; URI-only transformation. |
 
 ## Subsystem / Folder / File Placement Verdict
 
 | Path / Item | Target Placement Is Clear? (`Pass`/`Fail`) | Folder Matches Owning Boundary? (`Pass`/`Fail`) | Mixed-Layer Or Over-Split Risk (`Low`/`Medium`/`High`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Existing server context-files domain/services/store and REST | Pass | Pass | Low | Pass | Tighten owners in place. |
-| Existing web attachment utilities/composable/store and Org contexts | Pass | Pass | Low | Pass | No separate Org upload dashboard or parallel state. |
-| app-data-migrations/migrations/agent-org-flat-team-families-v1/agent-org-context-file-locator-transition.ts | Pass | Pass | Low | Pass | Historical locator knowledge isolated beside its family transformation. |
+| Core agent/message and memory/models | Pass | Pass | Low | Pass | Two small value files have clear owners and reusable meaning; no catch-all helper layer. |
+| Existing native/server recording paths | Pass | Pass | Low | Pass | Extend in place, no new writer subsystem. |
+| Existing history projection/GraphQL/web paths | Pass | Pass | Low | Pass | Read presentation ownership retained. |
+| Existing context-files locator and core raw archive | Pass | Pass | Low | Pass | Reuse actual archive boundary rather than filesystem-shape guesses. |
 
 ## Removal / Decommission Completeness Verdict
 
 | Item / Area | Redundant / Obsolete Piece To Remove Is Named? (`Pass`/`Fail`) | Replacement Owner / Structure Is Clear? (`Pass`/`Fail`/`N/A`) | Removal / Decommission Scope Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Org orgDraftId/memberAddress owner variants | Pass | Pass | Pass | Pass | Replace with required root/AgentRun pair in every current consumer. |
-| Old Org draft/final URL routes and regexes | Pass | Pass | Pass | Pass | No alias, redirect or current old-route reader. Team/standalone contracts retained. |
-| Address-only sameDraftOwner/finalization builders | Pass | Pass | Pass | Pass | Captured exact pair; no configured-first or first-match substitution. |
-| Blanket record-byte preservation direction | Pass | Pass | Pass | Pass | Narrow affected structured URI exception reconciled; native Team tree bytes/path stay unchanged. |
-| Mock/expected-rejection evidence as success | Pass | Pass | Pass | Pass | Explicitly rejected; required desired-success filesystem/REST and click tests replace incomplete proof. |
+| Media-only external user extraction | Pass | Pass | Pass | Pass | Shared disjoint partition replaces it; no second append. |
+| Native loss through LLM-only ingest/provider-copy clone | Pass | Pass | Pass | Pass | Original typed non-media recording refs cross existing clone/ingest. |
+| Media-only raw normalization/user hydration | Pass | Pass | Pass | Pass | Carry optional facts through every existing read hop. |
+| Page user mediaType field/query/DTO/mapping | Pass | Pass | Pass | Pass | Clean replacement fileType/fileName; true media visual field remains. |
+| Media-required locator early skip / root-only archive enumeration | Pass | Pass | Pass | Pass | Independent file-only visit and complete manifest-backed paths. |
+| GET/optimistic display as retained-history proof | Pass | Pass | Pass | Pass | Strengthened VAL-066 requires saved association and cold visible Open, no legacy-evidence repair. |
 
 ## Legacy / Backward-Compatibility Verdict
 
 | Area | Compatibility Wrapper / Dual-Path / Legacy Retention Exists? (`Yes`/`No`) | Clean-Cut Removal Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- |
-| Normal Org attachment APIs and readers | No | Pass | Pass | One exact current grammar; retain existing access/path policy, not old selector fallback. |
-| Initial saved-locator conversion | Yes | Pass | Pass | Migration-local known released Team selectors; actual evidenced old Org records only. |
-| Invented deployed upgrade / old draft compatibility | No | Pass | Pass | No new ID, reset/replay, draft ledger or alias. Unsupported real inventory must return for a decision. |
+| Optional file facts in versionless raw row | No | Pass | Pass | One version-agnostic current reader; absence is not an old-schema fallback. |
+| Old missing text association | No | Pass | Pass | No inferred backfill from provider prose, adjacent rows, disk names or API receipts. |
+| User page attachment field | No | Pass | Pass | No mediaType alias; synchronized source cut with retained true-media fields. |
+| Existing initial family locator transition | Yes | Pass | Pass | Legacy URI understanding remains migration-owned; visitor is also used for current read-only validation. |
 
 ## Persisted-Data Transition Verdict (When Applicable)
 
 | Area / Stored Subject | Approved Decision | Representative Reader / Semantic / Invariant Evidence Is Sufficient? (`Pass`/`Fail`) | Direct Use, Rebuild, Or Migration Choice Is Proportionate? (`Pass`/`Fail`) | Migration Safety Is Complete If Required? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Exact Org final bytes, IDs/ancestry and runtime/task schemas | Directly Usable — No Migration for selector correction | Pass | Pass | N/A | Pass | Final physical storage already exact; approved original family move remains. |
-| Known saved Team references into converted roots | Migration Required within existing family entry | Pass | Pass | Pass | Pass | Real saved media + unchanged normal reader proves need. Strict tree/file owner plan; known fields only, bounded atomic write/reread, original file hashes and record IDs preserved. |
-| Current exact locators / unaffected records / native flat Team tree | Directly Usable — No Migration | Pass | Pass | N/A | Pass | Zero writes when no affected reference; flat execution-tree bytes/path always unchanged. |
-| Old address-only Org final/draft inventory | Pre-cutover evidence gate; no assumed cohort | Pass | Pass | N/A | Pass | Actual positive final cohort requires strict file proof. Ambiguous draft owner or terminal migration plus old links is not automatically handled; preserve/return, never discard or replay. |
-| Derived history projection | Existing rebuild | Pass | Pass | N/A | Pass | Retain persisted trace IDs, recompute derived URI-dependent fingerprints normally; no duplicate records. |
-| Runner status and completion | Existing migration-specific reduction | Pass | Pass | Pass | Pass | Required locator/write/reread/cleanup failure is FAILED and prevents affected admission; summary valid-empty warning remains separate. |
-| External content and arbitrary prose/provider history | Not Affected | Pass | Pass | N/A | Pass | No global replacement, external repository mutation or invented recovery contract. |
+| Valid existing media-only/no-file traces | Directly Usable — No Migration | Pass | Pass | N/A | Pass | One optional-fact reader; no empty-field/backfill rewrite and old IDs/media/bytes stay intact. |
+| API33 missing text associations | Not recoverable from inspected authoritative rows | Pass | Pass | N/A | Pass | Keep source and bytes; forward correction cannot claim old records repaired. Return if a genuinely authoritative recovery source/requirement is established. |
+| New non-media user facts | Current writes in existing raw files | Pass | Pass | N/A | Pass | One append/roundtrip, user-only fields, no new persisted version or ledger. |
+| Native/external rotation and archive | Existing roundtrip extended | Pass | Pass | N/A | Pass | Actual complete archive membership/paths, IDs/status/count/time and native working context unchanged. |
+| Affected locators during approved initial family cutover | Existing migration extension | Pass | Pass | Pass | Pass | Visit file_attachments URI independently of media; strict owner plan, URI-only commit/reread, current zero-write and existing status/retry. |
+| Root schemas, sidecars, final bytes and provider history | Not Affected by representation extension | Pass | Pass | N/A | Pass | No relocation, schema/version, task-state or provider-history changes. |
+| IR049 actual installation | Existing cutover hold retained | Pass | Pass | N/A | Pass | Terminal success plus old locators is positive evidence, not a speculative absent cohort. No reset/replay/new migration authorized; not a blocker for forward coding/disposable tests. |
 
 ## Change / Refactor Safety Verdict
 
 | Area | Sequence Is Realistic? (`Pass`/`Fail`) | Temporary Seams Are Explicit? (`Pass`/`Fail`) | Cleanup / Removal Is Explicit? (`Pass`/`Fail`) | Verdict (`Pass`/`Fail`) |
 | --- | --- | --- | --- | --- |
-| Reconcile IR-048 checkpoint before completing source package | Pass | Pass | Pass | Pass |
-| Exact types/resolver/routes/layout and all browser/provider consumers together | Pass | Pass | Pass | Pass |
-| Initial migration plan, writes/reread, target-only retry and readiness before current admission | Pass | Pass | Pass | Pass |
-| Real filesystem/REST desired success, then rendered desktop/narrow and renewed cumulative validation | Pass | Pass | Pass | Pass |
+| Implement shared reference/partition and same-row codec first | Pass | Pass | Pass | Pass |
+| Wire both producers with clone/path and original-message tests | Pass | Pass | Pass | Pass |
+| Cut memory/replay/conversation/page/GraphQL/web consumers together | Pass | Pass | Pass | Pass |
+| Extend exact locator visitor and actual archive traversal, no live migration | Pass | Pass | Pass | Pass |
+| Reproduce full real persisted lifetime and renew cumulative downstream gates | Pass | Pass | Pass | Pass |
 
 ## Example Adequacy Verdict
 
 | Topic / Area | Example Was Needed? (`Yes`/`No`) | Example Is Present And Clear? (`Pass`/`Fail`/`N/A`) | Bad / Avoided Shape Is Explained When Helpful? (`Pass`/`Fail`/`N/A`) | Verdict (`Pass`/`Fail`) | Notes |
 | --- | --- | --- | --- | --- | --- |
-| Two retained tasks sharing configured address | Yes | Pass | Pass | Pass | VAL-065 requires exact successful bytes for each actual AgentRun, not a configured fallback. |
-| Draft/final mismatch before move and cross-view final reference | Yes | Pass | Pass | Pass | VAL-064–068 distinguish file owner, active viewer and access capability. |
-| Async focus/newer edits and partial-batch retry | Yes | Pass | Pass | Pass | Existing submission recovery preserved, no new queue. |
-| Pre-rename target validation and interrupted current cleanup | Yes | Pass | Pass | Pass | VAL-069 uses planned tree/source slot before rename, stored current resolver after rename. |
-| Data/provenance limits | Yes | Pass | Pass | Pass | 166 saved links support affected transition; zero samples/mock responses cannot establish global absence or deployment. |
+| Mixed image and text in one user row | Yes | Pass | Pass | Pass | Concrete disjoint JSON excerpt; full existing trace identity remains required. |
+| Native pre-normalization snapshot versus provider path | Yes | Pass | Pass | Pass | Explicit clone/ingest chain and null/direct-core case; unchanged media/working context. |
+| Cold conversation and Earlier page | Yes | Pass | Pass | Pass | Both DTO paths, IDs/equality and shared Open spelled out. |
+| Missing history versus file-only/archive current facts | Yes | Pass | Pass | Pass | VAL-073/074 prohibit reconstruction and require complete typed visitation/zero-write behavior. |
+| Real accepted/interrupted task evidence | Yes | Pass | Pass | Pass | VAL-071/075 rebuild fresh lifetimes at both widths; no old evidence repair or GET-only success. |
 
 ## Material Premise Validation (Only When Needed)
 
-### AR-PREM-009 — Initial family cutover leaves saved attachment links pointing at the old Team family
+### AR-PREM-010 — Native provider-path adaptation would lose the canonical non-media locator before recording
 
-- Related approved requirement or established contract: REQ-014 / AC-009 preservation of supported memory/history; REQ-015/016/034–036 retained content/reference navigation; production migration convention.
-- Relevant behavior ID(s): BEH-005/007/008/009.
-- Initiating basis kind: Operational.
-- Independent product-supported initiating trigger or applicable governing contract: first production startup of the approved Team-to-Org family release, preserving previously uploaded and sent attachments in supported saved Team histories.
-- Support evidence: actual server-memory records contain 166 structured Team media.images URLs in 77 trace files (independently read-only recounted). One sampled Team V2 root contains a direct Agent and two configured Teams, so it is in the approved one-level conversion cohort. Its sampled locator has one matching physical file. Existing user upload/Send, raw-media writer and retained projection explain how the record was produced; file internals are evidence, not a fabricated user-operated surface.
-- Forward current or approved target production caller/event path: existing user chooser/Send -> Context Files finalization -> forwarded message/raw media -> saved trace; first startup -> existing registered family migration -> Team package renamed into agent_orgs -> history projects the saved URI -> user clicks attachment -> old Team route cannot locate the moved family. Current raw projection does not translate that URI.
-- Lifecycle preconditions and material consequence: a converted package has saved links, bytes move with its original exact AgentRun directory, and the normal reader remains current-only. Leaving the URI unchanged breaks opening existing content despite preserving file bytes. Native flat roots do not need a family locator change merely because this API changes.
-- Scenario validity: Supported Normal Scenario; installed history survives the approved first upgrade and is subsequently inspected.
+- Related approved requirement or established contract: established shared context-file/history parity, REQ-014–016 and AC-010/011; exact URI ownership retained by DS-041/042.
+- Relevant behavior ID(s): BEH-002/004/005/006; CF-07/09.
+- Initiating basis kind: User.
+- Independent product-supported initiating trigger or applicable governing contract: user launches with the supported native AutoByteus runtime, chooses a file in the shared composer and Sends it to the selected Agent, then inspects the saved conversation.
+- Support evidence: native is an existing runtime, not introduced by the snapshot mechanism. Existing backend dispatch calls agent.postUserMessage with the provider-normalized message; AgentFactory installs MemoryIngestInputProcessor. The shared chooser and exact finalization already supply the original locator.
+- Forward current or approved target production caller/event path: chooser/Send -> finalization -> AgentRun.executeInputDispatch -> AgentRunProviderInputNormalizer resolves URI on a copy -> AutoByteus backend.postUserMessage -> UserMessageReceivedEvent -> AgentInputPipeline clone via toDict/fromDict -> installed MemoryIngestInputProcessor -> MemoryManager -> one raw user trace -> local memory history projection/Open.
+- Lifecycle preconditions and material consequence: an actual local attachment has a canonical read locator but provider input needs its physical path. Native ingest currently receives only processed LLM content/media; copying that physical value later cannot preserve the accepted URI. This is independent of the external API33 failure and requires no failure/timing scenario.
+- Scenario validity: Supported Normal Scenario.
 - Reachability: Reachable.
-- Review consequence / proportionate response: accept DS-043's known-field locator transformation inside the existing initial family migration, using strict tree plus unique physical-file ownership, committed reread, existing rename/cleanup/readiness and ordinary startup retry. Do not add generic URL repair, a runtime old-route reader, extra migration ID, record reset, backup/journal or hypothetical draft recovery. Actual rollout/draft inventory remains required; samples are not universal absence or deployment proof.
+- Review consequence / proportionate response: accept the typed immutable in-process recording snapshot captured before path replacement, preserved by the existing clone and explicitly passed to existing MemoryManager. Server adaptation ignores caller-supplied snapshot; unadapted direct-core input uses original event refs. Do not introduce a second native recorder, provider request field, metadata cache or durable all-attachments copy. Preserve existing native media/working-context semantics.
 
-Exact configured/task address overlap is already established in the behavior-basis section and CF-01–03, independently of IR-048's synthetic observation. No finding or added machinery relies on hypothetical corruption, arbitrary concurrent writers, old draft ownership inferred from address, or a presumed already-deployed intermediate release. AR-PREM-008 remains the prior rejection of that deployed-intermediate authoring inference; it is not evidence that all attachment data is absent.
+The external missing association is already directly established in the behavior basis by API33's normal user journey, two exact raw records and source map. AR-PREM-009's initial saved-link need remains valid; IR049 is now positive actual-installation evidence whose cutover decision remains separate. Neither absent associations nor unknown-origin records justify guessed repair or replay.
 
 ## Unresolved Approved-Behavior Or Current-State Gaps
 
-None for this implementation design. DS-043 explicitly withholds a transition decision for a different actual deployment or unprovable old draft cohort; if discovered, preserve it and return with evidence before that cutover. No such cohort is asserted by this review.
+| Item | Why It Matters | Required Action | Status |
+| --- | --- | --- | --- |
+| No new forward recording/projection gap | Current approved input-to-retained-Open path is fully specified. | Implement and validate both producers/read surfaces. | Resolved at design boundary. |
+| IR049 actual-root cutover condition (retained) | Existing terminal family record plus old locators cannot be processed merely by editing a pending migration. | Keep actual installation cutover held for its separate Architecture transition decision; no reset/replay or loss of evidence. | Not resolved or authorized by this recording review; not a blanket coding/disposable-test hold. |
 
 ## Review Decision
 
-**Pass — ARCH-REV-022**, cumulative AD-REV-025 under RER-033. IR048-DI-001 is resolved at the design boundary. The supported behavior basis and required initial saved-link transition are coherent and actionable; no new in-scope architecture blocker. This is permission to reconcile implementation, not a source/API/Delivery pass.
+**Pass — ARCH-REV-023**, cumulative AD-REV-026 under RER-033. CR-FIND042 / API-FIND035 is resolved at the architecture boundary. Forward implementation may proceed; historical missing associations and IR049 actual installation readiness are not claimed repaired or released.
 
 ## Findings
 
-None. Prior findings and triggering-impact disposition are recorded in ARCH-REV-022; no new AR-FIND ID.
+None. No new AR-FIND ID. Prior-impact resolution and retained gates are recorded in ARCH-REV-023.
 
 ## Classification
 
-N/A — no failing finding classification. Cumulative task_size=Large, architectural_risk=High; focused Medium/High. No Requirement Gap or Product gate.
+N/A — no new failing finding. Focused Medium/High; cumulative task_size=Large, architectural_risk=High. No new Requirement Gap or Product gate.
 
 ## Recommended Recipient
 
-`/software_engineering_team/implementation_engineer`, subject to the most-specific returned completed-review Pass rule. Reconcile IR-048 into one cumulative implementation package; do not create a duplicate upload assignment or advance the partial checkpoint as reviewed source.
+`/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule. Reconcile DS-044–046 with the current cumulative source; one result-based handoff, no duplicate task.
 
 ## Residual Risks
 
-- Every current owner/route/recognizer must carry exact OrgRun/AgentRun; one missed address-only consumer can break retained reads or mix drafts. Test actual file bytes and provider-local resolution, not only rendered chooser state.
-- Validate draft/final pair before mutation, preserve per-file retry and captured-context/newer-draft behavior. Keep file owner unchanged in another participant's conversation, Messages or Tasks view.
-- Validate saved-link migration on disposable representative filesystem/runner copies: known structured fields, unique source owner, before/after rename, atomic JSON/JSONL reread, original file hashes, current no-op and one interrupted-attempt retry. Required failures must exclude affected current admission without a blanket unrelated-root failure.
-- Record actual cutover roots/status/drafts. Terminal prior success plus old locators or unverifiable old draft ownership is a return condition, not permission to discard/reset/replay. This review does not certify deployment inventory.
-- Preserve RER-033 org_local/first-run output, native flat Team execution-tree no-write, external read-only boundary, task/command/ACK/lifecycle contracts and prior shared UI/history fixes. Existing Team selector limitations are not silently expanded into this ticket.
-- Renew full source review and real REST/provider/browser/desktop-narrow/API-E2E/Delivery coverage at the appropriate owners. IR-048 probe and mocked rendering are limited evidence, not completed upload/open or retained-data acceptance.
+- Both producers must preserve URI/type/name in the same user row. Clone loss, reading processed/native provider paths, or an additional observer append would defeat the design. Native TOOL exclusion, media provenance, input/ACK/error and shutdown sequencing remain unchanged.
+- Update both conversation JSON/memory and typed page GraphQL/web contracts, including user fileType/fileName, IDs, no-ID fingerprints, merge equality and recent witnesses. Preserve real media visuals and old empty-file identities; no stale alias or media-only merge.
+- Test the actual saved association and visible cold Open returning original bytes. Direct GET200, provider reply, optimistic state and extractor-test exit0 are insufficient. Cover file-only/mixed/unknown and representative non-media types, both producers and standalone/Org configured/task consumers.
+- Preserve optional facts through actual active/complete-archive roundtrip and known-field visitation; invalid present values fail at owning boundaries. No association recovery from filenames, adjacent records, prose, provider history or test Send captures. Existing API33 lost text associations remain an explicitly unrepaired historical limit.
+- Preserve existing exact owners, captured draft/continuation, observational history, root/task lifecycle, authoring/external-project boundary and initial migration status policy. IR049's positive installation cutover remains held separately; this review authorizes neither live migration nor status reset/replay.
+- API33 remains Fail78.6 with its 28 Pass / 11 Not Tested(partials) / 1 Fail / 1 N/A ledger and held groups. CR-FIND041 remains execution-resolved. Renew selected source review, real attachment/readiness/VAL054–058/restart/Restore/compaction/reconnect/Stop/finalUI/cumulative coverage, then pending successful API model-probe proportional review and Delivery-owned verification. No native/AppImage/user/release readiness follows from this design pass.
 
 ## Latest Authoritative Result
 
-- Review Decision: **Pass — ARCH-REV-022 on AD-REV-025**.
-- Material-Premise Gate (`Pass`/`Fail`/`Blocked`): **Pass**; independent supported task/history and first-cutover witnesses, no speculative recovery machinery.
-- Notes: implementation reconciliation and all downstream validation remain pending. No live data/source/test/other-owner evidence changed; previous independent results retain only their recorded scopes.
-- Review artifact checks: complete template headings, consistent table/fence structure, unique ARCH-REV-022 with ARCH-REV-001–021 bodies preserved, 69 unique design walkthroughs, approved upstream byte equality and reviewer diff-whitespace checks passed. These are document checks only.
-
-### Post-handoff provenance receipt — no new review round
-
-Architecture Designer forwarded Delivery's additional provenance after the
-ARCH-REV-022 handoff. AD-REV-025 and the Pass decision are unchanged; this is an
-evidence addendum, not another design approval or deployment-readiness result.
-
-Delivery identifies these recorded backend roots for the existing DS-043
-cutover inventory obligation:
-
-- `/root/.autobyteus/server-data` — DR003–005, Delivery-reported.
-- `/home/vncuser/.autobyteus/server-data` — DR006; independently confirmed in
-  `delivery-evidence/dr-006/electron-launch.log:37829–37841`. This additional
-  normal-profile root was not included in Architecture's bounded samples.
-- `/tmp/autobyteus-dr008-user-test-20260911/server-data` — DR008; recorded launch
-  data root confirmed in `delivery-evidence/dr-008/native-launch.json`.
-- `/tmp/autobyteus-dr009-user-test-20260911/server-data` — DR009, reused across
-  its recorded restarts; launch root confirmed in
-  `delivery-evidence/dr-009/restart-20260911T2308/native-launch.json`.
-
-These are historical exposure paths, not a globally complete inventory or a
-current existence/physical-alias/content check. Delivery's records document local
-build/test exposure; inherited version labels and port29695 do not establish
-publication or exclude another owner's deployment/saved Org locators. No current
-user-data scan or mutation was performed for this receipt. DS-043 already requires
-actual roots/status/draft/locator evidence and a return on unprovable old draft
-ownership or terminal migration success with old locators. No replay, empty-data
-assumption or new migration mechanism follows from this evidence. Forward these
-paths as additional clarification to the existing Implementation execution.
+- Review Decision: **Pass — ARCH-REV-023 on AD-REV-026**.
+- Material-Premise Gate (`Pass`/`Fail`/`Blocked`): **Pass**; supported real upload/history and native adaptation paths, no speculative repair/recovery.
+- Notes: current architecture is implementation-ready for this correction; no source/executable/Delivery pass and no actual-installation cutover authorization. Only reviewer report/revision files changed.
+- Review artifact checks: complete template headings, table/fence structure, one ARCH-REV-023, preserved ARCH-REV-001–022 bodies including provenance receipt, 75 unique design walkthroughs, approved upstream byte equality and reviewer diff-whitespace checks passed. Document checks only.

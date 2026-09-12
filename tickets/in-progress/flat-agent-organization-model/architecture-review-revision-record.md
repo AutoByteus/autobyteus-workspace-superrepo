@@ -29,6 +29,7 @@ concise chronological architecture-review history.
 | ARCH-REV-020 | Round 20 — history inspection, deliberate continuation and retained stop | AD-REV-023; AD-REV-022 copy-only direct | Pass | Pass | HIST-INSPECT-001/002 resolved at design boundary; no new AR-FIND |
 | ARCH-REV-021 | Round 21 — Org-local authoring and first-run final migration output | AD-REV-024; DS-038–040 | Pass | Pass | PKG-AUTH-002 resolved; AR-PREM-008 rejects deployed-intermediate assumption; no new AR-FIND |
 | ARCH-REV-022 | Round 22 — exact Org attachment ownership and initial saved-link preservation | AD-REV-025; DS-041–043 | Pass | Pass | IR048-DI-001 resolved at design boundary; AR-PREM-009; no new AR-FIND |
+| ARCH-REV-023 | Round 23 — durable non-media user association and both cold read surfaces | AD-REV-026; DS-044–046 | Pass | Pass | CR-FIND042 / API-FIND035 resolved at design boundary; AR-PREM-010; no new AR-FIND |
 
 ## Revision Entries
 
@@ -625,3 +626,34 @@ actual roots/status/draft/locator evidence and a return on unprovable old draft
 ownership or terminal migration success with old locators. No replay, empty-data
 assumption or new migration mechanism follows from this evidence. Forward these
 paths as additional clarification to the existing Implementation execution.
+
+
+### ARCH-REV-023 — Durable non-media attachment lifetime pass
+
+- Canonical design review report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/design-review-report.md`.
+- Review round and trigger: Round 23; CRR-081 classified API33 retained text omission as CR-FIND042 / Design Impact after actual normal chooser/Send/cold Tasks participant navigation.
+- Triggering role, report path, and finding IDs: Architecture Designer; `architecture-context-file-ownership-investigation.md`, `code-review-evidence/CRR-081/README.md`, `api-e2e-evidence/API-REV-033/live/API-FIND-035-retained-text-attachment-missing.md`; CR-FIND042 / API-FIND035.
+- Relevant architecture design revision IDs: `AD-REV-026@88ee8db1f871156749f473efda8913cc3b291c64`, DS-044–046 / CF-07–10 / VAL-070–075 and strengthened VAL-066; cumulative exact-owner authority remains AD-REV-025.
+- Requirements authority: `RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9`, unchanged.
+- Source evidence: IR001–054 source3d9a019d320878c421429f27c0f074f9a4c4c2f5 / artifactf8a3f37af0969748f05f0605e5fae1a1cc77f10f; source-informed design review, not a source acceptance result.
+- Prior authoritative decision: `Pass` (ARCH-REV-022 on AD-REV-025, plus evidence-only provenance receipt).
+- Current authoritative decision: `Pass`.
+- What changed: independently confirmed the two exact raw user rows/hashes are media-only and traced both producers and read surfaces. The bounded design adds disjoint optional non-media facts to the same user trace, captures original refs externally and through a typed pre-normalization native snapshot, preserves clone/ingest and existing media semantics, and updates both conversation and typed page projections/hydration/identity. Existing archive/locator traversal becomes complete without new ownership or migration. Original missing associations are not fabricated; actual installation cutover remains separate. No executable or old-evidence repair claim.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| CR-FIND042 / API-FIND035 | CRR-081 Design Impact / API33 real retained-text failure | Resolved at design boundary; execution pending | DS-044–046; VAL-066/070–075 | Same-row native/external association, complete cold/page read contracts, actual Open and archive/visitor requirements close the previously assumed saved-locator seam. |
+| IR048-DI-001 / original CRR-072 upload omission | AD025/ARCH022 exact-owner authority, later source scopes recorded | Retained, not reattributed | DS-041–046; current IR054 source | Real file bytes/final GET are intact; new failure concerns user-message association, not owner/path or chooser loss. |
+| IR049-DI-001 | Actual terminal-family/old-locator installation return condition | Still held for that installation; not a forward coding hold | IR049 evidence; DS-043/046 | No reset/replay/new migration/live cutover. New optional-fact representation is independently implementable and testable on disposable data. |
+| CR-FIND041 / API-FIND034 | Execution-resolved by API33 on current source | Remains execution-resolved | API33 / CRR081 | Non-media correction does not reopen standalone status origin or coverage. |
+| AR-FIND-001–007 / PKG-AUTH-002 | Resolved under retained authorities | Unchanged | Cumulative RER033/design | No external writes, handoff-order, authoring, root-family, FIFO/fence or status-reduction change. |
+| AR-FIND-008 / AAV-001 / task parity | Old configured-only policy superseded; retained identity preserved | Unchanged | RER028 cumulative; CF-08 | Exact participant references/task history remain; no directory/source-name substitution or reactivation. |
+| HIST-INSPECT-001/002 / COMPOSER-001 / prior draft guards | Prior reviewed design/source obligations | Retained | DS-035–037/041–045 | Cold selection/Open observational; deliberate Send and captured-context/newer-edit behavior unchanged. |
+| Product/UI, CR-FIND-019, API model-probe proportional review | Separately scoped obligations | Retained | Current downstream reports | No new UI gate; no unrelated source fix or pending test-review/Delivery completion claimed. |
+
+- New or remaining finding IDs: None. AR-PREM-010 documents the independently supported native original-locator snapshot need, not a blocker.
+- Material classification changes: focused Medium/High, cumulative Large/High; no new Requirement Gap or Product decision.
+- Recommended recipient: `/software_engineering_team/implementation_engineer` under the most-specific completed-review Pass rule.
+- Remaining risks: dual-producer/clone completeness, disjoint validation, both read DTOs and shared Open/equality, actual archives/file-only visitor, historical unrecoverable associations, and separate actual-root cutover. API33 remains Fail78.6; all held cumulative/runtime/browser/proportional-review and Delivery/native/user limits remain. Reviewer performed no application tests, live requests, data/source/test changes or migration.
