@@ -241,6 +241,8 @@ export const useRunHistoryStore = defineStore('runHistory', {
     applyAgentOrgActivity(orgRunId: string, isActive: boolean): void {
       this.agentOrgRequestGeneration += 1;
       this.agentOrgHistory = this.agentOrgHistory.map((run) => run.rootRunId === orgRunId ? { ...run, isActive } : run);
+      // Publish the confirmed fact to already-rendered rows before refresh I/O.
+      this.refreshRunNavigationTopology('agent-org-activity');
       void this.refreshAgentOrgHistory();
     },
 
