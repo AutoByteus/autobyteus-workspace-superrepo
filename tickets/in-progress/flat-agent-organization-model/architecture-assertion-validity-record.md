@@ -167,3 +167,77 @@ API/E2E retains ownership of report/coverage disposition. No source-defect
 finding, strengthened assertion pass, cumulative execution pass, or delivery
 readiness follows from this answer. All unrelated holds/findings remain with
 their existing owners.
+
+
+## AAV-002 — Supported Org file/package roundtrip versus Org-only root admission
+
+- Date: 2026-09-12.
+- Package: `AORG-FLAT-TEAM-001`; bounded question from API/E2E during API-REV-032.
+- Authority: RER-033@f84c5299f10898f49acff6a0e481d1cd61c769a9,
+  REQ-026/037, AC-032/035, ORG-CASE-062/064; AD-REV-025 / ARCH-REV-022,
+  inherited DS-031b/c and DS-038b/r.
+- Read-only source inspected at 8f744b4d68e0ef163e4106eae2d5bb407440399f.
+  This assertion answer is not a new completed architecture-design round,
+  source-defect classification, test result, or implementation assignment.
+
+### Evidence and boundary
+
+1. `autobyteus-server-ts/src/agent-packages/utils/package-root-summary.ts:55–83`
+   checks absolute/existing directory and requires a top-level `agents`,
+   `agent-teams`, or `applications` directory. It does not recognize
+   `agent-orgs` alone. It does not check reference closure at this stage.
+2. `agent-packages/services/agent-package-service.ts:282–300` calls that
+   validator before local root registration and catalog refresh.
+   `agent-org-definition/providers/file-agent-org-definition-provider.ts:35`
+   subsequently discovers `agent-orgs` under registered additional roots.
+   Org discovery within a registered package and structural acceptance of an
+   Org-only package root are distinct contracts.
+3. DS-031b/c and DS-038b/r retain existing package registration, per-definition
+   semantic admission, and supported file-copy/export/reimport. They add no
+   export API or explicit Org-only root admission. REQ-037 / AC-035 require
+   preservation of authored vocabulary and exact reference meaning through
+   supported operations; they do not separately prescribe an Org-only Settings
+   import-root acceptance assertion.
+4. API-owned `api-e2e-evidence/API-REV-032/live/AUTH-owned-roundtrip-prepared.json`
+   records copying only `agent-orgs/api32-local-owned-org/`, including children.
+   Its copied `agent-teams/local-team/team-config.json` still references
+   `aorg-lead`, `aorg-analyst`, and `aorg-verifier` with `refScope: shared`.
+   The copy is not a self-contained dependency bundle. This does not establish
+   that those dependencies are absent from every registered source; nor does
+   it explain the observed rejection, which occurred at the earlier structural
+   gate. The original rejection is not a reference-resolution failure.
+
+### Bounded assertion disposition
+
+Use a complete supported package for the AC-035 roundtrip: preserve the copied
+Org and owned children unchanged, include the exact referenced shared Agent
+packages under the established `agents/` family, and include any further real
+required dependencies. Do not add empty sentinel directories merely to bypass
+root validation, retarget refs, promote owned children into global definitions,
+or relax codecs. Validate through normal Settings registration and semantic
+read/reopen, not direct registry mutation. Registration alone is not success:
+compare exact authored bytes/meaning, refs, handoffs, owned identity/resolution,
+and global-catalog exclusion. Distinguish unchanged uppercase GraphQL enum
+mapping from required lowercase `org_local` in the authored JSON.
+
+Keep the original Org-only structural rejection and export evidence. It is
+**not a supported success assertion for this unchanged roundtrip design** and
+must not be counted as an implementation failure or a passing negative test
+against an invented requirement. The complete-package fixture correction can
+proceed within API/E2E ownership; do not erase or relabel the original result
+as a successful import. Success on the complete package would prove only that
+supported roundtrip, not Org-only admission.
+
+This does not decide that a self-contained Org-only package should be forbidden
+as product behavior. That broader acceptance question remains unadjudicated;
+if required, Requirements Engineering owns its explicit scope before an
+implementation or assertion is added. It is not necessary to resolve it to
+continue the already supported complete-package roundtrip.
+
+No source/test/requirements/design-spec/review revision or route changes are
+made by this answer. Cumulative Large/High and AD-REV-025 / ARCH-REV-022 remain
+unchanged; no AD-REV-026 is created. API/E2E owns remaining execution, coverage,
+reporting and cleanup. No API-REV-032 pass or delivery readiness is inferred.
+Current handoff rules contain no matching stage-outcome rule for this bounded
+assertion reply; return it by ordinary message only to the requesting API/E2E
+execution, with no duplicate assignment or additional recipient.
