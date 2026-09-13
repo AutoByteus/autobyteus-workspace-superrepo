@@ -1,83 +1,71 @@
-# Docs Sync Report
+# Docs Sync Report — DR-009
 
-## Scope
+## Scope / integrated authority
 
-- Ticket: `AORG-FLAT-TEAM-001`; Delivery revision **DR-008**, 2026-09-11.
-- Trigger: `RER-028 / AD-REV-019 / ARCH-REV-017 Pass / IR-001–038 / CRR-058 Pass / API-REV-024 Pass / CRR-059 Pass`; **Large / High / reviewed**.
-- Bootstrap reference: `personal@80e2bd195c42ea3ced778dbc051d4d00edaef16f`, recorded in `investigation-notes.md`; finalization target remains `origin/personal`.
-- Latest integrated base: `origin/personal@5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`.
-- Reviewed artifact: `6e2745680cd3529ab6787de07df252e92854247c`; local safety checkpoint/integrated HEAD: `14a94fc45de8bcab271e996eb7d6e8440f0d3ac5`.
-- Integration proof: `delivery-evidence/dr-008/integration-result.log`; already current, zero base-only commits. IR-035 resolved DR-007's conflicts before current full validation. No additional merge-triggered rerun needed because no new base code was integrated; current packaging is a separate Delivery gate.
-- Documentation checks: `delivery-evidence/dr-008/docs-validation.json` — Pass; changed-source owner paths exist, retired owners absent, obsolete task exclusions removed, `git diff --check` passes.
+- Ticket: `AORG-FLAT-TEAM-001 / UI-CLEAN-001`; date 2026-09-11.
+- Built/validated requirements: **RER-032**, cumulative **AD-REV-022**, parent
+  **AD-REV-021 / ARCH-REV-019 Pass**, **IR-001–043**, **CRR-066 source Pass**,
+  **API-REV-027 Pass**, **CRR-067 Not Applicable** (no current durable-test delta).
+- Classification/route: **Large / High / Reviewed**. Additional architecture
+  review for the one-word copy-only AD022 delta is **N/A — not applicable**;
+  the cumulative architecture review remains applicable and passed.
+- Bootstrap reference: `personal@80e2bd195c42ea3ced778dbc051d4d00edaef16f` in
+  `investigation-notes.md`; finalization target `origin/personal`.
+- Refreshed/integrated base: `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`.
+- Reviewed artifact: `6da826f8c246c197a70cceb69e19e33fdbdfdf69`; source/test
+  `4ffcdf733ff597a0d2ae94587eb91ec47f749501`.
+- Local safety checkpoint/integrated HEAD:
+  `0cf14f6f5371804fbadd2f34ac37fde250cbfd55`. Sixteen explicitly named tracked
+  markdown files protected; no source/test staging. Raw evidence preserved locally.
+- Integration: `git merge --no-edit origin/personal` → already current, zero
+  new base-only commits. No extra merge-triggered executable rerun needed;
+  fresh Electron packaging/native smoke is separately recorded in the delivery report.
+- All docs edits followed integration. `delivery-evidence/dr-009/docs-validation.json`
+  records **Pass** for source owners, field-free examples, retired concepts and diff check.
 
-## Why Docs Were Updated
+## Why documentation changed
 
-RER-028 restores task-inclusive ordinary communication and familiar Tasks for
-AgentOrg participants. DR-006's configured-only presentation and separate history
-owner descriptions are no longer true. Durable docs must explain exact retained
-identity and read-only inspection, not leave consumers to infer them from ticket
-notes. The integrated implementation is primary truth; the completed review and
-API24 evidence support it without expanding claims.
+DR008's pending authoring request is now implemented and cumulatively validated.
+The normal Team/Org definition shapes no longer contain authored versions, but
+runtime execution versions remain. UI cleanup removes permanent identity clutter
+without removing exact task inspection. Cold Org navigation and deliberate
+retained Team inspection have distinct read/selection contracts. These are
+long-lived authoring, migration and runtime facts, not merely ticket notes.
 
-## Long-Lived Docs Reviewed / Updated
+## Long-lived documents reviewed / updated
 
-| Doc path | Result | What changed / rationale |
+| Document | Result | Current change / rationale |
 | --- | --- | --- |
-| `autobyteus-web/docs/agent_orgs.md` | Updated | Strict four-field mutation projection; all configured/task Messages; independent exact relevant Tasks; truthful system input; fresh live publication; retained read-only inspection and ownership. |
-| `autobyteus-server-ts/docs/modules/agent_orgs.md` | Updated | Committed ordinary message receiver presentation without post-commit configured/liveness gate; notification provenance/acceptance; read-only query through existing transition lane and strict families; physical projection identity. |
-| `autobyteus-web/docs/agent_execution_architecture.md` | Updated | Root-neutral Messages/Tasks facets, shared Tasks layout, exact participant navigation, retained index/inspection and reactive settlement; unified history owner. |
-| `autobyteus-web/docs/agent_artifacts.md` | Updated | Replaced Team-only Tasks component; reference wrapper consumes root-specific adapter path instead of constructing a Team-only path. |
-| `autobyteus-web/docs/agent_teams.md` | No change | Current integrated document already preserves flat configured membership, exact task execution and stopped compatible-model behavior; shared presentation detail links to updated architecture. |
-| `autobyteus-server-ts/docs/modules/run_history.md` | No change | Integrated separate families, strict first-message qualification and compatible model save/read-back remain accurate. New inspection contract is documented in AgentOrg module. |
-| `autobyteus-web/README.md`, `docs/electron_packaging.md` | No change | Existing guarded build and explicit isolated packaged-launch ownership contract used; no new product launch policy. |
+| `autobyteus-server-ts/docs/modules/agent_team_definition.md` | Updated | Field-free current JSON, strict rejection of numeric/retired shapes, expectedFamily diagnostic, definition-only transition, current codec path. |
+| `autobyteus-server-ts/docs/modules/agent_orgs.md` | Updated | Field-free Org example and referenced Team contract; ordered independent authoring migration, owned scope/zero-write skip/equality/reread, external and runtime exclusions, retired codec names. |
+| `autobyteus-web/docs/agent_teams.md` | Updated | Current authored shape; normal settled task inspection while Team active/inactive; exact hydration-before-focus, read-only authority, live/recovery retention and compact participant links. |
+| `autobyteus-web/docs/agent_orgs.md` | Updated | Field-free authoring, history-only Orgs/组织 copy, compact Messages and Tasks identity disclosure, cold exact links independent of drawer mounting. |
+| `autobyteus-web/docs/agent_execution_architecture.md` | Updated | Shared compact detail/disclosure/navigation ownership, exact retained Team inspection intent versus ordinary live repair, cold Org history read, current history heading. |
+| `autobyteus-web/docs/agent_artifacts.md` | Updated | Exact participant link/disclosure ownership in task detail; no extra top strip or runtime selection owner in the detail component. |
+| `autobyteus-server-ts/docs/modules/agent_team_execution.md`, `run_history.md` | No change | Current strict runtime Team V2/Org V1, sidecar/history and stopped-model contracts remain accurate; new authored transition is documented in definition/Org modules. |
+| `autobyteus-server-ts/docs/design/production_data_migration_conventions.md` | No change | Current minimal known-source transition, independent status and no normal fallback conventions remain applicable; no migration-policy expansion. |
+| `autobyteus-web/README.md`, `docs/electron_packaging.md` | No change | Existing guarded ARM64 build and explicit isolated packaged launch used; no new release or launch policy. |
 
-## Durable Knowledge Promoted
+## Durable knowledge promoted / retired concepts
 
-| Topic | Current rule | Evidence / destination |
+| Topic / retired concept | Current truth | Supporting upstream authority |
 | --- | --- | --- |
-| Ordinary messages | All admitted configured/task pairs, exact retained sender/receiver AgentRun, one root sidecar and committed receiver input; no task exclusion | RER-028, AD-REV-019, IR-038, CRR-058/059, API24 → server/frontend Org docs |
-| Tasks | Relevant exact delegator, task Agent or assigned Team roster; no membership by descendant ancestry or address reuse | Same chain → frontend Org/architecture |
-| System notification truth | Accepted existing-handle input with provenance and backend suppression; task data is not a receipt; rejection keeps record plus warning | Same chain → server/frontend Org |
-| Retained inspection | Existing transition lane + validated package; actual physical/provider identity; no activation, Restore, repair or new persisted family; read-only capabilities | RER-027/028, IR-038, API24 → server/frontend Org/architecture |
-| Publication | Fresh events update held facets without refocus; settlement retires live status/rows, not retained identity/history | IR-034/037/038 and API24 → frontend Org/architecture |
-| Strict authoring | Only four admitted member input fields, no response-only Apollo metadata or accidental optional reset | IR-033/current API24 → frontend Org |
+| Numeric authored Team/Org configs and version-suffixed normal codecs | One strict field-free family shape; normal reads never strip versions; old numeric decoders are migration-only. Execution-tree versions remain unchanged. | RER029, AD020/DS031–033, IR039, API27 |
+| Implicit replay of family migration for authoring | Separate required startup-only `20260911_collaboration_definition_authoring_shape`; writable server-owned definitions only, independent result, exact non-version preservation. | Same chain and current registry/migration source |
+| Agent Orgs / singular Org history heading | Plural Orgs, zh-CN组织, directly after Teams within each Workspace; main navigation and domain/API names unchanged. | RER030–032, AD021/022, IR040/041 |
+| Permanent message address/Task-ID badge and task participant strip | Familiar compact content with exact on-demand identity and name links; all task-inclusive communication remains. | RER031, DS034, IR040/041 |
+| Cold Org link depends on drawer-loaded history | Existing strict Org-family read resolves missing row before exact navigation; no live inference or Restore fallback. | IR042, API-FIND028 resolved in API26 and confirmed API27 |
+| Settled task inspection requires a live Team row | Exact retained projection hydrates before view-owned deliberate inspection focus; read-only target; ordinary live selection remains distinct. | IR043, CRR066, API-FIND029 resolved API27 |
 
-## Removed / Replaced Components Recorded
+Current task-inclusive Messages/Tasks, true notification acceptance, first-message
+configured-external title eligibility, automatic-only recovery, immutable source
+identity and fixed configured topology remain unchanged. No Product/UI invention
+or source fix was performed by Delivery.
 
-| Retired concept | Replacement | Document |
-| --- | --- | --- |
-| Configured-only Org Messages/receiver presentation | Exact retained task-inclusive ordinary communication | Org docs and execution architecture |
-| `AgentOrgRunHistoryPanel.vue` parallel history owner | `WorkspaceAgentOrgHistoryCollection.vue` in unified Workspaces history | Frontend Org and execution architecture |
-| `TeamDelegatedTasksSection.vue` as Team-owned presentation | `CollaborationDelegatedTasksSection.vue` with independent root adapters/facets | Frontend Org, architecture, artifacts |
-| Task reference wrapper assumes Team root | Root-specific content path supplied by Tasks facet | Artifacts |
+## Continuation
 
-First-message title eligibility intentionally remains **external configured
-recipient only**. Task/system traffic does not become a title source. Fixed
-configured topology, mutable-definition exclusion on Restore, automatic-only
-recovery, and structural status traversal are preserved.
-
-## Delivery Continuation
-
-- Docs sync result: **Pass — Updated**, not No impact.
-- No unresolved documentation ambiguity or upstream reroute.
-- Next: complete current packaging/native launch and request explicit user
-  verification. Finalization/release/terminal return remain gated; current status
-  is authoritative in `handoff-summary.md` and `release-deployment-report.md`.
-- API24 limits are recorded separately in
-  `delivery-evidence/dr-008/upstream-evidence-limits.md`; docs do not promote
-  controlled probes, initial invalid assertions, or inferred historical causes
-  into stronger production claims.
-
-## Later same-round authority hold
-
-Architecture's concurrent inquiry-only commit `7ef7921304f504367c5d43929b62ffe773e474ad`
-added PKG-AUTH001. Before handoff, Requirements approved **RER-029** in the canonical
-requirements/contract: authored Team/Org configs omit schemaVersion; runtime
-tree versions remain. RER028 implementation and this build are unchanged.
-
-This docs Pass describes the integrated **RER028 source** only, not completion
-against RER029. Do not remove implemented version/admission facts from source
-reference docs before the new implementation exists. Architecture must consume
-the new authority and drive applicable downstream work; future Delivery must
-refresh these docs and packaging against that newly validated source. Current
-Delivery is Blocked — Design Impact / RER029 re-entry pending, not terminal.
+Docs sync **Pass — Updated**. No documentation ambiguity or upstream gap remains
+for the current RER032 package. Continue packaging/native checks and explicit
+user-verification hold; current completion gates are authoritative in
+`handoff-summary.md`, `release-deployment-report.md` and DR009. This is not
+repository finalization, release or terminal Delivery completion.

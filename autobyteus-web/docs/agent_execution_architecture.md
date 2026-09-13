@@ -462,18 +462,27 @@ selection keys. A live full-record replacement retains the selected item or
 reference while its stable identity still exists; otherwise selection falls
 back to that task's assignment. These actions must not focus the center
 conversation/composer, replace it with a task team card, or repeat the Workspaces
-execution hierarchy. The Tasks UI does not render raw task/run ids, routing JSON,
-target-kind metadata, raw arguments, a Technical details disclosure, responsible
-actor/member hierarchy rows, `Focus agent` / `Focus team` controls, or approval
-controls. Exact ids remain internal selection and reference-routing keys only.
+execution hierarchy. The Tasks UI does not add permanent raw-ID strips, routing JSON, raw arguments,
+actor hierarchy rows, `Focus agent` / `Focus team` controls, or approval controls.
+Readable Agent names in the selected item's direction line are exact navigation
+links. Task-Team names disclose all actual assigned participant links, not only
+the coordinator. A collapsed-by-default identity control reveals exact address
+and AgentRun/TeamRun facts; system rows use assignment participants without a
+fabricated named sender. Item/reference/scope changes reset disclosure state.
+Exact IDs remain authoritative navigation/reference keys, never display-name
+inference. The detail emits the selected exact link through its pane; the shared
+section uses existing root-specific navigation actions, not a new data owner.
 
 `TeamDelegatedTaskDetailPane` renders exactly one selected assignment/update
 detail or one selected task-owned reference preview. Item detail uses a readable
 localized title, direction, timestamp, Markdown content, and the assignment's
 current human status when the assignment is selected. The right pane does not
-duplicate the lifecycle timeline, reference navigation, actor roster, focus
-controls, or removed technical metadata. Messages remains an independent,
-unchanged message-owned surface.
+duplicate the lifecycle timeline or reference navigation and has no extra top
+participant strip. Messages remains an independent message-owned surface with
+compact type, counterpart, direction, time and content. Its identity disclosure
+contains exact address/AgentRun and applicable task/host/execution facts instead
+of permanent address or Task/ID badges; reference routing and task-inclusive
+eligibility are unchanged.
 
 The global Workspaces/run-history tree remains the navigation and execution-focus
 surface for workspaces, runs, teams, durable members, and task execution
@@ -487,11 +496,17 @@ workspace, but the cached projection is never an independent focus authority.
 root liveness. `LIVE_EXECUTION` excludes settled task subtrees and applies the
 existing focus-repair behavior. `HISTORICAL_INSPECTION` retains settled task
 Agents, task Teams, their members, and deeper task executions already persisted
-in the V1 tree/context so a cold-reopened exact AgentRun remains selectable. This
+in the retained tree/context so a cold-reopened exact AgentRun remains selectable. This
 historical discoverability does not recreate contexts, change task status,
-connect streams, resume work, or add the row to live execution membership. If a
-historical view becomes active again, focus is repaired after the purpose change
-when the focused settled execution is no longer live-eligible.
+connect streams, resume work, or add the row to live execution membership. Ordinary live selection
+still repairs to a live member after settlement. Deliberate retained inspection
+is separate view-owned intent: `focusAgentForInspection` admits the retained
+execution after authoritative projection hydration, then commits exact focus.
+The retained target is read-only with no interaction port even when its Team
+root remains active. This deliberate selection survives later task events,
+active/inactive hydration and existing verified stream-replacement snapshots as
+long as exact retained placement remains valid. No second selection owner, live
+row resurrection or task activation is introduced.
 
 The projection may reuse the shared status-dot presentation for workspace rows
 and stable member rows, but task executions remain navigation-only rows rather
@@ -822,10 +837,17 @@ become configured focus targets. Exact Agent selection waits for authoritative
 projection before changing the current-row state, and an offline Agent may be
 focused when retained projection is authoritative.
 
+Cold Org participant links resolve a missing history row through the existing
+`refreshAgentOrgHistory` read owner before navigation. Family errors and missing
+exact roots fail explicitly; no drawer mount, live-context inference or Restore
+fallback is required. Emitted-route Back/Refresh can therefore retain the exact
+read-only task at narrow widths without reactivation.
+
 The same always-mounted Workspaces panel also projects the AgentOrg family.
 Inside each Workspace, existing Agent groups remain first, **Teams** remains its
-existing category, and **Agent Orgs** is a distinct sibling immediately below
-Teams. The Org collection renders the coordinator-free root, direct Agents, and
+existing category, and **Orgs** (**组织** in zh-CN) is a distinct sibling
+immediately below Teams. Only this history heading changes; main navigation
+continues to say Agent Orgs, with unchanged root kinds and category membership. The Org collection renders the coordinator-free root, direct Agents, and
 direct mounted Teams from the Org V1 projection. Mounted Teams start collapsed
 and disclose their direct Agents and task rows. Selecting a mounted Team focuses
 its exact direct coordinator through the active Org context; it does not create

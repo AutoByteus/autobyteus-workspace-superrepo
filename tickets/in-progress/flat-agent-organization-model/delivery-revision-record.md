@@ -10,10 +10,9 @@
 | DR-004 | `CRR-037 / Pass` re-entry after the RER-024 / IR-028 navigation package | `DR-003 / Awaiting Explicit User Verification` (superseded) | `Awaiting Explicit User Verification` | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `release-notes.md`, `delivery-evidence/dr-004/*` |
 | DR-005 | `CRR-041 / Not Applicable` re-entry after the RER-025 / IR-030 first-message-summary and atomic-queue package | `DR-004 / Awaiting Explicit User Verification` (superseded) | `Awaiting Explicit User Verification` | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `release-notes.md`, `delivery-evidence/dr-005/*` |
 | DR-006 | `CRR-046 / Not Applicable` re-entry after the RER-026 / IR-032 communication-presentation and structural-status package | `DR-005 / Awaiting Explicit User Verification` (superseded) | `Awaiting Explicit User Verification` | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `release-notes.md`, `delivery-evidence/dr-006/*` |
-
 | DR-007 | `CRR-051 / Not Applicable` after IR-034 / API-REV-019 renewed validation | `DR-006 / Awaiting Explicit User Verification` (superseded) | `Blocked — Local Fix` at mandatory latest-base merge | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `release-notes.md`, `delivery-evidence/dr-007/*` |
-
 | DR-008 | CRR-059 Pass after fresh API-REV-024; concurrent PKG-AUTH-001 inquiry | DR-007 Blocked — Local Fix (resolved upstream) | Blocked — Design Impact; approved RER029 re-entry pending, RER028 native candidate available | docs-sync-report.md, handoff-summary.md, release-deployment-report.md, release-notes.md, delivery-evidence/dr-008/* |
+| DR-009 | CRR067 Not Applicable after fresh full API27/RER032 | DR008 Blocked — Design Impact (resolved by current reviewed implementation) | Awaiting Explicit User Verification | docs-sync-report.md, handoff-summary.md, release-deployment-report.md, release-notes.md, delivery-evidence/dr-009/* |
 
 ## Revision Entries
 
@@ -194,3 +193,85 @@
   Delivery/user verification. No new implementation assignment or redundant
   task-parity rerun requested.
 - Handoff confirmed: `DELIVERED` to `/software_engineering_team/architecture_designer`, exact run `architecture_designer_6b8b3019214246e086957b3f395901bb`; receipt `delivery-evidence/dr-008/handoff-confirmation.json`. Successful terminal Requirements return remains not sent. Delivery stops pending a later validated re-entry.
+
+### DR-009 — RER032 UI cleanup and authoring package rebuilt for user verification
+
+- Date/trigger:2026-09-11; **RER-032 / cumulative AD-REV-022 / parent AD-REV-021–ARCH-REV-019 Pass / IR-001–043 / CRR-066 source Pass / API-REV-027 Pass / CRR-067 Not Applicable**. Large/High Reviewed classification retained.
+- Prior authoritative result: DR008 Blocked — Design Impact. RER029 authoring
+  and subsequent RER030–032 UI corrections are now implemented/reviewed/currently
+  validated; that blocker is resolved. No prior acceptance or terminal result inferred.
+- Current authoritative result: **Awaiting Explicit User Verification**.
+- Reviewed artifact `6da826f8c246c197a70cceb69e19e33fdbdfdf69`, source/test `4ffcdf733ff597a0d2ae94587eb91ec47f749501`.
+  CRR066 source Pass; API27 fresh full95.6%/1981tests331files; CRR067 N/A for no
+  current durable delta. Historical CRR059 five-file Pass remains independent.
+- Integration/checkpoint: `0cf14f6f5371804fbadd2f34ac37fde250cbfd55`,16explicit tracked
+  markdown paths. Latest base `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793` already current; no new base-only
+  commit or source/test change, no merge-triggered rerun necessary. Pre-offer fetch
+  confirms same base. All documentation edits followed integration.
+- Fresh standard ARM64 Electron build **exit0**: guards/audit0, server/bootstrap,
+  mobile/renderer/native/transpilation/package pass. AppImage1.4.69 inherited,
+  524,089,483bytes, SHA256 `086dba3c98c8ba2b3ad8acec8955e1e6f6d2a28da8140df3a72cc519adffd262`. No public version/tag/release.
+- Actual native smoke: display99/window77594628/main13684,
+  backend13734 healthy31009, renderer binding correct; current asar/codecs/
+  migration hashes match. Copied current field-free19-file fixture, two sample
+  Orgs shown. Other sessions29695/31008 and their data preserved. Updater-disabled
+  profile notice dismissed; no full native/provider or manual acceptance claim.
+- Docs sync **Pass — Updated**, six canonical docs for field-free authoring,
+  scoped definition transition, Orgs/组织 heading, compact on-demand identity,
+  cold Org history reads and deliberate retained Team read-only focus.
+- Docs report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/docs-sync-report.md`.
+- Handoff summary: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/handoff-summary.md`.
+- Release/deployment report: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/release-deployment-report.md`.
+- Evidence: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-evidence/dr-009`. Initial prelaunch historical-fixture selection failed an
+  authoring-shape assertion before import; corrected to the API27-authoritative
+  API025 copy without modifying originals or claiming product failure.
+- Preservation:13,848other-owner baseline hashes unchanged; preexisting devkit
+  preserved; two generated SDK dirs and old AppImage retained outside worktree;
+  raw DB/env/key evidence unstaged. No application/test edit or blanket staging.
+- Limits:36local updates/9cycles versus35native outer successes; provider-generated
+  ReferenceError after local successful revision remains failed externally;
+  ten nonzero receipts/control/passive/historical/Brief-pack-only/DR007 limits
+  preserved, no replay or source attribution invented.
+- User verification/finalization: pending explicit current user acceptance.
+  Ticket stays in-progress; final ticket/target commit/push/merge, version/tag,
+  release/deployment/rollout and final cleanup not performed.
+- Terminal return to Requirements Engineer: **Not yet eligible / not sent**.
+- Why recorded: replace DR008's resolved re-entry hold with exact current
+  source-bound docs/package/native evidence and an explicit user-verification
+  hold; never confuse upstream validation or a successful launch with final delivery.
+- Next action: user verifies current DR009 window. Then refresh target again,
+  protect/re-integrate/recheck as needed, renew material-change verification,
+  archive/finalize and complete conditional release/cleanup before terminal routing.
+
+
+### DR-009 operational continuation — user-requested restart (2026-09-11 23:00 UTC)
+
+The user requested “close the app, and restart it thanks”. The same verified
+AppImage and existing isolated data root were restarted without rebuilding,
+reimporting fixtures or resetting data. Current main PID64930/server64980,
+launcher64870/process group64881/window77594628, health31009 HTTP200.
+Other sessions31008/29695 remain healthy and were not signaled. This operational
+continuation supersedes only the earlier running-process/window identifiers,
+not DR009 package provenance or validation. Main SIGTERM was followed by
+launcher-targeted forced cleanup of residual owned processes; do not describe
+this as an entirely graceful process-tree exit. Port absence was confirmed
+before relaunch. Evidence: `delivery-evidence/dr-009/restart-20260911T2259/`
+(`shutdown.json`, `native-launch.json`, `ready-health.json`, `restart-result.json`).
+Current launcher: `/tmp/start-autobyteus-dr009-restart.sh`; do not launch a duplicate
+while group64881 is alive. User verification remains pending; no finalization,
+release, upstream handoff, source edit or repository state change was performed.
+
+
+### DR-009 operational continuation — reopen after user shutdown (2026-09-11 23:09 UTC)
+
+User requested restart after shutting down the app. Prior process group64881
+was absent with non-forced completion recorded; port31009 was free. Reopened
+the same SHA256-verified AppImage and caller-supplied data root; no rebuild,
+fixture import, data reset or other-session signal. Current main70041/server70091,
+launcher69994/group70005/window77594628; visible/activated and health31009 HTTP200.
+Launcher `/tmp/start-autobyteus-dr009-restart2.sh`. Current runtime evidence:
+`delivery-evidence/dr-009/restart-20260911T2308/native-launch.json` and
+`restart-result.json`. Initial post-launch PID probe assertion was corrected
+using ps/xdotool; no second app launch or product failure inferred. Earlier
+process IDs remain historical. User verification still pending; no finalization
+or release/terminal handoff.

@@ -9,12 +9,11 @@ belongs to [AgentOrg](./agent_orgs.md), not to AgentTeam.
 ## Canonical Definition File
 
 A normal Team definition uses
-`agent-teams/<team-definition-id>/team-config.json` and exact
-`schemaVersion: 2`:
+`agent-teams/<team-definition-id>/team-config.json` with one strict current
+shape and **no authored `schemaVersion` field**:
 
 ```json
 {
-  "schemaVersion": 2,
   "coordinatorMemberName": "researcher",
   "members": [
     {
@@ -34,7 +33,7 @@ instructions.
 
 ## Member And Coordinator Rules
 
-- Every configured member is an Agent. Team V2 member records therefore have no
+- Every configured member is an Agent. Team definition member records therefore have no
   `refType`.
 - `memberName` is a unique path-safe address segment.
 - `ref` identifies the referenced Agent definition.
@@ -54,12 +53,23 @@ sources, but they still cannot contain Teams.
 | --- | --- | --- |
 | Shared `agent-teams/<id>/` | Standalone reusable Team | Shared Team provider |
 | Application `applications/<app>/agent-teams/<id>/` | Application-owned Team, also inspectable in the Team UI | Owning writable application bundle |
-| Registered external package root | Admitted only when already valid Team V2 | Read-only to this repository/process unless that package owner updates it |
+| Registered external package root | Admitted only when already valid current field-free Team config | Read-only to this repository/process unless that package owner updates it |
 
-Normal admission is target-only. Unversioned files, retired `refType` member
-records, or wrong versions are rejected with the package root, definition
-identity/path, expected version, and reason. Current runtime does not retry a
-legacy parser or rewrite an external source.
+Normal admission is target-only. A `schemaVersion` field of any value, retired
+Team-member `refType`, missing/unknown keys, or configured nesting is rejected.
+Omitting the version does not make other required keys optional. Diagnostics
+retain package root, definition identity/path, expected family (`expectedFamily`)
+and reason, not `expectedSchemaVersion`. Create/save/export-copy/import/reload
+all use the same current shape; normal readers never strip a version, retry a
+legacy parser, or rewrite an external source.
+
+The required startup-only `20260911_collaboration_definition_authoring_shape`
+pass removes only the investigated prior numeric definition version from
+writable server-data definitions, preserving all non-version values. Already
+current definitions are zero-write skips. It also inventories physical Org-owned
+Team children, even if their parent's config is invalid. Failures are reported
+for correction/restart; external repositories and runtime memory are not inputs.
+See [AgentOrg migration](./agent_orgs.md#migration-and-external-publication).
 
 ## Team-Local Handoffs
 
@@ -112,7 +122,7 @@ See [Agent Team Execution](./agent_team_execution.md),
 ## TS Source
 
 - `src/agent-team-definition/domain/agent-team-definition.ts`
-- `src/agent-team-definition/providers/agent-team-definition-config-v2.ts`
+- `src/agent-team-definition/providers/agent-team-definition-config.ts`
 - `src/agent-team-definition/providers/file-agent-team-definition-provider.ts`
 - `src/agent-team-definition/services/flat-team-definition-resolver.ts`
 - `src/agent-team-definition/services/flat-team-definition-validator.ts`

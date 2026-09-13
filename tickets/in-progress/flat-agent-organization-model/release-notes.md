@@ -1,73 +1,75 @@
 # AgentOrg / Flat Team — Release Notes Draft
 
-**DR-008 — local verification candidate, not a published release.**
-Current authority: RER-028 / AD-REV-019 / IR-038 / CRR-058 / API-REV-024 /
-CRR-059. The local package inherits version **1.4.69** from the integrated base;
-this is not a new version/tag or a replacement of the existing public release.
-Publication remains gated on explicit user verification, the newly approved RER029
-design/implementation/validation route, and repository finalization. Approved RER029 removal of authored
-`schemaVersion` fields is not included in this RER028 build. These notes supersede the DR-007 blocked integration draft.
+**DR-009: RER-032 local verification candidate, not a published release.**
+Cumulative AD022 / IR001–043 / CRR066 / API27 / CRR067. Local version **1.4.69**
+is inherited from the integrated base; no version bump, public tag or replacement
+of an existing release is claimed. Publication remains gated on explicit user
+verification and repository finalization.
 
-## User-visible changes
+## Changes
 
-- Reusable flat Agent Teams contain direct Agents with a coordinator; Agent Orgs
-  compose direct Agents and flat Teams without an Org coordinator or configured
-  Team nesting. Org launch starts without an implicit recipient.
-- Team-like collapsed member overrides, exact inheritance and readiness, runtime
-  Retry/default abandonment, Temp Workspace default, and strict edit/save
-  projection preserve deliberate configuration choices.
-- One Workspaces hierarchy keeps Teams and Agent Orgs distinct while exact
-  selection controls the URL, center, and single highlighted row. Locked
-  exact-Agent settings return to the same monitor; New is a separate journey.
-- Shared Messages now include all accepted ordinary configured/task Agent and
-  task-Team directions. Exact sender/receiver execution identity, receiver input,
-  and references survive history and Restore without a duplicate message store.
-- Familiar Tasks is available to direct and mounted Org participants as well as
-  task Agents/Teams. Assignment, submission, revision, acceptance, interruption,
-  and references remain tied to the exact relevant task and execution.
-- Participant navigation distinguishes repeated same-address tasks. Settled and
-  inactive executions retain read-only history, Messages, Tasks, configuration,
-  and references without silently restarting the execution.
-- Genuine accepted task-system inputs remain distinct from ordinary messages.
-  Notification rejection is a warning, not a fabricated receipt or lost durable
-  task update.
-- Already-mounted task facets and status rows update without refocus. Settled
-  executions converge offline and leave the live roster while retaining history.
-  Mounted-Team summaries remain presentation-only aggregates.
-- Automatic recovery preserves exact focus and bounded attempts, with separate
-  successful recovery and one-notice exhaustion behavior; no manual Reconnect.
-- AgentOrg history uses the first accepted non-empty external configured-member
-  message as its stable summary. Task/system traffic never replaces the title.
-  Derived metadata write failure does not replay accepted work or poison writes.
-- Separate Team V2 and AgentOrg V1 persisted families preserve task/provider
-  identity through supported migration, clean restart, Restore and terminal Stop.
-  The integrated stopped compatible-model workflow remains available for its
-  supported standalone Agent/flat Team scopes; it is not an Org model-edit grant.
+- Reusable Teams remain flat, coordinator-led Agent groups. Coordinator-free
+  Agent Orgs combine direct Agents and reusable Teams without configured nesting
+  or an implicit launch recipient.
+- Authored `team-config.json` and `org-config.json` no longer contain
+  `schemaVersion`. Current strict shapes are shared by save/reload/export/import;
+  missing or retired fields are not silently accepted. Runtime Team V2 and Org V1
+  execution-tree versions remain unchanged.
+- A separate required startup transition removes only the prior authored numeric
+  version from supported writable server-owned definitions, preserving all other
+  values. Current definitions are zero-write skips; external package publication
+  remains separately owned, and runtime memory is not part of this transition.
+- The Workspaces/history heading is **Orgs** (**组织**) immediately after Teams.
+  Main navigation still says Agent Orgs; run categories and domain/API names are
+  unchanged.
+- Messages keeps the familiar compact counterpart, direction, time, content and
+  references. Exact address/run/task identity is available on demand rather than
+  in permanent address and Task/ID badges. Task-origin messages remain included.
+- Tasks retains its familiar heading, status, direction, time and content without
+  an extra participant strip. Agent names navigate to exact executions; Team names
+  disclose all assigned participant links, including non-coordinators. Exact
+  identity details are optional and reset with item/reference/scope selection.
+- Cold narrow Org links resolve through authoritative history before navigation.
+  Back/Refresh preserves the exact task without requiring the history drawer or
+  restoring/reactivating it.
+- Normal standalone Team Tasks can inspect accepted/settled Agents while the
+  Team is active or inactive. Authoritative projection loads before exact focus;
+  repeated same-address assignments stay distinct. Conversation/Activity is
+  read-only, with no composer or commands. Deliberate old-task inspection
+  survives later task activation and verified reconnect snapshots; ordinary live
+  task selection still repairs after settlement.
+- Cumulative task-inclusive Messages/Tasks, genuine accepted system inputs,
+  fresh no-refocus publication, exact locked settings, Team-like overrides,
+  first-message history titles, automatic-only recovery, strict persistence,
+  supported migration/Restore/provider continuity and terminal Stop remain.
+- Integrated compatible-model editing remains limited to its supported stopped
+  standalone Agent/flat Team scopes; this is not an Org model-edit permission.
 
 ## Validation and limits
 
-Fresh full cumulative API-REV-024 passed at 95.9% reported confidence, with
-1,698 repository tests in 287 distinct files and current live task/message,
-notification, exact inspection, publication, recovery, migration and restart
-coverage. CRR-059 passed all five durable test updates. Native package build and
-launch evidence is recorded separately in the DR-008 delivery report, not
-inferred from browser execution.
+Fresh full cumulative API-REV-027 passed at **95.6%**, with **1,981 tests in331
+files** plus current realistic task/message/navigation/restart/migration checks.
+CRR066 is the cumulative source Pass; CRR067 is Not Applicable because API27
+changed no durable test. Historical CRR059 five-file review remains preserved.
+Current Delivery package/native checks are separately recorded in the delivery
+report and are not inferred from browser validation.
 
-The recursive initial native-wait prompt needed ordinary clarification;
-controlled notification/model probes are not real-provider failure evidence;
-the second non-quiescent startup assertion was invalid and the third startup
-provides the exact preservation proof. Historical stall causes remain unknown.
-External definition repositories must publish compatible definitions separately.
-No actual Brief Studio provider-user journey or distributed rollout is claimed.
-See `delivery-evidence/dr-008/upstream-evidence-limits.md` and API24 reconciliation.
+Nine formal cycles produced36 local durable updates; **35/36** outer native
+provider pairs succeeded. One provider-generated script threw ReferenceError
+after successfully awaiting local request_revision; local admission, durable
+commit and later resubmit/accept/settlement are proven, not a successful outer
+wrapper. No accepted request was replayed. Original nonzero receipts, controlled
+adverse fixtures, passive overhead, historical unassigned stalls, deterministic
+A–F and Brief pack-only scope remain explicit. No universal provider reliability,
+actual Brief Studio provider-user journey or distributed rollout is claimed.
 
-## Rollout / rollback
+## Rollout and rollback
 
-Use the repository's normal post-finalization release script only if publication
-is selected. Back up server data before a supported legacy-family migration;
-inspect migration outcomes and do not force incompatible definitions through
-admission. Never run an older family reader against migrated data to simulate
-rollback: retain a verified pre-migration backup and matching executable.
-The isolated DR-008 desktop test root is not the normal production data root.
-No target branch, public tag, external package, or deployment was changed by this
+Use the documented post-finalization release helper only when publication is
+selected, with archived release notes. Back up server data before supported
+migration, inspect independent migration outcomes, and never force incompatible
+external packages through normal admission. A rollback needs a matching
+executable and verified pre-migration backup—not an older reader over migrated
+files. The isolated DR009 native test root does not replace normal production
+history. No target branch, public tag or deployment has been changed by this
 local verification preparation.

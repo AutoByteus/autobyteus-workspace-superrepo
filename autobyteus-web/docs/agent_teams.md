@@ -25,7 +25,9 @@ The create/edit form owns:
 - ordered Team-local handoffs;
 - optional default launch preferences.
 
-Current Team definition config is exact schema V2. Agent member rows carry
+Current Team definition config is strict and has no authored `schemaVersion`.
+Normal save/import/export uses that same field-free shape; it does not silently
+strip numeric versions or accept retired shapes. Agent member rows carry
 `memberName`, `ref`, and explicit `refScope`; they do not carry
 `refType` because a Team cannot contain another Team or AgentOrg. The UI must
 not offer deeper configured composition, and the server rejects it at admission.
@@ -115,6 +117,22 @@ Opening a current or historical run hydrates its stored execution tree and exact
 member projection. Current definitions are not used to reinterpret the stored
 topology. External provider IDs remain provider bindings, not local AgentRun
 identity.
+
+The normal Tasks detail can deliberately inspect an accepted/settled task Agent
+while the containing Team is active or inactive. Admission uses exact retained
+AgentRun/placement and authoritative projection hydration, not presence in the
+live navigation roster. Focus commits only after successful hydration; repeated
+same-address assignments remain distinct. The retained monitor exposes actual
+conversation and Activity as read-only, without composer, commands, writes or
+reactivation. Deliberate inspection survives later task activation and existing
+verified stream-replacement snapshots. Ordinary live-task selection still repairs
+to an eligible live member when that task settles; it does not silently become
+retained-inspection intent.
+
+Shared Tasks keeps participant links in the familiar direction line rather than
+an extra name/ID strip. Exact Agent names navigate directly; a Team name or
+identity disclosure reveals all exact participant links, including non-coordinator
+members. Identity details are on demand and reset with the selected item/scope.
 
 A stopped Team can restore for supported follow-up. Stop ends runtime ownership
 but retains history. Archive and permanent Delete remain separate later user

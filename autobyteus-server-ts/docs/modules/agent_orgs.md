@@ -20,12 +20,11 @@ flat Team remains supported and is not configured membership.
 ## Definition Contract
 
 A normal AgentOrg definition uses
-`agent-orgs/<org-definition-id>/org-config.json` and exact
-`schemaVersion: 1`:
+`agent-orgs/<org-definition-id>/org-config.json` with one strict current shape
+and **no authored `schemaVersion` field**:
 
 ```json
 {
-  "schemaVersion": 1,
   "members": [
     {
       "memberName": "software_engineering_team",
@@ -48,8 +47,8 @@ instructions.
   `application_owned` when valid for the source owner.
 - An Org has no `coordinatorMemberName`, initial recipient, focus, or fallback
   field.
-- Referenced Teams must be admitted flat Team V2 definitions.
-- Invalid versions, unresolved references, deeper configured composition, and
+- Referenced Teams must be admitted current field-free flat Team definitions.
+- Any authored `schemaVersion`, unknown/missing keys, unresolved references, deeper configured composition, and
   unavailable external dependencies fail target admission without mutation or
   legacy fallback.
 
@@ -237,8 +236,8 @@ Required startup migration
 cutover for server-owned definitions and server memory run packages. It
 preflights candidates before writes, uses atomic replacement or same-root
 family rename, rereads and validates target families, updates the two history
-indexes, and reports per-item failures for restart Retry. Current runtime has no unversioned decoder, dual write, or
-request-time migration fallback.
+indexes, and reports per-item failures for restart Retry. Normal readers admit only the current family shape; no retired-shape decoder,
+dual write, or request-time migration fallback is available.
 
 The later required startup migration
 `20260905_agent_org_history_first_message_summary_v1` reconciles only empty
@@ -252,10 +251,38 @@ write/reread failure is `FAILED`. Normal runtime never infers titles from trace
 files or performs backfill on read.
 
 Registered external definition repositories are read-only dependencies to this
-ticket. Their owners must publish valid Team V2 and AgentOrg V1 definitions
-separately. An incompatible external definition becomes individually
+ticket. Their owners must publish current field-free flat Team and AgentOrg definitions
+separately; execution-tree versions do not belong in authored configs. An incompatible external definition becomes individually
 unavailable; it does not block server startup, compatible definitions, memory
 migration, or history inspection.
+
+### Definition-Only Authoring Transition
+
+Required startup-only `20260911_collaboration_definition_authoring_shape` runs
+after the earlier family migration in registry order but has its own result,
+without a runtime-memory prerequisite. It inventories writable server-data Team
+and Org definitions, including physical Org-owned Team directories. Package
+recovery and exact ownership/path checks precede conversion. Already current
+field-free configs are zero-write skips. Known prior numeric Team/Org configs
+lose only `schemaVersion`; all remaining JSON values must compare equal, the
+atomic write must commit, and strict reread must match the target. Invalid
+inventory/items are reported as failures for correction and restart, while
+independent valid items retain their actual outcomes.
+
+Legacy family conversion may produce its fixed historical numeric definition
+intermediates; the later pass establishes the field-free normal target. A prior
+completed family migration is not replayed to change authoring. Normal
+create/edit/save/export-copy/import/reload uses only current codecs, never
+migration codecs. Definition diagnostics expose `expectedFamily`, not numeric
+`expectedSchemaVersion`. Repository-owned fixtures/configs are updated in source;
+external repositories and application bundles are not rewritten by this pass.
+
+This is a definition-only transition: Team execution-tree V2, AgentOrg
+execution-tree V1, task/message sidecars, memory paths, provider identity and
+history are unchanged. Retired definition codec names with `-v2`/`-v1` are
+replaced by `agent-team-definition-config.ts` and
+`agent-org-definition-config.ts`; numeric prior-format readers live only under
+`app-data-migrations/legacy`.
 
 ## API Surface
 

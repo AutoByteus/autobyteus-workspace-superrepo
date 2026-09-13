@@ -24,6 +24,12 @@ independently launchable and keep their own coordinator and Team-local handoffs.
   Apollo response metadata such as `__typename` is not echoed into input.
   An omitted optional update remains omitted rather than resetting stored intent.
 
+Authored `org-config.json` and referenced `team-config.json` have no
+`schemaVersion` field. This does not remove required member fields or permit
+retired/nested Team shapes. Normal authoring/import/reload uses strict current
+codecs; only the server-owned startup transition handles supported prior numeric
+configs. Runtime execution-tree versions are unchanged.
+
 AgentOrg has no coordinator field, initial recipient, or implicit first member.
 
 ## Run Configuration
@@ -149,6 +155,16 @@ open the exact retained AgentRun, including settled instances, without selecting
 the current configured source at the same address. The shared section owns
 layout and local selection; the Org adapter owns record projection and routes.
 
+Messages keeps compact readable counterpart/type/direction/time/content and
+reference rows, without a permanent address or Task/ID badge. Exact counterpart
+address, AgentRun and task/host/execution identities remain available in an
+on-demand detail disclosure. Task detail likewise retains its familiar heading,
+status, direction, time and content without the extra participant strip. Agent
+names in the direction line navigate exactly; Team names disclose the complete
+exact assigned roster, including non-coordinators. System lifecycle items reveal
+assignment participants without inventing a named sender. Disclosure state resets
+on item, reference or scope changes; readable labels never replace identity keys.
+
 Genuine accepted task-system inputs appear in the recipient event monitor, not
 as ordinary Messages. A task record alone never fabricates a notification or
 receipt. A rejected notification leaves the committed task record visible and
@@ -158,8 +174,10 @@ substitute for normal live publication.
 
 The left **Workspaces** hierarchy remains mounted across configuration, active,
 focused, and stopped/history states. Within each Workspace it retains the
-existing Agent and **Teams** groups and places **Agent Orgs** as the distinct
-sibling group immediately below **Teams**. Switching between an Org member and
+existing Agent and **Teams** groups and places **Orgs** (**组织** in zh-CN) as
+the distinct sibling group immediately below **Teams**. This is history-heading
+copy only; main-navigation **Agent Orgs**, domain/API names and category membership
+are unchanged. Switching between an Org member and
 a standalone Agent/Team makes the destination the sole URL, center, and current
 row owner: standalone selection uses query-free `/workspace`, while an Org
 selection uses its exact `rootSubjectKind=agent_org`, root-run, and mode query.
@@ -172,6 +190,16 @@ Runtime, model, Workspace, and tool-approval identity remain inspection-only.
 **Back** returns to the same exact Org/member event monitor without disconnecting
 the live context; **New** remains a separate action that starts a fresh AgentOrg
 launch configuration without retaining the current `orgRunId`.
+
+### Cold Exact Inspection
+
+A participant link can open before the narrow history drawer mounts. If the
+Org-family row is not loaded, the existing history action awaits an authoritative
+Org-family refresh, propagates its error, and resolves the exact root before
+navigation. It does not infer a row from a live context or trigger Restore as a
+read fallback. Normal emitted-route Back/Refresh preserves the exact retained
+AgentRun in active and inactive read-only inspection, without opening the drawer,
+reactivating the task, or replacing it with a same-address execution.
 
 ## Status And Hierarchy
 

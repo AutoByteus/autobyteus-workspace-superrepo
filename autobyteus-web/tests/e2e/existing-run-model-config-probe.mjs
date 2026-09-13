@@ -65,6 +65,12 @@ const assert = (condition, message, details = undefined) => {
   throw error
 }
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds))
+// Hold canonical reads until the browser has actually observed loading. A fixed
+// delay can expire during cold module/render work before the assertion runs.
+let releaseInitialAgentRead
+let releaseInitialTeamRead
+const initialAgentRead = new Promise((resolve) => { releaseInitialAgentRead = resolve })
+const initialTeamRead = new Promise((resolve) => { releaseInitialTeamRead = resolve })
 const clone = (value) => JSON.parse(JSON.stringify(value))
 const waitFor = async (description, fn, timeout = timeoutMs, interval = 100) => {
   const startedAt = Date.now()
@@ -265,7 +271,7 @@ const state = {
 const operationResponse = async (operationName, variables) => {
   if (operationName === 'GetAgentRunResumeConfig') {
     state.agentResumeReads += 1
-    if (state.agentResumeReads === 1) await delay(700)
+    await initialAgentRead
     return { data: { getAgentRunResumeConfig: {
       runId: 'agent-run-browser-1',
       isActive: false,
@@ -285,7 +291,7 @@ const operationResponse = async (operationName, variables) => {
   if (operationName === 'GetTeamRunResumeConfig') {
     state.teamResumeReads += 1
     if (state.failTeamReads > 0) { state.failTeamReads -= 1; return { errors: [{ message: 'Canonical verification temporarily unavailable.' }] } }
-    if (state.teamResumeReads === 1) await delay(700)
+    await initialTeamRead
     return { data: { getTeamRunResumeConfig: {
       teamRunId: 'team-run-browser-1',
       isActive: false,
@@ -410,6 +416,9 @@ const runScenario = async (id, description, fn) => {
       try { await page.screenshot({ path: path.join(outputDir, `${id}-failure.png`), fullPage: true }) } catch {}
     }
   } finally {
+    // Failed observations must not leave a fixture response blocked for cleanup.
+    if (id === 'API-E2E-004-A') releaseInitialAgentRead()
+    if (id === 'API-E2E-004-B') releaseInitialTeamRead()
     // Persist each independent case before starting the next long-running journey.
     await fs.writeFile(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8')
   }
@@ -477,6 +486,7 @@ try {
     assert(await editor.getAttribute('aria-busy') === 'true', 'Agent Settings must remain busy while the network-fresh canonical read is delayed')
     const save = page.locator('[data-test="save-existing-model-config"]')
     assert(await save.isDisabled(), 'Save must be disabled during Agent canonical loading')
+    releaseInitialAgentRead()
     const effort = page.locator('#agent-run-reasoning_effort')
     await effort.waitFor({ state: 'visible', timeout: timeoutMs })
     await waitFor('Agent schema readiness', async () => await effort.isEnabled())
@@ -505,6 +515,7 @@ try {
     await waitFor('Team canonical loading state', async () => await editor.getAttribute('aria-busy') === 'true')
     const save = page.locator('[data-test="save-existing-model-config"]')
     assert(await save.isDisabled(), 'Save must be disabled during Team canonical loading')
+    releaseInitialTeamRead()
     const form = page.locator('[data-test="team-run-config-form"]')
     await form.waitFor({ state: 'visible', timeout: timeoutMs })
     assert(await form.getAttribute('data-mode') === 'existing', 'Team must render in existing-run mode')

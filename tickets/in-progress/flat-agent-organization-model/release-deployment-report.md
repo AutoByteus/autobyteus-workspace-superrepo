@@ -1,163 +1,187 @@
-# Delivery / Release / Deployment Report — DR-008
+# Delivery / Release / Deployment Report — DR-009
 
-## Scope and result
+## Scope and current result
 
-`AORG-FLAT-TEAM-001`, **Large / High / reviewed**.
-Validated chain: **RER-028 / AD-REV-019 / ARCH-REV-017 Pass / IR-001–038 / CRR-058 source Pass / API-REV-024 Pass / CRR-059 test-review Pass**.
+`AORG-FLAT-TEAM-001 / UI-CLEAN-001`; **Large / High / Reviewed**.
+Authority: **RER-032 / cumulative AD-REV-022 / parent AD-REV-021–ARCH-REV-019 Pass / IR-001–043 / CRR-066 source Pass / API-REV-027 Pass / CRR-067 Not Applicable**. Additional architecture review for AD022's copy-only
+change: **N/A**, retained parent architecture Pass remains applicable.
 
-**Blocked — Design Impact / approved RER-029 re-entry pending**, while RER028
-integration, source-bound docs sync, native packaging and launch smoke are
-complete. Explicit user verification is also missing. During this turn,
-PKG-AUTH001's authoring-version question was resolved by approved **RER-029**:
-remove the field from both authored definition families, preserve execution-tree
-versions. Architecture-owned impact/transition work and the applicable
-implementation/review/API validation must precede renewed Delivery. The running
-RER028 build does not implement RER029 and is only a bounded task/UI test candidate.
+**Awaiting Explicit User Verification**. Current integration/docs/package/native
+smoke passed; no source/packaging/design blocker remains. DR008's approved
+re-entry is implemented and validated; no prior user acceptance is inferred.
+This is not Delivery Completed or a public release.
 
 Handoff summary: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/handoff-summary.md` — Updated.
-Revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-revision-record.md` — DR-008.
+Revision record: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/in-progress/flat-agent-organization-model/delivery-revision-record.md` — DR009.
 
 ## Initial delivery integration refresh
 
-- Bootstrap context: `investigation-notes.md`, original
-  `personal@80e2bd195c42ea3ced778dbc051d4d00edaef16f`; target `origin/personal`.
-- Latest fetched base: `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`. Same as DR007's attempted base; already
-  integrated by IR035 before current validation. No new base advancement in DR008.
-- Safety checkpoint: **Completed**, `14a94fc45de8bcab271e996eb7d6e8440f0d3ac5`,
-  17 explicit tracked paths (five reviewed tests plus reports); secure dirty-state
-  snapshot separately retained. This is not repository finalization.
-- Integration method/result: **Already current / Completed**;
-  `git merge --no-edit origin/personal`, zero base-only commits.
-- New base commits integrated: **No**. Integration-triggered source rerun:
-  **Not needed**, unchanged validated implementation plus reviewed test hashes.
-- Post-integration executable result: **Passed**, full fresh guarded Electron
-  build and native launch/renderer/embedded-node smoke below.
+- Bootstrap source: `investigation-notes.md`, original personal80e2bd195c42ea3ced778dbc051d4d00edaef16f.
+- Latest tracked base: `origin/personal@5645b49d6f51faa60bd3545bc8e3f0e7e3f96793`.
+- Base advanced since the previous refresh: **No**. New base commits integrated: **No**.
+- Local checkpoint: **Completed**, `0cf14f6f5371804fbadd2f34ac37fde250cbfd55`;16 explicit
+  tracked markdown docs/reports; all raw dirty evidence protected outside Git.
+- Integration: **Already current / Completed**, `git merge --no-edit origin/personal`.
+- Merge-triggered rerun: **Not needed**; reviewed source/tests unchanged. Fresh
+  build/native checks nevertheless **Passed** on this integrated candidate.
 - Delivery edits began only after current integration: **Yes**.
-- Pre-offer remote fetch: successful, same base. Concurrent HEAD
-  `7ef7921304f504367c5d43929b62ffe773e474ad` adds only Architecture's inquiry,
-  no source/test/build-input delta; preserved separately.
+- Pre-offer fetch confirmed same base; zero base-only commits. No conflict.
+- A new target fetch is required after user acceptance before finalization.
 
-## User verification and docs
+## User verification / docs sync
 
-- Explicit user completion/acceptance received: **No**.
-- Native launch success is not user acceptance. RER028 may be tested in the open
-  isolated window; approved RER029 authoring simplification is not included.
-- Renewed verification: required if upstream changes the candidate materially.
-- Docs sync: **Updated / Pass**, `docs-sync-report.md`; frontend AgentOrg,
-  execution architecture, artifacts, and server AgentOrg module synchronized.
-- Release notes: `release-notes.md`, updated before verification; not used for
-  publication or archived yet.
+- Explicit current user testing/acceptance: **No**. Native smoke is not user approval.
+- Verification offer: current DR009 window described below; no acceptance reference yet.
+- Renewed verification after later re-integration: required if effective user-facing
+  state changes; not yet applicable.
+- Docs sync: **Updated / Pass**, six canonical docs per `docs-sync-report.md`.
+  Current source owners/examples/retired concepts and diff check pass in
+  `delivery-evidence/dr-009/docs-validation.json`.
+- Release notes: `release-notes.md` updated before verification, not yet archived/used.
 
-## Package / native smoke
+## Packaging and native evidence
 
-- Command: `PATH=/tmp/aorg-dr008-bin:$PATH pnpm -C autobyteus-web build:electron:linux:arm64`; **exit 0**.
-- Web/localization guards and zero-finding literal audit; core/SDK/server build
-  and sanitized bootstrap; mobile generation; deployed runtime/Prisma/native
-  rebuild; Electron renderer/transpilation; ARM64 AppImage: **Pass**.
-- Build warnings include existing peer/bin/deprecation/Browserslist/module-type
-  and default Linux-category notices; none suppressed or promoted to a clean
-  full-typecheck claim. Complete output is retained.
-- Package: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/electron-dist/AutoByteus_enterprise_linux-arm64-1.4.69.AppImage`.
-- Version **1.4.69** (inherited), size **524,065,092**, SHA-256
-  `dd794306220d50ad95d78f8e70f633c1ad2df253d02d51a3721d54ecf1498e3c`. Source `22809caca4a313e8079581a2a1b5b2e4eb2555f7`;
-  reviewed artifact `6e2745680cd3529ab6787de07df252e92854247c` plus exact five reviewed tests.
-- Actual AppImage launched via README's documented isolated profile, not an old
-  unpacked candidate. Extracted asar/server module hashes match current package.
-- Native window `65011716` / main PID `55845`, `DISPLAY=:99`, 1200×800.
-  Backend PID `55895`, HTTP200 healthy on port31008; renderer registry matches.
-- Independent data root `/tmp/autobyteus-dr008-user-test-20260911`; copied
-  19-file fixture imported here only. Original fixture and existing app on29695
-  remain untouched; normal app remains healthy. Global environment-seeded external
-  package sources may still be listed read-only; isolation is not a new credential
-  or external-publication policy.
-- Updates disabled by e2e profile; initial Update failed notice dismissed using
-  Later, not Check/Install. No full updater/provider journey is claimed.
-- `delivery-evidence/dr-008/package-provenance.json`, `native-smoke.json`,
-  `running-package-integrity.json`, and `native-agent-orgs.png` are authoritative.
+- Command `PATH=/tmp/aorg-dr009-bin:$PATH pnpm -C autobyteus-web build:electron:linux:arm64`: **exit0**.
+- Guards/audit0, core/SDK/server build, sanitized bootstrap, mobile renderer,
+  deployment packaging/Prisma/native rebuild, Electron renderer/transpilation and
+  ARM64 AppImage completed. Existing build warnings retained, not suppressed;
+  no unrelated full-typecheck or global audit green claim.
+- Artifact `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/autobyteus-web/electron-dist/AutoByteus_enterprise_linux-arm64-1.4.69.AppImage`; version **1.4.69** inherited.
+- Size **524,089,483**, SHA256 `086dba3c98c8ba2b3ad8acec8955e1e6f6d2a28da8140df3a72cc519adffd262`.
+- Source/test `4ffcdf733ff597a0d2ae94587eb91ec47f749501`, reviewed artifact `6da826f8c246c197a70cceb69e19e33fdbdfdf69`;
+  no source/test delta introduced by Delivery.
+- Actual AppImage window77594628, main13684, server13734;
+  `DISPLAY=:99`,1200×800, `http://127.0.0.1:31009/rest/health` HTTP200/ok.
+  Renderer registry matches31009; running asar/codecs/migration bytes match package.
+- Isolated root `/tmp/autobyteus-dr009-user-test-20260911`. Current field-free API025 fixture copied19/19
+  and imported only here; catalog shows two sample Orgs. Initial historical-fixture
+  prelaunch guard correction retained in fixture-copy.json; no product defect.
+- Existing normal29695 and DR00831008 sessions remain healthy/untouched. No shared
+  history or production registry copied/overwritten. Environment-seeded external
+  sources may still be listed; no new credential or publication policy is invented.
+- Updates disabled by documented e2e profile; initial update-failed toast dismissed
+  with Later. No update action. Native scope is launch/catalog/endpoint smoke,
+  not full shell features, current task cycles or provider-user execution.
+- Package/native evidence: `delivery-evidence/dr-009/` build log, provenance,
+  native-launch/smoke, running-package-integrity and screenshot artifacts.
+
+## Cumulative validation evidence
+
+API27 fresh full Pass95.6%, categories96/97/93/96/96/95/96; broader completed.
+Repository1981tests/331files (server156/874,web160/1039,core6/29,Electron9/39),
+plus current live normal Team retained inspection/cold Org navigation and all held
+cumulative groups. CRR066 source Pass remains authoritative. CRR067 N/A means
+no current durable-test update; it does not waive historical CRR059 review.
+
+36local durable updates/9cycles;35successful native outer pairs. One provider
+script failed after successful local revision acceptance; no outer-success claim,
+replay or invented stall cause. Ten original nonzero receipts remain disposed.
+Controlled adverse/model fixtures, passive overhead, historical/DR007 limits and
+Brief pack-only scope remain. Three supervised SIGTERM exits0 and two pure
+byte/mtime-preserving startups precede browser reconnect in API27. See current
+execution report and `upstream-evidence-limits.md`; no distributed rollout claim.
 
 ## Repository finalization / ticket state
 
 | Gate | Status |
 | --- | --- |
-| Ticket move to `tickets/done/flat-agent-organization-model` | Not performed |
-| Final ticket commit / push | Not performed; only allowed safety checkpoint |
-| Finalization target | `origin/personal` |
-| Target refresh after acceptance / material-change check | Pending current RER029 validated package and acceptance |
-| Protect Delivery edits / re-integrate before final merge if needed | Required when target advances; not yet applicable |
-| Update local target / merge ticket / push target | Not performed |
-| Repository finalization | Blocked — approved RER029 design/implementation/validation and renewed user verification |
-| Target/tag rollback needed | No target/tag change made |
+| Ticket archive to tickets/done/flat-agent-organization-model | Held — user verification |
+| Final ticket commit/push | Not performed; safety checkpoint only |
+| Target remote / branch | origin / personal |
+| Target update / merge ticket / push target | Held — user verification |
+| Protected re-integration / renewed checks if target advances | Required when applicable; not yet needed |
+| Repository finalization | Not complete |
+| Finalization target/tag changed | No |
+
+After explicit acceptance: refresh target again; protect current docs/evidence;
+re-integrate/recheck if needed; renew verification for material changes; archive
+ticket before final commit. Then commit/push ticket, update local target, merge
+ticket, push target in documented order. Do not publish raw runtime/secret evidence.
 
 ## Release / publication / deployment
 
-No release, version bump, tag, workflow dispatch, external-definition publication,
-or deployment has been performed. Whether publication is required must be
-settled after the newly validated RER029 package; it is **not yet Not required**.
-If selected, use the documented post-finalization `pnpm release <x.y.z>` with
-archived release notes and monitor the single tag-triggered workflow; do not
-manually tag or launch duplicate manual dispatch. Local1.4.69 is a test artifact,
-not replacement of the existing published1.4.69. No multi-node rollout claim.
+- Applicability: **Conditional — no current publication/deployment selection**;
+  not assumed Not required and not performed before user verification.
+- Current version inherited1.4.69; no release commit, tag or published overwrite.
+- If selected after finalization: documented `pnpm release <x.y.z>` with archived
+  release-notes.md; monitor the single tag-triggered workflow. Do not manually tag
+  or redundantly dispatch a fresh release.
+- Publication, release notes use, deployment and rollout: **not performed**.
+- No external definition repository was modified/published by Delivery.
 
-## Environment / persisted data
+## Persisted-data transition / rollback
 
-Supported legacy one-level family migration and first-message metadata migration
-remain part of the cumulative package; native flat Team V2 remains supported.
-IR038's retained inspection adds no persisted family/migration. API24's normal
-process/file evidence is authoritative for supported transition cases. The new
-isolated desktop root was initialized normally; Delivery did not migrate, corrupt,
-restore over, or overwrite shared production data. Approved but not yet implemented authored-definition
-version removal is not a runtime-tree version removal or an authorized codec change.
+Cumulative family/summary migrations remain. IR039 adds required startup-only
+`20260911_collaboration_definition_authoring_shape`: known numeric server-owned
+Team/Org configs lose only authored version, valid current definitions skip
+without writes, independent failure status and strict reread. Runtime tree
+versions/paths, tasks/messages and provider identity are not converted by that
+pass. External/application package sources remain owner-published/read-only.
 
-Before eventual rollout, back up current data, inspect required migration results,
-keep external repositories read-only, and verify exact history/Restore/provider
-identity on the deployed candidate. Stop rollout on failed required migration,
-identity mismatch, missing durable records or regressions. Roll back with a matching
-executable and verified pre-migration backup, never an old reader on migrated data.
+Native DR009 initializes a fresh isolated root; it is NOT evidence of migrating
+shared production data. API27 is authoritative for tested legacy/current/degraded
+transition cases. Before any real rollout, back up data, inspect required
+migration outcomes and verify exact history/Restore/provider continuity. Stop on
+required migration failure, identity mismatch or missing durable state; use a
+matching executable and verified pre-migration backup for rollback, not an old
+reader over migrated files. No target/release rollback is currently necessary.
 
 ## Preservation / cleanup
 
-- Secure pre-integration archive/manifest outside Git; **6,202 other-owner files
-  unchanged at the pre-RER029 checkpoint** (`preservation.json`). Later
-  Requirements-owned RER029 edits remain untouched by Delivery. Five API-owned tests retained byte-exact.
-- Build-created SDK outputs (two initially absent dirs) moved to secure snapshot;
-  no original raw evidence/fixture removed. Current package remains available.
-- Raw historical runtime DB/env/key evidence is not publication content. Keep it
-  local/unstaged and explicitly audit/exclude before final ticket commit.
-- Native app is deliberately left running for the user. Its owned process group
-  is55777; launcher55766 provides owned-tree cleanup on termination, retaining
-  caller-supplied root. Never signal the other-ticket processes92507/92595.
-- Ticket worktree `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model`, local ticket branch
-  `requirements/flat-agent-organization-model`: cleanup/prune **deferred** until
-  finalized/released as applicable; remote branch cleanup not performed.
-
-## Cumulative validation limits
-
-API24 Pass95.9%; 1,698 tests /287 distinct files; fresh full live execution.
-Preserve recursive native-wait clarification, passive logpoint overhead,
-non-quiescent second startup assertion versus separately valid third startup,
-controlled rejection/model probes versus real-provider failures, unknown historical
-stall origins, and no actual Brief Studio provider-user/distributed journey.
-See `delivery-evidence/dr-008/upstream-evidence-limits.md` and API24 reconciliation.
-Native smoke adds only the bounded evidence actually recorded in DR008.
-
-## Escalation / reroute
-
-- Classification: **Design Impact / approved RER-029 non-deployment re-entry**.
-- Recommended and returned recipient: `/software_engineering_team/architecture_designer`.
-- Evidence: current `requirements-doc.md` / `agent-org-contract.md` now RER029,
-  `architecture-package-authoring-investigation.md`, and inquiry-only commit7ef792130.
-- Requested next action: consume RER029 via the upstream Requirements handoff,
-  design its authored-definition transition/admission impact, and follow applicable
-  implementation/review/API validation before returning for a fresh Delivery build.
-  Preserve this RER028 package and docs as source-bound evidence; do not infer
-  RER029 verification or a task-parity source failure. The current test window may
-  remain available for unchanged task/UI behavior only.
+- Starting manifest13,857files;13,848non-Delivery-doc baseline files unchanged.
+  Source/test delta from reviewed HEAD is empty. Scoped integrity evidence retained.
+- Preexisting devkit128files preserved; only two initially absent generated SDK
+  dirs moved to secure snapshot. Original/current fixtures and other-owner evidence untouched.
+- Previous DR008 AppImage archived in secure preintegration snapshot; current
+  old native extraction remains running. Do not treat its overwritten original
+  artifact pathname as current DR008 provenance; use its recorded hash/archive.
+- Raw historical DB/env/key records remain local/unstaged. Final publication needs
+  explicit safe path selection/redaction/exclusion, never blanket staging.
+- Native DR009 deliberately remains running for user testing. Owned process group
+  13650, launcher13639; documented owned-tree cleanup
+  retains caller-supplied test root. No port-based signaling of other sessions.
+- Dedicated worktree `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model` and local branch `requirements/flat-agent-organization-model`:
+  cleanup/prune deferred until finalization/release-as-applicable is safe. Remote
+  branch cleanup not performed.
 
 ## Final status
 
-Explicit user verification: **No**. Repository finalization: **No**.
-Applicable release/deployment/rollout completed or truthfully not required: **No**.
-Safe final cleanup completed or not required: **No**.
-Remaining blockers: approved RER029 awaiting design/implementation/validation, followed by
-renewed explicit user verification. Successful terminal Requirements package: **Not eligible /
-not sent**. The current docs/build/native Pass is not Delivery Completed.
+User verification: **No**. Repository finalization: **No**. Applicable
+release/deployment/rollout and safe cleanup complete or truthfully Not required:
+**No**. Current hold: explicit user verification, then finalization/conditional
+release gates. No implementation/design reroute required. Successful terminal
+Requirements package eligible/sent: **No**. Current build and docs Pass do not
+satisfy those remaining gates.
+
+
+### DR-009 operational continuation — user-requested restart (2026-09-11 23:00 UTC)
+
+The user requested “close the app, and restart it thanks”. The same verified
+AppImage and existing isolated data root were restarted without rebuilding,
+reimporting fixtures or resetting data. Current main PID64930/server64980,
+launcher64870/process group64881/window77594628, health31009 HTTP200.
+Other sessions31008/29695 remain healthy and were not signaled. This operational
+continuation supersedes only the earlier running-process/window identifiers,
+not DR009 package provenance or validation. Main SIGTERM was followed by
+launcher-targeted forced cleanup of residual owned processes; do not describe
+this as an entirely graceful process-tree exit. Port absence was confirmed
+before relaunch. Evidence: `delivery-evidence/dr-009/restart-20260911T2259/`
+(`shutdown.json`, `native-launch.json`, `ready-health.json`, `restart-result.json`).
+Current launcher: `/tmp/start-autobyteus-dr009-restart.sh`; do not launch a duplicate
+while group64881 is alive. User verification remains pending; no finalization,
+release, upstream handoff, source edit or repository state change was performed.
+
+
+### DR-009 operational continuation — reopen after user shutdown (2026-09-11 23:09 UTC)
+
+User requested restart after shutting down the app. Prior process group64881
+was absent with non-forced completion recorded; port31009 was free. Reopened
+the same SHA256-verified AppImage and caller-supplied data root; no rebuild,
+fixture import, data reset or other-session signal. Current main70041/server70091,
+launcher69994/group70005/window77594628; visible/activated and health31009 HTTP200.
+Launcher `/tmp/start-autobyteus-dr009-restart2.sh`. Current runtime evidence:
+`delivery-evidence/dr-009/restart-20260911T2308/native-launch.json` and
+`restart-result.json`. Initial post-launch PID probe assertion was corrected
+using ps/xdotool; no second app launch or product failure inferred. Earlier
+process IDs remain historical. User verification still pending; no finalization
+or release/terminal handoff.
