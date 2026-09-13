@@ -281,3 +281,19 @@ the Tasks right pane until the task navigator selects the task summary or
 another reference. The generic task reference shell uses authorized fetch/object
 URLs and the shared read-only `FileViewer` modes for text/Markdown, protected
 media, PDF, CSV, and Excel content.
+
+
+## Uploaded Context Files Versus Collaboration References
+
+Uploaded user context files retain their recorded URI/type/name through raw
+trace, initial/cold/earlier-page projection and shared UserMessage hydration.
+They are not a new task artifact family. Org uploads are owned by root plus
+exact AgentRun; message/task reference URLs remain separately root-owned. Open
+uses saved ownership, not the current viewer or configured source at the same
+address. Separate text/JSON links remain accepted existing presentation.
+
+One accepted standalone native first-Send chip can retain a draft URL404 until
+reload/reselect yields final200 and exact stored bytes (API-FIND-040). This is
+not fixed or a durable-loss finding. See the task branch's archived
+`known-issues.md`; do not infer that passing retained-file checks prove this live
+chip path correct.

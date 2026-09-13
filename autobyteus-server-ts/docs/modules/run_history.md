@@ -728,6 +728,25 @@ snapshot behavior is unchanged; Codex and Claude have no current snapshot
 write/reconstruction path, and their old metadata-classified duplicates are a
 startup-cleanup concern rather than a retention window.
 
+## Retained Non-Media Context-File Associations
+
+The existing user raw trace stores optional immutable `file_attachments`
+(URI, type and recorded name), distinct from media fields. Accepted original
+external/native input is recorded before provider working-context transformations.
+Initial, cold and typed earlier-active-page projections retain these associations
+and exact owner identity, including file-only messages and complete archived
+segments. UI hydration uses recognized-upload friendly naming without changing
+raw facts or custom filenames. Reads do not fabricate associations missing from
+historical traces or replay a migration to backfill them.
+
+Org attachments resolve stored root plus exact AgentRun ownership and physical
+file membership, not the currently selected logical address. Root package
+readiness validates current references statelessly before admission. Only the
+existing initial family migration may transform proven prior locators; normal
+history, projection and Open do not perform repairs, runtime activation or legacy
+route fallback. See [AgentOrg](agent_orgs.md#exact-context-files-and-saved-references)
+for cutover inventory and saved-locator preservation constraints.
+
 ## Collaboration Root Restore / Projection Contract
 
 For standalone Team runs:

@@ -13,6 +13,8 @@
 | DR-007 | `CRR-051 / Not Applicable` after IR-034 / API-REV-019 renewed validation | `DR-006 / Awaiting Explicit User Verification` (superseded) | `Blocked — Local Fix` at mandatory latest-base merge | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `release-notes.md`, `delivery-evidence/dr-007/*` |
 | DR-008 | CRR-059 Pass after fresh API-REV-024; concurrent PKG-AUTH-001 inquiry | DR-007 Blocked — Local Fix (resolved upstream) | Blocked — Design Impact; approved RER029 re-entry pending, RER028 native candidate available | docs-sync-report.md, handoff-summary.md, release-deployment-report.md, release-notes.md, delivery-evidence/dr-008/* |
 | DR-009 | CRR067 Not Applicable after fresh full API27/RER032 | DR008 Blocked — Design Impact (resolved by current reviewed implementation) | Awaiting Explicit User Verification | docs-sync-report.md, handoff-summary.md, release-deployment-report.md, release-notes.md, delivery-evidence/dr-009/* |
+| DR-010 | CRR091 accepted success / CRR092 test Pass; direct user task-branch finalization | DR009 user-verification hold (superseded by acceptance) | Prepared — task-branch commit/push pending | docs-sync-report.md, handoff-summary.md, release-deployment-report.md, release-notes.md, known-issues.md, delivery-evidence/dr-010/* |
+
 
 ## Revision Entries
 
@@ -275,3 +277,33 @@ Launcher `/tmp/start-autobyteus-dr009-restart2.sh`. Current runtime evidence:
 using ps/xdotool; no second app launch or product failure inferred. Earlier
 process IDs remain historical. User verification still pending; no finalization
 or release/terminal handoff.
+
+
+### DR-010 — accepted package, task-branch-only finalization
+
+- Trigger: RER-033 / AD-REV-028 with valid AD027 / ARCH-REV-025 Pass / AAV-003 / IR-001–059 / CRR-090 source Pass (95.1/100) / API-REV-038 original Fail (85.6%) / CRR-091 user-accepted success / CRR-092 proportional test-code Pass; Large / High / Confirmed / Reviewed retained.
+- Prior authoritative Delivery result: DR009 Awaiting Explicit User Verification.
+  Current direct user acceptance resolves that hold for this package with three
+  known exceptions. No earlier build/launch is retroactively accepted as current.
+- Current result: **Prepared — task-branch commit/push pending**.
+- Source `6e2d7997444383d5585225d9febbc1ee54247714`; incoming artifact `3155da09c33c0bb5aeea19d0b2243a8163cc9595`.
+- Latest original base `5645b49d6f51faa60bd3545bc8e3f0e7e3f96793` already current; 21-path checkpoint
+  `a366f4faa1ca68bed934519c9fbb4164d672677a` and no-op base merge before docs. No merge-triggered code rerun.
+- User explicitly changes finalization target to `requirements/flat-agent-organization-model` itself; no personal
+  merge/push, release or rollout. Branch/worktree retained for future fixes.
+- Ticket archived to `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/done/flat-agent-organization-model` after user approval.
+- Docs sync Pass — Updated (seven cumulative long-lived docs). Docs/source/test
+  identity/reference/preservation checks are separate from API execution.
+- API38 Fail85.6 / 38 Pass, 3 observed Fail, 1 N/A / 320 receipts, 37 nonzero
+  remains unchanged. CRR091 accepts three issues; CRR092 passes all three carried
+  durable tests, not N/A. No fix, root-cause assignment, API39 or clean API Pass.
+- Known issues and verbatim scope: `known-issues.md`, CRR091 user-acceptance and
+  `delivery-evidence/dr-010/user-finalization-authority.json`.
+- Reports: `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/done/flat-agent-organization-model/docs-sync-report.md`, `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/done/flat-agent-organization-model/handoff-summary.md`,
+  `/home/autobyteus/workspace/.codex/worktrees/flat-agent-organization-model/tickets/done/flat-agent-organization-model/release-deployment-report.md`. Complete 6,504-reference index resolves
+  old artifact prefixes to archived paths; upstream bytes remain unchanged.
+- Release/deployment/native rebuild/migration: Not required for selected scope,
+  not performed. IR049 installation decision before cutover remains separate.
+- Cleanup: task branch/worktree deliberately retained; original raw evidence and
+  backup `/home/autobyteus/workspace/.codex/delivery-archives/AORG-FLAT-TEAM-001-DR010-20260913T033904Z` retained, no blanket staging or other-owner cleanup.
+- Terminal Requirements return: pending verified branch commit/push and fresh rules.

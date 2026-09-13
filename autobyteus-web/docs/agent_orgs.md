@@ -32,6 +32,17 @@ configs. Runtime execution-tree versions are unchanged.
 
 AgentOrg has no coordinator field, initial recipient, or implicit first member.
 
+### Exact Owned References
+
+Authored Org-local references use `org_local`; GraphQL/internal ownership tags
+keep their separate existing vocabulary. Cold Org detail/Edit resolves exact
+owned Team and Agent references independently of shared-catalog eligibility.
+Saving waits for complete, identity-correlated references and preserves ordered
+handoffs, member values, optional-field omission and expected revision. Exact
+owned reads stay fresh without inserting owned Agents into the shared catalog.
+Org → Team → Agent detail and Back retain the explicit Org-return context;
+ordinary standalone routes remain unscoped.
+
 ## Run Configuration
 
 Running an Org opens one configuration panel for the complete mounted scope.
@@ -114,7 +125,8 @@ collaboration frames. Each command carries the exact root and member execution
 identity.
 
 Supported commands are message, interrupt, tool approval, and tool denial.
-Context attachments and task reference files use AgentOrg-rooted content URLs.
+Context attachments use exact Org-root plus AgentRun-owned URLs. Message/task
+references keep their separate AgentOrg-rooted reference routes.
 Unknown roots, stale AgentRun IDs, wrong member addresses, and cross-root
 targets are rejected rather than guessed.
 
@@ -252,10 +264,13 @@ the last good slice instead of blanking the entire navigation tree.
   snapshot and projections use the actual execution/provider binding, never a
   same-address configured Agent's transcript or the Org-root memory path.
 - Settled task executions remain inspectable after their live row retires.
-  Inactive/settled inspection retains Messages, Tasks, references, configuration,
-  and monitor history as read-only; it exposes no composer, tool-decision, or
-  interrupt authority. Inactive contexts initialize offline. Inspection and
-  explicit Restore remain distinct operations.
+  Retained task inspection is read-only, without composer, tool decisions or
+  interrupt authority. Inactive configured Agents may expose a continuable
+  composer: inspection itself remains observational, while deliberate Send
+  restores the exact root and waits for strict stream readiness before dispatch.
+  Inactive contexts initialize offline. Editing a new draft or discarding it
+  does not activate runtime; failed continuation does not overwrite a newer
+  draft. Restore acceptance alone is not interaction readiness.
 - Restore rebuilds the same logical placements and preserves supported provider
   conversation identity.
 - A stopped Team can restore independently through its own Team root journey.
@@ -264,6 +279,38 @@ the last good slice instead of blanking the entire navigation tree.
 - Terminal Agent rows become offline and no reconnect control is synthesized.
 - Migration/recovery errors are surfaced explicitly; clearing recovery state
   requires a verified successful restore.
+
+### Stop, Read Freshness And Retained Focus
+
+Successful root termination immediately publishes inactive activity through the
+existing history/navigation owner, retaining the same selected conversation
+rather than redirecting to a launch screen. Failed Stop does not optimistically
+mark the root stopped. Final history and inspection acquisition disables Apollo
+in-flight query deduplication only on the relevant Org history, root inspection
+and member projection requests; a newer logical generation must not consume an
+older physical response. Generation, exact identity and activity-revision
+checks still govern atomic publication. No global Apollo setting, timer, polling
+or permanent stopped overlay is introduced. Root lifecycle, Agent statuses and
+mounted-Team aggregates remain separate authorities.
+
+### Attachments And Accepted Limitations
+
+The shared chooser captures exact Org/AgentRun ownership before asynchronous
+work. Preparation, draft finalization, Open, removal and captured Send use that
+owner, not whichever Agent is later focused. Original recorded non-media
+attachment facts survive initial, cold and earlier-page hydration; files from
+another sender remain owned by their original execution. Friendly upload labels
+do not alter saved names/URIs or genuine custom names.
+
+The finalized task branch explicitly retains three user-accepted issues, not
+fixes: a standalone native desktop first-Send text chip can use a stale draft
+URL (404) until ordinary reload/reselect obtains the saved final URL (200,
+original bytes); eager pre-message Team Idle/green differs from original
+Offline/unstarted; one mounted publication navigated to a prior Team and a
+separate follow-up did not reproduce. The observed 404 is not evidence of an
+Org/task/narrow failure or durable file loss. Separate text/JSON link opening is
+accepted existing behavior, not itself a new defect. See the archived ticket's
+`known-issues.md` for exact evidence and follow-up ownership.
 
 ## Store And Component Ownership
 

@@ -43,8 +43,10 @@ The adjacent `org.md` owns authored name, description, category, and
 instructions.
 
 - `refType` is exactly `agent` or `agent_team`.
-- `refScope` is `shared`, `agent_org_owned`, or
-  `application_owned` when valid for the source owner.
+- Authored `refScope` is `shared`, `org_local`, or `application_owned` when
+  valid for the source owner. Internal source tags remain `agent_org_owned`,
+  and GraphQL retains `AGENT_ORG_OWNED`; these are not authored values. Unknown
+  values are rejected rather than falling through to another source family.
 - An Org has no `coordinatorMemberName`, initial recipient, focus, or fallback
   field.
 - Referenced Teams must be admitted current field-free flat Team definitions.
@@ -263,15 +265,19 @@ after the earlier family migration in registry order but has its own result,
 without a runtime-memory prerequisite. It inventories writable server-data Team
 and Org definitions, including physical Org-owned Team directories. Package
 recovery and exact ownership/path checks precede conversion. Already current
-field-free configs are zero-write skips. Known prior numeric Team/Org configs
-lose only `schemaVersion`; all remaining JSON values must compare equal, the
+field-free current configs are zero-write skips. Known prior Team/Org configs
+lose their supported numeric `schemaVersion`; Org member scope
+`agent_org_owned` becomes authored `org_local`. Only these approved keys change;
+all other JSON values must compare equal, the
 atomic write must commit, and strict reread must match the target. Invalid
 inventory/items are reported as failures for correction and restart, while
 independent valid items retain their actual outcomes.
 
-Legacy family conversion may produce its fixed historical numeric definition
-intermediates; the later pass establishes the field-free normal target. A prior
-completed family migration is not replayed to change authoring. Normal
+The existing initial family conversion now writes the final field-free Team
+and `org_local` Org shape directly, without intermediate branch-era formats.
+Both existing migrations reuse the strict migration-only authoring transition.
+No new migration ID or registry order is introduced; a completed migration is
+not reset or replayed to retrofit an installation. Normal
 create/edit/save/export-copy/import/reload uses only current codecs, never
 migration codecs. Definition diagnostics expose `expectedFamily`, not numeric
 `expectedSchemaVersion`. Repository-owned fixtures/configs are updated in source;
@@ -283,6 +289,41 @@ history are unchanged. Retired definition codec names with `-v2`/`-v1` are
 replaced by `agent-team-definition-config.ts` and
 `agent-org-definition-config.ts`; numeric prior-format readers live only under
 `app-data-migrations/legacy`.
+
+## Exact Context Files And Saved References
+
+Org draft and final attachment owners include both `orgRunId` and the exact
+`agentRunId`. The strict stored execution tree proves membership and resolves
+the physical directory; logical address alone cannot distinguish repeated task
+executions. Draft/final owner equality is checked before file movement. The
+current context-file routes include:
+
+```text
+/drafts/agent-org-runs/:orgRunId/agent-runs/:agentRunId/context-files/:storedFilename
+/agent-org-runs/:orgRunId/agent-runs/:agentRunId/context-files/:storedFilename
+```
+
+These are context-file paths, distinct from message/task-owned reference routes.
+Ordinary readers do not accept retired address-only Org locators, activate a
+runtime, guess a configured source at the same address, or migrate on access.
+Missing/invalid ownership and internal failures retain distinct error outcomes.
+Native Team attachment ownership and physical layout remain native Team paths.
+
+The existing initial family migration owns the bounded saved-reference
+transition. Its typed JSON/JSONL visitor covers recognized attachment fields in
+current traces and complete archived segments, preserving unrelated values,
+lines and file bytes. Strict source/target package and unique physical-file
+proof precede writes. Committed atomic writes, strict reread, root move and
+cleanup must succeed; current packages are zero-write. Readiness checks saved
+context references before admitting the affected package, without a second
+cache, legacy parser, repair path or backfill of absent associations.
+
+**Before actual installation cutover:** Architecture must adjudicate the real
+installation inventory and any already-completed/intermediate migration state
+(IR049). Local branch/test exposure is not proof of public deployment or global
+absence of saved locators. Preserve originals and existing completion status;
+do not reset/replay a migration or invent another migration to bypass this gate.
+This operational decision does not block source-branch finalization.
 
 ## API Surface
 
